@@ -46,248 +46,247 @@ object Common {
     private fun Byte.tostr() = this.toInt().and(255).toString(16).padStart(2,'0')
     private val digester = DigestUtils.getSha256Digest()
 
-    val jsoner = Json(JsonWriter.OutputType.json)
+    val jsoner: Json
+        get() = Json(JsonWriter.OutputType.json).also {
+            // install custom (de)serialiser
+            it.ignoreUnknownFields = true
+            it.setUsePrototypes(false)
+            it.setIgnoreDeprecated(false)
 
-    // install custom (de)serialiser
-    init {
-        jsoner.ignoreUnknownFields = true
-        jsoner.setUsePrototypes(false)
-        jsoner.setIgnoreDeprecated(false)
-
-        // BigInteger
-        jsoner.setSerializer(BigInteger::class.java, object : Json.Serializer<BigInteger> {
-            override fun write(json: Json, obj: BigInteger?, knownType: Class<*>?) {
-                json.writeValue(obj?.toString())
-            }
-
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): BigInteger? {
-                return if (jsonData.isNull) null else BigInteger(jsonData.asString())
-            }
-        })
-        // ZipCodedStr
-        jsoner.setSerializer(ZipCodedStr::class.java, object : Json.Serializer<ZipCodedStr> {
-            override fun write(json: Json, obj: ZipCodedStr, knownType: Class<*>?) {
-                json.writeValue(zipStrAndEnascii(obj.doc))
-            }
-
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): ZipCodedStr {
-                return ZipCodedStr(unasciiAndUnzipStr(jsonData.asString()))
-            }
-        })
-        // BlockLayer
-        jsoner.setSerializer(BlockLayerI16::class.java, object : Json.Serializer<BlockLayerI16> {
-            override fun write(json: Json, obj: BlockLayerI16, knownType: Class<*>?) {
-                digester.reset()
-                obj.bytesIterator().forEachRemaining { digester.update(it) }
-                val hash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
-
-                val layer = LayerInfo(hash, blockLayerToStr(obj), obj.width, obj.height)
-
-                json.writeValue(layer)
-            }
-
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>): BlockLayerI16 {
-                // full manual
-                try {
-                    return strToBlockLayer(LayerInfo(
-                            jsonData.getString("h"),
-                            jsonData.getString("b"),
-                            jsonData.getInt("x"),
-                            jsonData.getInt("y")
-                    ))
+            // BigInteger
+            it.setSerializer(BigInteger::class.java, object : Json.Serializer<BigInteger> {
+                override fun write(json: Json, obj: BigInteger?, knownType: Class<*>?) {
+                    json.writeValue(obj?.toString())
                 }
-                catch (e: BlockLayerHashMismatchError) {
-                    EchoError(e.message ?: "")
-                    return e.offendingObject
-                }
-            }
-        })
-        // WorldTime
-        jsoner.setSerializer(WorldTime::class.java, object : Json.Serializer<WorldTime> {
-            override fun write(json: Json, obj: WorldTime, knownType: Class<*>?) {
-                json.writeValue(obj.TIME_T)
-            }
 
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WorldTime {
-                return WorldTime(jsonData.asLong())
-            }
-        })
-        // HashArray
-        jsoner.setSerializer(HashArray::class.java, object : Json.Serializer<HashArray<*>> {
-            override fun write(json: Json, obj: HashArray<*>, knownType: Class<*>?) {
-                json.writeObjectStart()
-                obj.forEach { (k, v) ->
-                    json.writeValue(k.toString(), v)
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): BigInteger? {
+                    return if (jsonData.isNull) null else BigInteger(jsonData.asString())
                 }
-                json.writeObjectEnd()
-            }
-
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashArray<*> {
-                val hashMap = HashArray<Any>()
-                JsonFetcher.forEachSiblings(jsonData) { key, obj ->
-                    hashMap[key.toLong()] = json.readValue(null, obj)
+            })
+            // ZipCodedStr
+            it.setSerializer(ZipCodedStr::class.java, object : Json.Serializer<ZipCodedStr> {
+                override fun write(json: Json, obj: ZipCodedStr, knownType: Class<*>?) {
+                    json.writeValue(zipStrAndEnascii(obj.doc))
                 }
-                return hashMap
-            }
-        })
-        // HashedWirings
-        jsoner.setSerializer(HashedWirings::class.java, object : Json.Serializer<HashedWirings> {
-            override fun write(json: Json, obj: HashedWirings, knownType: Class<*>?) {
-                json.writeObjectStart()
-                obj.forEach { (k, v) ->
-                    json.writeValue(k.toString(), v)
+
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): ZipCodedStr {
+                    return ZipCodedStr(unasciiAndUnzipStr(jsonData.asString()))
                 }
-                json.writeObjectEnd()
-            }
+            })
+            // BlockLayer
+            it.setSerializer(BlockLayerI16::class.java, object : Json.Serializer<BlockLayerI16> {
+                override fun write(json: Json, obj: BlockLayerI16, knownType: Class<*>?) {
+                    digester.reset()
+                    obj.bytesIterator().forEachRemaining { digester.update(it) }
+                    val hash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
 
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashedWirings {
-                val hashMap = HashedWirings()
-                JsonFetcher.forEachSiblings(jsonData) { key, obj ->
-                    hashMap[key.toLong()] = json.readValue(GameWorld.WiringNode::class.java, obj)
+                    val layer = LayerInfo(hash, blockLayerToStr(obj), obj.width, obj.height)
+
+                    json.writeValue(layer)
                 }
-                return hashMap
-            }
-        })
-        // HashedWiringGraph
-        jsoner.setSerializer(HashedWiringGraph::class.java, object : Json.Serializer<HashedWiringGraph> {
-            override fun write(json: Json, obj: HashedWiringGraph, knownType: Class<*>?) {
-                json.writeObjectStart()
-                obj.forEach { (k, v) ->
-                    json.writeValue(k.toString(), v, WiringGraphMap::class.java)
-                }
-                json.writeObjectEnd()
-            }
 
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashedWiringGraph {
-                val hashMap = HashedWiringGraph()
-                JsonFetcher.forEachSiblings(jsonData) { key, obj ->
-                    hashMap[key.toLong()] = json.readValue(WiringGraphMap::class.java, obj)
-                }
-                return hashMap
-            }
-        })
-        // WiringGraphMap; this serialiser is here just to reduce the JSON filesize
-        jsoner.setSerializer(WiringGraphMap::class.java, object : Json.Serializer<WiringGraphMap> {
-            override fun write(json: Json, obj: WiringGraphMap, knownType: Class<*>?) {
-                json.writeObjectStart()
-                obj.forEach { (k, v) ->
-                    json.writeValue(k, v, GameWorld.WiringSimCell::class.java)
-                }
-                json.writeObjectEnd()
-            }
-
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WiringGraphMap {
-                val hashMap = WiringGraphMap()
-                JsonFetcher.forEachSiblings(jsonData) { key, obj ->
-                    hashMap[key] = json.readValue(GameWorld.WiringSimCell::class.java, obj)
-                }
-                return hashMap
-            }
-        })
-        // UUID
-        jsoner.setSerializer(UUID::class.java, object : Json.Serializer<UUID> {
-            override fun write(json: Json, obj: UUID, knownType: Class<*>?) {
-                json.writeValue(obj.toString())
-            }
-
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): UUID? {
-                return if (jsonData.isNull) null else UUID.fromString(jsonData.asString())
-            }
-        })
-        // HQRNG
-        jsoner.setSerializer(HQRNG::class.java, object : Json.Serializer<HQRNG> {
-            override fun write(json: Json, obj: HQRNG, knownType: Class<*>?) {
-                json.writeValue("${obj.state0.toString()},${obj.state1.toString()}")
-            }
-
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HQRNG {
-                val rng = HQRNG()
-                val seedstr = jsonData.asString().split(',')
-                rng.setSeed(seedstr[0].toLong(), seedstr[1].toLong())
-                return rng
-            }
-        })
-        // kotlin.ByteArray
-        jsoner.setSerializer(ByteArray::class.java, object : Json.Serializer<ByteArray> {
-            override fun write(json: Json, obj: ByteArray, knownType: Class<*>?) {
-                json.writeValue(bytesToZipdStr(obj.iterator()))
-            }
-
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): ByteArray? {
-                return if (jsonData.isNull) return null else strToBytes(StringReader(jsonData.asString())).toByteArray()
-            }
-        })
-        // WeatherStateBox
-        jsoner.setSerializer(WeatherStateBox::class.java, object : Json.Serializer<WeatherStateBox> {
-            override fun write(json: Json, obj: WeatherStateBox, knownType: Class<*>?) {
-                json.writeValue("${obj.x};${obj.pM2};${obj.pM1};${obj.p0};${obj.p1};${obj.p2};${obj.p3}")
-            }
-
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WeatherStateBox {
-                return jsonData.asString().split(';').map { it.toFloat() }.let {
-                    WeatherStateBox(it[0], it[1], it[2], it[3], it[4], it[5], it[6])
-                }
-            }
-        })
-        // WeatherDirBox
-        jsoner.setSerializer(WeatherDirBox::class.java, object : Json.Serializer<WeatherDirBox> {
-            override fun write(json: Json, obj: WeatherDirBox, knownType: Class<*>?) {
-                json.writeValue("${obj.x};${obj.pM2};${obj.pM1};${obj.p0};${obj.p1};${obj.p2};${obj.p3}")
-            }
-
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WeatherDirBox {
-                try {
-                    return jsonData.asString().split(';').map { it.toFloat() }.let {
-                        WeatherDirBox(it[0], it[1], it[2], it[3], it[4], it[5], it[6])
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>): BlockLayerI16 {
+                    // full manual
+                    try {
+                        return strToBlockLayer(LayerInfo(
+                                jsonData.getString("h"),
+                                jsonData.getString("b"),
+                                jsonData.getInt("x"),
+                                jsonData.getInt("y")
+                        ))
+                    }
+                    catch (e: BlockLayerHashMismatchError) {
+                        EchoError(e.message ?: "")
+                        return e.offendingObject
                     }
                 }
-                // just for savegame compatibility
-                catch (_: IllegalStateException) {
-                    return WeatherDirBox(
-                        jsonData.getFloat("x"),
-                        jsonData.getFloat("pM2"),
-                        jsonData.getFloat("pM1"),
-                        jsonData.getFloat("p0"),
-                        jsonData.getFloat("p1"),
-                        jsonData.getFloat("p2"),
-                        jsonData.getFloat("p3")
-                    )
+            })
+            // WorldTime
+            it.setSerializer(WorldTime::class.java, object : Json.Serializer<WorldTime> {
+                override fun write(json: Json, obj: WorldTime, knownType: Class<*>?) {
+                    json.writeValue(obj.TIME_T)
                 }
-            }
-        })
-        // BaseModularWeather
-        jsoner.setSerializer(BaseModularWeather::class.java, object : Json.Serializer<BaseModularWeather> {
-            override fun write(json: Json, obj: BaseModularWeather, knownType: Class<*>?) {
-                json.writeValue(obj.identifier)
-            }
 
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): BaseModularWeather {
-                return WeatherMixer.weatherDict[jsonData.asString()]!!
-            }
-        })
-        // Fill
-        jsoner.setSerializer(Fill::class.java, object : Json.Serializer<Fill> {
-            override fun write(json: Json, obj: Fill, knownType: Class<*>?) {
-                json.writeValue("${obj.item};${obj.amount}")
-            }
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WorldTime {
+                    return WorldTime(jsonData.asLong())
+                }
+            })
+            // HashArray
+            it.setSerializer(HashArray::class.java, object : Json.Serializer<HashArray<*>> {
+                override fun write(json: Json, obj: HashArray<*>, knownType: Class<*>?) {
+                    json.writeObjectStart()
+                    obj.forEach { (k, v) ->
+                        json.writeValue(k.toString(), v)
+                    }
+                    json.writeObjectEnd()
+                }
 
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): Fill {
-                val csv = jsonData.asString().split(',')
-                return Fill(csv[0], csv[1].toFloat())
-            }
-        })
-        // OrePlacement
-        jsoner.setSerializer(OrePlacement::class.java, object : Json.Serializer<OrePlacement> {
-            override fun write(json: Json, obj: OrePlacement, knownType: Class<*>?) {
-                json.writeValue("${obj.item};${obj.tilePlacement}")
-            }
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashArray<*> {
+                    val hashMap = HashArray<Any>()
+                    JsonFetcher.forEachSiblings(jsonData) { key, obj ->
+                        hashMap[key.toLong()] = json.readValue(null, obj)
+                    }
+                    return hashMap
+                }
+            })
+            // HashedWirings
+            it.setSerializer(HashedWirings::class.java, object : Json.Serializer<HashedWirings> {
+                override fun write(json: Json, obj: HashedWirings, knownType: Class<*>?) {
+                    json.writeObjectStart()
+                    obj.forEach { (k, v) ->
+                        json.writeValue(k.toString(), v)
+                    }
+                    json.writeObjectEnd()
+                }
 
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): OrePlacement {
-                val csv = jsonData.asString().split(',')
-                return OrePlacement(csv[0], csv[1].toInt())
-            }
-        })
-    }
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashedWirings {
+                    val hashMap = HashedWirings()
+                    JsonFetcher.forEachSiblings(jsonData) { key, obj ->
+                        hashMap[key.toLong()] = json.readValue(GameWorld.WiringNode::class.java, obj)
+                    }
+                    return hashMap
+                }
+            })
+            // HashedWiringGraph
+            it.setSerializer(HashedWiringGraph::class.java, object : Json.Serializer<HashedWiringGraph> {
+                override fun write(json: Json, obj: HashedWiringGraph, knownType: Class<*>?) {
+                    json.writeObjectStart()
+                    obj.forEach { (k, v) ->
+                        json.writeValue(k.toString(), v, WiringGraphMap::class.java)
+                    }
+                    json.writeObjectEnd()
+                }
+
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashedWiringGraph {
+                    val hashMap = HashedWiringGraph()
+                    JsonFetcher.forEachSiblings(jsonData) { key, obj ->
+                        hashMap[key.toLong()] = json.readValue(WiringGraphMap::class.java, obj)
+                    }
+                    return hashMap
+                }
+            })
+            // WiringGraphMap; this serialiser is here just to reduce the JSON filesize
+            it.setSerializer(WiringGraphMap::class.java, object : Json.Serializer<WiringGraphMap> {
+                override fun write(json: Json, obj: WiringGraphMap, knownType: Class<*>?) {
+                    json.writeObjectStart()
+                    obj.forEach { (k, v) ->
+                        json.writeValue(k, v, GameWorld.WiringSimCell::class.java)
+                    }
+                    json.writeObjectEnd()
+                }
+
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WiringGraphMap {
+                    val hashMap = WiringGraphMap()
+                    JsonFetcher.forEachSiblings(jsonData) { key, obj ->
+                        hashMap[key] = json.readValue(GameWorld.WiringSimCell::class.java, obj)
+                    }
+                    return hashMap
+                }
+            })
+            // UUID
+            it.setSerializer(UUID::class.java, object : Json.Serializer<UUID> {
+                override fun write(json: Json, obj: UUID, knownType: Class<*>?) {
+                    json.writeValue(obj.toString())
+                }
+
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): UUID? {
+                    return if (jsonData.isNull) null else UUID.fromString(jsonData.asString())
+                }
+            })
+            // HQRNG
+            it.setSerializer(HQRNG::class.java, object : Json.Serializer<HQRNG> {
+                override fun write(json: Json, obj: HQRNG, knownType: Class<*>?) {
+                    json.writeValue("${obj.state0.toString()},${obj.state1.toString()}")
+                }
+
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HQRNG {
+                    val rng = HQRNG()
+                    val seedstr = jsonData.asString().split(',')
+                    rng.setSeed(seedstr[0].toLong(), seedstr[1].toLong())
+                    return rng
+                }
+            })
+            // kotlin.ByteArray
+            it.setSerializer(ByteArray::class.java, object : Json.Serializer<ByteArray> {
+                override fun write(json: Json, obj: ByteArray, knownType: Class<*>?) {
+                    json.writeValue(bytesToZipdStr(obj.iterator()))
+                }
+
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): ByteArray? {
+                    return if (jsonData.isNull) return null else strToBytes(StringReader(jsonData.asString())).toByteArray()
+                }
+            })
+            // WeatherStateBox
+            it.setSerializer(WeatherStateBox::class.java, object : Json.Serializer<WeatherStateBox> {
+                override fun write(json: Json, obj: WeatherStateBox, knownType: Class<*>?) {
+                    json.writeValue("${obj.x};${obj.pM2};${obj.pM1};${obj.p0};${obj.p1};${obj.p2};${obj.p3}")
+                }
+
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WeatherStateBox {
+                    return jsonData.asString().split(';').map { it.toFloat() }.let {
+                        WeatherStateBox(it[0], it[1], it[2], it[3], it[4], it[5], it[6])
+                    }
+                }
+            })
+            // WeatherDirBox
+            it.setSerializer(WeatherDirBox::class.java, object : Json.Serializer<WeatherDirBox> {
+                override fun write(json: Json, obj: WeatherDirBox, knownType: Class<*>?) {
+                    json.writeValue("${obj.x};${obj.pM2};${obj.pM1};${obj.p0};${obj.p1};${obj.p2};${obj.p3}")
+                }
+
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WeatherDirBox {
+                    try {
+                        return jsonData.asString().split(';').map { it.toFloat() }.let {
+                            WeatherDirBox(it[0], it[1], it[2], it[3], it[4], it[5], it[6])
+                        }
+                    }
+                    // just for savegame compatibility
+                    catch (_: IllegalStateException) {
+                        return WeatherDirBox(
+                            jsonData.getFloat("x"),
+                            jsonData.getFloat("pM2"),
+                            jsonData.getFloat("pM1"),
+                            jsonData.getFloat("p0"),
+                            jsonData.getFloat("p1"),
+                            jsonData.getFloat("p2"),
+                            jsonData.getFloat("p3")
+                        )
+                    }
+                }
+            })
+            // BaseModularWeather
+            it.setSerializer(BaseModularWeather::class.java, object : Json.Serializer<BaseModularWeather> {
+                override fun write(json: Json, obj: BaseModularWeather, knownType: Class<*>?) {
+                    json.writeValue(obj.identifier)
+                }
+
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): BaseModularWeather {
+                    return WeatherMixer.weatherDict[jsonData.asString()]!!
+                }
+            })
+            // Fill
+            it.setSerializer(Fill::class.java, object : Json.Serializer<Fill> {
+                override fun write(json: Json, obj: Fill, knownType: Class<*>?) {
+                    json.writeValue("${obj.item};${obj.amount}")
+                }
+
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): Fill {
+                    val csv = jsonData.asString().split(',')
+                    return Fill(csv[0], csv[1].toFloat())
+                }
+            })
+            // OrePlacement
+            it.setSerializer(OrePlacement::class.java, object : Json.Serializer<OrePlacement> {
+                override fun write(json: Json, obj: OrePlacement, knownType: Class<*>?) {
+                    json.writeValue("${obj.item};${obj.tilePlacement}")
+                }
+
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): OrePlacement {
+                    val csv = jsonData.asString().split(',')
+                    return OrePlacement(csv[0], csv[1].toInt())
+                }
+            })
+        }
 
 
     data class SpliceCmd(
