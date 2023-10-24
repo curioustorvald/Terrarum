@@ -9,7 +9,7 @@ import net.torvald.terrarum.langpack.Lang
 
 object ErrorDisp : Screen {
 
-    private val logoTex = App.logo
+    private val logoTex = App.splashScreenLogo
     private val font = App.fontGame
 
 

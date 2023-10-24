@@ -12,8 +12,8 @@ import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.github.strikerx3.jxinput.XInputDevice;
+import kotlin.text.Charsets;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
@@ -41,6 +41,8 @@ import net.torvald.unsafe.AddressOverflowException;
 import net.torvald.unsafe.DanglingPointerException;
 import net.torvald.unsafe.UnsafeHelper;
 import net.torvald.util.DebugTimers;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -186,7 +188,6 @@ public class App implements ApplicationListener {
         }
     }
 
-    private static boolean splashDisplayed = false;
     private static boolean postInitFired = false;
     private static boolean screenshotRequested = false;
     private static boolean resizeRequested = false;
@@ -254,7 +255,8 @@ public class App implements ApplicationListener {
     public static Mesh fullscreenQuad;
     private static OrthographicCamera camera;
     private static FlippingSpriteBatch logoBatch;
-    public static TextureRegion logo;
+    public static TextureRegion splashScreenLogo;
+    private static TextureRegion splashBackdrop;
     public static AudioDevice audioDevice;
 
     public static FlippingSpriteBatch batch;
@@ -474,9 +476,41 @@ public class App implements ApplicationListener {
             new GameCrashHandler(e);
         }
     }
-    
+
+    private static Color splashTextCol = new Color(0x282828FF);
+
     @Override
     public void create() {
+        File loadOrderFile = new File(App.loadOrderDir);
+        if (loadOrderFile.exists()) {
+            // load modules
+            CSVParser loadOrderCSVparser = null;
+            try {
+                loadOrderCSVparser = CSVParser.parse(
+                        loadOrderFile,
+                        Charsets.UTF_8,
+                        CSVFormat.DEFAULT.withCommentMarker('#')
+                );
+                var loadOrder = loadOrderCSVparser.getRecords();
+
+                if (loadOrder.size() > 0) {
+                    var modname = loadOrder.get(0).get(0);
+                    var textureFile = Gdx.files.internal("assets/mods/"+modname+"/splash.png");
+                    if (textureFile.exists()) {
+                        splashBackdrop = new TextureRegion(new Texture(textureFile));
+                        splashTextCol = new Color(0xeeeeeeff);
+                    }
+                }
+            }
+            catch (IOException e) {
+
+            }
+            finally {
+                try {loadOrderCSVparser.close();}
+                catch (IOException e) {}
+            }
+        }
+
         Gdx.graphics.setContinuousRendering(true);
 
         GAME_LOCALE = getConfigString("language");
@@ -505,8 +539,8 @@ public class App implements ApplicationListener {
         initViewPort(scr.getWidth(), scr.getHeight());
 
         // logo here :p
-        logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
-        logo.flip(false, false);
+        splashScreenLogo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
+        splashScreenLogo.flip(false, false);
 
         // set GL graphics constants
         for (int i = 0; i < ditherPatterns.length; i++) {
@@ -549,7 +583,7 @@ public class App implements ApplicationListener {
     public void render() {
 //        Gdx.gl.glDisable(GL20.GL_DITHER);
 
-        if (splashDisplayed && !postInitFired) {
+        if (!postInitFired) {
             postInitFired = true;
             postInit();
         }
@@ -649,7 +683,6 @@ public class App implements ApplicationListener {
 
 
 
-        splashDisplayed = true;
         GLOBAL_RENDER_TIMER += 1;
 
     }
@@ -700,38 +733,77 @@ public class App implements ApplicationListener {
 
         setCameraPosition(0f, 0f);
 
+        logoBatch.setColor(Color.WHITE);
+        logoBatch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+
         int drawWidth = Toolkit.INSTANCE.getDrawWidth();
         int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY", true));
-        int logoPosX = (drawWidth - logo.getRegionWidth() - safetyTextLen) >>> 1;
+        int logoPosX = (drawWidth - splashScreenLogo.getRegionWidth() - safetyTextLen) >>> 1;
         int logoPosY = Math.round(scr.getHeight() / 15f);
-        int textY = logoPosY + logo.getRegionHeight() - 16;
+        int textY = logoPosY + splashScreenLogo.getRegionHeight() - 16;
+
+        // draw custom backdrop (if exists)
+        if (splashBackdrop != null) {
+            logoBatch.setShader(null);
+            logoBatch.begin();
+            logoBatch.setColor(splashTextCol);
+
+
+            var size = ((float) Math.max(scr.getWidth(), scr.getHeight()));
+            var x = 0f;
+            var y = 0f;
+            if (scr.getWidth() > scr.getHeight()) {
+                y = (scr.getHeight() - size) / 2f;
+            }
+            else {
+                x = (scr.getWidth() - size) / 2f;
+            }
+
+            logoBatch.draw(splashBackdrop, x, y, size, size);
+
+
+            logoBatch.end();
+        }
+
+
 
         // draw logo reflection
         logoBatch.setShader(shaderReflect);
         logoBatch.setColor(Color.WHITE);
         logoBatch.begin();
-
         if (getConfigBoolean("showhealthmessageonstartup")) {
-            logoBatch.draw(logo, logoPosX, logoPosY + logo.getRegionHeight());
+            logoBatch.draw(splashScreenLogo, logoPosX, logoPosY + splashScreenLogo.getRegionHeight());
         }
         else {
-            logoBatch.draw(logo, (drawWidth - logo.getRegionWidth()) / 2f,
-                    (scr.getHeight() - logo.getRegionHeight() * 2) / 2f + logo.getRegionHeight()
+            logoBatch.draw(splashScreenLogo, (drawWidth - splashScreenLogo.getRegionWidth()) / 2f,
+                    (scr.getHeight() - splashScreenLogo.getRegionHeight() * 2) / 2f + splashScreenLogo.getRegionHeight()
             );
         }
+        logoBatch.end();
+        logoBatch.setShader(null);
+        logoBatch.begin();
+        if (getConfigBoolean("showhealthmessageonstartup")) {
+            logoBatch.draw(splashScreenLogo, logoPosX, logoPosY);
+        }
+        else {
+            logoBatch.draw(splashScreenLogo, (drawWidth - splashScreenLogo.getRegionWidth()) / 2f,
+                    (scr.getHeight() - splashScreenLogo.getRegionHeight() * 2) / 2f
+            );
+        }
+
+
 
         logoBatch.end();
 
         // draw health messages
-        logoBatch.setShader(null);
-        logoBatch.begin();
-
         if (getConfigBoolean("showhealthmessageonstartup")) {
+            logoBatch.setShader(null);
+            logoBatch.begin();
 
-            logoBatch.draw(logo, logoPosX, logoPosY);
-            logoBatch.setColor(new Color(0x282828ff));
+            logoBatch.setColor(splashTextCol);
             fontGame.draw(logoBatch, Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY", true),
-                    logoPosX + logo.getRegionWidth(),
+                    logoPosX + splashScreenLogo.getRegionWidth(),
                     textY
             );
 
@@ -747,22 +819,17 @@ public class App implements ApplicationListener {
                 }
             }
 
-            logoBatch.setColor(new Color(0x282828ff));
             Texture tex1 = CommonResourcePool.INSTANCE.getAsTexture("title_health1");
             Texture tex2 = CommonResourcePool.INSTANCE.getAsTexture("title_health2");
-            int virtualHeight = scr.getHeight() - logoPosY - logo.getRegionHeight() / 4;
+            int virtualHeight = scr.getHeight() - logoPosY - splashScreenLogo.getRegionHeight() / 4;
             int virtualHeightOffset = scr.getHeight() - virtualHeight;
             logoBatch.drawFlipped(tex1, (drawWidth - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
             logoBatch.drawFlipped(tex2, (drawWidth - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
 
         }
-        else {
-            logoBatch.draw(logo, (drawWidth - logo.getRegionWidth()) / 2f,
-                    (scr.getHeight() - logo.getRegionHeight() * 2) / 2f
-            );
-        }
 
         logoBatch.end();
+        batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     /**
@@ -875,7 +942,8 @@ public class App implements ApplicationListener {
         fontBigNumbers.dispose();
         ItemSlotImageFactory.INSTANCE.dispose();
 
-        logo.getTexture().dispose();
+        splashScreenLogo.getTexture().dispose();
+        splashBackdrop.getTexture().dispose();
 
         ModMgr.INSTANCE.disposeMods();
 

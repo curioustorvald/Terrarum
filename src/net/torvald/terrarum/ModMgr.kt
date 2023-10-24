@@ -124,7 +124,7 @@ object ModMgr {
 
 
     init {
-        val loadOrderFile = FileSystems.getDefault().getPath("${App.defaultDir}/LoadOrder.txt").toFile()
+        val loadOrderFile = File(App.loadOrderDir)
         if (loadOrderFile.exists()) {
 
             // load modules
