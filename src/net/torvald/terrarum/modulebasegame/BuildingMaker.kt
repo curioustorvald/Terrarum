@@ -29,6 +29,8 @@ import net.torvald.terrarum.serialise.POILayer
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.ui.UINSMenu
+import net.torvald.terrarum.utils.OrePlacement
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import java.io.File
@@ -238,6 +240,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         const val PENTARGET_TERRAIN = 1
         const val PENTARGET_WALL = 2
+        const val PENTARGET_ORE = 4
 
         val toolCursorColour = arrayOf(
             Color.YELLOW,
@@ -477,6 +480,22 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
     }
 
+    private fun getNearbyTilesPos8(x: Int, y: Int): Array<Point2i> {
+        return arrayOf(
+            Point2i(x + 1, y),
+            Point2i(x + 1, y + 1),
+            Point2i(x, y + 1),
+            Point2i(x - 1, y + 1),
+            Point2i(x - 1, y),
+            Point2i(x - 1, y - 1),
+            Point2i(x, y - 1),
+            Point2i(x + 1, y - 1)
+        )
+    }
+    private fun getNearbyOres8(x: Int, y: Int): List<OrePlacement> {
+        return getNearbyTilesPos8(x, y).map { world.getTileFromOre(it.x, it.y) }
+    }
+
     private fun makePenWork(x: Int, y: Int) {
         val world = gameWorld
         val palSelection = uiPaletteSelector.fore
@@ -486,14 +505,25 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             PENMODE_PENCIL -> {
                 if (palSelection.startsWith("wall@"))
                     world.setTileWall(x, y, palSelection.substring(5), true)
+                else if (palSelection.startsWith("ore@")) {
+                    // get autotiling placement
+                    val autotiled = getNearbyOres8(x, y).foldIndexed(0) { index, acc, placement ->
+                        acc or (placement.item == palSelection).toInt(index)
+                    }
+                    val placement = BlocksDrawer.connectLut47[autotiled]
+
+                    world.setTileOre(x, y, palSelection, placement)
+                }
                 else
                     world.setTileTerrain(x, y, palSelection, true)
             }
             PENMODE_PENCIL_ERASE -> {
+                if (currentPenTarget and PENTARGET_TERRAIN != 0)
+                    world.setTileTerrain(x, y, Block.AIR, true)
                 if (currentPenTarget and PENTARGET_WALL != 0)
                     world.setTileWall(x, y, Block.AIR, true)
-                else
-                    world.setTileTerrain(x, y, Block.AIR, true)
+                if (currentPenTarget and PENTARGET_ORE != 0)
+                    world.setTileOre(x, y, Block.NULL, 0)
             }
             PENMODE_EYEDROPPER -> {
                 uiPaletteSelector.fore = if (world.getTileFromTerrain(x, y) == Block.AIR)
