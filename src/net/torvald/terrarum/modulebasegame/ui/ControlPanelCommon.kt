@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.TerrarumScreenSize
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -129,7 +130,7 @@ object ControlPanelCommon {
             UIItemTextLineInput(parent, x, y, CONFIG_SPINNER_WIDTH,
                 defaultValue = { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" },
                 maxLen = InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS),
-                keyFilter = { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xX]")) == true },
+                keyFilter = { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xXpP]")) == true },
                 alignment = UIItemTextButton.Companion.Alignment.CENTRE
             ) to { it: UIItem, optionStr: String ->
                 (it as UIItemTextLineInput).textCommitListener = { text ->
@@ -141,7 +142,51 @@ object ControlPanelCommon {
                         App.setConfig(keyWidth, width)
                         App.setConfig(keyHeight, height)
                     }
-                    else it.markAsInvalid()
+                    else if (text == "720p") {
+                        it.markAsNormal()
+                        App.setConfig(keyWidth, 1280)
+                        App.setConfig(keyHeight, 720)
+                    }
+                    else if (text == "800p") {
+                        it.markAsNormal()
+                        App.setConfig(keyWidth, 1280)
+                        App.setConfig(keyHeight, 800)
+                    }
+                    else if (text == "900p") {
+                        it.markAsNormal()
+                        App.setConfig(keyWidth, 1600)
+                        App.setConfig(keyHeight, 900)
+                    }
+                    else if (text == "1080p") {
+                        it.markAsNormal()
+                        App.setConfig(keyWidth, 1920)
+                        App.setConfig(keyHeight, 1080)
+                    }
+                    else if (text == "1200p") {
+                        it.markAsNormal()
+                        App.setConfig(keyWidth, 1920)
+                        App.setConfig(keyHeight, 1200)
+                    }
+                    else if (text == "1440p") {
+                        it.markAsNormal()
+                        App.setConfig(keyWidth, 2560)
+                        App.setConfig(keyHeight, 1440)
+                    }
+                    else if (text == "1600p") {
+                        it.markAsNormal()
+                        App.setConfig(keyWidth, 2560)
+                        App.setConfig(keyHeight, 1600)
+                    }
+                    else if (text == "2160p") {
+                        it.markAsNormal()
+                        App.setConfig(keyWidth, 3840)
+                        App.setConfig(keyHeight, 2160)
+                    }
+                    else {
+                        it.markAsInvalid()
+                        App.setConfig(keyWidth, TerrarumScreenSize.defaultW)
+                        App.setConfig(keyHeight, TerrarumScreenSize.defaultH)
+                    }
                 }
             }
         }
