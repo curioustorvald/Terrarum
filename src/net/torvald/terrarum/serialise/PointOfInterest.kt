@@ -201,8 +201,8 @@ class POILayer(
     }
 
     fun placeOnWorld(world: GameWorld, bottomCentreX: Int, bottomCenterY: Int) {
-        val topLeftX = bottomCentreX - blockLayer[0].width / 2
-        val topLeftY = bottomCenterY - blockLayer[0].height
+        val topLeftX = bottomCentreX - (blockLayer[0].width - 1) / 2
+        val topLeftY = bottomCenterY - (blockLayer[0].height - 1)
 
         blockLayer.forEachIndexed { layerIndex, layer ->
             for (x in 0 until layer.width) { for (y in 0 until layer.height) {

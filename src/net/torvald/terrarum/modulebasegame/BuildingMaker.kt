@@ -226,22 +226,29 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
     }
 
+    internal var imported: PointOfInterest? = null
+
     companion object {
         const val PENMODE_PENCIL = 0
         const val PENMODE_PENCIL_ERASE = 1
         const val PENMODE_MARQUEE = 2
         const val PENMODE_MARQUEE_ERASE = 3
         const val PENMODE_EYEDROPPER = 4
+        const val PENMODE_IMPORT = 8
 
         const val PENTARGET_TERRAIN = 1
         const val PENTARGET_WALL = 2
 
         val toolCursorColour = arrayOf(
-                Color.YELLOW,
-                Color.YELLOW,
-                Color.MAGENTA,
-                Color.MAGENTA,
-                Color.WHITE
+            Color.YELLOW,
+            Color.YELLOW,
+            Color.MAGENTA,
+            Color.MAGENTA,
+            Color.WHITE,
+            Color.WHITE,
+            Color.WHITE,
+            Color.WHITE,
+            Color.MAGENTA,
         )
 
         const val DEFAULT_POI_NAME = "The Yucky Panopticon"
@@ -449,6 +456,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private fun makePenWork(x: Int, y: Int) {
         val world = gameWorld
         val palSelection = uiPaletteSelector.fore
+        val mouseJustDown = Terrarum.mouseJustDown
 
         when (currentPenMode) {
             // test paint terrain layer
@@ -476,53 +484,17 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             PENMODE_MARQUEE_ERASE -> {
                 removeBlockMarker(x, y)
             }
+            PENMODE_IMPORT -> {
+                if (mouseJustDown) importPoi(x, y)
+            }
         }
     }
 
-    /*private fun serialiseSelection(outfile: File) {
-        // save format: sparse list encoded in following binary format:
-        /*
-        Header: TEaT0bLD -- magic: Terrarum Attachment
-                Int8 version number -- always 1
-                Int8 number of layers -- always 2 or 3
-                Int8 number of payloads -- always 2 or 3
-                int8 compression algorithm -- always 1 (DEFLATE)
-                Int16 width
-
-        The rest: payloads defined in the map data format
-                  Payloads: array of (Int48 tileAddress, UInt16 blockID)
-                  Payload names: TerL, WalL, WirL for Terrain, Wall and Wire respectively
-
-        Footer: EndTEM \xFF\xFE -- magic: end of attachment with BOM
-
-        Endian: LITTLE
-         */
-        // proc:
-        //   translate boxes so that leftmost point is (0,0)
-        //   write to the list using translated coords
-
-        val payloads = arrayOf("WalL", "TerL", "WirL")
-
-        val selectionDim = getSelectionTotalDimension()
-        val fos = FileOutputStream(outfile)
-        // write header
-        fos.write("TEaT0bLD".toByteArray())
-        fos.write(byteArrayOf(1,3,3,1))
-        fos.write(selectionDim.x.toLittleShort())
-        // write wall -> terrain -> wire (order defined in GameWorld.TERRAIN/WALL/WIRE)
-        payloads.forEachIndexed { index, it ->
-            fos.write(PAYLOAD_HEADER); fos.write(it.toByteArray())
-            selection.forEach {
-                val tile = world.getTileFrom(index, it.x, it.y)!!
-                val addr = LandUtil.getBlockAddr(world, it.x - selectionDim.x, it.y - selectionDim.y)
-                fos.write(addr.toULittle48())
-                fos.write(tile.toLittle())
-            }
-            fos.write(PAYLOAD_FOOTER)
+    private fun importPoi(x: Int, y: Int) {
+        imported?.let {
+            it.placeOnWorld(listOf(it.layers.first().name), world, x, y) // TODO show layer list and ticker using right click?
         }
-        fos.write(FILE_FOOTER)
-        fos.close()
-    }*/
+    }
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {
         uiContainer.forEach {
@@ -865,30 +837,10 @@ class YamlCommandToolImportTest : YamlInvokable {
 
                 val poi = Common.jsoner.fromJson(PointOfInterest().javaClass, json).also {
                     it.getReadyToBeUsed(ui.world.tileNameToNumberMap)
-
-                    println("==== Test print layer ====")
-                    it.layers.forEach { layer ->
-                        println("Layer ${layer.name}")
-                        println("  Terrain:")
-                        for (y in 0 until it.h) {
-                            for (x in 0 until it.w) {
-                                val tnum = layer.blockLayer[TERRAIN].unsafeGetTile(x, y).toLong()
-                                print("$tnum(${ui.world.tileNumberToNameMap[tnum]?.replace("basegame:", "b")})\t")
-                            }
-                            println()
-                        }
-                        println("  Wall:")
-                        for (y in 0 until it.h) {
-                            for (x in 0 until it.w) {
-                                val tnum = layer.blockLayer[WALL].unsafeGetTile(x, y).toLong()
-                                print("$tnum(${ui.world.tileNumberToNameMap[tnum]?.replace("basegame:", "b")})\t")
-                            }
-                            println()
-                        }
-                    }
                 }
 
-                println("Imported POI: $poi")
+                ui.imported = poi
+                ui.currentPenMode = BuildingMaker.PENMODE_IMPORT
             }
         }
     }
