@@ -10,6 +10,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockPropUtil
+import net.torvald.terrarum.blockstats.TileSurvey
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitems.ItemID
@@ -18,6 +19,7 @@ import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
 import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
+import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
@@ -31,6 +33,7 @@ import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.utils.OrePlacement
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import java.io.File
@@ -339,7 +342,6 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private val updateGame = { delta: Float ->
 
-        WeatherMixer.update(delta, actorNowPlaying, gameWorld)
         blockPointingCursor.update(delta)
 
         if (!keyboardUsedByTextInput) {
@@ -388,9 +390,66 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         BlockPropUtil.dynamicLumFuncTickClock()
+        WeatherMixer.update(delta, actorNowPlaying, gameWorld)
+        if (WORLD_UPDATE_TIMER % 2 == 1) {
+            fillUpWiresBuffer()
+        }
 
 
         musicGovernor.update(this, delta)
+    }
+
+
+    private val maxRenderableWires = ReferencingRanges.ACTORS_WIRES.last - ReferencingRanges.ACTORS_WIRES.first + 1
+    private val wireActorsContainer = Array(maxRenderableWires) { WireActor(ReferencingRanges.ACTORS_WIRES.first + it).let {
+        forceAddActor(it)
+        /*^let*/ it
+    } }
+    var selectedWireRenderClass = ""
+    private var oldSelectedWireRenderClass = ""
+
+
+    private fun fillUpWiresBuffer() {
+        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorToInt() - LightmapRenderer.LIGHTMAP_OVERRENDER
+        val for_y_end = for_y_start + BlocksDrawer.tilesInVertical + 2* LightmapRenderer.LIGHTMAP_OVERRENDER
+
+        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorToInt() - LightmapRenderer.LIGHTMAP_OVERRENDER
+        val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal + 2* LightmapRenderer.LIGHTMAP_OVERRENDER
+
+        var wiringCounter = 0
+        for (y in for_y_start..for_y_end) {
+            for (x in for_x_start..for_x_end) {
+                if (wiringCounter >= maxRenderableWires) break
+
+                val (wires, nodes) = world.getAllWiresFrom(x, y)
+
+                wires?.forEach {
+                    val wireActor = wireActorsContainer[wiringCounter]
+
+                    wireActor.setWire(it, x, y, nodes!![it]!!.cnx)
+
+                    if (WireCodex[it].renderClass == selectedWireRenderClass || selectedWireRenderClass == "wire_render_all") {
+                        wireActor.renderOrder = Actor.RenderOrder.OVERLAY
+                    }
+                    else {
+                        wireActor.renderOrder = Actor.RenderOrder.BEHIND
+                    }
+
+                    wireActor.isUpdate = true
+                    wireActor.isVisible = true
+                    wireActor.forceDormant = false
+
+                    wiringCounter += 1
+                }
+
+            }
+        }
+
+        for (i in wiringCounter until maxRenderableWires) {
+            wireActorsContainer[i].isUpdate = false
+            wireActorsContainer[i].isVisible = false
+            wireActorsContainer[i].forceDormant = true
+        }
     }
 
     private val particles = CircularArray<ParticleBase>(16, true)
@@ -500,45 +559,50 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val world = gameWorld
         val palSelection = uiPaletteSelector.fore
 
-        when (currentPenMode) {
-            // test paint terrain layer
-            PENMODE_PENCIL -> {
-                if (palSelection.startsWith("wall@"))
-                    world.setTileWall(x, y, palSelection.substring(5), true)
-                else if (palSelection.startsWith("ore@")) {
-                    // get autotiling placement
-                    val autotiled = getNearbyOres8(x, y).foldIndexed(0) { index, acc, placement ->
-                        acc or (placement.item == palSelection).toInt(index)
-                    }
-                    val placement = BlocksDrawer.connectLut47[autotiled]
+        if (!mousePrimaryClickLatched) {
+            when (currentPenMode) {
+                // test paint terrain layer
+                PENMODE_PENCIL -> {
+                    if (palSelection.startsWith("wall@"))
+                        world.setTileWall(x, y, palSelection.substring(5), true)
+                    else if (palSelection.startsWith("ore@")) {
+                        // get autotiling placement
+                        val autotiled = getNearbyOres8(x, y).foldIndexed(0) { index, acc, placement ->
+                            acc or (placement.item == palSelection).toInt(index)
+                        }
+                        val placement = BlocksDrawer.connectLut47[autotiled]
 
-                    world.setTileOre(x, y, palSelection, placement)
+                        world.setTileOre(x, y, palSelection, placement)
+                    }
+                    else
+                        world.setTileTerrain(x, y, palSelection, true)
                 }
-                else
-                    world.setTileTerrain(x, y, palSelection, true)
-            }
-            PENMODE_PENCIL_ERASE -> {
-                if (currentPenTarget and PENTARGET_TERRAIN != 0)
-                    world.setTileTerrain(x, y, Block.AIR, true)
-                if (currentPenTarget and PENTARGET_WALL != 0)
-                    world.setTileWall(x, y, Block.AIR, true)
-                if (currentPenTarget and PENTARGET_ORE != 0)
-                    world.setTileOre(x, y, Block.NULL, 0)
-            }
-            PENMODE_EYEDROPPER -> {
-                uiPaletteSelector.fore = if (world.getTileFromTerrain(x, y) == Block.AIR)
-                    "wall@"+world.getTileFromWall(x, y)
-                else
-                    world.getTileFromTerrain(x, y)
-            }
-            PENMODE_MARQUEE -> {
-                addBlockMarker(x, y)
-            }
-            PENMODE_MARQUEE_ERASE -> {
-                removeBlockMarker(x, y)
-            }
-            PENMODE_IMPORT -> {
-                if (!mousePrimaryClickLatched) {
+
+                PENMODE_PENCIL_ERASE -> {
+                    if (currentPenTarget and PENTARGET_TERRAIN != 0)
+                        world.setTileTerrain(x, y, Block.AIR, true)
+                    if (currentPenTarget and PENTARGET_WALL != 0)
+                        world.setTileWall(x, y, Block.AIR, true)
+                    if (currentPenTarget and PENTARGET_ORE != 0)
+                        world.setTileOre(x, y, Block.NULL, 0)
+                }
+
+                PENMODE_EYEDROPPER -> {
+                    uiPaletteSelector.fore = if (world.getTileFromTerrain(x, y) == Block.AIR)
+                        "wall@" + world.getTileFromWall(x, y)
+                    else
+                        world.getTileFromTerrain(x, y)
+                }
+
+                PENMODE_MARQUEE -> {
+                    addBlockMarker(x, y)
+                }
+
+                PENMODE_MARQUEE_ERASE -> {
+                    removeBlockMarker(x, y)
+                }
+
+                PENMODE_IMPORT -> {
                     importPoi(x, y)
                     mousePrimaryClickLatched = true
                 }
