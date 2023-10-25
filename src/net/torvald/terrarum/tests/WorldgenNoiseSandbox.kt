@@ -11,13 +11,11 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.HdpiMode
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
-import net.torvald.random.XXHash32
-import net.torvald.terrarum.DefaultGL32Shaders
 import net.torvald.terrarum.FlippingSpriteBatch
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.RunnableFun
@@ -25,17 +23,15 @@ import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.worldgenerator.*
-import net.torvald.terrarum.tests.Oregen
 import net.torvald.terrarum.worlddrawer.toRGBA
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import java.util.concurrent.Future
-import kotlin.math.cos
-import kotlin.math.max
-import kotlin.math.sin
+import kotlin.math.*
 import kotlin.random.Random
+import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen
 
-const val NOISEBOX_WIDTH = 1024
-const val NOISEBOX_HEIGHT = 768
+const val NOISEBOX_WIDTH = 922
+const val NOISEBOX_HEIGHT = 2000
 const val TWO_PI = Math.PI * 2
 
 /**
@@ -83,7 +79,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     private var generationTime = 0f
 
-    private val NM_TERR = Terragen to TerragenParams()
+    private val NM_TERR = TerragenTest to TerragenParams()
     private val NM_BIOME = BiomeMaker to BiomegenParams()
     private val NM_ORES = Oregen to OregenParams()
 
@@ -232,7 +228,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
                         val sampleTheta = (x.toDouble() / NOISEBOX_WIDTH) * TWO_PI
                         val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
                         val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                        val sampleY = y.toDouble()
+                        val sampleY = y - (NOISEBOX_HEIGHT - Terragen.YHEIGHT_MAGIC) * Terragen.YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
 
                         noiseMaker.first.draw(x, y, localJoise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
                     }
@@ -331,7 +327,7 @@ internal object BiomeMaker : NoiseMaker {
 }
 
 // http://accidentalnoise.sourceforge.net/minecraftworlds.html
-internal object Terragen : NoiseMaker {
+internal object TerragenTest : NoiseMaker {
 
     private infix fun Color.mul(other: Color) = this.mul(other)
 
@@ -360,22 +356,55 @@ internal object Terragen : NoiseMaker {
     private val blockToCol = hashMapOf(
         Block.AIR to Color(0f, 0f, 0f, 1f),
         Block.DIRT to Color(0.588f, 0.45f, 0.3f, 1f),
-        Block.STONE to Color(0.533f, 0.533f, 0.533f, 1f),
-        Block.STONE_SLATE to Color(0.233f, 0.233f, 0.233f, 1f),
+        Block.STONE to Color(0.4f, 0.4f, 0.4f, 1f),
+        Block.STONE_SLATE to Color(0.2f, 0.2f, 0.2f, 1f),
     )
+
+    private val IRON_ORE = 0xff9a5dff.toInt()
+    private val COPPER_ORE = 0x00e9c8ff
 
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val terr = noiseValue[0].tiered(.0, .5, .88, 1.88)
         val cave = if (noiseValue[1] < 0.5) 0 else 1
+        val copper = (noiseValue[2] > 0.5)
+        val iron = (noiseValue[3] > 0.5)
 
         val wallBlock = groundDepthBlock[terr]
         val terrBlock = if (cave == 0) Block.AIR else wallBlock
 
+        val ore = if (iron) IRON_ORE else if (copper) COPPER_ORE else null
+
         outTex.drawPixel(x, y,
-            if (wallBlock == Block.AIR && terrBlock == Block.AIR) BACK
+            if (ore != null && (terrBlock == Block.STONE || terrBlock == Block.STONE_SLATE)) ore
+            else if (wallBlock == Block.AIR && terrBlock == Block.AIR) BACK
             else blockToCol[terrBlock]!!.toRGBA()
         )
+
+//        outTex.drawPixel(x, y, noiseValue[2].toColour())
     }
+
+    private fun Double.toColour(): Int {
+        val d = if (this.isNaN()) 0.0 else this.absoluteValue
+        val b = d.toFloat()
+
+        val c = if (b >= 2f)
+            // 1 0 1 S
+            // 0 1 1 E
+            Color(
+                FastMath.interpolateLinear(b - 2f, 1f, 0f),
+                FastMath.interpolateLinear(b - 2f, 0f, 1f),
+                1f, 1f
+            )
+        else if (b >= 1f)
+            Color(1f, 1f - (b - 1f), 1f, 1f)
+        else if (b >= 0f)
+            Color(b, b, b, 1f)
+        else
+            Color(b, 0f, 0f, 1f)
+
+        return c.toRGBA()
+    }
+
 
     override fun getGenerator(seed: Long, params: Any): List<Joise> {
         val params = params as TerragenParams
@@ -388,6 +417,8 @@ internal object Terragen : NoiseMaker {
         val cavePerturbMagic: Long = 0xA2410C // Armok
         val caveBlockageMagic: Long = 0xD15A57E5 // Disaster
 
+        val oreMagic = 0x023L
+        val orePerturbMagic = 12345L
 
         val groundGradient = ModuleGradient().also {
             it.setGradient(0.0, 0.0, 0.0, 1.0)
@@ -643,11 +674,87 @@ internal object Terragen : NoiseMaker {
             it.setSource(caveClamp)
         }
 
+        val caveAttenuateBiasScaled = ModuleScaleDomain().also {
+            it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
+            it.setScaleY(1.0 / params.featureSize)
+            it.setScaleZ(1.0 / params.featureSize)
+            it.setSource(caveAttenuateBias)
+        }
+
+
+
         //return Joise(caveInMix)
         return listOf(
             Joise(groundScaling),
-            Joise(caveScaling)
+            Joise(caveScaling),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake 0xC08204, params.oreCopperFreq, params.oreCopperPower, params.oreCopperScale)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake 0xFE2204, params.oreIronFreq, params.oreIronPower, params.oreIronScale)),
         )
+    }
+
+    private fun applyPowMult(joiseModule: Module, pow: Double, mult: Double): Module {
+        return ModuleScaleOffset().also {
+            it.setSource(ModulePow().also {
+                it.setSource(joiseModule)
+                it.setPower(pow)
+            })
+            it.setScale(mult)
+        }
+    }
+
+    private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, freq: Double, pow: Double, scale: Double): Module {
+        val oreShape = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.RIDGEMULTI)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(2)
+            it.setFrequency(freq) // adjust the "density" of the caves
+            it.seed = seed
+        }
+
+        val oreShape2 = ModuleScaleOffset().also {
+            it.setSource(oreShape)
+            it.setScale(1.0)
+            it.setOffset(-0.5)
+        }
+
+        val caveAttenuateBias3 = applyPowMult(caveAttenuateBiasScaled, pow, scale)
+
+        val oreShapeAttenuate = ModuleCombiner().also {
+            it.setType(ModuleCombiner.CombinerType.MULT)
+            it.setSource(0, oreShape2)
+            it.setSource(1, caveAttenuateBias3)
+        }
+
+        val orePerturbFractal = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.FBM)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(6)
+            it.setFrequency(freq * 3.0 / 4.0)
+            it.seed = seed shake 0x5721CE_76E_EA276L // strike the earth
+        }
+
+        val orePerturbScale = ModuleScaleOffset().also {
+            it.setSource(orePerturbFractal)
+            it.setScale(20.0)
+            it.setOffset(0.0)
+        }
+
+        val orePerturb = ModuleTranslateDomain().also {
+            it.setSource(oreShapeAttenuate)
+            it.setAxisXSource(orePerturbScale)
+        }
+
+        val oreSelect = ModuleSelect().also {
+            it.setLowSource(0.0)
+            it.setHighSource(1.0)
+            it.setControlSource(orePerturb)
+            it.setThreshold(0.5)
+            it.setFalloff(0.0)
+        }
+
+        return oreSelect
     }
 }
 

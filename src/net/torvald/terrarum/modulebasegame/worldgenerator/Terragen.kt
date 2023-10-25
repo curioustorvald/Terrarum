@@ -5,7 +5,6 @@ import com.sudoplay.joise.module.*
 import net.torvald.random.XXHash32
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -411,14 +410,29 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 }
 
 data class TerragenParams(
-        val featureSize: Double = 333.0,
-        val lowlandScaleOffset: Double = -0.65, // linearly alters the height
-        val highlandScaleOffset: Double = -0.2, // linearly alters the height
-        val mountainScaleOffset: Double = -0.1, // linearly alters the height
-        val mountainDisturbance: Double = 0.7, // greater = more distortion, overhangs
-        val caveShapeFreq: Double = 4.0, //adjust the "density" of the caves
-        val caveAttenuateBias: Double = 0.90, // adjust the "concentration" of the cave gen. Lower = larger voids
-        val caveSelectThre: Double = 0.918, // also adjust this if you've touched the bias value. Number can be greater than 1.0
-        val caveBlockageFractalFreq: Double = 8.88,
-        val caveBlockageSelectThre: Double = 1.40 // adjust cave cloing-up strength. Larger = more closing
+    val featureSize: Double = 333.0,
+    val lowlandScaleOffset: Double = -0.65, // linearly alters the height
+    val highlandScaleOffset: Double = -0.2, // linearly alters the height
+    val mountainScaleOffset: Double = -0.1, // linearly alters the height
+    val mountainDisturbance: Double = 0.7, // greater = more distortion, overhangs
+
+    val caveShapeFreq: Double = 4.0, //adjust the "density" of the caves
+    val caveAttenuateBias: Double = 0.90, // adjust the "concentration" of the cave gen. Lower = larger voids
+    val caveSelectThre: Double = 0.918, // also adjust this if you've touched the bias value. Number can be greater than 1.0
+    val caveBlockageFractalFreq: Double = 8.88,
+    val caveBlockageSelectThre: Double = 1.40, // adjust cave cloing-up strength. Larger = more closing
+
+    val oreCopperFreq: Double = 0.024, // adjust the "density" of the ore veins
+    val oreCopperPower: Double = 0.01, // super-low value almost negates the depth element
+    val oreCopperScale: Double = 0.505,
+
+    val oreIronFreq: Double = 0.04, // adjust the "density" of the ore veins
+    val oreIronPower: Double = 0.01, // super-low value almost negates the depth element
+    val oreIronScale: Double = 0.505,
+
+
+    // 0.01 - 0.505
+    // 0.1 - 0.5
+    // ...
+    // 0.8 - 0.42
 )
