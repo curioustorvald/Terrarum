@@ -16,16 +16,16 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
+import net.torvald.random.XXHash32
 import net.torvald.terrarum.DefaultGL32Shaders
 import net.torvald.terrarum.FlippingSpriteBatch
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.RunnableFun
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.inUse
-import net.torvald.terrarum.modulebasegame.worldgenerator.BiomegenParams
-import net.torvald.terrarum.modulebasegame.worldgenerator.OregenParams
-import net.torvald.terrarum.modulebasegame.worldgenerator.TerragenParams
-import net.torvald.terrarum.modulebasegame.worldgenerator.shake
+import net.torvald.terrarum.modulebasegame.worldgenerator.*
+import net.torvald.terrarum.tests.Oregen
 import net.torvald.terrarum.worlddrawer.toRGBA
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import java.util.concurrent.Future
@@ -83,9 +83,16 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     private var generationTime = 0f
 
+    private val NM_TERR = Terragen to TerragenParams()
+    private val NM_BIOME = BiomeMaker to BiomegenParams()
+    private val NM_ORES = Oregen to OregenParams()
+
+    private val NOISEMAKER = NM_TERR
+
     override fun render() {
+
         if (!initialGenDone) {
-            renderNoise()
+            renderNoise(NOISEMAKER)
         }
 
         // draw using pixmap
@@ -99,7 +106,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         if (!generateKeyLatched && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             generateKeyLatched = true
             seed = RNG.nextLong()
-            renderNoise()
+            renderNoise(NOISEMAKER)
         }
 
         val coroutineExecFinished = genFutures.fold(true) { acc, it -> acc and (it?.isDone ?: true) }
@@ -124,16 +131,6 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
                 font.draw(batch, "Generating...", 8f, 8f)
             }
         }
-    }
-
-//    private val NOISE_MAKER = AccidentalCave
-//    private val NOISE_MAKER = BiomeMaker
-    private val NOISE_MAKER = Oregen
-
-    private fun getNoiseGenerator(SEED: Long): List<Joise> {
-//        return NOISE_MAKER.getGenerator(SEED, TerragenParams())
-//        return NOISE_MAKER.getGenerator(SEED, BiomegenParams())
-        return NOISE_MAKER.getGenerator(SEED, OregenParams())
     }
 
     val colourNull = Color(0x1b3281ff)
@@ -173,7 +170,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     }
 
 
-    private fun renderNoise() {
+    private fun renderNoise(noiseMaker: Pair<NoiseMaker, Any>) {
         generationStartTime = System.nanoTime()
         generationTimeInMeasure = true
 
@@ -229,7 +226,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
         // 2. each runner gets their own copy of Joise
         val runnables: List<RunnableFun> = (0 until testTex.width).sliceEvenly(genSlices).map { range -> {
-                val localJoise = getNoiseGenerator(seed)
+                val localJoise = noiseMaker.first.getGenerator(seed, noiseMaker.second)
                 for (x in range) {
                     for (y in 0 until NOISEBOX_HEIGHT) {
                         val sampleTheta = (x.toDouble() / NOISEBOX_WIDTH) * TWO_PI
@@ -237,7 +234,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
                         val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
                         val sampleY = y.toDouble()
 
-                        NOISE_MAKER.draw(x, y, localJoise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
+                        noiseMaker.first.draw(x, y, localJoise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
                     }
                 }
         } }
@@ -334,7 +331,7 @@ internal object BiomeMaker : NoiseMaker {
 }
 
 // http://accidentalnoise.sourceforge.net/minecraftworlds.html
-internal object AccidentalCave : NoiseMaker {
+internal object Terragen : NoiseMaker {
 
     private infix fun Color.mul(other: Color) = this.mul(other)
 
@@ -347,46 +344,41 @@ internal object AccidentalCave : NoiseMaker {
             Color(0.97f, 0.6f, 0.56f, 1f)
     )
 
+    private val groundDepthBlock = listOf(
+        Block.AIR, Block.DIRT, Block.STONE, Block.STONE_SLATE
+    )
+
+    private fun Double.tiered(vararg tiers: Double): Int {
+        tiers.reversed().forEachIndexed { index, it ->
+            if (this >= it) return (tiers.lastIndex - index) // why??
+        }
+        return tiers.lastIndex
+    }
+
+    private val BACK = Color(0.6f, 0.66f, 0.78f, 1f).toRGBA()
+
+    private val blockToCol = hashMapOf(
+        Block.AIR to Color(0f, 0f, 0f, 1f),
+        Block.DIRT to Color(0.588f, 0.45f, 0.3f, 1f),
+        Block.STONE to Color(0.533f, 0.533f, 0.533f, 1f),
+        Block.STONE_SLATE to Color(0.233f, 0.233f, 0.233f, 1f),
+    )
+
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
-        // simple one-source draw
-        /*val c = noiseValue[0].toFloat()
-        val selector = c.minus(0.0001).floorToInt() fmod notationColours.size
-        val selecteeColour = Color(c - selector, c - selector, c - selector, 1f)
-        if (c < 0) {
-            outTex.setColor(-c, 0f, 0f, 1f)
-        }
-        else {
-            outTex.setColor(selecteeColour.mul(notationColours[selector]))
-        }
-        outTex.drawPixel(x, y)*/
+        val terr = noiseValue[0].tiered(.0, .5, .88, 1.88)
+        val cave = if (noiseValue[1] < 0.5) 0 else 1
 
+        val wallBlock = groundDepthBlock[terr]
+        val terrBlock = if (cave == 0) Block.AIR else wallBlock
 
-        fun Double.tiered(vararg tiers: Double): Int {
-            tiers.reversed().forEachIndexed { index, it ->
-                if (this >= it) return (tiers.lastIndex - index) // why??
-            }
-            return tiers.lastIndex
-        }
-
-        val groundDepthCol = listOf(
-                Color(0f, 0f, 0f, 1f),
-                Color(0.55f, 0.4f, 0.24f, 1f),
-                Color(.6f, .6f, .6f, 1f)
+        outTex.drawPixel(x, y,
+            if (wallBlock == Block.AIR && terrBlock == Block.AIR) BACK
+            else blockToCol[terrBlock]!!.toRGBA()
         )
-        val n1 = noiseValue[0].tiered(.0, .5, .88)
-        //var n2 = noiseValue[1].toFloat()
-        //if (n2 != 1f) n2 = 0.5f
-        val c1 = groundDepthCol[n1]
-        //val c2 = Color(n2, n2, n2, 1f)
-        //val cout = c1 mul c23
-        val cout = c1
-
-        outTex.drawPixel(x, y, cout.toRGBA())
     }
 
     override fun getGenerator(seed: Long, params: Any): List<Joise> {
         val params = params as TerragenParams
-
         val lowlandMagic: Long = 0x41A21A114DBE56 // Maria Lindberg
         val highlandMagic: Long = 0x0114E091      // Olive Oyl
         val mountainMagic: Long = 0x115AA4DE2504  // Lisa Anderson
@@ -397,248 +389,264 @@ internal object AccidentalCave : NoiseMaker {
         val caveBlockageMagic: Long = 0xD15A57E5 // Disaster
 
 
-        val groundGradient = ModuleGradient()
-        groundGradient.setGradient(0.0, 0.0, 0.0, 1.0)
+        val groundGradient = ModuleGradient().also {
+            it.setGradient(0.0, 0.0, 0.0, 1.0)
+        }
 
         /* lowlands */
 
-        val lowlandShapeFractal = ModuleFractal()
-        lowlandShapeFractal.setType(ModuleFractal.FractalType.BILLOW)
-        lowlandShapeFractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-        lowlandShapeFractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        lowlandShapeFractal.setNumOctaves(2)
-        lowlandShapeFractal.setFrequency(0.25)
-        lowlandShapeFractal.seed = seed shake lowlandMagic
+        val lowlandShapeFractal = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.BILLOW)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(2)
+            it.setFrequency(0.25)
+            it.seed = seed shake lowlandMagic
+        }
 
-        val lowlandAutoCorrect = ModuleAutoCorrect()
-        lowlandAutoCorrect.setSource(lowlandShapeFractal)
-        lowlandAutoCorrect.setLow(0.0)
-        lowlandAutoCorrect.setHigh(1.0)
+        val lowlandScale = ModuleScaleOffset().also {
+            it.setSource(lowlandShapeFractal)
+            it.setScale(0.22)
+            it.setOffset(params.lowlandScaleOffset) // linearly alters the height
+        }
 
-        val lowlandScale = ModuleScaleOffset()
-        lowlandScale.setScale(0.125)
-        lowlandScale.setOffset(params.lowlandScaleOffset) // TODO linearly alters the height
+        val lowlandYScale = ModuleScaleDomain().also {
+            it.setSource(lowlandScale)
+            it.setScaleY(0.02) // greater = more distortion, overhangs
+        }
 
-        val lowlandYScale = ModuleScaleDomain()
-        lowlandYScale.setSource(lowlandScale)
-        lowlandYScale.setScaleY(0.02) // greater = more distortion, overhangs
-
-        val lowlandTerrain = ModuleTranslateDomain()
-        lowlandTerrain.setSource(groundGradient)
-        lowlandTerrain.setAxisYSource(lowlandYScale)
+        val lowlandTerrain = ModuleTranslateDomain().also {
+            it.setSource(groundGradient)
+            it.setAxisYSource(lowlandYScale)
+        }
 
         /* highlands */
 
-        val highlandShapeFractal = ModuleFractal()
-        highlandShapeFractal.setType(ModuleFractal.FractalType.FBM)
-        highlandShapeFractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-        highlandShapeFractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        highlandShapeFractal.setNumOctaves(4)
-        highlandShapeFractal.setFrequency(2.0)
-        highlandShapeFractal.seed = seed shake highlandMagic
+        val highlandShapeFractal = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.FBM)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(4)
+            it.setFrequency(2.0)
+            it.seed = seed shake highlandMagic
+        }
 
-        val highlandAutocorrect = ModuleAutoCorrect()
-        highlandAutocorrect.setSource(highlandShapeFractal)
-        highlandAutocorrect.setLow(-1.0)
-        highlandAutocorrect.setHigh(1.0)
+        val highlandScale = ModuleScaleOffset().also {
+            it.setSource(highlandShapeFractal)
+            it.setScale(0.5)
+            it.setOffset(params.highlandScaleOffset) // linearly alters the height
+        }
 
-        val highlandScale = ModuleScaleOffset()
-        highlandScale.setSource(highlandAutocorrect)
-        highlandScale.setScale(0.25)
-        highlandScale.setOffset(params.highlandScaleOffset) // TODO linearly alters the height
+        val highlandYScale = ModuleScaleDomain().also {
+            it.setSource(highlandScale)
+            it.setScaleY(0.14) // greater = more distortion, overhangs
+        }
 
-        val highlandYScale = ModuleScaleDomain()
-        highlandYScale.setSource(highlandScale)
-        highlandYScale.setScaleY(0.14) // greater = more distortion, overhangs
-
-        val highlandTerrain = ModuleTranslateDomain()
-        highlandTerrain.setSource(groundGradient)
-        highlandTerrain.setAxisYSource(highlandYScale)
+        val highlandTerrain = ModuleTranslateDomain().also {
+            it.setSource(groundGradient)
+            it.setAxisYSource(highlandYScale)
+        }
 
         /* mountains */
 
-        val mountainShapeFractal = ModuleFractal()
-        mountainShapeFractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-        mountainShapeFractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        mountainShapeFractal.setNumOctaves(8)
-        mountainShapeFractal.setFrequency(1.0)
-        mountainShapeFractal.seed = seed shake mountainMagic
+        val mountainShapeFractal = ModuleFractal().also {
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(8)
+            it.setFrequency(1.0)
+            it.seed = seed shake mountainMagic
+        }
 
-        val mountainAutocorrect = ModuleAutoCorrect()
-        mountainAutocorrect.setSource(mountainShapeFractal)
-        mountainAutocorrect.setLow(-1.0)
-        mountainAutocorrect.setHigh(1.0)
+        val mountainScale = ModuleScaleOffset().also {
+            it.setSource(mountainShapeFractal)
+            it.setScale(1.0)
+            it.setOffset(params.mountainScaleOffset) // linearly alters the height
+        }
 
-        val mountainScale = ModuleScaleOffset()
-        mountainScale.setSource(mountainAutocorrect)
-        mountainScale.setScale(0.45)
-        mountainScale.setOffset(params.mountainScaleOffset) // TODO linearly alters the height
+        val mountainYScale = ModuleScaleDomain().also {
+            it.setSource(mountainScale)
+            it.setScaleY(params.mountainDisturbance) // greater = more distortion, overhangs
+        }
 
-        val mountainYScale = ModuleScaleDomain()
-        mountainYScale.setSource(mountainScale)
-        mountainYScale.setScaleY(params.mountainDisturbance) // greater = more distortion, overhangs
-
-        val mountainTerrain = ModuleTranslateDomain()
-        mountainTerrain.setSource(groundGradient)
-        mountainTerrain.setAxisYSource(mountainYScale)
+        val mountainTerrain = ModuleTranslateDomain().also {
+            it.setSource(groundGradient)
+            it.setAxisYSource(mountainYScale)
+        }
 
         /* selection */
 
-        val terrainTypeFractal = ModuleFractal()
-        terrainTypeFractal.setType(ModuleFractal.FractalType.FBM)
-        terrainTypeFractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-        terrainTypeFractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        terrainTypeFractal.setNumOctaves(3)
-        terrainTypeFractal.setFrequency(0.125)
-        terrainTypeFractal.seed = seed shake selectionMagic
+        val terrainTypeFractal = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.FBM)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(3)
+            it.setFrequency(0.125)
+            it.seed = seed shake selectionMagic
+        }
 
-        val terrainAutocorrect = ModuleAutoCorrect()
-        terrainAutocorrect.setSource(terrainTypeFractal)
-        terrainAutocorrect.setLow(0.0)
-        terrainAutocorrect.setHigh(1.0)
+        val terrainScaleOffset = ModuleScaleOffset().also {
+            it.setSource(terrainTypeFractal)
+            it.setOffset(0.5)
+            it.setScale(0.666666) // greater = more dynamic terrain
+        }
 
-        val terrainTypeYScale = ModuleScaleDomain()
-        terrainTypeYScale.setSource(terrainAutocorrect)
-        terrainTypeYScale.setScaleY(0.0)
+        val terrainTypeYScale = ModuleScaleDomain().also {
+            it.setSource(terrainScaleOffset)
+            it.setScaleY(0.0)
+        }
 
-        val terrainTypeCache = ModuleCache()
-        terrainTypeCache.setSource(terrainTypeYScale)
+        val terrainTypeCache = ModuleCache().also {
+            it.setSource(terrainTypeYScale)
+        }
 
-        val highlandMountainSelect = ModuleSelect()
-        highlandMountainSelect.setLowSource(highlandTerrain)
-        highlandMountainSelect.setHighSource(mountainTerrain)
-        highlandMountainSelect.setControlSource(terrainTypeCache)
-        highlandMountainSelect.setThreshold(0.55)
-        highlandMountainSelect.setFalloff(0.2)
+        val highlandMountainSelect = ModuleSelect().also {
+            it.setLowSource(highlandTerrain)
+            it.setHighSource(mountainTerrain)
+            it.setControlSource(terrainTypeCache)
+            it.setThreshold(0.55)
+            it.setFalloff(0.2)
+        }
 
-        val highlandLowlandSelect = ModuleSelect()
-        highlandLowlandSelect.setLowSource(lowlandTerrain)
-        highlandLowlandSelect.setHighSource(highlandMountainSelect)
-        highlandLowlandSelect.setControlSource(terrainTypeCache)
-        highlandLowlandSelect.setThreshold(0.25)
-        highlandLowlandSelect.setFalloff(0.15)
+        val highlandLowlandSelect = ModuleSelect().also {
+            it.setLowSource(lowlandTerrain)
+            it.setHighSource(highlandMountainSelect)
+            it.setControlSource(terrainTypeCache)
+            it.setThreshold(0.25)
+            it.setFalloff(0.15)
+        }
 
-        val highlandLowlandSelectCache = ModuleCache()
-        highlandLowlandSelectCache.setSource(highlandLowlandSelect)
+        val highlandLowlandSelectCache = ModuleCache().also {
+            it.setSource(highlandLowlandSelect)
+        }
 
-        val groundSelect = ModuleSelect()
-        groundSelect.setLowSource(0.0)
-        groundSelect.setHighSource(1.0)
-        groundSelect.setThreshold(0.5)
-        groundSelect.setControlSource(highlandLowlandSelectCache)
+        val groundSelect = ModuleSelect().also {
+            it.setLowSource(0.0)
+            it.setHighSource(1.0)
+            it.setThreshold(0.5)
+            it.setControlSource(highlandLowlandSelectCache)
+        }
 
-        val groundSelect2 = ModuleSelect()
-        groundSelect2.setLowSource(0.0)
-        groundSelect2.setHighSource(1.0)
-        groundSelect2.setThreshold(0.8)
-        groundSelect2.setControlSource(highlandLowlandSelectCache)
+        val groundSelect2 = ModuleSelect().also {
+            it.setLowSource(0.0)
+            it.setHighSource(1.0)
+            it.setThreshold(0.8)
+            it.setControlSource(highlandLowlandSelectCache)
+        }
 
         /* caves */
 
-        val caveShape = ModuleFractal()
-        caveShape.setType(ModuleFractal.FractalType.RIDGEMULTI)
-        caveShape.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-        caveShape.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        caveShape.setNumOctaves(1)
-        caveShape.setFrequency(params.caveShapeFreq) // TODO adjust the "density" of the caves
-        caveShape.seed = seed shake caveMagic
+        val caveShape = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.RIDGEMULTI)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(1)
+            it.setFrequency(params.caveShapeFreq) // adjust the "density" of the caves
+            it.seed = seed shake caveMagic
+        }
 
-        val caveAttenuateBias = ModuleBias()
-        caveAttenuateBias.setSource(highlandLowlandSelectCache)
-        caveAttenuateBias.setBias(params.caveAttenuateBias) // TODO (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
+        val caveAttenuateBias = ModuleBias().also {
+            it.setSource(highlandLowlandSelectCache)
+            it.setBias(params.caveAttenuateBias) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
+        }
 
-        val caveShapeAttenuate = ModuleCombiner()
-        caveShapeAttenuate.setType(ModuleCombiner.CombinerType.MULT)
-        caveShapeAttenuate.setSource(0, caveShape)
-        caveShapeAttenuate.setSource(1, caveAttenuateBias)
+        val caveShapeAttenuate = ModuleCombiner().also {
+            it.setType(ModuleCombiner.CombinerType.MULT)
+            it.setSource(0, caveShape)
+            it.setSource(1, caveAttenuateBias)
+        }
 
-        val cavePerturbFractal = ModuleFractal()
-        cavePerturbFractal.setType(ModuleFractal.FractalType.FBM)
-        cavePerturbFractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-        cavePerturbFractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        cavePerturbFractal.setNumOctaves(6)
-        cavePerturbFractal.setFrequency(3.0)
-        cavePerturbFractal.seed = seed shake cavePerturbMagic
+        val cavePerturbFractal = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.FBM)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(6)
+            it.setFrequency(params.caveShapeFreq * 3.0 / 4.0)
+            it.seed = seed shake cavePerturbMagic
+        }
 
-        val cavePerturbScale = ModuleScaleOffset()
-        cavePerturbScale.setSource(cavePerturbFractal)
-        cavePerturbScale.setScale(0.45)
-        cavePerturbScale.setOffset(0.0)
+        val cavePerturbScale = ModuleScaleOffset().also {
+            it.setSource(cavePerturbFractal)
+            it.setScale(0.45)
+            it.setOffset(0.0)
+        }
 
-        val cavePerturb = ModuleTranslateDomain()
-        cavePerturb.setSource(caveShapeAttenuate)
-        cavePerturb.setAxisXSource(cavePerturbScale)
+        val cavePerturb = ModuleTranslateDomain().also {
+            it.setSource(caveShapeAttenuate)
+            it.setAxisXSource(cavePerturbScale)
+        }
 
-        val caveSelect = ModuleSelect()
-        caveSelect.setLowSource(1.0)
-        caveSelect.setHighSource(0.0)
-        caveSelect.setControlSource(cavePerturb)
-        caveSelect.setThreshold(params.caveSelectThre) // TODO also adjust this if you've touched the bias value. Number can be greater than 1.0
-        caveSelect.setFalloff(0.0)
+        val caveSelect = ModuleSelect().also {
+            it.setLowSource(1.0)
+            it.setHighSource(0.0)
+            it.setControlSource(cavePerturb)
+            it.setThreshold(params.caveSelectThre) // also adjust this if you've touched the bias value. Number can be greater than 1.0
+            it.setFalloff(0.0)
+        }
 
-        val caveBlockageFractal = ModuleFractal()
-        caveBlockageFractal.setType(ModuleFractal.FractalType.RIDGEMULTI)
-        caveBlockageFractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-        caveBlockageFractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        caveBlockageFractal.setNumOctaves(2)
-        caveBlockageFractal.setFrequency(params.caveBlockageFractalFreq) // TODO same as caveShape frequency?
-        caveBlockageFractal.seed = seed shake caveBlockageMagic
+        val caveBlockageFractal = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.RIDGEMULTI)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(2)
+            it.setFrequency(params.caveBlockageFractalFreq) // same as caveShape frequency?
+            it.seed = seed shake caveBlockageMagic
+        }
 
         // will only close-up deeper caves. Shallow caves will be less likely to be closed up
-        val caveBlockageAttenuate = ModuleCombiner()
-        caveBlockageAttenuate.setType(ModuleCombiner.CombinerType.MULT)
-        caveBlockageAttenuate.setSource(0, caveBlockageFractal)
-        caveBlockageAttenuate.setSource(1, caveAttenuateBias)
+        val caveBlockageAttenuate = ModuleCombiner().also {
+            it.setType(ModuleCombiner.CombinerType.MULT)
+            it.setSource(0, caveBlockageFractal)
+            it.setSource(1, caveAttenuateBias)
+        }
 
-        val caveBlockageSelect = ModuleSelect()
-        caveBlockageSelect.setLowSource(0.0)
-        caveBlockageSelect.setHighSource(1.0)
-        caveBlockageSelect.setControlSource(caveBlockageAttenuate)
-        caveBlockageSelect.setThreshold(params.caveBlockageSelectThre) // TODO adjust cave cloing-up strength. Larger = more closing
-        caveBlockageSelect.setFalloff(0.0)
+        val caveBlockageSelect = ModuleSelect().also {
+            it.setLowSource(0.0)
+            it.setHighSource(1.0)
+            it.setControlSource(caveBlockageAttenuate)
+            it.setThreshold(params.caveBlockageSelectThre) // adjust cave cloing-up strength. Larger = more closing
+            it.setFalloff(0.0)
+        }
 
         // note: gradient-multiply DOESN'T generate "naturally cramped" cave entrance
 
-        val caveInMix = ModuleCombiner()
-        caveInMix.setType(ModuleCombiner.CombinerType.ADD)
-        caveInMix.setSource(0, caveSelect)
-        caveInMix.setSource(1, caveBlockageSelect)
-
-        /*val groundCaveMult = ModuleCombiner()
-        groundCaveMult.setType(ModuleCombiner.CombinerType.MULT)
-        groundCaveMult.setSource(0, caveInMix)
-        //groundCaveMult.setSource(0, caveSelect) // disables the cave-in for quick cavegen testing
-        groundCaveMult.setSource(1, groundSelect)*/
+        val caveInMix = ModuleCombiner().also {
+            it.setType(ModuleCombiner.CombinerType.ADD)
+            it.setSource(0, caveSelect)
+            it.setSource(1, caveBlockageSelect)
+        }
 
         // this noise tree WILL generate noise value greater than 1.0
         // they should be treated properly when you actually generate the world out of the noisemap
         // for the visualisation, no treatment will be done in this demo app.
 
-        val groundClamp = ModuleClamp()
-        groundClamp.setRange(0.0, 100.0)
-        groundClamp.setSource(highlandLowlandSelectCache)
+        val groundClamp = ModuleClamp().also {
+            it.setRange(0.0, 100.0)
+            it.setSource(highlandLowlandSelectCache)
+        }
 
-        val groundScaling = ModuleScaleDomain()
-        groundScaling.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
-        groundScaling.setScaleY(1.0 / params.featureSize)
-        groundScaling.setScaleZ(1.0 / params.featureSize)
-        groundScaling.setSource(groundClamp)
+        val groundScaling = ModuleScaleDomain().also {
+            it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
+            it.setScaleY(1.0 / params.featureSize)
+            it.setScaleZ(1.0 / params.featureSize)
+            it.setSource(groundClamp)
+        }
 
+        val caveClamp = ModuleClamp().also {
+            it.setRange(0.0, 1.0)
+            it.setSource(caveInMix)
+        }
 
-        val caveClamp = ModuleClamp()
-        caveClamp.setRange(0.0, 1.0)
-        caveClamp.setSource(caveInMix)
-
-        val caveScaling = ModuleScaleDomain()
-        caveScaling.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
-        caveScaling.setScaleY(1.0 / params.featureSize)
-        caveScaling.setScaleZ(1.0 / params.featureSize)
-        caveScaling.setSource(caveClamp)
+        val caveScaling = ModuleScaleDomain().also {
+            it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
+            it.setScaleY(1.0 / params.featureSize)
+            it.setScaleZ(1.0 / params.featureSize)
+            it.setSource(caveClamp)
+        }
 
         //return Joise(caveInMix)
         return listOf(
-                Joise(groundScaling),
-                Joise(caveScaling)
+            Joise(groundScaling),
+            Joise(caveScaling)
         )
     }
 }
@@ -701,7 +709,7 @@ internal object Oregen : NoiseMaker {
 
         val oreSelectAttenuate = ModulePow().also {
             it.setSource(ModuleGradient().also {
-                it.setGradient(0.0, 0.0, NOISEBOX_HEIGHT.toDouble() * 4, 100.0)
+                it.setGradient(0.0, 0.0, NOISEBOX_HEIGHT.toDouble() * 5, 100.0)
             })
             it.setPower(1.0 / 4.0)
         }
