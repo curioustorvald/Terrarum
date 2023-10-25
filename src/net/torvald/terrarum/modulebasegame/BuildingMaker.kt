@@ -6,25 +6,21 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockPropUtil
-import net.torvald.terrarum.blockstats.TileSurvey
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
-import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
-import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerPenMenu
 import net.torvald.terrarum.modulebasegame.ui.UIPaletteSelector
+import net.torvald.terrarum.modulebasegame.ui.UIScreenZoom
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.PointOfInterest
 import net.torvald.terrarum.serialise.POILayer
@@ -266,12 +262,15 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     init {
         essentialOverlays.add(blockPointingCursor)
 
-        uiContainer.add(uiToolbox)
-        uiContainer.add(uiPaletteSelector)
-        uiContainer.add(notifier)
-        uiContainer.add(uiPalette)
-        uiContainer.add(uiPenMenu)
-        uiContainer.add(uiGetPoiName)
+        uiContainer.add(
+            uiToolbox,
+            uiPaletteSelector,
+            notifier,
+            uiPalette,
+            uiPenMenu,
+            uiGetPoiName,
+            UIScreenZoom(),
+        )
 
 
 
@@ -304,7 +303,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
 
-    private var mousePrimaryClickLatched = false
+    private var disableMouseClick = false
     var mousePrimaryJustDown = false; private set
 
     override fun render(updateRate: Float) {
@@ -332,7 +331,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         if (!Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
-            mousePrimaryClickLatched = false
+            disableMouseClick = false
         }
     }
 
@@ -458,7 +457,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         _testMarkerDrawCalls = 0L
 
         IngameRenderer.invoke(false,
-                1f,
+                screenZoom,
                 listOf(),
                 listOf(),
                 listOf(),
@@ -504,10 +503,10 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             it.text = listOf("WH: $w\u00D7$h", "Name of the POI:")
             it.confirmCallback = { s ->
                 callback(s)
-                mousePrimaryClickLatched = true
+                disableMouseClick = true
             }
             it.cancelCallback = {
-                mousePrimaryClickLatched = true
+                disableMouseClick = true
             }
             it.setPosition(
                 240,
@@ -525,10 +524,10 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             it.text = listOf("Name of the POI:")
             it.confirmCallback = { s ->
                 callback(s)
-                mousePrimaryClickLatched = true
+                disableMouseClick = true
             }
             it.cancelCallback = {
-                mousePrimaryClickLatched = true
+                disableMouseClick = true
             }
             it.setPosition(
                 240,
@@ -559,7 +558,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val world = gameWorld
         val palSelection = uiPaletteSelector.fore
 
-        if (!mousePrimaryClickLatched) {
+        if (!disableMouseClick) {
             when (currentPenMode) {
                 // test paint terrain layer
                 PENMODE_PENCIL -> {
@@ -604,7 +603,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
                 PENMODE_IMPORT -> {
                     importPoi(x, y)
-                    mousePrimaryClickLatched = true
+                    disableMouseClick = true
                 }
             }
         }

@@ -57,12 +57,12 @@ class UIScreenZoom : UICanvas(
 
     override fun doOpening(delta: Float) {
         Terrarum.ingame?.screenZoom = Movement.fastPullOut(handler.openCloseCounter / openCloseTime, zoomMin, zoomMax)
-        handler.opacity = Terrarum.ingame?.screenZoom!! - zoomMin
+        handler.opacity = (Terrarum.ingame?.screenZoom ?: 1f) - zoomMin
     }
 
     override fun doClosing(delta: Float) {
         Terrarum.ingame?.screenZoom = Movement.fastPullOut(handler.openCloseCounter / openCloseTime, zoomMax, zoomMin)
-        handler.opacity = Terrarum.ingame?.screenZoom!! - zoomMin
+        handler.opacity = (Terrarum.ingame?.screenZoom ?: 1f) - zoomMin
     }
 
     override fun endOpening(delta: Float) {
