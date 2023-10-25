@@ -11,18 +11,23 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.HdpiMode
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.DefaultGL32Shaders
-import net.torvald.terrarum.concurrent.*
-import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.FlippingSpriteBatch
+import net.torvald.terrarum.concurrent.RunnableFun
+import net.torvald.terrarum.concurrent.ThreadExecutor
+import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.worldgenerator.BiomegenParams
+import net.torvald.terrarum.modulebasegame.worldgenerator.OregenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.TerragenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.shake
 import net.torvald.terrarum.worlddrawer.toRGBA
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import java.util.concurrent.Future
 import kotlin.math.cos
 import kotlin.math.max
@@ -59,14 +64,13 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private var genFutures: Array<Future<*>?> = arrayOfNulls(genSlices)
 
     override fun create() {
-        font = BitmapFont() // use default because fuck it
+        font = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap")
 
-        batch = SpriteBatch(1000, DefaultGL32Shaders.createSpriteBatchShader())
+        batch = FlippingSpriteBatch(1000)
         camera = OrthographicCamera(NOISEBOX_WIDTH.toFloat(), NOISEBOX_HEIGHT.toFloat())
-        camera.setToOrtho(false) // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin
+        camera.setToOrtho(true) // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin
         camera.update()
         batch.projectionMatrix = camera.combined
-        Gdx.gl20.glViewport(0, 0, NOISEBOX_WIDTH, NOISEBOX_HEIGHT)
 
         testTex = Pixmap(NOISEBOX_WIDTH, NOISEBOX_HEIGHT, Pixmap.Format.RGBA8888)
         testTex.blending = Pixmap.Blending.None
@@ -88,7 +92,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         batch.inUse {
             tempTex.dispose()
             tempTex = Texture(testTex)
-            batch.draw(tempTex, 0f, 0f)
+            batch.draw(tempTex, 0f, 0f, NOISEBOX_WIDTH.toFloat(), NOISEBOX_HEIGHT.toFloat())
         }
 
         // read key input
@@ -114,19 +118,22 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         // draw timer
         batch.inUse {
             if (!generationTimeInMeasure) {
-                font.draw(batch, "Generation time: ${generationTime} seconds", 8f, NOISEBOX_HEIGHT - 8f)
+                font.draw(batch, "Generation time: ${generationTime} seconds", 8f, 8f)
             }
             else {
-                font.draw(batch, "Generating...", 8f, NOISEBOX_HEIGHT - 8f)
+                font.draw(batch, "Generating...", 8f, 8f)
             }
         }
     }
 
-    private val NOISE_MAKER = BiomeMaker
+//    private val NOISE_MAKER = AccidentalCave
+//    private val NOISE_MAKER = BiomeMaker
+    private val NOISE_MAKER = Oregen
 
     private fun getNoiseGenerator(SEED: Long): List<Joise> {
-        //return NOISE_MAKER.getGenerator(SEED, TerragenParams())
-        return NOISE_MAKER.getGenerator(SEED, BiomegenParams())
+//        return NOISE_MAKER.getGenerator(SEED, TerragenParams())
+//        return NOISE_MAKER.getGenerator(SEED, BiomegenParams())
+        return NOISE_MAKER.getGenerator(SEED, OregenParams())
     }
 
     val colourNull = Color(0x1b3281ff)
@@ -327,7 +334,7 @@ internal object BiomeMaker : NoiseMaker {
 }
 
 // http://accidentalnoise.sourceforge.net/minecraftworlds.html
-internal object AccidentalCave {
+internal object AccidentalCave : NoiseMaker {
 
     private infix fun Color.mul(other: Color) = this.mul(other)
 
@@ -340,7 +347,7 @@ internal object AccidentalCave {
             Color(0.97f, 0.6f, 0.56f, 1f)
     )
 
-    fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
+    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         // simple one-source draw
         /*val c = noiseValue[0].toFloat()
         val selector = c.minus(0.0001).floorToInt() fmod notationColours.size
@@ -377,7 +384,7 @@ internal object AccidentalCave {
         outTex.drawPixel(x, y, cout.toRGBA())
     }
 
-    fun getGenerator(seed: Long, params: Any): List<Joise> {
+    override fun getGenerator(seed: Long, params: Any): List<Joise> {
         val params = params as TerragenParams
 
         val lowlandMagic: Long = 0x41A21A114DBE56 // Maria Lindberg
@@ -636,6 +643,83 @@ internal object AccidentalCave {
     }
 }
 
+
+internal object Oregen : NoiseMaker {
+    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
+        var n = noiseValue[0]
+
+//        if (n in 0.0..1.0) n = 1.0 - n
+
+        val cout = if (n >= 0.0)
+            Color(n.toFloat(), n.toFloat(), n.toFloat(), 1f)
+        else
+            Color(-n.toFloat(), 0f, 1f, 1f)
+
+        outTex.drawPixel(x, y, cout.toRGBA())
+    }
+
+    override fun getGenerator(seed: Long, params: Any): List<Joise> {
+        val params = params as OregenParams
+
+        val oreMagic = 0x023L
+        val orePerturbMagic = 12345L
+
+        val oreShape = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.RIDGEMULTI)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(2)
+            it.setFrequency(params.oreShapeFreq) // adjust the "density" of the caves
+            it.seed = seed shake oreMagic
+        }
+
+        val oreShape2 = ModuleScaleOffset().also {
+            it.setSource(oreShape)
+            it.setScale(1.0)
+            it.setOffset(-0.5)
+        }
+
+        val orePerturbFractal = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.FBM)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(6)
+            it.setFrequency(params.oreShapeFreq * 3.0 / 4.0)
+            it.seed = seed shake orePerturbMagic
+        }
+
+        val orePerturbScale = ModuleScaleOffset().also {
+            it.setSource(orePerturbFractal)
+            it.setScale(20.0)
+            it.setOffset(0.0)
+        }
+
+        val orePerturb = ModuleTranslateDomain().also {
+            it.setSource(oreShape2)
+            it.setAxisXSource(orePerturbScale)
+        }
+
+        val oreSelectAttenuate = ModulePow().also {
+            it.setSource(ModuleGradient().also {
+                it.setGradient(0.0, 0.0, NOISEBOX_HEIGHT.toDouble() * 4, 100.0)
+            })
+            it.setPower(1.0 / 4.0)
+        }
+
+        val oreSelect = ModuleSelect().also {
+            it.setLowSource(0.0)
+            it.setHighSource(1.0)
+            it.setControlSource(orePerturb)
+            it.setThreshold(oreSelectAttenuate)
+            it.setFalloff(0.0)
+        }
+
+        return listOf(
+            Joise(oreSelect)
+        )
+    }
+
+}
 
 
 /*infix fun Long.shake(other: Long): Long {

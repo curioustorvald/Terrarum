@@ -18,12 +18,15 @@ import kotlin.math.sin
  */
 class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
 
+    companion object {
+        const val YHEIGHT_MAGIC = 2800.0 / 3.0
+        const val YHEIGHT_DIVISOR = 2.0 / 7.0
+    }
+
     private val threadExecutor = TerrarumIngame.worldgenThreadExecutor
 
     private val genSlices = max(threadExecutor.threadCount, world.width / 8)
 
-    private val YHEIGHT_MAGIC = 2800.0 / 3.0
-    private val YHEIGHT_DIVISOR = 2.0 / 7.0
 
     private val dirtStoneDitherSize = 3 // actual dither size will be double of this value
     private val stoneSlateDitherSize = 4
@@ -84,12 +87,6 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
             world.setTileTerrain(x, y, terrBlock, true)
             world.setTileWall(x, y, wallBlock, true)
-
-
-            // TODO TEST CODE
-            if (terrBlock == Block.DIRT) {
-                world.setTileOre(x, y, "ores@basegame:1", 0)
-            }
         }
 
         // dither shits
@@ -322,7 +319,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
             it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
             it.setNumOctaves(6)
-            it.setFrequency(3.0)
+            it.setFrequency(params.caveShapeFreq * 3.0 / 4.0)
             it.seed = seed shake cavePerturbMagic
         }
 
