@@ -36,7 +36,7 @@ interface Pocketed {
         // Relevant Actorvalue is NOT being updated on time
         // They're being safely handled by UIItemInventoryElem*.touchDown() and ActorInventory.remove
 
-        item.effectOnUnequip(this as ActorWithBody, App.UPDATE_RATE)
+        item.effectOnUnequip(this as ActorWithBody)
     }
 
     fun unequipItem(itemID: ItemID?) {

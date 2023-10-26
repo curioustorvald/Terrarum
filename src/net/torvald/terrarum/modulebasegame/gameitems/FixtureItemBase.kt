@@ -88,7 +88,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
         }
     }
 
-    override fun effectOnUnequip(actor: ActorWithBody, delta: Float) {
+    override fun effectOnUnequip(actor: ActorWithBody) {
 //        ghostInit = false
 
         (INGAME as TerrarumIngame).blockMarkingActor.let {

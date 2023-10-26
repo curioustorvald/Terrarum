@@ -102,6 +102,8 @@ internal class UIInventoryCells(
                 ).let { drop ->
                     INGAME.queueActorAddition(drop)
                 }
+                // apply item effect
+                item.effectOnThrow(player)
                 // update inventory
                 rebuildList()
             } }

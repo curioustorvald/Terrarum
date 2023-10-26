@@ -151,6 +151,7 @@ object WorldSimulator {
                     if (result.distance < pickupDistSqr) {
                         droppedItem.flagDespawn = true
                         (actor as Pocketed).inventory.add(droppedItem.itemID, droppedItem.itemCount)
+                        ItemCodex[droppedItem.itemID]!!.effectOnPickup(actor)
                         break
                     }
                 }

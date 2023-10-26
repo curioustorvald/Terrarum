@@ -38,16 +38,26 @@ object Worldgen {
 
     private val oreRegistry = ArrayList<OregenParams>()
 
+    fun getJobs(tags: List<String> = emptyList()): List<Work> {
+        val tagFilter = if (tags.isEmpty()) { { work: Work -> true } }
+        else {
+            { work: Work ->
+                (work.tags union tags).isNotEmpty()
+            }
+        }
+        return listOf(
+            Work("Reticulating Splines", Terragen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")),
+            Work("Adding Rocks", Oregen(world, caveAttenuateBiasScaled, params.seed, oreRegistry), listOf("ORES")),
+            Work("Positioning Rocks", OregenAutotiling(world, params.seed), listOf("ORES")),
+            Work("Adding Vegetations", Biomegen(world, params.seed, params.biomegenParams), listOf("BIOME")),
+        ).filter(tagFilter)
+    }
+
     fun generateMap() {
         highlandLowlandSelectCache = getHighlandLowlandSelectCache(params.terragenParams, params.seed)
         caveAttenuateBiasScaled = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
 
-        val jobs = listOf(
-            Work("Reticulating Splines", Terragen(world, highlandLowlandSelectCache, params.seed, params.terragenParams)),
-            Work("Adding Rocks", Oregen(world, caveAttenuateBiasScaled, params.seed, oreRegistry)),
-            Work("Positioning Rocks", OregenAutotiling(world, params.seed)),
-            Work("Adding Vegetations", Biomegen(world, params.seed, params.biomegenParams)),
-        )
+        val jobs = getJobs()
 
 
         for (i in jobs.indices) {
@@ -80,10 +90,10 @@ object Worldgen {
 
     }
 
-    private data class Work(val loadingScreenName: String, val theWork: Gen)
+    data class Work(val loadingScreenName: String, val theWork: Gen, val tags: List<String>)
 
     fun getEstimationSec(width: Int, height: Int): Long {
-        return (23.05 * 1.25 * (48600000.0 / bogoflops) * ((width * height) / 40095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
+        return (23.15 * 1.25 * (48600000.0 / bogoflops) * ((width * height) / 40095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
     }
 
     private fun getHighlandLowlandSelectCache(params: TerragenParams, seed: Long): ModuleCache {

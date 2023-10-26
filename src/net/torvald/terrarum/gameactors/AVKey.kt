@@ -158,4 +158,11 @@ object AVKey {
      * This value is only used for IngamePlayers
      */
     const val GAMEMODE = "gamemode"
+
+    /** String
+     * Comma-separated ItemIDs for the item the ore drops (`item@basegame:128` instead of `ores@basegame:1`)
+     *
+     * When the player gets the ore item, its itemID is appended to this actorvalue.
+     */
+    const val ORE_DICT = "oredict"
 }

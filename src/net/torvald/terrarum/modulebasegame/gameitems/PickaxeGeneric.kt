@@ -14,6 +14,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRangeTools
 import net.torvald.terrarum.gameparticles.createRandomBlockParticle
 import net.torvald.terrarum.itemproperties.Calculate
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE
@@ -160,6 +161,30 @@ object PickaxeCore {
 
     const val BASE_MASS_AND_SIZE = 10.0 // of iron pick
     const val TOOL_DURABILITY_BASE = 350 // of iron pick
+
+    fun showOresTooltip(actor: ActorWithBody, tool: GameItem, mx: Int, my: Int): Unit {
+        if (App.getConfigBoolean("basegame:showpickaxetooltip")) {
+            var tooltipSet = false
+            mouseInInteractableRangeTools(actor, tool) {
+                val tileUnderCursor = INGAME.world.getTileFromOre(mx, my).item
+                val playerCodex = (actor.actorValue.getAsString(AVKey.ORE_DICT) ?: "").split(',').filter { it.isNotBlank() }
+
+
+                if (tileUnderCursor != Block.AIR) {
+                    val itemForOre = OreCodex[tileUnderCursor].item
+                    val tileName = if (playerCodex.binarySearch(itemForOre) >= 0)
+                        Lang[ItemCodex[itemForOre]!!.originalName]
+                    else "???"
+                    INGAME.setTooltipMessage(tileName)
+                    tooltipSet = true
+                }
+
+                true // just a placeholder
+            }
+
+            if (!tooltipSet) INGAME.setTooltipMessage(null)
+        }
+    }
 }
 
 /**
@@ -187,6 +212,8 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
             if (PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = PickaxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+
 }
 
 /**
@@ -214,6 +241,8 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
             if (PickaxeCore.startPrimaryUse(actor , delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = PickaxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+
 }
 
 /**
@@ -241,6 +270,8 @@ class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
             if (PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = PickaxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+
 }
 
 /**
@@ -268,4 +299,6 @@ class PickaxeWood(originalID: ItemID) : GameItem(originalID) {
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
         if (PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = PickaxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+
 }

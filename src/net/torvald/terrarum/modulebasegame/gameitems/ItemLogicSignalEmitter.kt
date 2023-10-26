@@ -26,8 +26,8 @@ class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, "
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "signal"
     }
 
-    override fun effectOnUnequip(actor: ActorWithBody, delta: Float) {
-        super.effectOnUnequip(actor, delta)
+    override fun effectOnUnequip(actor: ActorWithBody) {
+        super.effectOnUnequip(actor)
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 

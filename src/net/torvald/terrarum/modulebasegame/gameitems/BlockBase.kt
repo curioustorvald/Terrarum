@@ -205,7 +205,7 @@ object BlockBase {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = WireCodex[itemID].renderClass
     }
 
-    fun wireEffectWhenUnequipped(gameItem: GameItem, delta: Float) {
+    fun wireEffectWhenUnequipped(gameItem: GameItem) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 

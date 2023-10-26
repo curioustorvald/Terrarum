@@ -107,7 +107,7 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "wire_render_all"
     }
 
-    override fun effectOnUnequip(actor: ActorWithBody, delta: Float) {
+    override fun effectOnUnequip(actor: ActorWithBody) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 }

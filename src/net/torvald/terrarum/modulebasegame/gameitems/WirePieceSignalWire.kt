@@ -36,7 +36,7 @@ class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, priva
         BlockBase.wireEffectWhenEquipped(this, delta)
     }
 
-    override fun effectOnUnequip(actor: ActorWithBody, delta: Float) {
-        BlockBase.wireEffectWhenUnequipped(this, delta)
+    override fun effectOnUnequip(actor: ActorWithBody) {
+        BlockBase.wireEffectWhenUnequipped(this)
     }
 }

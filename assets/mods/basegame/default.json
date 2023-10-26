@@ -1,3 +1,4 @@
 {
-  "gameplay_max_crafting": 100
+  "gameplay_max_crafting": 100,
+  "showpickaxetooltip": true
 }

@@ -209,7 +209,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     /**
      * Effects applied immediately only once when picked up
      */
-    open fun effectOnPickup(actor: ActorWithBody, delta: Float) { }
+    open fun effectOnPickup(actor: ActorWithBody) { }
 
     /**
      * Apply effects (continuously or not) while primary button is down.
@@ -249,7 +249,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     /**
      * Effects applied immediately only once when thrown (discarded) from pocket
      */
-    open fun effectOnThrow(actor: ActorWithBody, delta: Float) { }
+    open fun effectOnThrow(actor: ActorWithBody) { }
 
     /**
      * Effects applied (continuously or not) while being equipped (drawn/pulled out)
@@ -259,7 +259,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     /**
      * Effects applied only once when unequipped
      */
-    open fun effectOnUnequip(actor: ActorWithBody, delta: Float) { }
+    open fun effectOnUnequip(actor: ActorWithBody) { }
 
     
     override fun toString(): String {

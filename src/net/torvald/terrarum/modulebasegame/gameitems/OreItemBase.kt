@@ -2,6 +2,8 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 
@@ -15,6 +17,16 @@ open class OreItemBase(originalID: ItemID) : GameItem(originalID) {
     override val isDynamic = false
     override val materialId = "OORE"
     override var equipPosition = EquipPosition.HAND_GRIP
+
+    override fun effectOnPickup(actor: ActorWithBody) {
+        val playerCodex = (actor.actorValue.getAsString(AVKey.ORE_DICT) ?: "").split(',').filter { it.isNotBlank() }.toMutableList()
+
+        if (playerCodex.binarySearch(originalID) < 0) {
+            playerCodex.add(originalID)
+            playerCodex.sort()
+            actor.actorValue[AVKey.ORE_DICT] = playerCodex.joinToString(",")
+        }
+    }
 }
 
 /* Wooden Log is a block */

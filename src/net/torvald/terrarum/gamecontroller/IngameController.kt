@@ -198,6 +198,8 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                     ).let { drop ->
                         INGAME.queueActorAddition(drop)
                     }
+                    // apply item effect
+                    ItemCodex[item]!!.effectOnThrow(player)
                 }
             }
         }
