@@ -582,6 +582,9 @@ open class GameWorld(
             throw IllegalArgumentException("illegal mode input: $mode")
     }
 
+    /**
+     * Will return (Block.AIR, 0) if there is no ore
+     */
     fun getTileFromOre(rawX: Int, rawY: Int): OrePlacement {
         val (x, y) = coerceXY(rawX, rawY)
         val (tileNum, placement) = layerOres.unsafeGetTile1(x, y)

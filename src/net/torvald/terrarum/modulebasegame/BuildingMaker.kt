@@ -569,7 +569,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                         val autotiled = getNearbyOres8(x, y).foldIndexed(0) { index, acc, placement ->
                             acc or (placement.item == palSelection).toInt(index)
                         }
-                        val placement = BlocksDrawer.connectLut47[autotiled]
+                        val placement = BlocksDrawer.connectLut16[autotiled]
 
                         world.setTileOre(x, y, palSelection, placement)
                     }

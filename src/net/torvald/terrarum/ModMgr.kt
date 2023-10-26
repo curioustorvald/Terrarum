@@ -15,6 +15,8 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.worldgenerator.OregenParams
+import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
@@ -508,7 +510,23 @@ object ModMgr {
         }
 
         @JvmStatic operator fun invoke(module: String) {
+            // register ore codex
             Terrarum.oreCodex.fromModule(module, "ores/ores.csv")
+
+            // register to worldgen
+            try {
+                CSVFetcher.readFromModule(module, "ores/worldgen.csv").forEach { rec ->
+                    val tile = "ores@$module:${rec.get("id")}"
+                    val freq = rec.get("freq").toDouble()
+                    val power = rec.get("power").toDouble()
+                    val scale = rec.get("scale").toDouble()
+
+                    Worldgen.registerOre(OregenParams(tile, freq, power, scale))
+                }
+            }
+            catch (e: IOException) {
+                e.printStackTrace()
+            }
         }
     }
 

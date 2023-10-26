@@ -15,7 +15,7 @@ import kotlin.math.sin
 /**
  * Created by minjaesong on 2019-07-23.
  */
-class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
+class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, seed: Long, params: Any) : Gen(world, seed, params) {
 
     companion object {
         const val YHEIGHT_MAGIC = 2800.0 / 3.0
@@ -137,159 +137,9 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
 
     private fun getGenerator(seed: Long, params: TerragenParams): List<Joise> {
-        val lowlandMagic: Long = 0x41A21A114DBE56 // Maria Lindberg
-        val highlandMagic: Long = 0x0114E091      // Olive Oyl
-        val mountainMagic: Long = 0x115AA4DE2504  // Lisa Anderson
-        val selectionMagic: Long = 0x41E10D9B100  // Melody Blue
-
         val caveMagic: Long = 0x00215741CDF // Urist McDF
         val cavePerturbMagic: Long = 0xA2410C // Armok
         val caveBlockageMagic: Long = 0xD15A57E5 // Disaster
-
-
-        val groundGradient = ModuleGradient().also {
-            it.setGradient(0.0, 0.0, 0.0, 1.0)
-        }
-
-        /* lowlands */
-
-        val lowlandShapeFractal = ModuleFractal().also {
-            it.setType(ModuleFractal.FractalType.BILLOW)
-            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-            it.setNumOctaves(2)
-            it.setFrequency(0.25)
-            it.seed = seed shake lowlandMagic
-        }
-
-        val lowlandScale = ModuleScaleOffset().also {
-            it.setSource(lowlandShapeFractal)
-            it.setScale(0.22)
-            it.setOffset(params.lowlandScaleOffset) // linearly alters the height
-        }
-
-        val lowlandYScale = ModuleScaleDomain().also {
-            it.setSource(lowlandScale)
-            it.setScaleY(0.02) // greater = more distortion, overhangs
-        }
-
-        val lowlandTerrain = ModuleTranslateDomain().also {
-            it.setSource(groundGradient)
-            it.setAxisYSource(lowlandYScale)
-        }
-
-        /* highlands */
-
-        val highlandShapeFractal = ModuleFractal().also {
-            it.setType(ModuleFractal.FractalType.FBM)
-            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-            it.setNumOctaves(4)
-            it.setFrequency(2.0)
-            it.seed = seed shake highlandMagic
-        }
-
-        val highlandScale = ModuleScaleOffset().also {
-            it.setSource(highlandShapeFractal)
-            it.setScale(0.5)
-            it.setOffset(params.highlandScaleOffset) // linearly alters the height
-        }
-
-        val highlandYScale = ModuleScaleDomain().also {
-            it.setSource(highlandScale)
-            it.setScaleY(0.14) // greater = more distortion, overhangs
-        }
-
-        val highlandTerrain = ModuleTranslateDomain().also {
-            it.setSource(groundGradient)
-            it.setAxisYSource(highlandYScale)
-        }
-
-        /* mountains */
-
-        val mountainShapeFractal = ModuleFractal().also {
-            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-            it.setNumOctaves(8)
-            it.setFrequency(1.0)
-            it.seed = seed shake mountainMagic
-        }
-
-        val mountainScale = ModuleScaleOffset().also {
-            it.setSource(mountainShapeFractal)
-            it.setScale(1.0)
-            it.setOffset(params.mountainScaleOffset) // linearly alters the height
-        }
-
-        val mountainYScale = ModuleScaleDomain().also {
-            it.setSource(mountainScale)
-            it.setScaleY(params.mountainDisturbance) // greater = more distortion, overhangs
-        }
-
-        val mountainTerrain = ModuleTranslateDomain().also {
-            it.setSource(groundGradient)
-            it.setAxisYSource(mountainYScale)
-        }
-
-        /* selection */
-
-        val terrainTypeFractal = ModuleFractal().also {
-            it.setType(ModuleFractal.FractalType.FBM)
-            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-            it.setNumOctaves(3)
-            it.setFrequency(0.125)
-            it.seed = seed shake selectionMagic
-        }
-
-        val terrainScaleOffset = ModuleScaleOffset().also {
-            it.setSource(terrainTypeFractal)
-            it.setOffset(0.5)
-            it.setScale(0.666666) // greater = more dynamic terrain
-        }
-
-        val terrainTypeYScale = ModuleScaleDomain().also {
-            it.setSource(terrainScaleOffset)
-            it.setScaleY(0.0)
-        }
-
-        val terrainTypeCache = ModuleCache().also {
-            it.setSource(terrainTypeYScale)
-        }
-
-        val highlandMountainSelect = ModuleSelect().also {
-            it.setLowSource(highlandTerrain)
-            it.setHighSource(mountainTerrain)
-            it.setControlSource(terrainTypeCache)
-            it.setThreshold(0.55)
-            it.setFalloff(0.2)
-        }
-
-        val highlandLowlandSelect = ModuleSelect().also {
-            it.setLowSource(lowlandTerrain)
-            it.setHighSource(highlandMountainSelect)
-            it.setControlSource(terrainTypeCache)
-            it.setThreshold(0.25)
-            it.setFalloff(0.15)
-        }
-
-        val highlandLowlandSelectCache = ModuleCache().also {
-            it.setSource(highlandLowlandSelect)
-        }
-
-        val groundSelect = ModuleSelect().also {
-            it.setLowSource(0.0)
-            it.setHighSource(1.0)
-            it.setThreshold(0.5)
-            it.setControlSource(highlandLowlandSelectCache)
-        }
-
-        val groundSelect2 = ModuleSelect().also {
-            it.setLowSource(0.0)
-            it.setHighSource(1.0)
-            it.setThreshold(0.8)
-            it.setControlSource(highlandLowlandSelectCache)
-        }
 
         /* caves */
 
@@ -401,6 +251,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             it.setSource(caveClamp)
         }
 
+
         //return Joise(caveInMix)
         return listOf(
                 Joise(groundScaling),
@@ -422,13 +273,13 @@ data class TerragenParams(
     val caveBlockageFractalFreq: Double = 8.88,
     val caveBlockageSelectThre: Double = 1.40, // adjust cave cloing-up strength. Larger = more closing
 
-    val oreCopperFreq: Double = 0.024, // adjust the "density" of the ore veins
-    val oreCopperPower: Double = 0.01, // super-low value almost negates the depth element
-    val oreCopperScale: Double = 0.505,
+//    val oreCopperFreq: Double = 0.024, // adjust the "density" of the ore veins
+//    val oreCopperPower: Double = 0.01, // super-low value almost negates the depth element
+//    val oreCopperScale: Double = 0.505,
 
-    val oreIronFreq: Double = 0.04, // adjust the "density" of the ore veins
-    val oreIronPower: Double = 0.01, // super-low value almost negates the depth element
-    val oreIronScale: Double = 0.505,
+//    val oreIronFreq: Double = 0.04, // adjust the "density" of the ore veins
+//    val oreIronPower: Double = 0.01, // super-low value almost negates the depth element
+//    val oreIronScale: Double = 0.505,
 
 
     // 0.01 - 0.505

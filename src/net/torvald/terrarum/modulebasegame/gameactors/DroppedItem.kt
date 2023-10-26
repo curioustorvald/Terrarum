@@ -102,7 +102,7 @@ open class DroppedItem : ActorWithBody {
             visualItemID = BlockCodex.getOrNull(itemID)?.world ?: itemID
         }
         if (textureRegion == null) {
-            textureRegion = ItemCodex.getItemImage(visualItemID)!!
+            textureRegion = ItemCodex.getItemImage(visualItemID) ?: throw NullPointerException("No Item image for ${visualItemID}")
         }
 
         // copy-pasted from ActorWithBody.drawSpriteInGoodPosition()

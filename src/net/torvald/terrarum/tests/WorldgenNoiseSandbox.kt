@@ -81,7 +81,6 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     private val NM_TERR = TerragenTest to TerragenParams()
     private val NM_BIOME = BiomeMaker to BiomegenParams()
-    private val NM_ORES = Oregen to OregenParams()
 
     private val NOISEMAKER = NM_TERR
 
@@ -687,8 +686,8 @@ internal object TerragenTest : NoiseMaker {
         return listOf(
             Joise(groundScaling),
             Joise(caveScaling),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake 0xC08204, params.oreCopperFreq, params.oreCopperPower, params.oreCopperScale)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake 0xFE2204, params.oreIronFreq, params.oreIronPower, params.oreIronScale)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:1", 0.024, 0.01, 0.505)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:2", 0.04, 0.01, 0.505)),
         )
     }
 
@@ -756,84 +755,6 @@ internal object TerragenTest : NoiseMaker {
 
         return oreSelect
     }
-}
-
-
-internal object Oregen : NoiseMaker {
-    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
-        var n = noiseValue[0]
-
-//        if (n in 0.0..1.0) n = 1.0 - n
-
-        val cout = if (n >= 0.0)
-            Color(n.toFloat(), n.toFloat(), n.toFloat(), 1f)
-        else
-            Color(-n.toFloat(), 0f, 1f, 1f)
-
-        outTex.drawPixel(x, y, cout.toRGBA())
-    }
-
-    override fun getGenerator(seed: Long, params: Any): List<Joise> {
-        val params = params as OregenParams
-
-        val oreMagic = 0x023L
-        val orePerturbMagic = 12345L
-
-        val oreShape = ModuleFractal().also {
-            it.setType(ModuleFractal.FractalType.RIDGEMULTI)
-            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-            it.setNumOctaves(2)
-            it.setFrequency(params.oreShapeFreq) // adjust the "density" of the caves
-            it.seed = seed shake oreMagic
-        }
-
-        val oreShape2 = ModuleScaleOffset().also {
-            it.setSource(oreShape)
-            it.setScale(1.0)
-            it.setOffset(-0.5)
-        }
-
-        val orePerturbFractal = ModuleFractal().also {
-            it.setType(ModuleFractal.FractalType.FBM)
-            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-            it.setNumOctaves(6)
-            it.setFrequency(params.oreShapeFreq * 3.0 / 4.0)
-            it.seed = seed shake orePerturbMagic
-        }
-
-        val orePerturbScale = ModuleScaleOffset().also {
-            it.setSource(orePerturbFractal)
-            it.setScale(20.0)
-            it.setOffset(0.0)
-        }
-
-        val orePerturb = ModuleTranslateDomain().also {
-            it.setSource(oreShape2)
-            it.setAxisXSource(orePerturbScale)
-        }
-
-        val oreSelectAttenuate = ModulePow().also {
-            it.setSource(ModuleGradient().also {
-                it.setGradient(0.0, 0.0, NOISEBOX_HEIGHT.toDouble() * 5, 100.0)
-            })
-            it.setPower(1.0 / 4.0)
-        }
-
-        val oreSelect = ModuleSelect().also {
-            it.setLowSource(0.0)
-            it.setHighSource(1.0)
-            it.setControlSource(orePerturb)
-            it.setThreshold(oreSelectAttenuate)
-            it.setFalloff(0.0)
-        }
-
-        return listOf(
-            Joise(oreSelect)
-        )
-    }
-
 }
 
 
