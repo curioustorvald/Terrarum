@@ -5,6 +5,7 @@ import net.torvald.random.XXHash64
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import kotlin.math.roundToLong
 
@@ -39,6 +40,10 @@ object Worldgen {
     private val oreRegistry = ArrayList<OregenParams>()
 
     fun getJobs(tags: List<String> = emptyList()): List<Work> {
+        val oreTilingModes = HashMap<ItemID, String>().also {
+            it.putAll(oreRegistry.map { it.tile to it.tiling })
+        }
+
         val tagFilter = if (tags.isEmpty()) { { work: Work -> true } }
         else {
             { work: Work ->
@@ -48,7 +53,7 @@ object Worldgen {
         return listOf(
             Work("Reticulating Splines", Terragen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")),
             Work("Adding Rocks", Oregen(world, caveAttenuateBiasScaled, params.seed, oreRegistry), listOf("ORES")),
-            Work("Positioning Rocks", OregenAutotiling(world, params.seed), listOf("ORES")),
+            Work("Positioning Rocks", OregenAutotiling(world, params.seed, oreTilingModes), listOf("ORES")),
             Work("Adding Vegetations", Biomegen(world, params.seed, params.biomegenParams), listOf("BIOME")),
         ).filter(tagFilter)
     }

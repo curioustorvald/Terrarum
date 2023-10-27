@@ -1,4 +1,20 @@
-"id";"freq";"power";"scale";"comment"
-"1";"0.026";"0.01";"0.505";"copper (malachite)"
-"2";"0.040";"0.01";"0.505";"iron (haematite)"
-#"3";"0.040";"0.08";"0.501";"coal"
+"id";"freq";"power";"scale";"tiling";"comment"
+"1";"0.026";"0.01";"0.505";"a16";"copper (malachite)"
+"2";"0.040";"0.01";"0.505";"a16";"iron (haematite)"
+#"3";"0.040";"0.08";"0.501";"r16";"coal"
+
+################################################################################
+
+# id: ore ID to spawn, the ID must exist on the ores.csv
+#
+# freq: frequency value used to set up noise generator. Larger = ore veins are closer together
+# power: power value (as in: randomNumber ^ power) used to set up the noise generator. Larger = veins are larger as you go deeper. 0.01 almost negates this effect
+# scale: scale value used to set up the noise generator. Larger = thicker veins. A valid value tend to play around the 0.5; you'll need figure out this value by trial and error
+#
+# tiling: determines how the tiles are tiled
+#   - a16: use 4-neighbour autotiling (16 possible cases)
+#   - a47: use 8-neighbour autotiling (47 possible cases)
+#   - r16: use the hash of the tile position as a variant selection, module 16
+#   - r8: use the hash of the tile position as a variant selection, module 8
+#
+# comment: human-readable comments, not actually parsed

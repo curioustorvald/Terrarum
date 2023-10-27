@@ -520,8 +520,9 @@ object ModMgr {
                     val freq = rec.get("freq").toDouble()
                     val power = rec.get("power").toDouble()
                     val scale = rec.get("scale").toDouble()
+                    val tiling = rec.get("tiling")
 
-                    Worldgen.registerOre(OregenParams(tile, freq, power, scale))
+                    Worldgen.registerOre(OregenParams(tile, freq, power, scale, tiling))
                 }
             }
             catch (e: IOException) {

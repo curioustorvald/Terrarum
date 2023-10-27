@@ -143,8 +143,9 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
 }
 
 data class OregenParams(
-    val tile: String,
+    val tile: String, // ores@<modname>:<id>
     val freq: Double, //adjust the "density" of the caves
     val power: Double, // adjust the "concentration" of the cave gen. Lower = larger voids
     val scale: Double, // also adjust this if you've touched the bias value. Number can be greater than 1.0
+    val tiling: String, // a16, a47, r16, r8
 )
