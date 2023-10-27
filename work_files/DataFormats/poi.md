@@ -1,3 +1,4 @@
+
 POI (Point of Interest) is a placement of blocks that can be used by the world generator.
 
 POIs are serialised as following:
@@ -11,8 +12,8 @@ POIs are serialised as following:
   "w": 7, "h": 4,
   "layers": [ /* order matters! */
     {"name": "base", "dat": [
-      "...layer_0.gz.b85", /* each byte matches what's on the LUT, except 0xFF (0xFFFF if wlen=16) always refers to the null tile. Endianness: little; byte of 0 is NOT guaranteed to be an air tile */
-      "...layer_1.gz.b85"
+      "...layer_0.gz.b85", /* each byte matches what's on the LUT. Endianness: little */
+      "...layer_1.gz.b85"  /* byte of 0 is NOT guaranteed to be an air tile, nor the byte of -1 is NOT guaranteed to be a null tile */
     ]},
     {"name": "varianceA", "dat": [
       "...layer_0.gz.b85",
