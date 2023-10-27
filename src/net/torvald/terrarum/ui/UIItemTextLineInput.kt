@@ -277,7 +277,9 @@ class UIItemTextLineInput(
                             endComposing()
                             copyToClipboard()
                         }
-                        else if (keycodes.contains(Input.Keys.BACKSPACE) || (keycodes.contains(Input.Keys.CAPS_LOCK) && lowLayer.capsMode == TerrarumKeyCapsMode.BACK)) {
+                        else if (
+                            (headkey == Input.Keys.BACKSPACE && keycodes.contains(Input.Keys.BACKSPACE)) ||
+                            (headkey == Input.Keys.CAPS_LOCK && keycodes.contains(Input.Keys.CAPS_LOCK) && lowLayer.capsMode == TerrarumKeyCapsMode.BACK)) {
 
     //                        printdbg(this, "BACKSPACE hit; ime.composing=${ime?.composing?.invoke()}; buflen=${textbuf.size}")
 

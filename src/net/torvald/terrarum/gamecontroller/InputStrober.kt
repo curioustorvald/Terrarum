@@ -56,7 +56,7 @@ object InputStrober {
         val keymap = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
 
         if (stroboStatus % 2 == 0 && keybuf[0] != 0) {
-//            println("Key strobed: ${keybuf.joinToString()}; ${oldKeys.joinToString()}; changed = $keyChanged")
+//            println("Key strobed: ${keybuf.joinToString()}; old: ${oldKeys.joinToString()}; changed = $keyChanged")
 
             stroboStatus += 1
             stroboTime = System.nanoTime()
@@ -82,11 +82,11 @@ object InputStrober {
             val headKeyCode = if (keyDiff.size < 1) keybuf[0] else keyDiff[0]
 
             if (!keyChanged) {
-//                    println("KEY_DOWN '$keysym' ($headKeyCode) $repeatCount; ${keys.joinToString()}")
+//                println("KEY_DOWN '$keysym' ($headKeyCode) $repeatCount")
                 App.inputStrobed(TerrarumKeyboardEvent(KEY_DOWN, keysym, headKeyCode, repeatCount, keybuf))
             }
             else if (newKeysym != null) {
-//                    println("KEY_DOWC '$newKeysym' ($headKeyCode) $repeatCount; ${keys.joinToString()}")
+//                println("KEY_DOWC '$newKeysym' ($headKeyCode) $repeatCount")
                 App.inputStrobed(TerrarumKeyboardEvent(KEY_DOWN, newKeysym, headKeyCode, repeatCount, keybuf))
             }
 
