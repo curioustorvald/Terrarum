@@ -1,0 +1,60 @@
+\usestyle{examination}
+
+\begin{blocklut}
+\0\{basegame:0}
+\1\{basegame:32}
+\100\{wall@basegame:32}
+\end{blocklut}
+
+
+\begin{examination}
+
+\section{Introduction}
+
+\begin{tiles}{5x4}
+\terr{
+0,1,1,1,0,
+1,0,0,0,1,
+1,0,0,0,1,
+0,1,1,1,0
+}
+\wall{
+0,1,1,1,0,
+1,1,1,1,1,
+1,1,1,1,1,
+0,1,1,1,0
+}
+\end{tiles}
+
+This is the first page of the Examination.
+
+Examination is a way to instruct the player certain gameplay concepts.
+
+The system is popularised by the Minecraft Mod called ``Create'', of which it was called Pondering.
+
+Terrarum borrows the concept and implements it using its own language.
+
+\section{Language}
+
+\begin{tiles}{5x4}
+\terr{
+0,1,1,1,0,
+1,0,1,0,1,
+1,0,1,0,1,
+0,1,1,1,0
+}
+\wall{
+0,1,1,1,0,
+1,1,1,1,1,
+1,1,1,1,1,
+0,1,1,1,0
+}
+\end{tiles}
+
+Examination relies on the script written in \BTeX.
+
+\BTeX\ is a \TeX-inspired language to write texts to be displayed onto the game, one example being a book.
+
+Examination is a special format of the "book" that operates on the same book system.
+
+\end{examination}
