@@ -691,7 +691,7 @@ internal object TerragenTest : NoiseMaker {
             Joise(caveScaling),
             Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:1", 0.024, 0.01, 0.505, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:2", 0.04, 0.01, 0.505, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:3", 0.04, 0.01, 0.505, 10.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:3", 0.04, 0.08, 0.493, 5.0)),
         )
     }
 

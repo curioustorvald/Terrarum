@@ -16,6 +16,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.utils.HashArray
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.AtlasSource.*
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_47
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
@@ -319,22 +320,32 @@ class CreateTileAtlas {
         // predefined by the image dimension: 16x16 for (1,0)
         if (tilesPixmap.width == TILE_SIZE && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_NA)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.maskTypeToTileCount(RenderTag.MASK_NA))
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_NA)
         }
         // predefined by the image dimension: 64x16 for (2,3)
         else if (tilesPixmap.width == TILE_SIZE * 4 && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_WALL_STICKER, RenderTag.MASK_TORCH)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.maskTypeToTileCount(RenderTag.MASK_TORCH))
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_TORCH)
         }
         // predefined by the image dimension: 128x16 for (3,4)
         else if (tilesPixmap.width == TILE_SIZE * 8 && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_WALL_STICKER_CONNECT_SELF, RenderTag.MASK_PLATFORM)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.maskTypeToTileCount(RenderTag.MASK_PLATFORM))
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_PLATFORM)
         }
         // predefined by the image dimension: 256x16
         else if (tilesPixmap.width == TILE_SIZE * 16 && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.maskTypeToTileCount(RenderTag.MASK_16))
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_16)
+        }
+        // predefined by the image dimension: 256x64
+        else if (tilesPixmap.width == TILE_SIZE * 16 && tilesPixmap.height == TILE_SIZE * 4) {
+            addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X4)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_16X4)
+        }
+        // predefined by the image dimension: 256x256
+        else if (tilesPixmap.width == TILE_SIZE * 16 && tilesPixmap.height == TILE_SIZE * 16) {
+            addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X16)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_16X16)
         }
         // 112x112 or 224x224
         else {
@@ -355,8 +366,7 @@ class CreateTileAtlas {
             }
 
             addTag(blockID, connectionType, maskType)
-            val tileCount = RenderTag.maskTypeToTileCount(maskType)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tileCount)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, maskType)
         }
 
         itemSheetNumbers[blockID] = itemSheetCursor
@@ -385,7 +395,8 @@ class CreateTileAtlas {
         printdbg(this, "tileName ${id} ->> tileNumber ${atlasCursor}")
     }
 
-    private fun drawToAtlantes(matte: Pixmap, glow: Pixmap, tilesCount: Int) {
+    private fun drawToAtlantes(matte: Pixmap, glow: Pixmap, renderMask: Int) {
+        val tilesCount = RenderTag.maskTypeToTileCount(renderMask)
         if (atlasCursor + tilesCount >= TOTAL_TILES) {
 //            throw Error("Too much tiles for $MAX_TEX_SIZE texture size: $atlasCursor")
             println("[CreateTileAtlas] Too much tiles for atlas of ${MAX_TEX_SIZE}x$MAX_TEX_SIZE (tiles so far: $atlasCursor/${(MAX_TEX_SIZE*MAX_TEX_SIZE)/(TILE_SIZE* TILE_SIZE)}, tiles to be added: $tilesCount), trying to expand the atlas...")
@@ -400,7 +411,7 @@ class CreateTileAtlas {
 
             // different texture for different seasons (224x224)
             if (sixSeasonal) {
-                val i = if (i < 41) i else i + 1 // to compensate the discontinuity between 40th and 41st tile
+                val i = if (renderMask == MASK_47) (if (i < 41) i else i + 1) else i // to compensate the discontinuity between 40th and 41st tile
                 _drawToAtlantes(matte, atlasCursor, i % 7     , i / 7, PREVERNAL)
                 _drawToAtlantes(matte, atlasCursor, i % 7 + 7 , i / 7, VERNAL)
                 _drawToAtlantes(matte, atlasCursor, i % 7 + 14, i / 7, AESTIVAL)
@@ -413,7 +424,7 @@ class CreateTileAtlas {
                 atlasCursor += 1
             }
             else {
-                val i = if (i < 41) i else i + 1 // to compensate the discontinuity between 40th and 41st tile
+                val i = if (renderMask == MASK_47) (if (i < 41) i else i + 1) else i // to compensate the discontinuity between 40th and 41st tile
                 _drawToAtlantes(matte, atlasCursor, i % txOfPixmap, i / txOfPixmap, SIX_SEASONS)
                 _drawToAtlantes(glow, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, GLOW)
                 atlasCursor += 1
@@ -470,6 +481,8 @@ class CreateTileAtlas {
             const val MASK_47 = 2
             const val MASK_TORCH = 3
             const val MASK_PLATFORM = 4
+            const val MASK_16X4 = 5
+            const val MASK_16X16 = 6
 
             fun maskTypeToTileCount(maskType: Int) = when (maskType) {
                 MASK_NA -> 1
@@ -477,6 +490,8 @@ class CreateTileAtlas {
                 MASK_47 -> 47
                 MASK_TORCH -> 4
                 MASK_PLATFORM -> 8
+                MASK_16X4 -> 64
+                MASK_16X16 -> 256
                 else -> throw IllegalArgumentException("Unknown maskType: $maskType")
             }
         }

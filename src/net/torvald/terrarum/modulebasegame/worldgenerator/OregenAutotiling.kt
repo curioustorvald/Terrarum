@@ -6,6 +6,7 @@ import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.isOre
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.toInt
@@ -34,6 +35,8 @@ class OregenAutotiling(world: GameWorld, seed: Long, val tilingModes: HashMap<It
         threadExecutor.join()
     }
 
+    private fun getHashCoord(x: Int, y: Int, mod: Int) =
+        (XXHash64.hash((y.toLong().shl(32) or x.toLong().and(0xFFFFFFFF)).toBig64(), mod.toLong()).and(0x7FFFFFFFFFFFFFFFL) % mod).toInt()
 
     private fun draw(x: Int) {
         for (y in 0 until world.height) {
@@ -52,6 +55,22 @@ class OregenAutotiling(world: GameWorld, seed: Long, val tilingModes: HashMap<It
                         BlocksDrawer.connectLut16[autotiled]
 
                     }
+                    "a16x4" -> {
+                        // get placement (tile connection) info
+                        val mult = getHashCoord(x, y, 4)
+                        val autotiled = getNearbyOres8(x, y).foldIndexed(0) { index, acc, placement ->
+                            acc or (placement.item == ore).toInt(index)
+                        }
+                        BlocksDrawer.connectLut16[autotiled] or mult.shl(4)
+                    }
+                    "a16x16" -> {
+                        // get placement (tile connection) info
+                        val mult = getHashCoord(x, y, 16)
+                        val autotiled = getNearbyOres8(x, y).foldIndexed(0) { index, acc, placement ->
+                            acc or (placement.item == ore).toInt(index)
+                        }
+                        BlocksDrawer.connectLut16[autotiled] or mult.shl(4)
+                    }
                     "a47" -> {
                         // get placement (tile connection) info
                         val autotiled = getNearbyOres8(x, y).foldIndexed(0) { index, acc, placement ->
@@ -60,10 +79,10 @@ class OregenAutotiling(world: GameWorld, seed: Long, val tilingModes: HashMap<It
                         BlocksDrawer.connectLut47[autotiled]
                     }
                     "r16" -> {
-                        (XXHash64.hash((y.toLong().shl(32) or x.toLong().and(0xFFFFFFFF)).toBig64(), 16L) % 16).toInt()
+                        getHashCoord(x, y, 16)
                     }
                     "r8" -> {
-                        (XXHash64.hash((y.toLong().shl(32) or x.toLong().and(0xFFFFFFFF)).toBig64(), 8L) % 8).toInt()
+                        getHashCoord(x, y, 8)
                     }
                     else -> throw IllegalArgumentException("Unknown tiling mode: $tilingMode")
                 }

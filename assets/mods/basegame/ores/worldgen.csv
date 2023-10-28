@@ -1,7 +1,7 @@
 "id";"freq";"power";"scale";"ratio";"tiling";"comment"
-"1";"0.026";"0.01";"0.505";"1.0";"a16";"copper (malachite)"
-"2";"0.040";"0.01";"0.505";"1.0";"a16";"iron (haematite)"
-#"3";"0.040";"0.08";"0.501";"1.0";"r16";"coal"
+"1";"0.026";"0.01";"0.505";"1.0";"a16x16";"copper (malachite)"
+"2";"0.040";"0.01";"0.505";"1.0";"a16x16";"iron (haematite)"
+"3";"0.040";"0.08";"0.493";"10.0";"a16x4";"coal"
 
 ################################################################################
 
@@ -14,6 +14,8 @@
 #
 # tiling: determines how the tiles are tiled
 #   - a16: use 4-neighbour autotiling (16 possible cases)
+#   - a16x4: 4 variants of a16
+#   - a16x16: 16 variants of a16
 #   - a47: use 8-neighbour autotiling (47 possible cases)
 #   - r16: use the hash of the tile position as a variant selection, module 16
 #   - r8: use the hash of the tile position as a variant selection, module 8
