@@ -29,6 +29,7 @@ import java.util.concurrent.Future
 import kotlin.math.*
 import kotlin.random.Random
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen
+import net.torvald.terrarum.sqr
 
 const val NOISEBOX_WIDTH = 922
 const val NOISEBOX_HEIGHT = 2000
@@ -361,17 +362,19 @@ internal object TerragenTest : NoiseMaker {
 
     private val IRON_ORE = 0xff9a5dff.toInt()
     private val COPPER_ORE = 0x00e9c8ff
+    private val COAL_ORE = 0xffffffff.toInt()
 
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val terr = noiseValue[0].tiered(.0, .5, .88, 1.88)
         val cave = if (noiseValue[1] < 0.5) 0 else 1
         val copper = (noiseValue[2] > 0.5)
         val iron = (noiseValue[3] > 0.5)
+        val coal = (noiseValue[4] > 0.5)
 
         val wallBlock = groundDepthBlock[terr]
         val terrBlock = if (cave == 0) Block.AIR else wallBlock
 
-        val ore = if (iron) IRON_ORE else if (copper) COPPER_ORE else null
+        val ore = if (iron) IRON_ORE else if (copper) COPPER_ORE else if (coal) COAL_ORE else null
 
         outTex.drawPixel(x, y,
             if (ore != null && (terrBlock == Block.STONE || terrBlock == Block.STONE_SLATE)) ore
@@ -686,8 +689,9 @@ internal object TerragenTest : NoiseMaker {
         return listOf(
             Joise(groundScaling),
             Joise(caveScaling),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:1", 0.024, 0.01, 0.505)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:2", 0.04, 0.01, 0.505)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:1", 0.024, 0.01, 0.505, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:2", 0.04, 0.01, 0.505, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:3", 0.04, 0.01, 0.505, 10.0)),
         )
     }
 
@@ -701,7 +705,7 @@ internal object TerragenTest : NoiseMaker {
         }
     }
 
-    private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, freq: Double, pow: Double, scale: Double): Module {
+    private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, freq: Double, pow: Double, scale: Double, ratio: Double): Module {
         val oreShape = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.RIDGEMULTI)
             it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
@@ -745,10 +749,22 @@ internal object TerragenTest : NoiseMaker {
             it.setAxisXSource(orePerturbScale)
         }
 
+        val oreStrecth = ModuleScaleDomain().also {
+            val xratio = if (ratio >= 1.0) ratio else 1.0
+            val yratio = if (ratio < 1.0) 1.0 / ratio else 1.0
+            val k = sqrt(2.0 / (xratio.sqr() + yratio.sqr()))
+            val xs = xratio * k
+            val ys = yratio * k
+
+            it.setSource(orePerturb)
+            it.setScaleX(1.0 / xs)
+            it.setScaleY(1.0 / ys)
+        }
+
         val oreSelect = ModuleSelect().also {
             it.setLowSource(0.0)
             it.setHighSource(1.0)
-            it.setControlSource(orePerturb)
+            it.setControlSource(oreStrecth)
             it.setThreshold(0.5)
             it.setFalloff(0.0)
         }

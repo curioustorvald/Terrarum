@@ -1,7 +1,7 @@
-"id";"freq";"power";"scale";"tiling";"comment"
-"1";"0.026";"0.01";"0.505";"a16";"copper (malachite)"
-"2";"0.040";"0.01";"0.505";"a16";"iron (haematite)"
-#"3";"0.040";"0.08";"0.501";"r16";"coal"
+"id";"freq";"power";"scale";"ratio";"tiling";"comment"
+"1";"0.026";"0.01";"0.505";"1.0";"a16";"copper (malachite)"
+"2";"0.040";"0.01";"0.505";"1.0";"a16";"iron (haematite)"
+#"3";"0.040";"0.08";"0.501";"1.0";"r16";"coal"
 
 ################################################################################
 
@@ -10,6 +10,7 @@
 # freq: frequency value used to set up noise generator. Larger = ore veins are closer together
 # power: power value (as in: randomNumber ^ power) used to set up the noise generator. Larger = veins are larger as you go deeper. 0.01 almost negates this effect
 # scale: scale value used to set up the noise generator. Larger = thicker veins. A valid value tend to play around the 0.5; you'll need figure out this value by trial and error
+# ratio: how elongated (or squeeze) the ore veins are. >1.0 = stretched horizontally, <1.0 = stretched vertically
 #
 # tiling: determines how the tiles are tiled
 #   - a16: use 4-neighbour autotiling (16 possible cases)

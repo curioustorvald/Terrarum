@@ -10,12 +10,14 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_DIVISOR
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_MAGIC
+import net.torvald.terrarum.sqr
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.utils.OrePlacement
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
  * Created by minjaesong on 2023-10-25.
@@ -46,7 +48,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
      */
     private fun getGenerator(seed: Long): List<Joise> {
         return ores.map {
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake it.tile, it.freq, it.power, it.scale))
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake it.tile, it.freq, it.power, it.scale, it.ratio))
         }
     }
 
@@ -86,7 +88,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
         }
     }
 
-    private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, freq: Double, pow: Double, scale: Double): Module {
+    private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, freq: Double, pow: Double, scale: Double, ratio: Double): Module {
         val oreShape = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.RIDGEMULTI)
             it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
@@ -130,10 +132,22 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
             it.setAxisXSource(orePerturbScale)
         }
 
+        val oreStrecth = ModuleScaleDomain().also {
+            val xratio = if (ratio >= 1.0) ratio else 1.0
+            val yratio = if (ratio < 1.0) 1.0 / ratio else 1.0
+            val k = sqrt(2.0 / (xratio.sqr() + yratio.sqr()))
+            val xs = xratio * k
+            val ys = yratio * k
+
+            it.setSource(orePerturb)
+            it.setScaleX(1.0 / xs)
+            it.setScaleY(1.0 / ys)
+        }
+
         val oreSelect = ModuleSelect().also {
             it.setLowSource(0.0)
             it.setHighSource(1.0)
-            it.setControlSource(orePerturb)
+            it.setControlSource(oreStrecth)
             it.setThreshold(0.5)
             it.setFalloff(0.0)
         }
@@ -147,5 +161,6 @@ data class OregenParams(
     val freq: Double, //adjust the "density" of the caves
     val power: Double, // adjust the "concentration" of the cave gen. Lower = larger voids
     val scale: Double, // also adjust this if you've touched the bias value. Number can be greater than 1.0
+    val ratio: Double, // how stretched the ore veins are. >1.0 = stretched horizontally, <1.0 = stretched vertically
     val tiling: String, // a16, a47, r16, r8
 )
