@@ -33,6 +33,7 @@
   "MENU_OPTIONS_DEBUG_CONSOLE": "Debug Console",
   "MENU_OPTIONS_DITHER": "Dithering",
   "MENU_OPTIONS_JVM_HEAP_MAX": "Max Heap Memory",
+  "MENU_OPTIONS_LIGHT_UPDATE_PASSES": "Light Calculation Depth",
   "MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION": "Show notification for",
   "MENU_OPTIONS_PARTICLES": "Particles",
   "MENU_OPTIONS_PERFORMANCE": "Performance",

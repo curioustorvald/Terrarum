@@ -341,6 +341,16 @@ object LightmapRenderer {
 //            }
             // no rendering trickery will eliminate the need of 2nd pass, even the "decay out"
         }
+
+        App.getConfigInt("lightpasses").let { passcnt ->
+            if (passcnt > 2) {
+                for (pass in 3..passcnt) {
+                    App.measureDebugTime("Renderer.LightRuns$pass") {
+                        r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap)
+                    }
+                }
+            }
+        }
     }
 
     private fun buildLanternAndShadowMap(actorContainer: List<ActorWithBody>) {
