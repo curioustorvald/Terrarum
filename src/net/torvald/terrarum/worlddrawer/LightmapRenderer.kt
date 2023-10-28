@@ -368,13 +368,15 @@ object LightmapRenderer {
                 val boxW = box.width * scale
                 val boxH = box.height * scale
 
-                val x0 = boxX.div(TILE_SIZE).floorToInt()
-                val x1 = (boxX + boxW).div(TILE_SIZE).floorToInt().coerceAtLeast(x0+1)
-                val y0 = boxY.div(TILE_SIZE).floorToInt()
-                val y1 = (boxY + boxH).div(TILE_SIZE).floorToInt().coerceAtLeast(y0+1)
+//                println("boxX=$boxX, boxY=$boxY, boxW=$boxW, boxH=$boxH; actor=$it; baseHitboxW=${it.baseHitboxW}; box=$box")
 
-                for (y in y0 until y1) {
-                    for (x in x0 until x1) {
+                val x0 = boxX.div(TILE_SIZE).floorToInt()
+                val x1 = (boxX + boxW - 1).div(TILE_SIZE).floorToInt()
+                val y0 = boxY.div(TILE_SIZE).floorToInt()
+                val y1 = (boxY + boxH - 1).div(TILE_SIZE).floorToInt()
+
+                for (y in y0 .. y1) {
+                    for (x in x0 .. x1) {
 
                         val oldLight = lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
                         val actorLight = colour
@@ -392,12 +394,12 @@ object LightmapRenderer {
                 val boxH = box.height * scale
 
                 val x0 = boxX.div(TILE_SIZE).floorToInt()
-                val x1 = (boxX + boxW).div(TILE_SIZE).floorToInt().coerceAtLeast(x0+1)
+                val x1 = (boxX + boxW - 1).div(TILE_SIZE).floorToInt()
                 val y0 = boxY.div(TILE_SIZE).floorToInt()
-                val y1 = (boxY + boxH).div(TILE_SIZE).floorToInt().coerceAtLeast(y0+1)
+                val y1 = (boxY + boxH - 1).div(TILE_SIZE).floorToInt()
 
-                for (y in y0 until y1) {
-                    for (x in x0 until x1) {
+                for (y in y0 .. y1) {
+                    for (x in x0 .. x1) {
 
                         val oldLight = shadowMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
                         val actorLight = colour

@@ -99,9 +99,9 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
      */
-    @Transient override var lightBoxList: ArrayList<Lightbox> = arrayListOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 2.0, baseHitboxH - 2.0), Cvec(0)))
+    @Transient override var lightBoxList: ArrayList<Lightbox> = arrayListOf(Lightbox(Hitbox(1.0, 1.0, baseHitboxW - 2.0, baseHitboxH - 2.0), Cvec(0)))
         // the actual values are update on the update()
-    @Transient override var shadeBoxList: ArrayList<Lightbox> = arrayListOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 2.0, baseHitboxH - 2.0), Cvec(0)))
+    @Transient override var shadeBoxList: ArrayList<Lightbox> = arrayListOf(Lightbox(Hitbox(1.0, 1.0, baseHitboxW - 2.0, baseHitboxH - 2.0), Cvec(0)))
         // the actual values are update on the update()
 
     @Transient val BASE_DENSITY = 980.0
@@ -800,5 +800,15 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
                 (spriteGlow as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_IDLE)
             }
         }
+    }
+
+    override fun reload() {
+        super.reload()
+
+        lightBoxList = arrayListOf(Lightbox(Hitbox(1.0, 1.0, baseHitboxW - 2.0, baseHitboxH - 2.0), Cvec(0)))
+        // the actual values are update on the update()
+        shadeBoxList = arrayListOf(Lightbox(Hitbox(1.0, 1.0, baseHitboxW - 2.0, baseHitboxH - 2.0), Cvec(0)))
+        // the actual values are update on the update()
+
     }
 }

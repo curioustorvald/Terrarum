@@ -12,6 +12,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import java.awt.Color
 import java.util.*
 
 /**
