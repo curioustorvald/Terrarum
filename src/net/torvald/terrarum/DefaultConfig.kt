@@ -128,7 +128,7 @@ object DefaultConfig {
             "bgmvolume" to 1.0,
             "sfxvolume" to 1.0,
 
-            "lightpasses" to 2,
+            "lightpasses" to 3,
 
 
 
