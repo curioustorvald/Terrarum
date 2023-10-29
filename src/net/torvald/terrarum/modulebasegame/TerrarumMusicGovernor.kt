@@ -55,7 +55,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
         printdbg(this, "Now stopping: $currentMusic")
         state = 2
         intermissionAkku = 0f
-        intermissionLength = 30f + 60f * Math.random().toFloat() // 30s-90m
+        intermissionLength = 30f + 30f * Math.random().toFloat() // 30s-60s
         musicFired = false
         currentMusic = null
         fadeoutFired = false
