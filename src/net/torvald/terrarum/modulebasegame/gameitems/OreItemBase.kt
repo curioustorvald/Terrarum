@@ -52,3 +52,8 @@ class OreIron(originalID: ItemID) : OreItemBase(originalID) {
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,6)
 }
+class OreCoal(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_ORE_COAL"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(4,6)
+}

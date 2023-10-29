@@ -18,6 +18,7 @@ id;classname
 
 128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper
 129;net.torvald.terrarum.modulebasegame.gameitems.OreIron
+130;net.torvald.terrarum.modulebasegame.gameitems.OreCoal
 
 256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak
 257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony
