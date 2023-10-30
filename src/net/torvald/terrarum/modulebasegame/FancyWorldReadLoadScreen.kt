@@ -37,7 +37,7 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
     val vtilesCount = worldheight / CHUNK_W
 
     val tileSize = ((540 * ratio) / htilesCount).roundToInt() // (visible tilesize + gapSize)
-    val gapSize = if (tileSize >= 15) 3 else if (tileSize >= 7) 2 else 1
+    val gapSize = if (tileSize >= 10) 2 else 1
     val visibleTileSize = tileSize - gapSize
     val previewWidth = tileSize * htilesCount - gapSize
     val previewHeight = tileSize * vtilesCount
