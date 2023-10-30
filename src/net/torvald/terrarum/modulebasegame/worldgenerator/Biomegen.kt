@@ -20,7 +20,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
     private val threadExecutor = TerrarumIngame.worldgenThreadExecutor
 
-    private val genSlices = max(threadExecutor.threadCount, world.width / 8)
+    private val genSlices = max(threadExecutor.threadCount, world.width / 9)
 
     private val YHEIGHT_MAGIC = 2800.0 / 3.0
     private val YHEIGHT_DIVISOR = 2.0 / 7.0

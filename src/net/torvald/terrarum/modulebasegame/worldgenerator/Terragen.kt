@@ -24,7 +24,7 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
 
     private val threadExecutor = TerrarumIngame.worldgenThreadExecutor
 
-    private val genSlices = max(threadExecutor.threadCount, world.width / 8)
+    private val genSlices = max(threadExecutor.threadCount, world.width / 9)
 
 
     private val dirtStoneDitherSize = 3 // actual dither size will be double of this value

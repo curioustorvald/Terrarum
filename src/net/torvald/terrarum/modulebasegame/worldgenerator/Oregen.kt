@@ -25,7 +25,7 @@ import kotlin.math.sqrt
 class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, private val ores: List<OregenParams>) : Gen(world, seed) {
 
     private val threadExecutor = TerrarumIngame.worldgenThreadExecutor
-    private val genSlices = max(threadExecutor.threadCount, world.width / 8)
+    private val genSlices = max(threadExecutor.threadCount, world.width / 9)
 
     override fun getDone() {
         threadExecutor.renew()
