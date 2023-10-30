@@ -10,9 +10,9 @@ import net.torvald.random.XXHash64
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.FancyWorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.NEW_WORLD_SIZE
-import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
 import net.torvald.terrarum.savegame.ByteArray64Reader
@@ -197,7 +197,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
                 ingame.gameLoadMode = TerrarumIngame.GameLoadMode.CREATE_NEW
 
                 Terrarum.setCurrentIngameInstance(ingame)
-                val loadScreen = WorldgenLoadScreen(ingame, wx, wy)
+                val loadScreen = FancyWorldgenLoadScreen(ingame, wx, wy)
                 App.setLoadScreen(loadScreen)
             }
             else {

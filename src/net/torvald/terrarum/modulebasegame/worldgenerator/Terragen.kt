@@ -4,6 +4,7 @@ import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.random.XXHash32
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
@@ -30,7 +31,9 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
     private val dirtStoneDitherSize = 3 // actual dither size will be double of this value
     private val stoneSlateDitherSize = 4
 
-    override fun getDone() {
+    override fun getDone(loadscreen: LoadScreenBase) {
+        loadscreen.progress.set(0L)
+
         threadExecutor.renew()
         (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
             threadExecutor.submit {
@@ -40,6 +43,7 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
                     val sampleOffset = world.width / 8.0
                     draw(x, localJoise, sampleTheta, sampleOffset)
                 }
+                loadscreen.progress.addAndGet((xs.last - xs.first + 1).toLong())
             }
         }
 

@@ -8,6 +8,7 @@ import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.util.CircularArray
+import java.util.concurrent.atomic.AtomicLong
 
 open class LoadScreenBase : ScreenAdapter(), Disposable, TerrarumGamescreen {
 
@@ -25,6 +26,8 @@ open class LoadScreenBase : ScreenAdapter(), Disposable, TerrarumGamescreen {
     internal var doContextChange = false
 
     var camera = OrthographicCamera(App.scr.wf, App.scr.hf)
+
+    var progress = AtomicLong(0L) // generic variable, interpretation will vary by the screen
 
     override fun show() {
         messages.clear()

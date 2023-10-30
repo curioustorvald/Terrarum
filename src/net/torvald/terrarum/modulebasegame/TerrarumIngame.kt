@@ -490,7 +490,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             //WorldGenerator.SEED = worldParams.worldGenSeed
             //WorldGenerator.generateMap()
             Worldgen.attachMap(world, WorldgenParams(worldParams.worldGenSeed))
-            Worldgen.generateMap()
+            Worldgen.generateMap(App.getLoadScreen())
 
 
             historicalFigureIDBucket = ArrayList<Int>()

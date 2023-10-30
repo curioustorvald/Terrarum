@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
@@ -9,20 +8,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.random.HQRNG
 import net.torvald.random.XXHash64
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureWorldPortal
-import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
-import net.torvald.terrarum.modulebasegame.serialise.ReadActor
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.savegame.ByteArray64Reader
-import net.torvald.terrarum.savegame.VDFileID
 import net.torvald.terrarum.savegame.VirtualDisk
-import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.RandomWordsName
 import kotlin.math.roundToInt

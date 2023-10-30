@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.terrarum.App
+import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
@@ -25,7 +26,9 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
     private val YHEIGHT_MAGIC = 2800.0 / 3.0
     private val YHEIGHT_DIVISOR = 2.0 / 7.0
 
-    override fun getDone() {
+    override fun getDone(loadscreen: LoadScreenBase) {
+//        loadscreen.progress.set((loadscreen.progress.get() + 0x1_000000_000000L) and 0x7FFF_000000_000000L)
+
         threadExecutor.renew()
         (0 until world.width).sliceEvenly(genSlices).map { xs ->
             threadExecutor.submit {

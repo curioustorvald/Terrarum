@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.random.HQRNG
@@ -8,9 +7,8 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.modulebasegame.FancyWorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
-import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderTestSubject1
 import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderWerebeastTest
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.utils.RandomWordsName
@@ -57,7 +55,7 @@ class UIProxyNewRandomGame(val remoCon: UIRemoCon) : UICanvas() {
         Terrarum.setCurrentIngameInstance(ingame)
         //LoadScreen.screenToLoad = ingame
         //AppLoader.setScreen(LoadScreen)
-        val loadScreen = WorldgenLoadScreen(ingame, worldParam.newWorldParams.width, worldParam.newWorldParams.height)
+        val loadScreen = FancyWorldgenLoadScreen(ingame, worldParam.newWorldParams.width, worldParam.newWorldParams.height)
         App.setLoadScreen(loadScreen)
     }
 

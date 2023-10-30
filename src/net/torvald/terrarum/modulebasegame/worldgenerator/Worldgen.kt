@@ -5,6 +5,7 @@ import net.torvald.random.XXHash64
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import kotlin.math.roundToLong
@@ -58,7 +59,7 @@ object Worldgen {
         ).filter(tagFilter)
     }
 
-    fun generateMap() {
+    fun generateMap(loadscreen: LoadScreenBase) {
         highlandLowlandSelectCache = getHighlandLowlandSelectCache(params.terragenParams, params.seed)
         caveAttenuateBiasScaled = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
 
@@ -71,7 +72,7 @@ object Worldgen {
             val it = jobs[i]
 
             App.getLoadScreen().addMessage(it.loadingScreenName)
-            it.theWork.getDone()
+            it.theWork.getDone(loadscreen)
         }
 
         // determine spawn point
@@ -257,7 +258,7 @@ object Worldgen {
 }
 
 abstract class Gen(val world: GameWorld, val seed: Long, val params: Any? = null) {
-    open fun getDone() { } // trying to use different name so that it won't be confused with Runnable or Callable
+    open fun getDone(loadscreen: LoadScreenBase) { } // trying to use different name so that it won't be confused with Runnable or Callable
 }
 
 data class WorldgenParams(

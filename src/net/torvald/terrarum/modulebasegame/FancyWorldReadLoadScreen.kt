@@ -3,17 +3,19 @@ package net.torvald.terrarum.modulebasegame
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 import kotlin.math.sqrt
 
 /**
  * Created by minjaesong on 2023-10-30.
  */
-class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidth: Int, private val worldheight: Int, override var preLoadJob: (LoadScreenBase) -> Unit) : LoadScreenBase() {
+open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidth: Int, private val worldheight: Int, override var preLoadJob: (LoadScreenBase) -> Unit) : LoadScreenBase() {
 
     init {
         CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer01") {
@@ -29,9 +31,6 @@ class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private val wor
 
 
     override var screenToLoad: IngameInstance? = screenToBeLoaded
-    private val world: GameWorld // must use Getter, as the field WILL BE redefined by the TerrarumIngame.enterCreateNewWorld() !
-        get() = screenToLoad!!.world
-
 
     val ratio = worldwidth * sqrt(2.0 / (worldwidth.sqr() + worldheight.sqr())) // world size is always wider than tall
     val htilesCount = worldwidth / CHUNK_W
@@ -58,8 +57,6 @@ class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private val wor
         TextureRegionPack(it, visibleTileSize, imgYoff + previewHeight, gapSize, 0, xoff, 0)
     }
 
-    var chunksLoaded = 0 // only increments when all the chunks were loaded
-
     override fun render(delta: Float) {
         gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
@@ -69,7 +66,8 @@ class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private val wor
             val previewY = (App.scr.height - previewHeight.times(1.5f)).div(2f).roundToFloat()
             Toolkit.drawBoxBorder(it, previewX.toInt()-1, previewY.toInt()-1, previewWidth+2, previewHeight+2)
 
-            drawTiles(it, getStage(), getProgress(), previewX, previewY - imgYoff)
+            val prog = progress.get()
+            drawTiles(it, getStage(prog), getProgress(prog), previewX, previewY - imgYoff)
 
             val text = messages.getHeadElem() ?: ""
             App.fontGame.draw(it,
@@ -83,18 +81,36 @@ class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private val wor
         super.render(delta)
     }
 
-    private fun getProgress(): Int {
-        return (chunksLoaded.toDouble() / vtilesCount).roundToInt()
+    protected open fun getProgress(progress: Long): Int {
+        return ((progress / 3.0) / vtilesCount).roundToInt()
     }
 
-    private fun getStage(): Int {
+    protected open fun getStage(progress: Long): Int {
         return 2 // fixed value for Read screen
     }
 
-    private fun drawTiles(batch: FlippingSpriteBatch, layerCount: Int, tileCount: Int, x: Float, y: Float) {
+    protected open fun drawTiles(batch: FlippingSpriteBatch, layerCount: Int, tileCount: Int, x: Float, y: Float) {
         for (layer in 0 until layerCount) {
-//            for (i in 0 until if (layer == layerCount - 1) tileCount else htilesCount) {
             for (i in 0 until tileCount) {
+                batch.draw(tiles[layer].get(i, 0), x + i * tileSize, y)
+            }
+        }
+    }
+}
+
+class FancyWorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidth: Int, private val worldheight: Int) : FancyWorldReadLoadScreen(screenToBeLoaded, worldwidth, worldheight, {}) {
+
+    override fun getProgress(progress: Long): Int {
+        return ((progress and 0xFFFFFF_FFFFFFL) / CHUNK_W).toInt()
+    }
+
+    override fun getStage(progress: Long): Int {
+        return (progress ushr 48).toInt() + 1
+    }
+
+    override fun drawTiles(batch: FlippingSpriteBatch, layerCount: Int, tileCount: Int, x: Float, y: Float) {
+        for (layer in 0 until layerCount) {
+            for (i in 0 until if (layer == layerCount - 1) tileCount else htilesCount) {
                 batch.draw(tiles[layer].get(i, 0), x + i * tileSize, y)
             }
         }

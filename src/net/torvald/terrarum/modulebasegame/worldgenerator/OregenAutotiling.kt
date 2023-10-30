@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import net.torvald.random.XXHash64
+import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameitems.ItemID
@@ -22,7 +23,7 @@ class OregenAutotiling(world: GameWorld, seed: Long, val tilingModes: HashMap<It
     private val threadExecutor = TerrarumIngame.worldgenThreadExecutor
     private val genSlices = max(threadExecutor.threadCount, world.width / 9)
 
-    override fun getDone() {
+    override fun getDone(loadscreen: LoadScreenBase) {
         threadExecutor.renew()
         (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
             threadExecutor.submit {

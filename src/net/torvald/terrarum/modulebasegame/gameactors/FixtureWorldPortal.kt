@@ -1,27 +1,18 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.random.XXHash64
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.FancyWorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
-import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_WEIGHT
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
-import net.torvald.terrarum.modulebasegame.serialise.ReadActor
-import net.torvald.terrarum.modulebasegame.ui.UILoadGovernor
 import net.torvald.terrarum.modulebasegame.ui.UIWorldPortal
-import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.DiskSkimmer
-import net.torvald.terrarum.savegame.VDFileID
-import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import org.dyn4j.geometry.Vector2
-import java.util.HashMap
 
 /**
  * Created by minjaesong on 2023-05-28.
@@ -99,7 +90,7 @@ class FixtureWorldPortal : Electric {
                     ingame.gameLoadMode = TerrarumIngame.GameLoadMode.CREATE_NEW
 
                     Terrarum.setCurrentIngameInstance(ingame)
-                    val loadScreen = WorldgenLoadScreen(ingame, wx, wy)
+                    val loadScreen = FancyWorldgenLoadScreen(ingame, wx, wy)
                     App.setLoadScreen(loadScreen)
                 }
             }
