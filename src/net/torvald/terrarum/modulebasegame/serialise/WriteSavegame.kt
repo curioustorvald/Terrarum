@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameworld.BlockLayerI16I8
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ChunkLoadingLoadScreen
+import net.torvald.terrarum.modulebasegame.FancyWorldGenLoadScreen
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -162,7 +163,7 @@ object LoadSavegame {
 
 
         val loadJob = { it: LoadScreenBase ->
-            val loadscreen = it as ChunkLoadingLoadScreen
+            val loadscreen = it as FancyWorldGenLoadScreen
             loadscreen.addMessage(Lang["MENU_IO_LOADING"])
 
 
@@ -210,7 +211,7 @@ object LoadSavegame {
             printdbg(this, "World loaded: ${newIngame.worldDisk.getDiskName(Common.CHARSET)}")
         }
 
-        val loadScreen = ChunkLoadingLoadScreen(newIngame, world.width, world.height, loadJob)
+        val loadScreen = FancyWorldGenLoadScreen(newIngame, world.width, world.height, loadJob)
         Terrarum.setCurrentIngameInstance(newIngame)
         App.setLoadScreen(loadScreen)
     }
