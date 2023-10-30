@@ -1,12 +1,16 @@
 package net.torvald.terrarum.modulebasegame.console
 
+import com.badlogic.gdx.graphics.Color
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.App
+import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.utils.RasterWriter
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
 import net.torvald.terrarum.worlddrawer.toRGBA
 import java.io.File
 import java.io.IOException
@@ -20,6 +24,14 @@ internal object ExportMap : ConsoleCommand {
     // private var mapDataPointer = 0
 
 
+    private val oreColourMap = hashMapOf(
+        Block.AIR to Cvec(0),
+        "ores@basegame:1" to Cvec(0x00e9c8ff),
+        "ores@basegame:2" to Cvec(0xff9a5dff.toInt()),
+        "ores@basegame:3" to Cvec(0x383314ff),
+    )
+
+    private val WALL_OVERLAY = Cvec(0.35f, 0.35f, 0.35f, 1f)
 
     override fun execute(args: Array<String>) {
         val world = (INGAME.world)
@@ -31,8 +43,13 @@ internal object ExportMap : ConsoleCommand {
             var mapData = ByteArray(world.width * world.height * 3)
             var mapDataPointer = 0
 
-            for (tile in world.terrainIterator()) {
-                val colArray = App.tileMaker.terrainTileColourMap.get(tile)!!.toByteArray()
+            for ((terr, wall, ore) in world.terrainIterator()) {
+                val colOre = (oreColourMap.get(ore) ?: throw NullPointerException("nullore $ore")).toByteArray()
+                val colFore = (App.tileMaker.terrainTileColourMap.get(terr) ?: throw NullPointerException("nullterr $terr")).toByteArray()
+                val colWall = (App.tileMaker.terrainTileColourMap.get(wall) ?: throw NullPointerException("nullwall $wall")).cpy().mul(WALL_OVERLAY).toByteArray()
+
+                val colArray = if (ore != Block.AIR) colOre else if (BlockCodex[terr].isSolid) colFore else colWall
+
 
                 for (i in 0..2) {
                     mapData[mapDataPointer + i] = colArray[i]

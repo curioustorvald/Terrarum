@@ -597,8 +597,8 @@ open class GameWorld(
         layerOres.unsafeSetTile(x, y, tileNameToNumberMap[ore]!!, placement)
     }
 
-    fun terrainIterator(): Iterator<ItemID> {
-        return object : Iterator<ItemID> {
+    fun terrainIterator(): Iterator<List<ItemID>> {
+        return object : Iterator<List<ItemID>> {
 
             private var iteratorCount = 0
 
@@ -606,13 +606,13 @@ open class GameWorld(
                 return iteratorCount < width * height
             }
 
-            override fun next(): ItemID {
+            override fun next(): List<ItemID> {
                 val y = iteratorCount / width
                 val x = iteratorCount % width
                 // advance counter
                 iteratorCount += 1
 
-                return getTileFromTerrain(x, y)
+                return listOf(getTileFromTerrain(x, y), getTileFromWall(x, y), getTileFromOre(x, y).item)
             }
 
         }
