@@ -57,7 +57,7 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
     }
 
     override fun render(delta: Float) {
-        gdxClearAndEnableBlend(.094f, .094f, .094f, 0f)
+        gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
         val drawWidth = Toolkit.drawWidth
 

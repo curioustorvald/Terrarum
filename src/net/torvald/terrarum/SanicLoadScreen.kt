@@ -79,7 +79,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
 
 
-        gdxClearAndEnableBlend(.094f, .094f, .094f, 0f)
+        gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
         textFbo.inAction(null, null) {
             gdxClearAndEnableBlend(0f, 0f, 0f, 0f)

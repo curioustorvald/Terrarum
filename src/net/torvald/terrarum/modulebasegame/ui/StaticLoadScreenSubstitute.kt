@@ -14,7 +14,7 @@ object StaticLoadScreenSubstitute {
     operator fun invoke(batch: SpriteBatch) {
         batch.end()
 
-        gdxClearAndEnableBlend(.094f, .094f, .094f, 0f)
+        gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
         batch.begin()
 

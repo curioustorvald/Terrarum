@@ -13,7 +13,7 @@ import kotlin.math.sqrt
 /**
  * Created by minjaesong on 2023-10-30.
  */
-class FancyWorldGenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidth: Int, private val worldheight: Int, override var preLoadJob: (LoadScreenBase) -> Unit) : LoadScreenBase() {
+class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidth: Int, private val worldheight: Int, override var preLoadJob: (LoadScreenBase) -> Unit) : LoadScreenBase() {
 
     init {
         CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer01") {
@@ -58,8 +58,10 @@ class FancyWorldGenLoadScreen(screenToBeLoaded: IngameInstance, private val worl
         TextureRegionPack(it, visibleTileSize, imgYoff + previewHeight, gapSize, 0, xoff, 0)
     }
 
+    var chunksLoaded = 0 // only increments when all the chunks were loaded
+
     override fun render(delta: Float) {
-        gdxClearAndEnableBlend(.094f, .094f, .094f, 0f)
+        gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
         App.batch.inUse { val it = it as FlippingSpriteBatch
             it.color = Color.WHITE
@@ -82,16 +84,17 @@ class FancyWorldGenLoadScreen(screenToBeLoaded: IngameInstance, private val worl
     }
 
     private fun getProgress(): Int {
-        return 42
+        return (chunksLoaded.toDouble() / vtilesCount).roundToInt()
     }
 
     private fun getStage(): Int {
-        return 2
+        return 2 // fixed value for Read screen
     }
 
     private fun drawTiles(batch: FlippingSpriteBatch, layerCount: Int, tileCount: Int, x: Float, y: Float) {
         for (layer in 0 until layerCount) {
-            for (i in 0 until if (layer == layerCount - 1) tileCount else htilesCount) {
+//            for (i in 0 until if (layer == layerCount - 1) tileCount else htilesCount) {
+            for (i in 0 until tileCount) {
                 batch.draw(tiles[layer].get(i, 0), x + i * tileSize, y)
             }
         }
