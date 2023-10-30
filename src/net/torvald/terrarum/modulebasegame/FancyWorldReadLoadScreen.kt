@@ -42,7 +42,7 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
     val previewWidth = tileSize * htilesCount - gapSize
     val previewHeight = tileSize * vtilesCount
 
-    val xoff = 0//(Math.random() * (1024 - 764)).toInt()
+    val xoff = (Math.random() * (1024-764)/2).toInt()
 
     val baseTileTex = arrayOf(
         CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer01"),
