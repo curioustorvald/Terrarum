@@ -61,6 +61,9 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
             val previewX = (drawWidth - previewWidth).div(2f).roundToFloat()
             val previewY = (App.scr.height - previewHeight.times(1.5f)).div(2f).roundToFloat()
 
+            it.color = Color.BLACK
+            Toolkit.fillArea(it, previewX, previewY, previewWidth.toFloat(), previewHeight.toFloat())
+
             // it sets the colour by itself
             drawTiles(it, getStage(), getProgress(), previewX, previewY - imgYoff)
 
@@ -94,7 +97,7 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
         batch.color = batchColour
         for (layer in 0 until layerCount) {
             for (i in 0 until tileCount.ceilToInt()) {
-                batch.color.a = (tileCount - i).toFloat()
+                batch.color.a = (tileCount - i).toFloat().coerceIn(0f, 1f)
                 batch.draw(tiles[layer].get(i, 0), x + i, y)
             }
         }
@@ -116,7 +119,7 @@ class FancyWorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worl
         for (layer in 0 until layerCount) {
             val isOldLayer = (layer != layerCount - 1)
             for (i in 0 until if (!isOldLayer) tileCount.ceilToInt() else previewWidth) {
-                batch.color.a = if (!isOldLayer) (tileCount - i).toFloat() else 1f
+                batch.color.a = if (!isOldLayer) (tileCount - i).toFloat().coerceIn(0f, 1f) else 1f
                 batch.draw(tiles[layer].get(i, 0), x + i, y)
             }
         }
