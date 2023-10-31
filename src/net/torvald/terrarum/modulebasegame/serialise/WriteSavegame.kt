@@ -199,8 +199,8 @@ object LoadSavegame {
                     val chunkXY = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
 
                     ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer]!!, chunkXY.x, chunkXY.y)
-                    loadscreen.progress.getAndAdd(1)
                 }
+                loadscreen.progress.getAndAdd(1)
             }
 
             loadscreen.addMessage("Updating Block Mappings...")
