@@ -24,11 +24,6 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
         const val YHEIGHT_DIVISOR = 2.0 / 7.0
     }
 
-    private val threadExecutor = TerrarumIngame.worldgenThreadExecutor
-
-    private val genSlices = max(threadExecutor.threadCount, world.width / 9)
-
-
     private val dirtStoneDitherSize = 3 // actual dither size will be double of this value
     private val stoneSlateDitherSize = 4
 
@@ -36,9 +31,9 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
         loadscreen.stageValue += 1
         loadscreen.progress.set(0L)
 
-        threadExecutor.renew()
-        (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
-            threadExecutor.submit {
+        Worldgen.threadExecutor.renew()
+        (0 until world.width).sliceEvenly(Worldgen.genSlices).mapIndexed { i, xs ->
+            Worldgen.threadExecutor.submit {
                 val localJoise = getGenerator(seed, params as TerragenParams)
                 for (x in xs) {
                     val sampleTheta = (x.toDouble() / world.width) * TWO_PI
@@ -49,7 +44,7 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
             }
         }
 
-        threadExecutor.join()
+        Worldgen.threadExecutor.join()
 
         printdbg(this, "Waking up Worldgen")
     }

@@ -8,6 +8,8 @@ import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import kotlin.math.max
 import kotlin.math.roundToLong
 
 /**
@@ -20,6 +22,9 @@ object Worldgen {
     private lateinit var world: GameWorld
     lateinit var params: WorldgenParams
         private set
+
+    val threadExecutor = TerrarumIngame.worldgenThreadExecutor
+    var genSlices = -1
 
     private val threadLock = java.lang.Object()
 
@@ -62,6 +67,8 @@ object Worldgen {
     fun generateMap(loadscreen: LoadScreenBase) {
         highlandLowlandSelectCache = getHighlandLowlandSelectCache(params.terragenParams, params.seed)
         caveAttenuateBiasScaled = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
+        genSlices = max(threadExecutor.threadCount, world.width / 9)
+
 
         val jobs = getJobs()
 
@@ -99,7 +106,7 @@ object Worldgen {
     data class Work(val loadingScreenName: String, val theWork: Gen, val tags: List<String>)
 
     fun getEstimationSec(width: Int, height: Int): Long {
-        return (23.15 * 1.25 * (48600000.0 / bogoflops) * ((width * height) / 40095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
+        return (23.15 * 1.25 * (48600000.0 / bogoflops) * ((width * height) / 20095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
     }
 
     private fun getHighlandLowlandSelectCache(params: TerragenParams, seed: Long): ModuleCache {

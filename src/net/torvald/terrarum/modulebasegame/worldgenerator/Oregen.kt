@@ -18,17 +18,13 @@ import kotlin.math.sqrt
  * Created by minjaesong on 2023-10-25.
  */
 class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, private val ores: List<OregenParams>) : Gen(world, seed) {
-
-    private val threadExecutor = TerrarumIngame.worldgenThreadExecutor
-    private val genSlices = max(threadExecutor.threadCount, world.width / 9)
-
     override fun getDone(loadscreen: LoadScreenBase) {
         loadscreen.stageValue += 1
         loadscreen.progress.set(0L)
 
-        threadExecutor.renew()
-        (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
-            threadExecutor.submit {
+        Worldgen.threadExecutor.renew()
+        (0 until world.width).sliceEvenly(Worldgen.genSlices).mapIndexed { i, xs ->
+            Worldgen.threadExecutor.submit {
                 val localJoise = getGenerator(seed)
                 for (x in xs) {
                     val sampleTheta = (x.toDouble() / world.width) * TWO_PI
@@ -39,7 +35,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
             }
         }
 
-        threadExecutor.join()
+        Worldgen.threadExecutor.join()
     }
 
     /**

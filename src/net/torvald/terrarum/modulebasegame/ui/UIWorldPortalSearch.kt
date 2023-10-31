@@ -195,10 +195,12 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
         App.fontGame.draw(batch, Lang["CONTEXT_PLACE_COORDINATE"], drawX - 4, drawY + sizeSelY + inputLineY2)
 
         val (wx, wy) = TerrarumIngame.NEW_WORLD_SIZE[sizeSelector.selection]
-        val etaMin = Worldgen.getEstimationSec(wx, wy).div(60f).roundToInt().coerceAtLeast(1)
+        val etaSec = Worldgen.getEstimationSec(wx, wy)
+        val etaMin = etaSec.div(60f).roundToInt().coerceAtLeast(1)
         val etaText = Lang.getAndUseTemplate("CONTEXT_ESTIMATED_MINUTES_PLURAL", true, etaMin)
+        val etaTextPrint = etaText + (if (App.IS_DEVELOPMENT_BUILD) " ($etaSec s)" else "")
 
-        Toolkit.drawTextCentered(batch, App.fontGame, etaText, width, drawX, drawY + sizeSelY + inputLineY3)
+        Toolkit.drawTextCentered(batch, App.fontGame, etaTextPrint, width, drawX, drawY + sizeSelY + inputLineY3)
 
         // memory gauge
         val chunksUsed = full.chunksUsed

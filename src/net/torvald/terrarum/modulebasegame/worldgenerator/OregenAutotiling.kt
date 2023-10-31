@@ -20,20 +20,17 @@ import kotlin.math.max
  */
 class OregenAutotiling(world: GameWorld, seed: Long, val tilingModes: HashMap<ItemID, String>) : Gen(world, seed) {
 
-    private val threadExecutor = TerrarumIngame.worldgenThreadExecutor
-    private val genSlices = max(threadExecutor.threadCount, world.width / 9)
-
     override fun getDone(loadscreen: LoadScreenBase) {
-        threadExecutor.renew()
-        (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
-            threadExecutor.submit {
+        Worldgen.threadExecutor.renew()
+        (0 until world.width).sliceEvenly(Worldgen.genSlices).mapIndexed { i, xs ->
+            Worldgen.threadExecutor.submit {
                 for (x in xs) {
                     draw(x)
                 }
             }
         }
 
-        threadExecutor.join()
+        Worldgen.threadExecutor.join()
     }
 
     private fun getHashCoord(x: Int, y: Int, mod: Int) =

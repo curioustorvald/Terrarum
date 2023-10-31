@@ -19,19 +19,15 @@ import kotlin.math.sin
  */
 class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
 
-    private val threadExecutor = TerrarumIngame.worldgenThreadExecutor
-
-    private val genSlices = max(threadExecutor.threadCount, world.width / 9)
-
     private val YHEIGHT_MAGIC = 2800.0 / 3.0
     private val YHEIGHT_DIVISOR = 2.0 / 7.0
 
     override fun getDone(loadscreen: LoadScreenBase) {
 //        loadscreen.progress.set((loadscreen.progress.get() + 0x1_000000_000000L) and 0x7FFF_000000_000000L)
 
-        threadExecutor.renew()
-        (0 until world.width).sliceEvenly(genSlices).map { xs ->
-            threadExecutor.submit {
+        Worldgen.threadExecutor.renew()
+        (0 until world.width).sliceEvenly(Worldgen.genSlices).map { xs ->
+            Worldgen.threadExecutor.submit {
                 val localJoise = getGenerator(seed, params as BiomegenParams)
                 for (x in xs) {
                     for (y in 0 until world.height) {
@@ -49,7 +45,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             }
         }
 
-        threadExecutor.join()
+        Worldgen.threadExecutor.join()
 
         App.printdbg(this, "Waking up Worldgen")
     }
