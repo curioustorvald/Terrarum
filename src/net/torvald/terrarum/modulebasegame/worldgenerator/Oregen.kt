@@ -3,14 +3,12 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.terrarum.*
-import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.FancyWorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_DIVISOR
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_MAGIC
-import net.torvald.terrarum.utils.OrePlacement
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
@@ -25,7 +23,8 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
     private val genSlices = max(threadExecutor.threadCount, world.width / 9)
 
     override fun getDone(loadscreen: LoadScreenBase) {
-        loadscreen.progress.set((loadscreen.progress.get() + 0x1_000000_000000L) and 0x7FFF_000000_000000L)
+        loadscreen.stageValue += 1
+        loadscreen.progress.set(0L)
 
         threadExecutor.renew()
         (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->

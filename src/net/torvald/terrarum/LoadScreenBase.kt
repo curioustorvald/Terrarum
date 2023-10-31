@@ -28,6 +28,7 @@ open class LoadScreenBase : ScreenAdapter(), Disposable, TerrarumGamescreen {
     var camera = OrthographicCamera(App.scr.wf, App.scr.hf)
 
     var progress = AtomicLong(0L) // generic variable, interpretation will vary by the screen
+    var stageValue = 0
 
     override fun show() {
         messages.clear()

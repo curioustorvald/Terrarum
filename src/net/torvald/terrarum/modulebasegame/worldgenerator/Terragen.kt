@@ -8,6 +8,7 @@ import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.FancyWorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import kotlin.math.cos
 import kotlin.math.max
@@ -32,6 +33,7 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
     private val stoneSlateDitherSize = 4
 
     override fun getDone(loadscreen: LoadScreenBase) {
+        loadscreen.stageValue += 1
         loadscreen.progress.set(0L)
 
         threadExecutor.renew()

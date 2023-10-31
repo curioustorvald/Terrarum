@@ -3,13 +3,11 @@ package net.torvald.terrarum.modulebasegame
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import kotlin.math.max
 import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 import kotlin.math.sqrt
 
 /**
@@ -66,8 +64,7 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
             val previewY = (App.scr.height - previewHeight.times(1.5f)).div(2f).roundToFloat()
             Toolkit.drawBoxBorder(it, previewX.toInt()-1, previewY.toInt()-1, previewWidth+2, previewHeight+2)
 
-            val prog = progress.get()
-            drawTiles(it, getStage(prog), getProgress(prog), previewX, previewY - imgYoff)
+            drawTiles(it, getStage(), getProgress(), previewX, previewY - imgYoff)
 
             val text = messages.getHeadElem() ?: ""
             App.fontGame.draw(it,
@@ -81,11 +78,11 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
         super.render(delta)
     }
 
-    protected open fun getProgress(progress: Long): Int {
-        return ((progress / 3.0) / vtilesCount).roundToInt()
+    protected open fun getProgress(): Int {
+        return ((progress.get() / 3.0) / vtilesCount).roundToInt()
     }
 
-    protected open fun getStage(progress: Long): Int {
+    protected open fun getStage(): Int {
         return 2 // fixed value for Read screen
     }
 
@@ -100,12 +97,12 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
 
 class FancyWorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidth: Int, private val worldheight: Int) : FancyWorldReadLoadScreen(screenToBeLoaded, worldwidth, worldheight, {}) {
 
-    override fun getProgress(progress: Long): Int {
-        return ((progress and 0xFFFFFF_FFFFFFL) / CHUNK_W).toInt()
+    override fun getProgress(): Int {
+        return (progress.get() / CHUNK_W).toInt()
     }
 
-    override fun getStage(progress: Long): Int {
-        return (progress ushr 48).toInt() + 1
+    override fun getStage(): Int {
+        return stageValue
     }
 
     override fun drawTiles(batch: FlippingSpriteBatch, layerCount: Int, tileCount: Int, x: Float, y: Float) {
