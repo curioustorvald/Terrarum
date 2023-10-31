@@ -2075,7 +2075,7 @@ open class ActorWithBody : Actor {
         val veloXvar = (Math.random() + Math.random()) * (if (Math.random() < 0.5) -1 else 1) * 0.5 // avr at 0.5
         val veloYvar = brownianRand()
         val veloMult = Vector2(
-            vecSum.x + veloXvar,
+            vecSum.x * 0.8 + veloXvar,
             (count.pow(0.5) + veloYvar) * vecSum.y.sign
         )
         createRandomBlockParticle(tileNum, pos, veloMult, u, v, pw, ph).let {
