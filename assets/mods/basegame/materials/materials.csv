@@ -44,7 +44,7 @@ GRVL;1;1;2400;0.0;0.0;36;0;36;gravel
 #
 # reach: Tool Reach in blocks. Default is 6 (iron)
 #
-$ rcs: Radar Cross Section -- how well the material reflects the radio wave used by the Ground Penetrating Radar.
+# rcs: Radar Cross Section -- how well the material reflects the radio wave used by the Ground Penetrating Radar.
 #
 # Comments: do nothing;do not parse
 #
