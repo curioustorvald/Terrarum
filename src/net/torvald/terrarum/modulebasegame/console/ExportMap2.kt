@@ -8,6 +8,7 @@ import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.isOre
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.terrarum.utils.RasterWriter
@@ -26,11 +27,11 @@ import kotlin.math.sign
  */
 internal object ExportMap2 : ConsoleCommand {
 
-    private fun getOreRCS(ore: ItemID) =
-        ItemCodex[OreCodex.oreProps.getOrElse(ore) { null }?.item]?.material?.rcs ?: MaterialCodex.nullMaterial.rcs
-    private fun getBlockRCS(block: ItemID) =
-        MaterialCodex.getOrDefault(BlockCodex.getOrNull(block)?.material).rcs
-
+    private fun getRCS(item: ItemID) =
+        if (item.isOre())
+            ItemCodex[OreCodex.oreProps.getOrElse(item) { null }?.item]?.material?.rcs ?: MaterialCodex.nullMaterial.rcs
+        else
+            MaterialCodex.getOrDefault(BlockCodex.getOrNull(item)?.material).rcs
 
     private fun triangularRand(amp: Float) = (((Math.random() + Math.random()) - 1.0) * amp).toFloat()
 
@@ -46,9 +47,6 @@ internal object ExportMap2 : ConsoleCommand {
     }
 
     override fun execute(args: Array<String>) {
-        println("Air RCS: ${getBlockRCS(Block.AIR)}")
-
-
         val world = (INGAME.world)
         if (args.size == 2) {
 
@@ -66,7 +64,7 @@ internal object ExportMap2 : ConsoleCommand {
                     val terr = world.getTileFromTerrain(x, y)
                     val ore = world.getTileFromOre(x, y).item
 
-                    val reflection0 = maxOf(getOreRCS(ore), getBlockRCS(terr))
+                    val reflection0 = maxOf(getRCS(ore), getRCS(terr))
                     val reflection = reflection0 + triangularRand(strToRandAmp(reflection0.toFloat()))
 
                     val delta = (reflection - akku).coerceAtLeast(0f)
