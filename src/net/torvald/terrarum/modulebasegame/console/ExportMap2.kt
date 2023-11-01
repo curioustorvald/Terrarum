@@ -9,6 +9,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.terrarum.utils.RasterWriter
 import net.torvald.terrarum.worlddrawer.toRGBA
@@ -17,6 +18,7 @@ import java.io.IOException
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.roundToInt
+import kotlin.math.sign
 
 /**
  * Ground Peneration Radar Simulator
@@ -42,6 +44,12 @@ internal object ExportMap2 : ConsoleCommand {
 
     private fun Float.bfpow(pow: Float) = if (this >= 0f) this.div(128f).pow(pow) else this.div(-128f).pow(pow).times(-1f)
 
+    private fun Float.toDitherredByte(): Byte {
+        val byteVal = this.times(255f).roundToInt()
+        val error = this - byteVal
+        val errorInt = if (Math.random() < error.absoluteValue) 0 else (1 * error.sign).toInt()
+        return (byteVal + errorInt).coerceIn(0..255).toByte()
+    }
 
     override fun execute(args: Array<String>) {
         val world = (INGAME.world)
@@ -74,7 +82,7 @@ internal object ExportMap2 : ConsoleCommand {
 
 
                     val deltaVal = delta5.bfpow(1f)
-                    mapData[y * world.width + x] = deltaVal.plus(0.5f).times(255f).coerceIn(0f..255f).roundToInt().toByte()
+                    mapData[y * world.width + x] = deltaVal.plus(0.5f).toDitherredByte()
 
 
                     akku5 = delta4
@@ -86,6 +94,31 @@ internal object ExportMap2 : ConsoleCommand {
                 }
             }
 
+            /*
+            // gaussian blur it
+            val sampleOff = arrayOf(-3,-2,-1,0,1,2,3)
+            val gaussLut = arrayOf(0.054f, 0.164f, 0.319f, 0.399f, 0.319f, 0.164f, 0.054f)
+            val mapData2 = FloatArray(world.width * world.height)
+            // blur pass horizontal
+            for (y in 0 until world.height) {
+                for (x in 0 until world.width) {
+                    val ps = sampleOff.map { y * world.width + (x+it) fmod world.width }
+                    val v = ps.mapIndexed { i, it -> gaussLut[i] * mapData[it].toUint() }.sum()
+                    mapData2[y * world.width + x] = v
+                }
+            }
+            val mapData3 = FloatArray(world.width * world.height)
+            // blur pass vertical
+            for (y in 0 until world.height) {
+                for (x in 0 until world.width) {
+                    val ps = sampleOff.map { (y + it).coerceIn(0 until world.height) * world.width + x }
+                    val v = ps.mapIndexed { i, it -> gaussLut[i] * mapData2[it] }.sum()
+                    mapData3[y * world.width + x] = v
+                }
+            }
+            // writeout
+            mapData3.forEachIndexed { index, fl -> mapData[index] = fl.toDitherredByte() }
+            */
 
             val dir = App.defaultDir + "/Exports/"
             val dirAsFile = File(dir)
