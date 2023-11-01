@@ -29,6 +29,8 @@ class Material {
 
     var toolReach: Int = 6
 
+    var rcs: Int = 10
+
     /**
      * Mainly intended to be used by third-party modules
      */
@@ -70,6 +72,7 @@ class MaterialCodex {
             prop.thermalConductivity = it.floatVal("tcond")
             prop.identifier = it.get("idst").toUpperCase()
             prop.toolReach = it.intVal("reach")
+            prop.rcs = it.intVal("rcs")
 
             materialProps[prop.identifier] = prop
 
@@ -86,6 +89,6 @@ class MaterialCodex {
         throw NullPointerException("Material with id $identifier does not exist.")
     }
 
-    fun getOrDefault(identifier: String) = materialProps[identifier.toUpperCase()] ?: nullMaterial
+    fun getOrDefault(identifier: String?) = materialProps[identifier?.toUpperCase()] ?: nullMaterial
 
 }

@@ -44,19 +44,16 @@ class OreStick(originalID: ItemID) : OreItemBase(originalID) {
 }
 class OreCopper(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_MALACHITE"
-    override val materialId = "ROCK"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,6)
 }
 class OreIron(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_HAEMATITE"
-    override val materialId = "ROCK"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,6)
 }
 class OreCoal(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_COAL"
-    override val materialId = "ROCK"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(4,6)
 }

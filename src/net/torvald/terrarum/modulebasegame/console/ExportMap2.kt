@@ -2,13 +2,12 @@ package net.torvald.terrarum.modulebasegame.console
 
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.terrarum.App
-import net.torvald.terrarum.BlockCodex
-import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.terrarum.utils.RasterWriter
@@ -27,16 +26,11 @@ import kotlin.math.sign
  */
 internal object ExportMap2 : ConsoleCommand {
 
-    //private var mapData: ByteArray? = null
-    // private var mapDataPointer = 0
+    private fun getOreRCS(ore: ItemID) =
+        ItemCodex[OreCodex.oreProps.getOrElse(ore) { null }?.item]?.material?.rcs ?: MaterialCodex.nullMaterial.rcs
+    private fun getBlockRCS(block: ItemID) =
+        MaterialCodex.getOrDefault(BlockCodex.getOrNull(block)?.material).rcs
 
-
-    private val oreColourMap = hashMapOf(
-        Block.AIR to 0,
-        "ores@basegame:1" to 160,
-        "ores@basegame:2" to 128,
-        "ores@basegame:3" to 96,
-    )
 
     private fun triangularRand(amp: Float) = (((Math.random() + Math.random()) - 1.0) * amp).toFloat()
 
@@ -52,6 +46,9 @@ internal object ExportMap2 : ConsoleCommand {
     }
 
     override fun execute(args: Array<String>) {
+        println("Air RCS: ${getBlockRCS(Block.AIR)}")
+
+
         val world = (INGAME.world)
         if (args.size == 2) {
 
@@ -69,9 +66,7 @@ internal object ExportMap2 : ConsoleCommand {
                     val terr = world.getTileFromTerrain(x, y)
                     val ore = world.getTileFromOre(x, y).item
 
-                    val colOre = (oreColourMap.get(ore) ?: throw NullPointerException("nullore $ore"))
-                    val colFore = (BlockCodex.getOrNull(terr)?.strength ?: throw NullPointerException("nullterr $terr"))
-                    val reflection0 = maxOf(colOre, colFore)
+                    val reflection0 = maxOf(getOreRCS(ore), getBlockRCS(terr))
                     val reflection = reflection0 + triangularRand(strToRandAmp(reflection0.toFloat()))
 
                     val delta = (reflection - akku).coerceAtLeast(0f)

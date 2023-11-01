@@ -1,23 +1,26 @@
-idst;tens;impf;dsty;fmod;endurance;tcond;reach;comments
-WOOD;10;10;800;1;0.173;0.17;5;just a generic wood
-ROCK;15;210;3000;1;0.42;2.9;5;data is that of marble
-OORE;15;210;3000;1;0.42;2.9;5;data is that of marble
-OGEM;15;210;3000;1;0.42;2.9;5;data is that of marble
-CUPR;210;770;8960;2;1.00;401.0;5;copper
-EGLS;33;1000;2325;4;0.82;1.0;6;elven glass/moldavite
-IRON;350;1085;7874;5;1.42;80.4;6;not wrought iron,just natural iron
-ARGN;170;595;10490;9;0.91;429.0;6;argentum/silver
-AURM;120;350;19300;9;0.88;318.0;6;aurum/gold
-STAL;531;2520;7874;14;1.73;26.0;7;steel
-EAUR;768;0;8192;21;1.36;1.0;7;elven aurichalcum
-TIAL;900;0;4420;33;2.16;1.0;8;titanium alloy (Ti6Al4V)
-ADMT;2000;4090;2700;71;3.42;1.0;8;adamant
-OOZE;20;0;1000;1;0.08;0.5;0;genetic ooze,data is about human skin
-BONE;130;0;2000;1;0.23;0.55;4;data is that of bovine bone
-BRAS;315;1015;8530;3;1.00;120;5;brass
-BRNZ;310;843;8770;3;1.20;75;5;bronze
-TINN;220;350;7310;2;1.00;69;5;tin
-ZINC;90;525;7140;2;1.00;116;5;zinc
+idst;tens;impf;dsty;fmod;endurance;tcond;reach;rcs;comments
+WOOD;10;10;800;1;0.173;0.17;5;18;just a generic wood
+ROCK;15;210;3000;1;0.42;2.9;5;48;data is that of marble
+OORE;15;210;3000;1;0.42;2.9;5;100;data is that of marble
+OGEM;15;210;3000;1;0.42;2.9;5;80;data is that of marble
+CUPR;210;770;8960;2;1.00;401.0;5;120;copper
+EGLS;33;1000;2325;4;0.82;1.0;6;10;elven glass/moldavite
+IRON;350;1085;7874;5;1.42;80.4;6;120;not wrought iron,just natural iron
+ARGN;170;595;10490;9;0.91;429.0;6;120;argentum/silver
+AURM;120;350;19300;9;0.88;318.0;6;120;aurum/gold
+STAL;531;2520;7874;14;1.73;26.0;7;120;steel
+EAUR;768;0;8192;21;1.36;1.0;7;120;elven aurichalcum
+TIAL;900;0;4420;33;2.16;1.0;8;120;titanium alloy (Ti6Al4V)
+ADMT;2000;4090;2700;71;3.42;1.0;8;120;adamant
+OOZE;20;0;1000;1;0.08;0.5;0;10;genetic ooze,data is about human skin
+BONE;130;0;2000;1;0.23;0.55;4;10;data is that of bovine bone
+BRAS;315;1015;8530;3;1.00;120;5;120;brass
+BRNZ;310;843;8770;3;1.20;75;5;120;bronze
+TINN;220;350;7310;2;1.00;69;5;120;tin
+ZINC;90;525;7140;2;1.00;116;5;120;zinc
+DIRT;1;1;1400;0.0;0.0;36;0;10;dirt
+PLST;1;1;1400;0.0;0.0;36;0;16;TODO plastic (polyethylene)
+AIIR;1;1;0;0.0;0.0;36;0;1;air
 
 # idst: ID_STRING, ALL CAPS
 #
