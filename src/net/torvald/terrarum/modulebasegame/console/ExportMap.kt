@@ -40,7 +40,7 @@ internal object ExportMap : ConsoleCommand {
 
             // TODO rewrite to use Pixmap and PixmapIO
 
-            var mapData = ByteArray(world.width * world.height * 3)
+            val mapData = ByteArray(world.width * world.height * 3)
             var mapDataPointer = 0
 
             for ((terr, wall, ore) in world.terrainIterator()) {
