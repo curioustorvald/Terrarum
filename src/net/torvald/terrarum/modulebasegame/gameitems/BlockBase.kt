@@ -25,15 +25,15 @@ object BlockBase {
             val ingame = Terrarum.ingame!! as TerrarumIngame
             val mousePoint = Point2d(mtx.toDouble(), mty.toDouble())
             val mouseTile = Point2i(mtx, mty)
+            val terrainUnderCursor = ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)
+            val wallUnderCursor = ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
+            val terrProp = BlockCodex[terrainUnderCursor]
+            val wallProp = BlockCodex[wallUnderCursor]
+            val heldTileisWall = itemID.isWall()
+            val heldProp = BlockCodex[itemID]
 
-            // check for collision with actors (BLOCK only)
-            // FIXME properly fix the collision detection: it OVERRIDES the tiki-torches which should not happen AT ALL
-            // FIXME (h)IntTilewiseHitbox is badly defined
-            // FIXME     actually it's this code: not recognising hitbox's starting point correctly. Use F9 for visualisation
-            // FIXME the above issue is resolved by using intTilewise instead of hInt, but the hitbox itself is still
-            // FIXME     badly defined
-
-            if (gameItem.inventoryCategory == GameItem.Category.BLOCK) {
+            // check for collision with actors (solid terrain block only)
+            if (gameItem.inventoryCategory == GameItem.Category.BLOCK && heldProp.isSolid) {
                 var ret1 = true
                 ingame.actorContainerActive.filter { it is ActorWithBody }.forEach { val it = it as ActorWithBody
                     if ((it is FixtureBase || it.physProp.usePhysics) && it.intTilewiseHitbox.intersects(mousePoint))
@@ -42,22 +42,19 @@ object BlockBase {
                 if (!ret1) return@mouseInInteractableRange -1L
             }
 
-            val isWall = itemID.isWall()
-            val terrainUnderCursor = ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)
-            val wallUnderCursor = ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
 
             // return false if there is a same tile already (including non-solid!)
-            if (isWall && wallUnderCursor == itemID || !isWall && terrainUnderCursor == itemID)
+            if (heldTileisWall && wallUnderCursor == itemID || !heldTileisWall && terrainUnderCursor == itemID)
                 return@mouseInInteractableRange -1L
 
             // return false if there is a "solid" tile already
-            if (isWall && BlockCodex[wallUnderCursor].isSolid ||
-                !isWall && !BlockCodex[terrainUnderCursor].hasTag("INCONSEQUENTIAL"))
+            if (heldTileisWall && wallProp.isSolid ||
+                !heldTileisWall && !terrProp.hasTag("INCONSEQUENTIAL"))
                 return@mouseInInteractableRange -1L
 
             // filter passed, do the job
             // FIXME this is only useful for Player
-            if (isWall) {
+            if (heldTileisWall) {
                 ingame.world.setTileWall(
                         mouseTile.x,
                         mouseTile.y,
