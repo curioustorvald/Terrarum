@@ -20,7 +20,9 @@ TINN;220;350;7310;2;1.00;69;5;120;tin
 ZINC;90;525;7140;2;1.00;116;5;120;zinc
 DIRT;1;1;1400;0.0;0.0;36;0;10;dirt
 PLST;1;1;1400;0.0;0.0;36;0;16;TODO plastic (polyethylene)
-AIIR;1;1;0;0.0;0.0;36;0;1;air
+AIIR;1;1;1;0.0;0.0;36;0;1;air
+SAND;1;1;2400;0.0;0.0;36;0;36;sand
+GRVL;1;1;2400;0.0;0.0;36;0;36;gravel
 
 # idst: ID_STRING, ALL CAPS
 #
@@ -41,6 +43,8 @@ AIIR;1;1;0;0.0;0.0;36;0;1;air
 # tcond: thermal conductivity
 #
 # reach: Tool Reach in blocks. Default is 6 (iron)
+#
+$ rcs: Radar Cross Section -- how well the material reflects the radio wave used by the Ground Penetrating Radar.
 #
 # Comments: do nothing;do not parse
 #
