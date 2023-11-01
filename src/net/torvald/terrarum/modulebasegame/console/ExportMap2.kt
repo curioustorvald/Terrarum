@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.console
 
+import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.App
 import net.torvald.terrarum.BlockCodex
@@ -13,6 +14,7 @@ import net.torvald.terrarum.utils.RasterWriter
 import net.torvald.terrarum.worlddrawer.toRGBA
 import java.io.File
 import java.io.IOException
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -34,6 +36,13 @@ internal object ExportMap2 : ConsoleCommand {
         "ores@basegame:3" to 96,
     )
 
+    private fun triangularRand(amp: Float) = (((Math.random() + Math.random()) - 1.0) * amp).toFloat()
+
+    private fun strToRandAmp(str: Float) = FastMath.log(str.absoluteValue.coerceAtLeast(4f), 2f).coerceAtLeast(0f)
+
+    private fun Float.bfpow(pow: Float) = if (this >= 0f) this.div(128f).pow(pow) else this.div(-128f).pow(pow).times(-1f)
+
+
     override fun execute(args: Array<String>) {
         val world = (INGAME.world)
         if (args.size == 2) {
@@ -43,27 +52,28 @@ internal object ExportMap2 : ConsoleCommand {
             val mapData = ByteArray(world.width * world.height)
 
             for (x in 0 until world.width) {
-                var akku = 0
-                var akku2 = 0
-                var akku3 = 0
-                var akku4 = 0
-                var akku5 = 0
+                var akku  = 0f
+                var akku2 = 0f
+                var akku3 = 0f
+                var akku4 = 0f
+                var akku5 = 0f
                 for (y in 0 until world.height) {
                     val terr = world.getTileFromTerrain(x, y)
                     val ore = world.getTileFromOre(x, y).item
 
                     val colOre = (oreColourMap.get(ore) ?: throw NullPointerException("nullore $ore"))
                     val colFore = (BlockCodex.getOrNull(terr)?.strength ?: throw NullPointerException("nullterr $terr"))
-                    val reflection = maxOf(colOre, colFore)
+                    val reflection0 = maxOf(colOre, colFore)
+                    val reflection = reflection0 + triangularRand(strToRandAmp(reflection0.toFloat()))
 
-                    val delta = (reflection - akku).coerceAtLeast(0)
+                    val delta = (reflection - akku).coerceAtLeast(0f)
                     val delta2 = delta - akku2
                     val delta3 = delta2 - akku3
                     val delta4 = delta3 - akku4
                     val delta5 = delta4 - akku5
 
 
-                    val deltaVal = delta5.div(128f)//if (delta5 >= 0f) delta5.div(128f).pow(1f / 3f) else delta5.div(-128f).pow(1f / 3f).times(-1f)
+                    val deltaVal = delta5.bfpow(1f)
                     mapData[y * world.width + x] = deltaVal.plus(0.5f).times(255f).coerceIn(0f..255f).roundToInt().toByte()
 
 
