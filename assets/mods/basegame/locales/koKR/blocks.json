@@ -35,20 +35,6 @@
   "BLOCK_GRAVEL": "자갈",
   "BLOCK_GRAVEL_GREY": "회색 자갈",
 
-  "BLOCK_ORE_MALACHITE": "공작석",
-  "BLOCK_ORE_HEMATITE": "적철석",
-  "BLOCK_ORE_NATURAL_GOLD": "금덩어리",
-  "BLOCK_ORE_NATURAL_SILVER": "은덩어리",
-  "BLOCK_ORE_RUTILE": "금홍석",
-  "BLOCK_ORE_AURICHALCUMITE": "진금석",
-
-  "BLOCK_GEM_RUBY": "홍옥석",
-  "BLOCK_GEM_EMERALD": "취옥석",
-  "BLOCK_GEM_SAPPHIRE": "청옥석",
-  "BLOCK_GEM_TOPAZ": "황옥석",
-  "BLOCK_GEM_DIAMOND": "금강석",
-  "BLOCK_GEM_AMETHYST": "자수정석",
-
   "BLOCK_SNOW": "눈",
 
   "BLOCK_ICE_FRAGILE": "살얼음",

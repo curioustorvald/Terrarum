@@ -35,20 +35,6 @@
   "BLOCK_GRAVEL": "Gravel",
   "BLOCK_GRAVEL_GREY": "Grey Gravel",
 
-  "BLOCK_ORE_MALACHITE": "Malachite",
-  "BLOCK_ORE_HEMATITE": "Hematite",
-  "BLOCK_ORE_NATURAL_GOLD": "Natural Gold",
-  "BLOCK_ORE_NATURAL_SILVER": "Natural Silver",
-  "BLOCK_ORE_RUTILE": "Rutile",
-  "BLOCK_ORE_AURICHALCUMITE": "Aurichalcumite",
-
-  "BLOCK_GEM_RUBY": "Raw Ruby",
-  "BLOCK_GEM_EMERALD": "Raw Emerald",
-  "BLOCK_GEM_SAPPHIRE": "Raw Sapphire",
-  "BLOCK_GEM_TOPAZ": "Raw Topaz",
-  "BLOCK_GEM_DIAMOND": "Raw Diamond",
-  "BLOCK_GEM_AMETHYST": "Raw Amethyst",
-
   "BLOCK_SNOW": "Snow",
 
   "BLOCK_ICE_FRAGILE": "Thin Ice",
