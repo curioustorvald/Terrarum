@@ -13,6 +13,8 @@ import net.torvald.terrarum.utils.RasterWriter
 import net.torvald.terrarum.worlddrawer.toRGBA
 import java.io.File
 import java.io.IOException
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 /**
  * Ground Peneration Radar Simulator
@@ -28,13 +30,12 @@ internal object ExportMap2 : ConsoleCommand {
     private val oreColourMap = hashMapOf(
         Block.AIR to 0,
         "ores@basegame:1" to 160,
-        "ores@basegame:2" to 160,
-        "ores@basegame:3" to 160,
+        "ores@basegame:2" to 128,
+        "ores@basegame:3" to 96,
     )
 
     override fun execute(args: Array<String>) {
         val world = (INGAME.world)
-
         if (args.size == 2) {
 
             // TODO rewrite to use Pixmap and PixmapIO
@@ -44,6 +45,9 @@ internal object ExportMap2 : ConsoleCommand {
             for (x in 0 until world.width) {
                 var akku = 0
                 var akku2 = 0
+                var akku3 = 0
+                var akku4 = 0
+                var akku5 = 0
                 for (y in 0 until world.height) {
                     val terr = world.getTileFromTerrain(x, y)
                     val ore = world.getTileFromOre(x, y).item
@@ -52,32 +56,25 @@ internal object ExportMap2 : ConsoleCommand {
                     val colFore = (BlockCodex.getOrNull(terr)?.strength ?: throw NullPointerException("nullterr $terr"))
                     val reflection = maxOf(colOre, colFore)
 
-                    val delta = reflection - akku
+                    val delta = (reflection - akku).coerceAtLeast(0)
                     val delta2 = delta - akku2
+                    val delta3 = delta2 - akku3
+                    val delta4 = delta3 - akku4
+                    val delta5 = delta4 - akku5
 
-                    mapData[y * world.width + x] = delta2.plus(128).coerceIn(0..255).toByte()
 
+                    val deltaVal = delta5.div(128f)//if (delta5 >= 0f) delta5.div(128f).pow(1f / 3f) else delta5.div(-128f).pow(1f / 3f).times(-1f)
+                    mapData[y * world.width + x] = deltaVal.plus(0.5f).times(255f).coerceIn(0f..255f).roundToInt().toByte()
+
+
+                    akku5 = delta4
+                    akku4 = delta3
+                    akku3 = delta2
                     akku2 = delta
                     akku = reflection
 
                 }
             }
-
-
-            /*for (x in 0 until world.width) {
-                var akku = 0
-                for (y in 0 until world.height) {
-                    val off = y * world.width + x
-
-                    val reflection = mapData[off].toUint() - 128
-
-                    val delta = reflection - akku
-                    akku = reflection
-
-
-                    mapData[off] = delta.plus(128).coerceIn(0..255).toByte()
-                }
-            }*/
 
 
             val dir = App.defaultDir + "/Exports/"
