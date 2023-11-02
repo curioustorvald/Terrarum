@@ -46,6 +46,29 @@ internal object ExportMap2 : ConsoleCommand {
         return (byteVal + errorInt).coerceIn(0..255).toByte()
     }
 
+    private val kernPos = listOf(
+        -1 to -1,
+         0 to -1,
+         1 to -1,
+        -1 to  0,
+         0 to  0,
+         1 to  0,
+        -1 to  1,
+         0 to  1,
+         1 to  1,
+    )
+    private val kernPow = listOf(
+        1f / 16f,
+        2f / 16f,
+        1f / 16f,
+        2f / 16f,
+        4f / 16f,
+        2f / 16f,
+        1f / 16f,
+        2f / 16f,
+        1f / 16f
+    )
+
     override fun execute(args: Array<String>) {
         val world = (INGAME.world)
         if (args.size == 2) {
@@ -61,11 +84,15 @@ internal object ExportMap2 : ConsoleCommand {
                 var akku4 = 0f
                 var akku5 = 0f
                 for (y in 0 until world.height) {
-                    val terr = world.getTileFromTerrain(x, y)
-                    val ore = world.getTileFromOre(x, y).item
+                    val terrs = kernPos.map { world.getTileFromTerrain(x + it.first, y + it.second) }
+                    val ores = kernPos.map { world.getTileFromOre(x + it.first, y + it.second).item }
 
-                    val reflection0 = maxOf(getRCS(ore), getRCS(terr))
-                    val reflection = reflection0 + triangularRand(strToRandAmp(reflection0.toFloat()))
+
+                    val reflection = kernPow.mapIndexed { index, mult ->
+                        val reflection0 = maxOf(getRCS(terrs[index]), getRCS(ores[index]))
+                        mult * (reflection0 + triangularRand(strToRandAmp(reflection0.toFloat())))
+                    }.sum()
+
 
                     val delta = (reflection - akku).coerceAtLeast(0f)
                     val delta2 = delta - akku2
@@ -86,32 +113,6 @@ internal object ExportMap2 : ConsoleCommand {
 
                 }
             }
-
-            /*
-            // gaussian blur it
-            val sampleOff = arrayOf(-3,-2,-1,0,1,2,3)
-            val gaussLut = arrayOf(0.054f, 0.164f, 0.319f, 0.399f, 0.319f, 0.164f, 0.054f)
-            val mapData2 = FloatArray(world.width * world.height)
-            // blur pass horizontal
-            for (y in 0 until world.height) {
-                for (x in 0 until world.width) {
-                    val ps = sampleOff.map { y * world.width + (x+it) fmod world.width }
-                    val v = ps.mapIndexed { i, it -> gaussLut[i] * mapData[it].toUint() }.sum()
-                    mapData2[y * world.width + x] = v
-                }
-            }
-            val mapData3 = FloatArray(world.width * world.height)
-            // blur pass vertical
-            for (y in 0 until world.height) {
-                for (x in 0 until world.width) {
-                    val ps = sampleOff.map { (y + it).coerceIn(0 until world.height) * world.width + x }
-                    val v = ps.mapIndexed { i, it -> gaussLut[i] * mapData2[it] }.sum()
-                    mapData3[y * world.width + x] = v
-                }
-            }
-            // writeout
-            mapData3.forEachIndexed { index, fl -> mapData[index] = fl.toDitherredByte() }
-            */
 
             val dir = App.defaultDir + "/Exports/"
             val dirAsFile = File(dir)
