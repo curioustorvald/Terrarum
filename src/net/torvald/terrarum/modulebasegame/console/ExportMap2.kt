@@ -69,13 +69,16 @@ internal object ExportMap2 : ConsoleCommand {
         1f / 16f
     )
 
+    private val DECAY = 1.8f
+
     override fun execute(args: Array<String>) {
         val world = (INGAME.world)
-        if (args.size == 2) {
+        val RAY = args[2].toFloat()
+        if (args.size == 3) {
 
             // TODO rewrite to use Pixmap and PixmapIO
 
-            val mapData = ByteArray(world.width * world.height)
+            val mapData = ByteArray(world.width * world.height) { 0x80.toByte() }
 
             for (x in 0 until world.width) {
                 var akku  = 0f
@@ -83,15 +86,21 @@ internal object ExportMap2 : ConsoleCommand {
                 var akku3 = 0f
                 var akku4 = 0f
                 var akku5 = 0f
+                var energy = RAY
                 for (y in 0 until world.height) {
-                    val terrs = kernPos.map { world.getTileFromTerrain(x + it.first, y + it.second) }
-                    val ores = kernPos.map { world.getTileFromOre(x + it.first, y + it.second).item }
+                    val reflection = if (energy > 0f) {
+                        val terrs = kernPos.map { world.getTileFromTerrain(x + it.first, y + it.second) }
+                        val ores = kernPos.map { world.getTileFromOre(x + it.first, y + it.second).item }
 
 
-                    val reflection = kernPow.mapIndexed { index, mult ->
-                        val reflection0 = maxOf(getRCS(terrs[index]), getRCS(ores[index]))
-                        mult * (reflection0 + triangularRand(strToRandAmp(reflection0.toFloat())))
-                    }.sum()
+                        kernPow.mapIndexed { index, mult ->
+                            val reflection0 = maxOf(getRCS(terrs[index]), getRCS(ores[index]))
+                            mult * (reflection0 + triangularRand(strToRandAmp(reflection0.toFloat())))
+                        }.sum()
+                    }
+                    else {
+                        akku3 / DECAY
+                    }
 
 
                     val delta = (reflection - akku).coerceAtLeast(0f)
@@ -103,6 +112,7 @@ internal object ExportMap2 : ConsoleCommand {
 
                     val deltaVal = delta5.bfpow(1f)
                     mapData[y * world.width + x] = deltaVal.plus(0.5f).toDitherredByte()
+                    energy -= reflection
 
 
                     akku5 = delta4
@@ -110,7 +120,6 @@ internal object ExportMap2 : ConsoleCommand {
                     akku3 = delta2
                     akku2 = delta
                     akku = reflection
-
                 }
             }
 
