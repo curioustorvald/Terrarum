@@ -60,6 +60,7 @@ object Worldgen {
             Work("Reticulating Splines", Terragen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")),
             Work("Adding Rocks", Oregen(world, caveAttenuateBiasScaled, params.seed, oreRegistry), listOf("ORES")),
             Work("Positioning Rocks", OregenAutotiling(world, params.seed, oreTilingModes), listOf("ORES")),
+            Work("Carving", Cavegen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
             Work("Adding Vegetations", Biomegen(world, params.seed, params.biomegenParams), listOf("BIOME")),
         ).filter(tagFilter)
     }

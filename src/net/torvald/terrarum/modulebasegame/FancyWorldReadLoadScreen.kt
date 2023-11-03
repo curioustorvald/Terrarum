@@ -23,6 +23,9 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
         CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer02") {
             Texture(ModMgr.getGdxFile("basegame", "gui/loadscr_layer02.png"))
         }
+        CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer03") {
+            Texture(ModMgr.getGdxFile("basegame", "gui/loadscr_layer03.png"))
+        }
         CommonResourcePool.loadAll()
 
         App.disposables.add(this)
@@ -44,6 +47,7 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
     val baseTileTex = arrayOf(
         CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer01"),
         CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer02"),
+        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
     )
 
     val drawWidth = Toolkit.drawWidth
@@ -88,7 +92,7 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
     }
 
     protected open fun getStage(): Int {
-        return 2 // fixed value for Read screen
+        return 3 // fixed value for Read screen
     }
 
     protected val batchColour = Color(-1) // create new Color instance just for the progress bar
