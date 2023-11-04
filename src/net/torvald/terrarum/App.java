@@ -579,14 +579,16 @@ public class App implements ApplicationListener {
     private FrameBuffer postProcessorOutFBO;
     private FrameBuffer postProcessorOutFBO2;
 
-    @Override
-    public void render() {
-//        Gdx.gl.glDisable(GL20.GL_DITHER);
-
+    private void firePostInit() {
         if (!postInitFired) {
             postInitFired = true;
             postInit();
         }
+    }
+
+    @Override
+    public void render() {
+//        Gdx.gl.glDisable(GL20.GL_DITHER);
 
         App.setDebugTime("GDX.rawDelta", (long) (Gdx.graphics.getDeltaTime() * 1000_000_000f));
 
@@ -605,6 +607,8 @@ public class App implements ApplicationListener {
             loadTimer += Gdx.graphics.getDeltaTime();
 
             if (loadTimer >= showupTime) {
+                firePostInit();
+
                 // hand over the scene control to this single class; Terrarum must call
                 // 'AppLoader.getINSTANCE().screen.render(delta)', this is not redundant at all!
 
@@ -624,9 +628,12 @@ public class App implements ApplicationListener {
         }
         // draw the screen
         else {
+            firePostInit();
+
             currentScreen.render(UPDATE_RATE);
             postProcessorOutFBO = TerrarumPostProcessor.INSTANCE.draw(camera.combined, renderFBO);
         }
+
 
         KeyToggler.INSTANCE.update(currentScreen instanceof TerrarumIngame);
 
@@ -1030,6 +1037,9 @@ public class App implements ApplicationListener {
      * Init stuffs which needs GL context
      */
     private void postInit() {
+        long t1 = System.nanoTime();
+
+
         CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false, false, false));
         CommonResourcePool.INSTANCE.addToLoadingList("blockmarking_actor", () -> new BlockMarkerActor());
         CommonResourcePool.INSTANCE.addToLoadingList("loading_circle_64", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/loading_circle_64.tga"), 64, 64, 0, 0, 0, 0, false, false, false));
@@ -1190,7 +1200,9 @@ public class App implements ApplicationListener {
         printdbg(this, "Has update: " + hasUpdate);
 
 
-        printdbg(this, "PostInit done");
+        long t2 = System.nanoTime();
+        double tms = (t2 - t1) / 1000000000.0;
+        printdbg(this, "PostInit done; took "+tms+" seconds");
     }
 
 
