@@ -307,7 +307,13 @@ internal object BlocksDrawer {
 
 
     private fun getHashCoord(x: Int, y: Int, mod: Int) =
-        (XXHash64.hash((y.toLong().shl(32) or x.toLong().and(0xFFFFFFFF)).toBig64(), mod.toLong()).and(0x7FFFFFFFFFFFFFFFL) % mod).toInt()
+        (XXHash64.hash(
+                (
+                        y.fmod(world.height).toLong().shl(32) or
+                        x.fmod(world.width).toLong().and(0xFFFFFFFF)
+                ).toBig64(), mod.toLong()
+            ).and(0x7FFFFFFFFFFFFFFFL) % mod
+        ).toInt()
 
 
     /**
@@ -374,9 +380,10 @@ internal object BlocksDrawer {
                 }
                 else if (platformTiles.binarySearch(thisTile) >= 0) {
                     hash %= 2
-                    getNearbyTilesInfoPlatform(x, y)//.swizzleH2(thisTile, hash)
+                    getNearbyTilesInfoPlatform(x, y).swizzleH2(thisTile, hash)
                 }
                 else if (wallStickerTiles.binarySearch(thisTile) >= 0) {
+                    hash = 0
                     getNearbyTilesInfoWallSticker(x, y)
                 }
                 else if (connectMutualTiles.binarySearch(thisTile) >= 0) {
@@ -454,6 +461,16 @@ internal object BlocksDrawer {
             ret = ret or this.ushr(ord).and(1).shl(index)
         }
         return ret
+    }
+
+
+    private val h2lut = arrayOf(
+        arrayOf(0,1,2,3,4,5,6,7),
+        arrayOf(0,2,1,5,6,3,4,7),
+    )
+
+    private fun Int.swizzleH2(tile: Int, hash: Int): Int {
+        return h2lut[hash][this]
     }
 
     private fun getNearbyTilesPos(x: Int, y: Int): Array<Point2i> {
