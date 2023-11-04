@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.math.Matrix4
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.random.XXHash64
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.App.printdbg
@@ -15,6 +16,7 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
@@ -303,6 +305,11 @@ internal object BlocksDrawer {
 
     }
 
+
+    private fun getHashCoord(x: Int, y: Int, mod: Int) =
+        (XXHash64.hash((y.toLong().shl(32) or x.toLong().and(0xFFFFFFFF)).toBig64(), mod.toLong()).and(0x7FFFFFFFFFFFFFFFL) % mod).toInt()
+
+
     /**
      * Autotiling; writes to buffer. Actual draw code must be called after this operation.
      *
@@ -348,6 +355,10 @@ internal object BlocksDrawer {
                     else -> throw IllegalArgumentException()
                 }
 
+                var hash = if ((mode == WALL || mode == TERRAIN) && !BlockCodex[world.tileNumberToNameMap[thisTile.toLong()]].hasTag("NORANDTILE"))
+                    getHashCoord(x, y, 8)
+                else 0
+
                 // draw a tile
                 val nearbyTilesInfo = if (mode == OCCLUSION) {
                     getNearbyTilesInfoFakeOcc(x, y)
@@ -359,19 +370,20 @@ internal object BlocksDrawer {
                     getNearbyTilesInfoFluids(x, y)
                 }*/
                 else if (treeTiles.binarySearch(thisTile) >= 0) {
-                    getNearbyTilesInfoTrees(x, y, mode)
+                    getNearbyTilesInfoTrees(x, y, mode).swizzle8(thisTile, hash)
                 }
                 else if (platformTiles.binarySearch(thisTile) >= 0) {
-                    getNearbyTilesInfoPlatform(x, y)
+                    hash %= 2
+                    getNearbyTilesInfoPlatform(x, y)//.swizzleH2(thisTile, hash)
                 }
                 else if (wallStickerTiles.binarySearch(thisTile) >= 0) {
                     getNearbyTilesInfoWallSticker(x, y)
                 }
                 else if (connectMutualTiles.binarySearch(thisTile) >= 0) {
-                    getNearbyTilesInfoConMutual(x, y, mode)
+                    getNearbyTilesInfoConMutual(x, y, mode).swizzle8(thisTile, hash)
                 }
                 else if (connectSelfTiles.binarySearch(thisTile) >= 0) {
-                    getNearbyTilesInfoConSelf(x, y, mode, thisTile)
+                    getNearbyTilesInfoConSelf(x, y, mode, thisTile).swizzle8(thisTile, hash)
                 }
                 else {
                     0
@@ -420,21 +432,40 @@ internal object BlocksDrawer {
                 val breakingStage = if (mode == TERRAIN || mode == WALL || mode == ORES) (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt() else 0
 
                 // draw a tile
-                writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
+                writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage, hash)
             }
         }
     }
 
+    private val swizzleMap8 = arrayOf(
+        arrayOf(0,1,2,3,4,5,6,7), /* normal */
+        arrayOf(4,3,2,1,0,7,6,5), /* horz flip */
+        arrayOf(2,3,4,5,6,7,0,1), /* CW 90 */
+        arrayOf(2,1,0,7,6,5,4,3), /* hfCW 90 */
+        arrayOf(4,5,6,7,0,1,2,3), /* CW 180 */
+        arrayOf(0,7,6,5,4,3,2,1), /* hfCW 180 */
+        arrayOf(6,7,0,1,2,3,4,5), /* CW 270 */
+        arrayOf(6,5,4,3,2,1,0,7), /* hfCW 270 */
+    )
+
+    private fun Int.swizzle8(tile: Int, hash: Int): Int {
+        var ret = 0
+        swizzleMap8[hash].forEachIndexed { index, ord ->
+            ret = ret or this.ushr(ord).and(1).shl(index)
+        }
+        return ret
+    }
+
     private fun getNearbyTilesPos(x: Int, y: Int): Array<Point2i> {
         return arrayOf(
-                Point2i(x + 1, y),
-                Point2i(x + 1, y + 1),
-                Point2i(x, y + 1),
-                Point2i(x - 1, y + 1),
-                Point2i(x - 1, y),
-                Point2i(x - 1, y - 1),
-                Point2i(x, y - 1),
-                Point2i(x + 1, y - 1)
+            Point2i(x + 1, y),
+            Point2i(x + 1, y + 1),
+            Point2i(x, y + 1),
+            Point2i(x - 1, y + 1),
+            Point2i(x - 1, y),
+            Point2i(x - 1, y - 1),
+            Point2i(x, y - 1),
+            Point2i(x + 1, y - 1)
         )
     }
 
@@ -617,16 +648,17 @@ internal object BlocksDrawer {
      *
      * @return Raw colour bits in RGBA8888 format
      */
-    private fun sheetXYToTilemapColour(mode: Int, sheetX: Int, sheetY: Int, breakage: Int): Int =
+    private fun sheetXYToTilemapColour(mode: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int): Int =
             // the tail ".or(255)" is there to write 1.0 to the A channel (remember, return type is RGBA)
 
             // this code is synced to the tilesTerrain's tile configuration, but everything else is hard-coded
             // right now.
             (tilesTerrain.horizontalCount * sheetY + sheetX).shl(8).or(255) or // the actual tile bits
-                breakage.and(15).shl(28) // breakage bits
+                breakage.and(15).shl(28) or // breakage bits
+                hash.and(15).shl(24) // flip-rot
 
 
-    private fun writeToBuffer(mode: Int, bufferPosX: Int, bufferPosY: Int, sheetX: Int, sheetY: Int, breakage: Int) {
+    private fun writeToBuffer(mode: Int, bufferPosX: Int, bufferPosY: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int) {
         val sourceBuffer = when(mode) {
             TERRAIN -> terrainTilesBuffer
             WALL -> wallTilesBuffer
@@ -638,7 +670,7 @@ internal object BlocksDrawer {
         }
 
 
-        sourceBuffer[bufferPosY][bufferPosX] = sheetXYToTilemapColour(mode, sheetX, sheetY, breakage)
+        sourceBuffer[bufferPosY][bufferPosX] = sheetXYToTilemapColour(mode, sheetX, sheetY, breakage, hash)
     }
 
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)

@@ -48,9 +48,9 @@ ivec2 getTileXY(int tileNumber) {
     return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));
 }
 
-// return: int=0xaarrggbb
+// return: int=0x(aa)rrggbb
 int _colToInt(vec4 color) {
-    return int(color.b * 255) | (int(color.g * 255) << 8) | (int(color.r * 255) << 16) | (int(color.a * 255) << 24);
+    return int(color.b * 255) | (int(color.g * 255) << 8) | (int(color.r * 255) << 16);// | (int(color.a * 255) << 24);
 }
 
 // 0x00ggbb where int=0xaarrggbb
@@ -63,6 +63,41 @@ int getTileFromColor(vec4 color) {
 // return: [0..15]
 int getBreakageFromColor(vec4 color) {
     return (_colToInt(color) >> 20) & 0xF;
+}
+
+// 0x000r0000 where int=0xaarrggbb
+// return: [0..15]
+int getTileFlipRotFromColor(vec4 color) {
+    return (_colToInt(color) >> 16) & 0xF;
+}
+
+
+mat2[] flipRotMat = mat2[](
+mat2( 1.0,  0.0,  0.0,  1.0),
+mat2(-1.0,  0.0,  0.0,  1.0),
+mat2( 0.0, -1.0,  1.0,  0.0),
+mat2( 0.0,  1.0,  1.0,  0.0),
+
+mat2(-1.0,  0.0,  0.0, -1.0),
+mat2( 1.0,  0.0,  0.0, -1.0),
+mat2( 0.0,  1.0, -1.0,  0.0),
+mat2( 0.0, -1.0, -1.0,  0.0)
+);
+
+vec2[] flipRotOffset = vec2[](
+vec2(0, 0),
+vec2(1, 0),
+vec2(0, 1),
+vec2(0, 0),
+
+vec2(1, 1),
+vec2(0, 1),
+vec2(1, 0),
+vec2(1, 1)
+);
+
+vec2 uvFlipRot(int op, vec2 uv) {
+    return flipRotMat[op] * uv + flipRotOffset[op] * tileSizeInPx;
 }
 
 void main() {
@@ -83,13 +118,14 @@ void main() {
     vec4 tileFromMap = texture(tilemap, flippedFragCoord / overscannedScreenDimension); // raw tile number
     int tile = getTileFromColor(tileFromMap);
     int breakage = getBreakageFromColor(tileFromMap);
+    int flipRot = getTileFlipRotFromColor(tileFromMap);
     ivec2 tileXY = getTileXY(tile);
     ivec2 breakageXY = getTileXY(breakage + 5); // +5 is hard-coded constant that depends on the contents of the atlas
 
     // calculate the UV coord value for texture sampling //
 
     // don't really need highp here; read the GLES spec
-    vec2 uvCoordForTile = (mod(flippedFragCoord, tileSizeInPx) * _tileSizeInPx) * _tilesInAtlas; // 0..0.00390625 regardless of tile position in atlas
+    vec2 uvCoordForTile = uvFlipRot(flipRot, mod(flippedFragCoord, tileSizeInPx)) * _tileSizeInPx * _tilesInAtlas; // 0..0.00390625 regardless of tile position in atlas
     vec2 uvCoordOffsetTile = tileXY * _tilesInAtlas; // where the tile starts in the atlas, using uv coord (0..1)
     vec2 uvCoordOffsetBreakage = breakageXY * _tilesInAtlas;
 

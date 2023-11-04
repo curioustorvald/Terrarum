@@ -14,9 +14,11 @@
 #
 # tiling: determines how the tiles are tiled
 #   - a16: use 4-neighbour autotiling (16 possible cases)
-#   - a16x4: 4 variants of a16
-#   - a16x16: 16 variants of a16
+#   - a16x4: 4 variants of a16 (typically 4 rotations, or 2 rotations x 2 flips)
+#   - a16x8: 8 variants of a16 (typically 4 rotations x 2 flips) -- horz/vert flip do not matter, both produces same sets of shapes
+#   - a16x16: 16 variants of a16 (typically 4 rotations x 2 flips x 2 styles)
 #   - a47: use 8-neighbour autotiling (47 possible cases)
+#   - a47x4: 4 variants of a47 (typically 4 rotations, or 2 rotations x 2 flips)
 #   - r16: use the hash of the tile position as a variant selection, module 16
 #   - r8: use the hash of the tile position as a variant selection, module 8
 #
