@@ -72,32 +72,19 @@ int getTileFlipRotFromColor(vec4 color) {
 }
 
 
-mat2[] flipRotMat = mat2[](
-mat2( 1.0,  0.0,  0.0,  1.0),
-mat2(-1.0,  0.0,  0.0,  1.0),
-mat2( 0.0, -1.0,  1.0,  0.0),
-mat2( 0.0,  1.0,  1.0,  0.0),
-
-mat2(-1.0,  0.0,  0.0, -1.0),
-mat2( 1.0,  0.0,  0.0, -1.0),
-mat2( 0.0,  1.0, -1.0,  0.0),
-mat2( 0.0, -1.0, -1.0,  0.0)
-);
-
-vec2[] flipRotOffset = vec2[](
-vec2(0, 0),
-vec2(1, 0),
-vec2(0, 1),
-vec2(0, 0),
-
-vec2(1, 1),
-vec2(0, 1),
-vec2(1, 0),
-vec2(1, 1)
+mat3x2[] flipRotMat = mat3x2[](
+mat3x2( 1.0,  0.0,  0.0,  1.0, tileSizeInPx.x*0.0, tileSizeInPx.y*0.0),
+mat3x2(-1.0,  0.0,  0.0,  1.0, tileSizeInPx.x*1.0, tileSizeInPx.y*0.0),
+mat3x2( 0.0, -1.0,  1.0,  0.0, tileSizeInPx.x*0.0, tileSizeInPx.y*1.0),
+mat3x2( 0.0,  1.0,  1.0,  0.0, tileSizeInPx.x*0.0, tileSizeInPx.y*0.0),
+mat3x2(-1.0,  0.0,  0.0, -1.0, tileSizeInPx.x*1.0, tileSizeInPx.y*1.0),
+mat3x2( 1.0,  0.0,  0.0, -1.0, tileSizeInPx.x*0.0, tileSizeInPx.y*1.0),
+mat3x2( 0.0,  1.0, -1.0,  0.0, tileSizeInPx.x*1.0, tileSizeInPx.y*0.0),
+mat3x2( 0.0, -1.0, -1.0,  0.0, tileSizeInPx.x*1.0, tileSizeInPx.y*1.0)
 );
 
 vec2 uvFlipRot(int op, vec2 uv) {
-    return flipRotMat[op] * uv + flipRotOffset[op] * tileSizeInPx;
+    return (flipRotMat[op] * vec3(uv, 1.0)).xy;
 }
 
 void main() {
