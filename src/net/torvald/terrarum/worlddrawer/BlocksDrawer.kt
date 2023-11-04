@@ -16,6 +16,7 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -306,15 +307,7 @@ internal object BlocksDrawer {
     }
 
 
-    private fun getHashCoord(x: Int, y: Int, mod: Int) =
-        (XXHash64.hash(
-                (
-                        y.fmod(world.height).toLong().shl(32) or
-                        x.fmod(world.width).toLong().and(0xFFFFFFFF)
-                ).toBig64(), mod.toLong()
-            ).and(0x7FFFFFFFFFFFFFFFL) % mod
-        ).toInt()
-
+    private fun getHashCoord(x: Int, y: Int, mod: Int) = (XXHash64.hash(LandUtil.getBlockAddr(world, x, y).toBig64(), mod.toLong()) fmod mod.toLong()).toInt()
 
     /**
      * Autotiling; writes to buffer. Actual draw code must be called after this operation.

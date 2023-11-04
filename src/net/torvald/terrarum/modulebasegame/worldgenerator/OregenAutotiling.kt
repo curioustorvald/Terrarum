@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameitems.isOre
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.utils.OrePlacement
@@ -33,8 +34,7 @@ class OregenAutotiling(world: GameWorld, seed: Long, val tilingModes: HashMap<It
         Worldgen.threadExecutor.join()
     }
 
-    private fun getHashCoord(x: Int, y: Int, mod: Int) =
-        (XXHash64.hash((y.toLong().shl(32) or x.toLong().and(0xFFFFFFFF)).toBig64(), mod.toLong()).and(0x7FFFFFFFFFFFFFFFL) % mod).toInt()
+    private fun getHashCoord(x: Int, y: Int, mod: Int) = (XXHash64.hash(LandUtil.getBlockAddr(world, x, y).toBig64(), mod.toLong()) fmod mod.toLong()).toInt()
 
     private fun draw(x: Int) {
         for (y in 0 until world.height) {
