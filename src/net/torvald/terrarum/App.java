@@ -243,8 +243,7 @@ public class App implements ApplicationListener {
 
 
     public static Texture[] ditherPatterns = new Texture[4];
-    private static ShaderProgram shaderBayerSkyboxFill; // ONLY to be used by the splash screen
-    public static ShaderProgram shaderHicolour;
+//    public static ShaderProgram shaderHicolour;
     public static ShaderProgram shaderDebugDiff;
     public static ShaderProgram shaderPassthruRGBA;
     public static ShaderProgram shaderColLUT;
@@ -495,12 +494,18 @@ public class App implements ApplicationListener {
 
                 if (loadOrder.size() > 0) {
                     var modname = loadOrder.get(0).get(0);
-                    var textureFile = Gdx.files.internal("assets/mods/"+modname+"/splash.png");
+
+                    var textureFile = Gdx.files.internal("assets/mods/"+modname+"/splashback.png");
                     if (textureFile.exists()) {
                         splashBackdrop = new TextureRegion(new Texture(textureFile));
                         splashTextCol = new Color(0xeeeeeeff);
                     }
-                }
+
+                    var logoFile = Gdx.files.internal("assets/mods/"+modname+"/splashlogo.png");
+                    if (logoFile.exists()) {
+                        splashScreenLogo = new TextureRegion(new Texture(logoFile));
+                    }
+                 }
             }
             catch (IOException e) {
 
@@ -509,6 +514,13 @@ public class App implements ApplicationListener {
                 try {loadOrderCSVparser.close();}
                 catch (IOException e) {}
             }
+        }
+
+        if (splashBackdrop == null) {
+            splashBackdrop = new TextureRegion(new Texture("assets/graphics/background_white.png"));
+        }
+        if (splashScreenLogo == null) {
+            splashScreenLogo = new TextureRegion(new Texture("assets/graphics/logo.png"));
         }
 
         Gdx.graphics.setContinuousRendering(true);
@@ -538,10 +550,6 @@ public class App implements ApplicationListener {
 
         initViewPort(scr.getWidth(), scr.getHeight());
 
-        // logo here :p
-        splashScreenLogo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
-        splashScreenLogo.flip(false, false);
-
         // set GL graphics constants
         for (int i = 0; i < ditherPatterns.length; i++) {
             Texture t = new Texture(Gdx.files.classpath("shaders/dither_512_"+i+".tga"));
@@ -550,9 +558,6 @@ public class App implements ApplicationListener {
             ditherPatterns[i] = t;
         }
 
-        shaderBayerSkyboxFill = loadShaderFromClasspath("shaders/default.vert",
-                "shaders/float_to_disp_dither_static.frag"
-        );
         shaderPassthruRGBA = loadShaderFromClasspath("shaders/gl32spritebatch.vert", "shaders/gl32spritebatch.frag");
         shaderReflect = loadShaderFromClasspath("shaders/default.vert", "shaders/reflect.frag");
         hq2x = new Hq2x(2);
@@ -728,16 +733,6 @@ public class App implements ApplicationListener {
     }
 
     private void drawSplash() {
-        getCurrentDitherTex().bind(0);
-        shaderBayerSkyboxFill.bind();
-        shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined);
-        shaderBayerSkyboxFill.setUniformi("u_texture", 0);
-        shaderBayerSkyboxFill.setUniformf("parallax_size", 0f);
-        shaderBayerSkyboxFill.setUniformf("topColor", gradWhiteTop.r, gradWhiteTop.g, gradWhiteTop.b, 1f);
-        shaderBayerSkyboxFill.setUniformf("bottomColor", gradWhiteBottom.r, gradWhiteBottom.g, gradWhiteBottom.b, 1f);
-        fullscreenQuad.render(shaderBayerSkyboxFill, GL20.GL_TRIANGLE_FAN);
-
-
         setCameraPosition(0f, 0f);
 
         logoBatch.setColor(Color.WHITE);
@@ -754,7 +749,6 @@ public class App implements ApplicationListener {
         if (splashBackdrop != null) {
             logoBatch.setShader(null);
             logoBatch.begin();
-            logoBatch.setColor(splashTextCol);
 
 
             var size = ((float) Math.max(scr.getWidth(), scr.getHeight()));
@@ -928,8 +922,7 @@ public class App implements ApplicationListener {
         for (Texture texture : ditherPatterns) {
             texture.dispose();
         }
-        shaderBayerSkyboxFill.dispose();
-        shaderHicolour.dispose();
+//        shaderHicolour.dispose();
         shaderDebugDiff.dispose();
         shaderPassthruRGBA.dispose();
         shaderColLUT.dispose();
@@ -1047,7 +1040,7 @@ public class App implements ApplicationListener {
         CommonResourcePool.INSTANCE.addToLoadingList("inventory_category", () -> new TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20, 0, 0, 0, 0, false, false, false));
         CommonResourcePool.INSTANCE.loadAll();
 
-        shaderHicolour = loadShaderFromClasspath("shaders/default.vert", "shaders/hicolour.frag");
+//        shaderHicolour = loadShaderFromClasspath("shaders/default.vert", "shaders/hicolour.frag");
         shaderDebugDiff = loadShaderFromClasspath("shaders/default.vert", "shaders/diff.frag");
         shaderColLUT = loadShaderFromClasspath("shaders/default.vert", "shaders/rgbonly.frag");
         shaderGhastlyWhite = loadShaderFromClasspath("shaders/default.vert", "shaders/ghastlywhite.frag");
