@@ -8,6 +8,7 @@ import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import kotlin.math.max
 import kotlin.math.roundToLong
@@ -57,11 +58,11 @@ object Worldgen {
             }
         }
         return listOf(
-            Work("Reticulating Splines", Terragen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")),
-            Work("Adding Rocks", Oregen(world, caveAttenuateBiasScaled, params.seed, oreRegistry), listOf("ORES")),
-            Work("Positioning Rocks", OregenAutotiling(world, params.seed, oreTilingModes), listOf("ORES")),
-            Work("Carving", Cavegen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
-            Work("Adding Vegetations", Biomegen(world, params.seed, params.biomegenParams), listOf("BIOME")),
+            Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")),
+            Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, caveAttenuateBiasScaled, params.seed, oreRegistry), listOf("ORES")),
+            Work(Lang["MENU_IO_WORLDGEN_POSITIONING_ROCKS"], OregenAutotiling(world, params.seed, oreTilingModes), listOf("ORES")),
+            Work(Lang["MENU_IO_WORLDGEN_CARVING_EARTH"], Cavegen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
+            Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Biomegen(world, params.seed, params.biomegenParams), listOf("BIOME")),
         ).filter(tagFilter)
     }
 

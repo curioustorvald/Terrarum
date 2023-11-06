@@ -193,7 +193,7 @@ object LoadSavegame {
             val layerCount = worldLayer.size
             for (chunk in 0L until (world.width * world.height) / (cw * ch)) {
                 for (layer in worldLayer.indices) {
-                    loadscreen.addMessage("${Lang["MENU_IO_LOADING"]}  ${chunk*layerCount+layer+1}/${chunkCount*layerCount}")
+                    loadscreen.addMessage(Lang["MENU_IO_LOADING"])
 
                     val chunkFile = newIngame.worldDisk.getFile(0x1_0000_0000L or layer.toLong().shl(24) or chunk)!!
                     val chunkXY = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
@@ -203,7 +203,7 @@ object LoadSavegame {
                 loadscreen.progress.getAndAdd(1)
             }
 
-            loadscreen.addMessage("Updating Block Mappings...")
+            loadscreen.addMessage(Lang["MENU_IO_LOAD_UPDATING_BLOCK_MAPPINGS"])
             world.renumberTilesAfterLoad()
 
 
