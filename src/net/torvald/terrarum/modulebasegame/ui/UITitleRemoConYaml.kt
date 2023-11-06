@@ -20,8 +20,8 @@ object UITitleRemoConYaml {
  - MENU_LABEL_IME : net.torvald.terrarum.modulebasegame.ui.UIIMEConfig
  - MENU_LABEL_SOUND : net.torvald.terrarum.modulebasegame.ui.UISoundControlPanel
  - MENU_LABEL_LANGUAGE : net.torvald.terrarum.modulebasegame.ui.UITitleLanguage
- - GAME_GENRE_MISC : net.torvald.terrarum.modulebasegame.ui.UIPerformanceControlPanel
  - CREDITS_GAME : net.torvald.terrarum.ModOptionsHost
+ - GAME_GENRE_MISC : net.torvald.terrarum.modulebasegame.ui.UIPerformanceControlPanel
  - MENU_LABEL_RETURN+WRITETOCONFIG
 - MENU_MODULES : net.torvald.terrarum.modulebasegame.ui.UITitleModules
  - MENU_LABEL_RETURN
