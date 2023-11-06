@@ -27,8 +27,12 @@ internal object ExportMap : ConsoleCommand {
     private val oreColourMap = hashMapOf(
         Block.AIR to Cvec(0),
         "ores@basegame:1" to Cvec(0x00e9c8ff),
-        "ores@basegame:2" to Cvec(0xff9a5dff.toInt()),
+        "ores@basegame:2" to Cvec(0xff7e74ff.toInt()),
         "ores@basegame:3" to Cvec(0x383314ff),
+        "ores@basegame:4" to Cvec(0xefde76ff.toInt()),
+        "ores@basegame:5" to Cvec(0xcd8b62ff.toInt()),
+        "ores@basegame:6" to Cvec(0xffcc00ff.toInt()),
+        "ores@basegame:7" to Cvec(0xd5d9f9ff.toInt()),
     )
 
     private val WALL_OVERLAY = Cvec(0.35f, 0.35f, 0.35f, 1f)

@@ -31,8 +31,8 @@ import kotlin.random.Random
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen
 import net.torvald.terrarum.sqr
 
-const val NOISEBOX_WIDTH = 922
-const val NOISEBOX_HEIGHT = 2000
+const val NOISEBOX_WIDTH = 1200
+const val NOISEBOX_HEIGHT = 2400
 const val TWO_PI = Math.PI * 2
 
 /**
@@ -360,21 +360,25 @@ internal object TerragenTest : NoiseMaker {
         Block.STONE_SLATE to Color(0.2f, 0.2f, 0.2f, 1f),
     )
 
-    private val IRON_ORE = 0xff9a5dff.toInt()
     private val COPPER_ORE = 0x00e9c8ff
-    private val COAL_ORE = 0xffffffff.toInt()
+    private val IRON_ORE = 0xff7e74ff.toInt()
+    private val COAL_ORE = 0x383314ff.toInt()
+    private val ZINC_ORE = 0xefde76ff.toInt()
+    private val TIN_ORE = 0xcd8b62ff.toInt()
+    private val GOLD_ORE = 0xffcc00ff.toInt()
+    private val SILVER_ORE = 0xd5d9f9ff.toInt()
+
+    private val oreCols = listOf(
+        COPPER_ORE, IRON_ORE, COAL_ORE, ZINC_ORE, TIN_ORE, GOLD_ORE, SILVER_ORE
+    )
 
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val terr = noiseValue[0].tiered(.0, .5, .88, 1.88)
         val cave = if (noiseValue[1] < 0.5) 0 else 1
-        val copper = (noiseValue[2] > 0.5)
-        val iron = (noiseValue[3] > 0.5)
-        val coal = (noiseValue[4] > 0.5)
+        val ore = (noiseValue.subList(2, noiseValue.size)).zip(oreCols).firstNotNullOfOrNull { (n, colour) -> if (n > 0.5) colour else null }
 
         val wallBlock = groundDepthBlock[terr]
         val terrBlock = if (cave == 0) Block.AIR else wallBlock
-
-        val ore = if (iron) IRON_ORE else if (copper) COPPER_ORE else if (coal) COAL_ORE else null
 
         outTex.drawPixel(x, y,
             if (ore != null && (terrBlock == Block.STONE || terrBlock == Block.STONE_SLATE)) ore
@@ -689,9 +693,13 @@ internal object TerragenTest : NoiseMaker {
         return listOf(
             Joise(groundScaling),
             Joise(caveScaling),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:1", 0.04, 0.01, 0.51, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:2", 0.07, 0.01, 0.51, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:3", 0.026, 0.07, 0.504, 3.8)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:1", 0.032, 0.010, 0.507, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:2", 0.056, 0.011, 0.507, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:3", 0.021, 0.070, 0.501, 3.8)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:4", 0.024, 0.011, 0.501, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:5", 0.021, 0.020, 0.501, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:6", 0.011, 0.300, 0.465, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:7", 0.016, 0.300, 0.467, 1.0)),
         )
     }
 
