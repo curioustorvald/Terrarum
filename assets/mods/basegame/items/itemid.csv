@@ -15,10 +15,15 @@ id;classname
 14;net.torvald.terrarum.modulebasegame.gameitems.PickaxeWood
 15;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerWood
 16;net.torvald.terrarum.modulebasegame.gameitems.ItemWorkbench
+17;net.torvald.terrarum.modulebasegame.gameitems.ItemCoalCoke
 
 128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper
 129;net.torvald.terrarum.modulebasegame.gameitems.OreIron
 130;net.torvald.terrarum.modulebasegame.gameitems.OreCoal
+131;net.torvald.terrarum.modulebasegame.gameitems.OreZinc
+132;net.torvald.terrarum.modulebasegame.gameitems.OreTin
+133;net.torvald.terrarum.modulebasegame.gameitems.OreGold
+134;net.torvald.terrarum.modulebasegame.gameitems.OreSilver
 
 256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak
 257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony

@@ -57,3 +57,30 @@ class OreCoal(originalID: ItemID) : OreItemBase(originalID) {
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(4,6)
 }
+class OreZinc(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_ORE_SPHALERITE"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(5,6)
+}
+class OreTin(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_ORE_CASSITERITE"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(6,6)
+}
+class OreGold(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_ORE_NATURAL_GOLD"
+    override val materialId: String = "AURM"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(7, 6)
+}
+class OreSilver(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_ORE_NATURAL_SILVER"
+    override val materialId: String = "ARGN"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,6)
+}
+class ItemCoalCoke(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_COAL_COKE"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,6)
+}
