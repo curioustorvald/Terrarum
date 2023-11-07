@@ -43,12 +43,6 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
     private var warningPrinted = false
 
-    private val musicVolume: Float
-        get() = (App.getConfigDouble("bgmvolume") * App.getConfigDouble("mastervolume")).toFloat()
-    private val ambientVolume: Float
-        get() = (App.getConfigDouble("sfxvolume") * App.getConfigDouble("mastervolume")).toFloat()
-
-
 
 
     private fun stopMusic() {
@@ -63,7 +57,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     private fun startMusic(song: MusicContainer) {
-        song.gdxMusic.volume = musicVolume
+        song.gdxMusic.volume = AudioManager.musicVolume
         song.gdxMusic.play()
         printdbg(this, "Now playing: $song")
 
@@ -102,7 +96,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
                     // process fadeout request
                     if (fadeoutFired) {
                         fadeoutAkku += delta
-                        currentMusic?.gdxMusic?.volume = 1f - musicVolume * (fadeoutAkku / fadeoutLength)
+                        currentMusic?.gdxMusic?.volume = 1f - AudioManager.musicVolume * (fadeoutAkku / fadeoutLength)
 
                         if (fadeoutAkku >= fadeoutLength) {
                             currentMusic?.gdxMusic?.pause()
@@ -114,7 +108,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
                             currentMusic?.gdxMusic?.play()
                         }
                         fadeoutAkku += delta
-                        currentMusic?.gdxMusic?.volume = musicVolume * (fadeoutAkku / fadeoutLength)
+                        currentMusic?.gdxMusic?.volume = AudioManager.musicVolume * (fadeoutAkku / fadeoutLength)
                     }
                 }
                 else {
