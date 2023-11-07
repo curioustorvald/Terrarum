@@ -108,7 +108,7 @@ object Worldgen {
     data class Work(val loadingScreenName: String, val theWork: Gen, val tags: List<String>)
 
     fun getEstimationSec(width: Int, height: Int): Long {
-        return (23.15 * 1.25 * (48600000.0 / bogoflops) * ((width * height) / 20095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
+        return (30.0 * 1.25 * (48600000.0 / bogoflops) * ((width * height) / 20095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
     }
 
     private fun getHighlandLowlandSelectCache(params: TerragenParams, seed: Long): ModuleCache {
