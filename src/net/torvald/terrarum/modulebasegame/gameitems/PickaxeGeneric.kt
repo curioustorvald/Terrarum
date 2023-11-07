@@ -164,13 +164,16 @@ object PickaxeCore {
 
     fun showOresTooltip(actor: ActorWithBody, tool: GameItem, mx: Int, my: Int): Unit {
         if (App.getConfigBoolean("basegame:showpickaxetooltip")) {
+
+            val overlayUIopen = (INGAME as? TerrarumIngame)?.uiBlur?.isVisible ?: false
             var tooltipSet = false
+
             mouseInInteractableRangeTools(actor, tool) {
                 val tileUnderCursor = INGAME.world.getTileFromOre(mx, my).item
                 val playerCodex = (actor.actorValue.getAsString(AVKey.ORE_DICT) ?: "").split(',').filter { it.isNotBlank() }
 
 
-                if (tileUnderCursor != Block.AIR) {
+                if (tileUnderCursor != Block.AIR && !overlayUIopen) {
                     val itemForOre = OreCodex[tileUnderCursor].item
                     val tileName = if (playerCodex.binarySearch(itemForOre) >= 0)
                         Lang[ItemCodex[itemForOre]!!.originalName]
