@@ -69,57 +69,88 @@ internal object ExportMap2 : ConsoleCommand {
         1f / 16f
     )
 
-    private val DECAY = 1.8f
+    private val ECHO_DECAY = 2.4f
+    private val ECHO_STRIDE = 4
+
+    private fun avr(vararg fs: Float) = fs.sum() / fs.size
+
+    private val gaussKernels = arrayOf(
+        floatArrayOf(),
+        floatArrayOf(1f),
+        intArrayOf(2,1).map { it / 3f }.toFloatArray(),
+        intArrayOf(6,4,1).map { it / 11f }.toFloatArray(),
+        intArrayOf(20,15,6,1).map { it / 42f }.toFloatArray(),
+        intArrayOf(70,56,28,2,1).map { it / 163f }.toFloatArray(),
+    )
+
+    private fun FloatArray.gaussianAvr(): Float {
+        return this.zip(gaussKernels[this.size]).map { (f, w) -> f*w }.sum()
+    }
+
+    private fun Iterable<Float>.normaliseNaN(default: Float = 0f): FloatArray {
+        return this.map { if (it.isNaN()) default else it }.toFloatArray()
+    }
 
     override fun execute(args: Array<String>) {
         val world = (INGAME.world)
-        val RAY = args[2].toFloat()
-        if (args.size == 3) {
+        val RAY = args.getOrNull(2)?.toFloat() ?: Float.POSITIVE_INFINITY
+        if (args.size >= 2 && RAY != null) {
 
             // TODO rewrite to use Pixmap and PixmapIO
 
             val mapData = ByteArray(world.width * world.height) { 0x80.toByte() }
+//            val mapDataFloat = FloatArray(world.width * world.height) { 0f }
 
             for (x in 0 until world.width) {
-                var akku  = 0f
-                var akku2 = 0f
-                var akku3 = 0f
-                var akku4 = 0f
-                var akku5 = 0f
+                val akku = floatArrayOf(0f,0f,0f,0f,0f)
                 var energy = RAY
+
+                // get values
                 for (y in 0 until world.height) {
                     val reflection = if (energy > 0f) {
                         val terrs = kernPos.map { world.getTileFromTerrain(x + it.first, y + it.second) }
                         val ores = kernPos.map { world.getTileFromOre(x + it.first, y + it.second).item }
 
 
-                        kernPow.mapIndexed { index, mult ->
+                        maxOf(kernPow.mapIndexed { index, mult ->
                             val reflection0 = maxOf(getRCS(terrs[index]), getRCS(ores[index]))
                             mult * (reflection0 + triangularRand(strToRandAmp(reflection0.toFloat())))
-                        }.sum()
+                        }.sum())
                     }
                     else {
-                        akku3 / DECAY
+                        0f
                     }
 
 
-                    val delta = (reflection - akku).coerceAtLeast(0f)
-                    val delta2 = delta - akku2
-                    val delta3 = delta2 - akku3
-                    val delta4 = delta3 - akku4
-                    val delta5 = delta4 - akku5
+                    val delta = (reflection - akku[0]).coerceAtLeast(0f)
+                    val delta2 = delta - akku[1]
+                    val delta3 = delta2 - akku[2]
+                    val delta4 = delta3 - akku[3]
+                    val delta5 = delta4 - akku[4]
 
 
                     val deltaVal = delta5.bfpow(1f)
                     mapData[y * world.width + x] = deltaVal.plus(0.5f).toDitherredByte()
+//                    mapDataFloat[y * world.width + x] = deltaVal
                     energy -= reflection
 
+                    akku[4] = delta4
+                    akku[3] = delta3
+                    akku[2] = delta2
+                    akku[1] = delta
+                    akku[0] = reflection
+                }
 
-                    akku5 = delta4
-                    akku4 = delta3
-                    akku3 = delta2
-                    akku2 = delta
-                    akku = reflection
+                // create artificial ringing artefacts
+                for (y in ECHO_STRIDE until world.height) {
+                    val srcOff = (y - ECHO_STRIDE) * world.width + x
+                    val thisOff = y * world.width + x
+
+                    val srcVal = mapData[srcOff].toUint().div(255f).minus(0.5f)
+                    val backVal = mapData[thisOff].toUint().div(255f).minus(0.5f)
+                    val newVal = backVal + srcVal / ECHO_DECAY
+
+                    mapData[thisOff] = newVal.plus(0.5f).toDitherredByte()
                 }
             }
 
