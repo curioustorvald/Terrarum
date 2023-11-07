@@ -575,7 +575,7 @@ open class ActorWithBody : Actor {
 
 
                     if (collisionStatus != 0 && collisionDamage >= 1.0) {
-                        val terrainDamage = collisionDamage / 512.0
+                        val terrainDamage = collisionDamage / 1000.0
                         getWalledTiles(hitbox, collisionStatus).let {
                             if (it.isNotEmpty()) {
 //                                printdbg(this, "Dmg to terrain: $terrainDamage, affected: ${it.size}")
