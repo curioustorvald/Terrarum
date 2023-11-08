@@ -21,4 +21,5 @@
   "MENU_LABEL_KEYCONFIG_HELP1": "Click On the Keycap to Assign Actions",
   "MENU_LABEL_SAVE_WILL_BE_DELETED": "The selected save file will be deleted.",
   "MENU_LABEL_UNSAVED_PROGRESS_WILL_BE_LOST": "Unsaved progress will be lost.",
+  "MENU_LABEL_WARN_ACE": "Script mods may damage your game or result in other unexpected behaviour.\nOnly use the mods you know they can be trusted."
 }

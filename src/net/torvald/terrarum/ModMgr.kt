@@ -140,6 +140,10 @@ object ModMgr {
 
 
             loadOrder.forEachIndexed { index, it ->
+
+                val loadScriptMod = if (App.getConfigBoolean("enablescriptmods")) true else (index == 0)
+
+
                 val moduleName = it[0]
                 this.loadOrder.add(moduleName)
                 printmsg(this, "Loading module $moduleName")
@@ -250,6 +254,11 @@ object ModMgr {
 
                     // run entry script in entry point
                     if (entryPoint.isNotBlank()) {
+                        if (!loadScriptMod) {
+                            throw ScriptModDisallowedException()
+                        }
+
+
                         var newClass: Class<*>? = null
                         try {
                             // for modules that has JAR defined
@@ -329,6 +338,14 @@ object ModMgr {
                     moduleInfo.remove(moduleName)
                     if (module != null) moduleInfoErrored[moduleName] = module
                 }
+                catch (noScriptModule: ScriptModDisallowedException) {
+                    printmsgerr(this, noScriptModule.message)
+
+                    logError(LoadErrorType.MY_FAULT, moduleName, noScriptModule)
+
+                    moduleInfo.remove(moduleName)
+                    if (module != null) moduleInfoErrored[moduleName] = module
+                }
                 catch (e: Throwable) {
                     // TODO: Instead of skipping module with error, just display the error message onto the face?
 
@@ -351,6 +368,8 @@ object ModMgr {
 
     private class ModuleDependencyNotSatisfied(want: String, have: String) :
             RuntimeException("Required: $want, Installed: $have")
+
+    private class ScriptModDisallowedException : RuntimeException("Script Mods disabled")
 
     operator fun invoke() { }
 

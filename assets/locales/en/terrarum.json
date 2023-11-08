@@ -32,6 +32,7 @@
   "MENU_OPTIONS_BLUR": "Blur",
   "MENU_OPTIONS_DEBUG_CONSOLE": "Debug Console",
   "MENU_OPTIONS_DITHER": "Dithering",
+  "MENU_OPTIONS_ENABLE_SCRIPT_MODS": "Enable Script Mods",
   "MENU_OPTIONS_JVM_HEAP_MAX": "Max Heap Memory",
   "MENU_OPTIONS_LIGHT_UPDATE_PASSES": "Light Calculation Depth",
   "MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION": "Show notification for",

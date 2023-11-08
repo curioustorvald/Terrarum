@@ -130,6 +130,8 @@ object DefaultConfig {
 
             "lightpasses" to 3,
 
+            "enablescriptmods" to false,
+
 
 
             // settings regarding debugger

@@ -36,7 +36,7 @@ object ControlPanelCommon {
         val optionName = optionNames.first()
         val arg = args.split(',')
 
-        return if (args.equals("h1") || args.equals("p")) {
+        return if (args == "h1" || args == "p" || args == "emph") {
             (object : UIItem(parent, x, y) {
                 override val width = 1
                 override val height = 1
@@ -201,10 +201,13 @@ object ControlPanelCommon {
         else throw IllegalArgumentException(args)
     }
 
+    private fun String.countLines() = this.count { it == '\n' } + 1
+
     private val linegap = 14
     private val panelgap = 20
 
-    private val rowheight = 20 + linegap
+    private val textLineHeight = App.fontGame.lineHeight.toInt()
+    private val rowheightDiff = textLineHeight - panelgap
 
     private val h1MarginTop = 16
     private val h1MarginBottom = 4
@@ -225,9 +228,11 @@ object ControlPanelCommon {
 
             optionsYpos[index] = akku
 
+            val realRowHeight = (row[1] as () -> String).invoke().countLines() * textLineHeight - rowheightDiff
+
             akku += when (option) {
-                "h1" -> rowheight + h1MarginBottom
-                else -> rowheight
+                "h1" -> realRowHeight + linegap + h1MarginBottom
+                else -> realRowHeight + linegap
             }
         }
         optionsYpos[optionsYpos.lastIndex] = akku
@@ -264,20 +269,23 @@ object ControlPanelCommon {
 
             val font = if (mode == "h1") App.fontUITitle else App.fontGame
 
-            val label = (args[1] as () -> String).invoke()
-            val labelWidth = font.getWidth(label)
+            val label = (args[1] as () -> String).invoke().lines()
+            val labelWidth = label.maxOf { font.getWidth(it) }
             batch.color = when (mode) {
                 "h1" -> Toolkit.Theme.COL_MOUSE_UP
                 "p" -> Color.LIGHT_GRAY
+                "emph" -> Toolkit.Theme.COL_RED
                 else -> Color.WHITE
             }
 
-            val xpos = if (mode == "p" || mode == "h1")
+            val xpos = if (mode == "p" || mode == "h1" || mode == "emph")
                 drawX + (width - labelWidth)/2 // centre-aligned
             else
-                drawX + width/2 - panelgap - labelWidth // right aligned at the middle of the panel, offsetted by panelgap
+                drawX + width/2 - panelgap - labelWidth // right aligned at the middle of the panel, offset by panelgap
 
-            font.draw(batch, label, xpos.toFloat(), drawY + optionsYpos[index] - 2f)
+            label.forEachIndexed { rows, s ->
+                font.draw(batch, s, xpos.toFloat(), drawY + optionsYpos[index] - 2f + textLineHeight * rows)
+            }
 
             // draw hrule
             if (mode == "h1") {

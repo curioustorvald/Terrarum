@@ -5,7 +5,7 @@ package net.torvald.terrarum
  */
 object AudioManager {
 
-    /** Returns a companded master volume */
+    /** Returns a master volume */
     val masterVolume: Float
         get() = App.getConfigDouble("mastervolume").toFloat()
 

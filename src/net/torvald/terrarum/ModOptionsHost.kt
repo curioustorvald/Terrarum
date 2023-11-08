@@ -22,7 +22,7 @@ class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
     private val moduleAreaHMargin = 48
     private val moduleAreaBorder = 8
 
-    override var width = App.scr.width - UIRemoCon.remoConWidth - moduleAreaHMargin
+    override var width = 560
     override var height = App.scr.height - moduleAreaHMargin * 2
 
     private val drawX = (Toolkit.drawWidth - width) / 2
@@ -78,7 +78,10 @@ class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
             else {
                 { options[1] }
             }
-            arrayOf("$modname:${options[0]}", labelfun, options[2])
+            if (options[0].isBlank())
+                arrayOf("", labelfun, options[2])
+            else
+                arrayOf("$modname:${options[0]}", labelfun, options[2])
         }.toTypedArray()
 
         ControlPanelCommon.register(this, width, "basegame.modcontrolpanel.$modname", modOptions)

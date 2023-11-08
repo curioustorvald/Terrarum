@@ -1,2 +1,3 @@
+->Lang:MENU_OPTIONS_GAMEPLAY->h1
 gameplay_max_crafting->Lang:MENU_OPTIONS_MAX_CRAFTING->spinner,100,1000,100
 showpickaxetooltip->Lang:MENU_OPTIONS_SHOW_ORES_TOOLTIP_WHEN_MINING->toggle

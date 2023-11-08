@@ -33,14 +33,14 @@ internal object Authenticator : ConsoleCommand {
             val pwd = args[1]
             val hashedPwd = DigestUtils.sha256Hex(pwd)
 
-            println("auth passwd: '$pwd'")
-            println("hash: $hashedPwd")
+//            println("auth passwd: '$pwd'")
+//            println("hash: $hashedPwd")
 
-            if ("2d962f949f55906ac47f16095ded190c9e44d95920259b8f36c2e54bd75df173".equals(hashedPwd, ignoreCase = true)) {
+            if ("c40232ae7b8020da3ab1449a015e7cc23f249a790856b63b1b69c6a5de019fed".equals(hashedPwd, ignoreCase = true)) {
                 // beedle
                 val msg = if (a) "Locked" else "Authenticated"
                 Echo(msg)
-                println("[Authenticator] " + msg)
+                println("[Authenticator] $msg")
                 a = !a
                 INGAME.consoleHandler.reset()
             }
