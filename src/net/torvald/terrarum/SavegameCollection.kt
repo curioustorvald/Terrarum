@@ -40,7 +40,7 @@ class SavegameCollection(files0: List<DiskSkimmer>, prefiltered: Boolean) {
     val manualSaves = files.filter { !it.diskFile.extension.matches(Regex("[a-z]")) }
 
     init {
-        printdbg(this, "Rebuilding skimmers (${files.size})")
+//        printdbg(this, "Rebuilding skimmers (${files.size})")
 //        files.forEach { it.rebuild() }
     }
 

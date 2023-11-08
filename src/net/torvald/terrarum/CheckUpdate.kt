@@ -17,7 +17,7 @@ import java.net.http.HttpResponse
  */
 object CheckUpdate {
 
-    private val versionNumFull = App.getVERSION_STRING()
+    private val versionNumFull = App.getVERSION_STRING_WITHOUT_SNAPSHOT()
     private val versionNumOnly = String.format(
         "%d.%d.%d",
         App.VERSION_RAW ushr 48,

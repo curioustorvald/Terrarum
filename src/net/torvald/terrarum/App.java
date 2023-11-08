@@ -74,6 +74,11 @@ public class App implements ApplicationListener {
                 (VERSION_TAG.isBlank() ? "" : "-"+VERSION_TAG) + (snap == null ? "" : (" (" + snap + ")"));
     }
 
+    public static final String getVERSION_STRING_WITHOUT_SNAPSHOT() {
+        return String.format("%d.%d.%d", VERSION_RAW >>> 48, (VERSION_RAW & 0xffff000000L) >>> 24, VERSION_RAW & 0xffffffL) +
+                (VERSION_TAG.isBlank() ? "" : "-"+VERSION_TAG);
+    }
+
     /**
      * when FALSE, some assertion and print code will not execute
      */
@@ -1182,7 +1187,6 @@ public class App implements ApplicationListener {
 
         AudioManager.INSTANCE.getMasterVolume();
         audioManagerThread = new Thread(new AudioManagerRunnable(), "TerrarumAudioManager");
-        audioManagerThread.setPriority(2);
         audioManagerThread.start();
 
         Terrarum.initialise();

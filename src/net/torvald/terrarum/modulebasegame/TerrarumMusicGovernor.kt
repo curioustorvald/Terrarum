@@ -25,7 +25,11 @@ class TerrarumMusicGovernor : MusicGovernor() {
                 MusicContainer(
                     it.nameWithoutExtension.replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
                     it,
-                    Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath))
+                    Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath)).also {
+                        it.setOnCompletionListener {
+                            stopMusic()
+                        }
+                    }
                 )
             }
             catch (e: GdxRuntimeException) {
@@ -98,9 +102,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
                 }
             }
             STATE_PLAYING -> {
-                if (AudioManager.currentMusic?.gdxMusic?.isPlaying == false) {
-//                    stopMusic()
-                }
+                // stopMusic() will be called when the music finishes; it's on the setOnCompletionListener
             }
             STATE_INTERMISSION -> {
                 intermissionAkku += delta

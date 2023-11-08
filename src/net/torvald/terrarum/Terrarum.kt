@@ -794,7 +794,7 @@ fun AppUpdateListOfSavegames() {
 
 
     // create list of worlds
-    printdbg("ListSavegames", "Listing saved worlds...")
+//    printdbg("ListSavegames", "Listing saved worlds...")
     val worldsDirLs = File(worldsDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
         try {
             DiskSkimmer(file, true)
@@ -820,16 +820,16 @@ fun AppUpdateListOfSavegames() {
     }
     filteringResults.forEachIndexed { index, list ->
         val it = list.first()
-        printdbg("ListSavegames", " ${index+1}.\t${it.diskFile.absolutePath}")
+//        printdbg("ListSavegames", " ${index+1}.\t${it.diskFile.absolutePath}")
 
-        printdbg("ListSavegames", "    collecting...")
+//        printdbg("ListSavegames", "    collecting...")
         val collection = SavegameCollection.collectFromBaseFilename(list, it.diskFile.name)
-        printdbg("ListSavegames", "    disk rebuilding...")
+//        printdbg("ListSavegames", "    disk rebuilding...")
         collection.rebuildLoadable()
-        printdbg("ListSavegames", "    get UUID...")
+//        printdbg("ListSavegames", "    get UUID...")
         val worldUUID = collection.getUUID()
 
-        printdbg("ListSavegames", "    registration...")
+//        printdbg("ListSavegames", "    registration...")
         // if multiple valid savegames with same UUID exist, only the most recent one is retained
         if (!App.savegameWorlds.contains(worldUUID)) {
             App.savegameWorlds[worldUUID] = collection
@@ -840,7 +840,7 @@ fun AppUpdateListOfSavegames() {
 
 
     // create list of players
-    printdbg("ListSavegames", "Listing saved players...")
+//    printdbg("ListSavegames", "Listing saved players...")
     val playersDirLs = File(playersDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
         try {
             DiskSkimmer(file, true)
@@ -866,16 +866,16 @@ fun AppUpdateListOfSavegames() {
     }
     filteringResults2.forEachIndexed { index, list ->
         val it = list.first()
-        printdbg("ListSavegames", " ${index+1}.\t${it.diskFile.absolutePath}")
+//        printdbg("ListSavegames", " ${index+1}.\t${it.diskFile.absolutePath}")
 
-        printdbg("ListSavegames", "    collecting...")
+//        printdbg("ListSavegames", "    collecting...")
         val collection = SavegameCollection.collectFromBaseFilename(list, it.diskFile.name)
-        printdbg("ListSavegames", "    disk rebuilding...")
+//        printdbg("ListSavegames", "    disk rebuilding...")
         collection.rebuildLoadable()
-        printdbg("ListSavegames", "    get UUID...")
+//        printdbg("ListSavegames", "    get UUID...")
         val playerUUID = collection.getUUID()
 
-        printdbg("ListSavegames", "    registration...")
+//        printdbg("ListSavegames", "    registration...")
         // if multiple valid savegames with same UUID exist, only the most recent one is retained
         if (!App.savegamePlayers.contains(playerUUID)) {
             App.savegamePlayers[playerUUID] = collection
