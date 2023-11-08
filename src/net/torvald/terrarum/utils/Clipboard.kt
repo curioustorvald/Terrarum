@@ -1,5 +1,6 @@
 package net.torvald.terrarum.utils
 
+import com.badlogic.gdx.Gdx
 import net.torvald.terrarum.App
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -14,20 +15,10 @@ import java.io.File
 object Clipboard {
     private val IS_MACOS = App.operationSystem == "OSX"
 
-    fun fetch(): String =
-        if (IS_MACOS) "Clipboard is disabled on macOS" else
-        try {
-            Toolkit.getDefaultToolkit().systemClipboard.getData(DataFlavor.stringFlavor) as String
-        }
-        catch (e: UnsupportedFlavorException) {
-            ""
-        }
+    fun fetch(): String = Gdx.app.clipboard.contents
 
     fun copy(s: String) {
-        if (IS_MACOS) return
-        val selection = StringSelection(s)
-        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-        clipboard.setContents(selection, selection)
+        Gdx.app.clipboard.contents = s
     }
 }
 
