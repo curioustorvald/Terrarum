@@ -36,34 +36,37 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
     private var musicBin: ArrayList<Int> = ArrayList(songs.indices.toList().shuffled())
 
-    private var currentMusic: MusicContainer? = null
-    private var currentAmbient: MusicContainer? = null
 
+    init {
+        songs.forEach {
+            App.disposables.add(it.gdxMusic)
+        }
+    }
 
 
     private var warningPrinted = false
 
 
+    private val STATE_INIT = 0
+    private val STATE_FIREPLAY = 1
+    private val STATE_PLAYING = 2
+    private val STATE_INTERMISSION = 3
+
 
     private fun stopMusic() {
-        printdbg(this, "Now stopping: $currentMusic")
-        state = 2
+        AudioManager.stopMusic()
+        state = STATE_INTERMISSION
         intermissionAkku = 0f
         intermissionLength = 30f + 30f * Math.random().toFloat() // 30s-60s
         musicFired = false
-        currentMusic = null
-        fadeoutFired = false
         printdbg(this, "Intermission: $intermissionLength seconds")
     }
 
     private fun startMusic(song: MusicContainer) {
-        song.gdxMusic.volume = AudioManager.musicVolume
-        song.gdxMusic.play()
+        AudioManager.startMusic(song)
         printdbg(this, "Now playing: $song")
-
         INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
-
-        currentMusic = song
+        state = STATE_PLAYING
     }
 
 
@@ -77,11 +80,11 @@ class TerrarumMusicGovernor : MusicGovernor() {
         }
 
 //        val ingame = ingame as TerrarumIngame
-        if (state == 0) state = 2
+        if (state == 0) state = STATE_INTERMISSION
 
 
         when (state) {
-            1 -> {
+            STATE_FIREPLAY -> {
                 if (!musicFired) {
                     musicFired = true
 
@@ -92,32 +95,14 @@ class TerrarumMusicGovernor : MusicGovernor() {
                     }
 
                     startMusic(song)
-
-                    // process fadeout request
-                    if (fadeoutFired) {
-                        fadeoutAkku += delta
-                        currentMusic?.gdxMusic?.volume = 1f - AudioManager.musicVolume * (fadeoutAkku / fadeoutLength)
-
-                        if (fadeoutAkku >= fadeoutLength) {
-                            currentMusic?.gdxMusic?.pause()
-                        }
-                    }
-                    // process fadein request
-                    else if (fadeinFired) {
-                        if (currentMusic?.gdxMusic?.isPlaying == false) {
-                            currentMusic?.gdxMusic?.play()
-                        }
-                        fadeoutAkku += delta
-                        currentMusic?.gdxMusic?.volume = AudioManager.musicVolume * (fadeoutAkku / fadeoutLength)
-                    }
-                }
-                else {
-                    if (currentMusic?.gdxMusic?.isPlaying == false) {
-                        stopMusic()
-                    }
                 }
             }
-            2 -> {
+            STATE_PLAYING -> {
+                if (AudioManager.currentMusic?.gdxMusic?.isPlaying == false) {
+//                    stopMusic()
+                }
+            }
+            STATE_INTERMISSION -> {
                 intermissionAkku += delta
 
                 if (intermissionAkku >= intermissionLength) {
@@ -130,8 +115,6 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     override fun dispose() {
-        currentMusic?.gdxMusic?.stop()
         stopMusic()
-        songs.forEach { it.gdxMusic.tryDispose() }
     }
 }

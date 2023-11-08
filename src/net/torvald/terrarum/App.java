@@ -340,6 +340,8 @@ public class App implements ApplicationListener {
 
     public static boolean gl40capable = false;
 
+    public static Thread audioManagerThread;
+
     public static void main(String[] args) {
 
         long st = System.nanoTime();
@@ -908,6 +910,7 @@ public class App implements ApplicationListener {
     public void dispose() {
         System.out.println("Goodbye !");
 
+        audioManagerThread.interrupt();
 
         if (currentScreen != null) {
             currentScreen.hide();
@@ -1176,6 +1179,11 @@ public class App implements ApplicationListener {
             throw new Error("TileMaker failed to load", e);
         }
 
+
+        AudioManager.INSTANCE.getMasterVolume();
+        audioManagerThread = new Thread(new AudioManagerRunnable(), "TerrarumAudioManager");
+        audioManagerThread.setPriority(2);
+        audioManagerThread.start();
 
         Terrarum.initialise();
 
