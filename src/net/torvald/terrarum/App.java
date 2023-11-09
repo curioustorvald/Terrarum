@@ -916,7 +916,9 @@ public class App implements ApplicationListener {
     public void dispose() {
         System.out.println("Goodbye !");
 
-        audioManagerThread.interrupt();
+        if (audioManagerThread != null) {
+            audioManagerThread.interrupt();
+        }
 
         if (currentScreen != null) {
             currentScreen.hide();
