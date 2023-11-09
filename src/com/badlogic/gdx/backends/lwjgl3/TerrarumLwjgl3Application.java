@@ -62,7 +62,7 @@ import org.lwjgl.system.Configuration;
  *
  * Created by minjaesong on 2023-11-08.
  */
-public class Lwjgl3Application implements Lwjgl3ApplicationBase {
+public class TerrarumLwjgl3Application implements Lwjgl3ApplicationBase {
     private final Lwjgl3ApplicationConfiguration config;
     final Array<Lwjgl3Window> windows = new Array<Lwjgl3Window>();
     private volatile Lwjgl3Window currentWindow;
@@ -134,11 +134,11 @@ public class Lwjgl3Application implements Lwjgl3ApplicationBase {
         }
     }
 
-    public Lwjgl3Application (ApplicationListener listener) {
+    public TerrarumLwjgl3Application (ApplicationListener listener) {
         this(listener, new Lwjgl3ApplicationConfiguration());
     }
 
-    public Lwjgl3Application (ApplicationListener listener, Lwjgl3ApplicationConfiguration config) {
+    public TerrarumLwjgl3Application (ApplicationListener listener, Lwjgl3ApplicationConfiguration config) {
         if (config.glEmulation == Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20) loadANGLE();
         initializeGlfw();
         setApplicationLogger(new Lwjgl3ApplicationLogger());

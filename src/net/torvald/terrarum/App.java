@@ -4,6 +4,7 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.TerrarumLwjgl3Application;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Color;
@@ -473,7 +474,7 @@ public class App implements ApplicationListener {
             // set some more configuration vars
             MULTITHREAD = THREAD_COUNT >= 3 && getConfigBoolean("multithread");
 
-            new Lwjgl3Application(new App(appConfig), appConfig);
+            new TerrarumLwjgl3Application(new App(appConfig), appConfig);
         }
         catch (Throwable e) {
             if (Gdx.app != null) {
