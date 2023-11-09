@@ -33,6 +33,7 @@ internal object ExportMap : ConsoleCommand {
         "ores@basegame:5" to Cvec(0xcd8b62ff.toInt()),
         "ores@basegame:6" to Cvec(0xffcc00ff.toInt()),
         "ores@basegame:7" to Cvec(0xd5d9f9ff.toInt()),
+        "ores@basegame:8" to Cvec(0xff9300ff.toInt()),
     )
 
     private val WALL_OVERLAY = Cvec(0.35f, 0.35f, 0.35f, 1f)

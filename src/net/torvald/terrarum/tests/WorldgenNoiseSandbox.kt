@@ -367,9 +367,10 @@ internal object TerragenTest : NoiseMaker {
     private val TIN_ORE = 0xcd8b62ff.toInt()
     private val GOLD_ORE = 0xffcc00ff.toInt()
     private val SILVER_ORE = 0xd5d9f9ff.toInt()
+    private val LEAD_ORE = 0xff9300ff.toInt()
 
     private val oreCols = listOf(
-        COPPER_ORE, IRON_ORE, COAL_ORE, ZINC_ORE, TIN_ORE, GOLD_ORE, SILVER_ORE
+        COPPER_ORE, IRON_ORE, COAL_ORE, ZINC_ORE, TIN_ORE, GOLD_ORE, SILVER_ORE, LEAD_ORE
     )
 
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
@@ -697,9 +698,10 @@ internal object TerragenTest : NoiseMaker {
             Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:2", 0.056, 0.011, 0.507, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:3", 0.021, 0.070, 0.501, 3.8)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:4", 0.024, 0.011, 0.501, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:5", 0.021, 0.020, 0.501, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:5", 0.021, 0.017, 0.501, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:6", 0.011, 0.300, 0.465, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:7", 0.016, 0.300, 0.467, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:8", 0.021, 0.020, 0.501, 1.0)),
         )
     }
 

@@ -24,6 +24,7 @@ id;classname
 132;net.torvald.terrarum.modulebasegame.gameitems.OreTin
 133;net.torvald.terrarum.modulebasegame.gameitems.OreGold
 134;net.torvald.terrarum.modulebasegame.gameitems.OreSilver
+135;net.torvald.terrarum.modulebasegame.gameitems.OreLead
 
 256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak
 257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony
