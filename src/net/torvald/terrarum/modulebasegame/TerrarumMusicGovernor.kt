@@ -58,7 +58,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
 
     private fun stopMusic() {
-        AudioManager.stopMusic()
+//        AudioManager.stopMusic() // music will stop itself; with this line not commented, the stop-callback from the already disposed musicgovernor will stop the music queued by the new musicgovernor instance
         state = STATE_INTERMISSION
         intermissionAkku = 0f
         intermissionLength = 30f + 30f * Math.random().toFloat() // 30s-60s
@@ -117,6 +117,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     override fun dispose() {
+        AudioManager.stopMusic() // explicit call for fade-out when the game instance quits
         stopMusic()
     }
 }
