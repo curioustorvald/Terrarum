@@ -298,9 +298,9 @@ internal object BiomeMaker : NoiseMaker {
 
         val scaleDomain = ModuleScaleDomain().also {
             it.setSource(fractal)
-            it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
-            it.setScaleY(1.0 / params.featureSize)
-            it.setScaleZ(1.0 / params.featureSize)
+            it.setScaleX(1.0 / params.featureSize1) // adjust this value to change features size
+            it.setScaleY(1.0 / params.featureSize1)
+            it.setScaleZ(1.0 / params.featureSize1)
         }
 
         val scale = ModuleScaleOffset().also {

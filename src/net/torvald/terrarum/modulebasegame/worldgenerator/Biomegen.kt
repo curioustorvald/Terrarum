@@ -5,13 +5,9 @@ import com.sudoplay.joise.module.*
 import net.torvald.terrarum.App
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import kotlin.math.cos
-import kotlin.math.max
 import kotlin.math.sin
 
 /**
@@ -73,7 +69,8 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
     }
 
     private fun draw(x: Int, y: Int, noiseValue: List<Double>, world: GameWorld) {
-        val control = noiseValue[0].coerceIn(0.0, 0.99999).times(slices).toInt().coerceIn(0 until slices)
+        val control1 = noiseValue[0].coerceIn(0.0, 0.99999).times(slices).toInt().coerceAtMost(slices - 1)
+        val control2 = noiseValue[1].coerceIn(0.0, 0.99999).times(9).toInt().coerceAtMost(9 - 1)
 
         if (y > 0) {
             val tileThis = world.getTileFromTerrain(x, y)
@@ -81,41 +78,76 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             val nearbyTerr = nearbyArr.map { world.getTileFromTerrain(x + it.first, y + it.second) }
             val nearbyWall = nearbyArr.map { world.getTileFromWall(x + it.first, y + it.second) }
 
-            when (control) {
+            val grassRock = when (control1) {
                 0 -> { // woodlands
                     if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
-                        world.setTileTerrain(x, y, Block.GRASS, true)
+                        Block.GRASS to null
                     }
+                    else null to null
                 }
                 1 -> { // shrublands
                     if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
-                        world.setTileTerrain(x, y, Block.GRASS, true)
+                        Block.GRASS to null
                     }
+                    else null to null
                 }
                 2, 3 -> { // plains
                     if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
-                        world.setTileTerrain(x, y, Block.GRASS, true)
+                        Block.GRASS to null
                     }
+                    else null to null
                 }
                 /*3 -> { // sands
                     if (tileThis == Block.DIRT && (nearbyTerr[BT] == Block.STONE || nearbyTerr[BT] == Block.AIR)) {
-                        world.setTileTerrain(x, y, Block.SANDSTONE)
+                        world.setTileTerrain(x, y, Block.SANDSTONE, true)
                     }
                     else if (tileThis == Block.DIRT) {
-                        world.setTileTerrain(x, y, Block.SAND)
+                        world.setTileTerrain(x, y, Block.SAND, true)
                     }
                 }*/
                 4 -> { // rockylands
                     if (tileThis == Block.DIRT || tileThis == Block.STONE_QUARRIED) {
-                        world.setTileTerrain(x, y, Block.STONE, true)
-                        world.setTileWall(x, y, Block.STONE, true)
+                        Block.STONE to Block.STONE
                     }
+                    else null to null
                 }
+                else -> null to null
             }
+            val sandNull = when (control2) {
+                8 -> {
+                    if (tileThis == Block.DIRT && (nearbyTerr[BT] == Block.AIR)) {
+                        Block.SANDSTONE to null
+                    }
+                    else if (tileThis == Block.DIRT) {
+                        Block.SAND to null
+                    }
+                    else null to null
+                }
+                else -> null to null
+            }
+
+            val outTile = if (grassRock.first == Block.STONE)
+                grassRock
+            else if (sandNull.first != null)
+                sandNull
+            else grassRock
+
+
+            if (outTile.first != null)
+                world.setTileTerrain(x, y, outTile.first!!, true)
+            if (outTile.second != null)
+                world.setTileWall(x, y, outTile.second!!, true)
         }
     }
 
     private fun getGenerator(seed: Long, params: BiomegenParams): List<Joise> {
+        return listOf(
+            makeRandomSpotties("TERRA", params.featureSize1),
+            makeRandomSpotties("SABLUM", params.featureSize2),
+        )
+    }
+
+    private fun makeRandomSpotties(shakeValue: String, featureSize: Double): Joise {
         //val biome = ModuleBasisFunction()
         //biome.setType(ModuleBasisFunction.BasisType.SIMPLEX)
 
@@ -125,14 +157,14 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
             it.setNumOctaves(4)
             it.setFrequency(1.0)
-            it.seed = seed shake 0x7E22A
+            it.seed = seed shake shakeValue
         }
 
         val scaleDomain = ModuleScaleDomain().also {
             it.setSource(fractal)
-            it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
-            it.setScaleY(1.0 / params.featureSize)
-            it.setScaleZ(1.0 / params.featureSize)
+            it.setScaleX(1.0 / featureSize) // adjust this value to change features size
+            it.setScaleY(1.0 / featureSize)
+            it.setScaleZ(1.0 / featureSize)
         }
 
         val scale = ModuleScaleOffset().also {
@@ -142,12 +174,12 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         }
 
         val last = scale
-
-        return listOf(Joise(last))
+        return Joise(last)
     }
 
 }
 
 data class BiomegenParams(
-        val featureSize: Double = 80.0
+    val featureSize1: Double = 80.0,
+    val featureSize2: Double = 120.0
 )

@@ -43,7 +43,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
      */
     private fun getGenerator(seed: Long): List<Joise> {
         return ores.map {
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake it.tile, it.freq, it.power, it.scale, it.ratio))
+            generateOreVeinModule(caveAttenuateBiasScaled, seed shake it.tile, it.freq, it.power, it.scale, it.ratio)
         }
     }
 
@@ -83,7 +83,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
         }
     }
 
-    private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, freq: Double, pow: Double, scale: Double, ratio: Double): Module {
+    private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, freq: Double, pow: Double, scale: Double, ratio: Double): Joise {
         val oreShape = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.RIDGEMULTI)
             it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
@@ -147,7 +147,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
             it.setFalloff(0.0)
         }
 
-        return oreSelect
+        return Joise(oreSelect)
     }
 }
 
