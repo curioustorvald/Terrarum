@@ -6,6 +6,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.sliceEvenly
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import kotlin.math.cos
 import kotlin.math.sin
@@ -18,7 +19,24 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
     private val YHEIGHT_MAGIC = 2800.0 / 3.0
     private val YHEIGHT_DIVISOR = 2.0 / 7.0
 
+
+    private lateinit var THISWORLD_SAND: ItemID
+    private lateinit var THISWORLD_SANDSTONE: ItemID
+
+
     override fun getDone(loadscreen: LoadScreenBase) {
+        val SAND_RND = seed.ushr(7).xor(seed and 255L).and(255L).toInt()
+        val SAND_BASE = when (SAND_RND) {
+            255 -> 5 // green
+            in 252..254 -> 4 // black
+            in 245..251 -> 2 // red
+            in 230..244 -> 1 // white
+            else -> 0
+        }
+        THISWORLD_SAND = "basegame:" + (Block.SAND.substringAfter(':').toInt() + SAND_BASE)
+        THISWORLD_SANDSTONE = "basegame:" + (Block.SANDSTONE.substringAfter(':').toInt() + SAND_BASE)
+
+
 //        loadscreen.progress.set((loadscreen.progress.get() + 0x1_000000_000000L) and 0x7FFF_000000_000000L)
 
         Worldgen.threadExecutor.renew()
@@ -113,13 +131,22 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
                 }
                 else -> null to null
             }
-            val sandNull = when (control2) {
-                8 -> {
+            val sablum = when (control2) {
+                0 -> {
                     if (tileThis == Block.DIRT && (nearbyTerr[BT] == Block.AIR)) {
-                        Block.SANDSTONE to null
+                        Block.STONE_QUARRIED to null
                     }
                     else if (tileThis == Block.DIRT) {
-                        Block.SAND to null
+                        Block.GRAVEL to null
+                    }
+                    else null to null
+                }
+                8 -> {
+                    if (tileThis == Block.DIRT && (nearbyTerr[BT] == Block.AIR)) {
+                        THISWORLD_SANDSTONE to null
+                    }
+                    else if (tileThis == Block.DIRT) {
+                        THISWORLD_SAND to null
                     }
                     else null to null
                 }
@@ -128,8 +155,8 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
             val outTile = if (grassRock.first == Block.STONE)
                 grassRock
-            else if (sandNull.first != null)
-                sandNull
+            else if (sablum.first != null)
+                sablum
             else grassRock
 
 
