@@ -307,7 +307,10 @@ internal object BlocksDrawer {
     }
 
 
-    private fun getHashCoord(x: Int, y: Int, mod: Int, layer: Int) = (XXHash64.hash(LandUtil.getBlockAddr(world, x, y).toBig64(), ((x*16777619) xor (y+1+layer)).toLong()) fmod mod.toLong()).toInt()
+    private fun getHashCoord(x: Int, y: Int, mod: Int, layer: Int): Int {
+        val (x, y) = world.coerceXY(x, y)
+        return (XXHash64.hash(LandUtil.getBlockAddr(world, x, y).toBig64(), ((x*16777619) xor (y+1+layer)).toLong()) fmod mod.toLong()).toInt()
+    }
 
     /**
      * Autotiling; writes to buffer. Actual draw code must be called after this operation.

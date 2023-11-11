@@ -34,7 +34,10 @@ class OregenAutotiling(world: GameWorld, seed: Long, val tilingModes: HashMap<It
         Worldgen.threadExecutor.join()
     }
 
-    private fun getHashCoord(x: Int, y: Int, mod: Int) = (XXHash64.hash(LandUtil.getBlockAddr(world, x, y).toBig64(), ((x*16777619) xor (y+1073)).toLong()) fmod mod.toLong()).toInt()
+    private fun getHashCoord(x: Int, y: Int, mod: Int): Int {
+        val (x, y) = world.coerceXY(x, y)
+        return (XXHash64.hash(LandUtil.getBlockAddr(world, x, y).toBig64(), ((x*16777619) xor (y+1073)).toLong()) fmod mod.toLong()).toInt()
+    }
 
     private fun draw(x: Int) {
         for (y in 0 until world.height) {
