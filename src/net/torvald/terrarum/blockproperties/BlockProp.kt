@@ -76,6 +76,9 @@ class BlockProp {
     }
 
     fun hasTag(s: String) = tags.contains(s)
+    fun hasAnyTagOf(vararg s: String) = s.any { hasTag(it) }
+    fun hasAnyTag(s: Collection<String>) = s.any { hasTag(it) }
+    fun hasAnyTag(s: Array<String>) = s.any { hasTag(it) }
 
     /**
      * @param luminosity

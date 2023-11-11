@@ -30,62 +30,70 @@ open class OreItemBase(originalID: ItemID) : GameItem(originalID) {
 }
 
 /* Wooden Log is a block */
-class OreWood(originalID: ItemID) : OreItemBase(originalID) {
-    override var originalName = "ITEM_WOOD"
+class ItemOakLogs(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_LOGS_OAK"
     override val materialId = "WOOD"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,10)
 }
+
+class ItemOakSEED(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_ACORN_OAK"
+    override val materialId = "WOOD"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,11)
+}
+
 class OreStick(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_WOOD_STICK"
     override val materialId = "WOOD"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,6)
 }
 class OreCopper(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_MALACHITE"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,6)
 }
 class OreIron(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_HAEMATITE"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,6)
 }
 class OreCoal(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_COAL"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(4,6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,6)
 }
 class OreZinc(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_SPHALERITE"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(5,6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(4,6)
 }
 class OreTin(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_CASSITERITE"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(6,6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(5,6)
 }
 class OreGold(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_NATURAL_GOLD"
     override val materialId: String = "AURM"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(7, 6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(6, 6)
 }
 class OreSilver(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_NATURAL_SILVER"
     override val materialId: String = "ARGN"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(7,6)
 }
 class OreLead(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_GALENA"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,6)
 }
 class ItemCoalCoke(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_COAL_COKE"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,10)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,6)
 }

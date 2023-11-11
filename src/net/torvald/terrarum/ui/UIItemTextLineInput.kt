@@ -553,7 +553,11 @@ class UIItemTextLineInput(
 
                 App.fontGameFBO.draw(it, text, -1f*cursorDrawScroll + textDrawOffset, -2f)
             } }
-            textCommitListener(getTextOrPlaceholder())
+
+            try {
+                textCommitListener(getTextOrPlaceholder())
+            }
+            catch (_: ConcurrentModificationException) { /* it's a render code, it's fine to do nothing */ }
         }
 
         batch.begin()
@@ -685,7 +689,9 @@ class UIItemTextLineInput(
         oldPosX = posX
     }
 
+    /** This function is likely to raise a ConcurrentModificationException */
     fun getText() = textbufToString()
+    /** This function is likely to raise a ConcurrentModificationException */
     fun getTextOrPlaceholder(): String = if (textbuf.isEmpty()) currentPlaceholderText.toJavaString() else getText()
     fun clearText() {
         resetIME()
