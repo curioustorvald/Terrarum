@@ -7,14 +7,16 @@ import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.realestate.LandUtil
 import kotlin.math.cos
 import kotlin.math.sin
 
 /**
  * Created by minjaesong on 2019-09-02.
  */
-class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
+class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashMap<BlockAddress, Byte>) : Gen(world, seed, params) {
 
     private val YHEIGHT_MAGIC = 2800.0 / 3.0
     private val YHEIGHT_DIVISOR = 2.0 / 7.0
@@ -84,33 +86,47 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         private const val BT = 5
         private const val LF = 6
         private const val RH = 7
+
+        const val BIOME_KEY_WOODLANDS = 1.toByte()
+        const val BIOME_KEY_SHRUBLANDS = 2.toByte()
+        const val BIOME_KEY_PLAINS = 3.toByte()
+        const val BIOME_KEY_ROCKY = (-1).toByte()
+        const val BIOME_KEY_SANDY = (-2).toByte()
+        const val BIOME_KEY_GRAVELS = (-3).toByte()
+
     }
 
     private fun draw(x: Int, y: Int, noiseValue: List<Double>, world: GameWorld) {
         val control1 = noiseValue[0].coerceIn(0.0, 0.99999).times(slices).toInt().coerceAtMost(slices - 1)
         val control2 = noiseValue[1].coerceIn(0.0, 0.99999).times(9).toInt().coerceAtMost(9 - 1)
+        val ba = LandUtil.getBlockAddr(world, x, y)
 
         if (y > 0) {
             val tileThis = world.getTileFromTerrain(x, y)
             val wallThis = world.getTileFromWall(x, y)
             val nearbyTerr = nearbyArr.map { world.getTileFromTerrain(x + it.first, y + it.second) }
             val nearbyWall = nearbyArr.map { world.getTileFromWall(x + it.first, y + it.second) }
+            val exposedToAir = nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }
+            val hasNoFloor = (nearbyTerr[BT] == Block.AIR)
 
             val grassRock = when (control1) {
                 0 -> { // woodlands
-                    if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
+                    if (tileThis == Block.DIRT && exposedToAir) {
+                        biomeMapOut[ba] = BIOME_KEY_WOODLANDS
                         Block.GRASS to null
                     }
                     else null to null
                 }
                 1 -> { // shrublands
-                    if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
+                    if (tileThis == Block.DIRT && exposedToAir) {
+                        biomeMapOut[ba] = BIOME_KEY_SHRUBLANDS
                         Block.GRASS to null
                     }
                     else null to null
                 }
                 2, 3 -> { // plains
-                    if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
+                    if (tileThis == Block.DIRT && exposedToAir) {
+                        biomeMapOut[ba] = BIOME_KEY_PLAINS
                         Block.GRASS to null
                     }
                     else null to null
@@ -125,6 +141,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
                 }*/
                 4 -> { // rockylands
                     if (tileThis == Block.DIRT || tileThis == Block.STONE_QUARRIED) {
+                        if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_ROCKY
                         Block.STONE to Block.STONE
                     }
                     else null to null
@@ -133,19 +150,23 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             }
             val sablum = when (control2) {
                 0 -> {
-                    if (tileThis == Block.DIRT && (nearbyTerr[BT] == Block.AIR)) {
+                    if (tileThis == Block.DIRT && hasNoFloor) {
+                        if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_GRAVELS
                         Block.STONE_QUARRIED to null
                     }
                     else if (tileThis == Block.DIRT) {
+                        if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_GRAVELS
                         Block.GRAVEL to null
                     }
                     else null to null
                 }
                 8 -> {
-                    if (tileThis == Block.DIRT && (nearbyTerr[BT] == Block.AIR)) {
+                    if (tileThis == Block.DIRT && hasNoFloor) {
+                        if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_SANDY
                         THISWORLD_SANDSTONE to null
                     }
                     else if (tileThis == Block.DIRT) {
+                        if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_SANDY
                         THISWORLD_SAND to null
                     }
                     else null to null

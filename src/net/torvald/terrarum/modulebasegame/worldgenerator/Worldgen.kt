@@ -7,6 +7,7 @@ import net.torvald.terrarum.App.*
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -36,6 +37,8 @@ object Worldgen {
 
     internal lateinit var highlandLowlandSelectCache: ModuleCache
     internal lateinit var caveAttenuateBiasScaled: ModuleScaleDomain
+    internal lateinit var biomeMap: HashMap<BlockAddress, Byte>
+
 
     /**
      * Other modules are free to add their own ores to the world generator.
@@ -62,13 +65,16 @@ object Worldgen {
             Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, caveAttenuateBiasScaled, params.seed, oreRegistry), listOf("ORES")),
             Work(Lang["MENU_IO_WORLDGEN_POSITIONING_ROCKS"], OregenAutotiling(world, params.seed, oreTilingModes), listOf("ORES")),
             Work(Lang["MENU_IO_WORLDGEN_CARVING_EARTH"], Cavegen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
-            Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Biomegen(world, params.seed, params.biomegenParams), listOf("BIOME")),
+            Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Biomegen(world, params.seed, params.biomegenParams, biomeMap), listOf("BIOME")),
+            Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Treegen(world, params.seed, params.treegenParams, biomeMap), listOf("TREES")),
         ).filter(tagFilter)
     }
 
     fun generateMap(loadscreen: LoadScreenBase) {
         highlandLowlandSelectCache = getHighlandLowlandSelectCache(params.terragenParams, params.seed)
         caveAttenuateBiasScaled = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
+        biomeMap = HashMap()
+
         genSlices = max(threadExecutor.threadCount, world.width / 9)
 
 
@@ -271,10 +277,11 @@ abstract class Gen(val world: GameWorld, val seed: Long, val params: Any? = null
 }
 
 data class WorldgenParams(
-        val seed: Long,
-        // optional parameters
-        val terragenParams: TerragenParams = TerragenParams(),
-        val biomegenParams: BiomegenParams = BiomegenParams()
+    val seed: Long,
+    // optional parameters
+    val terragenParams: TerragenParams = TerragenParams(),
+    val biomegenParams: BiomegenParams = BiomegenParams(),
+    val treegenParams: TreegenParams = TreegenParams(),
 )
 
 infix fun Long.shake(other: Long): Long {
