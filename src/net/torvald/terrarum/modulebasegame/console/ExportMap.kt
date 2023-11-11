@@ -53,7 +53,9 @@ internal object ExportMap : ConsoleCommand {
                 val colFore = (App.tileMaker.terrainTileColourMap.get(terr) ?: throw NullPointerException("nullterr $terr")).toByteArray()
                 val colWall = (App.tileMaker.terrainTileColourMap.get(wall) ?: throw NullPointerException("nullwall $wall")).cpy().mul(WALL_OVERLAY).toByteArray()
 
-                val colArray = if (ore != Block.AIR) colOre else if (BlockCodex[terr].isSolid) colFore else colWall
+                val terrProp = BlockCodex[terr]
+
+                val colArray = if (ore != Block.AIR) colOre else if (terrProp.isSolid || terrProp.hasTag("TREE")) colFore else colWall
 
 
                 for (i in 0..2) {

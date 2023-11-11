@@ -906,7 +906,7 @@ internal object BlocksDrawer {
     fun isPlatform(b: ItemID) = App.tileMaker.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER_CONNECT_SELF
     //fun isBlendMul(b: Int) = TILES_BLEND_MUL.contains(b)
     fun isTreeFoliage(b: ItemID) = BlockCodex[b].hasAllTagOf("TREE", "LEAVES")
-    fun isTreeTrunk(b: ItemID) = BlockCodex[b].let { it.hasTag("TREE") && !it.hasTag("LEAVES") }
+    fun isTreeTrunk(b: ItemID) = BlockCodex[b].hasAllTagOf("TREE", "TREETRUNK")
 
     fun tileInCamera(x: Int, y: Int) =
             x >= WorldCamera.x.div(TILE_SIZE) && y >= WorldCamera.y.div(TILE_SIZE) &&

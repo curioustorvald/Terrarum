@@ -46,40 +46,27 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
 
 
     private fun makeGrassMap(xs: IntProgression): Array<List<Int>> {
-        val STRIDE = 4
         val r = Array<List<Int>>(xs.last - xs.first + 1) { emptyList() }
 
 
         for (x in xs) {
             val ys = ArrayList<Int>()
-            var y = 0
+            var y = 1
+            var tileUp = world.getTileFromTerrain(x, y - 1)
+            var tile = world.getTileFromTerrain(x, y)
+            var tileProp = BlockCodex[tile]
             while (y < 800) {
-                val tile = world.getTileFromTerrain(x, y)
-                val tileProp = BlockCodex[tile]
-
                 if (tileProp.hasAnyTagOf("ROCK", "STONE")) break
 
-                if (tile == Block.GRASS) {
+                if (tile == Block.GRASS && tileUp == Block.AIR) {
                     ys.add(y)
                 }
-                // if dirt was hit, climb back up until a grass is seen
-                else if (tile == Block.DIRT) {
-                    var yi = 1
-                    var tile0 = world.getTileFromTerrain(x, y - yi)
-                    var found = false
-                    while (tile0 == Block.DIRT || yi < STRIDE) {
-                        tile0 = world.getTileFromTerrain(x, y - yi)
-                        if (tile0 == Block.GRASS) found = true
-                        yi += 1
-                    }
 
-                    // filter duplicates
-                    if (found && (ys.isEmpty() || ys.last() != y - yi)) {
-                        ys.add(y - yi)
-                    }
-                }
+                y += 1
 
-                y += STRIDE
+                tileUp = tile
+                tile = world.getTileFromTerrain(x, y)
+                tileProp = BlockCodex[tile]
             }
 
             r[x - xs.first] = ys
@@ -98,7 +85,7 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
                 val grad2 = yRight - y
 
                 if ((grad1 * grad2).absoluteValue <= 1) {
-                    printdbg(this, "Trying to plant tree at $x, $y")
+//                    printdbg(this, "Trying to plant tree at $x, $y")
 
                     val rnd = Math.random()
                     val biome = biomeMap[LandUtil.getBlockAddr(world, x, y)] ?: 0
@@ -123,10 +110,14 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
 
         var growCnt = 1
         if (size == 1) {
-            var heightSum = 5+3+2+1
+            var heightSum = 5+3+2
             // check for minimum height
-            if ((1..heightSum).any { BlockCodex[world.getTileFromTerrain(x, y - it)].isSolid }) {
-                printdbg(this, "Ceiling not tall enough, aborting")
+            val chkM1 = (2..heightSum).any { BlockCodex[world.getTileFromTerrain(x, y - it)].isSolid }
+            val chk0 = (1..heightSum).any { BlockCodex[world.getTileFromTerrain(x, y - it)].isSolid }
+            val chkP1 = (2..heightSum).any { BlockCodex[world.getTileFromTerrain(x, y - it)].isSolid }
+
+            if (chkM1 || chk0 || chkP1) {
+                printdbg(this, "Ceiling not tall enough at $x, $y, aborting")
                 return
             }
 
@@ -141,38 +132,53 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
 //            }
 //            while ((1..heightSum).none { BlockCodex[world.getTileFromTerrain(x, y - it)].isSolid })
 
-            printdbg(this, "Planting tree; params: $stem, $bulb1, $bulb2, $bulb3")
+            printdbg(this, "Planting tree at $x, $y; params: $stem, $bulb1, $bulb2, $bulb3")
 
             // trunk
             for (i in 0 until stem) {
                 for (xi in -1..+1) {
-                    world.setTileTerrain(x + xi, y - growCnt, if (xi == 0) trunk else Block.AIR, true)
+                    if (xi != 0) {
+                        val tileHere = world.getTileFromTerrain(x + xi, y - growCnt)
+                        if (BlockCodex[tileHere].hasTag("TREETRUNK"))
+                            world.setTileTerrain(x + xi, y - growCnt, Block.AIR, true)
+                    }
+                    else {
+                        world.setTileTerrain(x + xi, y - growCnt, trunk, true)
+                    }
                 }
                 growCnt += 1
             }
             // bulb base
             for (x in x-2..x+2) {
-                world.setTileTerrain(x, y - growCnt, foliage, true)
+                val tileHere = world.getTileFromTerrain(x, y - growCnt)
+                if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
+                    world.setTileTerrain(x, y - growCnt, foliage, true)
             }
             growCnt += 1
             // bulb 1
             for (i in 0 until bulb1) {
                 for (x in x-3..x+3) {
-                    world.setTileTerrain(x, y - growCnt, foliage, true)
+                    val tileHere = world.getTileFromTerrain(x, y - growCnt)
+                    if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
+                        world.setTileTerrain(x, y - growCnt, foliage, true)
                 }
                 growCnt += 1
             }
             // bulb 2
             for (i in 0 until bulb2) {
                 for (x in x-2..x+2) {
-                    world.setTileTerrain(x, y - growCnt, foliage, true)
+                    val tileHere = world.getTileFromTerrain(x, y - growCnt)
+                    if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
+                        world.setTileTerrain(x, y - growCnt, foliage, true)
                 }
                 growCnt += 1
             }
             // bulb 3
             for (i in 0 until bulb3) {
                 for (x in x-1..x+1) {
-                    world.setTileTerrain(x, y - growCnt, foliage, true)
+                    val tileHere = world.getTileFromTerrain(x, y - growCnt)
+                    if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
+                        world.setTileTerrain(x, y - growCnt, foliage, true)
                 }
                 growCnt += 1
             }
