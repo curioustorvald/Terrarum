@@ -268,7 +268,8 @@ internal object BlocksDrawer {
     private lateinit var wallStickerTiles: Array<Int>
     private lateinit var connectMutualTiles: Array<Int>
     private lateinit var connectSelfTiles: Array<Int>
-    private lateinit var treeTiles: Array<Int>
+    private lateinit var treeLeavesTiles: Array<Int>
+    private lateinit var treeTrunkTiles: Array<Int>
 
     internal fun rebuildInternalPrecalculations() {
         if (App.IS_DEVELOPMENT_BUILD) {
@@ -300,8 +301,12 @@ internal object BlocksDrawer {
             isConnectSelf(id) && !id.startsWith("virt:") && id != Block.NULL
         }.map { world.tileNameToNumberMap[it.key] ?: throw NullPointerException("No tilenumber for ${it.key} exists") }.sorted().toTypedArray()
 
-        treeTiles = BlockCodex.blockProps.filter { (id, prop) ->
-            isTreeTile(id) && !id.startsWith("virt:") && id != Block.NULL
+        treeLeavesTiles = BlockCodex.blockProps.filter { (id, prop) ->
+            isTreeFoliage(id) && !id.startsWith("virt:") && id != Block.NULL
+        }.map { world.tileNameToNumberMap[it.key] ?: throw NullPointerException("No tilenumber for ${it.key} exists") }.sorted().toTypedArray()
+
+        treeTrunkTiles = BlockCodex.blockProps.filter { (id, prop) ->
+            isTreeTrunk(id) && !id.startsWith("virt:") && id != Block.NULL
         }.map { world.tileNameToNumberMap[it.key] ?: throw NullPointerException("No tilenumber for ${it.key} exists") }.sorted().toTypedArray()
 
     }
@@ -371,8 +376,12 @@ internal object BlocksDrawer {
                 /*else if (mode == FLUID) {
                     getNearbyTilesInfoFluids(x, y)
                 }*/
-                else if (treeTiles.binarySearch(thisTile) >= 0) {
+                else if (treeLeavesTiles.binarySearch(thisTile) >= 0) {
                     getNearbyTilesInfoTrees(x, y, mode).swizzle8(thisTile, hash)
+                }
+                else if (treeTrunkTiles.binarySearch(thisTile) >= 0) {
+                    hash = 0
+                    getNearbyTilesInfoTrees(x, y, mode)
                 }
                 else if (platformTiles.binarySearch(thisTile) >= 0) {
                     hash %= 2
@@ -550,12 +559,22 @@ internal object BlocksDrawer {
     }
 
     private fun getNearbyTilesInfoTrees(x: Int, y: Int, mode: Int): Int {
+        val tileThis = world.getTileFromTerrain(x, y)
         val nearbyTiles: List<ItemID> = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) }
 
         var ret = 0
-        for (i in nearbyTiles.indices) {
-            if (isTreeTile(nearbyTiles[i])) {
-                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+        if (isTreeFoliage(tileThis)) {
+            for (i in nearbyTiles.indices) {
+                if (isTreeFoliage(nearbyTiles[i])) { // foliage "shadow" should not connect to the tree trunk
+                    ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+                }
+            }
+        }
+        else if (isTreeTrunk(tileThis)) {
+            for (i in nearbyTiles.indices) {
+                if (isTreeTrunk(nearbyTiles[i]) || i == 6 && isTreeFoliage(nearbyTiles[6])) { // if tile above is leaves, connect to it
+                    ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+                }
             }
         }
 
@@ -886,7 +905,8 @@ internal object BlocksDrawer {
     fun isWallSticker(b: ItemID) = App.tileMaker.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER
     fun isPlatform(b: ItemID) = App.tileMaker.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER_CONNECT_SELF
     //fun isBlendMul(b: Int) = TILES_BLEND_MUL.contains(b)
-    fun isTreeTile(b: ItemID) = BlockCodex[b].hasTag("TREE")
+    fun isTreeFoliage(b: ItemID) = BlockCodex[b].hasAllTagOf("TREE", "LEAVES")
+    fun isTreeTrunk(b: ItemID) = BlockCodex[b].let { it.hasTag("TREE") && !it.hasTag("LEAVES") }
 
     fun tileInCamera(x: Int, y: Int) =
             x >= WorldCamera.x.div(TILE_SIZE) && y >= WorldCamera.y.div(TILE_SIZE) &&

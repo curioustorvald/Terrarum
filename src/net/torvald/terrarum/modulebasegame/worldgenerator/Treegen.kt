@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
@@ -73,7 +74,7 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
                     }
 
                     // filter duplicates
-                    if (found && ys.last() != y - yi) {
+                    if (found && (ys.isEmpty() || ys.last() != y - yi)) {
                         ys.add(y - yi)
                     }
                 }
@@ -97,21 +98,87 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
                 val grad2 = yRight - y
 
                 if ((grad1 * grad2).absoluteValue <= 1) {
+                    printdbg(this, "Trying to plant tree at $x, $y")
+
                     val rnd = Math.random()
                     val biome = biomeMap[LandUtil.getBlockAddr(world, x, y)] ?: 0
-                    val prob = treegenProbabilityToBiome[biome]!!
+                    val prob = treegenProbabilityToBiome[biome] ?: 0.0
 
                     // actually plant a tree
-                    if (rnd < prob) {
-
+                    if (prob > 0.0 && rnd < prob) {
+                        plantTree(x, y, 0, 1) // TODO randomly select species and small/large tree
                     }
                 }
             }
-
-
-            for (y in grassMap[x - xs.first]) {
-            }
         }
+    }
+
+    // don't use POI -- generate tiles using code for randomisation
+    /**
+     * @param y where the grass/dirt tile is
+     */
+    private fun plantTree(x: Int, y: Int, type: Int, size: Int) {
+        val trunk = "basegame:" + ((if (size >= 1) 64 else 72) + type)
+        val foliage = "basegame:" + (112 + type)
+
+        var growCnt = 1
+        if (size == 1) {
+            var heightSum = 5+3+2+1
+            // check for minimum height
+            if ((1..heightSum).any { BlockCodex[world.getTileFromTerrain(x, y - it)].isSolid }) {
+                printdbg(this, "Ceiling not tall enough, aborting")
+                return
+            }
+
+            // roll for dice until we get a height that fits into the given terrain
+            var stem=0; var bulb1=0; var bulb2=0; var bulb3=0;
+//            do {
+                stem = 7 + fudgeN(2)
+                bulb1 = 4 + fudgeN(1)
+                bulb2 = 3 + fudgeN(1)
+                bulb3 = 2 + fudgeN(1)
+                heightSum = stem + bulb1 + bulb2 + bulb3
+//            }
+//            while ((1..heightSum).none { BlockCodex[world.getTileFromTerrain(x, y - it)].isSolid })
+
+            printdbg(this, "Planting tree; params: $stem, $bulb1, $bulb2, $bulb3")
+
+            // trunk
+            for (i in 0 until stem) {
+                for (xi in -1..+1) {
+                    world.setTileTerrain(x + xi, y - growCnt, if (xi == 0) trunk else Block.AIR, true)
+                }
+                growCnt += 1
+            }
+            // bulb base
+            for (x in x-2..x+2) {
+                world.setTileTerrain(x, y - growCnt, foliage, true)
+            }
+            growCnt += 1
+            // bulb 1
+            for (i in 0 until bulb1) {
+                for (x in x-3..x+3) {
+                    world.setTileTerrain(x, y - growCnt, foliage, true)
+                }
+                growCnt += 1
+            }
+            // bulb 2
+            for (i in 0 until bulb2) {
+                for (x in x-2..x+2) {
+                    world.setTileTerrain(x, y - growCnt, foliage, true)
+                }
+                growCnt += 1
+            }
+            // bulb 3
+            for (i in 0 until bulb3) {
+                for (x in x-1..x+1) {
+                    world.setTileTerrain(x, y - growCnt, foliage, true)
+                }
+                growCnt += 1
+            }
+
+        }
+        else throw IllegalArgumentException("Unknown tree size: $size")
     }
 
     /**
@@ -134,10 +201,16 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
 
         return r
     }
+
+    /**
+     * @return normally distributed integer, for `maxvar=1`, `[-1, 0, 1]`; for `maxvar=2`, `[-2, -1, 0, 1, 2]`, etc.
+     */
+    private fun fudgeN(maxvar: Int) = (0 until maxvar).sumOf { (Math.random() * 3).toInt() - 1 }
+
 }
 
 data class TreegenParams(
     val woodlandsTreeDist: Int = 9, // distances are merely a suggestion tho
-    val shrublandsTreeDist: Int = 14,
-    val plainsTreeDist: Int = 21,
+    val shrublandsTreeDist: Int = 12,
+    val plainsTreeDist: Int = 16,
 )

@@ -48,6 +48,11 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
         CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer01"),
         CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer02"),
         CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
+        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
+        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
+        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
+        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
+        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
     )
 
     val drawWidth = Toolkit.drawWidth
