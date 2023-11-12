@@ -9,9 +9,10 @@ import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIOME_KEY_PLAINS
-import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIOME_KEY_SHRUBLANDS
+import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIOME_KEY_SPARSE_WOODS
 import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIOME_KEY_WOODLANDS
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.serialise.toUint
 import kotlin.math.absoluteValue
 
 /**
@@ -40,7 +41,7 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
     private val treegenProbabilityToBiome = hashMapOf(
         0.toByte() to 0.0,
         BIOME_KEY_WOODLANDS to 1.0/params.woodlandsTreeDist,
-        BIOME_KEY_SHRUBLANDS to 1.0/params.shrublandsTreeDist,
+        BIOME_KEY_SPARSE_WOODS to 1.0/params.shrublandsTreeDist,
         BIOME_KEY_PLAINS to 1.0/params.plainsTreeDist,
     )
 
@@ -54,10 +55,7 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
             var y = 1
             var tileUp = world.getTileFromTerrain(x, y - 1)
             var tile = world.getTileFromTerrain(x, y)
-            var tileProp = BlockCodex[tile]
             while (y < 800) {
-                if (tileProp.hasAnyTagOf("ROCK", "STONE")) break
-
                 if (tile == Block.GRASS && tileUp == Block.AIR) {
                     ys.add(y)
                 }
@@ -66,7 +64,6 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
 
                 tileUp = tile
                 tile = world.getTileFromTerrain(x, y)
-                tileProp = BlockCodex[tile]
             }
 
             r[x - xs.first] = ys
@@ -75,8 +72,75 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
         return r
     }
 
+    private val posTreeLarge = arrayOf(arrayOf(arrayOf(2), arrayOf(6)))
+    private val posTreeSmall = arrayOf(arrayOf(arrayOf(2, 3), arrayOf(6, 7)), arrayOf(arrayOf(2, 3, 6, 7), arrayOf(4, 5)))
+
+    private val treePlot1 = arrayOf(2, 3)
+    private val treePlot2 = arrayOf(6, 7)
+    private val treePlotM = arrayOf(4, 5)
+
     private fun tryToPlant(xs: IntProgression, grassMap: Array<List<Int>>) {
-        for (x in xs.first+1..xs.last-1) {
+        val treeSpecies = 0
+
+
+        // single "slice" is guaranteed to be 9 blocks wide
+        val treePlantable = grassMap.zip(xs.first..xs.last).flatMap { (ys, x) ->
+            ys.map { y -> x to y }
+        }
+        // larger value = more likely to spawn large tree
+        // range: [0, 3]
+        val woodsWgt = treePlantable.map { (x, y) -> (biomeMap[LandUtil.getBlockAddr(world, x, y)] ?: 0).toUint().and(3) }.average()
+
+        val treeToSpawn = when (woodsWgt) { // . - none (0) o - shrub (1) ! - small tree (2) $ - large tree (3)
+            // 0: . .
+            // 1:  o
+            // 2: ! . / . !
+            // 3: ! !
+            // 4: $ ! / ! $
+            // 5: $ $
+            in 2.75..3.0 -> {
+                listOf(3, 3)
+            }
+            in 2.25..2.75 -> {
+                if (Math.random() < 0.5) listOf(2, 3) else listOf(3, 2)
+            }
+            in 1.75..2.25 -> {
+                listOf(2, 2)
+            }
+            in 1.25..1.75 -> {
+                if (Math.random() < 0.5) listOf(0, 2) else listOf(2, 0)
+            }
+            in 0.75..1.25 -> {
+                listOf(1)
+            }
+            else -> listOf()
+        }
+
+        when (treeToSpawn.size) {
+            2 -> {
+                val plot1 = if (treeToSpawn[0] < 3) treePlot1.random() else treePlot1[0]
+                val plot2 = if (treeToSpawn[1] < 3) treePlot2.random() else treePlot2[0]
+
+                // if there is no grass, grassMap[x] is an empty list
+                grassMap[plot1].let { if (it.isEmpty()) null else it.random() }?.let {
+                    plantTree(xs.first + plot1, it, treeSpecies, 1) // TODO use treeSize from the treeToSpawn
+                }
+                grassMap[plot2].let { if (it.isEmpty()) null else it.random() }?.let {
+                   plantTree(xs.first + plot2, it, treeSpecies, 1) // TODO use treeSize from the treeToSpawn
+                }
+            }
+            1 -> {
+                val plot1 = if (treeToSpawn[0] < 3) treePlotM.random() else treePlotM[0]
+
+                // if there is no grass, grassMap[x] is an empty list
+                grassMap[plot1].let { if (it.isEmpty()) null else it.random() }?.let {
+                    plantTree(xs.first + plot1, it, treeSpecies, 1) // TODO use treeSize from the treeToSpawn
+                }
+            }
+        }
+
+
+        /*for (x in xs.first+1..xs.last-1) {
             grassMap[x - xs.first].forEachIndexed { index, y ->
                 val yLeft = grassMap[x - xs.first - 1].getOrNull(index) ?: -1
                 val yRight = grassMap[x - xs.first + 1].getOrNull(index) ?: -1
@@ -97,7 +161,7 @@ class Treegen(world: GameWorld, seed: Long, params: TreegenParams, val biomeMap:
                     }
                 }
             }
-        }
+        }*/
     }
 
     // don't use POI -- generate tiles using code for randomisation

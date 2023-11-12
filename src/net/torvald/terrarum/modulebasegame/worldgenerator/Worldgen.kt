@@ -75,7 +75,7 @@ object Worldgen {
         caveAttenuateBiasScaled = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
         biomeMap = HashMap()
 
-        genSlices = max(threadExecutor.threadCount, world.width / 9)
+        genSlices = world.width / 9
 
 
         val jobs = getJobs()

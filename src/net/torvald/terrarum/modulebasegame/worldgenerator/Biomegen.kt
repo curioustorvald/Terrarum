@@ -87,9 +87,18 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
         private const val LF = 6
         private const val RH = 7
 
-        const val BIOME_KEY_WOODLANDS = 1.toByte()
-        const val BIOME_KEY_SHRUBLANDS = 2.toByte()
-        const val BIOME_KEY_PLAINS = 3.toByte()
+        /* Biome key format:
+
+        0x r 0000 ww
+
+        r: rocky?
+        ww: woods density
+
+         */
+
+        const val BIOME_KEY_PLAINS = 1.toByte()
+        const val BIOME_KEY_SPARSE_WOODS = 2.toByte()
+        const val BIOME_KEY_WOODLANDS = 3.toByte()
         const val BIOME_KEY_ROCKY = (-1).toByte()
         const val BIOME_KEY_SANDY = (-2).toByte()
         const val BIOME_KEY_GRAVELS = (-3).toByte()
@@ -117,9 +126,9 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
                     }
                     else null to null
                 }
-                1 -> { // shrublands
+                1 -> { // sparse forest
                     if (tileThis == Block.DIRT && exposedToAir) {
-                        biomeMapOut[ba] = BIOME_KEY_SHRUBLANDS
+                        biomeMapOut[ba] = BIOME_KEY_SPARSE_WOODS
                         Block.GRASS to null
                     }
                     else null to null
