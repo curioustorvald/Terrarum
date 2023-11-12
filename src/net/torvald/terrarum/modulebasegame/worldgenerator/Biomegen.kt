@@ -27,7 +27,11 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
 
 
     override fun getDone(loadscreen: LoadScreenBase) {
-        val SAND_RND = seed.ushr(7).xor(seed and 255L).and(255L).toInt()
+        loadscreen.stageValue += 1
+        loadscreen.progress.set(0L)
+
+
+        val SAND_RND = (seed shake "SANDYCOLOURS").ushr(7).xor(seed and 255L).and(255L).toInt()
         val SAND_BASE = when (SAND_RND) {
             255 -> 5 // green
             in 252..254 -> 4 // black
@@ -58,6 +62,9 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
                         draw(x, y, noise, world)
                     }
                 }
+
+
+                loadscreen.progress.addAndGet((xs.last - xs.first + 1).toLong())
             }
         }
 

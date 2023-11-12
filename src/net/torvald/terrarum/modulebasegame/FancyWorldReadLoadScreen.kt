@@ -26,6 +26,12 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
         CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer03") {
             Texture(ModMgr.getGdxFile("basegame", "gui/loadscr_layer03.png"))
         }
+        CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer04") {
+            Texture(ModMgr.getGdxFile("basegame", "gui/loadscr_layer04.png"))
+        }
+        CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer05") {
+            Texture(ModMgr.getGdxFile("basegame", "gui/loadscr_layer05.png"))
+        }
         CommonResourcePool.loadAll()
 
         App.disposables.add(this)
@@ -48,11 +54,11 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
         CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer01"),
         CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer02"),
         CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
+        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer04"),
+        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer05"),
+        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer05"),
+        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer05"),
+        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer05"),
     )
 
     val drawWidth = Toolkit.drawWidth
