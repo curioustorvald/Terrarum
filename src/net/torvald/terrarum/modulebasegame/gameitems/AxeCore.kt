@@ -17,6 +17,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import org.dyn4j.geometry.Vector2
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2023-11-13.
@@ -109,6 +110,7 @@ object AxeCore {
                             if (propHere.hasTag("TREETRUNK")) {
                                 INGAME.world.setTileTerrain(x, y - upCtr, Block.AIR, false)
                                 PickaxeCore.dropItem(propHere.drop, x, y - upCtr) // todo use log item if applicable
+                                PickaxeCore.makeDust(tile, x, y - upCtr, 2 + Math.random().roundToInt())
                             }
                             else if (propHere.hasTag("LEAVES")) {
                                 if (thisLeaf == null) thisLeaf = tileHere
@@ -141,7 +143,6 @@ object AxeCore {
                         }
                         // drop the item under cursor
                         PickaxeCore.dropItem(BlockCodex[tileBroken].drop, x, y) // todo use log item if applicable
-
                         PickaxeCore.makeDust(tile, x, y, 9)
                     }
                     // tile not busted
@@ -164,6 +165,7 @@ object AxeCore {
     }
 
     private fun removeLeaf(x: Int, y: Int, species: Int) {
+        val tileBack = INGAME.world.getTileFromTerrain(x, y)
         INGAME.world.setTileTerrain(x, y, Block.AIR, false)
         // drop items
         when (Math.random()) {
@@ -172,6 +174,7 @@ object AxeCore {
             else -> null
         }?.let {
             PickaxeCore.dropItem(it, x, y)
+            PickaxeCore.makeDust(tileBack, x, y, 2 + Math.random().roundToInt())
         }
     }
 
