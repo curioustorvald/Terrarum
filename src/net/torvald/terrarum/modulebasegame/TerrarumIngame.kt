@@ -1422,7 +1422,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val punchSize = actor.scale * actor.actorValue.getAsDouble(AVKey.BAREHAND_BASE_DIGSIZE)!!
         val punchBlockSize = punchSize.div(TILE_SIZED).floorToInt()
 
-        val mouseUnderPunchableTreeTrunk = BlockCodex[world.getTileFromTerrain(mtx, mty)].hasAllTagOf("TREETRUNK", "TREESMALL")
+        val mouseUnderPunchableTree = BlockCodex[world.getTileFromTerrain(mtx, mty)].hasAnyTagOf("LEAVES", "TREESMALL")
 
         // if there are attackable actor or fixtures
         val actorsUnderMouse: List<ActorWithBody> = getActorsAtVicinity(mwx, mwy, punchSize / 2.0).sortedBy {
@@ -1462,8 +1462,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 }
             }
         }
-        // TODO punch a small tree/shrub
-        else if (mouseUnderPunchableTreeTrunk) {
+        // punch a small tree/shrub
+        else if (mouseUnderPunchableTree) {
             barehandAxeInUse = true
             AxeCore.startPrimaryUse(actor, delta, null, mtx, mty, punchBlockSize.coerceAtLeast(1), punchBlockSize.coerceAtLeast(1), listOf("TREESMALL"))
         }

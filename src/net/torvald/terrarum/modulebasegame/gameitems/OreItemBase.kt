@@ -37,7 +37,7 @@ class ItemOakLogs(originalID: ItemID) : OreItemBase(originalID) {
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,10)
 }
 
-class ItemOakSEED(originalID: ItemID) : OreItemBase(originalID) {
+class ItemOakSeed(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ACORN_OAK"
     override val materialId = "WOOD"
     override val itemImage: TextureRegion

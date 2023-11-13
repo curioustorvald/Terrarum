@@ -16,7 +16,9 @@ id;classname
 15;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerWood
 16;net.torvald.terrarum.modulebasegame.gameitems.ItemWorkbench
 17;net.torvald.terrarum.modulebasegame.gameitems.ItemCoalCoke
+18;net.torvald.terrarum.modulebasegame.gameitems.OreStick
 
+# ores
 128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper
 129;net.torvald.terrarum.modulebasegame.gameitems.OreIron
 130;net.torvald.terrarum.modulebasegame.gameitems.OreCoal
@@ -25,6 +27,16 @@ id;classname
 133;net.torvald.terrarum.modulebasegame.gameitems.OreGold
 134;net.torvald.terrarum.modulebasegame.gameitems.OreSilver
 135;net.torvald.terrarum.modulebasegame.gameitems.OreLead
+
+# gemstones
+#144; gems
+
+# tree seeds by tree species
+160;net.torvald.terrarum.modulebasegame.gameitems.ItemOakSeed
+
+# tree logs
+168;net.torvald.terrarum.modulebasegame.gameitems.ItemOakLogs
+
 
 256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak
 257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony

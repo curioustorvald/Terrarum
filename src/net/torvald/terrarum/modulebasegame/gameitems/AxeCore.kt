@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -10,6 +11,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRangeTools
 import net.torvald.terrarum.gameparticles.createRandomBlockParticle
 import net.torvald.terrarum.itemproperties.Calculate
+import net.torvald.terrarum.itemproperties.Item
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
@@ -24,6 +26,8 @@ object AxeCore {
         actor: ActorWithBody, delta: Float, item: GameItem?, mx: Int, my: Int,
         mw: Int = 1, mh: Int = 1, additionalCheckTags: List<String> = listOf()
     ) = mouseInInteractableRangeTools(actor, item) {
+        val mh = 1
+
         // un-round the mx
         val ww = INGAME.world.width
         val hpww = ww * TerrarumAppConfiguration.TILE_SIZE / 2
@@ -39,6 +43,8 @@ object AxeCore {
         if (mh % 2 == 0 && apos.y > my * TerrarumAppConfiguration.TILE_SIZE) yoff += 1
 
         var usageStatus = false
+
+        val branchSize = if (item == null) 3 else 4
 
         for (oy in 0 until mh) for (ox in 0 until mw) {
             val x = mx + xoff + ox
@@ -60,8 +66,8 @@ object AxeCore {
             if (!ret1) return ret1*/
 
 
-            // check if tile under mouse is a tree
-            if (BlockCodex[tile].hasAllTag(listOf("TREE", "TREETRUNK") + additionalCheckTags)) {
+            // check if tile under mouse is leaves
+            if (BlockCodex[tile].hasTag("LEAVES")) {
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
@@ -71,14 +77,62 @@ object AxeCore {
                 ).let { tileBroken ->
                     // tile busted
                     if (tileBroken != null) {
-                        var upCtr = 0
+                        removeLeaf(x, y, tileBroken.substringAfter(':').toInt() - 112)
+                        PickaxeCore.makeDust(tile, x, y, 9)
+                    }
+                    // tile not busted
+                    if (Math.random() < actionInterval) {
+                        PickaxeCore.makeDust(tile, x, y, 1)
+                    }
+                }
+
+                usageStatus = usageStatus or true
+            }
+            // check if tile under mouse is a tree
+            else if (BlockCodex[tile].hasAllTag(listOf("TREE", "TREETRUNK") + additionalCheckTags)) {
+                val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+                val swingDmgToFrameDmg = delta.toDouble() / actionInterval
+
+                INGAME.world.inflictTerrainDamage(
+                    x, y,
+                    Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg
+                ).let { tileBroken ->
+                    // tile busted
+                    if (tileBroken != null) {
+                        var upCtr = 1
+                        var thisLeaf: ItemID? = null
                         while (true) {
                             val tileHere = INGAME.world.getTileFromTerrain(x, y - upCtr)
+                            val propHere = BlockCodex[tileHere]
 
-                            if (BlockCodex[tileHere].hasTag("TREETRUNK")) {
-                                PickaxeCore.dropItem(tileHere, x, y - upCtr) // todo use log item
+                            if (propHere.hasTag("TREETRUNK")) {
+                                INGAME.world.setTileTerrain(x, y - upCtr, Block.AIR, false)
+                                PickaxeCore.dropItem(tileHere, x, y - upCtr) // todo use log item if applicable
                             }
-                            else { // TODO check for leaves
+                            else if (propHere.hasTag("LEAVES")) {
+                                if (thisLeaf == null) thisLeaf = tileHere
+                                // only remove leaves that matches the species
+                                // scan horizontally left
+                                for (l in -1 downTo -branchSize) {
+                                    val tileBranch = INGAME.world.getTileFromTerrain(x + l, y - upCtr)
+                                    if (tileBranch == thisLeaf)
+                                        removeLeaf(x + l, y - upCtr, thisLeaf.substringAfter(':').toInt() - 112)
+                                    else break
+                                }
+                                // scan horizontally right
+                                for (l in 1 .. branchSize) {
+                                    val tileBranch = INGAME.world.getTileFromTerrain(x + l, y - upCtr)
+                                    if (tileBranch == thisLeaf)
+                                        removeLeaf(x + l, y - upCtr, thisLeaf.substringAfter(':').toInt() - 112)
+                                    else break
+                                }
+                                // deal with the current tile
+                                val tileBranch = INGAME.world.getTileFromTerrain(x, y - upCtr)
+                                if (tileBranch == thisLeaf)
+                                    removeLeaf(x, y - upCtr, thisLeaf.substringAfter(':').toInt() - 112)
+                                else break
+                            }
+                            else {
                                 break
                             }
 
@@ -104,6 +158,18 @@ object AxeCore {
 
 
         usageStatus
+    }
+
+    private fun removeLeaf(x: Int, y: Int, species: Int) {
+        INGAME.world.setTileTerrain(x, y, Block.AIR, false)
+        // drop items
+        when (Math.random()) {
+            in 0.0..0.10 -> Item.TREE_STICK
+            in 0.20..0.26 -> "item@basegame:${160+species}"
+            else -> null
+        }?.let {
+            PickaxeCore.dropItem(it, x, y)
+        }
     }
 
     fun endPrimaryUse(actor: ActorWithBody, item: GameItem?): Boolean {

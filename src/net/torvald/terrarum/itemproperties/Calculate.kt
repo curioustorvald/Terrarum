@@ -26,7 +26,7 @@ object Calculate {
     }
 
     @JvmStatic fun hatchetPower(actor: ActorWithBody, material: Material?): Float {
-        return (8.0 * (material?.forceMod?.toDouble() ?: 1.0).sqrt() * (actor.avStrength / 1000.0)).toFloat()
+        return (1.0 * (material?.forceMod?.toDouble() ?: 1.0).sqrt() * (actor.avStrength / 1000.0)).toFloat()
     }
 
     private val fallDamageDampenMult = (32.0 / 1176.0).sqr()
