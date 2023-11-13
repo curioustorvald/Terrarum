@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
@@ -15,6 +16,8 @@ import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.itemproperties.Item
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
+import net.torvald.terrarum.modulebasegame.gameitems.AxeCore.BASE_MASS_AND_SIZE
+import net.torvald.terrarum.modulebasegame.gameitems.AxeCore.TOOL_DURABILITY_BASE
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
@@ -187,5 +190,122 @@ object AxeCore {
 
     const val BASE_MASS_AND_SIZE = 10.0 // of iron pick
     const val TOOL_DURABILITY_BASE = 350 // of iron pick
+
+}
+
+/**
+ * Created by minjaesong on 2023-11-14.
+ */
+class AxeCopper(originalID: ItemID) : GameItem(originalID) {
+    internal constructor() : this("-uninitialised-")
+
+    override var baseToolSize: Double? = BASE_MASS_AND_SIZE
+    override var inventoryCategory = Category.TOOL
+    override val isDynamic = true
+    override val materialId = "CUPR"
+    override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,0)
+
+    init {
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
+        durability = maxDurability.toFloat()
+        tags.add("AXE")
+        originalName = "ITEM_HATCHET_COPPER"
+    }
+
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
+        if (AxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = AxeCore.endPrimaryUse(actor, this)
+//    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = AxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+    override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
+
+}
+/**
+ * Created by minjaesong on 2023-11-14.
+ */
+class AxeIron(originalID: ItemID) : GameItem(originalID) {
+    internal constructor() : this("-uninitialised-")
+
+    override var baseToolSize: Double? = BASE_MASS_AND_SIZE
+    override var inventoryCategory = Category.TOOL
+    override val isDynamic = true
+    override val materialId = "IRON"
+    override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(4,0)
+
+    init {
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
+        durability = maxDurability.toFloat()
+        tags.add("AXE")
+        originalName = "ITEM_HATCHET_IRON"
+    }
+
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
+        if (AxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = AxeCore.endPrimaryUse(actor, this)
+    //    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = AxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+    override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
+
+}
+/**
+ * Created by minjaesong on 2023-11-14.
+ */
+class AxeSteel(originalID: ItemID) : GameItem(originalID) {
+    internal constructor() : this("-uninitialised-")
+
+    override var baseToolSize: Double? = BASE_MASS_AND_SIZE
+    override var inventoryCategory = Category.TOOL
+    override val isDynamic = true
+    override val materialId = "STAL"
+    override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(5,0)
+
+    init {
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
+        durability = maxDurability.toFloat()
+        tags.add("AXE")
+        originalName = "ITEM_HATCHET_STEEL"
+    }
+
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
+        if (AxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = AxeCore.endPrimaryUse(actor, this)
+    //    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = AxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+    override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
+
+}
+/**
+ * Created by minjaesong on 2023-11-14.
+ */
+class AxeWood(originalID: ItemID) : GameItem(originalID) {
+    internal constructor() : this("-uninitialised-")
+
+    override var baseToolSize: Double? = BASE_MASS_AND_SIZE
+    override var inventoryCategory = Category.TOOL
+    override val isDynamic = true
+    override val materialId = "WOOD"
+    override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,4)
+
+    init {
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
+        durability = maxDurability.toFloat()
+        tags.add("AXE")
+        originalName = "ITEM_HATCHET_WOODEN"
+    }
+
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
+        if (AxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = AxeCore.endPrimaryUse(actor, this)
+    //    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = AxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+    override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
 
 }

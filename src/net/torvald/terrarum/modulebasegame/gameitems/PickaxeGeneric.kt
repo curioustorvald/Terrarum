@@ -313,7 +313,7 @@ class PickaxeWood(originalID: ItemID) : GameItem(originalID) {
         maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
         durability = maxDurability.toFloat()
         tags.add("PICK")
-        originalName = "ITEM_PICK_WOOD"
+        originalName = "ITEM_PICK_WOODEN"
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =

@@ -17,6 +17,10 @@ id;classname
 16;net.torvald.terrarum.modulebasegame.gameitems.ItemWorkbench
 17;net.torvald.terrarum.modulebasegame.gameitems.ItemCoalCoke
 18;net.torvald.terrarum.modulebasegame.gameitems.OreStick
+19;net.torvald.terrarum.modulebasegame.gameitems.AxeCopper
+20;net.torvald.terrarum.modulebasegame.gameitems.AxeIron
+21;net.torvald.terrarum.modulebasegame.gameitems.AxeSteel
+22;net.torvald.terrarum.modulebasegame.gameitems.AxeWood
 
 # ores
 128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper
