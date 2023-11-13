@@ -153,7 +153,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // - using any item that is not fixture (blocks, picks)
             // DON'T unlatch when:
             // - performing barehand action
-            if (!Terrarum.mouseDown || inventoryCategoryAllowClickAndDrag.contains(ItemCodex[itemOnGrip]?.inventoryCategory)) {
+            if (!Terrarum.mouseDown || inventoryCategoryAllowClickAndDrag.contains(ItemCodex[itemOnGrip]?.inventoryCategory) || ItemCodex[itemOnGrip]?.tags?.contains("ACTINGBLOCK") == true) {
                 worldPrimaryClickLatched = false
             }
 

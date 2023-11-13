@@ -32,10 +32,16 @@ id;classname
 #144; gems
 
 # tree seeds by tree species
-160;net.torvald.terrarum.modulebasegame.gameitems.ItemOakSeed
+160;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedOak
+161;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedEbony
+162;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedBirch
+163;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedRosewood
 
 # tree logs
-168;net.torvald.terrarum.modulebasegame.gameitems.ItemOakLogs
+168;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsOak
+169;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsEbony
+170;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsBirch
+171;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsRosewood
 
 
 256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak

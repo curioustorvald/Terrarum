@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
@@ -107,7 +108,7 @@ object AxeCore {
 
                             if (propHere.hasTag("TREETRUNK")) {
                                 INGAME.world.setTileTerrain(x, y - upCtr, Block.AIR, false)
-                                PickaxeCore.dropItem(tileHere, x, y - upCtr) // todo use log item if applicable
+                                PickaxeCore.dropItem(propHere.drop, x, y - upCtr) // todo use log item if applicable
                             }
                             else if (propHere.hasTag("LEAVES")) {
                                 if (thisLeaf == null) thisLeaf = tileHere
@@ -138,6 +139,8 @@ object AxeCore {
 
                             upCtr += 1
                         }
+                        // drop the item under cursor
+                        PickaxeCore.dropItem(BlockCodex[tileBroken].drop, x, y) // todo use log item if applicable
 
                         PickaxeCore.makeDust(tile, x, y, 9)
                     }

@@ -33,7 +33,7 @@ object BlockBase {
             val heldProp = BlockCodex[itemID]
 
             // check for collision with actors (solid terrain block only)
-            if (gameItem.inventoryCategory == GameItem.Category.BLOCK && heldProp.isSolid) {
+            if ((gameItem.inventoryCategory == GameItem.Category.BLOCK || gameItem.tags.contains("ACTINGBLOCK")) && heldProp.isSolid) {
                 var ret1 = true
                 ingame.actorContainerActive.filter { it is ActorWithBody }.forEach { val it = it as ActorWithBody
                     if ((it is FixtureBase || it.physProp.usePhysics) && it.intTilewiseHitbox.intersects(mousePoint))

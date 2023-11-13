@@ -30,19 +30,79 @@ open class OreItemBase(originalID: ItemID) : GameItem(originalID) {
 }
 
 /* Wooden Log is a block */
-class ItemOakLogs(originalID: ItemID) : OreItemBase(originalID) {
+class ItemLogsOak(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_LOGS_OAK"
     override val materialId = "WOOD"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,10)
+
+    init { tags.add("ACTINGBLOCK") }
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
+        return BlockBase.blockStartPrimaryUse(actor, this, "basegame:72", delta)
+    }
+}
+class ItemLogsEbony(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_LOGS_EBONY"
+    override val materialId = "WOOD"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,10)
+
+    init { tags.add("ACTINGBLOCK") }
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
+        return BlockBase.blockStartPrimaryUse(actor, this, "basegame:73", delta)
+    }
+}
+class ItemLogsBirch(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_LOGS_BIRCH"
+    override val materialId = "WOOD"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,10)
+
+    init { tags.add("ACTINGBLOCK") }
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
+        return BlockBase.blockStartPrimaryUse(actor, this, "basegame:74", delta)
+    }
+}
+class ItemLogsRosewood(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_LOGS_ROSEWOOD"
+    override val materialId = "WOOD"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,10)
+
+    init { tags.add("ACTINGBLOCK") }
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
+        return BlockBase.blockStartPrimaryUse(actor, this, "basegame:75", delta)
+    }
 }
 
-class ItemOakSeed(originalID: ItemID) : OreItemBase(originalID) {
-    override var originalName = "ITEM_ACORN_OAK"
-    override val materialId = "WOOD"
+
+
+class ItemSeedOak(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_SEED_OAK"
+    override val materialId = "OOZE"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,11)
 }
+class ItemSeedEbony(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_SEED_EBONY"
+    override val materialId = "OOZE"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,11)
+}
+class ItemSeedBirch(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_SEED_BIRCH"
+    override val materialId = "OOZE"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,11)
+}
+class ItemSeedRosewood(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_SEED_ROSEWOOD"
+    override val materialId = "OOZE"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,11)
+}
+
+
 
 class OreStick(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_WOOD_STICK"
