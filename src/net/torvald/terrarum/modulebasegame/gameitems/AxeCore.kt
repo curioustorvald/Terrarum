@@ -67,22 +67,24 @@ object AxeCore {
 
                 INGAME.world.inflictTerrainDamage(
                     x, y,
-                    Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg
+                    Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg
                 ).let { tileBroken ->
                     // tile busted
                     if (tileBroken != null) {
-                        // make tree fell by scanning upwards
-                        TODO()
-                        var drop = ""
-                        if (drop.isNotBlank()) {
-                            INGAME.queueActorAddition(
-                                DroppedItem(
-                                    drop,
-                                    (x + 0.5) * TerrarumAppConfiguration.TILE_SIZED,
-                                    (y + 1.0) * TerrarumAppConfiguration.TILE_SIZED
-                                )
-                            )
+                        var upCtr = 0
+                        while (true) {
+                            val tileHere = INGAME.world.getTileFromTerrain(x, y - upCtr)
+
+                            if (BlockCodex[tileHere].hasTag("TREETRUNK")) {
+                                PickaxeCore.dropItem(tileHere, x, y - upCtr) // todo use log item
+                            }
+                            else { // TODO check for leaves
+                                break
+                            }
+
+                            upCtr += 1
                         }
+
                         PickaxeCore.makeDust(tile, x, y, 9)
                     }
                     // tile not busted
@@ -104,45 +106,8 @@ object AxeCore {
         usageStatus
     }
 
-    private val pixelOffs = intArrayOf(2, 7, 12) // hard-coded assuming TILE_SIZE=16
-    fun makeDust(tile: ItemID, x: Int, y: Int, density: Int = 9, drawCol: Color = Color.WHITE) {
-        val pw = 3
-        val ph = 3
-        val xo = App.GLOBAL_RENDER_TIMER and 1
-        val yo = App.GLOBAL_RENDER_TIMER.ushr(1) and 1
-
-        val renderTag = App.tileMaker.getRenderTag(tile)
-        val baseTilenum = renderTag.tileNumber
-        val representativeTilenum = when (renderTag.maskType) {
-            CreateTileAtlas.RenderTag.MASK_47 -> 17
-            CreateTileAtlas.RenderTag.MASK_PLATFORM -> 7
-            else -> 0
-        }
-        val tileNum = baseTilenum + representativeTilenum // the particle won't match the visible tile anyway because of the seasons stuff
-
-        val indices = (0..8).toList().shuffled().subList(0, density)
-        for (it in indices) {
-            val u = pixelOffs[it % 3]
-            val v = pixelOffs[it / 3]
-            val pos = Vector2(
-                TerrarumAppConfiguration.TILE_SIZED * x + u + xo + 0.5,
-                TerrarumAppConfiguration.TILE_SIZED * y + v + yo + 2,
-            )
-            val veloMult = Vector2(
-                1.0 * (if (Math.random() < 0.5) -1 else 1),
-                (2.0 - (it / 3)) / 2.0 // 1, 0.5, 0
-            )
-            createRandomBlockParticle(tileNum, pos, veloMult, u, v, pw, ph).let {
-                it.despawnUponCollision = true
-                it.drawColour.set(drawCol)
-                (Terrarum.ingame as TerrarumIngame).addParticle(it)
-            }
-        }
-    }
-
-    fun endPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem): Boolean {
-
-        item.using = false
+    fun endPrimaryUse(actor: ActorWithBody, item: GameItem?): Boolean {
+        item?.using = false
         // reset action timer to zero
         actor.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
         return true

@@ -103,7 +103,7 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
     }
 
     protected open fun getStage(): Int {
-        return 3 // fixed value for Read screen
+        return 5 // fixed value for Read screen
     }
 
     protected val batchColour = Color(-1) // create new Color instance just for the progress bar

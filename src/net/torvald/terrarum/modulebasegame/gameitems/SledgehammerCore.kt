@@ -101,7 +101,7 @@ object SledgehammerCore {
                     if (Math.random() < dropProbability) {
                         val drop = BlockCodex[tileBroken].drop
                         if (drop.isNotBlank()) {
-                            INGAME.queueActorAddition(DroppedItem("wall@$drop", (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
+                            PickaxeCore.dropItem("wall@$drop", x, y)
                         }
                         PickaxeCore.makeDust(wall, x, y, 9, WALL_OVERLAY_COLOUR)
                     }
@@ -119,9 +119,8 @@ object SledgehammerCore {
         usageStatus
     }
 
-    fun endPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem): Boolean {
-
-        item.using = false
+    fun endPrimaryUse(actor: ActorWithBody, item: GameItem?): Boolean {
+        item?.using = false
         // reset action timer to zero
         actor.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
         return true
@@ -152,7 +151,7 @@ class SledgehammerCopper(originalID: ItemID) : GameItem(originalID) {
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
         if (SledgehammerCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
-    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = SledgehammerCore.endPrimaryUse(actor, delta, this)
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = SledgehammerCore.endPrimaryUse(actor, this)
 }
 
 class SledgehammerIron(originalID: ItemID) : GameItem(originalID) {
@@ -176,7 +175,7 @@ class SledgehammerIron(originalID: ItemID) : GameItem(originalID) {
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
         if (SledgehammerCore.startPrimaryUse(actor , delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
-    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = SledgehammerCore.endPrimaryUse(actor, delta, this)
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = SledgehammerCore.endPrimaryUse(actor, this)
 }
 
 class SledgehammerSteel(originalID: ItemID) : GameItem(originalID) {
@@ -200,7 +199,7 @@ class SledgehammerSteel(originalID: ItemID) : GameItem(originalID) {
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
         if (SledgehammerCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
-    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = SledgehammerCore.endPrimaryUse(actor, delta, this)
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = SledgehammerCore.endPrimaryUse(actor, this)
 }
 
 /**
@@ -227,5 +226,5 @@ class SledgehammerWood(originalID: ItemID) : GameItem(originalID) {
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
         if (SledgehammerCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
-    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = SledgehammerCore.endPrimaryUse(actor, delta, this)
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = SledgehammerCore.endPrimaryUse(actor, this)
 }

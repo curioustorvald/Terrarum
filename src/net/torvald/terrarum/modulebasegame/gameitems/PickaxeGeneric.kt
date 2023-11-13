@@ -102,7 +102,7 @@ object PickaxeCore {
                             BlockCodex[tileBroken].drop
 
                         if (drop.isNotBlank()) {
-                            INGAME.queueActorAddition(DroppedItem(drop, (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
+                            dropItem(drop, x, y)
                         }
                         makeDust(tile, x, y, 9)
                     }
@@ -118,6 +118,16 @@ object PickaxeCore {
 
 
         usageStatus
+    }
+
+    fun dropItem(item: ItemID, tx: Int, ty: Int) {
+        INGAME.queueActorAddition(
+            DroppedItem(
+                item,
+                (tx + 0.5) * TerrarumAppConfiguration.TILE_SIZED,
+                (ty + 1.0) * TerrarumAppConfiguration.TILE_SIZED
+            )
+        )
     }
 
     private val pixelOffs = intArrayOf(2, 7, 12) // hard-coded assuming TILE_SIZE=16
@@ -156,9 +166,8 @@ object PickaxeCore {
         }
     }
 
-    fun endPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem): Boolean {
-
-        item.using = false
+    fun endPrimaryUse(actor: ActorWithBody, item: GameItem?): Boolean {
+        item?.using = false
         // reset action timer to zero
         actor.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
         return true
@@ -219,7 +228,7 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
             if (PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
-    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, this)
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = PickaxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
     override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
 
@@ -249,7 +258,7 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
             if (PickaxeCore.startPrimaryUse(actor , delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
-    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, this)
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = PickaxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
     override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
 
@@ -279,7 +288,7 @@ class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
             if (PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
-    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, this)
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = PickaxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
     override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
 
@@ -309,7 +318,7 @@ class PickaxeWood(originalID: ItemID) : GameItem(originalID) {
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
         if (PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
-    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, this)
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = PickaxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
     override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
 

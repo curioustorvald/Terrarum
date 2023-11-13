@@ -18,6 +18,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.createRandomBlockParticle
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -356,9 +357,6 @@ open class ActorWithBody : Actor {
     @Transient internal val BASE_FRICTION = 0.3
 
     @Transient internal val BASE_FALLDAMAGE_DAMPEN = 50.0
-    val fallDamageDampening: Double
-        get() = BASE_FALLDAMAGE_DAMPEN * (actorValue.getAsDouble(AVKey.FALLDAMPENMULT) ?: 1.0)
-
 
     var collisionType = COLLISION_DYNAMIC
 
@@ -1107,10 +1105,9 @@ open class ActorWithBody : Actor {
 //                    val avrFeetTileStrength = feetTileStregthSum.toDouble() / feetTileCount
 //                    val adjustedTileStr = avrFeetTileStrength / 1176
 //                    val fallDamageDampenMult = (adjustedTileStr / (adjustedTileStr + 1)).sqr()
-                    val fallDamageDampenMult = (32.0 / 1176.0).sqr()
-                    // slam-into-whatever damage (such dirty; much hack; wow)
-                    //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
-                    collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.PHYS_TIME_FRAME).sqr()) * fallDamageDampenMult * GAME_TO_SI_ACC
+
+                    collisionDamage = Calculate.collisionDamage(this, vectorSum)
+
                     // kg * m / s^2 (mass * acceleration), acceleration -> (vectorMagn / (0.01)^2).gameToSI()
                     // take material softness(?) into account
                     if (collisionDamage != 0.0) debug1("Collision damage: $collisionDamage N")

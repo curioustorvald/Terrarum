@@ -667,7 +667,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         ItemCodex[itemOnGrip]?.endPrimaryUse(actor, delta)
 
         if (canPerformBarehandAction) {
-            actor.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
+            endPerformBarehandAction(actor)
         }
     }
 
@@ -1389,6 +1389,20 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         particlesContainer.appendHead(particle)
     }
 
+    private var barehandAxeInUse = false
+    private var barehandPickInUse = false
+
+    fun endPerformBarehandAction(actor: ActorWithBody) {
+        if (barehandAxeInUse) {
+            barehandAxeInUse = false
+            AxeCore.endPrimaryUse(actor, null)
+        }
+        if (barehandPickInUse) {
+            barehandPickInUse = false
+            PickaxeCore.endPrimaryUse(actor, null)
+        }
+    }
+
     fun performBarehandAction(actor: ActorWithBody, delta: Float, mwx: Double, mwy: Double, mtx: Int, mty: Int) {
 
         val canAttackOrDig = actor.scale * actor.baseHitboxH >= (actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0)
@@ -1450,6 +1464,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
         // TODO punch a small tree/shrub
         else if (mouseUnderPunchableTreeTrunk) {
+            barehandAxeInUse = true
             AxeCore.startPrimaryUse(actor, delta, null, mtx, mty, punchBlockSize.coerceAtLeast(1), punchBlockSize.coerceAtLeast(1), listOf("TREESMALL"))
         }
         // TODO attack a mob
@@ -1458,6 +1473,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // else, punch a block
         else if (canAttackOrDig) {
             if (punchBlockSize > 0) {
+                barehandPickInUse = true
                 PickaxeCore.startPrimaryUse(actor, delta, null, mtx, mty, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize)
             }
         }
