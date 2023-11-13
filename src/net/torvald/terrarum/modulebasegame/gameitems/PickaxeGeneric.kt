@@ -57,7 +57,6 @@ object PickaxeCore {
             val x = mx + xoff + ox
             val y = my + yoff + oy
 
-            val mousePoint = Point2d(x.toDouble(), y.toDouble())
             val actorvalue = actor.actorValue
             val tile = INGAME.world.getTileFromTerrain(x, y)
 
@@ -75,6 +74,12 @@ object PickaxeCore {
 
             // return false if here's no tile
             if (Block.AIR == tile || BlockCodex[tile].isActorBlock) {
+                usageStatus = usageStatus or false
+                continue
+            }
+            // return false for punchable trees
+            // non-punchable trees (= "log" tile placed by log item) must be mineable in order to make them useful as decor tiles
+            if (BlockCodex[tile].hasAllTagOf("TREE", "TREETRUNK", "TREESMALL")) {
                 usageStatus = usageStatus or false
                 continue
             }

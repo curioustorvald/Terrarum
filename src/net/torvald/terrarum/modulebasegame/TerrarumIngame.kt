@@ -31,6 +31,7 @@ import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
+import net.torvald.terrarum.modulebasegame.gameitems.AxeCore
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.terrarum.modulebasegame.gameworld.GameEconomy
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
@@ -1405,6 +1406,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         val punchSize = actor.scale * actor.actorValue.getAsDouble(AVKey.BAREHAND_BASE_DIGSIZE)!!
+        val punchBlockSize = punchSize.div(TILE_SIZED).floorToInt()
+
+        val mouseUnderPunchableTreeTrunk = BlockCodex[world.getTileFromTerrain(mtx, mty)].hasAllTagOf("TREETRUNK", "TREESMALL")
 
         // if there are attackable actor or fixtures
         val actorsUnderMouse: List<ActorWithBody> = getActorsAtVicinity(mwx, mwy, punchSize / 2.0).sortedBy {
@@ -1444,12 +1448,15 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 }
             }
         }
+        // TODO punch a small tree/shrub
+        else if (mouseUnderPunchableTreeTrunk) {
+            AxeCore.startPrimaryUse(actor, delta, null, mtx, mty, punchBlockSize.coerceAtLeast(1), punchBlockSize.coerceAtLeast(1), listOf("TREESMALL"))
+        }
         // TODO attack a mob
 //        else if (mobsUnderHand.size > 0 && canAttackOrDig) {
 //        }
         // else, punch a block
         else if (canAttackOrDig) {
-            val punchBlockSize = punchSize.div(TILE_SIZED).floorToInt()
             if (punchBlockSize > 0) {
                 PickaxeCore.startPrimaryUse(actor, delta, null, mtx, mty, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize)
             }
