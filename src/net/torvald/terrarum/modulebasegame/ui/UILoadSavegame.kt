@@ -191,5 +191,9 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         batch.projectionMatrix = camera.combined
     }
 
+    fun interruptListGenerator() {
+        transitionalListing.cellLoadThread.interrupt()
+    }
+
 }
 

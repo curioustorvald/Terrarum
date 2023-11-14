@@ -84,6 +84,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                     full.loadManageSelectedGame = full.loadables.getLoadableSave()!!
 
                     mode = MODE_LOAD
+
+                    full.interruptListGenerator()
                 }
             }
         }

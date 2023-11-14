@@ -68,7 +68,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
     private var spinnerFrame = 0
     private val spinnerInterval = 1f / 60
 
-    private lateinit var cellLoadThread: Thread
+    internal lateinit var cellLoadThread: Thread
 
     fun advanceMode() {
         App.printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
