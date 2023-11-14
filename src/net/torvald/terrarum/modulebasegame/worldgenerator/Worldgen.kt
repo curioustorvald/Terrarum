@@ -64,6 +64,8 @@ object Worldgen {
             Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")),
             Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, caveAttenuateBiasScaled, params.seed, oreRegistry), listOf("ORES")),
             Work(Lang["MENU_IO_WORLDGEN_POSITIONING_ROCKS"], OregenAutotiling(world, params.seed, oreTilingModes), listOf("ORES")),
+            // TODO generate rock veins
+            // TODO generate gemstones
             Work(Lang["MENU_IO_WORLDGEN_CARVING_EARTH"], Cavegen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
             Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Biomegen(world, params.seed, params.biomegenParams, biomeMap), listOf("BIOME")),
             Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Treegen(world, params.seed, params.terragenParams, params.treegenParams, biomeMap), listOf("TREES")),

@@ -14,6 +14,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise
+import com.sudoplay.joise.ModuleInstanceMap
+import com.sudoplay.joise.ModuleMap
+import com.sudoplay.joise.ModulePropertyMap
 import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.FlippingSpriteBatch
@@ -230,7 +233,9 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
                         val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
                         val sampleY = y - (NOISEBOX_HEIGHT - Terragen.YHEIGHT_MAGIC) * Terragen.YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
 
-                        noiseMaker.first.draw(x, y, localJoise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
+                        noiseMaker.first.draw(x, y, localJoise.mapIndexed { index, it ->
+                            it.get(sampleX, sampleY, sampleZ)
+                        }, testTex)
                     }
                 }
         } }
@@ -358,6 +363,7 @@ internal object TerragenTest : NoiseMaker {
         Block.DIRT to Color(0.588f, 0.45f, 0.3f, 1f),
         Block.STONE to Color(0.4f, 0.4f, 0.4f, 1f),
         Block.STONE_SLATE to Color(0.2f, 0.2f, 0.2f, 1f),
+        Block.STONE_MARBLE to Color(0.8f, 0.8f, 0.8f, 1f)
     )
 
     private val COPPER_ORE = 0x00e9c8ff
@@ -378,8 +384,11 @@ internal object TerragenTest : NoiseMaker {
         val cave = if (noiseValue[1] < 0.5) 0 else 1
         val ore = (noiseValue.subList(2, noiseValue.size)).zip(oreCols).firstNotNullOfOrNull { (n, colour) -> if (n > 0.5) colour else null }
 
-        val wallBlock = groundDepthBlock[terr]
-        val terrBlock = if (cave == 0) Block.AIR else wallBlock
+        val marbleLayerThre = noiseValue[10]..noiseValue[11]
+
+        val wallBlock =  if (noiseValue[0] in marbleLayerThre) Block.STONE_MARBLE else groundDepthBlock[terr]
+        val terrBlock = if (cave == 0) Block.AIR else if (noiseValue[0] in marbleLayerThre) Block.STONE_MARBLE else wallBlock
+
 
         outTex.drawPixel(x, y,
             if (ore != null && (terrBlock == Block.STONE || terrBlock == Block.STONE_SLATE)) ore
@@ -694,15 +703,35 @@ internal object TerragenTest : NoiseMaker {
         return listOf(
             Joise(groundScaling),
             Joise(caveScaling),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:1", 0.032, 0.010, 0.507, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:2", 0.056, 0.011, 0.507, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:3", 0.021, 0.070, 0.501, 3.8)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:4", 0.024, 0.011, 0.501, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:5", 0.021, 0.017, 0.501, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:6", 0.011, 0.300, 0.465, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:7", 0.016, 0.300, 0.467, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:8", 0.021, 0.020, 0.501, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:1", 0.026, 0.010, 0.517, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:2", 0.045, 0.011, 0.517, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:3", 0.017, 0.070, 0.511, 3.8)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:4", 0.019, 0.011, 0.511, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:5", 0.017, 0.017, 0.511, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:6", 0.009, 0.300, 0.474, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:7", 0.013, 0.300, 0.476, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:8", 0.017, 0.020, 0.511, 1.0)),
+
+            Joise(generate1Dline(seed shake 10, 1.88)),
+            Joise(generate1Dline(seed shake 10, 1.90)),
         )
+    }
+
+    private fun generate1Dline(seed: Long, avr: Double): Module {
+        return ModuleScaleOffset().also {
+            it.setSource(ModuleFractal().also {
+                it.setType(ModuleFractal.FractalType.RIDGEMULTI)
+                it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
+                it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+                it.setNumOctaves(1)
+                it.setFrequency(0.0)
+                it.seed = seed
+            })
+            it.setScale(1.0)
+            it.setOffset(avr - 1.0)
+        }
+
+        // TODO combine another noise generator to cut off the otherwise continuous line of stone layer
     }
 
     private fun applyPowMult(joiseModule: Module, pow: Double, mult: Double): Module {
@@ -718,7 +747,7 @@ internal object TerragenTest : NoiseMaker {
     private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, freq: Double, pow: Double, scale: Double, ratio: Double): Module {
         val oreShape = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.RIDGEMULTI)
-            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
             it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
             it.setNumOctaves(2)
             it.setFrequency(freq) // adjust the "density" of the caves
@@ -741,7 +770,7 @@ internal object TerragenTest : NoiseMaker {
 
         val orePerturbFractal = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.FBM)
-            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
             it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
             it.setNumOctaves(6)
             it.setFrequency(freq * 3.0 / 4.0)
@@ -780,6 +809,24 @@ internal object TerragenTest : NoiseMaker {
         }
 
         return oreSelect
+    }
+
+    private object DummyModule : Module() {
+        override fun get(x: Double, y: Double) = 0.0
+
+        override fun get(x: Double, y: Double, z: Double) = 0.0
+
+        override fun get(x: Double, y: Double, z: Double, w: Double) = 0.0
+
+        override fun get(x: Double, y: Double, z: Double, w: Double, u: Double, v: Double) = 0.0
+
+        override fun _writeToMap(map: ModuleMap?) {
+        }
+
+        override fun buildFromPropertyMap(props: ModulePropertyMap?, map: ModuleInstanceMap?): Module {
+            return this
+        }
+
     }
 }
 

@@ -86,7 +86,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
     private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, freq: Double, pow: Double, scale: Double, ratio: Double): Joise {
         val oreShape = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.RIDGEMULTI)
-            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
             it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
             it.setNumOctaves(2)
             it.setFrequency(freq) // adjust the "density" of the caves
@@ -109,7 +109,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
 
         val orePerturbFractal = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.FBM)
-            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
             it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
             it.setNumOctaves(6)
             it.setFrequency(freq * 3.0 / 4.0)
