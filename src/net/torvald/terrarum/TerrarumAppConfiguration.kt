@@ -117,6 +117,6 @@ data class Snapshot(var revision: Int) {
     }
 
     override fun hashCode(): Int {
-        return year.shl(24) or week.shl(16) or revision
+        return year.shl(16) or week.shl(8) or revision
     }
 }
