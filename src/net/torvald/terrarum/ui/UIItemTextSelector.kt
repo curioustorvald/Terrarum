@@ -4,11 +4,13 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 
 /**
  * @param width width of the text input where the text gets drawn, not the entire item
@@ -25,6 +27,7 @@ class UIItemTextSelector(
     private val drawBorder: Boolean = true,
     private val clickToShowPalette: Boolean = true,
     private val useSpinnerButtons: Boolean = false,
+    private val font: TerrarumSansBitmap = App.fontGame
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
@@ -143,7 +146,7 @@ class UIItemTextSelector(
 
                 it.color = Color.WHITE
                 val t = labelCache[selection]
-                val tw = App.fontGame.getWidth(t)
+                val tw = font.getWidth(t)
 
                 printdbg(this, "Drawing text: $t")
 
@@ -199,9 +202,9 @@ class UIItemTextSelector(
         if (!paletteShowing) {
             batch.color = UIItemTextLineInput.TEXTINPUT_COL_TEXT
             val t = labelCache[selection]
-            val tw = App.fontGame.getWidth(t)
+            val tw = font.getWidth(t)
 //            batch.draw(fbo.colorBufferTexture, posX + buttonW + 3f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
-            App.fontGame.draw(batch, t, posX + buttonW + 3 + (fboWidth - tw) / 2, posY)
+            font.draw(batch, t, posX + buttonW + 3 + (fboWidth - tw) / 2, posY)
         }
         // palette
         else {
@@ -227,8 +230,8 @@ class UIItemTextSelector(
                     else if (index == mouseOnPaletteItem) Toolkit.Theme.COL_MOUSE_UP
                     else UIItemTextLineInput.TEXTINPUT_COL_TEXT
                 val t = labelCache[index]
-                val tw = App.fontGame.getWidth(t)
-                App.fontGame.draw(batch, t,
+                val tw = font.getWidth(t)
+                font.draw(batch, t,
                         palX + (palW - tw) / 2,
                         getPalItemPosY(index) - 2
                 )

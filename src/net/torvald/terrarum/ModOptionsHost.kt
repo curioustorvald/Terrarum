@@ -23,7 +23,7 @@ class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
     private val moduleAreaBorder = 8
 
     override var width = 560
-    override var height = App.scr.height - moduleAreaHMargin * 2
+    override var height = 600//App.scr.height - moduleAreaHMargin * 2
 
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
@@ -35,7 +35,7 @@ class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
 
     private val modSelectorWidth = 360
     private val modSelector = UIItemTextSelector(this, drawX + (width - modSelectorWidth) / 2, drawY,
-        configurableMods.map { { it.first } }, 0, modSelectorWidth, false
+        configurableMods.map { { it.first } }, 0, modSelectorWidth, false, font = App.fontUITitle
     ).also { item ->
         item.selectionChangeListener = {
             currentlySelectedModule = configurableMods[it].second
