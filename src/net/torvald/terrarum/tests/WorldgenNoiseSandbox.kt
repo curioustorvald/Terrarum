@@ -672,6 +672,9 @@ internal object TerragenTest : NoiseMaker {
         val caveAttenuateBiasScaledCache = ModuleCache().also { it.setSource(caveAttenuateBiasScaled) }
 
 
+        val thicknesses = listOf(0.016, 0.021, 0.029, 0.036, 0.036, 0.029, 0.021, 0.016)
+        val marblerng = HQRNG(seed)
+
         //return Joise(caveInMix)
         return listOf(
             Joise(groundScalingCached),
@@ -685,13 +688,9 @@ internal object TerragenTest : NoiseMaker {
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:7", 0.013, 0.300, 0.476, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:8", 0.017, 0.020, 0.511, 1.0)),
 
-            Joise(generateRockLayer(groundScalingCached, seed shake 10, params, listOf(
-                0.02 to 2.6,
-                0.03 to 2.9,
-                0.04 to 3.2,
-                0.03 to 3.5,
-                0.02 to 3.8,
-            ))),
+            Joise(generateRockLayer(groundScalingCached, seed, params, (0..7).map {
+                thicknesses[it] + marblerng.nextTriangularBal() * 0.006 to 2.6 + it * 0.18 + marblerng.nextTriangularBal() * 0.09
+            })),
         )
     }
 
@@ -703,7 +702,7 @@ internal object TerragenTest : NoiseMaker {
             it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
             it.setNumOctaves(2)
             it.setFrequency(params.rockBandCutoffFreq / params.featureSize) // adjust the "density" of the veins
-            it.seed = seed
+            it.seed = seed shake 0x41A2B1E5
         }
 
         val occlusionScale = ModuleScaleDomain().also {
