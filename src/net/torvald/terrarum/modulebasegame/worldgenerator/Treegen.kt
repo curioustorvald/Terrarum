@@ -7,6 +7,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIOME_KEY_PLAINS
 import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIOME_KEY_SPARSE_WOODS
 import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIOME_KEY_WOODLANDS
@@ -397,7 +398,7 @@ class Treegen(world: GameWorld, seed: Long, val terragenParams: TerragenParams, 
      */
     private fun List<IntProgression>.rearrange(): List<IntProgression> {
         val r = ArrayList<IntProgression>()
-        val stride = this.size / 2
+        val stride = this.size / TerrarumIngame.worldgenThreadExecutor.threadCount
 
         for (i in 0 until stride) {
             var b = i

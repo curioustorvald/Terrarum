@@ -24,6 +24,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.RunnableFun
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.*
 import net.torvald.terrarum.worlddrawer.toRGBA
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
