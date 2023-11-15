@@ -685,27 +685,17 @@ internal object TerragenTest : NoiseMaker {
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:7", 0.013, 0.300, 0.476, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:8", 0.017, 0.020, 0.511, 1.0)),
 
-            Joise(generateRockLayer(groundScalingCached, seed shake 10, params, 0.03, 2.6,)),
+            Joise(generateRockLayer(groundScalingCached, seed shake 10, params, listOf(
+                0.02 to 2.6,
+                0.03 to 2.9,
+                0.04 to 3.2,
+                0.03 to 3.5,
+                0.02 to 3.8,
+            ))),
         )
     }
 
-    private fun generateRockLayer(ground: ModuleCache, seed: Long, params: TerragenParams, thickness: Double, rangeStart: Double): Module {
-        val thresholdLow = ModuleSelect().also {
-            it.setLowSource(0.0)
-            it.setHighSource(1.0)
-            it.setControlSource(ground)
-            it.setThreshold(rangeStart)
-            it.setFalloff(0.0)
-        }
-
-        val thresholdHigh = ModuleSelect().also {
-            it.setLowSource(1.0)
-            it.setHighSource(0.0)
-            it.setControlSource(ground)
-            it.setThreshold(rangeStart + thickness)
-            it.setFalloff(0.0)
-        }
-
+    private fun generateRockLayer(ground: ModuleCache, seed: Long, params: TerragenParams, thicknessAndRange: List<Pair<Double, Double>>): Module {
 
         val occlusion = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.RIDGEMULTI)
@@ -730,15 +720,44 @@ internal object TerragenTest : NoiseMaker {
             it.setFalloff(0.0)
         }
 
-
-        val occBand = ModuleCombiner().also {
-            it.setSource(0, thresholdLow)
-            it.setSource(1, thresholdHigh)
-            it.setSource(2, occlusionBinary)
-            it.setType(ModuleCombiner.CombinerType.MULT)
+        val occlusionCache = ModuleCache().also {
+            it.setSource(occlusionBinary)
         }
 
-        return occBand
+        val bands = thicknessAndRange.map { (thickness, rangeStart) ->
+            val thresholdLow = ModuleSelect().also {
+                it.setLowSource(0.0)
+                it.setHighSource(1.0)
+                it.setControlSource(ground)
+                it.setThreshold(rangeStart)
+                it.setFalloff(0.0)
+            }
+
+            val thresholdHigh = ModuleSelect().also {
+                it.setLowSource(1.0)
+                it.setHighSource(0.0)
+                it.setControlSource(ground)
+                it.setThreshold(rangeStart + thickness)
+                it.setFalloff(0.0)
+            }
+
+            ModuleCombiner().also {
+                it.setSource(0, thresholdLow)
+                it.setSource(1, thresholdHigh)
+                it.setSource(2, occlusionCache)
+                it.setType(ModuleCombiner.CombinerType.MULT)
+            }
+        }
+
+
+        val combinedBands = ModuleCombiner().also {
+            bands.forEachIndexed { index, module ->
+                it.setSource(index, module)
+            }
+            it.setType(ModuleCombiner.CombinerType.ADD)
+        }
+
+        return combinedBands
     }
 
     private fun applyPowMult(joiseModule: Module, pow: Double, mult: Double): Module {
