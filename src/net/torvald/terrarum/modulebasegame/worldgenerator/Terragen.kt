@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
+import net.torvald.random.HQRNG
 import net.torvald.random.XXHash32
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.LoadScreenBase
@@ -59,7 +60,8 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
         return tiers.lastIndex
     }
 
-    private val terragenTiers = listOf(.0, .5, 1.0, 2.5).map { it * (world.height / 2400.0).pow(0.75) } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
+    private val terragenYscaling = (world.height / 2400.0).pow(0.75)
+    private val terragenTiers = listOf(.0, .5, 1.0, 2.5).map { it * terragenYscaling } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
 
     //private fun draw(x: Int, y: Int, width: Int, height: Int, noiseValue: List<Double>, world: GameWorld) {
     private fun draw(x: Int, noises: List<Joise>, st: Double, soff: Double) {
@@ -81,8 +83,10 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
             if (stoneSlateTransition == 0 && terr == 3)
                 stoneSlateTransition = y
 
-            val wallBlock = groundDepthBlock[terr]
-            val terrBlock = wallBlock
+            val isMarble = noiseValue[1] > 0.5
+
+            val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
+            val terrBlock = if (isMarble) Block.STONE_MARBLE else wallBlock
 
             world.setTileTerrain(x, y, terrBlock, true)
             world.setTileWall(x, y, wallBlock, true)
@@ -135,6 +139,7 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
         }
     }
 
+    private val thicknesses = listOf(0.016, 0.021, 0.029, 0.036, 0.036, 0.029, 0.021, 0.016)
 
     private fun getGenerator(seed: Long, params: TerragenParams): List<Joise> {
         // this noise tree WILL generate noise value greater than 1.0
@@ -153,9 +158,80 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
             it.setSource(groundClamp)
         }
 
+        val marblerng = HQRNG(seed) // this must be here: every slice must get identical series of random numbers
+
         return listOf(
-            Joise(groundScaling)
+            Joise(groundScaling),
+
+            Joise(generateRockLayer(groundScaling, seed, params, (0..7).map {
+                thicknesses[it] + marblerng.nextTriangularBal() * 0.006 to (2.6 * terragenYscaling) + it * 0.18 + marblerng.nextTriangularBal() * 0.09
+            })),
         )
+    }
+
+    private fun generateRockLayer(ground: Module, seed: Long, params: TerragenParams, thicknessAndRange: List<Pair<Double, Double>>): Module {
+
+        val occlusion = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.RIDGEMULTI)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(2)
+            it.setFrequency(params.rockBandCutoffFreq / params.featureSize) // adjust the "density" of the veins
+            it.seed = seed shake 0x41A2B1E5
+        }
+
+        val occlusionScale = ModuleScaleDomain().also {
+            it.setScaleX(0.5)
+            it.setScaleZ(0.5)
+            it.setSource(occlusion)
+        }
+
+        val occlusionBinary = ModuleSelect().also {
+            it.setLowSource(0.0)
+            it.setHighSource(1.0)
+            it.setControlSource(occlusionScale)
+            it.setThreshold(1.1)
+            it.setFalloff(0.0)
+        }
+
+        val occlusionCache = ModuleCache().also {
+            it.setSource(occlusionBinary)
+        }
+
+        val bands = thicknessAndRange.map { (thickness, rangeStart) ->
+            val thresholdLow = ModuleSelect().also {
+                it.setLowSource(0.0)
+                it.setHighSource(1.0)
+                it.setControlSource(ground)
+                it.setThreshold(rangeStart)
+                it.setFalloff(0.0)
+            }
+
+            val thresholdHigh = ModuleSelect().also {
+                it.setLowSource(1.0)
+                it.setHighSource(0.0)
+                it.setControlSource(ground)
+                it.setThreshold(rangeStart + thickness)
+                it.setFalloff(0.0)
+            }
+
+            ModuleCombiner().also {
+                it.setSource(0, thresholdLow)
+                it.setSource(1, thresholdHigh)
+                it.setSource(2, occlusionCache)
+                it.setType(ModuleCombiner.CombinerType.MULT)
+            }
+        }
+
+
+        val combinedBands = ModuleCombiner().also {
+            bands.forEachIndexed { index, module ->
+                it.setSource(index, module)
+            }
+            it.setType(ModuleCombiner.CombinerType.ADD)
+        }
+
+        return combinedBands
     }
 }
 

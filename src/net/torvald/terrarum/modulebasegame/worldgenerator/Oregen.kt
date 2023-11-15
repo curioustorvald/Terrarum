@@ -62,7 +62,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaledCache: ModuleC
             val tileToPut = noiseValues.zip(oreTiles).firstNotNullOfOrNull { (n, tile) -> if (n > 0.5) tile else null }
             val backingTile = world.getTileFromTerrain(x, y)
 
-            if (tileToPut != null && BlockCodex[backingTile].hasTag("ROCK")) {
+            if (tileToPut != null && BlockCodex[backingTile].hasAllTagOf("ROCK", "OREBEARING")) {
                 // actually put the ore block
                 world.setTileOre(x, y, tileToPut, 0) // autotiling will be handled by the other worldgen process
             }

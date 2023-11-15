@@ -63,6 +63,7 @@ object Worldgen {
             Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")),
             Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, caveAttenuateBiasScaledCache, params.seed, oreRegistry), listOf("ORES")),
             Work(Lang["MENU_IO_WORLDGEN_POSITIONING_ROCKS"], OregenAutotiling(world, params.seed, oreTilingModes), listOf("ORES")),
+            Work(Lang["MENU_IO_WORLDGEN_POSITIONING_ROCKS"], OregenAutotiling(world, params.seed, oreTilingModes), listOf("ORES")),
             // TODO generate rock veins
             // TODO generate gemstones
             Work(Lang["MENU_IO_WORLDGEN_CARVING_EARTH"], Cavegen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
@@ -115,7 +116,7 @@ object Worldgen {
     data class Work(val loadingScreenName: String, val theWork: Gen, val tags: List<String>)
 
     fun getEstimationSec(width: Int, height: Int): Long {
-        return (30.0 * 1.25 * (48600000.0 / bogoflops) * ((width * height) / 20095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
+        return (38.0 * 1.25 * (48600000.0 / bogoflops) * ((width * height) / 20095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
     }
 
     private fun getHighlandLowlandSelectCache(params: TerragenParams, seed: Long): ModuleCache {

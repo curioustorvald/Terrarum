@@ -196,6 +196,8 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
                 ingame.gameLoadInfoPayload = worldParam
                 ingame.gameLoadMode = TerrarumIngame.GameLoadMode.CREATE_NEW
 
+                UILoadGovernor.interruptSavegameListGenerator = true
+
                 Terrarum.setCurrentIngameInstance(ingame)
                 val loadScreen = FancyWorldgenLoadScreen(ingame, wx, wy)
                 App.setLoadScreen(loadScreen)
@@ -227,6 +229,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
                         ByteArray64Reader(playerDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)
                     ) as IngamePlayer
 
+                    UILoadGovernor.interruptSavegameListGenerator = true
 
                     LoadSavegame(
                         App.savegamePlayers[player.uuid]!!.files[0],

@@ -82,6 +82,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
 
     override fun show() {
         if (!showCalled) {
+            UILoadGovernor.interruptSavegameListGenerator = false
             showCalled = true
 //            println("UILoadList ${this.hashCode()} show called by:")
 //            printStackTrace(this)
@@ -102,7 +103,10 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
                     // read savegames
                     var savegamesCount = 0
                     printdbg(this, "============== ${this.hashCode()} ============== ")
-                    App.sortedPlayers.forEach { uuid ->
+                    for (uuid in App.sortedPlayers) {
+                        if (UILoadGovernor.interruptSavegameListGenerator) break
+
+
                         printdbg(this, "Reading player $uuid")
 
                         val x = full.uiX

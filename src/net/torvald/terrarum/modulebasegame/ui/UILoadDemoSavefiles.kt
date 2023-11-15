@@ -75,6 +75,8 @@ object UILoadGovernor {
             field = value
         }*/
 
+    var interruptSavegameListGenerator = false
+
     fun reset() {
         printdbg(this, "Resetting player and world selection")
 //        playerDisk = null

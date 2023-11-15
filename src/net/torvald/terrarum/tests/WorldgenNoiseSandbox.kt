@@ -345,7 +345,8 @@ internal object TerragenTest : NoiseMaker {
         COPPER_ORE, IRON_ORE, COAL_ORE, ZINC_ORE, TIN_ORE, GOLD_ORE, SILVER_ORE, LEAD_ORE
     )
 
-    private val terragenTiers = listOf(.0, .5, 1.0, 2.5).map { it * (NOISEBOX_HEIGHT / 2400.0).pow(0.75) } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
+    private val terragenYscaling = (NOISEBOX_HEIGHT / 2400.0).pow(0.75)
+    private val terragenTiers = listOf(.0, .5, 1.0, 2.5).map { it * terragenYscaling } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
 
     private fun Double.dither() = Math.random() < this
 
@@ -356,7 +357,7 @@ internal object TerragenTest : NoiseMaker {
 
         val isMarble = noiseValue[10] > 0.5
 
-        val wallBlock =  if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
+        val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
         val terrBlock = if (cave == 0) Block.AIR else if (isMarble) Block.STONE_MARBLE else wallBlock
 
 
@@ -690,7 +691,7 @@ internal object TerragenTest : NoiseMaker {
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:8", 0.017, 0.020, 0.511, 1.0)),
 
             Joise(generateRockLayer(groundScalingCached, seed, params, (0..7).map {
-                thicknesses[it] + marblerng.nextTriangularBal() * 0.006 to 2.6 + it * 0.18 + marblerng.nextTriangularBal() * 0.09
+                thicknesses[it] + marblerng.nextTriangularBal() * 0.006 to (2.6 * terragenYscaling) + it * 0.18 + marblerng.nextTriangularBal() * 0.09
             })),
         )
     }
