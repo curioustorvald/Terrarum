@@ -349,7 +349,7 @@ internal object TerragenTest : NoiseMaker {
         Block.AIR, Block.DIRT, Block.STONE, Block.STONE_SLATE
     )
 
-    private fun Double.tiered(vararg tiers: Double): Int {
+    private fun Double.tiered(tiers: List<Double>): Int {
         tiers.reversed().forEachIndexed { index, it ->
             if (this >= it) return (tiers.lastIndex - index) // why??
         }
@@ -379,8 +379,10 @@ internal object TerragenTest : NoiseMaker {
         COPPER_ORE, IRON_ORE, COAL_ORE, ZINC_ORE, TIN_ORE, GOLD_ORE, SILVER_ORE, LEAD_ORE
     )
 
+    private val terragenTiers = listOf(.0, .5, 1.0, 2.5).map { it * (NOISEBOX_HEIGHT / 2400.0).pow(0.75) } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
+
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
-        val terr = noiseValue[0].tiered(.0, .5, .88, 1.88)
+        val terr = noiseValue[0].tiered(terragenTiers)
         val cave = if (noiseValue[1] < 0.5) 0 else 1
         val ore = (noiseValue.subList(2, noiseValue.size)).zip(oreCols).firstNotNullOfOrNull { (n, colour) -> if (n > 0.5) colour else null }
 
@@ -712,8 +714,8 @@ internal object TerragenTest : NoiseMaker {
             Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:7", 0.013, 0.300, 0.476, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:8", 0.017, 0.020, 0.511, 1.0)),
 
-            Joise(generate1Dline(seed shake 10, 1.88)),
-            Joise(generate1Dline(seed shake 10, 1.90)),
+            Joise(generate1Dline(seed shake 10, 2.6)),
+            Joise(generate1Dline(seed shake 10, 2.62)),
         )
     }
 

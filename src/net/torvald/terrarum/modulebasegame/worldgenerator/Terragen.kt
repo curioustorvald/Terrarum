@@ -8,10 +8,8 @@ import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.FancyWorldgenLoadScreen
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import kotlin.math.cos
-import kotlin.math.max
+import kotlin.math.pow
 import kotlin.math.sin
 
 /**
@@ -54,12 +52,14 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
             Block.AIR, Block.DIRT, Block.STONE, Block.STONE_SLATE
     )
 
-    private fun Double.tiered(vararg tiers: Double): Int {
+    private fun Double.tiered(tiers: List<Double>): Int {
         tiers.reversed().forEachIndexed { index, it ->
             if (this >= it) return (tiers.lastIndex - index) // why??
         }
         return tiers.lastIndex
     }
+
+    private val terragenTiers = listOf(.0, .5, 1.0, 2.5).map { it * (world.height / 2400.0).pow(0.75) } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
 
     //private fun draw(x: Int, y: Int, width: Int, height: Int, noiseValue: List<Double>, world: GameWorld) {
     private fun draw(x: Int, noises: List<Joise>, st: Double, soff: Double) {
@@ -73,7 +73,7 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
             // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
             val noiseValue = noises.map { it.get(sx, sy, sz) }
 
-            val terr = noiseValue[0].tiered(.0, .5, .88, 1.88)
+            val terr = noiseValue[0].tiered(terragenTiers)
 
             // mark off the position where the transition occurred
             if (dirtStoneTransition == 0 && terr == 2)
