@@ -685,11 +685,11 @@ internal object TerragenTest : NoiseMaker {
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:7", 0.013, 0.300, 0.476, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:8", 0.017, 0.020, 0.511, 1.0)),
 
-            Joise(generateRockLayer(groundScalingCached, seed shake 10, 2.6, 2.62)),
+            Joise(generateRockLayer(groundScalingCached, seed shake 10, params, 0.03, 2.6,)),
         )
     }
 
-    private fun generateRockLayer(ground: ModuleCache, seed: Long, rangeStart: Double, rangeEnd: Double): Module {
+    private fun generateRockLayer(ground: ModuleCache, seed: Long, params: TerragenParams, thickness: Double, rangeStart: Double): Module {
         val thresholdLow = ModuleSelect().also {
             it.setLowSource(0.0)
             it.setHighSource(1.0)
@@ -702,20 +702,43 @@ internal object TerragenTest : NoiseMaker {
             it.setLowSource(1.0)
             it.setHighSource(0.0)
             it.setControlSource(ground)
-            it.setThreshold(rangeEnd)
+            it.setThreshold(rangeStart + thickness)
             it.setFalloff(0.0)
         }
 
-        val band = ModuleCombiner().also {
+
+        val occlusion = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.RIDGEMULTI)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(2)
+            it.setFrequency(params.rockBandCutoffFreq / params.featureSize) // adjust the "density" of the veins
+            it.seed = seed
+        }
+
+        val occlusionScale = ModuleScaleDomain().also {
+            it.setScaleX(0.5)
+            it.setScaleZ(0.5)
+            it.setSource(occlusion)
+        }
+
+        val occlusionBinary = ModuleSelect().also {
+            it.setLowSource(0.0)
+            it.setHighSource(1.0)
+            it.setControlSource(occlusionScale)
+            it.setThreshold(1.1)
+            it.setFalloff(0.0)
+        }
+
+
+        val occBand = ModuleCombiner().also {
             it.setSource(0, thresholdLow)
             it.setSource(1, thresholdHigh)
+            it.setSource(2, occlusionBinary)
             it.setType(ModuleCombiner.CombinerType.MULT)
         }
 
-        return band
-
-
-        // TODO combine another noise generator to cut off the otherwise continuous line of stone layer
+        return occBand
     }
 
     private fun applyPowMult(joiseModule: Module, pow: Double, mult: Double): Module {
@@ -781,6 +804,7 @@ internal object TerragenTest : NoiseMaker {
 
             it.setSource(orePerturb)
             it.setScaleX(1.0 / xs)
+            it.setScaleZ(1.0 / xs)
             it.setScaleY(1.0 / ys)
         }
 

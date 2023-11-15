@@ -172,6 +172,8 @@ data class TerragenParams(
     val caveBlockageFractalFreq: Double = 8.88,
     val caveBlockageSelectThre: Double = 1.40, // adjust cave cloing-up strength. Larger = more closing
 
+    val rockBandCutoffFreq: Double = 4.0,
+
 //    val oreCopperFreq: Double = 0.024, // adjust the "density" of the ore veins
 //    val oreCopperPower: Double = 0.01, // super-low value almost negates the depth element
 //    val oreCopperScale: Double = 0.505,
@@ -185,4 +187,5 @@ data class TerragenParams(
     // 0.1 - 0.5
     // ...
     // 0.8 - 0.42
-)
+) {
+}

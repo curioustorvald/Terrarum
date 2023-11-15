@@ -133,6 +133,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaledCache: ModuleC
 
             it.setSource(orePerturb)
             it.setScaleX(1.0 / xs)
+            it.setScaleZ(1.0 / xs)
             it.setScaleY(1.0 / ys)
         }
 
