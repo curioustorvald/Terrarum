@@ -78,10 +78,10 @@ class Cavegen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, see
             it.seed = seed shake caveMagic
         }
 
-        val caveAttenuateBias = ModuleBias().also {
+        val caveAttenuateBias = ModuleCache().also {it.setSource(ModuleBias().also {
             it.setSource(highlandLowlandSelectCache)
             it.setBias(params.caveAttenuateBias) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
-        }
+        })}
 
         val caveShapeAttenuate = ModuleCombiner().also {
             it.setType(ModuleCombiner.CombinerType.MULT)

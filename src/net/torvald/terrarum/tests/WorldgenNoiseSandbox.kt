@@ -595,10 +595,10 @@ internal object TerragenTest : NoiseMaker {
             it.seed = seed shake caveMagic
         }
 
-        val caveAttenuateBias = ModuleBias().also {
+        val caveAttenuateBias = ModuleCache().also { it.setSource(ModuleBias().also {
             it.setSource(highlandLowlandSelectCache)
             it.setBias(params.caveAttenuateBias) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
-        }
+        })}
 
         val caveShapeAttenuate = ModuleCombiner().also {
             it.setType(ModuleCombiner.CombinerType.MULT)
@@ -703,24 +703,28 @@ internal object TerragenTest : NoiseMaker {
 
 
 
+        val groundScalingCached = ModuleCache().also { it.setSource(groundScaling) }
+        val caveAttenuateBiasScaledCache = ModuleCache().also { it.setSource(caveAttenuateBiasScaled) }
+
+
         //return Joise(caveInMix)
         return listOf(
-            Joise(groundScaling),
+            Joise(groundScalingCached),
             Joise(caveScaling),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:1", 0.026, 0.010, 0.517, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:2", 0.045, 0.011, 0.517, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:3", 0.017, 0.070, 0.511, 3.8)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:4", 0.019, 0.011, 0.511, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:5", 0.017, 0.017, 0.511, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:6", 0.009, 0.300, 0.474, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:7", 0.013, 0.300, 0.476, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:8", 0.017, 0.020, 0.511, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:1", 0.026, 0.010, 0.517, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:2", 0.045, 0.011, 0.517, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:3", 0.017, 0.070, 0.511, 3.8)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:4", 0.019, 0.011, 0.511, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:5", 0.017, 0.017, 0.511, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:6", 0.009, 0.300, 0.474, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:7", 0.013, 0.300, 0.476, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:8", 0.017, 0.020, 0.511, 1.0)),
 
-            Joise(generateRockLayer(groundScaling, seed shake 10, 2.6, 2.62)),
+            Joise(generateRockLayer(groundScalingCached, seed shake 10, 2.6, 2.62)),
         )
     }
 
-    private fun generateRockLayer(ground: Module, seed: Long, rangeStart: Double, rangeEnd: Double): Module {
+    private fun generateRockLayer(ground: ModuleCache, seed: Long, rangeStart: Double, rangeEnd: Double): Module {
         val thresholdLow = ModuleSelect().also {
             it.setLowSource(0.0)
             it.setHighSource(1.0)
@@ -759,7 +763,7 @@ internal object TerragenTest : NoiseMaker {
         }
     }
 
-    private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, freq: Double, pow: Double, scale: Double, ratio: Double): Module {
+    private fun generateOreVeinModule(caveAttenuateBiasScaledCache: ModuleCache, seed: Long, freq: Double, pow: Double, scale: Double, ratio: Double): Module {
         val oreShape = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.RIDGEMULTI)
             it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
@@ -775,7 +779,7 @@ internal object TerragenTest : NoiseMaker {
             it.setOffset(-0.5)
         }
 
-        val caveAttenuateBias3 = applyPowMult(caveAttenuateBiasScaled, pow, scale)
+        val caveAttenuateBias3 = applyPowMult(caveAttenuateBiasScaledCache, pow, scale)
 
         val oreShapeAttenuate = ModuleCombiner().also {
             it.setType(ModuleCombiner.CombinerType.MULT)

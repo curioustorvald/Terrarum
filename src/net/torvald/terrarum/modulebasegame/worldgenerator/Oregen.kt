@@ -5,19 +5,16 @@ import com.sudoplay.joise.module.*
 import net.torvald.terrarum.*
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.FancyWorldgenLoadScreen
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_DIVISOR
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_MAGIC
 import kotlin.math.cos
-import kotlin.math.max
 import kotlin.math.sin
 import kotlin.math.sqrt
 
 /**
  * Created by minjaesong on 2023-10-25.
  */
-class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, private val ores: List<OregenParams>) : Gen(world, seed) {
+class Oregen(world: GameWorld, private val caveAttenuateBiasScaledCache: ModuleCache, seed: Long, private val ores: List<OregenParams>) : Gen(world, seed) {
     override fun getDone(loadscreen: LoadScreenBase) {
         loadscreen.stageValue += 1
         loadscreen.progress.set(0L)
@@ -43,7 +40,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
      */
     private fun getGenerator(seed: Long): List<Joise> {
         return ores.map {
-            generateOreVeinModule(caveAttenuateBiasScaled, seed shake it.tile, it.freq, it.power, it.scale, it.ratio)
+            generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake it.tile, it.freq, it.power, it.scale, it.ratio)
         }
     }
 
@@ -83,7 +80,7 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaled: ModuleScaleD
         }
     }
 
-    private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleScaleDomain, seed: Long, freq: Double, pow: Double, scale: Double, ratio: Double): Joise {
+    private fun generateOreVeinModule(caveAttenuateBiasScaled: ModuleCache, seed: Long, freq: Double, pow: Double, scale: Double, ratio: Double): Joise {
         val oreShape = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.RIDGEMULTI)
             it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)

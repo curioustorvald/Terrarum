@@ -11,7 +11,6 @@ import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import kotlin.math.max
 import kotlin.math.roundToLong
 
 /**
@@ -36,7 +35,7 @@ object Worldgen {
     }
 
     internal lateinit var highlandLowlandSelectCache: ModuleCache
-    internal lateinit var caveAttenuateBiasScaled: ModuleScaleDomain
+    internal lateinit var caveAttenuateBiasScaledCache: ModuleCache
     internal lateinit var biomeMap: HashMap<BlockAddress, Byte>
 
 
@@ -62,7 +61,7 @@ object Worldgen {
         }
         return listOf(
             Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")),
-            Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, caveAttenuateBiasScaled, params.seed, oreRegistry), listOf("ORES")),
+            Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, caveAttenuateBiasScaledCache, params.seed, oreRegistry), listOf("ORES")),
             Work(Lang["MENU_IO_WORLDGEN_POSITIONING_ROCKS"], OregenAutotiling(world, params.seed, oreTilingModes), listOf("ORES")),
             // TODO generate rock veins
             // TODO generate gemstones
@@ -74,7 +73,7 @@ object Worldgen {
 
     fun generateMap(loadscreen: LoadScreenBase) {
         highlandLowlandSelectCache = getHighlandLowlandSelectCache(params.terragenParams, params.seed)
-        caveAttenuateBiasScaled = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
+        caveAttenuateBiasScaledCache = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
         biomeMap = HashMap()
 
         genSlices = world.width / 9
@@ -258,17 +257,21 @@ object Worldgen {
         return highlandLowlandSelectCache
     }
 
-    private fun getCaveAttenuateBiasScaled(highlandLowlandSelectCache: ModuleCache, params: TerragenParams): ModuleScaleDomain {
+    private fun getCaveAttenuateBiasScaled(highlandLowlandSelectCache: ModuleCache, params: TerragenParams): ModuleCache {
         val caveAttenuateBias = ModuleBias().also {
             it.setSource(highlandLowlandSelectCache)
             it.setBias(params.caveAttenuateBias) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
         }
 
-        return ModuleScaleDomain().also {
+        val scale =  ModuleScaleDomain().also {
             it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
             it.setScaleY(1.0 / params.featureSize)
             it.setScaleZ(1.0 / params.featureSize)
             it.setSource(caveAttenuateBias)
+        }
+
+        return ModuleCache().also {
+            it.setSource(scale)
         }
     }
 
