@@ -19,12 +19,11 @@ import com.sudoplay.joise.ModuleMap
 import com.sudoplay.joise.ModulePropertyMap
 import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.FlippingSpriteBatch
+import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.RunnableFun
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
-import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.worldgenerator.*
 import net.torvald.terrarum.worlddrawer.toRGBA
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
@@ -32,7 +31,7 @@ import java.util.concurrent.Future
 import kotlin.math.*
 import kotlin.random.Random
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen
-import net.torvald.terrarum.sqr
+import java.io.PrintStream
 
 const val NOISEBOX_WIDTH = 1200
 const val NOISEBOX_HEIGHT = 2400
@@ -56,9 +55,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private var seed = 10000L
 
     private var initialGenDone = false
-    private var generateKeyLatched = false
 
-    private var generationTimeInMeasure = false
     private var generationStartTime = 0L
     private var genSlices: Int = 0
     private var genFutures: Array<Future<*>?> = arrayOfNulls(genSlices)
@@ -92,6 +89,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
         if (!initialGenDone) {
             renderNoise(NOISEMAKER)
+            initialGenDone = true
         }
 
         // draw using pixmap
@@ -102,28 +100,15 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         }
 
         // read key input
-        if (!generateKeyLatched && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            generateKeyLatched = true
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && worldgenDone) {
             seed = RNG.nextLong()
             renderNoise(NOISEMAKER)
         }
 
-        val coroutineExecFinished = genFutures.fold(true) { acc, it -> acc and (it?.isDone ?: true) }
-        // check if generation is done
-        if (coroutineExecFinished) {
-            generateKeyLatched = false
-        }
-
-        // finish time measurement
-        if (coroutineExecFinished && generationTimeInMeasure) {
-            generationTimeInMeasure = false
-            val time = System.nanoTime() - generationStartTime
-            generationTime = time / 1000000000f
-        }
 
         // draw timer
         batch.inUse {
-            if (!generationTimeInMeasure) {
+            if (worldgenDone) {
                 font.draw(batch, "Generation time: ${generationTime} seconds", 8f, 8f)
             }
             else {
@@ -168,10 +153,18 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         }
     }
 
+    private fun printStackTrace(obj: Any, out: PrintStream = System.out) {
+        val indentation = " ".repeat(obj.javaClass.simpleName.length + 4)
+        Thread.currentThread().stackTrace.forEachIndexed { index, it ->
+            if (index == 1)
+                out.println("[${obj.javaClass.simpleName}]> $it")
+            else if (index > 1)
+                out.println("$indentation$it")
+        }
+    }
 
-    private fun renderNoise(noiseMaker: Pair<NoiseMaker, Any>) {
+    private fun renderNoise(noiseMaker: Pair<NoiseMaker, Any>, callback: () -> Unit = {}) {
         generationStartTime = System.nanoTime()
-        generationTimeInMeasure = true
 
         // erase first
         testTex.setColor(colourNull)
@@ -180,82 +173,54 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         testColSet.shuffle()
         testColSet2.shuffle()
 
-        // render noisemap to pixmap
+        worldgenDone = false
 
-        /*
-        I've got two ideas to resolve noisy artefact when noise generation runs concurrently:
+        Thread {
+            val runnables: List<RunnableFun> = (0 until testTex.width).sliceEvenly(genSlices).map { range ->
+                {
+                    val localJoise = noiseMaker.first.getGenerator(seed, noiseMaker.second)
+                    for (x in range) {
+                        for (y in 0 until NOISEBOX_HEIGHT) {
+                            val sampleTheta = (x.toDouble() / NOISEBOX_WIDTH) * TWO_PI
+                            val sampleX =
+                                sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
+                            val sampleZ =
+                                cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+                            val sampleY =
+                                y - (NOISEBOX_HEIGHT - Terragen.YHEIGHT_MAGIC) * Terragen.YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
 
-        1) 1 block = 1 coroutine
-        2) 1 thread has its own copy of Joise (threads have different INSTANCEs of Joise with same params)
-
-        Method 1) seemingly works but may break if the operation is more complex
-        Method 2) also works
-
-        --CuriousTorvald, 2020-04-29
-         */
-
-        // 0. naive concurrent approach
-        // CULPRIT: one global instance of Joise that all the threads try to access (and modify local variables) at the same time
-        /*val runnables: List<RunnableFun> = xSlices.map { range ->
-            {
-                for (x in range) {
-                    for (y in 0 until HEIGHT) {
-                        val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
-                        val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-                        val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                        val sampleY = y.toDouble()
-
-                        NOISE_MAKER.draw(x, y, joise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
+                            noiseMaker.first.draw(x, y, localJoise.mapIndexed { index, it ->
+                                it.get(sampleX, sampleY, sampleZ)
+                            }, testTex)
+                        }
                     }
                 }
             }
-        }*/
 
-        // 1. stupid one-block-is-one-coroutine approach (seemingly works?)
-        /*val joise = getNoiseGenerator(seed)
-        val runnables: List<RunnableFun> = runs.map { i -> {
-            val (x, y) = (i % WIDTH) to (i / WIDTH)
-            val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
-            val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-            val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-            val sampleY = y.toDouble()
+            threadExecutor.renew()
+            runnables.forEach {
+                threadExecutor.submit(it)
+            }
 
-            NOISE_MAKER.draw(x, y, joise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
-        } }*/
+            threadExecutor.join()
 
-        // 2. each runner gets their own copy of Joise
-        val runnables: List<RunnableFun> = (0 until testTex.width).sliceEvenly(genSlices).map { range -> {
-                val localJoise = noiseMaker.first.getGenerator(seed, noiseMaker.second)
-                for (x in range) {
-                    for (y in 0 until NOISEBOX_HEIGHT) {
-                        val sampleTheta = (x.toDouble() / NOISEBOX_WIDTH) * TWO_PI
-                        val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-                        val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                        val sampleY = y - (NOISEBOX_HEIGHT - Terragen.YHEIGHT_MAGIC) * Terragen.YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+            worldgenDone = true
 
-                        noiseMaker.first.draw(x, y, localJoise.mapIndexed { index, it ->
-                            it.get(sampleX, sampleY, sampleZ)
-                        }, testTex)
-                    }
-                }
-        } }
+            val time = System.nanoTime() - generationStartTime
+            generationTime = time / 1000000000f
+            callback()
+        }.start()
 
-
-        threadExecutor.renew()
-        runnables.forEach {
-            threadExecutor.submit(it)
-        }
-
-        threadExecutor.join()
-
-        initialGenDone = true
     }
+
+    var worldgenDone = true; private set
 
     override fun dispose() {
         testTex.dispose()
         tempTex.dispose()
     }
 }
+
 
 fun main(args: Array<String>) {
     ShaderProgram.pedantic = false
@@ -270,7 +235,7 @@ fun main(args: Array<String>) {
     Lwjgl3Application(WorldgenNoiseSandbox(), appConfig)
 }
 
-internal interface NoiseMaker {
+interface NoiseMaker {
     fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap)
     fun getGenerator(seed: Long, params: Any): List<Joise>
 }
