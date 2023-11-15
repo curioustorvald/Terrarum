@@ -42,7 +42,7 @@ internal object ExportMap2 : ConsoleCommand {
     private fun Float.toDitherredByte(): Byte {
         val byteVal = this.times(255f).roundToInt()
         val error = this - byteVal
-        val errorInt = if (Math.random() < (1 - error.absoluteValue)) 0 else (1 * error.sign).toInt()
+        val errorInt = if (Math.random() < error.absoluteValue) 0 else error.sign.toInt()
         return (byteVal + errorInt).coerceIn(0..255).toByte()
     }
 

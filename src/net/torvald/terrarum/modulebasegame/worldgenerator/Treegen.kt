@@ -70,7 +70,7 @@ class Treegen(world: GameWorld, seed: Long, val terragenParams: TerragenParams, 
     private fun Double.toDitherredInt(rng: HQRNG): Int {
         val ibase = this.floorToInt()
         val thre = this - ibase
-        return if (rng.nextDouble() < (1.0 - thre)) ibase else ibase + 1
+        return if (rng.nextDouble() < 1.0 - thre) ibase else ibase + 1
     }
 
     private fun tryToPlant(xs: IntProgression, grassMap: Array<List<Int>>, rng: HQRNG) {

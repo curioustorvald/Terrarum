@@ -381,15 +381,17 @@ internal object TerragenTest : NoiseMaker {
 
     private val terragenTiers = listOf(.0, .5, 1.0, 2.5).map { it * (NOISEBOX_HEIGHT / 2400.0).pow(0.75) } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
 
+    private fun Double.dither() = Math.random() < this
+
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val terr = noiseValue[0].tiered(terragenTiers)
         val cave = if (noiseValue[1] < 0.5) 0 else 1
         val ore = (noiseValue.subList(2, noiseValue.size)).zip(oreCols).firstNotNullOfOrNull { (n, colour) -> if (n > 0.5) colour else null }
 
-        val marbleLayerThre = noiseValue[10]..noiseValue[11]
+        val isMarble = noiseValue[10] > 0.5
 
-        val wallBlock =  if (noiseValue[0] in marbleLayerThre) Block.STONE_MARBLE else groundDepthBlock[terr]
-        val terrBlock = if (cave == 0) Block.AIR else if (noiseValue[0] in marbleLayerThre) Block.STONE_MARBLE else wallBlock
+        val wallBlock =  if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
+        val terrBlock = if (cave == 0) Block.AIR else if (isMarble) Block.STONE_MARBLE else wallBlock
 
 
         outTex.drawPixel(x, y,
@@ -714,24 +716,35 @@ internal object TerragenTest : NoiseMaker {
             Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:7", 0.013, 0.300, 0.476, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaled, seed shake "ores@basegame:8", 0.017, 0.020, 0.511, 1.0)),
 
-            Joise(generate1Dline(seed shake 10, 2.6)),
-            Joise(generate1Dline(seed shake 10, 2.62)),
+            Joise(generateRockLayer(groundScaling, seed shake 10, 2.6, 2.62)),
         )
     }
 
-    private fun generate1Dline(seed: Long, avr: Double): Module {
-        return ModuleScaleOffset().also {
-            it.setSource(ModuleFractal().also {
-                it.setType(ModuleFractal.FractalType.RIDGEMULTI)
-                it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
-                it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-                it.setNumOctaves(1)
-                it.setFrequency(0.0)
-                it.seed = seed
-            })
-            it.setScale(1.0)
-            it.setOffset(avr - 1.0)
+    private fun generateRockLayer(ground: Module, seed: Long, rangeStart: Double, rangeEnd: Double): Module {
+        val thresholdLow = ModuleSelect().also {
+            it.setLowSource(0.0)
+            it.setHighSource(1.0)
+            it.setControlSource(ground)
+            it.setThreshold(rangeStart)
+            it.setFalloff(0.0)
         }
+
+        val thresholdHigh = ModuleSelect().also {
+            it.setLowSource(1.0)
+            it.setHighSource(0.0)
+            it.setControlSource(ground)
+            it.setThreshold(rangeEnd)
+            it.setFalloff(0.0)
+        }
+
+        val band = ModuleCombiner().also {
+            it.setSource(0, thresholdLow)
+            it.setSource(1, thresholdHigh)
+            it.setType(ModuleCombiner.CombinerType.MULT)
+        }
+
+        return band
+
 
         // TODO combine another noise generator to cut off the otherwise continuous line of stone layer
     }
