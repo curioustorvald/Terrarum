@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
@@ -39,7 +38,6 @@ import net.torvald.util.CircularArray
 import org.dyn4j.geometry.Vector2
 import java.io.File
 import java.io.PrintStream
-import java.util.*
 import kotlin.math.*
 
 
@@ -686,10 +684,17 @@ inline fun printStackTrace(obj: Any) = printStackTrace(obj, System.out) // becau
 
 fun printStackTrace(obj: Any, out: PrintStream = System.out) {
     if (App.IS_DEVELOPMENT_BUILD) {
-        val indentation = " ".repeat(obj.javaClass.simpleName.length + 4)
+        val timeNow = System.currentTimeMillis()
+        val ss = timeNow / 1000 % 60
+        val mm = timeNow / 60000 % 60
+        val hh = timeNow / 3600000 % 24
+        val ms = timeNow % 1000
+        val objName = if (obj is String) obj else obj.javaClass.simpleName
+        val prompt = csiG + String.format("%02d:%02d:%02d.%03d%s [%s] ", hh, mm, ss, ms, csi0, objName)
+        val indentation = " ".repeat(objName.length + 16)
         Thread.currentThread().stackTrace.forEachIndexed { index, it ->
             if (index == 1)
-                out.println("[${obj.javaClass.simpleName}]> $it")
+                out.println("$prompt$it")
             else if (index > 1)
                 out.println("$indentation$it")
         }

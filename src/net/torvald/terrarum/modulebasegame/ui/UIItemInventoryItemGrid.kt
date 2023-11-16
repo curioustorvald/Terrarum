@@ -248,8 +248,19 @@ open class UIItemInventoryItemGrid(
         itemList.forEach { it.customHighlightRule2 = predicate }
     }
 
+    private var lastScrolled = System.nanoTime()
+
     open fun scrollItemPage(relativeAmount: Int) {
-        itemPage = if (itemPageCount == 0) 0 else (itemPage + relativeAmount).fmod(itemPageCount)
+        val timeNow = System.nanoTime()
+
+        // hack to fix double scroll when UI opened by right clicking on the workbench
+        // the double-stacktrace is identical, so I have no clue why the double-scrolling is happening :/
+        if ((timeNow - lastScrolled) ushr 20 != 0L) { // 1.048 ms
+//            printStackTrace("$this@${this.hashCode()}")
+            itemPage = if (itemPageCount == 0) 0 else (itemPage + relativeAmount).fmod(itemPageCount)
+        }
+
+        lastScrolled = timeNow // some nanoseconds have passed since the timeNow but it doesn't matter
     }
 
     val navRemoCon = UIItemListNavBarVertical(parentUI, iconPosX, posY + 8, height, true, if (isCompactMode) 1 else 0)
