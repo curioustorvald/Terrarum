@@ -35,7 +35,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
         get() = fullscaleToDecibels(volume)
         set(value) { volume = decibelsToFullscale(value) }
 
-    val filters = Array(4) { NullFilter }
+    val filters: Array<TerrarumAudioFilter> = Array(4) { NullFilter }
 
     internal val sidechainInputs = Array<Pair<TerrarumAudioMixerTrack, TrackVolume>?>(16)  { null }
     internal fun getSidechains(): List<TerrarumAudioMixerTrack?> = sidechainInputs.map { it?.first }

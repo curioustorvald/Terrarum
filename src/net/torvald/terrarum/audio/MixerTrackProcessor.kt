@@ -19,13 +19,6 @@ class MixerTrackProcessor(val bufferSize: Int, val track: TerrarumAudioMixerTrac
 
     internal val streamBuf = AudioProcessBuf(bufferSize)
     internal val sideChainBufs = Array(track.sidechainInputs.size) { AudioProcessBuf(bufferSize) }
-//    internal val outBufL0 = FloatArray(bufferSize / 4)
-//    internal val outBufR0 = FloatArray(bufferSize / 4)
-//    internal val outBufL1 = FloatArray(bufferSize / 4)
-//    internal val outBufR1 = FloatArray(bufferSize / 4)
-
-
-    private val testFilter = Lowpass(240, SAMPLING_RATE)
 
     private var fout0 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
     private var fout1 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
@@ -97,21 +90,28 @@ class MixerTrackProcessor(val bufferSize: Int, val track: TerrarumAudioMixerTrac
 
 
             // run the input through the stack of filters
-            val filterStack = track.filters.filter { !it.bypass }
+            val filterStack = track.filters.filter { !it.bypass && it !is NullFilter }
 
-            val fin0 = listOf(samplesL0, samplesR0)
-            val fin1 = listOf(samplesL1, samplesR1)
-            fout0 = fout1
-            fout1 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
-            val filter = if (track.isMaster) testFilter else NullFilter
-            filter(fin0, fin1, fout0, fout1)
+            if (filterStack.isEmpty()) {
+                fout1 = listOf(samplesL1, samplesR1)
+            }
+            else {
+                var fin0 = listOf(samplesL0, samplesR0)
+                var fin1 = listOf(samplesL1, samplesR1)
+                fout0 = fout1
+                fout1 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
 
+                filterStack.forEachIndexed { index, it ->
+                    it(fin0, fin1, fout0, fout1)
+                    fin0 = fout0
+                    fin1 = fout1
+                    if (index < filterStack.lastIndex) {
+                        fout0 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
+                        fout1 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
+                    }
+                }
+            }
 
-            // final writeout
-//            System.arraycopy(samplesL0, 0, outBufL0, 0, outBufL0.size)
-//            System.arraycopy(samplesR0, 0, outBufR0, 0, outBufR0.size)
-//            System.arraycopy(samplesL1, 0, outBufL1, 0, outBufL1.size)
-//            System.arraycopy(samplesR1, 0, outBufR1, 0, outBufR1.size)
 
             // by this time, the output buffer is filled with processed results, pause the execution
             if (!track.isMaster) {
