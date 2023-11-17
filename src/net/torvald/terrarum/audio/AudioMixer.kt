@@ -32,7 +32,7 @@ object AudioMixer: Disposable {
 
     private val masterTrack = TerrarumAudioMixerTrack("Master", true).also { master ->
         tracks.forEach { master.addSidechainInput(it, 1.0) }
-        master.filters[0] = Lowpass(240, TerrarumAudioMixerTrack.SAMPLING_RATE)
+//        master.filters[0] = Lowpass(240, TerrarumAudioMixerTrack.SAMPLING_RATE)
     }
 
     private val musicTrack: TerrarumAudioMixerTrack

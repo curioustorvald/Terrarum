@@ -119,9 +119,9 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
 
     // 1st ring of the hell: the THREADING HELL //
 
-    val BUFFER_SIZE = 4096
+    val BUFFER_SIZE = 8192
 
-    internal var processor = MixerTrackProcessor(BUFFER_SIZE, this)
+    internal var processor = MixerTrackProcessor(BUFFER_SIZE, SAMPLING_RATE, this)
     private val processorThread = Thread(processor).also {
         it.start()
     }
@@ -134,7 +134,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
         pcmQueue.addLast(listOf(FloatArray(BUFFER_SIZE / 4), FloatArray(BUFFER_SIZE / 4)))
 
         if (isMaster) {
-            queueDispatcher = FeedSamplesToAdev(this)
+            queueDispatcher = FeedSamplesToAdev(BUFFER_SIZE, SAMPLING_RATE, this)
             queueDispatcherThread = Thread(queueDispatcher).also {
                 it.start()
             }

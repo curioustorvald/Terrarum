@@ -7,7 +7,7 @@ import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RAT
 /**
  * Created by minjaesong on 2023-11-17.
  */
-class MixerTrackProcessor(val bufferSize: Int, val track: TerrarumAudioMixerTrack): Runnable {
+class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: TerrarumAudioMixerTrack): Runnable {
     @Volatile private var running = true
     @Volatile private var paused = false
     private val pauseLock = java.lang.Object()
@@ -22,13 +22,16 @@ class MixerTrackProcessor(val bufferSize: Int, val track: TerrarumAudioMixerTrac
     private var fout0 = listOf(emptyBuf, emptyBuf)
     private var fout1 = listOf(emptyBuf, emptyBuf)
 
+    private var breakBomb = false
 
+    private fun printdbg(msg: Any) {
+        if (true) println("[AudioAdapter ${track.name}] $msg")
+    }
     override fun run() {
-        w@ while (running) {
-            synchronized(pauseLock) {
+        while (running) { synchronized(pauseLock) {
                 if (!running) { // may have changed while waiting to
                     // synchronize on pauseLock
-//                    break@w
+                    breakBomb = true
                 }
                 if (paused) {
                     try {
@@ -41,23 +44,21 @@ class MixerTrackProcessor(val bufferSize: Int, val track: TerrarumAudioMixerTrac
                         // (link with explanation below this code)
                     }
                     catch (ex: InterruptedException) {
-//                        break@w
+                        breakBomb = true
                     }
                     if (!running) { // running might have changed since we paused
-//                        break@w
+                        breakBomb = true
                     }
                 }
             }
+
+            if (breakBomb) break
             // Your code here
-
-
-//            println("AudioMixerTrack ${track.name} (${track.hash}) streamPlaying=${track.streamPlaying}")
 
             // fetch deviceBufferSize amount of sample from the disk
             if (!track.isMaster && track.streamPlaying) {
                 streamBuf.fetchBytes {
                     track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
-//                    for (i in it.indices) { it[i] = (Math.random() * 255).toInt().toByte() }
                 }
             }
 
@@ -66,7 +67,6 @@ class MixerTrackProcessor(val bufferSize: Int, val track: TerrarumAudioMixerTrac
 
             // combine all the inputs
             // TODO this code just uses streamBuf
-
 
             var samplesL0: FloatArray? = null
             var samplesR0: FloatArray? = null
@@ -119,7 +119,6 @@ class MixerTrackProcessor(val bufferSize: Int, val track: TerrarumAudioMixerTrac
                 samplesR1 = streamBuf.getR1(track.volume)
             }
 
-
             if (samplesL0 != null && samplesL1 != null && samplesR0 != null && samplesR1 != null) {
                 // run the input through the stack of filters
                 val filterStack = track.filters.filter { !it.bypass && it !is NullFilter }
@@ -145,7 +144,6 @@ class MixerTrackProcessor(val bufferSize: Int, val track: TerrarumAudioMixerTrac
                 }
             }
 
-
             // by this time, the output buffer is filled with processed results, pause the execution
             if (!track.isMaster) {
                 this.pause()
@@ -154,31 +152,24 @@ class MixerTrackProcessor(val bufferSize: Int, val track: TerrarumAudioMixerTrac
                 if (samplesL0 != null && samplesL1 != null && samplesR0 != null && samplesR1 != null) {
 
                     // spin until queue is sufficiently empty
-                    while (track.pcmQueue.size > 3) {
-                        Thread.sleep(6)
+                    while (track.pcmQueue.size >= 4 && running) {
+                        Thread.sleep(1)
                     }
 
-                    println("[AudioAdapter ${track.name}] Pushing to queue (queue size: ${track.pcmQueue.size})")
+//                    printdbg("Pushing to queue (queue size: ${track.pcmQueue.size})")
                     track.pcmQueue.addLast(fout1)
                 }
 
                 // spin
-                Thread.sleep(12)
+                Thread.sleep((bufferSize / 8L / rate).coerceAtLeast(1L))
 
                 // wake sidechain processors
                 track.getSidechains().forEach {
-                    it?.processor?.resume()
+                    if (it?.processor?.running == true)
+                        it?.processor?.resume()
                 }
             }
-
-
         }
-
-        println("[AudioAdapter ${track.name}] MixerTrackProcessor EXIT")
-    }
-
-    private fun interleave(f1: FloatArray, f2: FloatArray) = FloatArray(f1.size + f2.size) {
-        if (it % 2 == 0) f1[it / 2] else f2[it / 2]
     }
 
     fun stop() {
@@ -212,7 +203,7 @@ private fun <T> Queue<T>.removeFirstOrElse(function: () -> T): T {
 }
 
 
-class FeedSamplesToAdev(val track: TerrarumAudioMixerTrack) : Runnable {
+class FeedSamplesToAdev(val bufferSize: Int, val rate: Int, val track: TerrarumAudioMixerTrack) : Runnable {
     init {
         if (!track.isMaster) throw IllegalArgumentException("Track is not master")
     }
@@ -227,32 +218,18 @@ class FeedSamplesToAdev(val track: TerrarumAudioMixerTrack) : Runnable {
             val writeQueue = track.pcmQueue
 
             if (writeQueue.notEmpty()) {
-
-                printdbg("Taking samples from queue (queue size: ${writeQueue.size})")
+//                printdbg("Taking samples from queue (queue size: ${writeQueue.size})")
 
                 val samples = writeQueue.removeFirst()
-//                playhead.position = writeQueue.size
-
-//                printdbg("P${playhead.index+1} Vol ${playhead.masterVolume}; LpP ${playhead.pcmUploadLength}; start playback...")
-//                    printdbg(""+(0..42).joinToString { String.format("%.2f", samples[it]) })
-
                 track.adev!!.writeSamples(samples)
-
-//                printdbg("P${playhead.index+1} go back to spinning")
-
             }
             else if (writeQueue.isEmpty) {
 //                printdbg("!! QUEUE EXHAUSTED !! QUEUE EXHAUSTED !! QUEUE EXHAUSTED !! QUEUE EXHAUSTED !! QUEUE EXHAUSTED !! QUEUE EXHAUSTED ")
-
-                // TODO: wait for 1-2 seconds then finally stop the device
-//                    playhead.audioDevice.stop()
-
             }
 
-
-            Thread.sleep(1)
+            Thread.sleep((bufferSize / 8L / rate).coerceAtLeast(1L))
         }
-        printdbg("FeedSamplesToAdev EXIT")
+//        printdbg("FeedSamplesToAdev EXIT")
     }
 
     fun stop() {
