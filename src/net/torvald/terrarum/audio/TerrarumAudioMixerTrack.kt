@@ -3,6 +3,7 @@ package net.torvald.terrarum.audio
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.audio.OpenALLwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.getHashStr
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -104,6 +105,10 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
         get() = currentTrack?.gdxMusic?.isPlaying
 
     override fun dispose() {
+        if (isMaster) {
+            queueDispatcher.stop()
+            queueDispatcherThread.join()
+        }
         processor.stop()
         processorThread.join()
         adev?.dispose()
@@ -114,15 +119,29 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
 
     // 1st ring of the hell: the THREADING HELL //
 
-    internal var processor = MixerTrackProcessor(4096, this)
+    val BUFFER_SIZE = 4096
+
+    internal var processor = MixerTrackProcessor(BUFFER_SIZE, this)
     private val processorThread = Thread(processor).also {
         it.start()
     }
+    internal var pcmQueue = Queue<List<FloatArray>>()
+    private lateinit var queueDispatcher: FeedSamplesToAdev
+    private lateinit var queueDispatcherThread: Thread
 
-    private fun interleave(f1: FloatArray, f2: FloatArray) = FloatArray(f1.size + f2.size) {
-        if (it % 2 == 0) f1[it / 2] else f2[it / 2]
+    init {
+        pcmQueue.addLast(listOf(FloatArray(BUFFER_SIZE / 4), FloatArray(BUFFER_SIZE / 4)))
+        pcmQueue.addLast(listOf(FloatArray(BUFFER_SIZE / 4), FloatArray(BUFFER_SIZE / 4)))
+
+        if (isMaster) {
+            queueDispatcher = FeedSamplesToAdev(this)
+            queueDispatcherThread = Thread(queueDispatcher).also {
+                it.start()
+            }
+        }
     }
+
 }
 
-fun fullscaleToDecibels(fs: Double) = 10.0 * log10(fs)
-fun decibelsToFullscale(db: Double) = 10.0.pow(db / 10.0)
+fun fullscaleToDecibels(fs: Double) = 20.0 * log10(fs)
+fun decibelsToFullscale(db: Double) = 10.0.pow(db / 20.0)

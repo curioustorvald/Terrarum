@@ -96,6 +96,20 @@ class OpenALBufferedAudioDevice(
         writeSamples(bytes!!, 0, numSamples * 2)
     }
 
+    private fun interleave(f1: FloatArray, f2: FloatArray) = FloatArray(f1.size + f2.size) {
+        if (it % 2 == 0) f1[it / 2] else f2[it / 2]
+    }
+
+    /**
+     * @param samples multitrack
+     * @param numSamples number of samples per channel
+     */
+    fun writeSamples(samples: List<FloatArray>) {
+        interleave(samples[0], samples[1]).let {
+            writeSamples(it, 0, it.size)
+        }
+    }
+
     private fun audioObtainSource(isMusic: Boolean): Int {
         val obtainSourceMethod = OpenALLwjgl3Audio::class.java.getDeclaredMethod("obtainSource", java.lang.Boolean.TYPE)
         obtainSourceMethod.isAccessible = true
