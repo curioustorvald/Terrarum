@@ -75,13 +75,17 @@ class TerrarumAudioMixerTracks(val isMaster: Boolean = false): Disposable {
         it.isAccessible = true
         it.get(Gdx.audio) as Int
     }
-    private val adev = OpenALBufferedAudioDevice(
-        Gdx.audio as OpenALLwjgl3Audio,
-        SAMPLING_RATE,
-        false,
-        deviceBufferSize,
-        deviceBufferCount
-    ) {}
+    private val adev: OpenALBufferedAudioDevice? =
+        if (isMaster) {
+            OpenALBufferedAudioDevice(
+                Gdx.audio as OpenALLwjgl3Audio,
+                SAMPLING_RATE,
+                false,
+                deviceBufferSize,
+                deviceBufferCount
+            ) {}
+        }
+        else null
 
 
     /**
@@ -104,7 +108,7 @@ class TerrarumAudioMixerTracks(val isMaster: Boolean = false): Disposable {
         get() = currentTrack?.gdxMusic?.isPlaying
 
     override fun dispose() {
-        adev.dispose()
+        adev?.dispose()
     }
 
     override fun equals(other: Any?) = this.hash == (other as TerrarumAudioMixerTracks).hash
@@ -158,11 +162,20 @@ class TerrarumAudioMixerTracks(val isMaster: Boolean = false): Disposable {
                 }
             }
             else {
+                adev!!.writeSamples(interleave(samplesL1, samplesR1), 0, samplesL1.size * 2)
+                withContext(Dispatchers.IO) {
+                    Thread.sleep(12)
+                }
+
                 getSidechains().forEach {
                     it?.processContinuation?.resume(Unit)
                 }
             }
         }
+    }
+
+    private fun interleave(f1: FloatArray, f2: FloatArray) = FloatArray(f1.size + f2.size) {
+        if (it % 2 == 0) f1[it / 2] else f2[it / 2]
     }
 }
 

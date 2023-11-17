@@ -17,5 +17,6 @@
     <orderEntry type="library" name="jetbrains.kotlin.reflect" level="project" />
     <orderEntry type="library" name="jetbrains.kotlin.test" level="project" />
     <orderEntry type="library" name="io.github.classgraph" level="project" />
+    <orderEntry type="library" name="jetbrains.kotlinx.coroutines.core" level="project" />
   </component>
 </module>
