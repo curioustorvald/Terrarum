@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.unicode.EMDASH
 import java.io.File
 
@@ -67,7 +68,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     private fun startMusic(song: MusicContainer) {
-        AudioManager.startMusic(song)
+        AudioMixer.startMusic(song)
         printdbg(this, "Now playing: $song")
         INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
         state = STATE_PLAYING
@@ -117,7 +118,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     override fun dispose() {
-        AudioManager.stopMusic() // explicit call for fade-out when the game instance quits
+        AudioMixer.stopMusic() // explicit call for fade-out when the game instance quits
         stopMusic()
     }
 }

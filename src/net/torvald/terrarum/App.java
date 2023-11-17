@@ -2,7 +2,6 @@ package net.torvald.terrarum;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.AudioDevice;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.TerrarumLwjgl3Application;
 import com.badlogic.gdx.controllers.Controllers;
@@ -16,6 +15,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.github.strikerx3.jxinput.XInputDevice;
 import kotlin.text.Charsets;
 import net.torvald.getcpuname.GetCpuName;
+import net.torvald.terrarum.audio.AudioMixer;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
@@ -1188,7 +1188,7 @@ public class App implements ApplicationListener {
         }
 
 
-        AudioManager.INSTANCE.getMasterVolume();
+        AudioMixer.INSTANCE.getMasterVolume();
         audioManagerThread = new Thread(new AudioManagerRunnable(), "TerrarumAudioManager");
         audioManagerThread.start();
 

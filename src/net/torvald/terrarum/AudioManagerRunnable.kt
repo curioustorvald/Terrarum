@@ -1,7 +1,6 @@
 package net.torvald.terrarum
 
-import com.badlogic.gdx.Gdx
-import net.torvald.terrarum.gamecontroller.InputStrober
+import net.torvald.terrarum.audio.AudioMixer
 
 /**
  * Created by minjaesong on 2023-11-08.
@@ -17,7 +16,7 @@ class AudioManagerRunnable : Runnable {
                 val T = System.nanoTime()
                 dT = (T - oldT) / 1000000000f
                 oldT = T;
-                AudioManager.update(dT)
+                AudioMixer.update(dT)
 //                println("AudioManagerRunnable dT = ${dT * 1000f} ms")
                 Thread.sleep(30L)
             }
