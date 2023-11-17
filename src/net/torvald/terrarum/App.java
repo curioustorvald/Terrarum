@@ -920,6 +920,8 @@ public class App implements ApplicationListener {
             audioManagerThread.interrupt();
         }
 
+        AudioMixer.INSTANCE.dispose();
+
         if (currentScreen != null) {
             currentScreen.hide();
             currentScreen.dispose();

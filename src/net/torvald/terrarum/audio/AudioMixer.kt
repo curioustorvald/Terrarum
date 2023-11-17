@@ -2,15 +2,17 @@ package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.audio.Lwjgl3Audio
+import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
 import net.torvald.terrarum.modulebasegame.MusicContainer
+import net.torvald.terrarum.tryDispose
 
 /**
  * Any audio reference fed into this manager will get lost; you must manually store and dispose of them on your own.
  *
  * Created by minjaesong on 2023-11-07.
  */
-object AudioMixer {
+object AudioMixer: Disposable {
     const val DEFAULT_FADEOUT_LEN = 2.4
 
     /** Returns a master volume */
@@ -28,8 +30,8 @@ object AudioMixer {
 
     private val tracks = Array(10) { TerrarumAudioMixerTracks() }
 
-    private val masterTrack = TerrarumAudioMixerTracks().also { master ->
-        tracks.forEach { master.sidechainInputs.add(it to 1.0) }
+    private val masterTrack = TerrarumAudioMixerTracks(true).also { master ->
+        tracks.forEach { master.addSidechainInput(it, 1.0) }
     }
 
     private val musicTrack: TerrarumAudioMixerTracks
@@ -122,4 +124,9 @@ object AudioMixer {
         }
     }
 
+
+    override fun dispose() {
+        tracks.forEach { it.tryDispose() }
+        masterTrack.tryDispose()
+    }
 }
