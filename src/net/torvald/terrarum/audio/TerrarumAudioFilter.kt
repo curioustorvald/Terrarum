@@ -2,11 +2,20 @@ package net.torvald.terrarum.audio
 
 import com.jme3.math.FastMath
 
-interface TerrarumAudioFilter {
-    fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>)
+abstract class TerrarumAudioFilter {
+    var bypass = false
+    protected abstract fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>)
+    operator fun invoke(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+        if (bypass) {
+            outbuf1.forEachIndexed { index, outTrack ->
+                System.arraycopy(inbuf1[index], 0, outTrack, 0, outTrack.size)
+            }
+        }
+        else thru(inbuf0, inbuf1, outbuf0, outbuf1)
+    }
 }
 
-object NullFilter: TerrarumAudioFilter {
+object NullFilter: TerrarumAudioFilter() {
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
         outbuf1.forEachIndexed { index, outTrack ->
             System.arraycopy(inbuf1[index], 0, outTrack, 0, outTrack.size)
@@ -15,7 +24,7 @@ object NullFilter: TerrarumAudioFilter {
 }
 
 
-class Lowpass(cutoff: Int, rate: Int): TerrarumAudioFilter {
+class Lowpass(cutoff: Int, rate: Int): TerrarumAudioFilter() {
 
     val alpha: Float
     init {

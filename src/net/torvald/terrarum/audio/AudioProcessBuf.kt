@@ -34,9 +34,9 @@ class AudioProcessBuf(val size: Int) {
         updateFloats()
     }
 
-    fun getL0() = FloatArray(size / 4) { fbuf0[2*it] }
-    fun getR0() = FloatArray(size / 4) { fbuf0[2*it+1] }
-    fun getL1() = FloatArray(size / 4) { fbuf1[2*it] }
-    fun getR1() = FloatArray(size / 4) { fbuf1[2*it+1] }
+    fun getL0(volume: Double) = FloatArray(size / 4) { (volume * fbuf0[2*it]).toFloat() }
+    fun getR0(volume: Double) = FloatArray(size / 4) { (volume * fbuf0[2*it+1]).toFloat() }
+    fun getL1(volume: Double) = FloatArray(size / 4) { (volume * fbuf1[2*it]).toFloat() }
+    fun getR1(volume: Double) = FloatArray(size / 4) { (volume * fbuf1[2*it+1]).toFloat() }
 
 }

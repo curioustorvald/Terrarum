@@ -82,27 +82,29 @@ class MixerTrackProcessor(val bufferSize: Int, val track: TerrarumAudioMixerTrac
             var samplesR1: FloatArray
 
             if (track.isMaster) {
-                val streamBuf = track.sidechainInputs[0]!!.first.processor.streamBuf
-                samplesL0 = streamBuf.getL0()
-                samplesR0 = streamBuf.getR0()
-                samplesL1 = streamBuf.getL1()
-                samplesR1 = streamBuf.getR1()
+                // TEST CODE must combine all the inputs
+                samplesL0 = track.sidechainInputs[0]!!.first.processor.fout0[0]
+                samplesR0 = track.sidechainInputs[0]!!.first.processor.fout0[1]
+                samplesL1 = track.sidechainInputs[0]!!.first.processor.fout1[0]
+                samplesR1 = track.sidechainInputs[0]!!.first.processor.fout1[1]
             }
             else {
-                samplesL0 = streamBuf.getL0()
-                samplesR0 = streamBuf.getR0()
-                samplesL1 = streamBuf.getL1()
-                samplesR1 = streamBuf.getR1()
+                samplesL0 = streamBuf.getL0(track.volume)
+                samplesR0 = streamBuf.getR0(track.volume)
+                samplesL1 = streamBuf.getL1(track.volume)
+                samplesR1 = streamBuf.getR1(track.volume)
             }
 
 
             // run the input through the stack of filters
+            val filterStack = track.filters.filter { !it.bypass }
+
             val fin0 = listOf(samplesL0, samplesR0)
             val fin1 = listOf(samplesL1, samplesR1)
             fout0 = fout1
             fout1 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
             val filter = if (track.isMaster) testFilter else NullFilter
-            filter.thru(fin0, fin1, fout0, fout1)
+            filter(fin0, fin1, fout0, fout1)
 
 
             // final writeout

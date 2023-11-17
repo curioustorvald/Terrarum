@@ -114,7 +114,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
 
     // 1st ring of the hell: the THREADING HELL //
 
-    internal var processor = MixerTrackProcessor(32768, this)
+    internal var processor = MixerTrackProcessor(4096, this)
     private val processorThread = Thread(processor).also {
         it.start()
     }
