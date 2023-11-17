@@ -28,15 +28,15 @@ object AudioMixer: Disposable {
         get() = (App.getConfigDouble("sfxvolume") * App.getConfigDouble("mastervolume"))
 
 
-    private val tracks = Array(10) { TerrarumAudioMixerTracks() }
+    private val tracks = Array(10) { TerrarumAudioMixerTrack("Audio Track #${it+1}") }
 
-    private val masterTrack = TerrarumAudioMixerTracks(true).also { master ->
+    private val masterTrack = TerrarumAudioMixerTrack("Master", true).also { master ->
         tracks.forEach { master.addSidechainInput(it, 1.0) }
     }
 
-    private val musicTrack: TerrarumAudioMixerTracks
+    private val musicTrack: TerrarumAudioMixerTrack
         get() = tracks[0]
-    private val ambientTrack: TerrarumAudioMixerTracks
+    private val ambientTrack: TerrarumAudioMixerTrack
         get() = tracks[1]
 
     private var fadeAkku = 0.0

@@ -15,17 +15,23 @@ class AudioProcessBuf(val size: Int) {
     var fbuf0 = FloatArray(size / 2); private set
     var fbuf1 = FloatArray(size / 2); private set
 
-    fun shift(): ByteArray {
+    private fun shift(): ByteArray {
         buf0 = buf1
         buf1 = ByteArray(size)
+        return buf1
+    }
 
+    private fun updateFloats() {
         fbuf0 = fbuf1
         fbuf1 = FloatArray(size / 2) {
-            val i16 = (buf1[4*it].toUint() or buf1[4*it+1].toUint().shl(8)).toShort()
+            val i16 = (buf1[2*it].toUint() or buf1[2*it+1].toUint().shl(8)).toShort()
             i16 / 32767f
         }
+    }
 
-        return buf1
+    fun fetchBytes(action: (ByteArray) -> Unit) {
+        action(shift())
+        updateFloats()
     }
 
     fun getL0() = FloatArray(size / 4) { fbuf0[2*it] }
