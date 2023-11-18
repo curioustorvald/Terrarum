@@ -3,6 +3,7 @@ package net.torvald.terrarum.audio
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
+import kotlin.math.absoluteValue
 
 /**
  * Created by minjaesong on 2023-11-17.
@@ -21,6 +22,8 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
     private var fout0 = listOf(emptyBuf, emptyBuf)
     private var fout1 = listOf(emptyBuf, emptyBuf)
+
+    var maxSigLevel = arrayOf(0.0, 0.0); private set
 
     private var breakBomb = false
 
@@ -58,7 +61,13 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
             // fetch deviceBufferSize amount of sample from the disk
             if (!track.isMaster && track.streamPlaying) {
                 streamBuf.fetchBytes {
-                    track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
+                    val bytesRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
+                    if (bytesRead == null || bytesRead <= 0) { // some class (namely Mp3) may return 0 instead of negative value
+//                        printdbg("Finished reading audio stream")
+                        track.currentTrack?.gdxMusic?.forceInvoke<Int>("reset", arrayOf())
+                        track.streamPlaying = false
+                        track.fireSongFinishHook()
+                    }
                 }
             }
 
@@ -146,6 +155,8 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
             // by this time, the output buffer is filled with processed results, pause the execution
             if (!track.isMaster) {
+                fout1.map { it.maxBy { it.absoluteValue } }.forEachIndexed { index, fl -> maxSigLevel[index] = fl.toDouble() }
+
                 this.pause()
             }
             else {
@@ -156,7 +167,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                         Thread.sleep(1)
                     }
 
-//                    printdbg("Pushing to queue (queue size: ${track.pcmQueue.size})")
+//                    printdbg("PUSHE; Queue size: ${track.pcmQueue.size}")
                     track.pcmQueue.addLast(fout1)
                 }
 
@@ -216,20 +227,18 @@ class FeedSamplesToAdev(val bufferSize: Int, val rate: Int, val track: TerrarumA
         while (!exit) {
 
             val writeQueue = track.pcmQueue
-
-            if (writeQueue.notEmpty()) {
-//                printdbg("Taking samples from queue (queue size: ${writeQueue.size})")
-
+            val queueSize = writeQueue.size
+            if (queueSize > 0) {
+//                printdbg("PULL; Queue size: $queueSize")
                 val samples = writeQueue.removeFirst()
                 track.adev!!.writeSamples(samples)
             }
-            else if (writeQueue.isEmpty) {
-//                printdbg("!! QUEUE EXHAUSTED !! QUEUE EXHAUSTED !! QUEUE EXHAUSTED !! QUEUE EXHAUSTED !! QUEUE EXHAUSTED !! QUEUE EXHAUSTED ")
-            }
+//            else {
+//                printdbg("QUEUE EMPTY QUEUE EMPTY QUEUE EMPTY ")
+//            }
 
             Thread.sleep((bufferSize / 8L / rate).coerceAtLeast(1L))
         }
-//        printdbg("FeedSamplesToAdev EXIT")
     }
 
     fun stop() {

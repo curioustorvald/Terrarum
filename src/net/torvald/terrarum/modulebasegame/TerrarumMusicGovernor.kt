@@ -12,8 +12,13 @@ import java.io.File
 data class MusicContainer(
     val name: String,
     val file: File,
-    val gdxMusic: Music
+    val gdxMusic: Music,
+    val songFinishedHook: (Music) -> Unit
 ) {
+    init {
+        gdxMusic.setOnCompletionListener(songFinishedHook)
+    }
+
     override fun toString() = if (name.isEmpty()) file.nameWithoutExtension else name
 }
 
@@ -26,11 +31,8 @@ class TerrarumMusicGovernor : MusicGovernor() {
                 MusicContainer(
                     it.nameWithoutExtension.replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
                     it,
-                    Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath)).also {
-                        it.setOnCompletionListener {
-                            stopMusic()
-                        }
-                    }
+                    Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath)),
+                    { stopMusic() }
                 )
             }
             catch (e: GdxRuntimeException) {

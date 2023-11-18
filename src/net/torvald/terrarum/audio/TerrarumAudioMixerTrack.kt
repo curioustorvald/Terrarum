@@ -116,10 +116,14 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
 
     override fun equals(other: Any?) = this.hash == (other as TerrarumAudioMixerTrack).hash
 
+    fun fireSongFinishHook() {
+        currentTrack?.songFinishedHook?.invoke(currentTrack!!.gdxMusic)
+    }
+
 
     // 1st ring of the hell: the THREADING HELL //
 
-    val BUFFER_SIZE = 8192
+    val BUFFER_SIZE = 16384
 
     internal var processor = MixerTrackProcessor(BUFFER_SIZE, SAMPLING_RATE, this)
     private val processorThread = Thread(processor).also {
