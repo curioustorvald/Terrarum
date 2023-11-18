@@ -17,6 +17,9 @@ import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
+import net.torvald.terrarum.audio.AudioMixer
+import net.torvald.terrarum.audio.Lowpass
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.clut.Skybox
 import net.torvald.terrarum.console.CommandDict
 import net.torvald.terrarum.gameactors.*
@@ -291,6 +294,9 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // to show "Continue" and "Load" on the titlescreen, uncomment this line
         App.updateListOfSavegames()
         UILoadGovernor.reset()
+
+
+        (AudioMixer.musicTrack.filters[0] as Lowpass).setCutoff(TerrarumAudioMixerTrack.SAMPLING_RATEF)
 
 
         loadThingsWhileIntroIsVisible()

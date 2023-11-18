@@ -12,6 +12,9 @@ import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
 import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.audio.AudioMixer
+import net.torvald.terrarum.audio.Lowpass
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.blockstats.TileSurvey
@@ -287,6 +290,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         IngameRenderer.setRenderedWorld(world)
         blockMarkingActor.isVisible = true
+
+        (AudioMixer.musicTrack.filters[0] as Lowpass).setCutoff(TerrarumAudioMixerTrack.SAMPLING_RATEF)
 
         super.show() // this function sets gameInitialised = true
     }

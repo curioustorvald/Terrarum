@@ -9,6 +9,10 @@ import kotlin.math.absoluteValue
  * Created by minjaesong on 2023-11-17.
  */
 class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: TerrarumAudioMixerTrack): Runnable {
+
+    val BACK_BUF_COUNT = 2
+
+
     @Volatile private var running = true
     @Volatile private var paused = false
     private val pauseLock = java.lang.Object()
@@ -163,7 +167,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 if (samplesL0 != null && samplesL1 != null && samplesR0 != null && samplesR1 != null) {
 
                     // spin until queue is sufficiently empty
-                    while (track.pcmQueue.size >= 4 && running) {
+                    while (track.pcmQueue.size >= BACK_BUF_COUNT && running) {
                         Thread.sleep(1)
                     }
 
