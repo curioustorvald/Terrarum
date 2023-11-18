@@ -36,9 +36,11 @@ object AudioMixer: Disposable {
         get() = App.getConfigDouble("sfxvolume")
 
 
-    val tracks = Array(10) { TerrarumAudioMixerTrack(
+    val tracks = Array(4) { TerrarumAudioMixerTrack(
         if (it == 0) "BGM"
         else if (it == 1) "AMB"
+        else if (it == 2) "Sfx Mix"
+        else if (it == 3) "GUI"
         else "Trk${it+1}"
     ) }
 

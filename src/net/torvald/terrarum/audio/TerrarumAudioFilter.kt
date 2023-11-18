@@ -64,6 +64,48 @@ class Lowpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
 
 }
 
+
+class Highpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
+
+    var cutoff = cutoff0.toDouble(); private set
+    private var alpha: Float = 0f
+
+    init {
+        setCutoff(cutoff0)
+    }
+
+    fun setCutoff(cutoff: Float) {
+//        println("LP Cutoff: $cutoff")
+        val RC: Float = 1f / (cutoff * FastMath.TWO_PI)
+        val dt: Float = 1f / rate
+        alpha = dt / (RC + dt)
+        this.cutoff = cutoff.toDouble()
+    }
+
+    fun setCutoff(cutoff: Double) {
+//        println("LP Cutoff: $cutoff")
+        val RC: Double = 1.0 / (cutoff * Math.PI * 2.0)
+        val dt: Double = 1.0 / rate
+        alpha = (dt / (RC + dt)).toFloat()
+        this.cutoff = cutoff
+    }
+
+    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+        for (ch in outbuf1.indices) {
+            val out = outbuf1[ch]
+            val inn = inbuf1[ch]
+
+            out[0] = outbuf0[ch].last()
+
+            for (i in 1 until outbuf1[ch].size) {
+                out[i] = inn[i] - inn[i-1] + (alpha * out[i-1]) // this actually works but setCutoff need to be changed
+            }
+        }
+    }
+
+}
+
+
 object Buffer : TerrarumAudioFilter() {
     init {
         bypass = true
