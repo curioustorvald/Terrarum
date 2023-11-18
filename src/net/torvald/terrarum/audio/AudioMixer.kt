@@ -21,7 +21,7 @@ import kotlin.math.pow
  * Created by minjaesong on 2023-11-07.
  */
 object AudioMixer: Disposable {
-    const val DEFAULT_FADEOUT_LEN = 2.4
+    const val DEFAULT_FADEOUT_LEN = 1.8
 
     /** Returns a master volume */
     val masterVolume: Double
@@ -54,11 +54,19 @@ object AudioMixer: Disposable {
         get() = tracks[0]
     val ambientTrack: TerrarumAudioMixerTrack
         get() = tracks[1]
+    val sfxMixTrack: TerrarumAudioMixerTrack
+        get() = tracks[2]
+    val guiTrack: TerrarumAudioMixerTrack
+        get() = tracks[3]
+
 
     init {
         musicTrack.filters[0] = Lowpass(48000f, TerrarumAudioMixerTrack.SAMPLING_RATE)
         ambientTrack.filters[0] = Lowpass(48000f, TerrarumAudioMixerTrack.SAMPLING_RATE)
+        sfxMixTrack.filters[0] = Lowpass(48000f, TerrarumAudioMixerTrack.SAMPLING_RATE)
     }
+
+    val faderTrack = arrayOf(musicTrack, ambientTrack, sfxMixTrack)
 
     private var fadeAkku = 0.0
     private var fadeLength = DEFAULT_FADEOUT_LEN
@@ -83,27 +91,30 @@ object AudioMixer: Disposable {
         if (fadeoutFired) {
             fadeAkku += delta
             val step = fadeAkku / fadeLength
-            musicTrack.volume = FastMath.interpolateLinear(step, fadeStart, fadeTarget)
+            faderTrack.forEach { it.volume = FastMath.interpolateLinear(step, fadeStart, fadeTarget) }
 
             if (fadeAkku >= fadeLength) {
                 fadeoutFired = false
                 musicTrack.volume = fadeTarget
+                faderTrack.forEach { it.volume = fadeTarget }
 
-                if (fadeTarget == 0.0)
+                if (fadeTarget == 0.0) {
                     musicTrack.currentTrack = null
+                    ambientTrack.currentTrack = null
+                }
             }
         }
         else if (fadeinFired) {
             fadeAkku += delta
             val step = fadeAkku / fadeLength
-            musicTrack.volume = FastMath.interpolateLinear(step, fadeStart, fadeTarget)
+            faderTrack.forEach { it.volume = FastMath.interpolateLinear(step, fadeStart, fadeTarget) }
 
-            if (musicTrack.isPlaying == false) {
-                musicTrack.play()
-            }
+//            if (musicTrack.isPlaying == false) {
+//                musicTrack.play()
+//            }
 
             if (fadeAkku >= fadeLength) {
-                musicTrack.volume = fadeTarget
+                faderTrack.forEach { it.volume = fadeTarget }
                 fadeinFired = false
             }
         }
@@ -115,11 +126,12 @@ object AudioMixer: Disposable {
             val q = 400.0
             val step = (q.pow(x) - 1) / (q - 1) // https://www.desmos.com/calculator/sttaq2qhzm
             val cutoff = FastMath.interpolateLinear(step, SAMPLING_RATED / 100.0, SAMPLING_RATED)
-            (musicTrack.filters[0] as Lowpass).setCutoff(cutoff)
+            faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(cutoff) }
+
 
             if (lpAkku >= lpLength) {
                 lpOutFired = false
-                (musicTrack.filters[0] as Lowpass).setCutoff(SAMPLING_RATEF)
+                faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(SAMPLING_RATEF) }
             }
         }
         else if (lpInFired) {
@@ -128,10 +140,10 @@ object AudioMixer: Disposable {
             val q = 400.0
             val step = log((q-1) * x + 1.0, q) // https://www.desmos.com/calculator/sttaq2qhzm
             val cutoff = FastMath.interpolateLinear(step, SAMPLING_RATED, SAMPLING_RATED / 100.0)
-            (musicTrack.filters[0] as Lowpass).setCutoff(cutoff)
+            faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(cutoff) }
 
             if (lpAkku >= lpLength) {
-                (musicTrack.filters[0] as Lowpass).setCutoff(SAMPLING_RATEF / 100.0)
+                faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(SAMPLING_RATEF / 100.0) }
                 lpInFired = false
             }
         }

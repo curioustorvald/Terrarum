@@ -488,6 +488,11 @@ class BasicDebugInfoWindow : UICanvas() {
         // slider handle
         drawFaderHandle(batch, x + 48f, faderY + 18f + meterHeight - dBfs * meterHeight)
 
+        // currently streaming
+        if (track.streamPlaying) {
+            batch.color = Color.LIME
+            App.fontSmallNumbers.draw(batch, "\u00C0", x + 17f, faderY + 1f)
+        }
     }
 
     private fun drawFilterParam(batch: SpriteBatch, x: Int, y: Int, filter: TerrarumAudioFilter, track: TerrarumAudioMixerTrack) {
