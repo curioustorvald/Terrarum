@@ -377,7 +377,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val stripGap = 1
     private val stripFilterHeight = 32
     private val stripFaderHeight = 200
-    private val stripH = stripFaderHeight + stripFilterHeight * 4
+    private val stripH = stripFaderHeight + stripFilterHeight * 4 + 16
 
     private val COL_WELL = Color(0x374854_aa)
     private val COL_WELL2 = Color(0x3f5360_aa)
@@ -409,10 +409,21 @@ class BasicDebugInfoWindow : UICanvas() {
         strips.forEachIndexed { index, track -> drawStrip(batch, x + index * (stripW + stripGap), y, track, index) }
     }
 
+    private val dbLow = 48.0
+
     private fun drawStrip(batch: SpriteBatch, x: Int, y: Int, track: TerrarumAudioMixerTrack, index: Int) {
         // back
         batch.color = if (track.isMaster) COL_WELL3 else trackBack[index % 2]
         Toolkit.fillArea(batch, x, y, stripW, stripH)
+
+        // strip/name separator
+        batch.color = COL_METER_GRAD2
+        Toolkit.fillArea(batch, x, y + stripH - 16, stripW, 2)
+
+        // name text
+        batch.color = FILTER_NAME_ACTIVE
+        App.fontSmallNumbers.draw(batch, track.name, x + 3f, y + stripH - 13f)
+
 
         // filterbank back
         batch.color = COL_FILTER_WELL_BACK
@@ -436,9 +447,9 @@ class BasicDebugInfoWindow : UICanvas() {
         // fader
         val dB = track.dBfs
         val dBstr = dB.toIntAndFrac(2,1)
-        val dBfs = dB.coerceIn(-96.0, 0.0).plus(96.0).div(96.0)
+        val dBfs = dB.coerceIn(-dbLow, 0.0).plus(dbLow).div(dbLow).toFloat()
         batch.color = FILTER_NAME_ACTIVE
-        App.fontSmallNumbers.draw(batch, dBstr, x+3f, faderY+1f)
+        App.fontSmallNumbers.draw(batch, dBstr, x+32f, faderY+1f)
 
         // fader trough
         batch.color = COL_METER_TROUGH
@@ -455,7 +466,7 @@ class BasicDebugInfoWindow : UICanvas() {
         batch.color = FILTER_NAME_ACTIVE
         for (i in 0..16 step 2) {
             val y = faderY + 11f + i * 11
-            val s = (i*6).toString().padStart(2, ' ')
+            val s = (i*dbLow/16).roundToInt().toString().padStart(2, ' ')
             App.fontSmallNumbers.draw(batch, s, x + 1f, y)
         }
 
@@ -466,9 +477,16 @@ class BasicDebugInfoWindow : UICanvas() {
             val dBfs = fullscaleToDecibels(fs)
 
             val x = x + 19f + 7 * ch
-            val h = ((dBfs + 96.0) / 96.0 * -meterHeight).coerceAtMost(0.0).toFloat()
+            val h = ((dBfs + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
             Toolkit.fillArea(batch, x, faderY + 18f + meterHeight, 6f, h)
         }
+
+        // slider trough
+        batch.color = COL_METER_TROUGH
+        Toolkit.fillArea(batch, x + 48, faderY + 16, 2, meterTroughHeight)
+
+        // slider handle
+        drawFaderHandle(batch, x + 48f, faderY + 18f + meterHeight - dBfs * meterHeight)
 
     }
 
@@ -484,6 +502,38 @@ class BasicDebugInfoWindow : UICanvas() {
                 App.fontSmallNumbers.draw(batch, "Bs:${BUFFER_SIZE/4}", x+3f, y+17f)
             }
         }
+    }
+
+
+    private val FADER_HANDLE_D1 = Color(0xffffff_bb.toInt())
+    private val FADER_HANDLE_D2 = Color(0xdddddd_bb.toInt())
+    private val FADER_HANDLE_D3 = Color(0xeeeeee_bb.toInt())
+    private val FADER_HANDLE_U1 = Color(0xffffff_bb.toInt())
+    private val FADER_HANDLE_U2 = Color(0xaaaaaa_bb.toInt())
+    private val FADER_HANDLE_U3 = Color(0xbbbbbb_bb.toInt())
+    private val FADER_HANDLE_L = Color(0x777777_bb.toInt())
+    private val FADER_HANDLE_C = Color(0x444444_bb.toInt())
+    private val FADER_HANDLE_R = Color(0x666666_bb.toInt())
+    private fun drawFaderHandle(batch: SpriteBatch, cx: Float, cy: Float) {
+        batch.color = FADER_HANDLE_U1
+        Toolkit.fillArea(batch, cx - 4, cy - 6, 10f, 2f)
+        batch.color = FADER_HANDLE_U2
+        Toolkit.fillArea(batch, cx - 4, cy - 4, 10f, 1f)
+        batch.color = FADER_HANDLE_U3
+        Toolkit.fillArea(batch, cx - 4, cy - 3, 10f, 3f)
+        batch.color = FADER_HANDLE_D3
+        Toolkit.fillArea(batch, cx - 4, cy + 1, 10f, 3f)
+        batch.color = FADER_HANDLE_D2
+        Toolkit.fillArea(batch, cx - 4, cy + 4, 10f, 1f)
+        batch.color = FADER_HANDLE_D1
+        Toolkit.fillArea(batch, cx - 4, cy + 5, 10f, 2f)
+
+        batch.color = FADER_HANDLE_L
+        Toolkit.fillArea(batch, cx - 5, cy - 5, 1f, 11f)
+        batch.color = FADER_HANDLE_R
+        Toolkit.fillArea(batch, cx + 6, cy - 5, 1f, 11f)
+        batch.color = FADER_HANDLE_C
+        Toolkit.fillArea(batch, cx - 4, cy, 10f, 1f)
     }
 
 

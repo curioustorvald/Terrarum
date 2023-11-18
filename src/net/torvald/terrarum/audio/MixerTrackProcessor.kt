@@ -2,6 +2,8 @@ package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
+import net.torvald.terrarum.audio.AudioMixer.masterVolume
+import net.torvald.terrarum.audio.AudioMixer.musicVolume
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import kotlin.math.absoluteValue
 
@@ -35,7 +37,8 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
         if (true) println("[AudioAdapter ${track.name}] $msg")
     }
     override fun run() {
-        while (running) { synchronized(pauseLock) {
+        while (running) {
+            synchronized(pauseLock) {
                 if (!running) { // may have changed while waiting to
                     // synchronize on pauseLock
                     breakBomb = true
@@ -90,11 +93,11 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
             if (track.isMaster) {
                 // TEST CODE must combine all the inputs
-                track.sidechainInputs[0]?.let {
-                    samplesL0 = it.first.processor.fout0[0]
-                    samplesR0 = it.first.processor.fout0[1]
-                    samplesL1 = it.first.processor.fout1[0]
-                    samplesR1 = it.first.processor.fout1[1]
+                track.sidechainInputs[TerrarumAudioMixerTrack.INDEX_BGM]?.let {
+                    samplesL0 = it.first.processor.fout0[0].applyVolume(musicVolume)
+                    samplesR0 = it.first.processor.fout0[1].applyVolume(musicVolume)
+                    samplesL1 = it.first.processor.fout1[0].applyVolume(musicVolume)
+                    samplesR1 = it.first.processor.fout1[1].applyVolume(musicVolume)
                 }
 
 
@@ -164,7 +167,6 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
             // by this time, the output buffer is filled with processed results, pause the execution
             if (!track.isMaster) {
-
                 this.pause()
             }
             else {
@@ -176,7 +178,9 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                     }
 
 //                    printdbg("PUSHE; Queue size: ${track.pcmQueue.size}")
-                    track.pcmQueue.addLast(fout1)
+                    val masvol = masterVolume
+                    track.volume = masvol
+                    track.pcmQueue.addLast(fout1.map { it.applyVolume(masvol) })
                 }
 
                 // spin
@@ -210,7 +214,10 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
             pauseLock.notifyAll() // Unblocks thread
         }
     }
+
+    private fun FloatArray.applyVolume(musicVolume: Double) = FloatArray(this.size) { (this[it] * musicVolume).toFloat() }
 }
+
 
 private fun <T> Queue<T>.removeFirstOrElse(function: () -> T): T {
     return if (this.isEmpty) {

@@ -366,6 +366,7 @@ class UIInventoryFull(
         INGAME.setTooltipMessage(null)
 
         AudioMixer.requestLowpassIn(0.4)
+        AudioMixer.requestFadeOut(0.4, 0.5)
     }
 
     override fun doClosing(delta: Float) {
@@ -375,6 +376,7 @@ class UIInventoryFull(
         INGAME.setTooltipMessage(null)
 
         AudioMixer.requestLowpassOut(0.4)
+        AudioMixer.requestFadeIn(0.4, 1.0)
     }
 
     override fun endOpening(delta: Float) {

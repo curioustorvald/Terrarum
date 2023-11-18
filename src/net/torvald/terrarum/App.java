@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import static java.lang.Thread.MAX_PRIORITY;
 import static net.torvald.terrarum.TerrarumKt.*;
 
 /**
@@ -1192,6 +1193,7 @@ public class App implements ApplicationListener {
 
         AudioMixer.INSTANCE.getMasterVolume();
         audioManagerThread = new Thread(new AudioManagerRunnable(), "TerrarumAudioManager");
+        audioManagerThread.setPriority(MAX_PRIORITY); // higher = more predictable; audio delay is very noticeable so it gets high priority
         audioManagerThread.start();
 
         Terrarum.initialise();

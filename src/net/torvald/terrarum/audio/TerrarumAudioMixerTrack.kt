@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.getHashStr
 import net.torvald.terrarum.modulebasegame.MusicContainer
+import java.lang.Thread.MAX_PRIORITY
 import kotlin.math.log10
 import kotlin.math.pow
 
@@ -18,7 +19,10 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
         const val SAMPLING_RATE = 48000
         const val SAMPLING_RATEF = 48000f
         const val SAMPLING_RATED = 48000.0
-        const val BUFFER_SIZE = 8000
+        const val BUFFER_SIZE = 12000
+
+        const val INDEX_BGM = 0
+        const val INDEX_AMB = 1
     }
 
     val hash = getHashStr()
@@ -128,6 +132,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
 
     internal var processor = MixerTrackProcessor(BUFFER_SIZE, SAMPLING_RATE, this)
     private val processorThread = Thread(processor).also {
+        it.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority
         it.start()
     }
     internal var pcmQueue = Queue<List<FloatArray>>()
@@ -141,6 +146,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
         if (isMaster) {
             queueDispatcher = FeedSamplesToAdev(BUFFER_SIZE, SAMPLING_RATE, this)
             queueDispatcherThread = Thread(queueDispatcher).also {
+                it.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority
                 it.start()
             }
         }
