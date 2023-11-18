@@ -11,6 +11,8 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.audio.*
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
@@ -70,9 +72,11 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val KEY_TIMERS = Input.Keys.T // + CONTROL_LEFT
     private val KEY_WEATHERS = Input.Keys.W // + CONTROL_LEFT
+    private val KEY_AUDIOMIXER = Input.Keys.M // + CONTROL_LEFT
 
     private var showTimers = false
     private var showWeatherInfo = false
+    private var showAudioMixer = false
 
     override fun show() {
         ingame = Terrarum.ingame
@@ -138,12 +142,13 @@ class BasicDebugInfoWindow : UICanvas() {
         // toggle show-something
         showTimers = showTimers xor (Gdx.input.isKeyJustPressed(KEY_TIMERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
         showWeatherInfo = showWeatherInfo xor (Gdx.input.isKeyJustPressed(KEY_WEATHERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
+        showAudioMixer = showAudioMixer xor (Gdx.input.isKeyJustPressed(KEY_AUDIOMIXER) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
 
 
         drawMain(batch)
         if (showTimers) drawTimers(batch)
         if (showWeatherInfo) drawWeatherInfo(batch)
-
+        if (showAudioMixer) drawAudioMixer(batch)
 
     }
 
@@ -349,7 +354,6 @@ class BasicDebugInfoWindow : UICanvas() {
         }
     }
 
-
     private fun drawWeatherInfo(batch: SpriteBatch) {
         val weatherbox = INGAME.world.weatherbox
         val drawX = App.scr.width - 170
@@ -368,6 +372,120 @@ class BasicDebugInfoWindow : UICanvas() {
             App.fontSmallNumbers.draw(batch, "$cc1${weather.weather.identifier} $cc2${weather.duration - sek}", drawXf, schedYstart + 13 * (index + 1))
         }
     }
+
+    private val stripW = 64
+    private val stripGap = 1
+    private val stripFilterHeight = 32
+    private val stripFaderHeight = 200
+    private val stripH = stripFaderHeight + stripFilterHeight * 4
+
+    private val COL_WELL = Color(0x374854_aa)
+    private val COL_WELL2 = Color(0x3f5360_aa)
+    private val COL_WELL3 = Color(0x485437_aa)
+    private val COL_FILTER_TITLE = Color(0x72777d_aa)
+    private val COL_FILTER_TITLE_SHADE = Color(0x505558_aa)
+    private val COL_FILTER_WELL_BACK = Color(0x222325_aa)
+    private val COL_MIXER_BACK = Color(0x0f110c_aa)
+    private val COL_METER_TROUGH = Color(0x242527_aa)
+    private val COL_METER_GRAD = Color(0x1c5075_aa)
+    private val COL_METER_GRAD2 = Color(0x2ca3f3_aa)
+    private val COL_METER_BAR = Color(0x76c9fb_aa)
+
+    private val FILTER_NAME_ACTIVE = Color(0xeeeeee_bf.toInt())
+    private val FILTER_BYPASSED = Color(0xf1b934_bf.toInt())
+    private val trackBack = listOf(COL_WELL, COL_WELL2)
+    private val meterTroughHeight = 16 * 11 + 5
+    private val meterHeight = meterTroughHeight - 4
+    private fun drawAudioMixer(batch: SpriteBatch) {
+
+        val x = App.scr.width - 186 - (AudioMixer.tracks.size + 1) * (stripW + stripGap)
+        val y = App.scr.height - 38 - stripH
+
+        val strips = AudioMixer.tracks + AudioMixer.masterTrack
+
+//        batch.color = COL_MIXER_BACK
+//        Toolkit.fillArea(batch, x - stripGap, y - stripGap, strips.size * (stripW + stripGap) + stripGap, stripH + 2*stripGap)
+
+        strips.forEachIndexed { index, track -> drawStrip(batch, x + index * (stripW + stripGap), y, track, index) }
+    }
+
+    private fun drawStrip(batch: SpriteBatch, x: Int, y: Int, track: TerrarumAudioMixerTrack, index: Int) {
+        // back
+        batch.color = if (track.isMaster) COL_WELL3 else trackBack[index % 2]
+        Toolkit.fillArea(batch, x, y, stripW, stripH)
+
+        // filterbank back
+        batch.color = COL_FILTER_WELL_BACK
+        Toolkit.fillArea(batch, x, y, stripW, stripFilterHeight * 4)
+
+        track.filters.forEachIndexed { i, filter -> if (filter !is NullFilter) {
+            // draw filter title back
+            batch.color = COL_FILTER_TITLE_SHADE
+            Toolkit.fillArea(batch, x, y + stripFilterHeight * i, stripW, 16)
+            batch.color = COL_FILTER_TITLE
+            Toolkit.fillArea(batch, x, y + stripFilterHeight * i, stripW, 14)
+            // draw filter name
+            batch.color = if (filter.bypass) FILTER_BYPASSED else FILTER_NAME_ACTIVE
+            App.fontSmallNumbers.draw(batch, filter.javaClass.simpleName, x + 3f, y + stripFilterHeight * i + 1f)
+
+            drawFilterParam(batch, x, y + stripFilterHeight * i + 16, filter, track)
+        } }
+
+        val faderY = y + stripFilterHeight * 4
+
+        // fader
+        val dB = track.dBfs
+        val dBstr = dB.toIntAndFrac(2,1)
+        val dBfs = dB.coerceIn(-96.0, 0.0).plus(96.0).div(96.0)
+        batch.color = FILTER_NAME_ACTIVE
+        App.fontSmallNumbers.draw(batch, dBstr, x+3f, faderY+1f)
+
+        // fader trough
+        batch.color = COL_METER_TROUGH
+        Toolkit.fillArea(batch, x+16, faderY+16, 19, meterTroughHeight)
+        for (i in 0..16) {
+            val y = faderY + 18 + i * 11
+            val x = x + if (i == 0 || i == 16) 16 else 17
+            val w = if (i == 0 || i == 16) 19 else 17
+            batch.color = if (i == 0 || i == 16) COL_METER_GRAD2 else COL_METER_GRAD
+            Toolkit.fillArea(batch, x, y, w, 1)
+        }
+
+        // fader labels
+        batch.color = FILTER_NAME_ACTIVE
+        for (i in 0..16 step 2) {
+            val y = faderY + 11f + i * 11
+            val s = (i*6).toString().padStart(2, ' ')
+            App.fontSmallNumbers.draw(batch, s, x + 1f, y)
+        }
+
+        // fader
+        batch.color = COL_METER_BAR
+        for (ch in 0..1) {
+            val fs = track.processor.maxSigLevel[ch]
+            val dBfs = fullscaleToDecibels(fs)
+
+            val x = x + 19f + 7 * ch
+            val h = ((dBfs + 96.0) / 96.0 * -meterHeight).coerceAtMost(0.0).toFloat()
+            Toolkit.fillArea(batch, x, faderY + 18f + meterHeight, 6f, h)
+        }
+
+    }
+
+    private fun drawFilterParam(batch: SpriteBatch, x: Int, y: Int, filter: TerrarumAudioFilter, track: TerrarumAudioMixerTrack) {
+        when (filter) {
+            is Lowpass -> {
+                batch.color = FILTER_NAME_ACTIVE
+                App.fontSmallNumbers.draw(batch, "F:${filter.cutoff.toInt()}", x+3f, y+1f)
+            }
+            is Buffer -> {
+                batch.color = FILTER_NAME_ACTIVE
+                App.fontSmallNumbers.draw(batch, "Buf:${track.pcmQueue.size}", x+3f, y+1f)
+                App.fontSmallNumbers.draw(batch, "Bs:${BUFFER_SIZE/4}", x+3f, y+17f)
+            }
+        }
+    }
+
 
     private val colHairline = Color(0xf22100ff.toInt())
     private val colGraph = Toolkit.Theme.COL_SELECTED

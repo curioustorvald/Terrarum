@@ -18,6 +18,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
         const val SAMPLING_RATE = 48000
         const val SAMPLING_RATEF = 48000f
         const val SAMPLING_RATED = 48000.0
+        const val BUFFER_SIZE = 8000
     }
 
     val hash = getHashStr()
@@ -124,8 +125,6 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
 
 
     // 1st ring of the hell: the THREADING HELL //
-
-    val BUFFER_SIZE = 6000
 
     internal var processor = MixerTrackProcessor(BUFFER_SIZE, SAMPLING_RATE, this)
     private val processorThread = Thread(processor).also {

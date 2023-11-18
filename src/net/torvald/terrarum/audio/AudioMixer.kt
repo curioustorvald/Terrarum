@@ -42,6 +42,7 @@ object AudioMixer: Disposable {
 
     val masterTrack = TerrarumAudioMixerTrack("Master", true).also { master ->
         tracks.forEach { master.addSidechainInput(it, 1.0) }
+        master.filters[0] = Buffer
     }
 
     val musicTrack: TerrarumAudioMixerTrack

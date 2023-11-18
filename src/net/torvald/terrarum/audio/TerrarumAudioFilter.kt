@@ -15,7 +15,7 @@ abstract class TerrarumAudioFilter {
     }
 }
 
-object NullFilter: TerrarumAudioFilter() {
+object NullFilter : TerrarumAudioFilter() {
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
         outbuf1.forEachIndexed { index, outTrack ->
             System.arraycopy(inbuf1[index], 0, outTrack, 0, outTrack.size)
@@ -24,11 +24,13 @@ object NullFilter: TerrarumAudioFilter() {
 }
 
 
-class Lowpass(cutoff: Float, val rate: Int): TerrarumAudioFilter() {
+class Lowpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
 
+    var cutoff = cutoff0.toDouble(); private set
     private var alpha: Float = 0f
+
     init {
-        setCutoff(cutoff)
+        setCutoff(cutoff0)
     }
 
     fun setCutoff(cutoff: Float) {
@@ -36,6 +38,7 @@ class Lowpass(cutoff: Float, val rate: Int): TerrarumAudioFilter() {
         val RC: Float = 1f / (cutoff * FastMath.TWO_PI)
         val dt: Float = 1f / rate
         alpha = dt / (RC + dt)
+        this.cutoff = cutoff.toDouble()
     }
 
     fun setCutoff(cutoff: Double) {
@@ -43,6 +46,7 @@ class Lowpass(cutoff: Float, val rate: Int): TerrarumAudioFilter() {
         val RC: Double = 1.0 / (cutoff * Math.PI * 2.0)
         val dt: Double = 1.0 / rate
         alpha = (dt / (RC + dt)).toFloat()
+        this.cutoff = cutoff
     }
 
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
@@ -58,4 +62,14 @@ class Lowpass(cutoff: Float, val rate: Int): TerrarumAudioFilter() {
         }
     }
 
+}
+
+object Buffer : TerrarumAudioFilter() {
+    init {
+        bypass = true
+    }
+
+    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+        bypass = true
+    }
 }

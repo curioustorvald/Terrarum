@@ -37,6 +37,7 @@ internal object Inventory : ConsoleCommand {
                     "remove" -> if (args.size > 3) removeItem(actor, args[2], args[3].toLong()) else removeItem(actor, args[2])
                     "equip"  -> equipItem(actor, args[2])
                     "unequip"-> unequipItem(actor, args[2])
+                    "clear" -> actor.inventory.clear()
                     else     -> printUsage()
                 }
             }

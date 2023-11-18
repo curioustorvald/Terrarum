@@ -155,11 +155,15 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                         }
                     }
                 }
+
+                fout1.map { it.maxOf { it.absoluteValue } }.forEachIndexed { index, fl ->
+                    maxSigLevel[index] = fl.toDouble()
+                }
             }
+
 
             // by this time, the output buffer is filled with processed results, pause the execution
             if (!track.isMaster) {
-                fout1.map { it.maxBy { it.absoluteValue } }.forEachIndexed { index, fl -> maxSigLevel[index] = fl.toDouble() }
 
                 this.pause()
             }
