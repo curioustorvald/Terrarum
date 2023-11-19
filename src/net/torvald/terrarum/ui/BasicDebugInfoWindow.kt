@@ -396,6 +396,10 @@ class BasicDebugInfoWindow : UICanvas() {
     private val trackBack = listOf(COL_WELL, COL_WELL2)
     private val meterTroughHeight = 16 * 11 + 5
     private val meterHeight = meterTroughHeight - 4
+
+    private val mixerLastTimeHadClipping = (AudioMixer.tracks + AudioMixer.masterTrack).map { arrayOf(0L, 0L) }
+    private val clippingHoldTime = 60000L * 3 // 3 mins
+
     private fun drawAudioMixer(batch: SpriteBatch) {
 
         val x = App.scr.width - 186 - (AudioMixer.tracks.size + 1) * (stripW + stripGap)
@@ -406,7 +410,15 @@ class BasicDebugInfoWindow : UICanvas() {
 //        batch.color = COL_MIXER_BACK
 //        Toolkit.fillArea(batch, x - stripGap, y - stripGap, strips.size * (stripW + stripGap) + stripGap, stripH + 2*stripGap)
 
-        strips.forEachIndexed { index, track -> drawStrip(batch, x + index * (stripW + stripGap), y, track, index) }
+        strips.forEachIndexed { index, track ->
+            // get clipping status
+            track.processor.hasClipping.forEachIndexed { channel, b ->
+                if (b) mixerLastTimeHadClipping[index][channel] = System.currentTimeMillis()
+            }
+
+            // draw
+            drawStrip(batch, x + index * (stripW + stripGap), y, track, index)
+        }
     }
 
     private val dbLow = 48.0
@@ -492,6 +504,15 @@ class BasicDebugInfoWindow : UICanvas() {
         if (track.streamPlaying) {
             batch.color = ICON_GREEN
             App.fontSmallNumbers.draw(batch, "\u00C0", x + 17f, faderY + 1f)
+        }
+
+        // clipping marker
+        val timeNow = System.currentTimeMillis()
+        batch.color = ICON_RED
+        mixerLastTimeHadClipping[index].forEachIndexed { channel, time ->
+            if (timeNow - time < clippingHoldTime) {
+                Toolkit.fillArea(batch, x + 19 + channel*7, faderY + 16, 6, 2)
+            }
         }
     }
 

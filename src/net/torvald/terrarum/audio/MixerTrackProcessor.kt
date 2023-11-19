@@ -31,6 +31,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
     private var fout1 = listOf(emptyBuf, emptyBuf)
 
     var maxSigLevel = arrayOf(0.0, 0.0); private set
+    var hasClipping = arrayOf(false, false); private set
 
     private var breakBomb = false
 
@@ -163,9 +164,22 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 fout1.map { it.maxOf { it.absoluteValue } }.forEachIndexed { index, fl ->
                     maxSigLevel[index] = fl.toDouble()
                 }
+                hasClipping.fill(false)
+                fout1.forEachIndexed { index, floats ->
+                    var lastSample = floats[0]
+                    for (i in 1 until floats.size) {
+                        val currentSample = floats[i]
+                        if (lastSample * currentSample > 0.0 && lastSample.absoluteValue >= 1.0 && currentSample.absoluteValue >= 1.0) {
+                            hasClipping[index] = true
+                            break
+                        }
+                        lastSample = currentSample
+                    }
+                }
             }
             else {
                 maxSigLevel.fill(0.0)
+                hasClipping.fill(false)
             }
 
 
