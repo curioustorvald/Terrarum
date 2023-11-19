@@ -50,13 +50,12 @@ class Lowpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
     }
 
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
-        // fixme crackles on buffer-edge
         for (ch in outbuf1.indices) {
             val out = outbuf1[ch]
             val inn = inbuf1[ch]
 
-            out[0] = outbuf0[ch].last()
-
+            out[0] = outbuf0[ch].last() + alpha * (inn[0] - outbuf0[ch].last())
+            
             for (i in 1 until outbuf1[ch].size) {
                 out[i] = out[i-1] + alpha * (inn[i] - out[i-1])
             }
@@ -96,7 +95,7 @@ class Highpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
             val out = outbuf1[ch]
             val inn = inbuf1[ch]
 
-            out[0] = outbuf0[ch].last()
+            out[0] = alpha * (outbuf0[ch].last() + inn[0] - inbuf0[ch].last())
 
             for (i in 1 until outbuf1[ch].size) {
                 out[i] = alpha * (out[i-1] + inn[i] - inn[i-1])
