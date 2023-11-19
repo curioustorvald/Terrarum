@@ -19,7 +19,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
         const val SAMPLING_RATE = 48000
         const val SAMPLING_RATEF = 48000f
         const val SAMPLING_RATED = 48000.0
-        const val BUFFER_SIZE = 12000
+        const val BUFFER_SIZE = 6000
 
         const val INDEX_BGM = 0
         const val INDEX_AMB = 1

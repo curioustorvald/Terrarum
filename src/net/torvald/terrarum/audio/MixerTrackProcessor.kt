@@ -12,8 +12,9 @@ import kotlin.math.absoluteValue
  */
 class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: TerrarumAudioMixerTrack): Runnable {
 
-    val BACK_BUF_COUNT = 2
-
+    companion object {
+        val BACK_BUF_COUNT = 1
+    }
 
     @Volatile private var running = true
     @Volatile private var paused = false
@@ -162,6 +163,9 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 fout1.map { it.maxOf { it.absoluteValue } }.forEachIndexed { index, fl ->
                     maxSigLevel[index] = fl.toDouble()
                 }
+            }
+            else {
+                maxSigLevel.fill(0.0)
             }
 
 

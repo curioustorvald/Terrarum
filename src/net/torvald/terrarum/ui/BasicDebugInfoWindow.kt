@@ -12,6 +12,7 @@ import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.audio.*
+import net.torvald.terrarum.audio.MixerTrackProcessor.Companion.BACK_BUF_COUNT
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
@@ -490,7 +491,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // currently streaming
         if (track.streamPlaying) {
-            batch.color = Color.LIME
+            batch.color = ICON_GREEN
             App.fontSmallNumbers.draw(batch, "\u00C0", x + 17f, faderY + 1f)
         }
     }
@@ -502,12 +503,21 @@ class BasicDebugInfoWindow : UICanvas() {
                 App.fontSmallNumbers.draw(batch, "F:${filter.cutoff.toInt()}", x+3f, y+1f)
             }
             is Buffer -> {
+                val currentQueueSize = track.pcmQueue.size
+                for (i in 0 until BACK_BUF_COUNT) {
+                    batch.color = if (i < currentQueueSize) ICON_GREEN else ICON_RED
+                    App.fontSmallNumbers.draw(batch, "|", x+3f+26 + 4*i, y+1f)
+                }
+
                 batch.color = FILTER_NAME_ACTIVE
-                App.fontSmallNumbers.draw(batch, "Buf:${track.pcmQueue.size}", x+3f, y+1f)
+                App.fontSmallNumbers.draw(batch, "Buf:", x+3f, y+1f)
                 App.fontSmallNumbers.draw(batch, "Bs:${BUFFER_SIZE/4}", x+3f, y+17f)
             }
         }
     }
+
+    private val ICON_GREEN = Color(0x33ff33_bb.toInt())
+    private val ICON_RED = Color(0xff4444_bb.toInt())
 
 
     private val FADER_HANDLE_D1 = Color(0xffffff_bb.toInt())
