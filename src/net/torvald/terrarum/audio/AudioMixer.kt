@@ -7,6 +7,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.INDEX_AMB
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.INDEX_BGM
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -59,9 +60,9 @@ object AudioMixer: Disposable {
 
 
     init {
-        musicTrack.filters[0] = Lowpass(48000f, TerrarumAudioMixerTrack.SAMPLING_RATE)
-        ambientTrack.filters[0] = Lowpass(48000f, TerrarumAudioMixerTrack.SAMPLING_RATE)
-        sfxMixTrack.filters[0] = Lowpass(48000f, TerrarumAudioMixerTrack.SAMPLING_RATE)
+        musicTrack.filters[0] = Lowpass(SAMPLING_RATE / 2f, SAMPLING_RATE)
+        ambientTrack.filters[0] = Lowpass(SAMPLING_RATE / 2f, SAMPLING_RATE)
+        sfxMixTrack.filters[0] = Lowpass(SAMPLING_RATE / 2f, SAMPLING_RATE)
     }
 
     val faderTrack = arrayOf(musicTrack, ambientTrack, sfxMixTrack)
