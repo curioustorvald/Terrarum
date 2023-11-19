@@ -341,7 +341,7 @@ abstract class UICanvas(
     }
 
     companion object {
-        const val OPENCLOSE_GENERIC = 0.0666f
+        const val OPENCLOSE_GENERIC = 0.1f
 
         fun doOpeningFade(ui: UICanvas, openCloseTime: Second) {
             ui.handler.opacity = max(0f, ui.handler.openCloseCounter - 0.02f) / openCloseTime // fade start 1/50 sec late, it's intended

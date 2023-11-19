@@ -292,7 +292,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         IngameRenderer.setRenderedWorld(world)
         blockMarkingActor.isVisible = true
 
-        AudioMixer.faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(SAMPLING_RATEF) }
+        AudioMixer.faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(SAMPLING_RATEF / 2) }
 
 
         super.show() // this function sets gameInitialised = true

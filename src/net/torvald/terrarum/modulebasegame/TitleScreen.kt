@@ -296,7 +296,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         UILoadGovernor.reset()
 
 
-        (AudioMixer.musicTrack.filters[0] as Lowpass).setCutoff(TerrarumAudioMixerTrack.SAMPLING_RATEF)
+        (AudioMixer.musicTrack.filters[0] as Lowpass).setCutoff(TerrarumAudioMixerTrack.SAMPLING_RATEF / 2)
 
 
         loadThingsWhileIntroIsVisible()

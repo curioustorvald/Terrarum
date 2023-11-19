@@ -11,9 +11,7 @@ import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RAT
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.tryDispose
-import kotlin.math.log
-import kotlin.math.log10
-import kotlin.math.pow
+import kotlin.math.*
 
 /**
  * Any audio reference fed into this manager will get lost; you must manually store and dispose of them on your own.
@@ -79,6 +77,8 @@ object AudioMixer: Disposable {
     private var lpLength = 0.4
     private var lpOutFired = false
     private var lpInFired = false
+    private var lpStart = SAMPLING_RATED / 2.0
+    private var lpTarget = SAMPLING_RATED / 2.0
 
     // TODO make sidechaining work
     // TODO master volume controls the master track
@@ -122,28 +122,30 @@ object AudioMixer: Disposable {
 
         if (lpOutFired) {
             lpAkku += delta
-            val x = lpAkku / lpLength
-            val q = 400.0
-            val step = (q.pow(x) - 1) / (q - 1) // https://www.desmos.com/calculator/sttaq2qhzm
-            val cutoff = FastMath.interpolateLinear(step, SAMPLING_RATED / 100.0, SAMPLING_RATED)
+            // https://www.desmos.com/calculator/dmhve2awxm
+            val t = (lpAkku / lpLength).coerceIn(0.0, 1.0)
+            val b = ln(lpStart / lpTarget) / -1.0
+            val a = lpStart
+            val cutoff = a * exp(b * t)
             faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(cutoff) }
 
 
             if (lpAkku >= lpLength) {
                 lpOutFired = false
-                faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(SAMPLING_RATEF) }
+                faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(lpTarget) }
             }
         }
         else if (lpInFired) {
             lpAkku += delta
-            val x = lpAkku / lpLength
-            val q = 400.0
-            val step = log((q-1) * x + 1.0, q) // https://www.desmos.com/calculator/sttaq2qhzm
-            val cutoff = FastMath.interpolateLinear(step, SAMPLING_RATED, SAMPLING_RATED / 100.0)
+            // https://www.desmos.com/calculator/dmhve2awxm
+            val t = (lpAkku / lpLength).coerceIn(0.0, 1.0)
+            val b = ln(lpStart / lpTarget) / -1.0
+            val a = lpStart
+            val cutoff = a * exp(b * t)
             faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(cutoff) }
 
             if (lpAkku >= lpLength) {
-                faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(SAMPLING_RATEF / 100.0) }
+                faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(lpTarget) }
                 lpInFired = false
             }
         }
@@ -194,6 +196,8 @@ object AudioMixer: Disposable {
             lpLength = length.coerceAtLeast(1.0/1024.0)
             lpAkku = 0.0
             lpOutFired = true
+            lpStart = (musicTrack.filters[0] as Lowpass).cutoff
+            lpTarget = SAMPLING_RATED / 2.0
         }
     }
 
@@ -202,6 +206,8 @@ object AudioMixer: Disposable {
             lpLength = length.coerceAtLeast(1.0/1024.0)
             lpAkku = 0.0
             lpInFired = true
+            lpStart = (musicTrack.filters[0] as Lowpass).cutoff
+            lpTarget = SAMPLING_RATED / 100.0
         }
     }
 

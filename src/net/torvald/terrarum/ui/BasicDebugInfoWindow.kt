@@ -14,6 +14,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.audio.MixerTrackProcessor.Companion.BACK_BUF_COUNT
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
@@ -27,9 +28,7 @@ import net.torvald.terrarum.weather.WeatherStateBox
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import kotlin.math.absoluteValue
-import kotlin.math.max
-import kotlin.math.roundToInt
+import kotlin.math.*
 
 /**
  * Created by minjaesong on 2016-03-14.
@@ -499,6 +498,16 @@ class BasicDebugInfoWindow : UICanvas() {
     private fun drawFilterParam(batch: SpriteBatch, x: Int, y: Int, filter: TerrarumAudioFilter, track: TerrarumAudioMixerTrack) {
         when (filter) {
             is Lowpass -> {
+                // https://www.desmos.com/calculator/dmhve2awxm
+                val f = filter.cutoff
+                val b = ln(24 / 24000.0) / -1.0
+                val a = 24.0
+                val perc = (ln(f / a) / b).toFloat()
+                batch.color = COL_METER_GRAD2
+                Toolkit.fillArea(batch, x.toFloat(), y.toFloat(), stripW * perc, 14f)
+                batch.color = COL_METER_GRAD
+                Toolkit.fillArea(batch, x.toFloat(), y+14f, stripW * perc, 2f)
+
                 batch.color = FILTER_NAME_ACTIVE
                 App.fontSmallNumbers.draw(batch, "F:${filter.cutoff.toInt()}", x+3f, y+1f)
             }
