@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.audio.AudioMixer.masterVolume
 import net.torvald.terrarum.audio.AudioMixer.musicVolume
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import kotlin.math.absoluteValue
 
 /**
@@ -16,8 +15,8 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
         val BACK_BUF_COUNT = 1
     }
 
-    @Volatile private var running = true
-    @Volatile private var paused = false
+    @Volatile var running = true; private set
+    @Volatile var paused = false; private set
     private val pauseLock = java.lang.Object()
 
 
@@ -39,8 +38,8 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
         if (true) println("[AudioAdapter ${track.name}] $msg")
     }
     override fun run() {
-        while (running) {
-            synchronized(pauseLock) {
+//        while (running) { // uncomment to multithread
+            /*synchronized(pauseLock) { // uncomment to multithread
                 if (!running) { // may have changed while waiting to
                     // synchronize on pauseLock
                     breakBomb = true
@@ -64,11 +63,11 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 }
             }
 
-            if (breakBomb) break
+            if (breakBomb) break*/ // uncomment to multithread
             // Your code here
 
             // fetch deviceBufferSize amount of sample from the disk
-            if (!track.isMaster && track.streamPlaying) {
+            if (!track.isMaster && !track.isBus && track.streamPlaying) {
                 streamBuf.fetchBytes {
                     val bytesRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
                     if (bytesRead == null || bytesRead <= 0) { // some class (namely Mp3) may return 0 instead of negative value
@@ -77,6 +76,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                         track.streamPlaying = false
                         track.fireSongFinishHook()
                     }
+
                 }
             }
 
@@ -93,7 +93,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
             var bufEmpty = false
 
-            if (track.isMaster) {
+            if (track.isMaster || track.isBus) {
                 // TEST CODE must combine all the inputs
                 track.sidechainInputs[TerrarumAudioMixerTrack.INDEX_BGM]?.let {
                     samplesL0 = it.first.processor.fout0[0].applyVolume(musicVolume)
@@ -137,7 +137,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 samplesR1 = streamBuf.getR1(track.volume)
             }
 
-            if (samplesL0 != null && samplesL1 != null && samplesR0 != null && samplesR1 != null) {
+            if (samplesL0 != null /*&& samplesL1 != null && samplesR0 != null && samplesR1 != null*/) {
                 // run the input through the stack of filters
                 val filterStack = track.filters.filter { !it.bypass && it !is NullFilter }
 
@@ -188,12 +188,12 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 this.pause()
             }
             else {
-                if (samplesL0 != null && samplesL1 != null && samplesR0 != null && samplesR1 != null) {
+                if (samplesL0 != null /*&& samplesL1 != null && samplesR0 != null && samplesR1 != null*/) {
 
                     // spin until queue is sufficiently empty
-                    while (track.pcmQueue.size >= BACK_BUF_COUNT && running) {
+                    /*while (track.pcmQueue.size >= BACK_BUF_COUNT && running) { // uncomment to multithread
                         Thread.sleep(1)
-                    }
+                    }*/
 
 //                    printdbg("PUSHE; Queue size: ${track.pcmQueue.size}")
                     val masvol = masterVolume
@@ -202,16 +202,29 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 }
 
                 // spin
-                Thread.sleep((bufferSize / 8L / rate).coerceAtLeast(1L))
+//                Thread.sleep(((1000*bufferSize) / 8L / rate).coerceAtLeast(1L)) // uncomment to multithread
 
                 // wake sidechain processors
-                track.getSidechains().forEach {
-                    if (it?.processor?.running == true)
-                        it?.processor?.resume()
+                resumeSidechainsRecursively(track, track.name)
+            }
+//        } // uncomment to multithread
+    }
+
+
+    private fun resumeSidechainsRecursively(track: TerrarumAudioMixerTrack?, caller: String) {
+        track?.getSidechains()?.forEach {
+            if (it?.processor?.running == true) {
+                it.processor.resume()
+                it.getSidechains().forEach {
+                    if (it?.processor?.running == true) {
+                        it.processor.resume()
+                        resumeSidechainsRecursively(it, caller + caller)
+                    }
                 }
             }
         }
     }
+
 
     fun stop() {
         running = false
@@ -222,11 +235,13 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
     }
 
     fun pause() {
+//        printdbg("PAUSE")
         // you may want to throw an IllegalStateException if !running
         paused = true
     }
 
     fun resume() {
+//        printdbg("RESUME")
         synchronized(pauseLock) {
             paused = false
             pauseLock.notifyAll() // Unblocks thread
@@ -252,6 +267,10 @@ class FeedSamplesToAdev(val bufferSize: Int, val rate: Int, val track: TerrarumA
         if (!track.isMaster) throw IllegalArgumentException("Track is not master")
     }
 
+    val sleepTime = (1000000000.0 * ((bufferSize / 4.0) / TerrarumAudioMixerTrack.SAMPLING_RATED)).toLong()
+    val sleepMS = sleepTime / 1000000
+    val sleepNS = (sleepTime % 1000000).toInt()
+
     private fun printdbg(msg: Any) {
         if (true) println("[AudioAdapter ${track.name}] $msg")
     }
@@ -270,7 +289,7 @@ class FeedSamplesToAdev(val bufferSize: Int, val rate: Int, val track: TerrarumA
 //                printdbg("QUEUE EMPTY QUEUE EMPTY QUEUE EMPTY ")
 //            }
 
-            Thread.sleep((bufferSize / 8L / rate).coerceAtLeast(1L))
+//            Thread.sleep(sleepMS, sleepNS)
         }
     }
 

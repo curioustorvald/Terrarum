@@ -13,13 +13,13 @@ import kotlin.math.pow
 
 typealias TrackVolume = Double
 
-class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): Disposable {
+class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, val isBus: Boolean = false): Disposable {
 
     companion object {
         const val SAMPLING_RATE = 48000
         const val SAMPLING_RATEF = 48000f
         const val SAMPLING_RATED = 48000.0
-        const val BUFFER_SIZE = 6000
+        const val BUFFER_SIZE = 512 // n ms -> 384 * n
 
         const val INDEX_BGM = 0
         const val INDEX_AMB = 1
@@ -112,12 +112,12 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
         get() = currentTrack?.gdxMusic?.isPlaying
 
     override fun dispose() {
-        if (isMaster) {
+        /*if (isMaster) { // uncomment to multithread
             queueDispatcher.stop()
             queueDispatcherThread.join()
         }
         processor.stop()
-        processorThread.join()
+        processorThread.join()*/
         adev?.dispose()
     }
 
@@ -131,10 +131,10 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
     // 1st ring of the hell: the THREADING HELL //
 
     internal var processor = MixerTrackProcessor(BUFFER_SIZE, SAMPLING_RATE, this)
-    private val processorThread = Thread(processor).also {
+    /*private val processorThread = Thread(processor).also { // uncomment to multithread
         it.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority
         it.start()
-    }
+    }*/
     internal var pcmQueue = Queue<List<FloatArray>>()
     private lateinit var queueDispatcher: FeedSamplesToAdev
     private lateinit var queueDispatcherThread: Thread
@@ -143,13 +143,13 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false): 
         pcmQueue.addLast(listOf(FloatArray(BUFFER_SIZE / 4), FloatArray(BUFFER_SIZE / 4)))
         pcmQueue.addLast(listOf(FloatArray(BUFFER_SIZE / 4), FloatArray(BUFFER_SIZE / 4)))
 
-        if (isMaster) {
+        /*if (isMaster) { // uncomment to multithread
             queueDispatcher = FeedSamplesToAdev(BUFFER_SIZE, SAMPLING_RATE, this)
             queueDispatcherThread = Thread(queueDispatcher).also {
                 it.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority
                 it.start()
             }
-        }
+        }*/
     }
 
 }

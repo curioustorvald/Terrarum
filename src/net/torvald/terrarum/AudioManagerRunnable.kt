@@ -18,7 +18,7 @@ class AudioManagerRunnable : Runnable {
                 oldT = T;
                 AudioMixer.update(dT)
 //                println("AudioManagerRunnable dT = ${dT * 1000f} ms")
-                Thread.sleep(30L)
+                Thread.sleep(1L)
             }
             catch (e: InterruptedException) {
                 break

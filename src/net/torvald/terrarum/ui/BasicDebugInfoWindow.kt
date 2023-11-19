@@ -382,6 +382,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val COL_WELL = Color(0x374854_aa)
     private val COL_WELL2 = Color(0x3f5360_aa)
     private val COL_WELL3 = Color(0x485437_aa)
+    private val COL_WELL4 = Color(0x543748_aa)
     private val COL_FILTER_TITLE = Color(0x72777d_aa)
     private val COL_FILTER_TITLE_SHADE = Color(0x505558_aa)
     private val COL_FILTER_WELL_BACK = Color(0x222325_aa)
@@ -425,7 +426,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private fun drawStrip(batch: SpriteBatch, x: Int, y: Int, track: TerrarumAudioMixerTrack, index: Int) {
         // back
-        batch.color = if (track.isMaster) COL_WELL3 else trackBack[index % 2]
+        batch.color = if (track.isMaster) COL_WELL4 else if (track.isBus) COL_WELL3 else trackBack[index % 2]
         Toolkit.fillArea(batch, x, y, stripW, stripH)
 
         // strip/name separator

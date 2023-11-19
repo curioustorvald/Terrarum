@@ -302,7 +302,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     override fun show() {
         Gdx.input.inputProcessor = BuildingMakerController(this)
-        (AudioMixer.musicTrack.filters[0] as Lowpass).setCutoff(TerrarumAudioMixerTrack.SAMPLING_RATEF / 2)
+        (AudioMixer.fadeBus.filters[0] as Lowpass).setCutoff(TerrarumAudioMixerTrack.SAMPLING_RATEF / 2)
         super.show()
     }
 

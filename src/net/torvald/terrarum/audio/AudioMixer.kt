@@ -5,6 +5,8 @@ import com.badlogic.gdx.backends.lwjgl3.audio.Lwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App
+import net.torvald.terrarum.audio.MixerTrackProcessor.Companion.BACK_BUF_COUNT
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.INDEX_AMB
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.INDEX_BGM
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
@@ -12,6 +14,7 @@ import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RAT
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.tryDispose
+import java.lang.Thread.MAX_PRIORITY
 import kotlin.math.*
 
 /**
@@ -35,19 +38,16 @@ object AudioMixer: Disposable {
         get() = App.getConfigDouble("sfxvolume")
 
 
-    val tracks = Array(4) { TerrarumAudioMixerTrack(
+    val tracks = Array(5) { TerrarumAudioMixerTrack(
         if (it == 0) "BGM"
         else if (it == 1) "AMB"
         else if (it == 2) "Sfx Mix"
         else if (it == 3) "GUI"
-        else "Trk${it+1}"
+        else if (it == 4) "BUS1"
+        else "Trk${it+1}", isBus = (it == 4)
     ) }
 
-    val masterTrack = TerrarumAudioMixerTrack("Master", true).also { master ->
-        master.volume = masterVolume
-        master.filters[0] = Buffer
-        tracks.forEachIndexed { i, it -> master.addSidechainInput(it, if (i == INDEX_BGM) musicVolume else if (i == INDEX_AMB) ambientVolume else 1.0) }
-    }
+    val masterTrack = TerrarumAudioMixerTrack("Master", true)
 
     val musicTrack: TerrarumAudioMixerTrack
         get() = tracks[0]
@@ -58,14 +58,54 @@ object AudioMixer: Disposable {
     val guiTrack: TerrarumAudioMixerTrack
         get() = tracks[3]
 
+    val fadeBus: TerrarumAudioMixerTrack
+        get() = tracks[4]
 
-    init {
-        musicTrack.filters[0] = Lowpass(SAMPLING_RATE / 2f, SAMPLING_RATE)
-        ambientTrack.filters[0] = Lowpass(SAMPLING_RATE / 2f, SAMPLING_RATE)
-        sfxMixTrack.filters[0] = Lowpass(SAMPLING_RATE / 2f, SAMPLING_RATE)
+    var processing = true
+
+    val processingThread = Thread {
+        while (processing) {
+            // process
+            tracks.forEach {
+                if (!it.processor.paused) {
+                    it.processor.run()
+                }
+            }
+            masterTrack.processor.run()
+
+            /*while (masterTrack.pcmQueue.size >= BACK_BUF_COUNT && masterTrack.processor.running && processing) {
+                Thread.sleep(1)
+            }*/
+
+            while (!masterTrack.pcmQueue.isEmpty) {
+                masterTrack.adev!!.writeSamples(masterTrack.pcmQueue.removeFirst()) // it blocks until the queue is consumed
+            }
+        }
     }
 
-    val faderTrack = arrayOf(musicTrack, ambientTrack, sfxMixTrack)
+//    val feeder = FeedSamplesToAdev(BUFFER_SIZE, SAMPLING_RATE, masterTrack)
+//    val feedingThread = Thread(feeder)
+
+
+    init {
+        masterTrack.volume = masterVolume
+        masterTrack.filters[0] = Buffer
+
+        fadeBus.addSidechainInput(musicTrack, 1.0)
+        fadeBus.addSidechainInput(ambientTrack, 1.0)
+        fadeBus.addSidechainInput(sfxMixTrack, 1.0)
+        fadeBus.filters[0] = Lowpass(SAMPLING_RATE / 2f, SAMPLING_RATE)
+
+        masterTrack.addSidechainInput(fadeBus, 1.0)
+        masterTrack.addSidechainInput(guiTrack, 1.0)
+
+
+        processingThread.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority
+        processingThread.start()
+//        feedingThread.priority = MAX_PRIORITY
+//        feedingThread.start()
+    }
+
 
     private var fadeAkku = 0.0
     private var fadeLength = DEFAULT_FADEOUT_LEN
@@ -92,12 +132,12 @@ object AudioMixer: Disposable {
         if (fadeoutFired) {
             fadeAkku += delta
             val step = fadeAkku / fadeLength
-            faderTrack.forEach { it.volume = FastMath.interpolateLinear(step, fadeStart, fadeTarget) }
+            fadeBus.volume = FastMath.interpolateLinear(step, fadeStart, fadeTarget)
 
             if (fadeAkku >= fadeLength) {
                 fadeoutFired = false
-                musicTrack.volume = fadeTarget
-                faderTrack.forEach { it.volume = fadeTarget }
+                fadeBus.volume = fadeTarget
+                fadeBus.volume = fadeTarget
 
                 if (fadeTarget == 0.0) {
                     musicTrack.currentTrack = null
@@ -108,14 +148,14 @@ object AudioMixer: Disposable {
         else if (fadeinFired) {
             fadeAkku += delta
             val step = fadeAkku / fadeLength
-            faderTrack.forEach { it.volume = FastMath.interpolateLinear(step, fadeStart, fadeTarget) }
+            fadeBus.volume = FastMath.interpolateLinear(step, fadeStart, fadeTarget)
 
 //            if (musicTrack.isPlaying == false) {
 //                musicTrack.play()
 //            }
 
             if (fadeAkku >= fadeLength) {
-                faderTrack.forEach { it.volume = fadeTarget }
+                fadeBus.volume = fadeTarget
                 fadeinFired = false
             }
         }
@@ -128,12 +168,12 @@ object AudioMixer: Disposable {
             val b = ln(lpStart / lpTarget) / -1.0
             val a = lpStart
             val cutoff = a * exp(b * t)
-            faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(cutoff) }
+            (fadeBus.filters[0] as Lowpass).setCutoff(cutoff)
 
 
             if (lpAkku >= lpLength) {
                 lpOutFired = false
-                faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(lpTarget) }
+                (fadeBus.filters[0] as Lowpass).setCutoff(lpTarget)
             }
         }
         else if (lpInFired) {
@@ -143,10 +183,10 @@ object AudioMixer: Disposable {
             val b = ln(lpStart / lpTarget) / -1.0
             val a = lpStart
             val cutoff = a * exp(b * t)
-            faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(cutoff) }
+            (fadeBus.filters[0] as Lowpass).setCutoff(cutoff)
 
             if (lpAkku >= lpLength) {
-                faderTrack.forEach { (it.filters[0] as Lowpass).setCutoff(lpTarget) }
+                (fadeBus.filters[0] as Lowpass).setCutoff(lpTarget)
                 lpInFired = false
             }
         }
@@ -155,7 +195,7 @@ object AudioMixer: Disposable {
         if (musicTrack.isPlaying != true && musicTrack.nextTrack != null) {
 //            printdbg(this, "Playing next music: ${nextMusic!!.name}")
             musicTrack.queueNext(null)
-            musicTrack.volume = 1.0
+            fadeBus.volume = 1.0
             musicTrack.play()
         }
     }
@@ -177,7 +217,7 @@ object AudioMixer: Disposable {
             fadeAkku = 0.0
             fadeoutFired = true
             fadeTarget = target
-            fadeStart = musicTrack.volume
+            fadeStart = fadeBus.volume
         }
     }
 
@@ -187,7 +227,7 @@ object AudioMixer: Disposable {
             fadeAkku = 0.0
             fadeinFired = true
             fadeTarget = target
-            fadeStart = musicTrack.volume
+            fadeStart = fadeBus.volume
         }
     }
 
@@ -197,7 +237,7 @@ object AudioMixer: Disposable {
             lpLength = length.coerceAtLeast(1.0/1024.0)
             lpAkku = 0.0
             lpOutFired = true
-            lpStart = (musicTrack.filters[0] as Lowpass).cutoff
+            lpStart = (fadeBus.filters[0] as Lowpass).cutoff
             lpTarget = SAMPLING_RATED / 2.0
         }
     }
@@ -207,13 +247,17 @@ object AudioMixer: Disposable {
             lpLength = length.coerceAtLeast(1.0/1024.0)
             lpAkku = 0.0
             lpInFired = true
-            lpStart = (musicTrack.filters[0] as Lowpass).cutoff
+            lpStart = (fadeBus.filters[0] as Lowpass).cutoff
             lpTarget = SAMPLING_RATED / 100.0
         }
     }
 
 
     override fun dispose() {
+        processing = false
+        processingThread.join()
+//        feeder.stop()
+//        feedingThread.join()
         tracks.forEach { it.tryDispose() }
         masterTrack.tryDispose()
     }
