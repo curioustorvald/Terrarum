@@ -1341,6 +1341,7 @@ public class App implements ApplicationListener {
     public static String customDir;
     /** defaultDir + "/Custom/Music" */
     public static String customMusicDir;
+    public static String customAmbientDir;
 
     private static void getDefaultDirectory() {
         String OS = OSName.toUpperCase();
@@ -1376,6 +1377,7 @@ public class App implements ApplicationListener {
         importDir = defaultDir + "/Imports";
         customDir = defaultDir + "/Custom";
         customMusicDir = customDir + "/Music";
+        customAmbientDir = customDir + "/Ambient";
 
         System.out.println(String.format("os.name = %s (with identifier %s)", OSName, operationSystem));
         System.out.println(String.format("os.version = %s", OSVersion));

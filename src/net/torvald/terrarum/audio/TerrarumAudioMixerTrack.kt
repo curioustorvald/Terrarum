@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.getHashStr
+import net.torvald.terrarum.hashStrMap
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import java.lang.Thread.MAX_PRIORITY
 import kotlin.math.log10
@@ -13,7 +14,7 @@ import kotlin.math.pow
 
 typealias TrackVolume = Double
 
-class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, val isBus: Boolean = false): Disposable {
+class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, val isBus: Boolean = false, private val maxVolumeFun: () -> Double): Disposable {
 
     companion object {
         const val SAMPLING_RATE = 48000
@@ -26,6 +27,9 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, v
     }
 
     val hash = getHashStr()
+    private val hashCode0 = hash.map { hashStrMap.indexOf(it) }.foldIndexed(0) { i, acc, c ->
+        acc or (c shl (5*i))
+    }
 
     var currentTrack: MusicContainer? = null
     var nextTrack: MusicContainer? = null
@@ -36,6 +40,9 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, v
             field = value
             currentTrack?.gdxMusic?.volume = volume.toFloat()
         }
+
+    val maxVolume: Double
+        get() = maxVolumeFun()
 
     var pan = 0.0
 
@@ -152,6 +159,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, v
         }*/
     }
 
+    override fun hashCode() = hashCode0
 }
 
 fun fullscaleToDecibels(fs: Double) = 20.0 * log10(fs)

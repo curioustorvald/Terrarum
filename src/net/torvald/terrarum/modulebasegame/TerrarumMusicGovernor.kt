@@ -31,9 +31,8 @@ class TerrarumMusicGovernor : MusicGovernor() {
                 MusicContainer(
                     it.nameWithoutExtension.replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
                     it,
-                    Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath)),
-                    { stopMusic() }
-                )
+                    Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath))
+                ) { stopMusic() }
             }
             catch (e: GdxRuntimeException) {
                 e.printStackTrace()
@@ -42,6 +41,25 @@ class TerrarumMusicGovernor : MusicGovernor() {
         } ?: emptyList() // TODO test code
 
     private var musicBin: ArrayList<Int> = ArrayList(songs.indices.toList().shuffled())
+
+    private val ambients: List<MusicContainer> =
+        File(App.customAmbientDir).listFiles()?.mapNotNull {
+            printdbg(this, "Ambient: ${it.absolutePath}")
+            try {
+                MusicContainer(
+                    it.nameWithoutExtension.replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
+                    it,
+                    Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath))
+                ) { stopMusic() }
+            }
+            catch (e: GdxRuntimeException) {
+                e.printStackTrace()
+                null
+            }
+        } ?: emptyList() // TODO test code
+
+    private var ambientsBin: ArrayList<Int> = ArrayList(ambients.indices.toList().shuffled())
+
 
 
     init {
@@ -59,10 +77,11 @@ class TerrarumMusicGovernor : MusicGovernor() {
     private val STATE_PLAYING = 2
     private val STATE_INTERMISSION = 3
 
+    protected var ambState = 0
+    protected var ambFired = false
 
     private fun stopMusic() {
-//        AudioManager.stopMusic() // music will stop itself; with this line not commented, the stop-callback from the already disposed musicgovernor will stop the music queued by the new musicgovernor instance
-        state = STATE_INTERMISSION
+        musicState = STATE_INTERMISSION
         intermissionAkku = 0f
         intermissionLength = 30f + 30f * Math.random().toFloat() // 30s-60s
         musicFired = false
@@ -73,7 +92,23 @@ class TerrarumMusicGovernor : MusicGovernor() {
         AudioMixer.startMusic(song)
         printdbg(this, "Now playing: $song")
         INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
-        state = STATE_PLAYING
+        musicState = STATE_PLAYING
+    }
+
+
+    private fun stopAmbient() {
+        ambState = STATE_INTERMISSION
+        intermissionAkku = 0f
+        intermissionLength = 30f + 30f * Math.random().toFloat() // 30s-60s
+        ambFired = false
+        printdbg(this, "Intermission: $intermissionLength seconds")
+    }
+
+    private fun startAmbient(song: MusicContainer) {
+        AudioMixer.startAmb(song)
+        printdbg(this, "Now playing: $song")
+        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
+        ambState = STATE_PLAYING
     }
 
 
@@ -87,10 +122,10 @@ class TerrarumMusicGovernor : MusicGovernor() {
         }
 
 //        val ingame = ingame as TerrarumIngame
-        if (state == 0) state = STATE_INTERMISSION
+        if (musicState == 0) musicState = STATE_INTERMISSION
 
 
-        when (state) {
+        when (musicState) {
             STATE_FIREPLAY -> {
                 if (!musicFired) {
                     musicFired = true
@@ -112,15 +147,39 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
                 if (intermissionAkku >= intermissionLength) {
                     intermissionAkku = 0f
-                    state = 1
+                    musicState = STATE_FIREPLAY
                 }
             }
         }
 
+        when (ambState) {
+            STATE_FIREPLAY -> {
+                if (!ambFired) {
+                    ambFired = true
+
+                    val song = ambients[ambientsBin.removeAt(0)]
+                    // prevent same song to play twice
+                    if (ambientsBin.isEmpty()) {
+                        ambientsBin = ArrayList(ambients.indices.toList().shuffled())
+                    }
+
+                    startAmbient(song)
+                }
+            }
+            STATE_PLAYING -> {
+                // stopMusic() will be called when the music finishes; it's on the setOnCompletionListener
+            }
+            STATE_INTERMISSION -> {
+                ambState = STATE_FIREPLAY
+            }
+        }
+
+
     }
 
     override fun dispose() {
-        AudioMixer.stopMusic() // explicit call for fade-out when the game instance quits
+        AudioMixer.requestFadeOut(AudioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
         stopMusic()
+        stopAmbient()
     }
 }

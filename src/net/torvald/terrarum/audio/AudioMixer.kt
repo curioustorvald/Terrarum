@@ -15,6 +15,7 @@ import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RAT
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.tryDispose
 import java.lang.Thread.MAX_PRIORITY
+import java.util.*
 import kotlin.math.*
 
 /**
@@ -47,10 +48,18 @@ object AudioMixer: Disposable {
         else if (it == 2) "SFX"
         else if (it == 3) "GUI"
         else if (it == 4) "BUS1"
-        else "Trk${it+1}", isBus = (it == 4)
+        else "Trk${it+1}", isBus = (it == 4), maxVolumeFun = {
+            when (it) {
+                0 -> { musicVolume }
+                1 -> { ambientVolume }
+                2 -> { sfxVolume }
+                3 -> { guiVolume }
+                else -> { 1.0 }
+            }
+        }
     ) }
 
-    val masterTrack = TerrarumAudioMixerTrack("Master", true)
+    val masterTrack = TerrarumAudioMixerTrack("Master", true) { masterVolume }
 
     val musicTrack: TerrarumAudioMixerTrack
         get() = tracks[0]
@@ -109,12 +118,21 @@ object AudioMixer: Disposable {
     }
 
 
-    private var fadeAkku = 0.0
-    private var fadeLength = DEFAULT_FADEOUT_LEN
-    private var fadeoutFired = false
-    private var fadeinFired = false
-    private var fadeTarget = 0.0
-    private var fadeStart = 0.0
+    data class FadeRequest(
+        var fadeAkku: Double = 0.0,
+        var fadeLength: Double = DEFAULT_FADEOUT_LEN,
+        var fadeoutFired: Boolean = false,
+        var fadeinFired: Boolean = false,
+        var fadeTarget: Double = 0.0,
+        var fadeStart: Double = 0.0,
+    )
+
+    private val fadeReqs = HashMap<TerrarumAudioMixerTrack, FadeRequest>().also { map ->
+        listOf(musicTrack, ambientTrack, sfxMixTrack, guiTrack, fadeBus).forEach {
+            map[it] = FadeRequest()
+        }
+    }
+    private val fadeReqsCol = fadeReqs.entries
 
     private var lpAkku = 0.0
     private var lpLength = 0.4
@@ -138,34 +156,31 @@ object AudioMixer: Disposable {
 
 
         // process fades
-        if (fadeoutFired) {
-            fadeAkku += delta
-            val step = fadeAkku / fadeLength
-            fadeBus.volume = FastMath.interpolateLinear(step, fadeStart, fadeTarget)
+        fadeReqsCol.forEach { val track = it.key; val req = it.value
+            if (req.fadeoutFired) {
+                req.fadeAkku += delta
+                val step = req.fadeAkku / req.fadeLength
+                track.volume = FastMath.interpolateLinear(step, req.fadeStart, req.fadeTarget)
 
-            if (fadeAkku >= fadeLength) {
-                fadeoutFired = false
-                fadeBus.volume = fadeTarget
-                fadeBus.volume = fadeTarget
+                if (req.fadeAkku >= req.fadeLength) {
+                    req.fadeoutFired = false
+                    track.volume = req.fadeTarget
+                    track.volume = req.fadeTarget
 
-                if (fadeTarget == 0.0) {
-                    musicTrack.currentTrack = null
-                    ambientTrack.currentTrack = null
+                    if (req.fadeTarget == 0.0) {
+                        track.currentTrack = null
+                    }
                 }
             }
-        }
-        else if (fadeinFired) {
-            fadeAkku += delta
-            val step = fadeAkku / fadeLength
-            fadeBus.volume = FastMath.interpolateLinear(step, fadeStart, fadeTarget)
+            else if (req.fadeinFired) {
+                req.fadeAkku += delta
+                val step = req.fadeAkku / req.fadeLength
+                track.volume = FastMath.interpolateLinear(step, req.fadeStart, req.fadeTarget)
 
-//            if (musicTrack.isPlaying == false) {
-//                musicTrack.play()
-//            }
-
-            if (fadeAkku >= fadeLength) {
-                fadeBus.volume = fadeTarget
-                fadeinFired = false
+                if (req.fadeAkku >= req.fadeLength) {
+                    track.volume = req.fadeTarget
+                    req.fadeinFired = false
+                }
             }
         }
 
@@ -211,32 +226,45 @@ object AudioMixer: Disposable {
 
     fun startMusic(song: MusicContainer) {
         if (musicTrack.isPlaying == true) {
-            requestFadeOut(DEFAULT_FADEOUT_LEN)
+            requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
         }
         musicTrack.nextTrack = song
     }
 
     fun stopMusic() {
-        requestFadeOut(DEFAULT_FADEOUT_LEN)
+        requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
     }
 
-    fun requestFadeOut(length: Double, target: Double = 0.0) {
-        if (!fadeoutFired) {
-            fadeLength = length.coerceAtLeast(1.0/1024.0)
-            fadeAkku = 0.0
-            fadeoutFired = true
-            fadeTarget = target
-            fadeStart = fadeBus.volume
+    fun startAmb(song: MusicContainer) {
+        if (ambientTrack.isPlaying == true) {
+            requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
+        }
+        ambientTrack.nextTrack = song
+    }
+
+    fun stopAmb() {
+        requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
+    }
+
+    fun requestFadeOut(track: TerrarumAudioMixerTrack, length: Double, target: Double = 0.0) {
+        val req = fadeReqs[track]!!
+        if (!req.fadeoutFired) {
+            req.fadeLength = length.coerceAtLeast(1.0/1024.0)
+            req.fadeAkku = 0.0
+            req.fadeoutFired = true
+            req.fadeTarget = target * track.maxVolume
+            req.fadeStart = fadeBus.volume
         }
     }
 
-    fun requestFadeIn(length: Double, target: Double = 1.0) {
-        if (!fadeinFired) {
-            fadeLength = length.coerceAtLeast(1.0/1024.0)
-            fadeAkku = 0.0
-            fadeinFired = true
-            fadeTarget = target
-            fadeStart = fadeBus.volume
+    fun requestFadeIn(track: TerrarumAudioMixerTrack, length: Double, target: Double = 1.0) {
+        val req = fadeReqs[track]!!
+        if (!req.fadeinFired) {
+            req.fadeLength = length.coerceAtLeast(1.0/1024.0)
+            req.fadeAkku = 0.0
+            req.fadeinFired = true
+            req.fadeTarget = target * track.maxVolume
+            req.fadeStart = fadeBus.volume
         }
     }
 
