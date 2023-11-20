@@ -2,8 +2,6 @@ package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
-import net.torvald.terrarum.audio.AudioMixer.masterVolume
-import net.torvald.terrarum.audio.AudioMixer.musicVolume
 import kotlin.math.absoluteValue
 
 /**
@@ -93,13 +91,14 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
             var bufEmpty = false
 
+            // get samples and apply the fader
             if (track.isMaster || track.isBus) {
                 // TEST CODE must combine all the inputs
-                track.sidechainInputs[TerrarumAudioMixerTrack.INDEX_BGM]?.let {
-                    samplesL0 = it.first.processor.fout0[0].applyVolume(musicVolume)
-                    samplesR0 = it.first.processor.fout0[1].applyVolume(musicVolume)
-                    samplesL1 = it.first.processor.fout1[0].applyVolume(musicVolume)
-                    samplesR1 = it.first.processor.fout1[1].applyVolume(musicVolume)
+                track.sidechainInputs[TerrarumAudioMixerTrack.INDEX_BGM]?.let { (side, mix) ->
+                    samplesL0 = side.processor.fout0[0].applyVolume((mix * track.volume).toFloat())
+                    samplesR0 = side.processor.fout0[1].applyVolume((mix * track.volume).toFloat())
+                    samplesL1 = side.processor.fout1[0].applyVolume((mix * track.volume).toFloat())
+                    samplesR1 = side.processor.fout1[1].applyVolume((mix * track.volume).toFloat())
                 }
 
 
@@ -161,6 +160,8 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                     }
                 }
 
+
+                // scan the finished sample for mapping signal level and clipping detection
                 fout1.map { it.maxOf { it.absoluteValue } }.forEachIndexed { index, fl ->
                     maxSigLevel[index] = fl.toDouble()
                 }
@@ -196,9 +197,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                     }*/
 
 //                    printdbg("PUSHE; Queue size: ${track.pcmQueue.size}")
-                    val masvol = masterVolume
-                    track.volume = masvol
-                    track.pcmQueue.addLast(fout1.map { it.applyVolume(masvol) })
+                    track.pcmQueue.addLast(fout1)
                 }
 
                 // spin
@@ -208,6 +207,13 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 resumeSidechainsRecursively(track, track.name)
             }
 //        } // uncomment to multithread
+    }
+
+    private fun FloatArray.applyVolume(volume: Float) = FloatArray(this.size) { (this[it] * volume) }
+    private fun FloatArray.applyVolumeInline(volume: Float) {
+        for (i in this.indices) {
+            this[i] *= volume
+        }
     }
 
 
@@ -247,8 +253,6 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
             pauseLock.notifyAll() // Unblocks thread
         }
     }
-
-    private fun FloatArray.applyVolume(musicVolume: Double) = FloatArray(this.size) { (this[it] * musicVolume).toFloat() }
 }
 
 

@@ -124,9 +124,10 @@ object DefaultConfig {
 
 
             "mastervolume" to 1.0,
-            "musicvolume" to 1.0,
             "bgmvolume" to 1.0,
+            "ambientvolume" to 1.0,
             "sfxvolume" to 1.0,
+            "guivolume" to 1.0,
 
             "lightpasses" to 3,
 

@@ -17,14 +17,15 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         handler.allowESCtoClose = false
 
         ControlPanelCommon.register(this, width, "basegame.soundcontrolpanel", arrayOf(
-            arrayOf("mastervolume", { Lang["MENU_OPTIONS_SOUND_VOLUME"] }, "sliderd,0,1"),
+            arrayOf("mastervolume", { Lang["MENU_OPTIONS_MASTER_VOLUME"] }, "sliderd,0,1"),
             arrayOf("", { "" }, "p"),
-            arrayOf("bgmvolume", { Lang["MENU_LABEL_BACKGROUND_MUSIC"] }, "sliderd,0,1"),
+            arrayOf("bgmvolume", { Lang["MENU_LABEL_MUSIC"] }, "sliderd,0,1"),
             arrayOf("", { "" }, "p"),
-            arrayOf("musicvolume", { Lang["MENU_LABEL_MUSIC"] }, "sliderd,0,1"),
+            arrayOf("ambientvolume", { Lang["MENU_LABEL_AMBIENT_SOUND"] }, "sliderd,0,1"),
             arrayOf("", { "" }, "p"),
             arrayOf("sfxvolume", { Lang["CREDITS_SFX"] }, "sliderd,0,1"),
-
+            arrayOf("", { "" }, "p"),
+            arrayOf("guivolume", { Lang["MENU_LABEL_INTERFACE"] }, "sliderd,0,1"),
         ))
     }
 

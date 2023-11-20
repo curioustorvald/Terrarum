@@ -377,7 +377,8 @@ class BasicDebugInfoWindow : UICanvas() {
     private val stripGap = 1
     private val stripFilterHeight = 32
     private val stripFaderHeight = 200
-    private val stripH = stripFaderHeight + stripFilterHeight * 4 + 16
+    private val numberOfFilters = 5
+    private val stripH = stripFaderHeight + stripFilterHeight * numberOfFilters + 16
 
     private val COL_WELL = Color(0x374854_aa)
     private val COL_WELL2 = Color(0x3f5360_aa)
@@ -440,7 +441,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // filterbank back
         batch.color = COL_FILTER_WELL_BACK
-        Toolkit.fillArea(batch, x, y, stripW, stripFilterHeight * 4)
+        Toolkit.fillArea(batch, x, y, stripW, stripFilterHeight * numberOfFilters)
 
         track.filters.forEachIndexed { i, filter -> if (filter !is NullFilter) {
             // draw filter title back
@@ -455,7 +456,23 @@ class BasicDebugInfoWindow : UICanvas() {
             drawFilterParam(batch, x, y + stripFilterHeight * i + 16, filter, track)
         } }
 
-        val faderY = y + stripFilterHeight * 4
+        val faderY = y + stripFilterHeight * numberOfFilters
+
+        // receives (opposite of "sends")
+        track.sidechainInputs.filterNotNull().reversed().forEachIndexed { i, (side, mix) ->
+            val mixDb = fullscaleToDecibels(mix)
+            val perc = ((mixDb + 24.0).coerceAtLeast(0.0) / 24.0).toFloat()
+            // gauge background
+            batch.color = COL_METER_GRAD2
+            Toolkit.fillArea(batch, x.toFloat(), faderY - (i+1)*16f, stripW * perc, 14f)
+            batch.color = COL_METER_GRAD
+            Toolkit.fillArea(batch, x.toFloat(), faderY - (i+1)*16f + 14f, stripW * perc, 2f)
+
+            // label
+            batch.color = FILTER_NAME_ACTIVE
+            App.fontSmallNumbers.draw(batch, "\u00C0", x.toFloat(), faderY - (i+1)*16f + 1f)
+            App.fontSmallNumbers.draw(batch, side.name, x + 10f, faderY - (i+1)*16f + 1f)
+        }
 
         // fader
         val dB = track.dBfs

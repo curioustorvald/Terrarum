@@ -25,17 +25,20 @@ import kotlin.math.*
 object AudioMixer: Disposable {
     const val DEFAULT_FADEOUT_LEN = 1.8
 
-    /** Returns a master volume */
     val masterVolume: Double
         get() = App.getConfigDouble("mastervolume")
 
-    /** Returns a (master volume * bgm volume) */
     val musicVolume: Double
         get() = App.getConfigDouble("bgmvolume")
 
-    /** Returns a (master volume * sfx volume */
     val ambientVolume: Double
+        get() = App.getConfigDouble("ambientvolume")
+
+    val sfxVolume: Double
         get() = App.getConfigDouble("sfxvolume")
+
+    val guiVolume: Double
+        get() = App.getConfigDouble("guivolume")
 
 
     val tracks = Array(5) { TerrarumAudioMixerTrack(
@@ -88,7 +91,6 @@ object AudioMixer: Disposable {
 
 
     init {
-        masterTrack.volume = masterVolume
         masterTrack.filters[0] = Buffer
 
         fadeBus.addSidechainInput(musicTrack, 1.0)
@@ -126,9 +128,16 @@ object AudioMixer: Disposable {
     // TODO fadein/out controls the master track
 
     fun update(delta: Float) {
+        // the real updates
         (Gdx.audio as? Lwjgl3Audio)?.update()
+        masterTrack.volume = masterVolume
+        musicTrack.volume = musicVolume
+        ambientTrack.volume = ambientVolume
+        sfxMixTrack.volume = sfxVolume
+        guiTrack.volume = guiVolume
 
 
+        // process fades
         if (fadeoutFired) {
             fadeAkku += delta
             val step = fadeAkku / fadeLength
