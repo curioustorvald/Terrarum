@@ -66,6 +66,9 @@ class TerrarumMusicGovernor : MusicGovernor() {
         songs.forEach {
             App.disposables.add(it.gdxMusic)
         }
+        ambients.forEach {
+            App.disposables.add(it.gdxMusic)
+        }
     }
 
 
@@ -113,17 +116,9 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
 
     override fun update(ingame: IngameInstance, delta: Float) {
-        if (songs.isEmpty()) {
-            if (!warningPrinted) {
-                warningPrinted = true
-                printdbg(this, "Warning: songs list is empty")
-            }
-            return
-        }
-
-//        val ingame = ingame as TerrarumIngame
-        if (musicState == 0) musicState = STATE_INTERMISSION
-        if (ambState == 0) ambState = STATE_INTERMISSION
+        // start the song queueing if there is one to play
+        if (songs.isNotEmpty() && musicState == 0) musicState = STATE_INTERMISSION
+        if (ambients.isNotEmpty() && ambState == 0) ambState = STATE_INTERMISSION
 
 
         when (musicState) {

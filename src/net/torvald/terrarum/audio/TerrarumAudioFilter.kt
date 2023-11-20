@@ -38,7 +38,7 @@ object SoftLim : TerrarumAudioFilter() {
     }
 }
 
-object Scope : TerrarumAudioFilter() {
+class Scope : TerrarumAudioFilter() {
     val backbufL = Array(BUFFER_SIZE / 16) { FloatArray(BUFFER_SIZE / 4) }
     val backbufR = Array(BUFFER_SIZE / 16) { FloatArray(BUFFER_SIZE / 4) }
 
