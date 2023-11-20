@@ -39,8 +39,8 @@ object SoftLim : TerrarumAudioFilter() {
 }
 
 object Scope : TerrarumAudioFilter() {
-    val backbufL = Array(8) { FloatArray(BUFFER_SIZE / 4) }
-    val backbufR = Array(8) { FloatArray(BUFFER_SIZE / 4) }
+    val backbufL = Array(BUFFER_SIZE / 16) { FloatArray(BUFFER_SIZE / 4) }
+    val backbufR = Array(BUFFER_SIZE / 16) { FloatArray(BUFFER_SIZE / 4) }
 
     private val sqrt2p = 0.7071067811865476
 

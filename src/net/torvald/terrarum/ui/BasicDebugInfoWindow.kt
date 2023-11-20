@@ -550,16 +550,7 @@ class BasicDebugInfoWindow : UICanvas() {
     )
 
 
-    private val scopePlotCol = arrayOf(
-        Color(0x2ca3f3_aa),
-        Color(0x2ca3f3_99),
-        Color(0x2ca3f3_88),
-        Color(0x2ca3f3_77),
-        Color(0x2ca3f3_66),
-        Color(0x2ca3f3_55),
-        Color(0x2ca3f3_44),
-        Color(0x2ca3f3_33),
-    )
+    private val scopePlotCol = Color(0x76c9fb_33)
 
     private fun drawFilterParam(batch: SpriteBatch, x: Int, y: Int, filter: TerrarumAudioFilter, track: TerrarumAudioMixerTrack) {
         when (filter) {
@@ -582,17 +573,24 @@ class BasicDebugInfoWindow : UICanvas() {
                 App.fontSmallNumbers.draw(batch, "Bs:${BUFFER_SIZE/4}", x+3f, y+1f)
             }
             is Scope -> {
+                batch.color = scopePlotCol
                 val xxs = filter.backbufR
                 val yys = filter.backbufL
+//                var scopedSamples = 0
                 for (t in xxs.lastIndex downTo 0) {
-                    batch.color = scopePlotCol[t]
                     val xs = xxs[t]
                     val ys = yys[t]
 
-                    for (i in xs.indices) {
+                    for (i in xs.indices.reversed()) {
+                        /*val col = COL_METER_BAR.cpy().also {
+                            it.a *= 0.999f
+                        }
+                        batch.color = col*/
                         val px = xs[i] * halfStripW + halfStripW
                         val py = ys[i] * halfStripW + halfStripW
                         Toolkit.fillArea(batch, x + px, y + py, 1f, 1f)
+
+//                        scopedSamples++
                     }
 
                 }
