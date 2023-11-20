@@ -2,7 +2,9 @@ package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
+import org.apache.commons.math3.special.Erf.erf
 import kotlin.math.absoluteValue
+import kotlin.math.tanh
 
 /**
  * Created by minjaesong on 2023-11-17.
@@ -78,12 +80,6 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 }
             }
 
-            // also fetch samples from sidechainInputs
-            // TODO
-
-            // combine all the inputs
-            // TODO this code just uses streamBuf
-
             var samplesL0: FloatArray? = null
             var samplesR0: FloatArray? = null
             var samplesL1: FloatArray? = null
@@ -93,41 +89,36 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
             // get samples and apply the fader
             if (track.isMaster || track.isBus) {
-                // TODO combine all the inputs
-                track.sidechainInputs[TerrarumAudioMixerTrack.INDEX_BGM]?.let { (side, mix) ->
+                // combine all the inputs
+                samplesL0 = FloatArray(bufferSize / 4)
+                samplesR0 = FloatArray(bufferSize / 4)
+                samplesL1 = FloatArray(bufferSize / 4)
+                samplesR1 = FloatArray(bufferSize / 4)
+
+                val sidechains = track.sidechainInputs.filterNotNull()
+                // add all up
+                sidechains.forEach { (side, mix) ->
+                    for (i in samplesL0!!.indices) {
+                        samplesL0!![i] += side.processor.fout0[0][i] * (mix * track.volume).toFloat()
+                        samplesR0!![i] += side.processor.fout0[1][i] * (mix * track.volume).toFloat()
+                        samplesL1!![i] += side.processor.fout1[0][i] * (mix * track.volume).toFloat()
+                        samplesR1!![i] += side.processor.fout1[1][i] * (mix * track.volume).toFloat()
+                    }
+                }
+                // de-clip using sigmoid function
+                for (i in samplesL0.indices) {
+                    samplesL0[i] = erf(samplesL0[i].toDouble()).toFloat()
+                    samplesR0[i] = erf(samplesR0[i].toDouble()).toFloat()
+                    samplesL1[i] = erf(samplesL1[i].toDouble()).toFloat()
+                    samplesR1[i] = erf(samplesR1[i].toDouble()).toFloat()
+                }
+
+                /*track.sidechainInputs[TerrarumAudioMixerTrack.INDEX_BGM]?.let { (side, mix) ->
                     samplesL0 = side.processor.fout0[0].applyVolume((mix * track.volume).toFloat()) // must not applyVolumeInline
                     samplesR0 = side.processor.fout0[1].applyVolume((mix * track.volume).toFloat())
                     samplesL1 = side.processor.fout1[0].applyVolume((mix * track.volume).toFloat())
                     samplesR1 = side.processor.fout1[1].applyVolume((mix * track.volume).toFloat())
-                }
-
-
-                /*track.sidechainInputs[0].let {
-                    if (it != null) {
-                        val f0 = it.first.pcmQueue.removeFirstOrElse {
-                            bufEmpty = true
-                            listOf(emptyBuf, emptyBuf)
-                        }
-                        samplesL0 = f0[0]
-                        samplesR0 = f0[1]
-
-                        val f1 = it.first.pcmQueue.removeFirstOrElse {
-                            bufEmpty = true
-                            listOf(emptyBuf, emptyBuf)
-                        }
-                        samplesL1 = f1[0]
-                        samplesR1 = f1[1]
-                    }
-                    else {
-                        samplesL0 = emptyBuf
-                        samplesR0 = emptyBuf
-                        samplesL1 = emptyBuf
-                        samplesR1 = emptyBuf
-
-                        bufEmpty = true
-                    }
                 }*/
-
             }
             // source channel: skip processing if there's no active input
 //            else if (track.getSidechains().any { it != null && !it.isBus && !it.isMaster && !it.streamPlaying } && !track.streamPlaying) {
