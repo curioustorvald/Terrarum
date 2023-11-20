@@ -373,7 +373,7 @@ class BasicDebugInfoWindow : UICanvas() {
         }
     }
 
-    private val stripW = 64
+    private val stripW = 56
     private val stripGap = 1
     private val stripFilterHeight = 32
     private val stripFaderHeight = 200
@@ -475,11 +475,14 @@ class BasicDebugInfoWindow : UICanvas() {
         }
 
         // fader
+        val sliderX = x + stripW - 12
+
+        // slider text
         val dB = track.dBfs
         val dBstr = dB.toIntAndFrac(2,1)
         val dBfs = dB.coerceIn(-dbLow, 0.0).plus(dbLow).div(dbLow).toFloat()
         batch.color = FILTER_NAME_ACTIVE
-        App.fontSmallNumbers.draw(batch, dBstr, x+32f, faderY+1f)
+        App.fontSmallNumbers.draw(batch, dBstr, sliderX - 16f, faderY+1f)
 
         // fader trough
         batch.color = COL_METER_TROUGH
@@ -513,10 +516,10 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // slider trough
         batch.color = COL_METER_TROUGH
-        Toolkit.fillArea(batch, x + 48, faderY + 16, 2, meterTroughHeight)
+        Toolkit.fillArea(batch, sliderX, faderY + 16, 2, meterTroughHeight)
 
         // slider handle
-        drawFaderHandle(batch, x + 48f, faderY + 18f + meterHeight - dBfs * meterHeight)
+        drawFaderHandle(batch, sliderX.toFloat(), faderY + 18f + meterHeight - dBfs * meterHeight)
 
         // currently streaming
         if (track.streamPlaying) {

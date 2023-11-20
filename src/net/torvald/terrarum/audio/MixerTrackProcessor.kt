@@ -93,9 +93,9 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
             // get samples and apply the fader
             if (track.isMaster || track.isBus) {
-                // TEST CODE must combine all the inputs
+                // TODO combine all the inputs
                 track.sidechainInputs[TerrarumAudioMixerTrack.INDEX_BGM]?.let { (side, mix) ->
-                    samplesL0 = side.processor.fout0[0].applyVolume((mix * track.volume).toFloat())
+                    samplesL0 = side.processor.fout0[0].applyVolume((mix * track.volume).toFloat()) // must not applyVolumeInline
                     samplesR0 = side.processor.fout0[1].applyVolume((mix * track.volume).toFloat())
                     samplesL1 = side.processor.fout1[0].applyVolume((mix * track.volume).toFloat())
                     samplesR1 = side.processor.fout1[1].applyVolume((mix * track.volume).toFloat())
@@ -128,6 +128,14 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                     }
                 }*/
 
+            }
+            // source channel: skip processing if there's no active input
+//            else if (track.getSidechains().any { it != null && !it.isBus && !it.isMaster && !it.streamPlaying } && !track.streamPlaying) {
+            else if (!track.streamPlaying) {
+                samplesL0 = null
+                samplesR0 = null
+                samplesL1 = null
+                samplesR1 = null
             }
             else {
                 samplesL0 = streamBuf.getL0(track.volume)
@@ -210,11 +218,12 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
     }
 
     private fun FloatArray.applyVolume(volume: Float) = FloatArray(this.size) { (this[it] * volume) }
-    private fun FloatArray.applyVolumeInline(volume: Float) {
+    /*private fun FloatArray.applyVolumeInline(volume: Float): FloatArray {
         for (i in this.indices) {
             this[i] *= volume
         }
-    }
+        return this
+    }*/
 
 
     private fun resumeSidechainsRecursively(track: TerrarumAudioMixerTrack?, caller: String) {

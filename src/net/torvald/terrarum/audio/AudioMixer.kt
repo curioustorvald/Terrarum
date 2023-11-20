@@ -44,7 +44,7 @@ object AudioMixer: Disposable {
     val tracks = Array(5) { TerrarumAudioMixerTrack(
         if (it == 0) "BGM"
         else if (it == 1) "AMB"
-        else if (it == 2) "Sfx Mix"
+        else if (it == 2) "SFX"
         else if (it == 3) "GUI"
         else if (it == 4) "BUS1"
         else "Trk${it+1}", isBus = (it == 4)
