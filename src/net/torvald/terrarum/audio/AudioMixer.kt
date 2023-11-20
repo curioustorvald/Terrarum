@@ -97,6 +97,7 @@ object AudioMixer: Disposable {
     init {
         masterTrack.filters[0] = SoftLim
         masterTrack.filters[1] = Buffer
+        masterTrack.filters[2] = Scope
 
         fadeBus.addSidechainInput(musicTrack, 1.0)
         fadeBus.addSidechainInput(ambientTrack, 1.0)

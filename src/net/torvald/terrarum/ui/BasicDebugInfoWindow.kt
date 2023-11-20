@@ -374,6 +374,7 @@ class BasicDebugInfoWindow : UICanvas() {
     }
 
     private val stripW = 56
+    private val halfStripW = stripW / 2
     private val stripGap = 1
     private val stripFilterHeight = 16
     private val stripFaderHeight = 200
@@ -391,6 +392,8 @@ class BasicDebugInfoWindow : UICanvas() {
     private val COL_METER_TROUGH = Color(0x242527_aa)
     private val COL_METER_GRAD = Color(0x1c5075_aa)
     private val COL_METER_GRAD2 = Color(0x2ca3f3_aa)
+    private val COL_SENDS_GRAD = Color(0x50751c_aa)
+    private val COL_SENDS_GRAD2 = Color(0xa3f32c_aa.toInt())
     private val COL_METER_BAR = Color(0x76c9fb_aa)
 
     private val FILTER_NAME_ACTIVE = Color(0xeeeeee_bf.toInt())
@@ -466,9 +469,9 @@ class BasicDebugInfoWindow : UICanvas() {
             val mixDb = fullscaleToDecibels(mix)
             val perc = ((mixDb + 24.0).coerceAtLeast(0.0) / 24.0).toFloat()
             // gauge background
-            batch.color = COL_METER_GRAD2
+            batch.color = COL_SENDS_GRAD2
             Toolkit.fillArea(batch, x.toFloat(), faderY - (i+1)*16f, stripW * perc, 14f)
-            batch.color = COL_METER_GRAD
+            batch.color = COL_SENDS_GRAD
             Toolkit.fillArea(batch, x.toFloat(), faderY - (i+1)*16f + 14f, stripW * perc, 2f)
 
             // label
@@ -542,7 +545,20 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val paramViewHeight = hashMapOf(
         "Lowpass" to 16,
-        "Buffer" to 32,
+        "Buffer" to 16,
+        "Scope" to stripW
+    )
+
+
+    private val scopePlotCol = arrayOf(
+        Color(0x2ca3f3_aa),
+        Color(0x2ca3f3_99),
+        Color(0x2ca3f3_88),
+        Color(0x2ca3f3_77),
+        Color(0x2ca3f3_66),
+        Color(0x2ca3f3_55),
+        Color(0x2ca3f3_44),
+        Color(0x2ca3f3_33),
     )
 
     private fun drawFilterParam(batch: SpriteBatch, x: Int, y: Int, filter: TerrarumAudioFilter, track: TerrarumAudioMixerTrack) {
@@ -562,15 +578,24 @@ class BasicDebugInfoWindow : UICanvas() {
                 App.fontSmallNumbers.draw(batch, "F:${filter.cutoff.toInt()}", x+3f, y+1f)
             }
             is Buffer -> {
-                val currentQueueSize = track.pcmQueue.size
-                for (i in 0 until BACK_BUF_COUNT) {
-                    batch.color = if (i < currentQueueSize) ICON_GREEN else ICON_RED
-                    App.fontSmallNumbers.draw(batch, "|", x+3f+26 + 4*i, y+1f)
-                }
-
                 batch.color = FILTER_NAME_ACTIVE
-                App.fontSmallNumbers.draw(batch, "Buf:", x+3f, y+1f)
-                App.fontSmallNumbers.draw(batch, "Bs:${BUFFER_SIZE/4}", x+3f, y+17f)
+                App.fontSmallNumbers.draw(batch, "Bs:${BUFFER_SIZE/4}", x+3f, y+1f)
+            }
+            is Scope -> {
+                val xxs = filter.backbufR
+                val yys = filter.backbufL
+                for (t in xxs.lastIndex downTo 0) {
+                    batch.color = scopePlotCol[t]
+                    val xs = xxs[t]
+                    val ys = yys[t]
+
+                    for (i in xs.indices) {
+                        val px = xs[i] * halfStripW + halfStripW
+                        val py = ys[i] * halfStripW + halfStripW
+                        Toolkit.fillArea(batch, x + px, y + py, 1f, 1f)
+                    }
+
+                }
             }
         }
     }
