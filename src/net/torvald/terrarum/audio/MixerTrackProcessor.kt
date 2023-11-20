@@ -2,7 +2,6 @@ package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
-import org.apache.commons.math3.special.Erf.erf
 import kotlin.math.absoluteValue
 import kotlin.math.tanh
 
@@ -105,20 +104,6 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                         samplesR1!![i] += side.processor.fout1[1][i] * (mix * track.volume).toFloat()
                     }
                 }
-                // de-clip using sigmoid function
-                for (i in samplesL0.indices) {
-                    samplesL0[i] = erf(samplesL0[i].toDouble()).toFloat()
-                    samplesR0[i] = erf(samplesR0[i].toDouble()).toFloat()
-                    samplesL1[i] = erf(samplesL1[i].toDouble()).toFloat()
-                    samplesR1[i] = erf(samplesR1[i].toDouble()).toFloat()
-                }
-
-                /*track.sidechainInputs[TerrarumAudioMixerTrack.INDEX_BGM]?.let { (side, mix) ->
-                    samplesL0 = side.processor.fout0[0].applyVolume((mix * track.volume).toFloat()) // must not applyVolumeInline
-                    samplesR0 = side.processor.fout0[1].applyVolume((mix * track.volume).toFloat())
-                    samplesL1 = side.processor.fout1[0].applyVolume((mix * track.volume).toFloat())
-                    samplesR1 = side.processor.fout1[1].applyVolume((mix * track.volume).toFloat())
-                }*/
             }
             // source channel: skip processing if there's no active input
 //            else if (track.getSidechains().any { it != null && !it.isBus && !it.isMaster && !it.streamPlaying } && !track.streamPlaying) {

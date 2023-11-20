@@ -5,13 +5,8 @@ import com.badlogic.gdx.backends.lwjgl3.audio.Lwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App
-import net.torvald.terrarum.audio.MixerTrackProcessor.Companion.BACK_BUF_COUNT
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.INDEX_AMB
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.INDEX_BGM
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.tryDispose
 import java.lang.Thread.MAX_PRIORITY
@@ -100,7 +95,8 @@ object AudioMixer: Disposable {
 
 
     init {
-        masterTrack.filters[0] = Buffer
+        masterTrack.filters[0] = SoftLim
+        masterTrack.filters[1] = Buffer
 
         fadeBus.addSidechainInput(musicTrack, 1.0)
         fadeBus.addSidechainInput(ambientTrack, 1.0)
@@ -165,10 +161,13 @@ object AudioMixer: Disposable {
                 if (req.fadeAkku >= req.fadeLength) {
                     req.fadeoutFired = false
                     track.volume = req.fadeTarget
-                    track.volume = req.fadeTarget
 
-                    if (req.fadeTarget == 0.0) {
-                        track.currentTrack = null
+                    // stop streaming if fadeBus is muted
+                    if (req.fadeTarget == 0.0 && track == fadeBus) {
+                        musicTrack.currentTrack = null
+                        musicTrack.streamPlaying = false
+                        ambientTrack.currentTrack = null
+                        ambientTrack.streamPlaying = false
                     }
                 }
             }
@@ -216,11 +215,16 @@ object AudioMixer: Disposable {
         }
 
 
-        if (musicTrack.isPlaying != true && musicTrack.nextTrack != null) {
-//            printdbg(this, "Playing next music: ${nextMusic!!.name}")
+        if (!musicTrack.isPlaying && musicTrack.nextTrack != null) {
             musicTrack.queueNext(null)
             fadeBus.volume = 1.0
             musicTrack.play()
+        }
+
+        if (!ambientTrack.isPlaying && ambientTrack.nextTrack != null) {
+            ambientTrack.queueNext(null)
+            requestFadeIn(ambientTrack, DEFAULT_FADEOUT_LEN * 4, 1.0, 0.00001)
+            ambientTrack.play()
         }
     }
 
@@ -240,31 +244,32 @@ object AudioMixer: Disposable {
             requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
         }
         ambientTrack.nextTrack = song
+        // fade will be processed by the update()
     }
 
     fun stopAmb() {
-        requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
+        requestFadeOut(ambientTrack, DEFAULT_FADEOUT_LEN * 4)
     }
 
-    fun requestFadeOut(track: TerrarumAudioMixerTrack, length: Double, target: Double = 0.0) {
+    fun requestFadeOut(track: TerrarumAudioMixerTrack, length: Double, target: Double = 0.0, source: Double? = null) {
         val req = fadeReqs[track]!!
         if (!req.fadeoutFired) {
             req.fadeLength = length.coerceAtLeast(1.0/1024.0)
             req.fadeAkku = 0.0
             req.fadeoutFired = true
             req.fadeTarget = target * track.maxVolume
-            req.fadeStart = fadeBus.volume
+            req.fadeStart = source ?: fadeBus.volume
         }
     }
 
-    fun requestFadeIn(track: TerrarumAudioMixerTrack, length: Double, target: Double = 1.0) {
+    fun requestFadeIn(track: TerrarumAudioMixerTrack, length: Double, target: Double = 1.0, source: Double? = null) {
         val req = fadeReqs[track]!!
         if (!req.fadeinFired) {
             req.fadeLength = length.coerceAtLeast(1.0/1024.0)
             req.fadeAkku = 0.0
             req.fadeinFired = true
             req.fadeTarget = target * track.maxVolume
-            req.fadeStart = fadeBus.volume
+            req.fadeStart = source ?: fadeBus.volume
         }
     }
 

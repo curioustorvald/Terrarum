@@ -1,6 +1,7 @@
 package net.torvald.terrarum.audio
 
 import com.jme3.math.FastMath
+import kotlin.math.tanh
 
 abstract class TerrarumAudioFilter {
     var bypass = false
@@ -19,6 +20,19 @@ object NullFilter : TerrarumAudioFilter() {
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
         outbuf1.forEachIndexed { index, outTrack ->
             System.arraycopy(inbuf1[index], 0, outTrack, 0, outTrack.size)
+        }
+    }
+}
+
+object SoftLim : TerrarumAudioFilter() {
+    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+        for (ch in inbuf1.indices) {
+            val inn = inbuf1[ch]
+            val out = outbuf1[ch]
+
+            for (i in inn.indices) {
+                out[i] = tanh(inn[i])
+            }
         }
     }
 }

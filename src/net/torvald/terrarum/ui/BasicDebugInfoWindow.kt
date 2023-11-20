@@ -375,9 +375,9 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val stripW = 56
     private val stripGap = 1
-    private val stripFilterHeight = 32
+    private val stripFilterHeight = 16
     private val stripFaderHeight = 200
-    private val numberOfFilters = 5
+    private val numberOfFilters = 10
     private val stripH = stripFaderHeight + stripFilterHeight * numberOfFilters + 16
 
     private val COL_WELL = Color(0x374854_aa)
@@ -443,17 +443,20 @@ class BasicDebugInfoWindow : UICanvas() {
         batch.color = COL_FILTER_WELL_BACK
         Toolkit.fillArea(batch, x, y, stripW, stripFilterHeight * numberOfFilters)
 
+        var filterBankYcursor = 0
         track.filters.forEachIndexed { i, filter -> if (filter !is NullFilter) {
             // draw filter title back
             batch.color = COL_FILTER_TITLE_SHADE
-            Toolkit.fillArea(batch, x, y + stripFilterHeight * i, stripW, 16)
+            Toolkit.fillArea(batch, x, y + filterBankYcursor, stripW, 16)
             batch.color = COL_FILTER_TITLE
-            Toolkit.fillArea(batch, x, y + stripFilterHeight * i, stripW, 14)
+            Toolkit.fillArea(batch, x, y + filterBankYcursor, stripW, 14)
             // draw filter name
             batch.color = if (filter.bypass) FILTER_BYPASSED else FILTER_NAME_ACTIVE
-            App.fontSmallNumbers.draw(batch, filter.javaClass.simpleName, x + 3f, y + stripFilterHeight * i + 1f)
+            App.fontSmallNumbers.draw(batch, filter.javaClass.simpleName, x + 3f, y + filterBankYcursor + 1f)
 
-            drawFilterParam(batch, x, y + stripFilterHeight * i + 16, filter, track)
+            drawFilterParam(batch, x, y + filterBankYcursor + stripFilterHeight, filter, track)
+
+            filterBankYcursor += stripFilterHeight + paramViewHeight.getOrDefault(filter.javaClass.simpleName, 0)
         } }
 
         val faderY = y + stripFilterHeight * numberOfFilters
@@ -536,6 +539,11 @@ class BasicDebugInfoWindow : UICanvas() {
             }
         }
     }
+
+    private val paramViewHeight = hashMapOf(
+        "Lowpass" to 16,
+        "Buffer" to 32,
+    )
 
     private fun drawFilterParam(batch: SpriteBatch, x: Int, y: Int, filter: TerrarumAudioFilter, track: TerrarumAudioMixerTrack) {
         when (filter) {

@@ -50,7 +50,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
                     it.nameWithoutExtension.replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
                     it,
                     Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath))
-                ) { stopMusic() }
+                ) { stopAmbient() }
             }
             catch (e: GdxRuntimeException) {
                 e.printStackTrace()
@@ -123,6 +123,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
 //        val ingame = ingame as TerrarumIngame
         if (musicState == 0) musicState = STATE_INTERMISSION
+        if (ambState == 0) ambState = STATE_INTERMISSION
 
 
         when (musicState) {

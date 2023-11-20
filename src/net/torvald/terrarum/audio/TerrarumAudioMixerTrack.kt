@@ -115,8 +115,8 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, v
 //        currentTrack?.gdxMusic?.play()
     }
 
-    val isPlaying: Boolean?
-        get() = currentTrack?.gdxMusic?.isPlaying
+    val isPlaying: Boolean
+        get() = streamPlaying//currentTrack?.gdxMusic?.isPlaying
 
     override fun dispose() {
         /*if (isMaster) { // uncomment to multithread
