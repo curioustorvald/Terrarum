@@ -20,7 +20,7 @@ id;classname
 19;net.torvald.terrarum.modulebasegame.gameitems.AxeCopper
 20;net.torvald.terrarum.modulebasegame.gameitems.AxeIron
 21;net.torvald.terrarum.modulebasegame.gameitems.AxeSteel
-22;net.torvald.terrarum.modulebasegame.gameitems.AxeWood
+#22;net.torvald.terrarum.modulebasegame.gameitems.AxeWood
 
 # ores
 128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper
