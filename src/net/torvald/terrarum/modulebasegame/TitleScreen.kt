@@ -268,6 +268,10 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         bogoflops = Math.round(bogoflops.toDouble() * (1000000000.0 / (sc - st)))
         printdbg(this, "Bogoflops old: ${App.bogoflops} new: $bogoflops")
         App.bogoflops = maxOf(App.bogoflops, bogoflops)
+
+
+        (AudioMixer.fadeBus.filters[0] as Lowpass).setCutoff(TerrarumAudioMixerTrack.SAMPLING_RATEF / 2)
+
     }
 
 
@@ -294,10 +298,6 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // to show "Continue" and "Load" on the titlescreen, uncomment this line
         App.updateListOfSavegames()
         UILoadGovernor.reset()
-
-
-        (AudioMixer.fadeBus.filters[0] as Lowpass).setCutoff(TerrarumAudioMixerTrack.SAMPLING_RATEF / 2)
-
 
         loadThingsWhileIntroIsVisible()
         printdbg(this, "show() exit")
