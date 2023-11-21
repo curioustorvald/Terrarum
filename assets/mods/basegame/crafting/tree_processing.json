@@ -1,0 +1,22 @@
+{
+  "basegame:48": { /* oak planks */
+    "workbench": "",
+    "ingredients": [[2, 1, "item@basegame:168"]]
+  },
+  "basegame:49": { /* ebony planks */
+    "workbench": "",
+    "ingredients": [[2, 1, "item@basegame:169"]]
+  },
+  "basegame:50": { /* birch planks */
+    "workbench": "",
+    "ingredients": [[2, 1, "item@basegame:170"]]
+  },
+  "basegame:51": { /* rosewood planks */
+    "workbench": "",
+    "ingredients": [[2, 1, "item@basegame:171"]]
+  },
+  "item@basegame:18": { /* stick */
+    "workbench": "",
+    "ingredients": [[2, 1, "$WOOD"]]
+  }
+}

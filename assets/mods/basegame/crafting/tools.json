@@ -1,0 +1,14 @@
+{
+  "item@basegame:14": { /* wooden pick */
+    "workbench": "basiccrafting",
+    "ingredients": [[1, 6, "$WOOD", 2, "item@basegame:18"]]
+  },
+  "item@basegame:22": { /* wooden hatchet */
+    "workbench": "basiccrafting",
+    "ingredients": [[1, 6, "$WOOD", 2, "item@basegame:18"]]
+  },
+  "item@basegame:15": { /* wooden mallet */
+    "workbench": "basiccrafting",
+    "ingredients": [[1, 6, "$WOOD", 2, "item@basegame:18"]]
+  }
+}
