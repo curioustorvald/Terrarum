@@ -187,13 +187,8 @@ object AudioMixer: Disposable {
 
         if (lpOutFired) {
             lpAkku += delta
-            // https://www.desmos.com/calculator/dmhve2awxm
-            val t = (lpAkku / lpLength).coerceIn(0.0, 1.0)
-            val b = ln(lpStart / lpTarget) / -1.0
-            val a = lpStart
-            val cutoff = a * exp(b * t)
+            val cutoff = linPercToLog(lpAkku / lpLength, lpStart, lpTarget)
             (fadeBus.filters[0] as Lowpass).setCutoff(cutoff)
-
 
             if (lpAkku >= lpLength) {
                 lpOutFired = false
@@ -202,11 +197,7 @@ object AudioMixer: Disposable {
         }
         else if (lpInFired) {
             lpAkku += delta
-            // https://www.desmos.com/calculator/dmhve2awxm
-            val t = (lpAkku / lpLength).coerceIn(0.0, 1.0)
-            val b = ln(lpStart / lpTarget) / -1.0
-            val a = lpStart
-            val cutoff = a * exp(b * t)
+            val cutoff = linPercToLog(lpAkku / lpLength, lpStart, lpTarget)
             (fadeBus.filters[0] as Lowpass).setCutoff(cutoff)
 
             if (lpAkku >= lpLength) {
@@ -304,4 +295,19 @@ object AudioMixer: Disposable {
         tracks.forEach { it.tryDispose() }
         masterTrack.tryDispose()
     }
+}
+
+fun linToLogPerc(value: Double, low: Double, high: Double): Double {
+    // https://www.desmos.com/calculator/dmhve2awxm
+    val b = -ln(low / high)
+    val a = low
+    return ln(value / a) / b
+}
+
+fun linPercToLog(perc: Double, low: Double, high: Double): Double {
+    // https://www.desmos.com/calculator/dmhve2awxm
+    val t = perc.coerceIn(0.0, 1.0)
+    val b = -ln(low / high)
+    val a = low
+    return a * exp(b * t)
 }

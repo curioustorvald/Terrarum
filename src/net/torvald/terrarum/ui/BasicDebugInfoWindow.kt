@@ -555,11 +555,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private fun drawFilterParam(batch: SpriteBatch, x: Int, y: Int, filter: TerrarumAudioFilter, track: TerrarumAudioMixerTrack) {
         when (filter) {
             is Lowpass -> {
-                // https://www.desmos.com/calculator/dmhve2awxm
-                val f = filter.cutoff
-                val b = ln(24 / 24000.0) / -1.0
-                val a = 24.0
-                val perc = (ln(f / a) / b).toFloat()
+                val perc = linToLogPerc(filter.cutoff, 24.0, 24000.0).toFloat()
                 batch.color = COL_METER_GRAD2
                 Toolkit.fillArea(batch, x.toFloat(), y.toFloat(), stripW * perc, 14f)
                 batch.color = COL_METER_GRAD
