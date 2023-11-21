@@ -569,6 +569,9 @@ class BasicDebugInfoWindow : UICanvas() {
                 App.fontSmallNumbers.draw(batch, "Bs:${BUFFER_SIZE/4}", x+3f, y+1f)
             }
             is Scope -> {
+//                batch.color = COL_FILTER_WELL_BACK
+//                Toolkit.fillArea(batch, 200, 200, 256, 256)
+
                 batch.color = scopePlotCol
                 val xxs = filter.backbufR
                 val yys = filter.backbufL
@@ -585,6 +588,9 @@ class BasicDebugInfoWindow : UICanvas() {
                         val px = xs[i] * halfStripW + halfStripW
                         val py = ys[i] * halfStripW + halfStripW
                         Toolkit.fillArea(batch, x + px, y + py, 1f, 1f)
+
+
+//                        Toolkit.fillArea(batch, 328 + xs[i] * 128, 328 + ys[i] * 128, 1f, 1f)
 
 //                        scopedSamples++
                     }

@@ -2,6 +2,7 @@ package net.torvald.terrarum.audio
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
+import net.torvald.terrarum.modulebasegame.ui.abs
 import kotlin.math.tanh
 
 abstract class TerrarumAudioFilter {
@@ -55,11 +56,11 @@ class Scope : TerrarumAudioFilter() {
 
         // plot dots
         for (i in 0 until BUFFER_SIZE/4) {
-            val x0 = inbuf1[0][i] * 0.7
-            val y0 = inbuf1[1][i] * 0.7
+            val y0 = inbuf1[0][i] * 0.7
+            val x0 = -inbuf1[1][i] * 0.7 // rotate the domain by -90 deg
 
-            val x = (x0*sqrt2p + y0*sqrt2p) * 1.414
-            val y = (x0*sqrt2p - y0*sqrt2p) * 1.414
+            val x = (+x0*sqrt2p -y0*sqrt2p) * 1.414
+            val y = (-x0*sqrt2p -y0*sqrt2p) * 1.414 // further rotate by -45 deg then flip along the y axis
 
             backbufL[0][i] = x.toFloat()
             backbufR[0][i] = y.toFloat()
