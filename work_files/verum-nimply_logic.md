@@ -80,7 +80,55 @@ Note: For the most cases, an OR gate can be substituted using merging wires and 
 = ((⊤ ↛ ((⊤ ↛ p) ↛ q)) ↛ (⊤ ↛ (⊤ ↛ (p ↛ (⊤ ↛ q)))))
 = ((⊤ ↛ ((⊤ ↛ p) ↛ q)) ↛ (p ↛ (⊤ ↛ q)))
 
-
+## Proof by Simulation
+```kotlin
+val T = true
+val F = false
+infix fun Boolean.nimply(other: Boolean) = (this && !other)
+fun Boolean.toInt() = if (this) 1 else 0
+fun printTruthTable(fn: (Boolean, Boolean) -> Boolean) {
+    println("p | q | out")
+    println("--+---+----")
+    for (p0 in 0..1) {
+        for (q0 in 0..1) {
+            val p = (p0 == 1)
+            val q = (q0 == 1)
+            println("${p.toInt()} | ${q.toInt()} | ${fn(p, q).toInt()}")
+        }
+    }
+    println()
+}
+fun printTruthTable2(fn: (Boolean) -> Boolean) {
+    println("p | out")
+    println("--+----")
+    for (p0 in 0..1) {
+        val p = (p0 == 1)
+        println("${p.toInt()} | ${fn(p).toInt()}")
+    }
+    println()
+}
+fun main() {
+    println("NIMPLY")
+    printTruthTable { p, q -> p nimply q }
+    println("FALSUM")
+    printTruthTable2 { p -> T nimply T }
+    println("NOT")
+    printTruthTable2 { p -> T nimply p }
+    println("BUFFER")
+    printTruthTable2 { p -> T nimply (T nimply p) }
+    printTruthTable2 { p -> p nimply F }
+    println("AND")
+    printTruthTable { p, q -> p nimply (T nimply q) }
+    println("NAND")
+    printTruthTable { p, q -> T nimply (p nimply (T nimply q)) }
+    println("OR")
+    printTruthTable { p, q -> T nimply ((T nimply p) nimply q) }
+    println("NOR")
+    printTruthTable { p, q -> (T nimply p) nimply q }
+    println("XOR")
+    printTruthTable { p, q -> (T nimply ((T nimply p) nimply q)) nimply (p nimply (T nimply q)) }
+}
+```
 
 
 
