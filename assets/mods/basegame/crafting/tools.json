@@ -10,5 +10,13 @@
   "item@basegame:15": { /* wooden mallet */
     "workbench": "basiccrafting",
     "ingredients": [[1, 6, "$WOOD", 2, "item@basegame:18"]]
-  }
+  },
+  "item@basegame:23": { /* stone pick */
+    "workbench": "basiccrafting",
+    "ingredients": [[1, 6, "$ROCK", 2, "item@basegame:18"]]
+  },
+  "item@basegame:24": { /* stone axe */
+  "workbench": "basiccrafting",
+  "ingredients": [[1, 6, "$ROCK", 2, "item@basegame:18"]]
+}
 }

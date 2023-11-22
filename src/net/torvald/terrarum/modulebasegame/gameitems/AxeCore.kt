@@ -309,3 +309,32 @@ class AxeWood(originalID: ItemID) : GameItem(originalID) {
     override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
 
 }
+/**
+ * Created by minjaesong on 2023-11-22.
+ */
+class AxeStone(originalID: ItemID) : GameItem(originalID) {
+    internal constructor() : this("-uninitialised-")
+
+    override var baseToolSize: Double? = BASE_MASS_AND_SIZE
+    override var inventoryCategory = Category.TOOL
+    override val isDynamic = true
+    override val materialId = "ROCK"
+    override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(12,4)
+
+    init {
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
+        durability = maxDurability.toFloat()
+        tags.add("AXE")
+        originalName = "ITEM_HATCHET_STONE"
+    }
+
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
+        if (AxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = AxeCore.endPrimaryUse(actor, this)
+    //    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = AxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+    override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
+
+}
