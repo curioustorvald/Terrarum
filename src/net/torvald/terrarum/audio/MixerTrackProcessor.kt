@@ -2,7 +2,9 @@ package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
+import net.torvald.terrarum.sqr
 import kotlin.math.absoluteValue
+import kotlin.math.sqrt
 import kotlin.math.tanh
 
 /**
@@ -28,8 +30,9 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
     private var fout0 = listOf(emptyBuf, emptyBuf)
     private var fout1 = listOf(emptyBuf, emptyBuf)
 
-    var maxSigLevel = arrayOf(0.0, 0.0); private set
-    var hasClipping = arrayOf(false, false); private set
+    val maxSigLevel = arrayOf(0.0, 0.0)
+    val maxRMS = arrayOf(0.0, 0.0)
+    val hasClipping = arrayOf(false, false)
 
     private var breakBomb = false
 
@@ -149,6 +152,9 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 fout1.map { it.maxOf { it.absoluteValue } }.forEachIndexed { index, fl ->
                     maxSigLevel[index] = fl.toDouble()
                 }
+                fout1.map { it.sumOf { it.sqr().toDouble() } }.forEachIndexed { index, fl ->
+                    maxRMS[index] = sqrt(fl / (bufferSize / 4))
+                }
                 hasClipping.fill(false)
                 fout1.forEachIndexed { index, floats ->
                     var lastSample = floats[0]
@@ -164,6 +170,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
             }
             else {
                 maxSigLevel.fill(0.0)
+                maxRMS.fill(0.0)
                 hasClipping.fill(false)
             }
 

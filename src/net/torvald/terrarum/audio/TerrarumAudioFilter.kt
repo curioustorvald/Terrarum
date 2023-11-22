@@ -28,10 +28,10 @@ object NullFilter : TerrarumAudioFilter() {
 }
 
 object SoftLim : TerrarumAudioFilter() {
-    var downForce = 1.0f; private set
+    val downForce = arrayOf(1.0f, 1.0f)
 
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
-        downForce = 1.0f
+        downForce.fill(1.0f)
 
         for (ch in inbuf1.indices) {
             val inn = inbuf1[ch]
@@ -44,7 +44,7 @@ object SoftLim : TerrarumAudioFilter() {
                 out[i] = v
 
                 if (!diff.isNaN()) {
-                    downForce = minOf(downForce, diff)
+                    downForce[ch] = minOf(downForce[ch], diff)
                 }
             }
         }

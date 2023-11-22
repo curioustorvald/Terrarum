@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
@@ -404,7 +405,8 @@ class BasicDebugInfoWindow : UICanvas() {
     private val meterTroughHeight = 16 * 11 + 5
     private val meterHeight = meterTroughHeight - 4
 
-    private val mixerLastTimeHadClipping = (AudioMixer.tracks + AudioMixer.masterTrack).map { arrayOf(0L, 0L) }
+    private val trackCount = (AudioMixer.tracks + AudioMixer.masterTrack).size
+    private val mixerLastTimeHadClipping = Array(trackCount) { arrayOf(0L, 0L) }
     private val clippingHoldTime = 60000L * 3 // 3 mins
 
     private fun drawAudioMixer(batch: SpriteBatch) {
@@ -429,6 +431,14 @@ class BasicDebugInfoWindow : UICanvas() {
     }
 
     private val dbLow = 48.0
+
+    private val oldPeak = Array(trackCount) { arrayOf(0.0, 0.0) }
+    private val oldRMS = Array(trackCount) { arrayOf(0.0, 0.0) }
+    private val oldComp = Array(trackCount) { arrayOf(0.0, 0.0) }
+
+    private fun getSmoothingFactor(sampleCount: Int) = 1.0 - (BUFFER_SIZE / (4.0 * sampleCount))
+    private val PEAK_SMOOTHING_FACTOR = getSmoothingFactor(640)
+    private val RMS_SMOOTHING_FACTOR = getSmoothingFactor(12000)
 
     private fun drawStrip(batch: SpriteBatch, x: Int, y: Int, track: TerrarumAudioMixerTrack, index: Int) {
         // back
@@ -487,10 +497,10 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // slider text
         val dB = track.dBfs
-        val dBstr = dB.toIntAndFrac(2,1)
+        val dBstr = dB.toIntAndFrac(3,1)
         val dBfs = dB.coerceIn(-dbLow, 0.0).plus(dbLow).div(dbLow).toFloat()
         batch.color = FILTER_NAME_ACTIVE
-        App.fontSmallNumbers.draw(batch, dBstr, sliderX - 16f, faderY+1f)
+        App.fontSmallNumbers.draw(batch, dBstr, sliderX - 23f, faderY+1f)
 
         // fader trough
         batch.color = COL_METER_TROUGH
@@ -514,21 +524,43 @@ class BasicDebugInfoWindow : UICanvas() {
         // fader
         batch.color = COL_METER_BAR
         for (ch in 0..1) {
-            val fs = track.processor.maxSigLevel[ch]
+            val fs = FastMath.interpolateLinear(PEAK_SMOOTHING_FACTOR, track.processor.maxSigLevel[ch], oldPeak[index][ch])
             val dBfs = fullscaleToDecibels(fs)
 
             val x = x + 19f + 7 * ch
             val h = ((dBfs + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
             Toolkit.fillArea(batch, x, faderY + 18f + meterHeight, 6f, h)
+
+            oldPeak[index][ch] = fs
+        }
+
+        // rms marker
+        batch.color = FILTER_NAME_ACTIVE
+        for (ch in 0..1) {
+            val rms = FastMath.interpolateLinear(RMS_SMOOTHING_FACTOR, track.processor.maxRMS[ch], oldRMS[index][ch])
+            val dBfs = fullscaleToDecibels(rms)
+
+            val x = x + 19f + 7 * ch
+            val h = ((dBfs + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
+            Toolkit.fillArea(batch, x, faderY + 19f + meterHeight + h, 6f, -2f)
+
+            oldRMS[index][ch] = rms
         }
 
         // comp marker
         track.filters.filterIsInstance<SoftLim>().firstOrNull()?.let {
-            val downDb = fullscaleToDecibels(it.downForce.toDouble())
-            if (downDb.isFinite()) {
-                val h = meterHeight + ((downDb + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
-                batch.color = COL_METER_COMP_BAR
-                Toolkit.fillArea(batch, x + 33f, faderY + 18f, 2f, h)
+            for (ch in 0..1) {
+                val downForceNow = it.downForce[ch] * 1.0
+                if (downForceNow != 0.0) {
+                    val down = FastMath.interpolateLinear(PEAK_SMOOTHING_FACTOR, downForceNow, oldComp[index][ch])
+                    val dBfs = fullscaleToDecibels(down)
+
+                    val h = meterHeight + ((dBfs + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
+                    batch.color = COL_METER_COMP_BAR
+                    Toolkit.fillArea(batch, x + 16f + ch * 17, faderY + 18f, 2f, h)
+
+                    oldComp[index][ch] = down
+                }
             }
         }
 
