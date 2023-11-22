@@ -3,6 +3,7 @@ package net.torvald.terrarum.audio
 import com.jme3.math.FastMath
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
 import net.torvald.terrarum.modulebasegame.ui.abs
+import kotlin.math.absoluteValue
 import kotlin.math.tanh
 
 abstract class TerrarumAudioFilter {
@@ -27,13 +28,24 @@ object NullFilter : TerrarumAudioFilter() {
 }
 
 object SoftLim : TerrarumAudioFilter() {
+    var downForce = 1.0f; private set
+
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+        downForce = 1.0f
+
         for (ch in inbuf1.indices) {
             val inn = inbuf1[ch]
             val out = outbuf1[ch]
 
             for (i in inn.indices) {
-                out[i] = tanh(inn[i])
+                val u = inn[i]
+                val v = tanh(u)
+                val diff = (v.absoluteValue / u.absoluteValue)
+                out[i] = v
+
+                if (!diff.isNaN()) {
+                    downForce = minOf(downForce, diff)
+                }
             }
         }
     }

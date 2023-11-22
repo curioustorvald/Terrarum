@@ -385,16 +385,18 @@ class BasicDebugInfoWindow : UICanvas() {
     private val COL_WELL2 = Color(0x3f5360_aa)
     private val COL_WELL3 = Color(0x485437_aa)
     private val COL_WELL4 = Color(0x543748_aa)
-    private val COL_FILTER_TITLE = Color(0x72777d_aa)
-    private val COL_FILTER_TITLE_SHADE = Color(0x505558_aa)
+    private val COL_FILTER_TITLE = Color(0x5e656c_aa)
+    private val COL_FILTER_TITLE_SHADE = Color(0x3b3f43_aa)
     private val COL_FILTER_WELL_BACK = Color(0x222325_aa)
     private val COL_MIXER_BACK = Color(0x0f110c_aa)
-    private val COL_METER_TROUGH = Color(0x242527_aa)
+    private val COL_METER_TROUGH = Color(0x232527_aa)
     private val COL_METER_GRAD = Color(0x1c5075_aa)
-    private val COL_METER_GRAD2 = Color(0x2ca3f3_aa)
+    private val COL_METER_GRAD2 = Color(0x25a0f2_aa)
     private val COL_SENDS_GRAD = Color(0x50751c_aa)
-    private val COL_SENDS_GRAD2 = Color(0xa3f32c_aa.toInt())
-    private val COL_METER_BAR = Color(0x76c9fb_aa)
+    private val COL_SENDS_GRAD2 = Color(0xa0f225_aa.toInt())
+    private val COL_METER_BAR = Color(0x4caee5_aa)
+    private val COL_METER_COMP_BAR = Color(0xf3d458_aa.toInt())
+    private val COL_METER_COMP_BAR2 = Color(0x7f6b18_aa.toInt())
 
     private val FILTER_NAME_ACTIVE = Color(0xeeeeee_bf.toInt())
     private val FILTER_BYPASSED = Color(0xf1b934_bf.toInt())
@@ -520,6 +522,18 @@ class BasicDebugInfoWindow : UICanvas() {
             Toolkit.fillArea(batch, x, faderY + 18f + meterHeight, 6f, h)
         }
 
+        // comp marker
+        track.filters.filterIsInstance<SoftLim>().firstOrNull()?.let {
+            val downDb = fullscaleToDecibels(it.downForce.toDouble())
+            if (downDb.isFinite()) {
+                val h = meterHeight + ((downDb + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
+                batch.color = COL_METER_COMP_BAR2
+                Toolkit.fillArea(batch, x + 32f, faderY + 18f, 1f, h)
+                batch.color = COL_METER_COMP_BAR
+                Toolkit.fillArea(batch, x + 33f, faderY + 18f, 1f, h)
+            }
+        }
+
         // slider trough
         batch.color = COL_METER_TROUGH
         Toolkit.fillArea(batch, sliderX, faderY + 16, 2, meterTroughHeight)
@@ -550,7 +564,7 @@ class BasicDebugInfoWindow : UICanvas() {
     )
 
 
-    private val scopePlotCol = Color(0x76c9fb_33)
+    private val scopePlotCol = Color(0x61b3df_33)
 
     private fun drawFilterParam(batch: SpriteBatch, x: Int, y: Int, filter: TerrarumAudioFilter, track: TerrarumAudioMixerTrack) {
         when (filter) {
