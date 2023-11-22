@@ -10,7 +10,7 @@ Verum is a logic-gate modelling of the "Signal Source".
 | 1 |
 
 ### Falsum (⊥)
-Verum is a logic-gate modelling of the "Lack of Signal" or "No Connection".
+Falsum is a logic-gate modelling of the "Lack of Signal" or "No Connection".
 | Output |
 |----|
 | 0 |
@@ -47,8 +47,13 @@ This document will use the convention where the Collector is placed on the lefth
 = (⊤ ↛ (p ↛ (⊤ ↛ q)))
 
 ### p OR q
-= NOT ( NOT(p) AND NOT(q) )
-= NOT ( (⊤ ↛ p) AND (⊤ ↛ q) )
-= NOT ( ( (⊤ ↛ p) ↛ (⊤ ↛ (⊤ ↛ p)) ) )
-= (⊤ ↛ ( ( (⊤ ↛ p) ↛ (⊤ ↛ (⊤ ↛ p)) ) ))
+Method 1:
+= NOT (NOT(p) AND NOT(q))
+= NOT ((⊤ ↛ p) AND (⊤ ↛ q))
+= NOT ((⊤ ↛ p) ↛ (⊤ ↛ (⊤ ↛ q)))
+= (⊤ ↛ ((⊤ ↛ p) ↛ (⊤ ↛ (⊤ ↛ q))))
+Method 2:
+= (NOT p) NAND (NOT q)
+= (⊤ ↛ ((NOT p) ↛ (⊤ ↛ (NOT p))))
+= (⊤ ↛ ((⊤ ↛ p) ↛ (⊤ ↛ (⊤ ↛ q))))
 Note: For the most cases, an OR gate can be substituted using merging wires and diodes.
