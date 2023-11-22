@@ -31,8 +31,13 @@ This document will use the convention where the Collector is placed on the lefth
 
 ## Derivations
 
-### Diode
-= (p ↛ ⊥)
+### Falsum
+⊥ = (⊤ ↛ ⊤)
+
+### Buffer
+p = (p ↛ ⊥)
+= NOT (NOT p)
+= (⊤ ↛ (⊤ ↛ p))
 
 ### NOT p
 = (⊤ ↛ p)
@@ -43,6 +48,7 @@ This document will use the convention where the Collector is placed on the lefth
 
 ### p NAND q
 = NOT (p AND q)
+= NOT (p ↛ (NOT q))
 = NOT (p ↛ (⊤ ↛ q))
 = (⊤ ↛ (p ↛ (⊤ ↛ q)))
 
@@ -51,9 +57,11 @@ Method 1:
 = NOT (NOT(p) AND NOT(q))
 = NOT ((⊤ ↛ p) AND (⊤ ↛ q))
 = NOT ((⊤ ↛ p) ↛ (⊤ ↛ (⊤ ↛ q)))
-= (⊤ ↛ ((⊤ ↛ p) ↛ (⊤ ↛ (⊤ ↛ q))))
+= NOT ((⊤ ↛ p) ↛ q)
+= (⊤ ↛ ((⊤ ↛ p) ↛ q))
 Method 2:
 = (NOT p) NAND (NOT q)
 = (⊤ ↛ ((NOT p) ↛ (⊤ ↛ (NOT p))))
 = (⊤ ↛ ((⊤ ↛ p) ↛ (⊤ ↛ (⊤ ↛ q))))
-Note: For the most cases, an OR gate can be substituted using merging wires and diodes.
+= (⊤ ↛ ((⊤ ↛ p) ↛ q))
+Note: For the most cases, an OR gate can be substituted using merging wires and buffers.
