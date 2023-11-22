@@ -527,10 +527,8 @@ class BasicDebugInfoWindow : UICanvas() {
             val downDb = fullscaleToDecibels(it.downForce.toDouble())
             if (downDb.isFinite()) {
                 val h = meterHeight + ((downDb + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
-                batch.color = COL_METER_COMP_BAR2
-                Toolkit.fillArea(batch, x + 32f, faderY + 18f, 1f, h)
                 batch.color = COL_METER_COMP_BAR
-                Toolkit.fillArea(batch, x + 33f, faderY + 18f, 1f, h)
+                Toolkit.fillArea(batch, x + 33f, faderY + 18f, 2f, h)
             }
         }
 
