@@ -34,13 +34,13 @@ This document will use the convention where the Collector is placed on the lefth
 ### Falsum
 ⊥ = (⊤ ↛ ⊤)
 
+### NOT p
+= (⊤ ↛ p)
+
 ### Buffer
 p = (p ↛ ⊥)
 = NOT (NOT p)
 = (⊤ ↛ (⊤ ↛ p))
-
-### NOT p
-= (⊤ ↛ p)
 
 ### p AND q
 = (p ↛ (NOT q))
@@ -65,3 +65,23 @@ Method 2:
 = (⊤ ↛ ((⊤ ↛ p) ↛ (⊤ ↛ (⊤ ↛ q))))
 = (⊤ ↛ ((⊤ ↛ p) ↛ q))
 Note: For the most cases, an OR gate can be substituted using merging wires and buffers.
+
+### p NOR q
+= NOT (p OR q)
+= NOT (NOT(p) AND NOT(q))
+= NOT(p) AND NOT(q)
+= ((⊤ ↛ p) ↛ (⊤ ↛ (⊤ ↛ q)))
+= ((⊤ ↛ p) ↛ q)
+
+### p XOR q
+= (p OR q) AND NOT(p AND q)
+= (p OR q) AND (p NAND q)
+= (⊤ ↛ ((⊤ ↛ p) ↛ q)) AND (⊤ ↛ (p ↛ (⊤ ↛ q)))
+= ((⊤ ↛ ((⊤ ↛ p) ↛ q)) ↛ (⊤ ↛ (⊤ ↛ (p ↛ (⊤ ↛ q)))))
+= ((⊤ ↛ ((⊤ ↛ p) ↛ q)) ↛ (p ↛ (⊤ ↛ q)))
+
+
+
+
+
+
