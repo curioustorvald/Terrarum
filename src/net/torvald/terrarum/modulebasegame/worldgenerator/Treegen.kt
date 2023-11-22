@@ -5,6 +5,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.sliceEvenly
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -213,14 +214,7 @@ class Treegen(world: GameWorld, seed: Long, val terragenParams: TerragenParams, 
                 growCnt += 1
             }
             // bulb 1
-            for (i in 0 until bulb1) {
-                for (x in x-1..x+1) {
-                    val tileHere = world.getTileFromTerrain(x, y - growCnt)
-                    if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
-                        world.setTileTerrain(x, y - growCnt, foliage, true)
-                }
-                growCnt += 1
-            }
+            growCnt = drawBulb(x, y, 3, bulb1, foliage, growCnt)
         }
         else if (size == 1) {
             val heightSum = 5+3+2+1
@@ -263,33 +257,11 @@ class Treegen(world: GameWorld, seed: Long, val terragenParams: TerragenParams, 
             }
             growCnt += 1
             // bulb 1
-            for (i in 0 until bulb1) {
-                for (x in x-3..x+3) {
-                    val tileHere = world.getTileFromTerrain(x, y - growCnt)
-                    if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
-                        world.setTileTerrain(x, y - growCnt, foliage, true)
-                }
-                growCnt += 1
-            }
+            growCnt = drawBulb(x, y, 7, bulb1, foliage, growCnt)
             // bulb 2
-            for (i in 0 until bulb2) {
-                for (x in x-2..x+2) {
-                    val tileHere = world.getTileFromTerrain(x, y - growCnt)
-                    if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
-                        world.setTileTerrain(x, y - growCnt, foliage, true)
-                }
-                growCnt += 1
-            }
+            growCnt = drawBulb(x, y, 5, bulb2, foliage, growCnt)
             // bulb 3
-            for (i in 0 until bulb3) {
-                for (x in x-1..x+1) {
-                    val tileHere = world.getTileFromTerrain(x, y - growCnt)
-                    if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
-                        world.setTileTerrain(x, y - growCnt, foliage, true)
-                }
-                growCnt += 1
-            }
-
+            growCnt = drawBulb(x, y, 3, bulb3, foliage, growCnt)
         }
         else if (size == 2) {
             val heightSum = 12+4+3+2+1
@@ -314,14 +286,32 @@ class Treegen(world: GameWorld, seed: Long, val terragenParams: TerragenParams, 
             printdbg(this, "Planting tree at $x, $y; params: $stem, $bulb1, $bulb2, $bulb3")
 
             // soiling
-            for (i in 1..2) {
-                val tileLeft = world.getTileFromTerrain(x, y + i)
-                val wallLeft = world.getTileFromWall(x, y + i)
-                val tileRight = world.getTileFromTerrain(x + 1, y + i)
-                if (tileRight != tileLeft) {
-                    world.setTileTerrain(x + 1, y + i, tileLeft, true)
-                    world.setTileWall(x + 1, y + i, wallLeft, true)
+            val tl1 = world.getTileFromTerrain(x - 1, y)
+            val tl2 = world.getTileFromTerrain(x + 1, y)
+            if (BlockCodex[tl2].hasTag("INCONSEQUENTIAL")) {
+                world.setTileTerrain(x + 1, y, Block.GRASS, true)
+                /*
+            Case 1
+             WW     WW
+            GG. -> GGG
+            xGx    xDx
+
+             WW     WW
+            xG. -> xGG
+            xG.    xDG
+             */
+                if (tl1 == Block.GRASS) {
+                    world.setTileTerrain(x, y + 1, Block.DIRT, true)
+
+                    if (BlockCodex[world.getTileFromTerrain(x + 1, y + 1)].hasTag("INCONSEQUENTIAL"))
+                    world.setTileTerrain(x + 1, y + 1, Block.DIRT, true)
                 }
+                /*
+            Case 2
+             WW     WW
+            .G. -> .GG
+            xGx    xGx
+             */
             }
             // trunk
             for (i in 0 until stem) {
@@ -351,43 +341,39 @@ class Treegen(world: GameWorld, seed: Long, val terragenParams: TerragenParams, 
             }
             growCnt += 1
             // bulb 1
-            for (i in 0 until bulb1) {
-                for (x in x-4..x+5) {
-                    val tileHere = world.getTileFromTerrain(x, y - growCnt)
-                    if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
-                        world.setTileTerrain(x, y - growCnt, foliage, true)
-                }
-                growCnt += 1
-            }
+            growCnt = drawBulb(x, y, 10, bulb1, foliage, growCnt)
             // bulb 2
-            for (i in 0 until bulb2) {
-                for (x in x-3..x+4) {
-                    val tileHere = world.getTileFromTerrain(x, y - growCnt)
-                    if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
-                        world.setTileTerrain(x, y - growCnt, foliage, true)
-                }
-                growCnt += 1
-            }
+            growCnt = drawBulb(x, y, 8, bulb2, foliage, growCnt)
             // bulb 3
-            for (i in 0 until bulb3) {
-                for (x in x-2..x+3) {
-                    val tileHere = world.getTileFromTerrain(x, y - growCnt)
-                    if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
-                        world.setTileTerrain(x, y - growCnt, foliage, true)
-                }
-                growCnt += 1
-            }
+            growCnt = drawBulb(x, y, 6, bulb3, foliage, growCnt)
             // bulb 4
-            for (i in 0 until bulb4) {
-                for (x in x-1..x+2) {
-                    val tileHere = world.getTileFromTerrain(x, y - growCnt)
-                    if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
-                        world.setTileTerrain(x, y - growCnt, foliage, true)
-                }
-                growCnt += 1
-            }
+            growCnt = drawBulb(x, y, 4, bulb4, foliage, growCnt)
         }
         else throw IllegalArgumentException("Unknown tree size: $size")
+    }
+
+    private fun drawBulb(x: Int, y: Int, width: Int, height: Int, foliage: ItemID, growCnt0: Int): Int {
+        var growCnt = growCnt0
+        val xStart = x - width / 2 + (1 - (width % 2))
+        val xEnd = xStart + width
+        var xStart2 = xStart
+        var xEnd2 = xEnd
+        Math.random().let {
+            if (it < 0.25) xStart2 += 1
+            else if (it < 0.5) xEnd2 -= 1
+        }
+        val xs1 = xStart until xEnd
+        val xs2 = xStart2 until xEnd2
+
+        for (i in 0 until height) {
+            for (x in if (i == height - 1 && i > 0) xs2 else xs1) {
+                val tileHere = world.getTileFromTerrain(x, y - growCnt)
+                if (BlockCodex[tileHere].hasTag("INCONSEQUENTIAL"))
+                    world.setTileTerrain(x, y - growCnt, foliage, true)
+            }
+            growCnt += 1
+        }
+        return growCnt
     }
 
     /**

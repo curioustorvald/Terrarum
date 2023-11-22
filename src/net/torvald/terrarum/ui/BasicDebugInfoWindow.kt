@@ -138,12 +138,12 @@ class BasicDebugInfoWindow : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         TerrarumIngame.setCameraPosition(batch, App.shapeRender, camera, 0f, 0f)
 
-
         // toggle show-something
         showTimers = showTimers xor (Gdx.input.isKeyJustPressed(KEY_TIMERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
         showWeatherInfo = showWeatherInfo xor (Gdx.input.isKeyJustPressed(KEY_WEATHERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
         showAudioMixer = showAudioMixer xor (Gdx.input.isKeyJustPressed(KEY_AUDIOMIXER) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
 
+        AudioMixer.masterTrack.filters[2].bypass = !showAudioMixer
 
         drawMain(batch)
         if (showTimers) drawTimers(batch)
@@ -867,6 +867,7 @@ class BasicDebugInfoWindow : UICanvas() {
     }
 
     override fun endClosing(delta: Float) {
+        AudioMixer.masterTrack.filters[2].bypass = true
     }
 
     override fun dispose() {
