@@ -178,11 +178,16 @@ class CreateTileAtlas {
                         }
                 }
                 else {
-                    // TODO test
-                    dir.list().filter { tgaFile -> tgaFile.extension() == "tga" && !tgaFile.isDirectory }.sortedBy { it.nameWithoutExtension().toInt() }.forEach { tgaFile: FileHandle ->
-                        val newFile = ModMgr.GameRetextureLoader.altFilePaths.getOrDefault(tgaFile.path(), tgaFile)
-                        tgaList[dirName]!!.add(modname to newFile)
-                    }
+                    // filter files that do not exist on the orecodex
+                    dir.list()
+                        .filter { tgaFile -> tgaFile.extension() == "tga" && !tgaFile.isDirectory && (OreCodex.getOrNull("ores@$modname:${tgaFile.nameWithoutExtension()}") != null) }
+                        .sortedBy { it.nameWithoutExtension().toInt() }
+                        .forEach { tgaFile: FileHandle -> // toInt() to sort by the number, not lexicographically
+                            // tgaFile be like: ./assets/mods/basegame/blocks/32.tga (which is not always .tga)
+                            val newFile = ModMgr.GameRetextureLoader.altFilePaths.getOrDefault(tgaFile.path(), tgaFile)
+                            tgaList[dirName]!!.add(modname to newFile)
+                            // printdbg(this, "modname = $modname, file = $newFile")
+                        }
                 }
             }
         }

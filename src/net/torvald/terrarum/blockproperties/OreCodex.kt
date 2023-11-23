@@ -46,6 +46,10 @@ class OreCodex {
         }
     }
 
+    fun getOrNull(blockID: ItemID?): OreProp? {//<O>
+        return oreProps[blockID]
+    }
+
     private fun setProp(modname: String, key: Int, record: CSVRecord) {
         val prop = OreProp()
         prop.id = "ores@$modname:$key"
