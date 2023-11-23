@@ -5,6 +5,7 @@ import com.jme3.math.FastMath.sin
 import net.torvald.terrarum.audio.AudioMixer.SPEED_OF_SOUND
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
+import net.torvald.terrarum.roundToFloat
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.tanh
@@ -231,6 +232,19 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
         for (ch in 0..1) {
             for (i in 0 until BUFFER_SIZE / 4) {
                 outbuf1[ch][i] = getFrom(i - delays[ch], inbuf0[0], inbuf1[0]) * mults[ch]
+            }
+        }
+    }
+}
+
+class Bitcrush(var steps: Int, var inputGain: Float = 1f): TerrarumAudioFilter() {
+    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+        for (ch in 0 until outbuf1.size) {
+            for (i in 0 until BUFFER_SIZE / 4) {
+                val inn = ((inbuf1[ch][i] * inputGain).coerceIn(-1f, 1f) + 1f) / 2f // 0f..1f
+                val stepped = (inn * (steps - 1)).roundToFloat() / (steps - 1)
+                val out = (stepped * 2f) - 1f // -1f..1f
+                outbuf1[ch][i] = out
             }
         }
     }
