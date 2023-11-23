@@ -1,8 +1,11 @@
 package net.torvald.terrarum.audio
 
 import com.jme3.math.FastMath
+import com.jme3.math.FastMath.sin
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 import kotlin.math.tanh
 
 abstract class TerrarumAudioFilter {
@@ -174,5 +177,61 @@ object Buffer : TerrarumAudioFilter() {
 
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
         bypass = true
+    }
+}
+
+/**
+ * The input audio must be monaural
+ *
+ * @param pan -1 for far-left, 0 for centre, 1 for far-right
+ * @param soundSpeed speed of the sound in meters per seconds
+ * @param earDist distance between ears in meters
+ */
+class BinoPan(var pan: Float, var soundSpeed: Float = 340f, var earDist: Float = 0.18f): TerrarumAudioFilter() {
+
+    private val PANNING_CONST = 3.0 // 3dB panning rule
+
+    private fun getFrom(index: Float, buf0: FloatArray, buf1: FloatArray): Float {
+        val index = index.toInt() // TODO resampling
+        return if (index >= 0) buf1[index]
+        else buf0[buf0.size + index]
+    }
+
+    private val delays = arrayOf(0f, 0f)
+    private val mults = arrayOf(1f, 1f)
+
+    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>
+    ) {
+        val angle = pan * 1.5707963f
+        val timeDiffMax = earDist / soundSpeed * SAMPLING_RATEF
+        val delayInSamples = (timeDiffMax * sin(angle)).absoluteValue
+        val volMultDbThis = PANNING_CONST * pan.absoluteValue
+        val volMultFsThis = decibelsToFullscale(volMultDbThis).toFloat()
+        val volMultDbOther = -(PANNING_CONST * pan.absoluteValue)
+        val volMUltFsOther = decibelsToFullscale(volMultDbOther).toFloat()
+
+        if (pan >= 0) {
+            delays[0] = delayInSamples
+            delays[1] = 0f
+        }
+        else {
+            delays[0] = 0f
+            delays[1] = delayInSamples
+        }
+
+        if (pan >= 0) {
+            mults[0] = volMUltFsOther
+            mults[1] = volMultFsThis
+        }
+        else {
+            mults[0] = volMultFsThis
+            mults[1] = volMUltFsOther
+        }
+
+        for (ch in 0..1) {
+            for (i in 0 until BUFFER_SIZE / 4) {
+                outbuf1[ch][i] = getFrom(i - delays[ch], inbuf0[0], inbuf1[0]) * mults[ch]
+            }
+        }
     }
 }
