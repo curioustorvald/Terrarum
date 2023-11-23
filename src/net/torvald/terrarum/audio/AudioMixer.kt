@@ -1,6 +1,7 @@
 package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.backends.lwjgl3.audio.Lwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
@@ -95,6 +96,8 @@ object AudioMixer: Disposable {
 
 
     init {
+//        musicTrack.filters[0] = BinoPan((Math.random() * 2.0 - 1.0).toFloat())
+
         masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer
         masterTrack.filters[2] = Scope()
@@ -138,11 +141,19 @@ object AudioMixer: Disposable {
     private var lpStart = SAMPLING_RATED / 2.0
     private var lpTarget = SAMPLING_RATED / 2.0
 
-    // TODO make sidechaining work
-    // TODO master volume controls the master track
-    // TODO fadein/out controls the master track
-
     fun update(delta: Float) {
+        // test the panning
+        /*(musicTrack.filters[0] as? BinoPan)?.let {
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                it.pan = (it.pan + 0.001f).coerceIn(-1f, 1f)
+            }
+            else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                it.pan = (it.pan - 0.001f).coerceIn(-1f, 1f)
+            }
+        }*/
+
+
+
         // the real updates
         (Gdx.audio as? Lwjgl3Audio)?.update()
         masterTrack.volume = masterVolume

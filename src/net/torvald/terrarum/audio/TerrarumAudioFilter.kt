@@ -207,8 +207,7 @@ class BinoPan(var pan: Float, var soundSpeed: Float = 340f, var earDist: Float =
         val delayInSamples = (timeDiffMax * sin(angle)).absoluteValue
         val volMultDbThis = PANNING_CONST * pan.absoluteValue
         val volMultFsThis = decibelsToFullscale(volMultDbThis).toFloat()
-        val volMultDbOther = -(PANNING_CONST * pan.absoluteValue)
-        val volMUltFsOther = decibelsToFullscale(volMultDbOther).toFloat()
+        val volMUltFsOther = 1f / volMultFsThis
 
         if (pan >= 0) {
             delays[0] = delayInSamples

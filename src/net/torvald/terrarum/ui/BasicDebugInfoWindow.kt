@@ -21,6 +21,7 @@ import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
+import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.weather.WeatherDirBox
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.weather.WeatherStateBox
@@ -588,7 +589,8 @@ class BasicDebugInfoWindow : UICanvas() {
     private val paramViewHeight = hashMapOf(
         "Lowpass" to 16,
         "Buffer" to 16,
-        "Scope" to stripW
+        "BinoPan" to 32,
+        "Scope" to stripW,
     )
 
 
@@ -605,6 +607,21 @@ class BasicDebugInfoWindow : UICanvas() {
 
                 batch.color = FILTER_NAME_ACTIVE
                 App.fontSmallNumbers.draw(batch, "F:${filter.cutoff.toInt()}", x+3f, y+1f)
+            }
+            is BinoPan -> {
+                val w = filter.pan * 0.5f * stripW
+                batch.color = COL_METER_GRAD2
+                Toolkit.fillArea(batch, x + stripW / 2f, y.toFloat(), w, 14f)
+                batch.color = COL_METER_GRAD
+                Toolkit.fillArea(batch, x + stripW / 2f, y+14f, w, 2f)
+
+                batch.color = FILTER_NAME_ACTIVE
+                val panLabel = if (filter.pan == 0f) "<C>"
+                else if (filter.pan < 0) "L${filter.pan.absoluteValue.times(100).toIntAndFrac(3,1)}"
+                else "R${filter.pan.absoluteValue.times(100).toIntAndFrac(3,1)}"
+                App.fontSmallNumbers.draw(batch, panLabel, x+3f, y+1f)
+
+                App.fontSmallNumbers.draw(batch, "AS:${filter.soundSpeed.roundToInt()}", x+3f, y+17f)
             }
             is Buffer -> {
                 batch.color = FILTER_NAME_ACTIVE
