@@ -20,6 +20,11 @@ import kotlin.math.*
  * Created by minjaesong on 2023-11-07.
  */
 object AudioMixer: Disposable {
+    var SPEED_OF_SOUND = 340f
+
+    const val SPEED_OF_SOUND_AIR = 340f
+    const val SPEED_OF_SOUND_WATER = 1480f
+
     const val DEFAULT_FADEOUT_LEN = 1.8
 
     val masterVolume: Double

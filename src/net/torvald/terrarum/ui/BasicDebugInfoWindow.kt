@@ -621,7 +621,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 else "R${filter.pan.absoluteValue.times(100).toIntAndFrac(3,1)}"
                 App.fontSmallNumbers.draw(batch, panLabel, x+3f, y+1f)
 
-                App.fontSmallNumbers.draw(batch, "AS:${filter.soundSpeed.roundToInt()}", x+3f, y+17f)
+                App.fontSmallNumbers.draw(batch, "AS:${AudioMixer.SPEED_OF_SOUND.roundToInt()}", x+3f, y+17f)
             }
             is Buffer -> {
                 batch.color = FILTER_NAME_ACTIVE

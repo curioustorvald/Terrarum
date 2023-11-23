@@ -2,6 +2,7 @@ package net.torvald.terrarum.audio
 
 import com.jme3.math.FastMath
 import com.jme3.math.FastMath.sin
+import net.torvald.terrarum.audio.AudioMixer.SPEED_OF_SOUND
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import kotlin.math.absoluteValue
@@ -187,7 +188,7 @@ object Buffer : TerrarumAudioFilter() {
  * @param soundSpeed speed of the sound in meters per seconds
  * @param earDist distance between ears in meters
  */
-class BinoPan(var pan: Float, var soundSpeed: Float = 340f, var earDist: Float = 0.18f): TerrarumAudioFilter() {
+class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter() {
 
     private val PANNING_CONST = 3.0 // 3dB panning rule
 
@@ -203,7 +204,7 @@ class BinoPan(var pan: Float, var soundSpeed: Float = 340f, var earDist: Float =
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>
     ) {
         val angle = pan * 1.5707963f
-        val timeDiffMax = earDist / soundSpeed * SAMPLING_RATEF
+        val timeDiffMax = earDist / SPEED_OF_SOUND * SAMPLING_RATEF
         val delayInSamples = (timeDiffMax * sin(angle)).absoluteValue
         val volMultDbThis = PANNING_CONST * pan.absoluteValue
         val volMultFsThis = decibelsToFullscale(volMultDbThis).toFloat()
