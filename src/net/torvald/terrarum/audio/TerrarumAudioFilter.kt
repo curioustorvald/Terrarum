@@ -42,7 +42,7 @@ object SoftClp : TerrarumAudioFilter() {
             val out = outbuf1[ch]
 
             for (i in inn.indices) {
-                val u = inn[i]
+                val u = inn[i] * 0.95f
                 val v = tanh(u)
                 val diff = (v.absoluteValue / u.absoluteValue)
                 out[i] = v
@@ -90,7 +90,7 @@ class Scope : TerrarumAudioFilter() {
 }
 
 
-class Lowpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
+class Lowpass(cutoff0: Float): TerrarumAudioFilter() {
 
     var cutoff = cutoff0.toDouble(); private set
     private var alpha: Float = 0f
@@ -100,9 +100,8 @@ class Lowpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
     }
 
     fun setCutoff(cutoff: Float) {
-//        println("LP Cutoff: $cutoff")
         val RC: Float = 1f / (cutoff * FastMath.TWO_PI)
-        val dt: Float = 1f / rate
+        val dt: Float = 1f / SAMPLING_RATEF
         alpha = dt / (RC + dt)
         this.cutoff = cutoff.toDouble()
     }
@@ -110,7 +109,7 @@ class Lowpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
     fun setCutoff(cutoff: Double) {
 //        println("LP Cutoff: $cutoff")
         val RC: Double = 1.0 / (cutoff * Math.PI * 2.0)
-        val dt: Double = 1.0 / rate
+        val dt: Double = 1.0 / SAMPLING_RATEF
         alpha = (dt / (RC + dt)).toFloat()
         this.cutoff = cutoff
     }
@@ -131,7 +130,7 @@ class Lowpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
 }
 
 
-class Highpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
+class Highpass(cutoff0: Float): TerrarumAudioFilter() {
 
     var cutoff = cutoff0.toDouble(); private set
     private var alpha: Float = 0f
@@ -143,7 +142,7 @@ class Highpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
     fun setCutoff(cutoff: Float) {
 //        println("LP Cutoff: $cutoff")
         val RC: Float = 1f / (cutoff * FastMath.TWO_PI)
-        val dt: Float = 1f / rate
+        val dt: Float = 1f / SAMPLING_RATEF
         alpha = dt / (RC + dt)
         this.cutoff = cutoff.toDouble()
     }
@@ -151,7 +150,7 @@ class Highpass(cutoff0: Float, val rate: Int): TerrarumAudioFilter() {
     fun setCutoff(cutoff: Double) {
 //        println("LP Cutoff: $cutoff")
         val RC: Double = 1.0 / (cutoff * Math.PI * 2.0)
-        val dt: Double = 1.0 / rate
+        val dt: Double = 1.0 / SAMPLING_RATEF
         alpha = (RC / (RC + dt)).toFloat()
         this.cutoff = cutoff
     }
@@ -244,6 +243,44 @@ class Bitcrush(var steps: Int, var inputGain: Float = 1f): TerrarumAudioFilter()
                 val inn = ((inbuf1[ch][i] * inputGain).coerceIn(-1f, 1f) + 1f) / 2f // 0f..1f
                 val stepped = (inn * (steps - 1)).roundToFloat() / (steps - 1)
                 val out = (stepped * 2f) - 1f // -1f..1f
+                outbuf1[ch][i] = out
+            }
+        }
+    }
+}
+
+class Reverb(val delayMS: Float, var decay: Float, var lowpass: Float): TerrarumAudioFilter() {
+
+    private var delay = (SAMPLING_RATEF * delayMS / 1000f).roundToInt()
+
+    private val buf = Array<FloatArray>(2) { FloatArray(delay) }
+
+    private fun unshift(sample: Float, buf: FloatArray) {
+        for (i in delay - 1 downTo 1) {
+            buf[i] = buf[i - 1]
+        }
+        buf[0] = sample
+    }
+
+    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+        val RC: Float = 1f / (lowpass * FastMath.TWO_PI)
+        val dt: Float = 1f / SAMPLING_RATEF
+        val alpha = dt / (RC + dt)
+
+        for (ch in 0 until outbuf1.size) {
+            for (i in 0 until BUFFER_SIZE / 4) {
+                val in1 = inbuf1[ch][i]
+
+                val in2 = buf[ch][delay - 2]
+                val in3 = buf[ch][delay - 1]
+
+                val dek1 = 1f / (1f + decay)
+                val dek2 = decay / (1f + decay)
+
+                val out = in1 * dek1 + (in2 + alpha * (in3 - in2)) * dek2
+
+                unshift(out, buf[ch])
+
                 outbuf1[ch][i] = out
             }
         }

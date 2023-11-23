@@ -102,6 +102,7 @@ object AudioMixer: Disposable {
 
     init {
 //        musicTrack.filters[0] = BinoPan((Math.random() * 2.0 - 1.0).toFloat())
+//        musicTrack.filters[1] = Reverb(25f, 1f, 1000f)
 
         masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer
@@ -110,7 +111,7 @@ object AudioMixer: Disposable {
         fadeBus.addSidechainInput(musicTrack, 1.0)
         fadeBus.addSidechainInput(ambientTrack, 1.0)
         fadeBus.addSidechainInput(sfxMixTrack, 1.0)
-        fadeBus.filters[0] = Lowpass(SAMPLING_RATE / 2f, SAMPLING_RATE)
+        fadeBus.filters[0] = Lowpass(SAMPLING_RATE / 2f)
 
         masterTrack.addSidechainInput(fadeBus, 1.0)
         masterTrack.addSidechainInput(guiTrack, 1.0)
