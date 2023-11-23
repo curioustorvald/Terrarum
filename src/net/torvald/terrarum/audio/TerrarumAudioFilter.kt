@@ -286,3 +286,29 @@ class Reverb(val delayMS: Float, var decay: Float, var lowpass: Float): Terrarum
         }
     }
 }
+
+object XYtoMS: TerrarumAudioFilter() {
+    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+        for (i in 0 until BUFFER_SIZE / 4) {
+            val X = inbuf1[0][i]
+            val Y = inbuf1[1][i]
+            val M = (X + Y) / 2f
+            val S = (X - Y) / 2f
+            outbuf1[0][i] = M
+            outbuf1[1][i] = S
+        }
+    }
+}
+
+object MStoXY: TerrarumAudioFilter() {
+    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+        for (i in 0 until BUFFER_SIZE / 4) {
+            val M = inbuf1[0][i]
+            val S = inbuf1[1][i]
+            val X = M + S
+            val Y = M - S
+            outbuf1[0][i] = X
+            outbuf1[1][i] = Y
+        }
+    }
+}
