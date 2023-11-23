@@ -13,9 +13,7 @@ import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.audio.*
-import net.torvald.terrarum.audio.MixerTrackProcessor.Companion.BACK_BUF_COUNT
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
@@ -548,7 +546,7 @@ class BasicDebugInfoWindow : UICanvas() {
         }
 
         // comp marker
-        track.filters.filterIsInstance<SoftLim>().firstOrNull()?.let {
+        track.filters.filterIsInstance<SoftClp>().firstOrNull()?.let {
             for (ch in 0..1) {
                 val downForceNow = it.downForce[ch] * 1.0
                 if (downForceNow != 0.0) {

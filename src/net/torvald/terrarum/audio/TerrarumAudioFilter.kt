@@ -2,7 +2,6 @@ package net.torvald.terrarum.audio
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
-import net.torvald.terrarum.modulebasegame.ui.abs
 import kotlin.math.absoluteValue
 import kotlin.math.tanh
 
@@ -27,7 +26,7 @@ object NullFilter : TerrarumAudioFilter() {
     }
 }
 
-object SoftLim : TerrarumAudioFilter() {
+object SoftClp : TerrarumAudioFilter() {
     val downForce = arrayOf(1.0f, 1.0f)
 
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
@@ -55,7 +54,7 @@ class Scope : TerrarumAudioFilter() {
     val backbufL = Array(BUFFER_SIZE / 16) { FloatArray(BUFFER_SIZE / 4) }
     val backbufR = Array(BUFFER_SIZE / 16) { FloatArray(BUFFER_SIZE / 4) }
 
-    private val sqrt2p = 0.7071067811865476
+    private val sqrt2p = 0.7071067811865475
 
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
         // shift buffer

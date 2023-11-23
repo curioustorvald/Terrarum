@@ -95,7 +95,7 @@ object AudioMixer: Disposable {
 
 
     init {
-        masterTrack.filters[0] = SoftLim
+        masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer
         masterTrack.filters[2] = Scope()
 
