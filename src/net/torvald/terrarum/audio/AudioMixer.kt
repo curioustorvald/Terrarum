@@ -102,7 +102,7 @@ object AudioMixer: Disposable {
 
     init {
 //        musicTrack.filters[0] = BinoPan((Math.random() * 2.0 - 1.0).toFloat())
-//        musicTrack.filters[1] = Reverb(25f, 1f, 1000f)
+        musicTrack.filters[1] = Reverb(36f, 0.9f, 100f)
 
         masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer

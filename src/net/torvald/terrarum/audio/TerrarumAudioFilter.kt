@@ -238,7 +238,7 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
 
 class Bitcrush(var steps: Int, var inputGain: Float = 1f): TerrarumAudioFilter() {
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
-        for (ch in 0 until outbuf1.size) {
+        for (ch in outbuf1.indices) {
             for (i in 0 until BUFFER_SIZE / 4) {
                 val inn = ((inbuf1[ch][i] * inputGain).coerceIn(-1f, 1f) + 1f) / 2f // 0f..1f
                 val stepped = (inn * (steps - 1)).roundToFloat() / (steps - 1)
@@ -249,35 +249,35 @@ class Bitcrush(var steps: Int, var inputGain: Float = 1f): TerrarumAudioFilter()
     }
 }
 
-class Reverb(val delayMS: Float, var decay: Float, var lowpass: Float): TerrarumAudioFilter() {
+class Reverb(val delayMS: Float, var feedback: Float, var lowpass: Float): TerrarumAudioFilter() {
 
     private var delay = (SAMPLING_RATEF * delayMS / 1000f).roundToInt()
-
-    private val buf = Array<FloatArray>(2) { FloatArray(delay) }
-
+    private val bufSize = delay
+    private val buf = Array<FloatArray>(2) { FloatArray(bufSize) }
     private fun unshift(sample: Float, buf: FloatArray) {
-        for (i in delay - 1 downTo 1) {
+        for (i in bufSize - 1 downTo 1) {
             buf[i] = buf[i - 1]
         }
         buf[0] = sample
     }
+
 
     override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
         val RC: Float = 1f / (lowpass * FastMath.TWO_PI)
         val dt: Float = 1f / SAMPLING_RATEF
         val alpha = dt / (RC + dt)
 
-        for (ch in 0 until outbuf1.size) {
+        for (ch in outbuf1.indices) {
             for (i in 0 until BUFFER_SIZE / 4) {
+                // TODO lowpass is not really working
                 val in1 = inbuf1[ch][i]
 
-                val in2 = buf[ch][delay - 2]
-                val in3 = buf[ch][delay - 1]
+                val rv1 = buf[ch][delay - 1]
+                val rv0 = buf[ch][delay - 2]
 
-                val dek1 = 1f / (1f + decay)
-                val dek2 = decay / (1f + decay)
+                val reverb = (rv1 + alpha * (rv0 - rv1))
 
-                val out = in1 * dek1 + (in2 + alpha * (in3 - in2)) * dek2
+                val out = in1 - reverb * feedback
 
                 unshift(out, buf[ch])
 
