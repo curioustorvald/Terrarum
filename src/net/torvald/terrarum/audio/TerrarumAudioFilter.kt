@@ -4,7 +4,6 @@ import com.jme3.math.FastMath
 import com.jme3.math.FastMath.sin
 import net.torvald.terrarum.audio.AudioMixer.SPEED_OF_SOUND
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.roundToFloat
 import java.io.File
@@ -58,8 +57,8 @@ object SoftClp : TerrarumAudioFilter() {
 }
 
 class Scope : TerrarumAudioFilter() {
-    val backbufL = Array((4096f / BUFFER_SIZE * 4).roundToInt()) { FloatArray(BUFFER_SIZE / 4) }
-    val backbufR = Array((4096f / BUFFER_SIZE * 4).roundToInt()) { FloatArray(BUFFER_SIZE / 4) }
+    val backbufL = Array((4096f / BUFFER_SIZE * 4).roundToInt().coerceAtLeast(1)) { FloatArray(BUFFER_SIZE / 4) }
+    val backbufR = Array((4096f / BUFFER_SIZE * 4).roundToInt().coerceAtLeast(1)) { FloatArray(BUFFER_SIZE / 4) }
 
     private val sqrt2p = 0.7071067811865475
 
@@ -445,11 +444,11 @@ object MStoXY: TerrarumAudioFilter() {
     }
 }
 
-class Gain(val gain: Float): TerrarumAudioFilter() {
+class Gain(var gain: Float): TerrarumAudioFilter() {
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         for (i in 0 until BUFFER_SIZE / 4) {
-            outbuf[0][i] = inbuf[1][i] * gain
-            outbuf[1][i] = inbuf[0][i] * gain
+            outbuf[0][i] = inbuf[0][i] * gain
+            outbuf[1][i] = inbuf[1][i] * gain
         }
     }
 }

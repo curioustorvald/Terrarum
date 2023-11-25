@@ -81,54 +81,48 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 }
             }
 
-            var samplesL0: FloatArray? = null
-            var samplesR0: FloatArray? = null
-            var samplesL1: FloatArray? = null
-            var samplesR1: FloatArray? = null
+            var samplesL1: FloatArray
+            var samplesR1: FloatArray
 
             var bufEmpty = false
 
             // get samples and apply the fader
             if (track.isMaster || track.isBus) {
                 // combine all the inputs
-                samplesL0 = FloatArray(bufferSize / 4)
-                samplesR0 = FloatArray(bufferSize / 4)
                 samplesL1 = FloatArray(bufferSize / 4)
                 samplesR1 = FloatArray(bufferSize / 4)
 
                 val sidechains = track.sidechainInputs.filterNotNull()
                 // add all up
                 sidechains.forEach { (side, mix) ->
-                    for (i in samplesL0!!.indices) {
-                        samplesL1!![i] += side.processor.fout1[0][i] * (mix * track.volume).toFloat()
-                        samplesR1!![i] += side.processor.fout1[1][i] * (mix * track.volume).toFloat()
+                    for (i in samplesL1.indices) {
+                        samplesL1[i] += side.processor.fout1[0][i] * (mix * track.volume).toFloat()
+                        samplesR1[i] += side.processor.fout1[1][i] * (mix * track.volume).toFloat()
                     }
                 }
             }
             // source channel: skip processing if there's no active input
 //            else if (track.getSidechains().any { it != null && !it.isBus && !it.isMaster && !it.streamPlaying } && !track.streamPlaying) {
             else if (!track.streamPlaying) {
-                samplesL0 = null
-                samplesR0 = null
-                samplesL1 = null
-                samplesR1 = null
+                samplesL1 = emptyBuf
+                samplesR1 = emptyBuf
+
+                bufEmpty = true
             }
             else {
-                samplesL0 = streamBuf.getL0(track.volume)
-                samplesR0 = streamBuf.getR0(track.volume)
                 samplesL1 = streamBuf.getL1(track.volume)
                 samplesR1 = streamBuf.getR1(track.volume)
             }
 
-            if (samplesL0 != null /*&& samplesL1 != null && samplesR0 != null && samplesR1 != null*/) {
+            if (!bufEmpty) {
                 // run the input through the stack of filters
                 val filterStack = track.filters.filter { !it.bypass && it !is NullFilter }
 
                 if (filterStack.isEmpty()) {
-                    fout1 = listOf(samplesL1!!, samplesR1!!)
+                    fout1 = listOf(samplesL1, samplesR1)
                 }
                 else {
-                    var fin1 = listOf(samplesL1!!, samplesR1!!)
+                    var fin1 = listOf(samplesL1, samplesR1)
                     fout1 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
 
                     filterStack.forEachIndexed { index, it ->
@@ -162,6 +156,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 }
             }
             else {
+                fout1 = listOf(samplesL1, samplesR1) // keep pass the so that long-delay filters can empty out its buffer
                 maxSigLevel.fill(0.0)
                 maxRMS.fill(0.0)
                 hasClipping.fill(false)
@@ -173,16 +168,14 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 this.pause()
             }
             else {
-                if (samplesL0 != null /*&& samplesL1 != null && samplesR0 != null && samplesR1 != null*/) {
 
-                    // spin until queue is sufficiently empty
-                    /*while (track.pcmQueue.size >= BACK_BUF_COUNT && running) { // uncomment to multithread
-                        Thread.sleep(1)
-                    }*/
+                // spin until queue is sufficiently empty
+                /*while (track.pcmQueue.size >= BACK_BUF_COUNT && running) { // uncomment to multithread
+                    Thread.sleep(1)
+                }*/
 
-//                    printdbg("PUSHE; Queue size: ${track.pcmQueue.size}")
-                    track.pcmQueue.addLast(fout1)
-                }
+//                printdbg("PUSHE; Queue size: ${track.pcmQueue.size}")
+                track.pcmQueue.addLast(fout1)
 
                 // spin
 //                Thread.sleep(((1000*bufferSize) / 8L / rate).coerceAtLeast(1L)) // uncomment to multithread

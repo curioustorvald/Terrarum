@@ -44,13 +44,16 @@ object AudioMixer: Disposable {
         get() = App.getConfigDouble("guivolume")
 
 
-    val tracks = Array(5) { TerrarumAudioMixerTrack(
-        if (it == 0) "BGM"
-        else if (it == 1) "AMB"
-        else if (it == 2) "SFX"
+    val tracks = Array(8) { TerrarumAudioMixerTrack(
+        if (it == 0) "Music"
+        else if (it == 1) "Ambient"
+        else if (it == 2) "Player"
         else if (it == 3) "GUI"
-        else if (it == 4) "BUS1"
-        else "Trk${it+1}", isBus = (it == 4), maxVolumeFun = {
+        else if (it == 4) "\u00F0 \u00E4 \u00F0" // summation
+        else if (it == 5) "\u00D9Open\u00D9" // convolution1
+        else if (it == 6) "\u00D9Cave\u00D9" // convolution2
+        else if (it == 7) "\u00F0 \u00DA \u00F0" // fade
+        else "Trk${it+1}", isBus = (it >= 4), maxVolumeFun = {
             when (it) {
                 0 -> { musicVolume }
                 1 -> { ambientVolume }
@@ -61,7 +64,7 @@ object AudioMixer: Disposable {
         }
     ) }
 
-    val masterTrack = TerrarumAudioMixerTrack("Master", true) { masterVolume }
+    val masterTrack = TerrarumAudioMixerTrack("\u00DBMASTER", true) { masterVolume }
 
     val musicTrack: TerrarumAudioMixerTrack
         get() = tracks[0]
@@ -72,8 +75,14 @@ object AudioMixer: Disposable {
     val guiTrack: TerrarumAudioMixerTrack
         get() = tracks[3]
 
-    val fadeBus: TerrarumAudioMixerTrack
+    val sumBus: TerrarumAudioMixerTrack
         get() = tracks[4]
+    val convolveBusOpen: TerrarumAudioMixerTrack
+        get() = tracks[5]
+    val convolveBusCave: TerrarumAudioMixerTrack
+        get() = tracks[6]
+    val fadeBus: TerrarumAudioMixerTrack
+        get() = tracks[7]
 
     var processing = true
 
@@ -102,19 +111,37 @@ object AudioMixer: Disposable {
 
 
     init {
-//        musicTrack.filters[0] = BinoPan((Math.random() * 2.0 - 1.0).toFloat())
-//        musicTrack.filters[1] = Reverb(36f, 0.92f, 1200f)
+        // initialise audio paths //
+
+//        musicTrack.filters[1] = BinoPan(0f)
+//        musicTrack.filters[2] = Reverb(36f, 0.92f, 1200f)
+
+        listOf(musicTrack, ambientTrack, sfxMixTrack, guiTrack).forEach {
+            it.filters[0] = Gain(1f)
+        }
 
         masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer
         masterTrack.filters[2] = Scope()
 
-        fadeBus.addSidechainInput(musicTrack, 1.0)
-        fadeBus.addSidechainInput(ambientTrack, 1.0)
-        fadeBus.addSidechainInput(sfxMixTrack, 1.0)
-        fadeBus.filters[0] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - CedarCreekWinery.bin"))
-        fadeBus.filters[1] = Gain(10f)
-        fadeBus.filters[3] = Lowpass(SAMPLING_RATE / 2f)
+        listOf(sumBus, convolveBusOpen, convolveBusCave).forEach {
+            it.addSidechainInput(musicTrack, 1.0)
+            it.addSidechainInput(ambientTrack, 1.0)
+            it.addSidechainInput(sfxMixTrack, 1.0)
+        }
+
+        convolveBusOpen.filters[0] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - Cranbrook Art Museum.bin"))
+        convolveBusOpen.filters[1] = Gain(decibelsToFullscale(21.0).toFloat())
+        convolveBusOpen.volume = 0.5
+
+        convolveBusCave.filters[0] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - CedarCreekWinery.bin"))
+        convolveBusCave.filters[1] = Gain(decibelsToFullscale(18.0).toFloat())
+        convolveBusCave.volume = 0.5
+
+        fadeBus.addSidechainInput(sumBus, 1.0 / 3.0)
+        fadeBus.addSidechainInput(convolveBusOpen, 2.0 / 3.0)
+        fadeBus.addSidechainInput(convolveBusCave, 2.0 / 3.0)
+        fadeBus.filters[0] = Lowpass(SAMPLING_RATE / 2f)
 
         masterTrack.addSidechainInput(fadeBus, 1.0)
         masterTrack.addSidechainInput(guiTrack, 1.0)
@@ -152,7 +179,7 @@ object AudioMixer: Disposable {
 
     fun update(delta: Float) {
         // test the panning
-        /*(musicTrack.filters[0] as? BinoPan)?.let {
+        /*musicTrack.getFilter<BinoPan>().let {
             if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 it.pan = (it.pan + 0.001f).coerceIn(-1f, 1f)
             }
@@ -166,10 +193,10 @@ object AudioMixer: Disposable {
         // the real updates
         (Gdx.audio as? Lwjgl3Audio)?.update()
         masterTrack.volume = masterVolume
-        musicTrack.volume = musicVolume
-        ambientTrack.volume = ambientVolume
-        sfxMixTrack.volume = sfxVolume
-        guiTrack.volume = guiVolume
+        musicTrack.getFilter<Gain>().gain = musicVolume.toFloat()
+        ambientTrack.getFilter<Gain>().gain = ambientVolume.toFloat()
+        sfxMixTrack.getFilter<Gain>().gain = sfxVolume.toFloat()
+        guiTrack.getFilter<Gain>().gain = guiVolume.toFloat()
 
 
         // process fades

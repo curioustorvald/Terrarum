@@ -377,7 +377,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val meterTroughHeight = meterGradCountMinusOne * meterGradSize + 5
     private val meterHeight = meterTroughHeight - 4
 
-    private val stripW = 56
+    private val stripW = 54
     private val halfStripW = stripW / 2
     private val stripGap = 1
     private val stripFilterHeight = 16
@@ -454,7 +454,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // name text
         batch.color = FILTER_NAME_ACTIVE
-        App.fontSmallNumbers.draw(batch, track.name, x + 3f, y + stripH - 13f)
+        App.fontSmallNumbers.draw(batch, track.name, x + 1f + (stripW - track.name.length * 7) / 2, y + stripH - 13f)
 
 
         // filterbank back
@@ -484,6 +484,8 @@ class BasicDebugInfoWindow : UICanvas() {
             val mixDb = fullscaleToDecibels(mix)
             val perc = ((mixDb + 24.0).coerceAtLeast(0.0) / 24.0).toFloat()
             // gauge background
+            batch.color = COL_METER_TROUGH
+            Toolkit.fillArea(batch, x.toFloat(), faderY - (i+1)*16f, stripW.toFloat(), 14f)
             batch.color = COL_SENDS_GRAD2
             Toolkit.fillArea(batch, x.toFloat(), faderY - (i+1)*16f, stripW * perc, 14f)
             batch.color = COL_SENDS_GRAD
