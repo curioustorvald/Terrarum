@@ -1,7 +1,5 @@
 package net.torvald.terrarum.audio
 
-import com.github.psambit9791.jdsp.transform.FastFourier
-import com.github.psambit9791.jdsp.transform.InverseFastFourier
 import com.jme3.math.FastMath
 import com.jme3.math.FastMath.sin
 import net.torvald.terrarum.audio.AudioMixer.SPEED_OF_SOUND
@@ -9,7 +7,6 @@ import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.roundToFloat
-import org.apache.commons.math3.complex.Complex
 import java.io.File
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -298,12 +295,11 @@ class Reverb(val delayMS: Float = 36f, var feedback: Float = 0.92f, var lowpass:
     }
 }
 
-class Convolv(ir: File, val gain: Float = decibelsToFullscale(-12.0).toFloat()): TerrarumAudioFilter() {
+class Convolv(ir: File, val gain: Float = decibelsToFullscale(-24.0).toFloat()): TerrarumAudioFilter() {
 
     private val fftLen: Int
-    private val convFFT: Array<Array<Complex>>
-    private val inbuf: Array<DoubleArray>
-//    private val outbuf: Array<DoubleArray>
+    private val convFFT: Array<Array<FComplex>>
+    private val inbuf: Array<FloatArray>
 
     private val BLOCKSIZE = BUFFER_SIZE / 4
 
@@ -317,8 +313,8 @@ class Convolv(ir: File, val gain: Float = decibelsToFullscale(-12.0).toFloat()):
 
         println("IR Sample Count = $sampleCount; FFT Length = $fftLen")
 
-        val conv = Array(2) { DoubleArray(fftLen) }
-        inbuf = Array(2) { DoubleArray(fftLen) }
+        val conv = Array(2) { FloatArray(fftLen) }
+        inbuf = Array(2) { FloatArray(fftLen) }
 //        outbuf = Array(2) { DoubleArray(fftLen) }
 
         ir.inputStream().let {
@@ -331,8 +327,8 @@ class Convolv(ir: File, val gain: Float = decibelsToFullscale(-12.0).toFloat()):
                         it.read().and(255).shl(8) or
                         it.read().and(255).shl(16) or
                         it.read().and(255).shl(24))
-                conv[0][i] = f1.toDouble()
-                conv[1][i] = f2.toDouble()
+                conv[0][i] = f1
+                conv[1][i] = f2
             }
 
             it.close()
@@ -340,7 +336,7 @@ class Convolv(ir: File, val gain: Float = decibelsToFullscale(-12.0).toFloat()):
 
         // fourier-transform the 'conv'
         convFFT = Array(2) {
-            FastFourier(conv[it]).let { it.transform(); it.getComplex(false) }
+            FFT.fft(conv[it])
         }
 
         println("convFFT Length = ${convFFT[0].size}")
@@ -354,72 +350,33 @@ class Convolv(ir: File, val gain: Float = decibelsToFullscale(-12.0).toFloat()):
 
         val t1 = System.nanoTime()
         for (ch in outbuf1.indices) {
+            push(inbuf1[ch].applyGain(gain), inbuf[ch])
 
-            push(inbuf1[ch].toDoubleArray(gain), inbuf[ch])
-
-            val inputFFT = FastFourier(inbuf[ch]).let { it.transform(); it.getComplex(false) }
-
-            val Ny = inputFFT.size// + convFFT[ch].size - 1
-
-//            println("inputFFT.size=${inputFFT.size}  convFFT[ch].size=${convFFT[ch].size}  Ny=$Ny")
+            val inputFFT = FFT.fft(inbuf[ch])
 
             val Y = multiply(inputFFT, convFFT[ch])
-            val y = real(ifft(Y))
+            val y = FFT.ifftAndGetReal(Y)
 
-//            val u = y.sliceArray(Ny - BLOCKSIZE until Ny).toFloatArray(gain) // y size == Ny
-            val u = y.takeLast(BLOCKSIZE).map { it.toFloat() }.toFloatArray()
-
-//            println("y size: ${y.size}; Ny=$Ny")
+            val u = y.takeLast(BLOCKSIZE).toFloatArray()
 
             System.arraycopy(u, 0, outbuf1[ch], 0, BLOCKSIZE)
         }
         val t2 = System.nanoTime()
         val ptime = (t2 - t1).toDouble()
         val realtime = BLOCKSIZE / SAMPLING_RATED * 1000000000L
-        if (realtime >= ptime) {
-//            println("Processing speed: ${realtime / ptime}x FASTER than realtime")
-        }
-        else {
-//            println("Processing speed: ${ptime / realtime}x SLOWER than realtime")
-        }
+        println("Processing speed: ${realtime / ptime}x")
     }
 
-    private fun real(cs: Array<Complex>): DoubleArray {
-        return cs.map { it.real }.toDoubleArray()
+    private fun multiply(X: Array<FComplex>, H: Array<FComplex>): Array<FComplex> {
+        return Array(X.size) { X[it] * H[it] }
     }
 
-    private fun ifft(y: Array<Complex>): Array<Complex> {
-        return InverseFastFourier(y, false).let { it.transform(); it.complex }
-    }
-
-    private fun multiply(X: Array<Complex>, H: Array<Complex>): Array<Complex> {
-        if (X.size != H.size) throw IllegalArgumentException()
-        return Array(X.size) {
-            //X[it].multiply(H[it])
-
-            // following is a snippet of the code from org.apache.commons.math3.complex.multiply,
-            // to remove the non-necessary sanity checks
-            val a = X[it]
-            val b = H[it]
-            val re = a.real * b.real - a.imaginary * b.imaginary
-            val im = a.real * b.imaginary + a.imaginary * b.real
-            Complex(re, im)
-        }
-    }
-
-
-    private fun push(sample: Double, buf: DoubleArray) {
-        System.arraycopy(buf, 1, buf, 0, buf.size - 1)
-        buf[buf.lastIndex] = sample
-    }
-
-    private fun push(samples: DoubleArray, buf: DoubleArray) {
+    private fun push(samples: FloatArray, buf: FloatArray) {
         System.arraycopy(buf, samples.size, buf, 0, buf.size - samples.size)
         System.arraycopy(samples, 0, buf, buf.size - samples.size, samples.size)
     }
 
-    private fun FloatArray.toDoubleArray(gain: Float = 1f) = this.map { it.toDouble() * gain }.toDoubleArray()
-    private fun DoubleArray.toFloatArray(gain: Float = 1f) = this.map { it.toFloat() * gain }.toFloatArray()
+    private fun FloatArray.applyGain(gain: Float = 1f) = this.map { it * gain }.toFloatArray()
 }
 
 object XYtoMS: TerrarumAudioFilter() {
