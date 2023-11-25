@@ -392,7 +392,15 @@ class Convolv(ir: File, val gain: Float = decibelsToFullscale(-12.0).toFloat()):
     private fun multiply(X: Array<Complex>, H: Array<Complex>): Array<Complex> {
         if (X.size != H.size) throw IllegalArgumentException()
         return Array(X.size) {
-            X[it].multiply(H[it])
+            //X[it].multiply(H[it])
+
+            // following is a snippet of the code from org.apache.commons.math3.complex.multiply,
+            // to remove the non-necessary sanity checks
+            val a = X[it]
+            val b = H[it]
+            val re = a.real * b.real - a.imaginary * b.imaginary
+            val im = a.real * b.imaginary + a.imaginary * b.real
+            Complex(re, im)
         }
     }
 

@@ -21,7 +21,6 @@ import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
-import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.weather.WeatherDirBox
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.weather.WeatherStateBox
@@ -373,11 +372,16 @@ class BasicDebugInfoWindow : UICanvas() {
         }
     }
 
+    private val meterGradSize = 9
+    private val meterGradCountMinusOne = 22
+    private val meterTroughHeight = meterGradCountMinusOne * meterGradSize + 5
+    private val meterHeight = meterTroughHeight - 4
+
     private val stripW = 56
     private val halfStripW = stripW / 2
     private val stripGap = 1
     private val stripFilterHeight = 16
-    private val stripFaderHeight = 200
+    private val stripFaderHeight = meterHeight + 20
     private val numberOfFilters = 10
     private val stripH = stripFaderHeight + stripFilterHeight * numberOfFilters + 16
 
@@ -395,14 +399,13 @@ class BasicDebugInfoWindow : UICanvas() {
     private val COL_SENDS_GRAD = Color(0x50751c_aa)
     private val COL_SENDS_GRAD2 = Color(0xa0f225_aa.toInt())
     private val COL_METER_BAR = Color(0x4caee5_aa)
+    private val COL_METER_BAR_OVER = Color(0xef8297_aa.toInt())
     private val COL_METER_COMP_BAR = Color(0xf3d458_aa.toInt())
     private val COL_METER_COMP_BAR2 = Color(0x7f6b18_aa.toInt())
 
     private val FILTER_NAME_ACTIVE = Color(0xeeeeee_bf.toInt())
     private val FILTER_BYPASSED = Color(0xf1b934_bf.toInt())
     private val trackBack = listOf(COL_WELL, COL_WELL2)
-    private val meterTroughHeight = 16 * 11 + 5
-    private val meterHeight = meterTroughHeight - 4
 
     private val trackCount = 64//(AudioMixer.tracks + AudioMixer.masterTrack).size
     private val mixerLastTimeHadClipping = Array(trackCount) { arrayOf(0L, 0L) }
@@ -429,7 +432,8 @@ class BasicDebugInfoWindow : UICanvas() {
         }
     }
 
-    private val dbLow = 48.0
+    private val dbOver = 6.0
+    private val dbLow = 60.0
 
     private val oldPeak = Array(trackCount) { arrayOf(0.0, 0.0) }
     private val oldRMS = Array(trackCount) { arrayOf(0.0, 0.0) }
@@ -501,34 +505,40 @@ class BasicDebugInfoWindow : UICanvas() {
         batch.color = FILTER_NAME_ACTIVE
         App.fontSmallNumbers.draw(batch, dBstr, sliderX - 23f, faderY+1f)
 
-        // fader trough
+        // fader trough and grads
         batch.color = COL_METER_TROUGH
         Toolkit.fillArea(batch, x+16, faderY+16, 19, meterTroughHeight)
-        for (i in 0..16) {
-            val y = faderY + 18 + i * 11
-            val x = x + if (i == 0 || i == 16) 16 else 17
-            val w = if (i == 0 || i == 16) 19 else 17
-            batch.color = if (i == 0 || i == 16) COL_METER_GRAD2 else COL_METER_GRAD
+        for (i in 0..meterGradCountMinusOne) {
+            val y = faderY + 18 + i * meterGradSize
+            val x = x + if (i == 0 || i == meterGradCountMinusOne) 16 else 17
+            val w = if (i == 0 || i == meterGradCountMinusOne) 19 else 17
+            batch.color = if (i == 0 || i == meterGradCountMinusOne) COL_METER_GRAD2 else COL_METER_GRAD
             Toolkit.fillArea(batch, x, y, w, 1)
         }
 
         // fader labels
         batch.color = FILTER_NAME_ACTIVE
-        for (i in 0..16 step 2) {
-            val y = faderY + 11f + i * 11
-            val s = (i*dbLow/16).roundToInt().toString().padStart(2, ' ')
+        for (i in 0..meterGradCountMinusOne step 2) {
+            val y = faderY + meterGradSize.toFloat() + i * meterGradSize + 2
+            val s = (i*3 - 6).absoluteValue.toString().padStart(2, ' ')
             App.fontSmallNumbers.draw(batch, s, x + 1f, y)
         }
 
         // fader
-        batch.color = COL_METER_BAR
+        val decibelZeroMeterHeight = ((dbLow - dbOver) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
         for (ch in 0..1) {
             val fs = FastMath.interpolateLinear(PEAK_SMOOTHING_FACTOR, track.processor.maxSigLevel[ch], oldPeak[index][ch])
             val dBfs = fullscaleToDecibels(fs)
 
             val x = x + 19f + 7 * ch
-            val h = ((dBfs + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
-            Toolkit.fillArea(batch, x, faderY + 18f + meterHeight, 6f, h)
+            val h = ((dBfs + (dbLow - dbOver)) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
+
+            batch.color = COL_METER_BAR
+            Toolkit.fillArea(batch, x, faderY + 17f + meterHeight, 6f, maxOf(h, decibelZeroMeterHeight))
+            if (dBfs > 0.0) {
+                batch.color = COL_METER_BAR_OVER
+                Toolkit.fillArea(batch, x, faderY + 17f + meterHeight + decibelZeroMeterHeight, 6f, h - decibelZeroMeterHeight)
+            }
 
             oldPeak[index][ch] = fs
         }
@@ -540,8 +550,8 @@ class BasicDebugInfoWindow : UICanvas() {
             val dBfs = fullscaleToDecibels(rms)
 
             val x = x + 19f + 7 * ch
-            val h = ((dBfs + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
-            Toolkit.fillArea(batch, x, faderY + 19f + meterHeight + h, 6f, -2f)
+            val h = ((dBfs + (dbLow - dbOver)) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
+            Toolkit.fillArea(batch, x, faderY + 18f + meterHeight + h, 6f, -2f)
 
             oldRMS[index][ch] = rms
         }
@@ -556,7 +566,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
                     val h = meterHeight + ((dBfs + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
                     batch.color = COL_METER_COMP_BAR
-                    Toolkit.fillArea(batch, x + 16f + ch * 17, faderY + 18f, 2f, h)
+                    Toolkit.fillArea(batch, x + 16f + ch * 17, faderY + 19f, 2f, h)
 
                     oldComp[index][ch] = down
                 }
