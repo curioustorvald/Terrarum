@@ -5,10 +5,10 @@ import org.apache.commons.math3.transform.DftNormalization
 import org.apache.commons.math3.transform.TransformType
 import org.apache.commons.math3.util.FastMath
 
-data class FComplex(var real: Float = 0f, var imaginary: Float = 0f) {
+data class FComplex(var re: Float = 0f, var im: Float = 0f) {
     operator fun times(other: FComplex) = FComplex(
-        this.real * other.real - this.imaginary * other.imaginary,
-        this.real * other.imaginary + this.imaginary * other.real
+        this.re * other.re - this.im * other.im,
+        this.re * other.im + this.im * other.re
     )
 }
 
@@ -34,8 +34,8 @@ object FFT {
     fun ifftAndGetReal(y: Array<FComplex>): FloatArray {
         val dataRI = Array<FloatArray>(2) { FloatArray(y.size) }
         for (i in y.indices) {
-            dataRI[0][i] = y[i].real
-            dataRI[1][i] = y[i].imaginary
+            dataRI[0][i] = y[i].re
+            dataRI[1][i] = y[i].im
         }
 
         transformInPlace(dataRI, DftNormalization.STANDARD, TransformType.INVERSE)
@@ -111,8 +111,6 @@ object FFT {
         }
 
         bitReversalShuffle2(dataR, dataI)
-
-        // Do 4-term DFT.
 
         // Do 4-term DFT.
         if (type == TransformType.INVERSE) {

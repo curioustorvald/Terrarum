@@ -315,11 +315,15 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
 
     private val fftLen: Int
     private val convFFT: Array<Array<FComplex>>
+    private val convFFTpartd: Array<Array<Array<FComplex>>> // index: Channel, partition, frequencies
     private val inbuf: Array<FloatArray>
 
     private val BLOCKSIZE = BUFFER_SIZE / 4
 
     var processingSpeed = 1f; private set
+
+    private val partSizes: IntArray
+    private val partOffsets: IntArray
 
     init {
         if (!ir.exists()) {
@@ -358,6 +362,30 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
         }
 
 //        println("convFFT Length = ${convFFT[0].size}")
+
+        if (fftLen < BUFFER_SIZE) // buffer size is always 4x the samples in the buffer
+            throw Error("FIR size is too small (minimum: $BUFFER_SIZE samples)")
+
+
+        val partitions = ArrayList<Int>()
+        var cnt = fftLen
+        while (cnt > BUFFER_SIZE / 4) {
+            cnt /= 2
+            partitions.add(cnt)
+        }
+        partitions.add(cnt)
+
+        partSizes = partitions.reversed().toIntArray()
+        partOffsets = partSizes.clone().also { it[0] = 0 }
+
+        // allocate arrays
+        convFFTpartd = Array(2) { ch ->
+            Array(partSizes.size) { partNo ->
+                Array(partSizes[partNo]) {
+                    convFFT[ch][partOffsets[partNo] + it]
+                }
+            }
+        }
     }
 
     /**
