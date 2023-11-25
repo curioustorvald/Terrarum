@@ -270,7 +270,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         App.bogoflops = maxOf(App.bogoflops, bogoflops)
 
 
-        (AudioMixer.fadeBus.filters[0] as Lowpass).setCutoff(TerrarumAudioMixerTrack.SAMPLING_RATEF / 2)
+        AudioMixer.fadeBus.getFilter<Lowpass>().setCutoff(TerrarumAudioMixerTrack.SAMPLING_RATEF / 2)
 
     }
 

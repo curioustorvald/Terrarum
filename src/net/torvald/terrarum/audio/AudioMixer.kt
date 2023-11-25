@@ -105,15 +105,16 @@ object AudioMixer: Disposable {
 //        musicTrack.filters[0] = BinoPan((Math.random() * 2.0 - 1.0).toFloat())
 //        musicTrack.filters[1] = Reverb(36f, 0.92f, 1200f)
 
-//        masterTrack.filters[0] = SoftClp
+        masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer
         masterTrack.filters[2] = Scope()
 
         fadeBus.addSidechainInput(musicTrack, 1.0)
         fadeBus.addSidechainInput(ambientTrack, 1.0)
         fadeBus.addSidechainInput(sfxMixTrack, 1.0)
-        fadeBus.filters[0] = Lowpass(SAMPLING_RATE / 2f)
-        fadeBus.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/WoodruffLane.bin"))
+        fadeBus.filters[0] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - CedarCreekWinery.bin"))
+        fadeBus.filters[1] = Gain(16f)
+        fadeBus.filters[3] = Lowpass(SAMPLING_RATE / 2f)
 
         masterTrack.addSidechainInput(fadeBus, 1.0)
         masterTrack.addSidechainInput(guiTrack, 1.0)
@@ -207,20 +208,20 @@ object AudioMixer: Disposable {
         if (lpOutFired) {
             lpAkku += delta
             val cutoff = linPercToLog(lpAkku / lpLength, lpStart, lpTarget)
-            (fadeBus.filters[0] as Lowpass).setCutoff(cutoff)
+            fadeBus.getFilter<Lowpass>().setCutoff(cutoff)
 
             if (lpAkku >= lpLength) {
                 lpOutFired = false
-                (fadeBus.filters[0] as Lowpass).setCutoff(lpTarget)
+                fadeBus.getFilter<Lowpass>().setCutoff(lpTarget)
             }
         }
         else if (lpInFired) {
             lpAkku += delta
             val cutoff = linPercToLog(lpAkku / lpLength, lpStart, lpTarget)
-            (fadeBus.filters[0] as Lowpass).setCutoff(cutoff)
+            fadeBus.getFilter<Lowpass>().setCutoff(cutoff)
 
             if (lpAkku >= lpLength) {
-                (fadeBus.filters[0] as Lowpass).setCutoff(lpTarget)
+                fadeBus.getFilter<Lowpass>().setCutoff(lpTarget)
                 lpInFired = false
             }
         }
@@ -290,7 +291,7 @@ object AudioMixer: Disposable {
             lpLength = length.coerceAtLeast(1.0/1024.0)
             lpAkku = 0.0
             lpOutFired = true
-            lpStart = (fadeBus.filters[0] as Lowpass).cutoff
+            lpStart = fadeBus.getFilter<Lowpass>().cutoff
             lpTarget = SAMPLING_RATED / 2.0
         }
     }
@@ -300,7 +301,7 @@ object AudioMixer: Disposable {
             lpLength = length.coerceAtLeast(1.0/1024.0)
             lpAkku = 0.0
             lpInFired = true
-            lpStart = (fadeBus.filters[0] as Lowpass).cutoff
+            lpStart = fadeBus.getFilter<Lowpass>().cutoff
             lpTarget = SAMPLING_RATED / 100.0
         }
     }

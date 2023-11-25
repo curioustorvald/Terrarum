@@ -501,7 +501,7 @@ class BasicDebugInfoWindow : UICanvas() {
         // slider text
         val dB = track.dBfs
         val dBstr = dB.toIntAndFrac(3,1)
-        val dBfs = dB.coerceIn(-dbLow, 0.0).plus(dbLow).div(dbLow).toFloat()
+        val faderKnobDbFs = dB.coerceIn(-dbLow, 0.0).plus(dbLow).div(dbLow + dbOver).toFloat()
         batch.color = FILTER_NAME_ACTIVE
         App.fontSmallNumbers.draw(batch, dBstr, sliderX - 23f, faderY+1f)
 
@@ -578,7 +578,7 @@ class BasicDebugInfoWindow : UICanvas() {
         Toolkit.fillArea(batch, sliderX, faderY + 16, 2, meterTroughHeight)
 
         // slider handle
-        drawFaderHandle(batch, sliderX.toFloat(), faderY + 18f + meterHeight - dBfs * meterHeight)
+        drawFaderHandle(batch, sliderX.toFloat(), faderY + 18f + meterHeight - faderKnobDbFs * meterHeight)
 
         // currently streaming
         if (track.streamPlaying) {
@@ -600,6 +600,8 @@ class BasicDebugInfoWindow : UICanvas() {
         "Lowpass" to 16,
         "Buffer" to 16,
         "BinoPan" to 32,
+        "Convolv" to 16,
+        "Gain" to 16,
         "Scope" to stripW,
     )
 
@@ -636,6 +638,14 @@ class BasicDebugInfoWindow : UICanvas() {
             is Buffer -> {
                 batch.color = FILTER_NAME_ACTIVE
                 App.fontSmallNumbers.draw(batch, "Bs:${BUFFER_SIZE/4}", x+3f, y+1f)
+            }
+            is Convolv -> {
+                batch.color = FILTER_NAME_ACTIVE
+                App.fontSmallNumbers.draw(batch, "P:${filter.processingSpeed.times(100).roundToInt().div(100f)}x", x+3f, y+1f)
+            }
+            is Gain -> {
+                batch.color = FILTER_NAME_ACTIVE
+                App.fontSmallNumbers.draw(batch, "G:${fullscaleToDecibels(filter.gain.toDouble()).times(100).roundToInt().div(100f)}", x+3f, y+1f)
             }
             is Scope -> {
 //                batch.color = COL_FILTER_WELL_BACK

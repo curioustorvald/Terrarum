@@ -20,7 +20,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, v
         const val SAMPLING_RATE = 48000
         const val SAMPLING_RATEF = 48000f
         const val SAMPLING_RATED = 48000.0
-        const val BUFFER_SIZE = 512 // n ms -> 384 * n
+        const val BUFFER_SIZE = 8192 // n ms -> 384 * n
     }
 
     val hash = getHashStr()
@@ -48,6 +48,8 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, v
         set(value) { volume = decibelsToFullscale(value) }
 
     val filters: Array<TerrarumAudioFilter> = Array(4) { NullFilter }
+
+    inline fun <reified T> getFilter() = filters.filterIsInstance<T>().first()!!
 
     internal val sidechainInputs = Array<Pair<TerrarumAudioMixerTrack, TrackVolume>?>(16)  { null }
     internal fun getSidechains(): List<TerrarumAudioMixerTrack?> = sidechainInputs.map { it?.first }

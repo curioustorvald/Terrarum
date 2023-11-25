@@ -27,7 +27,6 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
     internal val streamBuf = AudioProcessBuf(bufferSize)
     internal val sideChainBufs = Array(track.sidechainInputs.size) { AudioProcessBuf(bufferSize) }
 
-    private var fout0 = listOf(emptyBuf, emptyBuf)
     private var fout1 = listOf(emptyBuf, emptyBuf)
 
     val maxSigLevel = arrayOf(0.0, 0.0)
@@ -101,8 +100,6 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 // add all up
                 sidechains.forEach { (side, mix) ->
                     for (i in samplesL0!!.indices) {
-                        samplesL0!![i] += side.processor.fout0[0][i] * (mix * track.volume).toFloat()
-                        samplesR0!![i] += side.processor.fout0[1][i] * (mix * track.volume).toFloat()
                         samplesL1!![i] += side.processor.fout1[0][i] * (mix * track.volume).toFloat()
                         samplesR1!![i] += side.processor.fout1[1][i] * (mix * track.volume).toFloat()
                     }
@@ -131,17 +128,13 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                     fout1 = listOf(samplesL1!!, samplesR1!!)
                 }
                 else {
-                    var fin0 = listOf(samplesL0!!, samplesR0!!)
                     var fin1 = listOf(samplesL1!!, samplesR1!!)
-                    fout0 = fout1
                     fout1 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
 
                     filterStack.forEachIndexed { index, it ->
-                        it(fin0, fin1, fout0, fout1)
-                        fin0 = fout0
+                        it(fin1, fout1)
                         fin1 = fout1
                         if (index < filterStack.lastIndex) {
-                            fout0 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
                             fout1 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
                         }
                     }

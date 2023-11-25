@@ -14,21 +14,21 @@ import kotlin.math.tanh
 
 abstract class TerrarumAudioFilter {
     var bypass = false
-    protected abstract fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>)
-    operator fun invoke(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+    protected abstract fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>)
+    operator fun invoke(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         if (bypass) {
-            outbuf1.forEachIndexed { index, outTrack ->
-                System.arraycopy(inbuf1[index], 0, outTrack, 0, outTrack.size)
+            outbuf.forEachIndexed { index, outTrack ->
+                System.arraycopy(inbuf[index], 0, outTrack, 0, outTrack.size)
             }
         }
-        else thru(inbuf0, inbuf1, outbuf0, outbuf1)
+        else thru(inbuf, outbuf)
     }
 }
 
 object NullFilter : TerrarumAudioFilter() {
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
-        outbuf1.forEachIndexed { index, outTrack ->
-            System.arraycopy(inbuf1[index], 0, outTrack, 0, outTrack.size)
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
+        outbuf.forEachIndexed { index, outTrack ->
+            System.arraycopy(inbuf[index], 0, outTrack, 0, outTrack.size)
         }
     }
 }
@@ -36,12 +36,12 @@ object NullFilter : TerrarumAudioFilter() {
 object SoftClp : TerrarumAudioFilter() {
     val downForce = arrayOf(1.0f, 1.0f)
 
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         downForce.fill(1.0f)
 
-        for (ch in inbuf1.indices) {
-            val inn = inbuf1[ch]
-            val out = outbuf1[ch]
+        for (ch in inbuf.indices) {
+            val inn = inbuf[ch]
+            val out = outbuf[ch]
 
             for (i in inn.indices) {
                 val u = inn[i] * 0.95f
@@ -63,7 +63,7 @@ class Scope : TerrarumAudioFilter() {
 
     private val sqrt2p = 0.7071067811865475
 
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         // shift buffer
         for (i in backbufL.lastIndex downTo 1) {
             backbufL[i] = backbufL[i - 1]
@@ -74,8 +74,8 @@ class Scope : TerrarumAudioFilter() {
 
         // plot dots
         for (i in 0 until BUFFER_SIZE/4) {
-            val y0 = inbuf1[0][i] * 0.7
-            val x0 = -inbuf1[1][i] * 0.7 // rotate the domain by -90 deg
+            val y0 = inbuf[0][i] * 0.7
+            val x0 = -inbuf[1][i] * 0.7 // rotate the domain by -90 deg
 
             val x = (+x0*sqrt2p -y0*sqrt2p) * 1.414
             val y = (-x0*sqrt2p -y0*sqrt2p) * 1.414 // further rotate by -45 deg then flip along the y axis
@@ -85,8 +85,8 @@ class Scope : TerrarumAudioFilter() {
         }
 
         // copy samples over
-        outbuf1.forEachIndexed { index, outTrack ->
-            System.arraycopy(inbuf1[index], 0, outTrack, 0, outTrack.size)
+        outbuf.forEachIndexed { index, outTrack ->
+            System.arraycopy(inbuf[index], 0, outTrack, 0, outTrack.size)
         }
     }
 }
@@ -116,16 +116,23 @@ class Lowpass(cutoff0: Float): TerrarumAudioFilter() {
         this.cutoff = cutoff
     }
 
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
-        for (ch in outbuf1.indices) {
-            val out = outbuf1[ch]
-            val inn = inbuf1[ch]
+    val in0 = FloatArray(2)
+    val out0 = FloatArray(2)
 
-            out[0] = outbuf0[ch].last() + alpha * (inn[0] - outbuf0[ch].last())
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
+        for (ch in outbuf.indices) {
+            val out = outbuf[ch]
+            val inn = inbuf[ch]
+
+
+            out[0] = (out0[ch].div(16f) + alpha * (inn[0].div(16f) - out0[ch].div(16f))).times(16f)
             
-            for (i in 1 until outbuf1[ch].size) {
-                out[i] = out[i-1] + alpha * (inn[i] - out[i-1])
+            for (i in 1 until outbuf[ch].size) {
+                out[i] = (out[i-1].div(16f) + alpha * (inn[i].div(16f) - out[i-1].div(16f))).times(16f)
             }
+
+            out0[ch] = outbuf[ch].last()
+            in0[ch] = inbuf[ch].last()
         }
     }
 
@@ -136,6 +143,9 @@ class Highpass(cutoff0: Float): TerrarumAudioFilter() {
 
     var cutoff = cutoff0.toDouble(); private set
     private var alpha: Float = 0f
+
+    val in0 = FloatArray(2)
+    val out0 = FloatArray(2)
 
     init {
         setCutoff(cutoff0)
@@ -157,16 +167,19 @@ class Highpass(cutoff0: Float): TerrarumAudioFilter() {
         this.cutoff = cutoff
     }
 
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
-        for (ch in outbuf1.indices) {
-            val out = outbuf1[ch]
-            val inn = inbuf1[ch]
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
+        for (ch in outbuf.indices) {
+            val out = outbuf[ch]
+            val inn = inbuf[ch]
 
-            out[0] = alpha * (outbuf0[ch].last() + inn[0] - inbuf0[ch].last())
+            out[0] = alpha * (out0[ch] + inn[0] - in0[ch])
 
-            for (i in 1 until outbuf1[ch].size) {
+            for (i in 1 until outbuf[ch].size) {
                 out[i] = alpha * (out[i-1] + inn[i] - inn[i-1])
             }
+
+            out0[ch] = outbuf[ch].last()
+            in0[ch] = inbuf[ch].last()
         }
     }
 
@@ -178,7 +191,7 @@ object Buffer : TerrarumAudioFilter() {
         bypass = true
     }
 
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         bypass = true
     }
 }
@@ -194,6 +207,8 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
 
     private val PANNING_CONST = 3.0 // 3dB panning rule
 
+    private val delayLine = FloatArray(BUFFER_SIZE / 4)
+
     private fun getFrom(index: Float, buf0: FloatArray, buf1: FloatArray): Float {
         val index = index.toInt() // TODO resampling
         return if (index >= 0) buf1[index]
@@ -203,8 +218,7 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
     private val delays = arrayOf(0f, 0f)
     private val mults = arrayOf(1f, 1f)
 
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>
-    ) {
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         val angle = pan * 1.5707963f
         val timeDiffMax = earDist / SPEED_OF_SOUND * SAMPLING_RATEF
         val delayInSamples = (timeDiffMax * sin(angle)).absoluteValue
@@ -232,20 +246,22 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
 
         for (ch in 0..1) {
             for (i in 0 until BUFFER_SIZE / 4) {
-                outbuf1[ch][i] = getFrom(i - delays[ch], inbuf0[0], inbuf1[0]) * mults[ch]
+                outbuf[ch][i] = getFrom(i - delays[ch], delayLine, inbuf[0]) * mults[ch]
             }
         }
+
+        push(inbuf[0], delayLine)
     }
 }
 
 class Bitcrush(var steps: Int, var inputGain: Float = 1f): TerrarumAudioFilter() {
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
-        for (ch in outbuf1.indices) {
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
+        for (ch in outbuf.indices) {
             for (i in 0 until BUFFER_SIZE / 4) {
-                val inn = ((inbuf1[ch][i] * inputGain).coerceIn(-1f, 1f) + 1f) / 2f // 0f..1f
+                val inn = ((inbuf[ch][i] * inputGain).coerceIn(-1f, 1f) + 1f) / 2f // 0f..1f
                 val stepped = (inn * (steps - 1)).roundToFloat() / (steps - 1)
                 val out = (stepped * 2f) - 1f // -1f..1f
-                outbuf1[ch][i] = out
+                outbuf[ch][i] = out
             }
         }
     }
@@ -269,16 +285,16 @@ class Reverb(val delayMS: Float = 36f, var feedback: Float = 0.92f, var lowpass:
 
     private val out0 = FloatArray(2)
 
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         val RCLo: Float = 1f / (lowpass * FastMath.TWO_PI)
         val RCHi: Float = 1f / (highpass * FastMath.TWO_PI)
         val dt: Float = 1f / SAMPLING_RATEF
         val alphaLo = dt / (RCLo + dt)
         val alphaHi = RCHi / (RCHi + dt)
 
-        for (ch in outbuf1.indices) {
+        for (ch in outbuf.indices) {
             for (i in 0 until BUFFER_SIZE / 4) {
-                val inn = inbuf1[ch][i]
+                val inn = inbuf[ch][i]
 
                 // reverb
                 val rev = buf[ch][delay - 1]
@@ -289,19 +305,21 @@ class Reverb(val delayMS: Float = 36f, var feedback: Float = 0.92f, var lowpass:
                 val lp = lp0 + alphaLo * (out - lp0)
                 unshift(lp, buf[ch])
 
-                outbuf1[ch][i] = out
+                outbuf[ch][i] = out
             }
         }
     }
 }
 
-class Convolv(ir: File, val gain: Float = decibelsToFullscale(-24.0).toFloat()): TerrarumAudioFilter() {
+class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
 
     private val fftLen: Int
     private val convFFT: Array<Array<FComplex>>
     private val inbuf: Array<FloatArray>
 
     private val BLOCKSIZE = BUFFER_SIZE / 4
+
+    var processingSpeed = 1f; private set
 
     init {
         if (!ir.exists()) {
@@ -311,7 +329,7 @@ class Convolv(ir: File, val gain: Float = decibelsToFullscale(-24.0).toFloat()):
         val sampleCount = ir.length().toInt() / 8
         fftLen = FastMath.nextPowerOfTwo(sampleCount)
 
-        println("IR Sample Count = $sampleCount; FFT Length = $fftLen")
+//        println("IR Sample Count = $sampleCount; FFT Length = $fftLen")
 
         val conv = Array(2) { FloatArray(fftLen) }
         inbuf = Array(2) { FloatArray(fftLen) }
@@ -339,68 +357,77 @@ class Convolv(ir: File, val gain: Float = decibelsToFullscale(-24.0).toFloat()):
             FFT.fft(conv[it])
         }
 
-        println("convFFT Length = ${convFFT[0].size}")
+//        println("convFFT Length = ${convFFT[0].size}")
     }
 
     /**
      * https://thewolfsound.com/fast-convolution-fft-based-overlap-add-overlap-save-partitioned/
      */
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
 //        println("Convolv thru")
 
         val t1 = System.nanoTime()
-        for (ch in outbuf1.indices) {
-            push(inbuf1[ch].applyGain(gain), inbuf[ch])
+        for (ch in outbuf.indices) {
+            push(inbuf[ch].applyGain(gain), this.inbuf[ch])
 
-            val inputFFT = FFT.fft(inbuf[ch])
+            val inputFFT = FFT.fft(this.inbuf[ch])
 
             val Y = multiply(inputFFT, convFFT[ch])
             val y = FFT.ifftAndGetReal(Y)
 
             val u = y.takeLast(BLOCKSIZE).toFloatArray()
 
-            System.arraycopy(u, 0, outbuf1[ch], 0, BLOCKSIZE)
+            System.arraycopy(u, 0, outbuf[ch], 0, BLOCKSIZE)
         }
         val t2 = System.nanoTime()
-        val ptime = (t2 - t1).toDouble()
-        val realtime = BLOCKSIZE / SAMPLING_RATED * 1000000000L
-        println("Processing speed: ${realtime / ptime}x")
+        val ptime = (t2 - t1).toFloat()
+        val realtime = BLOCKSIZE / SAMPLING_RATEF * 1000000000L
+        processingSpeed = realtime / ptime
     }
 
     private fun multiply(X: Array<FComplex>, H: Array<FComplex>): Array<FComplex> {
         return Array(X.size) { X[it] * H[it] }
     }
 
-    private fun push(samples: FloatArray, buf: FloatArray) {
-        System.arraycopy(buf, samples.size, buf, 0, buf.size - samples.size)
-        System.arraycopy(samples, 0, buf, buf.size - samples.size, samples.size)
-    }
-
-    private fun FloatArray.applyGain(gain: Float = 1f) = this.map { it * gain }.toFloatArray()
 }
 
 object XYtoMS: TerrarumAudioFilter() {
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         for (i in 0 until BUFFER_SIZE / 4) {
-            val X = inbuf1[0][i]
-            val Y = inbuf1[1][i]
+            val X = inbuf[0][i]
+            val Y = inbuf[1][i]
             val M = (X + Y) / 2f
             val S = (X - Y) / 2f
-            outbuf1[0][i] = M
-            outbuf1[1][i] = S
+            outbuf[0][i] = M
+            outbuf[1][i] = S
         }
     }
 }
 
 object MStoXY: TerrarumAudioFilter() {
-    override fun thru(inbuf0: List<FloatArray>, inbuf1: List<FloatArray>, outbuf0: List<FloatArray>, outbuf1: List<FloatArray>) {
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         for (i in 0 until BUFFER_SIZE / 4) {
-            val M = inbuf1[0][i]
-            val S = inbuf1[1][i]
+            val M = inbuf[0][i]
+            val S = inbuf[1][i]
             val X = M + S
             val Y = M - S
-            outbuf1[0][i] = X
-            outbuf1[1][i] = Y
+            outbuf[0][i] = X
+            outbuf[1][i] = Y
         }
     }
+}
+
+class Gain(val gain: Float): TerrarumAudioFilter() {
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
+        for (i in 0 until BUFFER_SIZE / 4) {
+            outbuf[0][i] = inbuf[1][i] * gain
+            outbuf[1][i] = inbuf[0][i] * gain
+        }
+    }
+}
+
+fun FloatArray.applyGain(gain: Float = 1f) = this.map { it * gain }.toFloatArray()
+fun push(samples: FloatArray, buf: FloatArray) {
+    System.arraycopy(buf, samples.size, buf, 0, buf.size - samples.size)
+    System.arraycopy(samples, 0, buf, buf.size - samples.size, samples.size)
 }
