@@ -404,7 +404,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val meterTroughHeight = 16 * 11 + 5
     private val meterHeight = meterTroughHeight - 4
 
-    private val trackCount = (AudioMixer.tracks + AudioMixer.masterTrack).size
+    private val trackCount = 64//(AudioMixer.tracks + AudioMixer.masterTrack).size
     private val mixerLastTimeHadClipping = Array(trackCount) { arrayOf(0L, 0L) }
     private val clippingHoldTime = 60000L * 3 // 3 mins
 
