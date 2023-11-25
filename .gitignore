@@ -10,6 +10,7 @@ buildapp/TerrarumLinux.*
 buildapp/TerrarumMac.*
 buildapp/TerrarumWindows.*
 assets/mods/dwarventech/ModuleComputers.jar
+work_files/skylight/hosek_model_source/*.bin
 
 # Java native errors
 hs_err_pid*
@@ -43,10 +44,3 @@ tmp_*
 ## Vim temp files
 *.swp
 *.swo
-
-# Eclipse MAT heap files
-*.hprof
-*.bin
-*.index
-*.threads
-*_Leak_Suspects.zip
