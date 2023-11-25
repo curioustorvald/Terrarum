@@ -61,8 +61,8 @@ object SoftClp : TerrarumAudioFilter() {
 }
 
 class Scope : TerrarumAudioFilter() {
-    val backbufL = Array(BUFFER_SIZE / 16) { FloatArray(BUFFER_SIZE / 4) }
-    val backbufR = Array(BUFFER_SIZE / 16) { FloatArray(BUFFER_SIZE / 4) }
+    val backbufL = Array((4096f / BUFFER_SIZE * 4).roundToInt()) { FloatArray(BUFFER_SIZE / 4) }
+    val backbufR = Array((4096f / BUFFER_SIZE * 4).roundToInt()) { FloatArray(BUFFER_SIZE / 4) }
 
     private val sqrt2p = 0.7071067811865475
 
@@ -355,7 +355,7 @@ class Convolv(ir: File, val gain: Float = decibelsToFullscale(-12.0).toFloat()):
         val t1 = System.nanoTime()
         for (ch in outbuf1.indices) {
 
-            push(inbuf1[ch].toDoubleArray(), inbuf[ch])
+            push(inbuf1[ch].toDoubleArray(gain), inbuf[ch])
 
             val inputFFT = FastFourier(inbuf[ch]).let { it.transform(); it.getComplex(false) }
 
@@ -366,7 +366,10 @@ class Convolv(ir: File, val gain: Float = decibelsToFullscale(-12.0).toFloat()):
             val Y = multiply(inputFFT, convFFT[ch])
             val y = real(ifft(Y))
 
-            val u = y.sliceArray(Ny - BLOCKSIZE until Ny).toFloatArray(gain)
+//            val u = y.sliceArray(Ny - BLOCKSIZE until Ny).toFloatArray(gain) // y size == Ny
+            val u = y.takeLast(BLOCKSIZE).map { it.toFloat() }.toFloatArray()
+
+//            println("y size: ${y.size}; Ny=$Ny")
 
             System.arraycopy(u, 0, outbuf1[ch], 0, BLOCKSIZE)
         }
@@ -374,10 +377,10 @@ class Convolv(ir: File, val gain: Float = decibelsToFullscale(-12.0).toFloat()):
         val ptime = (t2 - t1).toDouble()
         val realtime = BLOCKSIZE / SAMPLING_RATED * 1000000000L
         if (realtime >= ptime) {
-            println("Processing speed: ${realtime / ptime}x FASTER than realtime")
+//            println("Processing speed: ${realtime / ptime}x FASTER than realtime")
         }
         else {
-            println("Processing speed: ${ptime / realtime}x SLOWER than realtime")
+//            println("Processing speed: ${ptime / realtime}x SLOWER than realtime")
         }
     }
 
@@ -412,10 +415,10 @@ class Convolv(ir: File, val gain: Float = decibelsToFullscale(-12.0).toFloat()):
 
     private fun push(samples: DoubleArray, buf: DoubleArray) {
         System.arraycopy(buf, samples.size, buf, 0, buf.size - samples.size)
-        System.arraycopy(samples, 0, buf, buf.size - samples.size - 1, samples.size)
+        System.arraycopy(samples, 0, buf, buf.size - samples.size, samples.size)
     }
 
-    private fun FloatArray.toDoubleArray() = this.map { it.toDouble() }.toDoubleArray()
+    private fun FloatArray.toDoubleArray(gain: Float = 1f) = this.map { it.toDouble() * gain }.toDoubleArray()
     private fun DoubleArray.toFloatArray(gain: Float = 1f) = this.map { it.toFloat() * gain }.toFloatArray()
 }
 

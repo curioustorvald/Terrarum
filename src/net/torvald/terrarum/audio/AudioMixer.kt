@@ -105,7 +105,7 @@ object AudioMixer: Disposable {
 //        musicTrack.filters[0] = BinoPan((Math.random() * 2.0 - 1.0).toFloat())
 //        musicTrack.filters[1] = Reverb(36f, 0.92f, 1200f)
 
-        masterTrack.filters[0] = SoftClp
+//        masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer
         masterTrack.filters[2] = Scope()
 
@@ -113,7 +113,7 @@ object AudioMixer: Disposable {
         fadeBus.addSidechainInput(ambientTrack, 1.0)
         fadeBus.addSidechainInput(sfxMixTrack, 1.0)
         fadeBus.filters[0] = Lowpass(SAMPLING_RATE / 2f)
-        fadeBus.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - TransitCenter.bin"))
+        fadeBus.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/WoodruffLane.bin"))
 
         masterTrack.addSidechainInput(fadeBus, 1.0)
         masterTrack.addSidechainInput(guiTrack, 1.0)
