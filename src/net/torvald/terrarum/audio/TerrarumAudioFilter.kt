@@ -125,10 +125,10 @@ class Lowpass(cutoff0: Float): TerrarumAudioFilter() {
             val inn = inbuf[ch]
 
 
-            out[0] = (out0[ch].div(16f) + alpha * (inn[0].div(16f) - out0[ch].div(16f))).times(16f)
+            out[0] = out0[ch] + alpha * (inn[0] - out0[ch])
             
             for (i in 1 until outbuf[ch].size) {
-                out[i] = (out[i-1].div(16f) + alpha * (inn[i].div(16f) - out[i-1].div(16f))).times(16f)
+                out[i] = out[i-1] + alpha * (inn[i] - out[i-1])
             }
 
             out0[ch] = outbuf[ch].last()

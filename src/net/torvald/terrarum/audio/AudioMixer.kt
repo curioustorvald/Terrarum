@@ -113,7 +113,7 @@ object AudioMixer: Disposable {
         fadeBus.addSidechainInput(ambientTrack, 1.0)
         fadeBus.addSidechainInput(sfxMixTrack, 1.0)
         fadeBus.filters[0] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - CedarCreekWinery.bin"))
-        fadeBus.filters[1] = Gain(16f)
+        fadeBus.filters[1] = Gain(10f)
         fadeBus.filters[3] = Lowpass(SAMPLING_RATE / 2f)
 
         masterTrack.addSidechainInput(fadeBus, 1.0)
