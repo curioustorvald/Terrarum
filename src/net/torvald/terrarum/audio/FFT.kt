@@ -10,14 +10,14 @@ import org.bytedeco.javacpp.Loader
 import org.jtransforms.fft.FloatFFT_1D
 import java.util.concurrent.locks.ReentrantLock
 
+private val RE0 = 0
+private val IM0 = 1
 
-class ComplexArray(val reim: FloatArray) {
+private val RE1 = -1
+private val IM1 = 0
 
-    private val RE0 = 0
-    private val IM0 = 1
+@JvmInline value class ComplexArray(val reim: FloatArray) {
 
-    private val RE1 = -1
-    private val IM1 = 0
 
     val indices: IntProgression
         get() = 0 until size
@@ -39,6 +39,10 @@ class ComplexArray(val reim: FloatArray) {
         }
 
         return ComplexArray(out)
+    }
+
+    fun getReal(): FloatArray {
+        return FloatArray(size) { reim[it * 2] }
     }
 }
 
@@ -138,7 +142,7 @@ object FFT: Disposable {
         val signal = signal0.reim
         val fft = FloatFFT_1D(signal0.size.toLong())
         fft.complexInverse(signal, true)
-        return FloatArray(signal0.size) { signal[it * 2] }
+        return signal0.getReal()
     }
 
     // org.apache.commons.math3.transform.FastFouriesTransformer.java:214

@@ -2,6 +2,7 @@ package net.torvald.terrarum.audio
 
 import com.jme3.math.FastMath
 import com.jme3.math.FastMath.sin
+import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.audio.AudioMixer.SPEED_OF_SOUND
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
@@ -375,9 +376,12 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
         for (ch in outbuf.indices) {
             push(inbuf[ch].applyGain(gain), this.inbuf[ch])
 
-            val inputFFT = FFT.fft(this.inbuf[ch])
-            val Y = inputFFT * convFFT[ch]
-            val y = FFT.ifftAndGetReal(Y)
+            var inputFFT: ComplexArray? = null
+            var Y: ComplexArray? = null
+            lateinit var y: FloatArray
+            measureDebugTime("audio.convolve.inputFFT") { inputFFT = FFT.fft(this.inbuf[ch]) }
+            measureDebugTime("audio.convolve.multiply") { Y = inputFFT!! * convFFT[ch] }
+            measureDebugTime("audio.convolve.inputIFFT") { y = FFT.ifftAndGetReal(Y!!) }
             val u = y.takeLast(BLOCKSIZE).toFloatArray()
 
 
