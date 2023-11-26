@@ -2,18 +2,37 @@ package net.torvald.terrarum.audio
 
 import org.apache.commons.math3.transform.DftNormalization
 import org.apache.commons.math3.transform.TransformType
+import org.jtransforms.fft.FloatFFT_1D
 
-class ComplexArray(val res: FloatArray, val ims: FloatArray) {
+
+class ComplexArray(val reim: FloatArray) {
+
+    private val RE0 = 0
+    private val IM0 = 1
+
+    private val RE1 = -1
+    private val IM1 = 0
+
     val indices: IntProgression
         get() = 0 until size
     val size: Int
-        get() = res.size
+        get() = reim.size / 2
 
     operator fun times(other: ComplexArray): ComplexArray {
         val l = size
-        val re = FloatArray(l) { res[it] * other.res[it] - ims[it] * other.ims[it] }
-        val im = FloatArray(l) { res[it] * other.ims[it] + ims[it] * other.res[it] }
-        return ComplexArray(re, im)
+//        val re = FloatArray(l) { res[2*it+RE] * other.res[it] - ims[it] * other.ims[it] }
+//        val im = FloatArray(l) { res[it] * other.ims[it] + ims[it] * other.res[it] }
+//        return ComplexArray(re, im)
+
+        val out = FloatArray(l * 2) {
+            if (it % 2 == 0)
+                reim[it+RE0] * other.reim[it+RE0] - reim[it+IM0] * other.reim[it+IM0]
+            else
+                reim[it+RE1] *other.reim[it+IM1] + reim[it+IM1] * other.reim[it+RE1]
+
+        }
+
+        return ComplexArray(out)
     }
 }
 
@@ -25,16 +44,77 @@ class ComplexArray(val res: FloatArray, val ims: FloatArray) {
 object FFT {
 
     // org.apache.commons.math3.transform.FastFouriesTransformer.java:370
-    fun fft(signal: FloatArray): ComplexArray {
-        val dataRI = ComplexArray(signal.copyOf(), FloatArray(signal.size))
-        transformInPlace(dataRI, DftNormalization.STANDARD, TransformType.FORWARD)
-        return dataRI
+    fun fft(signal0: FloatArray): ComplexArray {
+//        val dataRI = ComplexArray(signal0.copyOf(), FloatArray(signal0.size))
+//        transformInPlace(dataRI, DftNormalization.STANDARD, TransformType.FORWARD)
+//        return dataRI
+
+
+        // USING FFTW //
+        /*Loader.load(fftw3::class.java)
+        val signal = DoublePointer(2L * signal0.size)
+        val result = DoublePointer(2L * signal0.size)
+
+        val plan = fftw_plan_dft_1d(signal0.size, signal, result, FFTW_FORWARD, FFTW_ESTIMATE) // wtf sigsegv
+
+        signal0.forEachIndexed { index, fl -> signal.put(index * 2L, fl.toDouble()) }
+
+        fftw_execute(plan)
+
+        val re = FloatArray(signal0.size) { result.get(it * 2L).toFloat() }
+        val im = FloatArray(signal0.size) { result.get(it * 2L + 1).toFloat() }
+
+        val retObj = ComplexArray(re, im)
+
+        fftw_destroy_plan(plan)
+
+        signal.deallocate()
+        result.deallocate()
+
+        return retObj*/
+
+
+        // USING JTRANSFORMS //
+        val signal = FloatArray(signal0.size * 2) { if (it % 2 == 0) signal0[it / 2] else 0f }
+        val fft = FloatFFT_1D(signal0.size.toLong())
+        fft.complexForward(signal)
+        return ComplexArray(signal)
     }
 
     // org.apache.commons.math3.transform.FastFouriesTransformer.java:404
-    fun ifftAndGetReal(y: ComplexArray): FloatArray {
-        transformInPlace(y, DftNormalization.STANDARD, TransformType.INVERSE)
-        return y.res
+    fun ifftAndGetReal(signal0: ComplexArray): FloatArray {
+//        transformInPlace(signal0, DftNormalization.STANDARD, TransformType.INVERSE)
+//        return signal0.res
+
+
+        // USING FFTW //
+        /*Loader.load(fftw3::class.java)
+        val signal = FloatPointer(2L * signal0.size)
+        val result = FloatPointer(2L * signal0.size)
+
+        val plan = fftwf_plan_dft_1d(signal0.size, signal, result, FFTW_BACKWARD, FFTW_ESTIMATE)
+
+        signal0.res.forEachIndexed { index, fl -> signal.put(index * 2L, fl) }
+        signal0.ims.forEachIndexed { index, fl -> signal.put(index * 2L, fl) }
+
+        fftwf_execute(plan)
+
+        val re = FloatArray(signal0.size) { result.get(it * 2L) }
+
+        fftwf_destroy_plan(plan)
+
+        signal.deallocate()
+        result.deallocate()
+
+        return re*/
+
+
+        // USING JTRANSFORMS //
+//        val signal = FloatArray(signal0.size * 2) { if (it % 2 == 0) signal0.res[it / 2] else signal0.ims[it / 2] }
+        val signal = signal0.reim
+        val fft = FloatFFT_1D(signal0.size.toLong())
+        fft.complexInverse(signal, true)
+        return FloatArray(signal0.size) { signal[it * 2] }
     }
 
     // org.apache.commons.math3.transform.FastFouriesTransformer.java:214
@@ -54,10 +134,7 @@ object FFT {
      * @throws MathIllegalArgumentException if the number of data points is not
      *   a power of two
      */
-    private fun transformInPlace(dataRI: ComplexArray, normalization: DftNormalization, type: TransformType) {
-        val dataR = dataRI.res
-        val dataI = dataRI.ims
-        val n = dataR.size
+    private fun transformInPlace(dataR: FloatArray, dataI: FloatArray, n: Int, normalization: DftNormalization, type: TransformType) {
 
         /*if (n == 1) {
             return
@@ -186,7 +263,7 @@ object FFT {
             lastLogN0 = logN0
         }
 
-        normalizeTransformedData(dataRI, normalization, type)
+        normalizeTransformedData(dataR, dataI, n, normalization, type)
     }
 
 
@@ -198,12 +275,9 @@ object FFT {
      * @param type the type of transform (forward, inverse) which resulted in the specified data
      */
     private fun normalizeTransformedData(
-        dataRI: ComplexArray,
+        dataR: FloatArray, dataI: FloatArray, n: Int,
         normalization: DftNormalization, type: TransformType
     ) {
-        val dataR = dataRI.res
-        val dataI = dataRI.ims
-        val n = dataR.size
 //        assert(dataI.size == n)
 //        when (normalization) {
 //            DftNormalization.STANDARD ->

@@ -117,6 +117,8 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/junit-platform-launcher-1.0.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/surefire-api-2.19.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/common-java5-2.19.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/JTransforms-3.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/JLargeArrays-1.5.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
