@@ -600,6 +600,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val paramViewHeight = hashMapOf(
         "Lowpass" to 16,
+        "Highpass" to 16,
         "Buffer" to 16,
         "BinoPan" to 32,
         "Convolv" to 16,
@@ -618,6 +619,16 @@ class BasicDebugInfoWindow : UICanvas() {
                 Toolkit.fillArea(batch, x.toFloat(), y.toFloat(), stripW * perc, 14f)
                 batch.color = COL_METER_GRAD
                 Toolkit.fillArea(batch, x.toFloat(), y+14f, stripW * perc, 2f)
+
+                batch.color = FILTER_NAME_ACTIVE
+                App.fontSmallNumbers.draw(batch, "F:${filter.cutoff.toInt()}", x+3f, y+1f)
+            }
+            is Highpass -> {
+                val perc = 1f - linToLogPerc(filter.cutoff, 2.0, 24000.0).toFloat()
+                batch.color = COL_METER_GRAD2
+                Toolkit.fillArea(batch, x.toFloat() + stripW, y.toFloat(), -stripW * perc, 14f)
+                batch.color = COL_METER_GRAD
+                Toolkit.fillArea(batch, x.toFloat() + stripW, y+14f, -stripW * perc, 2f)
 
                 batch.color = FILTER_NAME_ACTIVE
                 App.fontSmallNumbers.draw(batch, "F:${filter.cutoff.toInt()}", x+3f, y+1f)

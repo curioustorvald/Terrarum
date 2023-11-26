@@ -130,12 +130,14 @@ object AudioMixer: Disposable {
             it.addSidechainInput(sfxMixTrack, 1.0)
         }
 
-        convolveBusOpen.filters[0] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - Cranbrook Art Museum.bin"))
-        convolveBusOpen.filters[1] = Gain(decibelsToFullscale(21.0).toFloat())
+        convolveBusOpen.filters[0] = Highpass(80f)
+        convolveBusOpen.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - Cranbrook Art Museum.bin"))
+        convolveBusOpen.filters[2] = Gain(decibelsToFullscale(18.0).toFloat())
         convolveBusOpen.volume = 0.5
 
-        convolveBusCave.filters[0] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - CedarCreekWinery.bin"))
-        convolveBusCave.filters[1] = Gain(decibelsToFullscale(18.0).toFloat())
+        convolveBusCave.filters[0] = Highpass(80f)
+        convolveBusCave.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - CedarCreekWinery.bin"))
+        convolveBusCave.filters[2] = Gain(decibelsToFullscale(18.0).toFloat())
         convolveBusCave.volume = 0.5
 
         fadeBus.addSidechainInput(sumBus, 1.0 / 3.0)
@@ -187,6 +189,14 @@ object AudioMixer: Disposable {
                 it.pan = (it.pan - 0.001f).coerceIn(-1f, 1f)
             }
         }*/
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            convolveBusOpen.volume = (convolveBusOpen.volume + 0.001).coerceIn(0.0, 1.0)
+            convolveBusCave.volume = 1.0 - convolveBusOpen.volume
+        }
+        else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            convolveBusOpen.volume = (convolveBusOpen.volume - 0.001).coerceIn(0.0, 1.0)
+            convolveBusCave.volume = 1.0 - convolveBusOpen.volume
+        }
 
 
 
