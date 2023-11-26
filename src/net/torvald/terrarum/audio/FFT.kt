@@ -2,13 +2,9 @@ package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
-import net.torvald.terrarum.lock
 import org.apache.commons.math3.transform.DftNormalization
 import org.apache.commons.math3.transform.TransformType
-import org.bytedeco.fftw.global.fftw3.*
-import org.bytedeco.javacpp.Loader
 import org.jtransforms.fft.FloatFFT_1D
-import java.util.concurrent.locks.ReentrantLock
 
 private val RE0 = 0
 private val IM0 = 1
@@ -54,12 +50,12 @@ private val IM1 = 0
 object FFT: Disposable {
 
     init {
-        Loader.load(org.bytedeco.fftw.global.fftw3::class.java)
+//        Loader.load(org.bytedeco.fftw.global.fftw3::class.java)
 
         App.disposables.add(this)
     }
 
-    private val reLock = ReentrantLock(true)
+    /*private val reLock = ReentrantLock(true)
 
     private fun getForwardPlan(n: Int, inn: FloatArray, out: FloatArray): fftwf_plan {
         return fftwf_plan_dft_1d(n, inn, out, FFTW_FORWARD, FFTW_ESTIMATE)
@@ -69,7 +65,7 @@ object FFT: Disposable {
     }
     private fun destroyPlan(plan: fftwf_plan) {
         fftwf_destroy_plan(plan)
-    }
+    }*/
 
     override fun dispose() {
     }
