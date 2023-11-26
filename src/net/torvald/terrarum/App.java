@@ -977,6 +977,9 @@ public class App implements ApplicationListener {
             }
             catch (NullPointerException | IllegalArgumentException | GdxRuntimeException | ConcurrentModificationException e) { }
         });
+
+        // kill the zombies, no matter what
+        System.exit(0);
     }
 
     @Override

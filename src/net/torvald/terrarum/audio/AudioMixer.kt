@@ -6,6 +6,7 @@ import com.badlogic.gdx.backends.lwjgl3.audio.Lwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
@@ -89,6 +90,7 @@ object AudioMixer: Disposable {
     var processing = true
 
     private val processingExecutor = ThreadExecutor()
+//    private lateinit var processingSubthreads: List<Thread>
     val processingThread = Thread {
         /*while (processing) {
             // process
@@ -109,32 +111,38 @@ object AudioMixer: Disposable {
         }*/
 
         while (processing) {
-            parallelProcessingSchedule.forEach { tracks ->
-                /*val callables = tracks.map { Callable {
+            for (tracks in parallelProcessingSchedule) {
+                if (!processing) break
+
+                val callables = tracks.map { Callable {
                     if (!it.processor.paused) {
-                        it.processor.run()
+                        try { it.processor.run() }
+                        catch (e: Throwable) { e.printStackTrace() }
                     }
                 } }
 
-                processingExecutor.renew()
-                processingExecutor.submitAll(callables)
-                processingExecutor.join()*/
+                try {
+                    processingExecutor.renew()
+                    processingExecutor.submitAll(callables)
+                    processingExecutor.join()
+                }
+                catch (_: Throwable) {}
 
 
-                val threads = tracks.map { Thread {
+                /*processingSubthreads = tracks.map { Thread {
                     if (!it.processor.paused) {
                         it.processor.run()
                     }
                 }.also { it.priority = MAX_PRIORITY } }
 
                 try {
-                    threads.forEach { it.start() }
-                    threads.forEach { it.join() }
+                    processingSubthreads.forEach { it.start() }
+                    processingSubthreads.forEach { it.join() }
                 }
-                catch (e: InterruptedException) {}
+                catch (e: InterruptedException) {}*/
             }
 
-            while (!masterTrack.pcmQueue.isEmpty) {
+            while (processing && !masterTrack.pcmQueue.isEmpty) {
                 masterTrack.adev!!.writeSamples(masterTrack.pcmQueue.removeFirst()) // it blocks until the queue is consumed
             }
         }
@@ -389,8 +397,10 @@ object AudioMixer: Disposable {
 
 
     override fun dispose() {
+        processingExecutor.killAll()
+//        processingSubthreads.forEach { it.interrupt() }
         processing = false
-        processingThread.join()
+        processingThread.interrupt()
 //        feeder.stop()
 //        feedingThread.join()
         tracks.forEach { it.tryDispose() }
