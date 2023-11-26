@@ -110,7 +110,7 @@ object AudioMixer: Disposable {
 
         while (processing) {
             parallelProcessingSchedule.forEach { tracks ->
-                val callables = tracks.map { Callable {
+                /*val callables = tracks.map { Callable {
                     if (!it.processor.paused) {
                         it.processor.run()
                     }
@@ -118,7 +118,20 @@ object AudioMixer: Disposable {
 
                 processingExecutor.renew()
                 processingExecutor.submitAll(callables)
-                processingExecutor.join()
+                processingExecutor.join()*/
+
+                
+                val threads = tracks.map { Thread {
+                    if (!it.processor.paused) {
+                        it.processor.run()
+                    }
+                }.also { it.priority = MAX_PRIORITY } }
+
+                try {
+                    threads.forEach { it.start() }
+                    threads.forEach { it.join() }
+                }
+                catch (e: InterruptedException) {}
             }
 
             while (!masterTrack.pcmQueue.isEmpty) {
