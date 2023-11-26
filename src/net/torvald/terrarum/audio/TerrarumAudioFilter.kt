@@ -312,7 +312,7 @@ class Reverb(val delayMS: Float = 36f, var feedback: Float = 0.92f, var lowpass:
 
 class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
 
-    private val fftLen: Int
+    val fftLen: Int
     private val convFFT: Array<ComplexArray>
 //    private val convFFTpartd: Array<Array<ComplexArray>> // index: Channel, partition, frequencies
     private val inbuf: Array<FloatArray>

@@ -398,6 +398,10 @@ class BasicDebugInfoWindow : UICanvas() {
     private val COL_METER_GRAD2 = Color(0x25a0f2_aa)
     private val COL_SENDS_GRAD = Color(0x50751c_aa)
     private val COL_SENDS_GRAD2 = Color(0xa0f225_aa.toInt())
+    private val COL_METER_GRAD_YELLOW = Color(0x62471c_aa)
+    private val COL_METER_GRAD2_YELLOW = Color(0xc68f24_aa.toInt())
+    private val COL_METER_GRAD_RED = Color(0x921c34_aa.toInt())
+    private val COL_METER_GRAD2_RED = Color(0xfa687d_aa.toInt())
     private val COL_METER_BAR = Color(0x4caee5_aa)
     private val COL_METER_BAR_OVER = Color(0xef8297_aa.toInt())
     private val COL_METER_COMP_BAR = Color(0xf3d458_aa.toInt())
@@ -603,7 +607,7 @@ class BasicDebugInfoWindow : UICanvas() {
         "Highpass" to 16,
         "Buffer" to 16,
         "BinoPan" to 32,
-        "Convolv" to 16,
+        "Convolv" to 32,
         "Gain" to 16,
         "Scope" to stripW,
     )
@@ -653,8 +657,26 @@ class BasicDebugInfoWindow : UICanvas() {
                 App.fontSmallNumbers.draw(batch, "Bs:${BUFFER_SIZE/4}", x+3f, y+1f)
             }
             is Convolv -> {
+                // processing speed bar
+                val w = filter.processingSpeed
+                val perc = w.coerceAtMost(2f) / 2f
+                batch.color = if (w > 1.5f) COL_METER_GRAD2 else if (w > 1f) COL_METER_GRAD2_YELLOW else COL_METER_GRAD2_RED
+                Toolkit.fillArea(batch, x.toFloat(), y.toFloat(), stripW * perc, 14f)
+                batch.color = if (w > 1.5f) COL_METER_GRAD else if (w > 1f) COL_METER_GRAD_YELLOW else COL_METER_GRAD_RED
+                Toolkit.fillArea(batch, x.toFloat(), y+14f, stripW * perc, 2f)
+
+                // filter length bar
+                val g = FastMath.intLog2(BUFFER_SIZE / 4)
+                val perc2 = (FastMath.intLog2(filter.fftLen).minus(g).toFloat() / (16f - g)).coerceIn(0f, 1f)
+                batch.color = COL_METER_GRAD2
+                Toolkit.fillArea(batch, x.toFloat(), y + 16f, stripW * perc2, 14f)
+                batch.color = COL_METER_GRAD
+                Toolkit.fillArea(batch, x.toFloat(), y + 16f+14f, stripW * perc2, 2f)
+
+                // texts
                 batch.color = FILTER_NAME_ACTIVE
                 App.fontSmallNumbers.draw(batch, "P:${filter.processingSpeed.times(100).roundToInt().div(100f)}x", x+3f, y+1f)
+                App.fontSmallNumbers.draw(batch, "L:${filter.fftLen}", x+3f, y+17f)
             }
             is Gain -> {
                 batch.color = FILTER_NAME_ACTIVE

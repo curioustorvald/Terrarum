@@ -9,10 +9,12 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
+import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.tryDispose
 import java.lang.Thread.MAX_PRIORITY
 import java.util.*
+import java.util.concurrent.Callable
 import kotlin.math.*
 
 /**
@@ -86,8 +88,9 @@ object AudioMixer: Disposable {
 
     var processing = true
 
+    private val processingExecutor = ThreadExecutor()
     val processingThread = Thread {
-        while (processing) {
+        /*while (processing) {
             // process
             tracks.forEach {
                 if (!it.processor.paused) {
@@ -103,8 +106,28 @@ object AudioMixer: Disposable {
             while (!masterTrack.pcmQueue.isEmpty) {
                 masterTrack.adev!!.writeSamples(masterTrack.pcmQueue.removeFirst()) // it blocks until the queue is consumed
             }
+        }*/
+
+        while (processing) {
+            parallelProcessingSchedule.forEach { tracks ->
+                val callables = tracks.map { Callable {
+                    if (!it.processor.paused) {
+                        it.processor.run()
+                    }
+                } }
+
+                processingExecutor.renew()
+                processingExecutor.submitAll(callables)
+                processingExecutor.join()
+            }
+
+            while (!masterTrack.pcmQueue.isEmpty) {
+                masterTrack.adev!!.writeSamples(masterTrack.pcmQueue.removeFirst()) // it blocks until the queue is consumed
+            }
         }
     }
+
+    val parallelProcessingSchedule: Array<Array<TerrarumAudioMixerTrack>>
 
 //    val feeder = FeedSamplesToAdev(BUFFER_SIZE, SAMPLING_RATE, masterTrack)
 //    val feedingThread = Thread(feeder)
@@ -147,6 +170,14 @@ object AudioMixer: Disposable {
 
         masterTrack.addSidechainInput(fadeBus, 1.0)
         masterTrack.addSidechainInput(guiTrack, 1.0)
+
+
+        parallelProcessingSchedule = arrayOf(
+            arrayOf(musicTrack, ambientTrack, sfxMixTrack, guiTrack),
+            arrayOf(sumBus, convolveBusOpen, convolveBusCave),
+            arrayOf(fadeBus),
+            arrayOf(masterTrack)
+        )
 
 
         processingThread.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority

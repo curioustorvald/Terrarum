@@ -20,7 +20,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, v
         const val SAMPLING_RATE = 48000
         const val SAMPLING_RATEF = 48000f
         const val SAMPLING_RATED = 48000.0
-        const val BUFFER_SIZE = 512*4 // n ms -> 384 * n
+        const val BUFFER_SIZE = 256*4 // n ms -> 384 * n
     }
 
     val hash = getHashStr()
