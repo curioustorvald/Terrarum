@@ -36,7 +36,7 @@ object ControlPanelCommon {
         val optionName = optionNames.first()
         val arg = args.split(',')
 
-        return if (args == "h1" || args == "p" || args == "emph") {
+        return if (args == "h1" || args == "p" || args == "emph" || args == "pp") {
             (object : UIItem(parent, x, y) {
                 override val width = 1
                 override val height = 1
@@ -232,6 +232,7 @@ object ControlPanelCommon {
 
             akku += when (option) {
                 "h1" -> realRowHeight + linegap + h1MarginBottom
+                "pp" -> realRowHeight - 7
                 else -> realRowHeight + linegap
             }
         }

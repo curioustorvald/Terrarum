@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl3.audio.OpenALLwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
+import net.torvald.terrarum.App
 import net.torvald.terrarum.getHashStr
 import net.torvald.terrarum.hashStrMap
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -20,7 +21,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, v
         const val SAMPLING_RATE = 48000
         const val SAMPLING_RATEF = 48000f
         const val SAMPLING_RATED = 48000.0
-        const val BUFFER_SIZE = 256*4 // n ms -> 384 * n
+        val BUFFER_SIZE = 4 * App.getConfigInt("audiobuffersize") // n ms -> 384 * n
     }
 
     val hash = getHashStr()

@@ -17,15 +17,20 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         handler.allowESCtoClose = false
 
         ControlPanelCommon.register(this, width, "basegame.soundcontrolpanel", arrayOf(
-            arrayOf("mastervolume", { Lang["MENU_OPTIONS_MASTER_VOLUME"] }, "sliderd,0,1"),
-            arrayOf("", { "" }, "p"),
-            arrayOf("bgmvolume", { Lang["MENU_LABEL_MUSIC"] }, "sliderd,0,1"),
-            arrayOf("", { "" }, "p"),
-            arrayOf("ambientvolume", { Lang["MENU_LABEL_AMBIENT_SOUND"] }, "sliderd,0,1"),
-            arrayOf("", { "" }, "p"),
-            arrayOf("sfxvolume", { Lang["CREDITS_SFX"] }, "sliderd,0,1"),
-            arrayOf("", { "" }, "p"),
-            arrayOf("guivolume", { Lang["MENU_LABEL_INTERFACE"] }, "sliderd,0,1"),
+            arrayOf("", { Lang["MENU_OPTIONS_SOUND_VOLUME"] }, "h1"),
+                arrayOf("mastervolume", { Lang["MENU_OPTIONS_MASTER_VOLUME"] }, "sliderd,0,1"),
+                arrayOf("", { "" }, "pp"),
+                arrayOf("bgmvolume", { Lang["MENU_LABEL_MUSIC"] }, "sliderd,0,1"),
+                arrayOf("", { "" }, "pp"),
+                arrayOf("ambientvolume", { Lang["MENU_LABEL_AMBIENT_SOUNDS"] }, "sliderd,0,1"),
+                arrayOf("", { "" }, "pp"),
+                arrayOf("sfxvolume", { Lang["CREDITS_SFX"] }, "sliderd,0,1"),
+                arrayOf("", { "" }, "pp"),
+                arrayOf("guivolume", { Lang["MENU_LABEL_INTERFACE"] }, "sliderd,0,1"),
+            arrayOf("", { Lang["MENU_LABEL_HARDWARE"] }, "h1"),
+                arrayOf("audiobuffersize", { Lang["MENU_OPTIONS_AUDIO_BUFFER_SIZE"] }, "spinnersel,128,256,512,1024,2048"),
+                arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
+
         ))
     }
 

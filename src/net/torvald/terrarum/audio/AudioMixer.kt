@@ -117,6 +117,7 @@ object AudioMixer: Disposable {
                 val callables = tracks.map { Callable {
                     if (!it.processor.paused) {
                         try { it.processor.run() }
+                        catch (_: InterruptedException) {}
                         catch (e: Throwable) { e.printStackTrace() }
                     }
                 } }
@@ -126,7 +127,8 @@ object AudioMixer: Disposable {
                     processingExecutor.submitAll(callables)
                     processingExecutor.join()
                 }
-                catch (_: Throwable) {}
+                catch (_: InterruptedException) {}
+                catch (e: Throwable) { e.printStackTrace() }
 
 
                 /*processingSubthreads = tracks.map { Thread {
