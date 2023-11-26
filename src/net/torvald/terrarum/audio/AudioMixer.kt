@@ -129,19 +129,6 @@ object AudioMixer: Disposable {
                 }
                 catch (_: InterruptedException) {}
                 catch (e: Throwable) { e.printStackTrace() }
-
-
-                /*processingSubthreads = tracks.map { Thread {
-                    if (!it.processor.paused) {
-                        it.processor.run()
-                    }
-                }.also { it.priority = MAX_PRIORITY } }
-
-                try {
-                    processingSubthreads.forEach { it.start() }
-                    processingSubthreads.forEach { it.join() }
-                }
-                catch (e: InterruptedException) {}*/
             }
 
             while (processing && !masterTrack.pcmQueue.isEmpty) {

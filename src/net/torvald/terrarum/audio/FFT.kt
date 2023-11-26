@@ -1,8 +1,14 @@
 package net.torvald.terrarum.audio
 
+import com.badlogic.gdx.utils.Disposable
+import net.torvald.terrarum.App
+import net.torvald.terrarum.lock
 import org.apache.commons.math3.transform.DftNormalization
 import org.apache.commons.math3.transform.TransformType
+import org.bytedeco.fftw.global.fftw3.*
+import org.bytedeco.javacpp.Loader
 import org.jtransforms.fft.FloatFFT_1D
+import java.util.concurrent.locks.ReentrantLock
 
 
 class ComplexArray(val reim: FloatArray) {
@@ -41,36 +47,56 @@ class ComplexArray(val reim: FloatArray) {
  *
  * Created by minjaesong on 2023-11-25.
  */
-object FFT {
+object FFT: Disposable {
+
+    init {
+        Loader.load(org.bytedeco.fftw.global.fftw3::class.java)
+
+        App.disposables.add(this)
+    }
+
+    private val reLock = ReentrantLock(true)
+
+    private fun getForwardPlan(n: Int, inn: FloatArray, out: FloatArray): fftwf_plan {
+        return fftwf_plan_dft_1d(n, inn, out, FFTW_FORWARD, FFTW_ESTIMATE)
+    }
+    private fun getBackwardPlan(n: Int, inn: FloatArray, out: FloatArray): fftwf_plan {
+        return fftwf_plan_dft_1d(n, inn, out, FFTW_BACKWARD, FFTW_ESTIMATE)
+    }
+    private fun destroyPlan(plan: fftwf_plan) {
+        fftwf_destroy_plan(plan)
+    }
+
+    override fun dispose() {
+    }
 
     // org.apache.commons.math3.transform.FastFouriesTransformer.java:370
-    fun fft(signal0: FloatArray): ComplexArray {
+    @Synchronized fun fft(signal0: FloatArray): ComplexArray {
 //        val dataRI = ComplexArray(signal0.copyOf(), FloatArray(signal0.size))
 //        transformInPlace(dataRI, DftNormalization.STANDARD, TransformType.FORWARD)
 //        return dataRI
 
 
         // USING FFTW //
-        /*Loader.load(fftw3::class.java)
-        val signal = DoublePointer(2L * signal0.size)
-        val result = DoublePointer(2L * signal0.size)
+        /*lateinit var retObj: ComplexArray
+        reLock.lock {
+            fftw_init_threads()
 
-        val plan = fftw_plan_dft_1d(signal0.size, signal, result, FFTW_FORWARD, FFTW_ESTIMATE) // wtf sigsegv
+            val signal = FloatArray(2 * signal0.size)
+            val result = FloatArray(2 * signal0.size)
 
-        signal0.forEachIndexed { index, fl -> signal.put(index * 2L, fl.toDouble()) }
+            val plan = getForwardPlan(signal0.size, signal, result)
 
-        fftw_execute(plan)
+            signal0.forEachIndexed { index, fl -> signal[index * 2] = fl }
 
-        val re = FloatArray(signal0.size) { result.get(it * 2L).toFloat() }
-        val im = FloatArray(signal0.size) { result.get(it * 2L + 1).toFloat() }
+            fftwf_execute(plan)
 
-        val retObj = ComplexArray(re, im)
+            retObj = ComplexArray(result)
 
-        fftw_destroy_plan(plan)
+            destroyPlan(plan)
 
-        signal.deallocate()
-        result.deallocate()
-
+            fftwf_cleanup_threads()
+        }
         return retObj*/
 
 
@@ -82,35 +108,33 @@ object FFT {
     }
 
     // org.apache.commons.math3.transform.FastFouriesTransformer.java:404
-    fun ifftAndGetReal(signal0: ComplexArray): FloatArray {
+    @Synchronized fun ifftAndGetReal(signal0: ComplexArray): FloatArray {
 //        transformInPlace(signal0, DftNormalization.STANDARD, TransformType.INVERSE)
 //        return signal0.res
 
 
         // USING FFTW //
-        /*Loader.load(fftw3::class.java)
-        val signal = FloatPointer(2L * signal0.size)
-        val result = FloatPointer(2L * signal0.size)
+        /*lateinit var re: FloatArray
+        reLock.lock {
+            fftw_init_threads()
 
-        val plan = fftwf_plan_dft_1d(signal0.size, signal, result, FFTW_BACKWARD, FFTW_ESTIMATE)
+            val signal = signal0.reim
+            val result = FloatArray(2 * signal0.size)
 
-        signal0.res.forEachIndexed { index, fl -> signal.put(index * 2L, fl) }
-        signal0.ims.forEachIndexed { index, fl -> signal.put(index * 2L, fl) }
+            val plan = getBackwardPlan(signal0.size, signal, result)
 
-        fftwf_execute(plan)
+            fftwf_execute(plan)
 
-        val re = FloatArray(signal0.size) { result.get(it * 2L) }
+            re = FloatArray(signal0.size) { result[it * 2] }
 
-        fftwf_destroy_plan(plan)
+            destroyPlan(plan)
 
-        signal.deallocate()
-        result.deallocate()
-
+            fftwf_cleanup_threads()
+        }
         return re*/
 
 
         // USING JTRANSFORMS //
-//        val signal = FloatArray(signal0.size * 2) { if (it % 2 == 0) signal0.res[it / 2] else signal0.ims[it / 2] }
         val signal = signal0.reim
         val fft = FloatFFT_1D(signal0.size.toLong())
         fft.complexInverse(signal, true)
