@@ -313,30 +313,29 @@ class Reverb(val delayMS: Float = 36f, var feedback: Float = 0.92f, var lowpass:
 class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
 
     private val fftLen: Int
-    private val convFFT: Array<Array<FComplex>>
-    private val convFFTpartd: Array<Array<Array<FComplex>>> // index: Channel, partition, frequencies
+    private val convFFT: Array<ComplexArray>
+//    private val convFFTpartd: Array<Array<ComplexArray>> // index: Channel, partition, frequencies
     private val inbuf: Array<FloatArray>
 
     private val BLOCKSIZE = BUFFER_SIZE / 4
 
     var processingSpeed = 1f; private set
 
-    private val partSizes: IntArray
-    private val partOffsets: IntArray
+//    private val partSizes: IntArray
+//    private val partOffsets: IntArray
 
     init {
         if (!ir.exists()) {
             throw IllegalArgumentException("Impulse Response file '${ir.path}' does not exist.")
         }
 
-        val sampleCount = ir.length().toInt() / 8
+        val sampleCount = (ir.length().toInt() / 8)//.coerceAtMost(65536)
         fftLen = FastMath.nextPowerOfTwo(sampleCount)
 
-//        println("IR Sample Count = $sampleCount; FFT Length = $fftLen")
+        println("IR '${ir.path}' Sample Count = $sampleCount; FFT Length = $fftLen")
 
         val conv = Array(2) { FloatArray(fftLen) }
         inbuf = Array(2) { FloatArray(fftLen) }
-//        outbuf = Array(2) { DoubleArray(fftLen) }
 
         ir.inputStream().let {
             for (i in 0 until sampleCount) {
@@ -362,30 +361,9 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
 
 //        println("convFFT Length = ${convFFT[0].size}")
 
-        if (fftLen < BUFFER_SIZE) // buffer size is always 4x the samples in the buffer
-            throw Error("FIR size is too small (minimum: $BUFFER_SIZE samples)")
 
-
-        val partitions = ArrayList<Int>()
-        var cnt = fftLen
-        while (cnt > BUFFER_SIZE / 4) {
-            cnt /= 2
-            partitions.add(cnt)
-        }
-        partitions.add(cnt)
-
-        partSizes = partitions.reversed().toIntArray()
-        partOffsets = partSizes.clone().also { it[0] = 0 }
-
-        // allocate arrays
-        convFFTpartd = Array(2) { ch ->
-            Array(partSizes.size) { partNo ->
-                Array(partSizes[partNo]) {
-                    convFFT[ch][partOffsets[partNo] + it]
-                }
-            }
-        }
     }
+
 
     /**
      * https://thewolfsound.com/fast-convolution-fft-based-overlap-add-overlap-save-partitioned/
@@ -398,11 +376,18 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
             push(inbuf[ch].applyGain(gain), this.inbuf[ch])
 
             val inputFFT = FFT.fft(this.inbuf[ch])
-
-            val Y = multiply(inputFFT, convFFT[ch])
+            val Y = inputFFT * convFFT[ch]
             val y = FFT.ifftAndGetReal(Y)
-
             val u = y.takeLast(BLOCKSIZE).toFloatArray()
+
+
+            /*val inputFFTs = FFT.fft(this.inbuf[ch]).sliceUnevenly()
+            val u = convFFTpartd[ch].zip(inputFFTs).map { (convFFT, inputFFT) ->
+                val Y = multiply(inputFFT, convFFT)
+                FFT.ifftAndGetReal(Y)
+            }.last().takeLast(BLOCKSIZE).toFloatArray()*/
+
+
 
             System.arraycopy(u, 0, outbuf[ch], 0, BLOCKSIZE)
         }
@@ -410,10 +395,6 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
         val ptime = (t2 - t1).toFloat()
         val realtime = BLOCKSIZE / SAMPLING_RATEF * 1000000000L
         processingSpeed = realtime / ptime
-    }
-
-    private fun multiply(X: Array<FComplex>, H: Array<FComplex>): Array<FComplex> {
-        return Array(X.size) { X[it] * H[it] }
     }
 
 }

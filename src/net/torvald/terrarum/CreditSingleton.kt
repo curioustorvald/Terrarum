@@ -198,22 +198,6 @@ SOFTWARE.
 
 
 
-$BULLET Ambient sound recordings:
-
-    - ambient_forest_01.ogg
-    - ambient_meadow_01.ogg
-    - ambient_windy_01.ogg
-    - ambient_woods_01.ogg
-    - crickets_01.ogg
-    - crickets_02.ogg
-
-Copyright (C) 2012, 2013, 2015, 2016, 2017 Klankbeeld
-Sound from <http://www.freesound.org/people/klankbeeld/>
-
-
-
-
-
 $BULLET GraalVM Community Edition
 
 GraalVM Community Edition consists of multiple modules. The software as a whole,
@@ -253,6 +237,7 @@ SOFTWARE.
 
 
 $BULLET Apache Commons Codec
+
 Copyright 2002-2023 The Apache Software Foundation
 
 This product includes software developed at
@@ -263,6 +248,7 @@ The Apache Software Foundation (https://www.apache.org/).
 
 
 $BULLET Apache Commons CSV
+
 Copyright 2005-2023 The Apache Software Foundation
 
 This product includes software developed at
@@ -282,6 +268,30 @@ The Apache Software Foundation (http://www.apache.org/).
 This product includes software developed for Orekit by
 CS Systèmes d'Information (http://www.c-s.fr/)
 Copyright 2010-2012 CS Systèmes d'Information
+
+
+
+
+
+$BULLET Ambient sound recordings:
+
+    - ambient_forest_01.ogg
+    - ambient_meadow_01.ogg
+    - ambient_windy_01.ogg
+    - ambient_woods_01.ogg
+    - crickets_01.ogg
+    - crickets_02.ogg
+
+Copyright (C) 2012, 2013, 2015, 2016, 2017 Klankbeeld
+Sound from <http://www.freesound.org/people/klankbeeld/>
+
+
+
+
+
+$BULLET EchoThief Impulse Response Library
+
+Copyright 2013-2023 Chris Warren <cwarren@sdsu.edu> 
 """).split('\n')
 
 
