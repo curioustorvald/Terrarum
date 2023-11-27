@@ -35,6 +35,11 @@
   "BLOCK_GRAVEL": "자갈",
   "BLOCK_GRAVEL_GREY": "회색 자갈",
 
+  "BLOCK_FOLIAGE_NORMAL": "나뭇잎",
+  "BLOCK_FOLIAGE_EBONY": "흑단 나뭇잎",
+  "BLOCK_FOLIAGE_BIRCH": "백단 나뭇잎",
+  "BLOCK_FOLIAGE_ROSEWOOD": "자단 나뭇잎",
+
   "BLOCK_SNOW": "눈",
 
   "BLOCK_ICE_FRAGILE": "살얼음",
@@ -78,6 +83,9 @@
   "BLOCK_SANDSTONE_GREEN": "초록 사암",
 
   "BLOCK_SCAFFOLDING_NORMAL": "사다리",
+  "BLOCK_SCAFFOLDING_EBONY": "흑단 사다리",
+  "BLOCK_SCAFFOLDING_BIRCH": "백단 사다리",
+  "BLOCK_SCAFFOLDING_ROSEWOOD": "자단 사다리",
 
   "BLOCK_LANTERN": "램프",
   "BLOCK_SUNSTONE": "태양석",
@@ -130,7 +138,7 @@
     - Dark Grey -> 암회색
     - Black -> 흑색
   - 자연색의 경우 (모래, 사암 등), 가급적 고유어 단어를 사용한다
-    - Grey는 가급적 '잿빛'으로 옮기지 않는다 (일상에서 사용되지 않는 단어)
+    - Grey는 '잿빛'으로 옮기지 않는다 (일상에서 사용되지 않는 단어)
 
 ## 목재명의 번역
   - 추가적 논의가 있기 전까지는 다음의 단어를 사용한다:
