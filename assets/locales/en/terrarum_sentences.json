@@ -18,6 +18,7 @@
   "MENU_IO_WORLDGEN_GROWING_MINERALS": "Growing Minerals...",
   "MENU_IO_WORLDGEN_POSITIONING_ROCKS": "Positioning Rocks...",
   "MENU_IO_WORLDGEN_RETICULATING_SPLINES": "Reticulating Splines...",
+  "MENU_LABEL_AUDIO_BUFFER_INSTRUCTION": "Set it to the minimum value in which you do not hear a stuttering.\nIf your audio is stuttering, increase the value and restart the game.\nLarger value will increase the processing stability and the delay.",
   "MENU_LABEL_KEYCONFIG_HELP1": "Click On the Keycap to Assign Actions",
   "MENU_LABEL_SAVE_WILL_BE_DELETED": "The selected save file will be deleted.",
   "MENU_LABEL_UNSAVED_PROGRESS_WILL_BE_LOST": "Unsaved progress will be lost.",

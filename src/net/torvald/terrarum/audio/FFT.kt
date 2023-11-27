@@ -71,10 +71,10 @@ object FFT: Disposable {
     }
 
     // org.apache.commons.math3.transform.FastFouriesTransformer.java:370
-    @Synchronized fun fft(signal0: FloatArray): ComplexArray {
-//        val dataRI = ComplexArray(signal0.copyOf(), FloatArray(signal0.size))
-//        transformInPlace(dataRI, DftNormalization.STANDARD, TransformType.FORWARD)
-//        return dataRI
+    fun fft(signal0: FloatArray): ComplexArray {
+//        val im = FloatArray(signal0.size)
+//        transformInPlace(signal0, im, signal0.size, DftNormalization.STANDARD, TransformType.FORWARD)
+//        return ComplexArray(FloatArray(signal0.size) { if (it % 2 == 0) signal0[it / 2] else im[it / 2] })
 
 
         // USING FFTW //
@@ -108,9 +108,11 @@ object FFT: Disposable {
     }
 
     // org.apache.commons.math3.transform.FastFouriesTransformer.java:404
-    @Synchronized fun ifftAndGetReal(signal0: ComplexArray): FloatArray {
-//        transformInPlace(signal0, DftNormalization.STANDARD, TransformType.INVERSE)
-//        return signal0.res
+    fun ifftAndGetReal(signal0: ComplexArray): FloatArray {
+//        val re = FloatArray(signal0.size) { signal0.reim[it * 2] }
+//        val im = FloatArray(signal0.size) { signal0.reim[it * 2 + 1] }
+//        transformInPlace(re, im, re.size, DftNormalization.STANDARD, TransformType.INVERSE)
+//        return re
 
 
         // USING FFTW //

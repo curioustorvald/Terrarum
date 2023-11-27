@@ -473,7 +473,7 @@ public class App implements ApplicationListener {
             );
 
             // set some more configuration vars
-            MULTITHREAD = THREAD_COUNT >= 3 && getConfigBoolean("multithread");
+            MULTITHREAD = THREAD_COUNT >= 3;
 
             new TerrarumLwjgl3Application(new App(appConfig), appConfig);
         }

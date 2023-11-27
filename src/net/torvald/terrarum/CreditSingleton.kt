@@ -34,8 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-
-
 $BULLET Terrarum Sans Bitmap
 
 Copyright (c) 2017-2022 Minjae Song ("CuriousTorvald") and the contributors
@@ -57,8 +55,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
-
 
 
 
@@ -103,8 +99,6 @@ Copyright (C) 2011 Joshua Tippetts
 
 
 
-
-
 $BULLET Vector2.java, Epsilon.java
 
 Copyright (c) 2010-2015 William Bittle  http://www.dyn4j.org/
@@ -131,8 +125,6 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Kotlin translated and modified code Copyright (C) 2016 Minjaesong (CuriousTorvald)
-
-
 
 
 
@@ -170,8 +162,6 @@ SUCH DAMAGE.
 
 
 
-
-
 $BULLET HUSLColorConverter.java
 
 Copyright (c) 2016 Alexei Boronine
@@ -196,8 +186,6 @@ SOFTWARE.
 
 
 
-
-
 $BULLET GraalVM Community Edition
 
 GraalVM Community Edition consists of multiple modules. The software as a whole,
@@ -205,8 +193,6 @@ as well as the JVMCI and VisualVM modules, are released under version 2 of the
 GNU General Public License with the “Classpath” Exception.
 
 Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
-
-
 
 
 
@@ -234,8 +220,6 @@ SOFTWARE.
 
 
 
-
-
 $BULLET Apache Commons Codec
 
 Copyright 2002-2023 The Apache Software Foundation
@@ -245,16 +229,12 @@ The Apache Software Foundation (https://www.apache.org/).
 
 
 
-
-
 $BULLET Apache Commons CSV
 
 Copyright 2005-2023 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (https://www.apache.org/).
-
-
 
 
 
@@ -271,8 +251,6 @@ Copyright 2010-2012 CS Systèmes d'Information
 
 
 
-
-
 $BULLET Ambient sound recordings:
 
     - ambient_forest_01.ogg
@@ -283,9 +261,7 @@ $BULLET Ambient sound recordings:
     - crickets_02.ogg
 
 Copyright (C) 2012, 2013, 2015, 2016, 2017 Klankbeeld
-Sound from <http://www.freesound.org/people/klankbeeld/>
-
-
+Sound from <https://www.freesound.org/people/klankbeeld/>
 
 
 
