@@ -27,7 +27,6 @@ object DefaultConfig {
             "notificationshowuptime" to 4000, // 4s
             "selecteditemnameshowuptime" to 4000, // 4s
             "autosaveinterval" to 300000, // 5m
-            "multithread" to true,
 
             "showhealthmessageonstartup" to true,
 
