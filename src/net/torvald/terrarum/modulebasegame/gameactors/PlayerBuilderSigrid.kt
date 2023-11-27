@@ -98,6 +98,7 @@ object PlayerBuilderSigrid {
 
         // item ids are defined in <module>/items/itemid.csv
 
+        /*
         inventory.add("item@basegame:1", 16) // copper pick
         inventory.add("item@basegame:2", 64) // iron pick
         inventory.add("item@basegame:3", 256) // steel pick
@@ -105,7 +106,6 @@ object PlayerBuilderSigrid {
         inventory.add("item@basegame:4", 16) // iron sledgehammer
         inventory.add("item@basegame:13", 16) // steel sledgehammer
 
-//        inventory.add("item@basegame:5", 995) // test tiki torch
 
         inventory.add("item@basegame:6", 95) // storage chest
         inventory.add("item@basegame:7", 1) // wire debugger
@@ -115,11 +115,13 @@ object PlayerBuilderSigrid {
         inventory.add("item@basegame:11", 10) // calendar
 
         inventory.add("item@basegame:16", 10) // workbench
-
-//        inventory.add("item@basegame:256", 995) // doors
-//        inventory.add("item@basegame:257", 995) // doors
-//        inventory.add("item@basegame:258", 995) // doors
-//        inventory.add("item@basegame:259", 995) // doors
+        */
+        for (i in 1..255) {
+            try {
+                inventory.add("item@basegame:${i}", 995)
+            }
+            catch (_: Throwable) {}
+        }
 
         inventory.add("item@basegame:320", 5) // portal
 

@@ -35,6 +35,11 @@
   "BLOCK_GRAVEL": "Gravel",
   "BLOCK_GRAVEL_GREY": "Grey Gravel",
 
+  "BLOCK_FOLIAGE_NORMAL": "Oak Leaves",
+  "BLOCK_FOLIAGE_EBONY": "Ebony Leaves",
+  "BLOCK_FOLIAGE_BIRCH": "Birch Leaves",
+  "BLOCK_FOLIAGE_ROSEWOOD": "Rosewood Leaves",
+
   "BLOCK_SNOW": "Snow",
 
   "BLOCK_ICE_FRAGILE": "Thin Ice",
@@ -78,6 +83,9 @@
   "BLOCK_SANDSTONE_GREEN": "Green Sandstone",
 
   "BLOCK_SCAFFOLDING_NORMAL": "Scaffolding",
+  "BLOCK_SCAFFOLDING_EBONY": "Ebony Scaffolding",
+  "BLOCK_SCAFFOLDING_BIRCH": "Birch Scaffolding",
+  "BLOCK_SCAFFOLDING_ROSEWOOD": "Rosewood Scaffolding",
 
   "BLOCK_LANTERN": "Lantern",
   "BLOCK_SUNSTONE": "Sunstone",
