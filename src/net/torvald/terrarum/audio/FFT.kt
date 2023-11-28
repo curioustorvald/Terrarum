@@ -12,6 +12,7 @@ private val IM0 = 1
 private val RE1 = -1
 private val IM1 = 0
 
+private val mulBuf = FloatArray(2)
 @JvmInline value class ComplexArray(val reim: FloatArray) {
 
 
@@ -21,12 +22,7 @@ private val IM1 = 0
         get() = reim.size / 2
 
     operator fun times(other: ComplexArray): ComplexArray {
-        val l = size
-//        val re = FloatArray(l) { res[2*it+RE] * other.res[it] - ims[it] * other.ims[it] }
-//        val im = FloatArray(l) { res[it] * other.ims[it] + ims[it] * other.res[it] }
-//        return ComplexArray(re, im)
-
-        val out = FloatArray(l * 2) {
+        val out = FloatArray(size * 2) {
             if (it % 2 == 0)
                 reim[it+RE0] * other.reim[it+RE0] - reim[it+IM0] * other.reim[it+IM0]
             else
@@ -36,6 +32,32 @@ private val IM1 = 0
 
         return ComplexArray(out)
     }
+
+    fun mult(other: ComplexArray, out: ComplexArray) {
+        for (it in 0 until size * 2) {
+            out.reim[it] =
+            if (it % 2 == 0)
+                reim[it+RE0] * other.reim[it+RE0] - reim[it+IM0] * other.reim[it+IM0]
+            else
+                reim[it+RE1] *other.reim[it+IM1] + reim[it+IM1] * other.reim[it+RE1]
+
+        }
+    }
+
+    // this is actually slower that having a separate array for mult results
+    /*fun inlineMult(other: ComplexArray) {
+        for (it in 0 until size * 2) {
+            mulBuf[it % 2] = if (it % 2 == 0)
+                reim[it+RE0] * other.reim[it+RE0] - reim[it+IM0] * other.reim[it+IM0]
+            else
+                reim[it+RE1] *other.reim[it+IM1] + reim[it+IM1] * other.reim[it+RE1]
+
+            if (it % 2 == 1) {
+                reim[it+RE1] = mulBuf[0]
+                reim[it+IM1] = mulBuf[1]
+            }
+        }
+    }*/
 
     fun getReal(): FloatArray {
         return FloatArray(size) { reim[it * 2] }
@@ -118,6 +140,10 @@ object FFT: Disposable {
         val signal = FloatArray(signal0.size * 2) { if (it % 2 == 0) signal0[it / 2] else 0f }
         ffts[signal0.size]!!.complexForward(signal)
         return ComplexArray(signal)
+    }
+
+    fun fft(signal0: ComplexArray) {
+        ffts[signal0.size]!!.complexForward(signal0.reim)
     }
 
     // org.apache.commons.math3.transform.FastFouriesTransformer.java:404

@@ -109,6 +109,10 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
     }
 
     private val realtime = (BLOCKSIZE / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L)
+    private val fftIn = ComplexArray(FloatArray(fftLen * 2))
+    private val fftMult = ComplexArray(FloatArray(fftLen * 2))
+    private val fftOut = FloatArray(fftLen)
+
     /**
      * https://thewolfsound.com/fast-convolution-fft-based-overlap-add-overlap-save-partitioned/
      */
@@ -119,10 +123,16 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
 
         for (ch in outbuf.indices) {
             push(inbuf[ch].applyGain(gain), this.inbuf[ch])
-            val inputFFT = FFT.fft(this.inbuf[ch])
-            val Y = inputFFT * convFFT[ch]
-            val y = FFT.ifftAndGetReal(Y)
-            System.arraycopy(y, fftLen - BLOCKSIZE, outbuf[ch], 0, BLOCKSIZE)
+
+            for (i in 0 until fftLen) {
+                fftIn.reim[i * 2] = this.inbuf[ch][i]
+                fftIn.reim[i * 2 + 1] = 0f
+            }
+
+            FFT.fft(fftIn)
+            fftIn.mult(convFFT[ch], fftMult)
+            FFT.ifftAndGetReal(fftMult, fftOut)
+            System.arraycopy(fftOut, fftLen - BLOCKSIZE, outbuf[ch], 0, BLOCKSIZE)
         }
 
 
