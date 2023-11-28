@@ -2,10 +2,10 @@ package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
+import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.sqr
 import kotlin.math.absoluteValue
 import kotlin.math.sqrt
-import kotlin.math.tanh
 
 /**
  * Created by minjaesong on 2023-11-17.

@@ -13,8 +13,7 @@ import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.AudioMixer
-import net.torvald.terrarum.audio.Lowpass
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
+import net.torvald.terrarum.audio.dsp.Lowpass
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.MinimapComposer

@@ -18,7 +18,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.audio.AudioMixer
-import net.torvald.terrarum.audio.Lowpass
+import net.torvald.terrarum.audio.dsp.Lowpass
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.clut.Skybox
 import net.torvald.terrarum.console.CommandDict

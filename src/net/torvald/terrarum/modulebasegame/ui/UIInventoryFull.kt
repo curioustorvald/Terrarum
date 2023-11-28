@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -8,10 +7,6 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.audio.AudioMixer
-import net.torvald.terrarum.audio.Lowpass
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.Toolkit
@@ -20,7 +15,6 @@ import net.torvald.terrarum.ui.UIHandler
 import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.*
-import kotlin.math.pow
 
 /**
  * Created by minjaesong on 2017-10-21.

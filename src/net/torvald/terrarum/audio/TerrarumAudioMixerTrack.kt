@@ -4,12 +4,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.audio.OpenALLwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Queue
-import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
+import net.torvald.terrarum.audio.dsp.NullFilter
+import net.torvald.terrarum.audio.dsp.TerrarumAudioFilter
 import net.torvald.terrarum.getHashStr
 import net.torvald.terrarum.hashStrMap
 import net.torvald.terrarum.modulebasegame.MusicContainer
-import java.lang.Thread.MAX_PRIORITY
 import kotlin.math.log10
 import kotlin.math.pow
 
