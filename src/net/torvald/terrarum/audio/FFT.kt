@@ -49,6 +49,20 @@ private val IM1 = 0
  */
 object FFT: Disposable {
 
+    private val ffts = hashMapOf(
+        128 to FloatFFT_1D(128),
+        256 to FloatFFT_1D(256),
+        512 to FloatFFT_1D(512),
+        1024 to FloatFFT_1D(1024),
+        2048 to FloatFFT_1D(2048),
+        4096 to FloatFFT_1D(4096),
+        8192 to FloatFFT_1D(8192),
+        16384 to FloatFFT_1D(16384),
+        32768 to FloatFFT_1D(32768),
+        65536 to FloatFFT_1D(65536),
+    )
+
+
     init {
 //        Loader.load(org.bytedeco.fftw.global.fftw3::class.java)
 
@@ -102,8 +116,7 @@ object FFT: Disposable {
 
         // USING JTRANSFORMS //
         val signal = FloatArray(signal0.size * 2) { if (it % 2 == 0) signal0[it / 2] else 0f }
-        val fft = FloatFFT_1D(signal0.size.toLong())
-        fft.complexForward(signal)
+        ffts[signal0.size]!!.complexForward(signal)
         return ComplexArray(signal)
     }
 
@@ -137,10 +150,15 @@ object FFT: Disposable {
 
 
         // USING JTRANSFORMS //
-        val signal = signal0.reim
-        val fft = FloatFFT_1D(signal0.size.toLong())
-        fft.complexInverse(signal, true)
+        ffts[signal0.size]!!.complexInverse(signal0.reim, true)
         return signal0.getReal()
+    }
+
+    fun ifftAndGetReal(signal0: ComplexArray, output: FloatArray) {
+        ffts[signal0.size]!!.complexInverse(signal0.reim, true)
+        for (i in 0 until signal0.size) {
+            output[i] = signal0.reim[i * 2]
+        }
     }
 
     // org.apache.commons.math3.transform.FastFouriesTransformer.java:214

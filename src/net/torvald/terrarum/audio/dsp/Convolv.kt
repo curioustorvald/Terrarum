@@ -2,6 +2,7 @@ package net.torvald.terrarum.audio.dsp
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App.measureDebugTime
+import net.torvald.terrarum.App.setDebugTime
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
 import java.io.File
@@ -107,47 +108,26 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
         }
     }
 
-
-    private val targetY = ComplexArray(FloatArray(fftLen * 2))
-
+    private val realtime = (BLOCKSIZE / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L)
     /**
      * https://thewolfsound.com/fast-convolution-fft-based-overlap-add-overlap-save-partitioned/
      */
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
-//        println("Convolv thru")
 
         val t1 = System.nanoTime()
+
+
         for (ch in outbuf.indices) {
             push(inbuf[ch].applyGain(gain), this.inbuf[ch])
-            lateinit var u: FloatArray
-
-
-            measureDebugTime("audio.convolve") {
-                val inputFFT = FFT.fft(this.inbuf[ch])
-                val Y = inputFFT * convFFT[ch]
-                val y = FFT.ifftAndGetReal(Y)
-                u = y.takeLast(BLOCKSIZE).toFloatArray()
-            }
-
-
-            // doesn't work AND slightly slower than the lines above
-            /*measureDebugTime("audio.convolve") {
-                // orthodox uneven-partitioning
-                fillUnevenly(this.inbuf[ch], inputPartd[ch])
-                val partY = inputPartd[ch].mapIndexed { i, inputSamples ->
-                    FFT.fft(inputSamples) * convFFTpartd[ch][i]
-                }
-                concatParts(partY, targetY)
-                val y = FFT.ifftAndGetReal(targetY)
-                u = y.takeLast(BLOCKSIZE).toFloatArray()
-            }*/
-
-
-            System.arraycopy(u, 0, outbuf[ch], 0, BLOCKSIZE)
+            val inputFFT = FFT.fft(this.inbuf[ch])
+            val Y = inputFFT * convFFT[ch]
+            val y = FFT.ifftAndGetReal(Y)
+            System.arraycopy(y, fftLen - BLOCKSIZE, outbuf[ch], 0, BLOCKSIZE)
         }
-        val t2 = System.nanoTime()
-        val ptime = (t2 - t1).toFloat()
-        val realtime = BLOCKSIZE / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L
+
+
+        val ptime = System.nanoTime() - t1
+        setDebugTime("audio.convolve", ptime)
         processingSpeed = realtime / ptime
     }
 
