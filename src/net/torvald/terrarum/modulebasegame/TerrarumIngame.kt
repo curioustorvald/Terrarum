@@ -278,6 +278,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         CREATE_NEW, LOAD_FROM
     }
 
+    private val soundReflectiveMaterials = hashSetOf(
+        ""
+    )
+
     override fun show() {
         //initViewPort(AppLoader.terrarumAppConfig.screenW, AppLoader.terrarumAppConfig.screenH)
 
@@ -295,6 +299,17 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         super.show() // this function sets gameInitialised = true
+
+        TileSurvey.submitProposal(
+            TileSurvey.SurveyProposal(
+                "basegame.Ingame.audioReflection", 72, 48, 2, 4
+            ) { world, x, y ->
+                val tileProp = BlockCodex[world.getTileFromTerrain(x, y)]
+                val wallProp = BlockCodex[world.getTileFromWall(x, y)]
+                val prop = if (tileProp.isSolid && !tileProp.isActorBlock) tileProp else wallProp
+                MaterialCodex[prop.material].sondrefl
+            }
+        )
     }
 
     data class NewGameParams(
@@ -869,9 +884,17 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             oldCamX = WorldCamera.x
             oldPlayerX = actorNowPlaying?.hitbox?.canonicalX ?: 0.0
 
+            // update audio mixer
+            val ratio = (TileSurvey.getRatio("basegame.Ingame.audioReflection") ?: 0.0).coerceIn(0.0, 1.0)
+            AudioMixer.convolveBusCave.volume = ratio
+            AudioMixer.convolveBusOpen.volume = 1.0 - ratio
+
+
+
 
             WORLD_UPDATE_TIMER += 1
 
+            // run benchmark if F2 is on
             if (KeyToggler.isOn(Input.Keys.F2)) {
                 deltaTeeBenchmarks.appendHead(1f / Gdx.graphics.deltaTime)
 

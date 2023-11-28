@@ -230,14 +230,14 @@ object AudioMixer: Disposable {
                 it.pan = (it.pan - 0.001f).coerceIn(-1f, 1f)
             }
         }*/
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        /*if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             convolveBusOpen.volume = (convolveBusOpen.volume + 0.001).coerceIn(0.0, 1.0)
             convolveBusCave.volume = 1.0 - convolveBusOpen.volume
         }
         else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             convolveBusOpen.volume = (convolveBusOpen.volume - 0.001).coerceIn(0.0, 1.0)
             convolveBusCave.volume = 1.0 - convolveBusOpen.volume
-        }
+        }*/
 
 
 

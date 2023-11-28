@@ -20,11 +20,11 @@ object TileSurvey {
         val height: Int,
         val spatialGranularity: Int, // 1: survey every (w*h) tile, 2: survey every other (w*h/4) tile ...
         val temporalGranularity: Int, // 1: survey every frame, 2: every other frame ...
-        val predicate: (GameWorld, Int, Int) -> Boolean
+        val predicate: (GameWorld, Int, Int) -> Float
     )
 
     private val proposals = HashMap<String, SurveyProposal>()
-    private val results = HashMap<String, Pair<Double, Int>>() // (matching tiles/actually surveyed tiles)
+    private val results = HashMap<String, Pair<Double, Float>>() // (ratio of accumulated data to total tile count / raw accumulated data)
 
     fun submitProposal(proposal: SurveyProposal) {
         proposals[proposal.surveyIdentifier] = proposal
@@ -54,11 +54,11 @@ object TileSurvey {
                 val for_x_end = ceil(player.intTilewiseHitbox.centeredX + proposal.width / 2.0).toInt()
                 val for_y_end = ceil(player.intTilewiseHitbox.centeredY + proposal.height / 2.0).toInt()
 
-                var akku = 0
+                var akku = 0f
 
                 for (y in for_y_start until for_y_end step proposal.spatialGranularity) {
                     for (x in for_x_start until for_x_end step proposal.spatialGranularity) {
-                        if (proposal.predicate(world, x, y)) akku += 1
+                        akku += proposal.predicate(world, x, y)
                     }
                 }
 

@@ -18,7 +18,7 @@
   "MENU_IO_WORLDGEN_GROWING_MINERALS": "광물을 키우는 중...",
   "MENU_IO_WORLDGEN_POSITIONING_ROCKS": "바위들의 위치 조정 중...",
   "MENU_IO_WORLDGEN_RETICULATING_SPLINES": "망상 구조 결합 중...",
-  "MENU_LABEL_AUDIO_BUFFER_INSTRUCTION": "오디오 끊김이 들리지 않는 선에서 가장 작은 값으로 설정해주십시오.\n오디오에 끊김이 있다면 더 큰 값으로 설정하고 게임을 재시작하십시오.\n더 큰 값은 오디오 처리의 안정성을 증가시키지만 딜레이도 더 늘어나게 합니다.",
+  "MENU_LABEL_AUDIO_BUFFER_INSTRUCTION": "오디오 끊김이 들리지 않는 선에서 가장 작은 값으로 설정해주십시오.\n오디오에 끊김이 있다면 더 큰 값으로 설정하고 게임을 재시작하십시오.\n더 큰 값은 오디오 처리의 안정성을 증가시키지만 처리 지연도 더 늘립니다.",
   "MENU_LABEL_KEYCONFIG_HELP1": "키캡을 클릭해 컨트롤을 배정하십시오",
   "MENU_LABEL_SAVE_WILL_BE_DELETED": "선택된 세이브가 삭제됩니다.",
   "MENU_LABEL_UNSAVED_PROGRESS_WILL_BE_LOST": "저장하지 않은 진행 상황을 잃게 됩니다.",

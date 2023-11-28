@@ -31,6 +31,8 @@ class Material {
 
     var rcs: Int = 10
 
+    var sondrefl: Float = 0f
+
     /**
      * Mainly intended to be used by third-party modules
      */
@@ -73,6 +75,7 @@ class MaterialCodex {
             prop.identifier = it.get("idst").toUpperCase()
             prop.toolReach = it.intVal("reach")
             prop.rcs = it.intVal("rcs")
+            prop.sondrefl = it.floatVal("sondrefl")
 
             materialProps[prop.identifier] = prop
 
