@@ -64,7 +64,9 @@ import org.khelekore.prtree.PRTree
 import java.io.File
 import java.util.*
 import java.util.logging.Level
+import kotlin.math.absoluteValue
 import kotlin.math.min
+import kotlin.math.pow
 import kotlin.math.roundToInt
 
 
@@ -302,7 +304,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         TileSurvey.submitProposal(
             TileSurvey.SurveyProposal(
-                "basegame.Ingame.audioReflection", 72, 48, 2, 4
+                "basegame.Ingame.audioReflection", 73, 73, 2, 4
             ) { world, x, y ->
                 val tileProp = BlockCodex[world.getTileFromTerrain(x, y)]
                 val wallProp = BlockCodex[world.getTileFromWall(x, y)]
@@ -885,10 +887,17 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             oldPlayerX = actorNowPlaying?.hitbox?.canonicalX ?: 0.0
 
             // update audio mixer
-            val ratio = (TileSurvey.getRatio("basegame.Ingame.audioReflection") ?: 0.0).coerceIn(0.0, 1.0)
-            AudioMixer.convolveBusCave.volume = ratio
-            AudioMixer.convolveBusOpen.volume = 1.0 - ratio
-
+            val ratio = (TileSurvey.getRatio("basegame.Ingame.audioReflection") ?: 0.0)
+            if (ratio >= 0.0) {
+                val ratio1 = ratio.coerceIn(0.0, 1.0)
+                AudioMixer.convolveBusCave.volume = ratio1
+                AudioMixer.convolveBusOpen.volume = 1.0 - ratio1
+            }
+            else {
+                val ratio1 = (ratio / MaterialCodex["AIIR"].sondrefl).absoluteValue.coerceIn(0.0, 1.0)
+                AudioMixer.convolveBusOpen.volume = (1.0 - ratio1).pow(0.75)
+                AudioMixer.convolveBusCave.volume = 0.0
+            }
 
 
 
