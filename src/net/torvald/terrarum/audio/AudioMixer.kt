@@ -165,12 +165,12 @@ object AudioMixer: Disposable {
 
         convolveBusOpen.filters[0] = Highpass(80f)
         convolveBusOpen.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - PurgatoryChasm.bin"))
-        convolveBusOpen.filters[2] = Gain(decibelsToFullscale(18.0).toFloat()) // don't make it too loud; it'll sound like a shit
+        convolveBusOpen.filters[2] = Gain(decibelsToFullscale(16.5).toFloat()) // don't make it too loud; it'll sound like a shit
         convolveBusOpen.volume = 0.5 // will be controlled by the other updater which surveys the world
 
         convolveBusCave.filters[0] = Highpass(80f)
         convolveBusCave.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - WaterplacePark-trimmed.bin"))
-        convolveBusCave.filters[2] = Gain(decibelsToFullscale(18.0).toFloat())
+        convolveBusCave.filters[2] = Gain(decibelsToFullscale(16.5).toFloat())
         convolveBusCave.volume = 0.5 // will be controlled by the other updater which surveys the world
 
         fadeBus.addSidechainInput(sumBus, 1.0 / 3.0)
