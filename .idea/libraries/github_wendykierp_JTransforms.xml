@@ -3,13 +3,11 @@
     <properties maven-id="com.github.wendykierp:JTransforms:3.1" />
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/JTransforms-3.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/commons-math3-3.5.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/JLargeArrays-1.5.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/lib/JTransforms-3.1-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/commons-math3-3.5-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/JLargeArrays-1.5-sources.jar!/" />
     </SOURCES>
   </library>
