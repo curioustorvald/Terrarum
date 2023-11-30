@@ -19,7 +19,7 @@ class Material {
 
     var thermalConductivity: Float = 10f // watts per metre-kelven
 
-    var forceMod: Int = 1 // arbitrary unit. See Pickaxe_Power.xlsx
+    var forceMod: Float = 1f // arbitrary unit. See Pickaxe_Power.xlsx
     var enduranceMod: Float = 1f // multiplier. Copper as 1.0
     //var armourMod: Float // multiplier. Copper as 1.0
 
@@ -69,7 +69,7 @@ class MaterialCodex {
             val prop = Material()
             prop.strength = it.intVal("tens")
             prop.density = it.intVal("dsty")
-            prop.forceMod = it.intVal("fmod")
+            prop.forceMod = it.floatVal("fmod")
             prop.enduranceMod = it.floatVal("endurance")
             prop.thermalConductivity = it.floatVal("tcond")
             prop.identifier = it.get("idst").toUpperCase()
