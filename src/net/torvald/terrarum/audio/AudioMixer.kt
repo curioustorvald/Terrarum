@@ -5,14 +5,13 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.backends.lwjgl3.audio.Lwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
-import net.torvald.terrarum.App
-import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.*
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.concurrent.ThreadExecutor
+import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.MusicContainer
-import net.torvald.terrarum.tryDispose
 import java.lang.Thread.MAX_PRIORITY
 import java.util.*
 import java.util.concurrent.Callable
@@ -163,14 +162,12 @@ object AudioMixer: Disposable {
             it.addSidechainInput(sfxMixTrack, 1.0)
         }
 
-        convolveBusOpen.filters[0] = Highpass(80f)
         convolveBusOpen.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - PurgatoryChasm.bin"))
-        convolveBusOpen.filters[2] = Gain(decibelsToFullscale(16.5).toFloat()) // don't make it too loud; it'll sound like a shit
+        convolveBusOpen.filters[2] = Gain(decibelsToFullscale(17.0).toFloat()) // don't make it too loud; it'll sound like a shit
         convolveBusOpen.volume = 0.5 // will be controlled by the other updater which surveys the world
 
-        convolveBusCave.filters[0] = Highpass(80f)
         convolveBusCave.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - WaterplacePark-trimmed.bin"))
-        convolveBusCave.filters[2] = Gain(decibelsToFullscale(16.5).toFloat())
+        convolveBusCave.filters[2] = Gain(decibelsToFullscale(16.0).toFloat())
         convolveBusCave.volume = 0.5 // will be controlled by the other updater which surveys the world
 
         fadeBus.addSidechainInput(sumBus, 1.0 / 3.0)
@@ -220,6 +217,8 @@ object AudioMixer: Disposable {
     private var lpStart = SAMPLING_RATED / 2.0
     private var lpTarget = SAMPLING_RATED / 2.0
 
+    private var testAudioMixRatio = 0.0
+
     fun update(delta: Float) {
         // test the panning
         /*musicTrack.getFilter<BinoPan>().let {
@@ -230,14 +229,33 @@ object AudioMixer: Disposable {
                 it.pan = (it.pan - 0.001f).coerceIn(-1f, 1f)
             }
         }*/
-        /*if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            convolveBusOpen.volume = (convolveBusOpen.volume + 0.001).coerceIn(0.0, 1.0)
-            convolveBusCave.volume = 1.0 - convolveBusOpen.volume
+        if (Terrarum.ingame is BuildingMaker) {
+            val mixDelta = if (testAudioMixRatio >= 0.0) 0.001 else (0.001 * MaterialCodex["AIIR"].sondrefl).absoluteValue
+
+            if (Gdx.input.isKeyPressed(Input.Keys.UP))
+                testAudioMixRatio += mixDelta
+            else if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+                testAudioMixRatio -= mixDelta
+            else if (Gdx.input.isKeyPressed(Input.Keys.NUM_1))
+                testAudioMixRatio = -1.0
+            else if (Gdx.input.isKeyPressed(Input.Keys.NUM_2))
+                testAudioMixRatio = 0.0
+            else if (Gdx.input.isKeyPressed(Input.Keys.NUM_3))
+                testAudioMixRatio = 1.0
+
+            testAudioMixRatio = testAudioMixRatio.coerceIn(MaterialCodex["AIIR"].sondrefl.absoluteValue * -1.0, 1.0)
+
+            if (testAudioMixRatio >= 0.0) {
+                val ratio1 = testAudioMixRatio.coerceIn(0.0, 1.0)
+                AudioMixer.convolveBusCave.volume = ratio1
+                AudioMixer.convolveBusOpen.volume = 1.0 - ratio1
+            }
+            else {
+                val ratio1 = (testAudioMixRatio / MaterialCodex["AIIR"].sondrefl).absoluteValue.coerceIn(0.0, 1.0)
+                AudioMixer.convolveBusOpen.volume = (1.0 - ratio1).pow(0.75)
+                AudioMixer.convolveBusCave.volume = 0.0
+            }
         }
-        else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            convolveBusOpen.volume = (convolveBusOpen.volume - 0.001).coerceIn(0.0, 1.0)
-            convolveBusCave.volume = 1.0 - convolveBusOpen.volume
-        }*/
 
 
 
