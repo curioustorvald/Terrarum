@@ -12,6 +12,7 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.*
+import kotlin.collections.HashMap
 
 typealias BlockBoxIndex = Int
 typealias WireEmissionType = String
@@ -66,10 +67,16 @@ open class Electric : FixtureBase {
     fun setWireEmissionAt(x: Int, y: Int, emission: Vector2) { wireEmission[pointToBlockBoxIndex(x, y)] = emission }
     fun setWireConsumptionAt(x: Int, y: Int, consumption: Vector2) { wireConsumption[pointToBlockBoxIndex(x, y)] = consumption }
 
+    // these are characteristic properties of the fixture (they have constant value) so must not be serialised
     @Transient val wireEmitterTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
     @Transient val wireSinkTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
     @Transient val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
     @Transient val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
+
+    // these are NOT constant so they ARE serialised. Type: Map<SinkType (String) -> Charge (Double>
+    // Use case: signal buffer (sinkType=digital_bit), battery (sinkType=electricity), etc.
+    val chargeStored: HashMap<String, Double> = HashMap()
+
 
     /** Triggered when 'digital_bit' rises from low to high. Edge detection only considers the real component (labeled as 'x') of the vector */
     open fun onRisingEdge(readFrom: BlockBoxIndex) {}
