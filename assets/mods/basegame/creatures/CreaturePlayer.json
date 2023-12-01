@@ -20,7 +20,7 @@
   "scale": 1.0,
   "scalemult": [100,100,100,100,100,100,100],
 
-  "encumbrance": 1000,
+  "encumbrance": 50000,
   "defence": 100,
   "reach": 100,
 

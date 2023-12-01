@@ -37,7 +37,7 @@ object PlayerBuilderTestSubject1 {
 //        p.setPosition(3.0 * TILE_SIZE, 3.0 * TILE_SIZE)
 
 
-        PlayerBuilderSigrid.fillTestInventory(p.inventory)
+//        PlayerBuilderSigrid.fillTestInventory(p.inventory)
 
         //p.actorValue[AVKey.LUMR] = 0.84
         //p.actorValue[AVKey.LUMG] = 0.93
