@@ -18,6 +18,7 @@ object Block {
     const val DIRT = "basegame:32"
     const val GRASS = "basegame:33"
     const val GRASSWALL = "basegame:34"
+    const val CLAY = "basegame:35"
 
     const val PLANK_NORMAL = "basegame:48"
     const val PLANK_EBONY = "basegame:49"

@@ -115,6 +115,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
     private fun draw(x: Int, y: Int, noiseValue: List<Double>, world: GameWorld) {
         val control1 = noiseValue[0].coerceIn(0.0, 0.99999).times(slices).toInt().coerceAtMost(slices - 1)
         val control2 = noiseValue[1].coerceIn(0.0, 0.99999).times(9).toInt().coerceAtMost(9 - 1)
+        val control3 = noiseValue[2].coerceIn(0.0, 0.99999).times(12).toInt().coerceAtMost(12 - 1)
         val ba = LandUtil.getBlockAddr(world, x, y)
 
         if (y > 0) {
@@ -189,11 +190,22 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
                 }
                 else -> null to null
             }
+            val lutum = when (control3) {
+                0 -> {
+                    if (tileThis == Block.DIRT) {
+                        Block.CLAY to Block.CLAY
+                    }
+                    else null to null
+                }
+                else -> null to null
+            }
 
             val outTile = if (grassRock.first == Block.STONE)
                 grassRock
             else if (sablum.first != null)
                 sablum
+            else if (lutum.first != null)
+                lutum
             else grassRock
 
 
@@ -208,6 +220,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
         return listOf(
             makeRandomSpotties("TERRA", params.featureSize1),
             makeRandomSpotties("SABLUM", params.featureSize2),
+            makeRandomSpotties("LUTUM", params.featureSize2),
         )
     }
 
