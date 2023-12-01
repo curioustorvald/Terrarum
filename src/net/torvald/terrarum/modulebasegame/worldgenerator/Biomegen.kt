@@ -115,7 +115,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
     private fun draw(x: Int, y: Int, noiseValue: List<Double>, world: GameWorld) {
         val control1 = noiseValue[0].coerceIn(0.0, 0.99999).times(slices).toInt().coerceAtMost(slices - 1)
         val control2 = noiseValue[1].coerceIn(0.0, 0.99999).times(9).toInt().coerceAtMost(9 - 1)
-        val control3 = noiseValue[2].coerceIn(0.0, 0.99999).times(12).toInt().coerceAtMost(12 - 1)
+        val control3 = noiseValue[2].coerceIn(0.0, 0.99999).times(9).toInt().coerceAtMost(9 - 1)
         val ba = LandUtil.getBlockAddr(world, x, y)
 
         if (y > 0) {
@@ -192,7 +192,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
             }
             val lutum = when (control3) {
                 0 -> {
-                    if (tileThis == Block.DIRT) {
+                    if (tileThis == Block.DIRT || wallThis == Block.DIRT) {
                         Block.CLAY to Block.CLAY
                     }
                     else null to null
@@ -209,7 +209,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
             else grassRock
 
 
-            if (outTile.first != null)
+            if (outTile.first != null && tileThis != Block.AIR)
                 world.setTileTerrain(x, y, outTile.first!!, true)
             if (outTile.second != null)
                 world.setTileWall(x, y, outTile.second!!, true)
@@ -220,7 +220,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
         return listOf(
             makeRandomSpotties("TERRA", params.featureSize1),
             makeRandomSpotties("SABLUM", params.featureSize2),
-            makeRandomSpotties("LUTUM", params.featureSize2),
+            makeRandomSpotties("LUTUM", params.featureSize3),
         )
     }
 
@@ -258,5 +258,6 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
 
 data class BiomegenParams(
     val featureSize1: Double = 80.0,
-    val featureSize2: Double = 120.0
+    val featureSize2: Double = 120.0,
+    val featureSize3: Double = 30.0,
 )
