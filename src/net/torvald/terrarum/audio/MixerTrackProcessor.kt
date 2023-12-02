@@ -3,7 +3,6 @@ package net.torvald.terrarum.audio
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.audio.dsp.BinoPan
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -94,10 +93,17 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
             if (track.trackType != TrackType.MASTER && track.trackType != TrackType.BUS && track.streamPlaying) {
                 streamBuf.fetchBytes {
                     // FIXME THIS IS NOT THREAD SAFE: trying to play different audio too fast too much, shits happen
-                    val bytesRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
-                    if (bytesRead == null || bytesRead <= 0) { // some class (namely Mp3) may return 0 instead of negative value
+                    // OR somehow make sfx memory-streamable
+                    try {
+                        val bytesRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
+                        if (bytesRead == null || bytesRead <= 0) { // some class (namely Mp3) may return 0 instead of negative value
 //                        printdbg("Finished reading audio stream")
-                        track.stop()
+                            track.stop()
+                        }
+                    }
+                    catch (e: Throwable) {
+                        e.printStackTrace()
+                        it.fill(0)
                     }
 
                 }
