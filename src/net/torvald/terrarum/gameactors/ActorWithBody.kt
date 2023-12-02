@@ -2028,8 +2028,8 @@ open class ActorWithBody : Actor {
         val feetTiles = getFeetTiles()
 
         if (collisionDamage > 1.0 / 1024.0) {
-            printdbg(this, "Collision damage: $collisionDamage N, count: $particleCount, velocity: $vecSum, mass: ${this.mass}")
-            printdbg(this, "feetTileCount = ${feetTiles.size}")
+//            printdbg(this, "Collision damage: $collisionDamage N, count: $particleCount, velocity: $vecSum, mass: ${this.mass}")
+//            printdbg(this, "feetTileCount = ${feetTiles.size}")
             val feetTileIndices = (feetTiles.indices).toList().toIntArray()
 
             for (i in 0 until trueParticleCount) {
@@ -2057,7 +2057,7 @@ open class ActorWithBody : Actor {
                 Terrarum.audioCodex.getRandomFootstep(mat)?.let {
                     val vol = volumeMax * (cnt / feetTileCnt)
                     startAudio(it, vol)
-                    printdbg(this, "Playing footstep $mat (vol: $vol, file: ${it.file.name}, cd: $collisionDamage)")
+//                    printdbg(this, "Playing footstep $mat (vol: $vol, file: ${it.file.name}, cd: $collisionDamage)")
                 }
             }
         }

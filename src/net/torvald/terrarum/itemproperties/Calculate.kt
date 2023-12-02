@@ -22,11 +22,11 @@ object Calculate {
      * TODO Newtons as unit?
      */
     @JvmStatic fun pickaxePower(actor: ActorWithBody, material: Material?): Float {
-        return (4.0 * (material?.forceMod?.toDouble() ?: 0.0) * (actor.avStrength / 1000.0)).toFloat()
+        return (4.0 * (material?.forceMod?.toDouble() ?: 0.15) * (actor.avStrength / 1000.0)).toFloat()
     }
 
     @JvmStatic fun hatchetPower(actor: ActorWithBody, material: Material?): Float {
-        return (1.0 * (material?.forceMod?.toDouble() ?: 0.0) * (actor.avStrength / 1000.0)).toFloat()
+        return (1.0 * (material?.forceMod?.toDouble() ?: 0.15) * (actor.avStrength / 1000.0)).toFloat()
     }
 
     private val fallDamageDampenMult = (32.0 / 1176.0).sqr()

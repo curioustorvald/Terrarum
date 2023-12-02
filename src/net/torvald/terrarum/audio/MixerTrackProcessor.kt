@@ -93,6 +93,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
             // fetch deviceBufferSize amount of sample from the disk
             if (track.trackType != TrackType.MASTER && track.trackType != TrackType.BUS && track.streamPlaying) {
                 streamBuf.fetchBytes {
+                    // FIXME THIS IS NOT THREAD SAFE: trying to play different audio too fast too much, shits happen
                     val bytesRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
                     if (bytesRead == null || bytesRead <= 0) { // some class (namely Mp3) may return 0 instead of negative value
 //                        printdbg("Finished reading audio stream")
