@@ -2,10 +2,13 @@ package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.audio.dsp.BinoPan
 import net.torvald.terrarum.audio.dsp.NullFilter
+import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.relativeXposition
 import net.torvald.terrarum.sqr
-import kotlin.math.absoluteValue
-import kotlin.math.sqrt
+import kotlin.math.*
 
 /**
  * Created by minjaesong on 2023-11-17.
@@ -34,6 +37,8 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
     val hasClipping = arrayOf(false, false)
 
     private var breakBomb = false
+
+    private val distFalloff = 2048.0
 
     private fun printdbg(msg: Any) {
         if (true) println("[AudioAdapter ${track.name}] $msg")
@@ -67,15 +72,30 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
             if (breakBomb) break*/ // uncomment to multithread
             // Your code here
 
+
+            // update panning and shits
+            if (track.trackType == TrackType.DYNAMIC_SOURCE && track.isPlaying) {
+                if (AudioMixer.actorNowPlaying != null) {
+                    if (track.trackingTarget == null || track.trackingTarget == AudioMixer.actorNowPlaying) {
+                        track.volume = track.maxVolume
+                        (track.filters[0] as BinoPan).pan = 0f
+                    }
+                    else {
+                        val relativeXpos = relativeXposition(AudioMixer.actorNowPlaying!!, track.trackingTarget!!)
+                        track.volume = track.maxVolume * (1.0 - relativeXpos.absoluteValue.pow(0.5) / distFalloff)
+                        (track.filters[0] as BinoPan).pan = ((2*asin(relativeXpos / distFalloff)) / Math.PI).toFloat()
+                    }
+                }
+            }
+
+
             // fetch deviceBufferSize amount of sample from the disk
             if (track.trackType != TrackType.MASTER && track.trackType != TrackType.BUS && track.streamPlaying) {
                 streamBuf.fetchBytes {
                     val bytesRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
                     if (bytesRead == null || bytesRead <= 0) { // some class (namely Mp3) may return 0 instead of negative value
 //                        printdbg("Finished reading audio stream")
-                        track.currentTrack?.gdxMusic?.forceInvoke<Int>("reset", arrayOf())
-                        track.streamPlaying = false
-                        track.fireSongFinishHook()
+                        track.stop()
                     }
 
                 }

@@ -951,6 +951,23 @@ fun distBetweenActors(a: ActorWithBody, b: ActorWithBody): Double {
     val dist = min(min(bpos.distanceSquared(apos1), bpos.distanceSquared(apos2)), bpos.distanceSquared(apos3))
     return dist.sqrt()
 }
+
+/**
+ * @return positive if the otherActor is on the right side of the player, negative if on the left
+ */
+fun relativeXposition(thisActor: ActorWithBody, otherActor: ActorWithBody): Double {
+    val ww = INGAME.world.width * TILE_SIZED
+    val thisPos = thisActor.centrePosVector
+    val pos1 = otherActor.centrePosVector
+    val pos2 = Vector2(pos1.x + ww, pos1.y)
+    val pos3 = Vector2(pos1.x - ww, pos1.y)
+    val posToUse = listOf(
+        pos1 to thisPos.distanceSquared(pos1),
+        pos2 to thisPos.distanceSquared(pos2),
+        pos3 to thisPos.distanceSquared(pos3),
+    ).sortedBy { it.second }.first().first
+    return posToUse.x - thisPos.x
+}
 fun distBetween(a: ActorWithBody, bpos: Vector2): Double {
     val ww = INGAME.world.width * TILE_SIZED
     val apos1 = a.centrePosVector

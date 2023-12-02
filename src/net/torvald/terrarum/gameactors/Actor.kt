@@ -1,9 +1,14 @@
 package net.torvald.terrarum.gameactors
 
+import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.audio.Sound
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.audio.AudioMixer
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
+import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.savegame.toBigEndian
@@ -87,6 +92,60 @@ abstract class Actor : Comparable<Actor>, Runnable {
      * @param value null if the key is deleted
      */
     abstract @Event fun onActorValueChange(key: String, value: Any?)
+
+//    @Transient val soundTracks = HashMap<Sound, TerrarumAudioMixerTrack>()
+    @Transient val musicTracks = HashMap<MusicContainer, TerrarumAudioMixerTrack>()
+
+    /*open fun startAudio(sound: Sound) {
+        getTrackByAudio(sound)?.let {
+            it.trackingTarget = if (this is ActorWithBody) this else null
+            it.currentSound = sound
+            it.play()
+        }
+    }*/
+
+    private fun getTrackByAudio(music: MusicContainer): TerrarumAudioMixerTrack? {
+        // get existing track
+        var track = musicTracks[music]
+
+        // if there is no existing track, try to get one
+        if (track == null) {
+            track = if (this == Terrarum.ingame?.actorNowPlaying)
+                AudioMixer.getFreeTrackNoMatterWhat()
+            else
+                AudioMixer.getFreeTrack()
+            // if the request was successful, put it into the hashmap
+            if (track != null) {
+                musicTracks[music] = track
+            }
+        }
+
+        return track
+    }
+
+    open fun startAudio(music: MusicContainer) {
+        getTrackByAudio(music)?.let {
+            it.trackingTarget = if (this is ActorWithBody) this else null
+            it.currentTrack = music
+            it.play()
+        }
+    }
+
+    /*open fun stopAudio(sound: Sound) {
+
+    }*/
+
+    open fun stopAudio(music: MusicContainer) {
+        musicTracks[music]?.stop()
+    }
+
+    /*open fun onAudioInterrupt(sound: Sound) {
+
+    }*/
+
+    open @Event fun onAudioInterrupt(music: MusicContainer) {
+        music.songFinishedHook(music.gdxMusic)
+    }
 
     abstract fun dispose()
 

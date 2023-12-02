@@ -1,12 +1,15 @@
 package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.backends.lwjgl3.audio.OpenALLwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Queue
+import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.audio.dsp.TerrarumAudioFilter
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.getHashStr
 import net.torvald.terrarum.hashStrMap
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -36,6 +39,8 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, privat
     var currentTrack: MusicContainer? = null
     var nextTrack: MusicContainer? = null
 
+    var currentSound: Sound? = null // DYNAMIC_SOURCE only
+
     var volume: TrackVolume = 1.0
         get() = field
         set(value) {
@@ -46,13 +51,15 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, privat
     val maxVolume: Double
         get() = maxVolumeFun()
 
-    var pan = 0.0
-
     var dBfs: Double
         get() = fullscaleToDecibels(volume)
         set(value) { volume = decibelsToFullscale(value) }
 
     val filters: Array<TerrarumAudioFilter> = Array(4) { NullFilter }
+
+    var trackingTarget: ActorWithBody? = null
+
+    var playStartedTime = 0L; private set
 
     inline fun <reified T> getFilter() = filters.filterIsInstance<T>().first()!!
 
@@ -110,6 +117,7 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, privat
 
     internal var streamPlaying = false
     fun play() {
+        playStartedTime = System.nanoTime()
         streamPlaying = true
 //        currentTrack?.gdxMusic?.play()
     }
@@ -128,6 +136,14 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, privat
     }
 
     override fun equals(other: Any?) = this.hash == (other as TerrarumAudioMixerTrack).hash
+
+    fun stop() {
+        currentTrack?.gdxMusic?.forceInvoke<Int>("reset", arrayOf())
+        streamPlaying = false
+        playStartedTime = 0L
+        fireSongFinishHook()
+        // fireSoundFinishHook()
+    }
 
     fun fireSongFinishHook() {
         currentTrack?.songFinishedHook?.invoke(currentTrack!!.gdxMusic)

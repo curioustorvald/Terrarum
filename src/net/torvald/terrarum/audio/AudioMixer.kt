@@ -95,6 +95,26 @@ object AudioMixer: Disposable {
 
     var processing = true
 
+    var actorNowPlaying = Terrarum.ingame?.actorNowPlaying; private set
+
+    /**
+     * Return oldest dynamic track, even if the track is currently playing
+     */
+    fun getFreeTrackNoMatterWhat(): TerrarumAudioMixerTrack {
+        return dynamicTracks.minBy { it.playStartedTime }
+    }
+
+    /**
+     * Return oldest dynamic track that is not playing
+     */
+    fun getFreeTrack(): TerrarumAudioMixerTrack? {
+        val oldestTrack = dynamicTracks.minBy { it.playStartedTime }
+        return if (oldestTrack.isPlaying)
+            null
+        else
+            oldestTrack
+    }
+
     private val processingExecutor = ThreadExecutor()
 //    private lateinit var processingSubthreads: List<Thread>
     val processingThread = Thread {
@@ -117,6 +137,8 @@ object AudioMixer: Disposable {
         }*/
 
         while (processing) {
+            actorNowPlaying = Terrarum.ingame?.actorNowPlaying
+
             for (tracks in parallelProcessingSchedule) {
                 if (!processing) break
 
