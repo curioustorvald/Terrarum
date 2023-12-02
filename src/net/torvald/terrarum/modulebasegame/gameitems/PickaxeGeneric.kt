@@ -105,6 +105,7 @@ object PickaxeCore {
                             dropItem(drop, x, y)
                         }
                         makeDust(tile, x, y, 9)
+                        makeNoise(actor, tile)
                     }
                 }
                 // tile not busted
@@ -163,6 +164,12 @@ object PickaxeCore {
                 it.drawColour.set(drawCol)
                 (Terrarum.ingame as TerrarumIngame).addParticle(it)
             }
+        }
+    }
+
+    fun makeNoise(actor: ActorWithBody, tile: ItemID) {
+        Terrarum.audioCodex.getRandomFootstep(BlockCodex[tile].material)?.let {
+            actor.startAudio(it, 2.0)
         }
     }
 

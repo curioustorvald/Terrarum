@@ -104,6 +104,7 @@ object SledgehammerCore {
                             PickaxeCore.dropItem("wall@$drop", x, y)
                         }
                         PickaxeCore.makeDust(wall, x, y, 9, WALL_OVERLAY_COLOUR)
+                        PickaxeCore.makeNoise(actor, wall)
                     }
                 }
                 // tile not busted

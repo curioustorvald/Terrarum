@@ -200,6 +200,8 @@ object AudioMixer: Disposable {
         masterTrack.addSidechainInput(fadeBus, 1.0)
         masterTrack.addSidechainInput(guiTrack, 1.0)
 
+        musicTrack.filters[1] = Gain(0.5f)
+
         dynamicTracks.forEach {
             it.filters[0] = BinoPan(0f)
             sfxSumBus.addSidechainInput(it, 1.0)

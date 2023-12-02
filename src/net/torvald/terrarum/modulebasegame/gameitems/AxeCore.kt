@@ -147,6 +147,7 @@ object AxeCore {
                         // drop the item under cursor
                         PickaxeCore.dropItem(BlockCodex[tileBroken].drop, x, y) // todo use log item if applicable
                         PickaxeCore.makeDust(tile, x, y, 9)
+                        PickaxeCore.makeNoise(actor, tile)
                     }
                     // tile not busted
                     if (Math.random() < actionInterval) {

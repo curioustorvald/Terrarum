@@ -588,7 +588,7 @@ open class ActorWithBody : Actor {
                     // make some effects
                     if (collisionStatus != 0)
                         makeDust(collisionDamage, vecSum)
-                    if (collisionStatus == COLLIDING_BOTTOM)
+                    if (collisionStatus and COLLIDING_BOTTOM != 0)
                         makeNoise(collisionDamage)
                 }
                 else {
@@ -2049,7 +2049,7 @@ open class ActorWithBody : Actor {
         if (collisionDamage > 1.0 / 1024.0) {
             val feetTiles = getFeetTiles()
             val volumeMax = collisionDamage / 108
-            val feetTileMats = feetTiles.slice(0 until feetTiles.size).map { BlockCodex[it.second].material }
+            val feetTileMats = feetTiles.slice(feetTiles.indices).map { BlockCodex[it.second].material }
             val feetTileCnt = feetTileMats.size.toDouble()
             val materialStats = feetTileMats.distinct().map { mat -> mat to feetTileMats.count { it == mat } }
 

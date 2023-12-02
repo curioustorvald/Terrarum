@@ -70,6 +70,7 @@ object BlockBase {
                         false
                 )
             }
+            PickaxeCore.makeNoise(actor, itemID)
 
             1L
         }
