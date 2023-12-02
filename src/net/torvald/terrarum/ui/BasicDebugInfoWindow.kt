@@ -422,7 +422,7 @@ class BasicDebugInfoWindow : UICanvas() {
         val x = App.scr.width - 186 - (AudioMixer.tracks.size + 1) * (stripW + stripGap)
         val y = App.scr.height - 38 - stripH
 
-        val strips = AudioMixer.tracks + AudioMixer.masterTrack
+        val strips = /*AudioMixer.dynamicTracks.sliceArray(0..7) +*/ AudioMixer.tracks + AudioMixer.masterTrack
 
 //        batch.color = COL_MIXER_BACK
 //        Toolkit.fillArea(batch, x - stripGap, y - stripGap, strips.size * (stripW + stripGap) + stripGap, stripH + 2*stripGap)
@@ -486,8 +486,8 @@ class BasicDebugInfoWindow : UICanvas() {
         val faderY = y + stripFilterHeight * numberOfFilters
 
         // receives (opposite of "sends")
-        if (track != AudioMixer.sfxSumTrack) {
-            track.sidechainInputs.filterNotNull().reversed().forEachIndexed { i, (side, mix) ->
+        if (track != AudioMixer.sfxSumBus) {
+            track.sidechainInputs.reversed().forEachIndexed { i, (side, mix) ->
                 val mixDb = fullscaleToDecibels(mix)
                 val perc = ((mixDb + 24.0).coerceAtLeast(0.0) / 24.0).toFloat()
                 // gauge background
@@ -527,7 +527,7 @@ class BasicDebugInfoWindow : UICanvas() {
         // slider text
         val dB = track.dBfs
         val dBstr = dB.toIntAndFrac(3,1)
-        val faderKnobDbFs = dB.coerceIn(-dbLow, 0.0).plus(dbLow).div(dbLow + dbOver).toFloat()
+        val faderKnobDbFs = dB.coerceIn(-dbLow, 6.0).plus(dbLow).div(dbLow + dbOver).toFloat()
         batch.color = FILTER_NAME_ACTIVE
         App.fontSmallNumbers.draw(batch, dBstr, sliderX - 23f, faderY+1f)
 

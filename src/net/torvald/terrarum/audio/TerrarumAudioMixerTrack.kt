@@ -64,13 +64,13 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, var ma
 
     inline fun <reified T> getFilter() = filters.filterIsInstance<T>().first()!!
 
-    internal val sidechainInputs = ArrayList<Pair<TerrarumAudioMixerTrack, TrackVolume>?>()
-    internal fun getSidechains(): List<TerrarumAudioMixerTrack?> = sidechainInputs.map { it?.first }
+    internal val sidechainInputs = ArrayList<Pair<TerrarumAudioMixerTrack, TrackVolume>>()
+    internal fun getSidechains(): List<TerrarumAudioMixerTrack?> = sidechainInputs.map { it.first }
     fun addSidechainInput(input: TerrarumAudioMixerTrack, inputVolume: TrackVolume) {
         if (input.trackType == TrackType.MASTER)
             throw IllegalArgumentException("Cannot add master track as a sidechain")
 
-        if (sidechainInputs.map { it?.first }.any { it?.hash == input.hash })
+        if (sidechainInputs.map { it.first }.any { it.hash == input.hash })
             throw IllegalArgumentException("The track '${input.hash}' already exists")
 
         if (getSidechains().any { mySidechain ->

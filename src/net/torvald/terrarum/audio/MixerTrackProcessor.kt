@@ -92,10 +92,6 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
             // fetch deviceBufferSize amount of sample from the disk
             if (track.trackType != TrackType.MASTER && track.trackType != TrackType.BUS && track.streamPlaying) {
-                if (track.trackType == TrackType.DYNAMIC_SOURCE) {
-                    printdbg("${track.name} streaming")
-                }
-
                 streamBuf.fetchBytes {
                     val bytesRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
                     if (bytesRead == null || bytesRead <= 0) { // some class (namely Mp3) may return 0 instead of negative value
@@ -117,7 +113,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 samplesL1 = FloatArray(bufferSize / 4)
                 samplesR1 = FloatArray(bufferSize / 4)
 
-                val sidechains = track.sidechainInputs.filterNotNull()
+                val sidechains = track.sidechainInputs
                 // add all up
                 sidechains.forEach { (side, mix) ->
                     for (i in samplesL1.indices) {

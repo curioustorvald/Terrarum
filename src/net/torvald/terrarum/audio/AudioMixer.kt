@@ -81,7 +81,7 @@ object AudioMixer: Disposable {
         get() = tracks[1]
     val guiTrack: TerrarumAudioMixerTrack
         get() = tracks[2]
-    val sfxSumTrack: TerrarumAudioMixerTrack
+    val sfxSumBus: TerrarumAudioMixerTrack
         get() = tracks[3]
 
     val sumBus: TerrarumAudioMixerTrack
@@ -170,7 +170,7 @@ object AudioMixer: Disposable {
     init {
         // initialise audio paths //
 
-        listOf(musicTrack, ambientTrack, sfxSumTrack, guiTrack).forEach {
+        listOf(musicTrack, ambientTrack, sfxSumBus, guiTrack).forEach {
             it.filters[0] = Gain(1f)
         }
 
@@ -181,7 +181,7 @@ object AudioMixer: Disposable {
         listOf(sumBus, convolveBusOpen, convolveBusCave).forEach {
             it.addSidechainInput(musicTrack, 1.0)
             it.addSidechainInput(ambientTrack, 1.0)
-            it.addSidechainInput(sfxSumTrack, 1.0)
+            it.addSidechainInput(sfxSumBus, 1.0)
         }
 
         convolveBusOpen.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - PurgatoryChasm.bin"))
@@ -202,17 +202,16 @@ object AudioMixer: Disposable {
 
         dynamicTracks.forEach {
             it.filters[0] = BinoPan(0f)
-            sfxSumTrack.addSidechainInput(it, 1.0)
+            sfxSumBus.addSidechainInput(it, 1.0)
         }
 
         parallelProcessingSchedule = arrayOf(
             arrayOf(musicTrack, ambientTrack, guiTrack),
             dynamicTracks,
-            arrayOf(sumBus, convolveBusOpen, convolveBusCave),
+            arrayOf(sfxSumBus, sumBus, convolveBusOpen, convolveBusCave),
             arrayOf(fadeBus),
             arrayOf(masterTrack)
         )
-
 
         processingThread.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority
         processingThread.start()
@@ -291,7 +290,7 @@ object AudioMixer: Disposable {
         masterTrack.volume = masterVolume
         musicTrack.getFilter<Gain>().gain = musicVolume.toFloat()
         ambientTrack.getFilter<Gain>().gain = ambientVolume.toFloat()
-        sfxSumTrack.getFilter<Gain>().gain = sfxVolume.toFloat()
+        sfxSumBus.getFilter<Gain>().gain = sfxVolume.toFloat()
         guiTrack.getFilter<Gain>().gain = guiVolume.toFloat()
 
 

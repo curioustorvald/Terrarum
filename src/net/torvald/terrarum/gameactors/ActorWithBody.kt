@@ -390,8 +390,6 @@ open class ActorWithBody : Actor {
     internal var walledTop = false    // UNUSED; only for BasicDebugInfoWindow
     internal var walledBottom = false // UNUSED; only for BasicDebugInfoWindow
     internal var colliding = false
-    @Transient internal var feetTiles = Array<BlockProp?>(160) { null }
-    @Transient internal var bodyTiles = Array<BlockProp?>(2400) { null }
 
     var isWalkingH = false
     var isWalkingV = false
@@ -587,9 +585,11 @@ open class ActorWithBody : Actor {
                         }
                     }
 
-                    // make dusts
+                    // make some effects
                     if (collisionStatus != 0)
                         makeDust(collisionDamage, vecSum)
+                    if (collisionStatus == COLLIDING_BOTTOM)
+                        makeNoise(collisionDamage)
                 }
                 else {
                     stairPenaltyCounter = 999
@@ -631,22 +631,7 @@ open class ActorWithBody : Actor {
             walledTop = isWalled(hitbox, COLLIDING_TOP)
             walledBottom = isWalled(hitbox, COLLIDING_BOTTOM)
             colliding = isColliding(hitbox)
-            var ptrFeet = 0
-            var ptrBody = 0
-            forEachFeetTile {
-                if (ptrFeet < feetTiles.size) {
-                    feetTiles[ptrFeet] = it
-                    ptrFeet += 1
-                }
-            }
-            forEachOccupyingTile {
-                if (ptrBody < bodyTiles.size) {
-                    bodyTiles[ptrBody] = it
-                    ptrBody += 1
-                }
-            }
-            feetTiles.fill(null, ptrFeet)
-            bodyTiles.fill(null, ptrBody)
+
             if (isNoCollideWorld) {
                 walledLeft = false
                 walledRight = false
@@ -2014,6 +1999,19 @@ open class ActorWithBody : Actor {
         return tileProps.forEach(consumer)
     }
 
+    fun forEachFeetTileWithPos(consumer: (Point2i, ItemID) -> Unit) {
+        val y = intTilewiseHitbox.height.toInt() + 1
+        (0..intTilewiseHitbox.width.toInt()).map { x ->
+            val px = x + intTilewiseHitbox.startX.toInt()
+            val py = y + intTilewiseHitbox.startY.toInt()
+
+            val point = Point2i(px, py)
+            val item = world!!.getTileFromTerrain(px, py)
+
+            consumer(point, item)
+        }
+    }
+
     fun getFeetTiles(): List<Pair<Point2i, ItemID>> {
         val y = intTilewiseHitbox.height.toInt() + 1
         return (0..intTilewiseHitbox.width.toInt()).map { x ->
@@ -2027,11 +2025,12 @@ open class ActorWithBody : Actor {
         val particleCount = (collisionDamage / 24.0).pow(0.75)
         val trueParticleCount = particleCount.toInt() + (Math.random() < (particleCount % 1.0)).toInt()
 
-        if (collisionDamage > 1.0 / 1024.0) {
-//            printdbg(this, "Collision damage: $collisionDamage N, count: $particleCount, velocity: $vecSum, mass: ${this.mass}")
+        val feetTiles = getFeetTiles()
 
-            val feetTiles = getFeetTiles()
-            val feetTileIndices = feetTiles.indices.toList().toIntArray()
+        if (collisionDamage > 1.0 / 1024.0) {
+            printdbg(this, "Collision damage: $collisionDamage N, count: $particleCount, velocity: $vecSum, mass: ${this.mass}")
+            printdbg(this, "feetTileCount = ${feetTiles.size}")
+            val feetTileIndices = (feetTiles.indices).toList().toIntArray()
 
             for (i in 0 until trueParticleCount) {
                 if (i % feetTiles.size == 0) feetTileIndices.shuffle()
@@ -2043,17 +2042,22 @@ open class ActorWithBody : Actor {
                 }
             }
 
-            if (particleCount >= 1.0) {
-                val volumeMax = (particleCount.pow(0.75) / 8.0).coerceIn(0.0, 2.0)
-                val feetTileMats = feetTiles.map { BlockCodex[it.second].material }
-                val feetTileCnt = feetTileMats.size.toDouble()
-                val materialStats = feetTileMats.distinct().map { mat -> mat to feetTileMats.count { it == mat } }
-                materialStats.forEach { (mat, cnt) ->
-                    Terrarum.audioCodex.getRandomFootstep(mat)?.let {
-                        val vol = volumeMax * (cnt / feetTileCnt)
-                        startAudio(it, vol)
-                        printdbg(this, "Playing footstep $mat (vol: $vol, file: ${it.file.name})")
-                    }
+        }
+    }
+
+    private fun makeNoise(collisionDamage: Double) {
+        if (collisionDamage > 1.0 / 1024.0) {
+            val feetTiles = getFeetTiles()
+            val volumeMax = collisionDamage / 108
+            val feetTileMats = feetTiles.slice(0 until feetTiles.size).map { BlockCodex[it.second].material }
+            val feetTileCnt = feetTileMats.size.toDouble()
+            val materialStats = feetTileMats.distinct().map { mat -> mat to feetTileMats.count { it == mat } }
+
+            materialStats.forEach { (mat, cnt) ->
+                Terrarum.audioCodex.getRandomFootstep(mat)?.let {
+                    val vol = volumeMax * (cnt / feetTileCnt)
+                    startAudio(it, vol)
+                    printdbg(this, "Playing footstep $mat (vol: $vol, file: ${it.file.name}, cd: $collisionDamage)")
                 }
             }
         }
