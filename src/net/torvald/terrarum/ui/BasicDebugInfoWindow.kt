@@ -13,6 +13,7 @@ import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.audio.*
+import net.torvald.terrarum.audio.AudioMixer.dynamicSourceCount
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
 import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.controller.TerrarumController
@@ -450,7 +451,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private fun drawStrip(batch: SpriteBatch, x: Int, y: Int, track: TerrarumAudioMixerTrack, index: Int) {
         // back
-        batch.color = if (track.isMaster) COL_WELL4 else if (track.isBus) COL_WELL3 else trackBack[index % 2]
+        batch.color = if (track.trackType == TrackType.MASTER) COL_WELL4 else if (track.trackType == TrackType.BUS) COL_WELL3 else trackBack[index % 2]
         Toolkit.fillArea(batch, x, y, stripW, stripH)
 
         // strip/name separator
@@ -485,21 +486,39 @@ class BasicDebugInfoWindow : UICanvas() {
         val faderY = y + stripFilterHeight * numberOfFilters
 
         // receives (opposite of "sends")
-        track.sidechainInputs.filterNotNull().reversed().forEachIndexed { i, (side, mix) ->
-            val mixDb = fullscaleToDecibels(mix)
-            val perc = ((mixDb + 24.0).coerceAtLeast(0.0) / 24.0).toFloat()
+        if (track != AudioMixer.sfxSumTrack) {
+            track.sidechainInputs.filterNotNull().reversed().forEachIndexed { i, (side, mix) ->
+                val mixDb = fullscaleToDecibels(mix)
+                val perc = ((mixDb + 24.0).coerceAtLeast(0.0) / 24.0).toFloat()
+                // gauge background
+                batch.color = COL_METER_TROUGH
+                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW.toFloat(), 14f)
+                batch.color = COL_SENDS_GRAD2
+                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW * perc, 14f)
+                batch.color = COL_SENDS_GRAD
+                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, stripW * perc, 2f)
+
+                // label
+                batch.color = FILTER_NAME_ACTIVE
+                App.fontSmallNumbers.draw(batch, "\u00C0", x.toFloat(), faderY - (i + 1) * 16f + 1f)
+                App.fontSmallNumbers.draw(batch, side.name, x + 10f, faderY - (i + 1) * 16f + 1f)
+            }
+        }
+        else {
+            val i = 0
+            val perc = 1f
             // gauge background
             batch.color = COL_METER_TROUGH
-            Toolkit.fillArea(batch, x.toFloat(), faderY - (i+1)*16f, stripW.toFloat(), 14f)
+            Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW.toFloat(), 14f)
             batch.color = COL_SENDS_GRAD2
-            Toolkit.fillArea(batch, x.toFloat(), faderY - (i+1)*16f, stripW * perc, 14f)
+            Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW * perc, 14f)
             batch.color = COL_SENDS_GRAD
-            Toolkit.fillArea(batch, x.toFloat(), faderY - (i+1)*16f + 14f, stripW * perc, 2f)
+            Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, stripW * perc, 2f)
 
             // label
             batch.color = FILTER_NAME_ACTIVE
-            App.fontSmallNumbers.draw(batch, "\u00C0", x.toFloat(), faderY - (i+1)*16f + 1f)
-            App.fontSmallNumbers.draw(batch, side.name, x + 10f, faderY - (i+1)*16f + 1f)
+            App.fontSmallNumbers.draw(batch, "\u00C0", x.toFloat(), faderY - (i + 1) * 16f + 1f)
+            App.fontSmallNumbers.draw(batch, "DS($dynamicSourceCount)", x + 10f, faderY - (i + 1) * 16f + 1f)
         }
 
         // fader

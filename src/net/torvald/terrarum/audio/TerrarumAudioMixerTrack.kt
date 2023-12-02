@@ -15,13 +15,17 @@ import kotlin.math.pow
 
 typealias TrackVolume = Double
 
-class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, val isBus: Boolean = false, private val maxVolumeFun: () -> Double): Disposable {
+enum class TrackType {
+    STATIC_SOURCE, DYNAMIC_SOURCE, BUS, MASTER
+}
+
+class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, private val maxVolumeFun: () -> Double = {1.0}): Disposable {
 
     companion object {
         const val SAMPLING_RATE = 48000
         const val SAMPLING_RATEF = 48000f
         const val SAMPLING_RATED = 48000.0
-        val BUFFER_SIZE = 4 * App.getConfigInt("audiobuffersize") // n ms -> 384 * n
+        val BUFFER_SIZE = 4 * App.getConfigInt("audio_buffer_size") // n ms -> 384 * n
     }
 
     val hash = getHashStr()
@@ -52,10 +56,10 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, v
 
     inline fun <reified T> getFilter() = filters.filterIsInstance<T>().first()!!
 
-    internal val sidechainInputs = Array<Pair<TerrarumAudioMixerTrack, TrackVolume>?>(16)  { null }
+    internal val sidechainInputs = ArrayList<Pair<TerrarumAudioMixerTrack, TrackVolume>?>()
     internal fun getSidechains(): List<TerrarumAudioMixerTrack?> = sidechainInputs.map { it?.first }
     fun addSidechainInput(input: TerrarumAudioMixerTrack, inputVolume: TrackVolume) {
-        if (input.isMaster)
+        if (input.trackType == TrackType.MASTER)
             throw IllegalArgumentException("Cannot add master track as a sidechain")
 
         if (sidechainInputs.map { it?.first }.any { it?.hash == input.hash })
@@ -67,13 +71,8 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, v
         })
             throw IllegalArgumentException("The track '${input.hash}' contains current track (${this.hash}) as its sidechain")
 
-        val emptySpot = sidechainInputs.indexOf(null)
-        if (emptySpot != -1) {
-            sidechainInputs[emptySpot] = (input to inputVolume)
-        }
-        else {
-            throw IllegalStateException("Sidechain is full (${sidechainInputs.size})!")
-        }
+
+        sidechainInputs.add(input to inputVolume)
     }
 
 
@@ -87,7 +86,7 @@ class TerrarumAudioMixerTrack(val name: String, val isMaster: Boolean = false, v
         it.get(Gdx.audio) as Int
     }
     internal val adev: OpenALBufferedAudioDevice? =
-        if (isMaster) {
+        if (trackType == TrackType.MASTER) {
             OpenALBufferedAudioDevice(
                 Gdx.audio as OpenALLwjgl3Audio,
                 SAMPLING_RATE,

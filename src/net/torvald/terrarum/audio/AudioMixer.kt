@@ -45,17 +45,19 @@ object AudioMixer: Disposable {
     val guiVolume: Double
         get() = App.getConfigDouble("guivolume")
 
+    val dynamicSourceCount: Int
+        get() = App.getConfigInt("audio_dynamic_source_max")
 
     val tracks = Array(8) { TerrarumAudioMixerTrack(
         if (it == 0) "Music"
         else if (it == 1) "Ambient"
-        else if (it == 2) "Player"
-        else if (it == 3) "GUI"
+        else if (it == 2) "GUI"
+        else if (it == 3) "\u00E4SFX"
         else if (it == 4) "\u00F0 \u00E4 \u00F0" // summation
         else if (it == 5) "\u00D9Open\u00D9" // convolution1
         else if (it == 6) "\u00D9Cave\u00D9" // convolution2
         else if (it == 7) "\u00F0 \u00DA \u00F0" // fade
-        else "Trk${it+1}", isBus = (it >= 4), maxVolumeFun = {
+        else "Trk${it+1}", trackType = if (it >= 3) TrackType.BUS else TrackType.STATIC_SOURCE, maxVolumeFun = {
             when (it) {
                 0 -> { musicVolume }
                 1 -> { ambientVolume }
@@ -66,15 +68,20 @@ object AudioMixer: Disposable {
         }
     ) }
 
-    val masterTrack = TerrarumAudioMixerTrack("\u00DBMASTER", true) { masterVolume }
+    val dynamicTracks = Array(dynamicSourceCount) { TerrarumAudioMixerTrack(
+        "DS${(it + 1).toString().padStart(3, '0')}",
+        TrackType.DYNAMIC_SOURCE
+    ) }
+
+    val masterTrack = TerrarumAudioMixerTrack("\u00DBMASTER", TrackType.MASTER) { masterVolume }
 
     val musicTrack: TerrarumAudioMixerTrack
         get() = tracks[0]
     val ambientTrack: TerrarumAudioMixerTrack
         get() = tracks[1]
-    val sfxMixTrack: TerrarumAudioMixerTrack
-        get() = tracks[2]
     val guiTrack: TerrarumAudioMixerTrack
+        get() = tracks[2]
+    val sfxSumTrack: TerrarumAudioMixerTrack
         get() = tracks[3]
 
     val sumBus: TerrarumAudioMixerTrack
@@ -145,10 +152,7 @@ object AudioMixer: Disposable {
     init {
         // initialise audio paths //
 
-//        musicTrack.filters[1] = BinoPan(0f)
-//        musicTrack.filters[2] = Reverb(36f, 0.92f, 1200f)
-
-        listOf(musicTrack, ambientTrack, sfxMixTrack, guiTrack).forEach {
+        listOf(musicTrack, ambientTrack, sfxSumTrack, guiTrack).forEach {
             it.filters[0] = Gain(1f)
         }
 
@@ -159,7 +163,7 @@ object AudioMixer: Disposable {
         listOf(sumBus, convolveBusOpen, convolveBusCave).forEach {
             it.addSidechainInput(musicTrack, 1.0)
             it.addSidechainInput(ambientTrack, 1.0)
-            it.addSidechainInput(sfxMixTrack, 1.0)
+            it.addSidechainInput(sfxSumTrack, 1.0)
         }
 
         convolveBusOpen.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - PurgatoryChasm.bin"))
@@ -178,9 +182,14 @@ object AudioMixer: Disposable {
         masterTrack.addSidechainInput(fadeBus, 1.0)
         masterTrack.addSidechainInput(guiTrack, 1.0)
 
+        dynamicTracks.forEach {
+            it.filters[0] = BinoPan(0f)
+            sfxSumTrack.addSidechainInput(it, 1.0)
+        }
 
         parallelProcessingSchedule = arrayOf(
-            arrayOf(musicTrack, ambientTrack, sfxMixTrack, guiTrack),
+            arrayOf(musicTrack, ambientTrack, guiTrack),
+            dynamicTracks,
             arrayOf(sumBus, convolveBusOpen, convolveBusCave),
             arrayOf(fadeBus),
             arrayOf(masterTrack)
@@ -204,7 +213,7 @@ object AudioMixer: Disposable {
     )
 
     private val fadeReqs = HashMap<TerrarumAudioMixerTrack, FadeRequest>().also { map ->
-        listOf(musicTrack, ambientTrack, sfxMixTrack, guiTrack, fadeBus).forEach {
+        listOf(musicTrack, ambientTrack, guiTrack, fadeBus).forEach {
             map[it] = FadeRequest()
         }
     }
@@ -264,7 +273,7 @@ object AudioMixer: Disposable {
         masterTrack.volume = masterVolume
         musicTrack.getFilter<Gain>().gain = musicVolume.toFloat()
         ambientTrack.getFilter<Gain>().gain = ambientVolume.toFloat()
-        sfxMixTrack.getFilter<Gain>().gain = sfxVolume.toFloat()
+        sfxSumTrack.getFilter<Gain>().gain = sfxVolume.toFloat()
         guiTrack.getFilter<Gain>().gain = guiVolume.toFloat()
 
 

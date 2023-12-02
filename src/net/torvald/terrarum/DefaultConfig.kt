@@ -21,7 +21,9 @@ object DefaultConfig {
             "screenheight" to TerrarumScreenSize.defaultH,
             "fullscreen" to false,
             "atlastexsize" to 2048,
-            "audiobuffersize" to 512,
+
+            "audio_buffer_size" to 512,
+            "audio_dynamic_source_max" to 128,
 
             "language" to App.getSysLang(),
             "notificationshowuptime" to 4000, // 4s

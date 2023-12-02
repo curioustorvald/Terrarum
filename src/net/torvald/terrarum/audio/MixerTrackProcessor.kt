@@ -68,7 +68,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
             // Your code here
 
             // fetch deviceBufferSize amount of sample from the disk
-            if (!track.isMaster && !track.isBus && track.streamPlaying) {
+            if (track.trackType != TrackType.MASTER && track.trackType != TrackType.BUS && track.streamPlaying) {
                 streamBuf.fetchBytes {
                     val bytesRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
                     if (bytesRead == null || bytesRead <= 0) { // some class (namely Mp3) may return 0 instead of negative value
@@ -87,7 +87,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
             var bufEmpty = false
 
             // get samples and apply the fader
-            if (track.isMaster || track.isBus) {
+            if (track.trackType == TrackType.MASTER || track.trackType == TrackType.BUS) {
                 // combine all the inputs
                 samplesL1 = FloatArray(bufferSize / 4)
                 samplesR1 = FloatArray(bufferSize / 4)
@@ -164,7 +164,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
 
             // by this time, the output buffer is filled with processed results, pause the execution
-            if (!track.isMaster) {
+            if (track.trackType != TrackType.MASTER) {
                 this.pause()
             }
             else {
@@ -246,7 +246,7 @@ private fun <T> Queue<T>.removeFirstOrElse(function: () -> T): T {
 
 class FeedSamplesToAdev(val bufferSize: Int, val rate: Int, val track: TerrarumAudioMixerTrack) : Runnable {
     init {
-        if (!track.isMaster) throw IllegalArgumentException("Track is not master")
+        if (track.trackType != TrackType.MASTER) throw IllegalArgumentException("Track is not master")
     }
 
     val sleepTime = (1000000000.0 * ((bufferSize / 4.0) / TerrarumAudioMixerTrack.SAMPLING_RATED)).toLong()
