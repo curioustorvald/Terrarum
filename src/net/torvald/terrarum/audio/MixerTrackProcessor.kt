@@ -2,6 +2,7 @@ package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.audio.dsp.BinoPan
 import net.torvald.terrarum.audio.dsp.NullFilter
@@ -41,7 +42,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
     private val distFalloff = 2048.0
 
     private fun printdbg(msg: Any) {
-        if (true) println("[AudioAdapter ${track.name}] $msg")
+        if (true) App.printdbg("AudioAdapter ${track.name}", msg)
     }
     override fun run() {
 //        while (running) { // uncomment to multithread
@@ -80,8 +81,8 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                         track.volume = track.maxVolume
                         (track.filters[0] as BinoPan).pan = 0f
                     }
-                    else {
-                        val relativeXpos = relativeXposition(AudioMixer.actorNowPlaying!!, track.trackingTarget!!)
+                    else if (track.trackingTarget is ActorWithBody) {
+                        val relativeXpos = relativeXposition(AudioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
                         track.volume = track.maxVolume * (1.0 - relativeXpos.absoluteValue.pow(0.5) / distFalloff)
                         (track.filters[0] as BinoPan).pan = ((2*asin(relativeXpos / distFalloff)) / Math.PI).toFloat()
                     }
@@ -91,6 +92,10 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
             // fetch deviceBufferSize amount of sample from the disk
             if (track.trackType != TrackType.MASTER && track.trackType != TrackType.BUS && track.streamPlaying) {
+                if (track.trackType == TrackType.DYNAMIC_SOURCE) {
+                    printdbg("${track.name} streaming")
+                }
+
                 streamBuf.fetchBytes {
                     val bytesRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
                     if (bytesRead == null || bytesRead <= 0) { // some class (namely Mp3) may return 0 instead of negative value

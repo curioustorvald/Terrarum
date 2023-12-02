@@ -261,7 +261,20 @@ $BULLET Ambient sound recordings:
     - crickets_02.ogg
 
 Copyright (C) 2012, 2013, 2015, 2016, 2017 Klankbeeld
-Sound from <https://www.freesound.org/people/klankbeeld/>
+Sound from <https://www.freesound.org/people/klankbeeld>
+
+
+
+$BULLET Footstep sound recordings:
+
+    - GRSS_01..06.ogg
+    - GRVL_01..07.ogg
+    - ROCK_01..09.ogg
+    - SAND_01..04.ogg
+    - WOOD_01..03.ogg
+
+Copyright (C) 2020, 2021, 2022 Nox Sound
+Sound from <https://freesound.org/people/Nox_Sound>
 
 
 

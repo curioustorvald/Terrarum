@@ -9,6 +9,7 @@ import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.audio.dsp.TerrarumAudioFilter
+import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.getHashStr
 import net.torvald.terrarum.hashStrMap
@@ -22,7 +23,7 @@ enum class TrackType {
     STATIC_SOURCE, DYNAMIC_SOURCE, BUS, MASTER
 }
 
-class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, private val maxVolumeFun: () -> Double = {1.0}): Disposable {
+class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, var maxVolumeFun: () -> Double = {1.0}): Disposable {
 
     companion object {
         const val SAMPLING_RATE = 48000
@@ -57,7 +58,7 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, privat
 
     val filters: Array<TerrarumAudioFilter> = Array(4) { NullFilter }
 
-    var trackingTarget: ActorWithBody? = null
+    var trackingTarget: Actor? = null
 
     var playStartedTime = 0L; private set
 
@@ -140,9 +141,16 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, privat
     fun stop() {
         currentTrack?.gdxMusic?.forceInvoke<Int>("reset", arrayOf())
         streamPlaying = false
-        playStartedTime = 0L
+//        playStartedTime = 0L
+
+        if (trackingTarget != null && currentTrack != null) {
+            trackingTarget!!.onAudioInterrupt(currentTrack!!)
+        }
+
         fireSongFinishHook()
         // fireSoundFinishHook()
+
+        trackingTarget = null
     }
 
     fun fireSongFinishHook() {

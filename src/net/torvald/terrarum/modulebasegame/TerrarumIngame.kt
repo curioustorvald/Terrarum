@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
+import net.torvald.terrarum.Terrarum.audioCodex
 import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
 import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
@@ -1586,7 +1587,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
         musicGovernor.dispose()
-
+        audioCodex.dispose()
         super.dispose()
     }
 }

@@ -11,6 +11,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
+import net.torvald.terrarum.audio.AudioCodex
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gamecontroller.KeyToggler
@@ -2039,6 +2040,20 @@ open class ActorWithBody : Actor {
                     val px = hitbox.startX + Math.random() * hitbox.width
                     val py = hitbox.endY
                     makeDust0(tile, px, py, particleCount, collisionDamage, vecSum)
+                }
+            }
+
+            if (particleCount >= 1.0) {
+                val volumeMax = (particleCount.pow(0.75) / 8.0).coerceIn(0.0, 2.0)
+                val feetTileMats = feetTiles.map { BlockCodex[it.second].material }
+                val feetTileCnt = feetTileMats.size.toDouble()
+                val materialStats = feetTileMats.distinct().map { mat -> mat to feetTileMats.count { it == mat } }
+                materialStats.forEach { (mat, cnt) ->
+                    Terrarum.audioCodex.getRandomFootstep(mat)?.let {
+                        val vol = volumeMax * (cnt / feetTileCnt)
+                        startAudio(it, vol)
+                        printdbg(this, "Playing footstep $mat (vol: $vol, file: ${it.file.name})")
+                    }
                 }
             }
         }

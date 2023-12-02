@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.App.setToGameConfig
+import net.torvald.terrarum.audio.AudioCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.OreCodex
 import net.torvald.terrarum.blockproperties.WireCodex
@@ -464,6 +465,16 @@ object ModMgr {
             return dir.listFiles()
         }
     }
+    fun getGdxFiles(module: String, path: String): Array<FileHandle> {
+        checkExistence(module)
+        val dir = getGdxFile(module, path)
+        if (!dir.isDirectory) {
+            throw FileNotFoundException("The path is not a directory")
+        }
+        else {
+            return dir.list()
+        }
+    }
 
     /** Get a common file (literal file or directory) from all the installed mods. Files are guaranteed to exist. If a mod does not
      * contain the file, the mod will be skipped.
@@ -665,6 +676,35 @@ object ModMgr {
 
         @JvmStatic operator fun invoke(module: String) {
             Terrarum.materialCodex.fromModule(module, matePath + "materials.csv")
+        }
+    }
+
+    object GameAudioLoader {
+        val audioPath = listOf(
+            "audio/music",
+            "audio/effects",
+            "audio/ambient",
+        )
+
+        init {
+            Terrarum.audioCodex = AudioCodex()
+        }
+
+        private fun loadAudio(basename: String, file: FileHandle) {
+            if (file.isDirectory)
+                file.list().forEach { loadAudio("$basename.${it.nameWithoutExtension()}", it) }
+            else {
+                val id = basename
+                val materialID = file.nameWithoutExtension().substringBefore('_')
+                Terrarum.audioCodex.addToFootstepPool(materialID, file)
+                printdbg(this, "Registering music $id")
+            }
+        }
+
+        @JvmStatic operator fun invoke(module: String) {
+            audioPath.forEach {
+                getGdxFiles(module, it).forEach { file -> loadAudio("audio.${file.name()}", file) }
+            }
         }
     }
 

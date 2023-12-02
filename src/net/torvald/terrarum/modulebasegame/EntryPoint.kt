@@ -43,6 +43,7 @@ class EntryPoint : ModuleEntryPoint() {
         ModMgr.GameOreLoader.invoke(moduleName)
         ModMgr.GameLanguageLoader.invoke(moduleName)
         ModMgr.GameCraftingRecipeLoader.invoke(moduleName)
+        ModMgr.GameAudioLoader.invoke(moduleName)
 
         if (App.IS_DEVELOPMENT_BUILD) {
             println("[EntryPoint] Crafting Recipes: ")

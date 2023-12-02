@@ -101,18 +101,14 @@ object AudioMixer: Disposable {
      * Return oldest dynamic track, even if the track is currently playing
      */
     fun getFreeTrackNoMatterWhat(): TerrarumAudioMixerTrack {
-        return dynamicTracks.minBy { it.playStartedTime }
+        return getFreeTrack() ?: dynamicTracks.minBy { it.playStartedTime }
     }
 
     /**
      * Return oldest dynamic track that is not playing
      */
     fun getFreeTrack(): TerrarumAudioMixerTrack? {
-        val oldestTrack = dynamicTracks.minBy { it.playStartedTime }
-        return if (oldestTrack.isPlaying)
-            null
-        else
-            oldestTrack
+        return dynamicTracks.filter { it.trackingTarget == null && !it.isPlaying }.minByOrNull { it.playStartedTime }
     }
 
     private val processingExecutor = ThreadExecutor()

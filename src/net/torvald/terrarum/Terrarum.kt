@@ -16,6 +16,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.audio.AudioCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.FluidCodex
 import net.torvald.terrarum.blockproperties.OreCodex
@@ -78,6 +79,7 @@ object Terrarum : Disposable {
     var apocryphas = HashMap<String, Any>(); internal set
     var fluidCodex = FluidCodex(); internal set
     var oreCodex = OreCodex(); internal set
+    var audioCodex = AudioCodex(); internal set
 
 
     //////////////////////////////

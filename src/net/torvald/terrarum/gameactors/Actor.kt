@@ -3,11 +3,13 @@ package net.torvald.terrarum.gameactors
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
+import net.torvald.terrarum.audio.TrackVolume
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
@@ -120,13 +122,17 @@ abstract class Actor : Comparable<Actor>, Runnable {
             }
         }
 
+        printdbg(this, "Dynamic Source ${track?.name}")
+
         return track
     }
 
-    open fun startAudio(music: MusicContainer) {
+    open fun startAudio(music: MusicContainer, volume: TrackVolume = 1.0) {
         getTrackByAudio(music)?.let {
-            it.trackingTarget = if (this is ActorWithBody) this else null
+            it.stop()
+            it.trackingTarget = this
             it.currentTrack = music
+            it.maxVolumeFun = { volume }
             it.play()
         }
     }
