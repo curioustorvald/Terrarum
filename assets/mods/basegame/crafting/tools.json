@@ -16,7 +16,7 @@
     "ingredients": [[1, 6, "$ROCK", 2, "item@basegame:18"]]
   },
   "item@basegame:24": { /* stone axe */
-  "workbench": "basiccrafting",
-  "ingredients": [[1, 6, "$ROCK", 2, "item@basegame:18"]]
-}
+    "workbench": "basiccrafting",
+    "ingredients": [[1, 6, "$ROCK", 2, "item@basegame:18"]]
+  }
 }

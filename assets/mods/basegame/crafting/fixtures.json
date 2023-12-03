@@ -2,7 +2,7 @@
   "basegame:176": { /* torch */
     "workbench": "",
     "ingredients": [
-      [4, 1, "item@basegame:18", 1, "item@basegame:130"] /* 4 torches = 1 stick, 1 coal */
+      [5, 1, "item@basegame:18", 1, "item@basegame:130"] /* 5 torches = 1 stick, 1 coal */
     ]
   },
   "item@basegame:5": { /* tiki torch */
@@ -17,6 +17,12 @@
     "workbench": "",
     "ingredients": [
       [1, 8, "$WOOD"]
+    ]
+  },
+  "item@basegame:17": { /* basic smelter */
+    "workbench": "",
+    "ingredients": [
+      [1, 20, "$ROCK", 10, "item@basegame:25"] /* 1 smelter = 20 rocks, 10 clay balls */
     ]
   },
 

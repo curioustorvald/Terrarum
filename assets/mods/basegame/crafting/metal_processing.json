@@ -1,0 +1,34 @@
+{
+  "item@basegame:112": { /* copper */
+    "workbench": "basicsmelter",
+    "ingredients": [[1, 2, "item@basegame:128"]]
+  },
+  "item@basegame:113": { /* iron */
+    "workbench": "basicsmelter",
+    "ingredients": [[1, 2, "item@basegame:129"]]
+  },
+  "item@basegame:114": { /* coal coke */
+    "workbench": "basicsmelter",
+    "ingredients": [[1, 1, "item@basegame:130"]]
+  },
+  "item@basegame:115": { /* zinc */
+    "workbench": "basicsmelter",
+    "ingredients": [[1, 2, "item@basegame:131"]]
+  },
+  "item@basegame:116": { /* tin */
+    "workbench": "basicsmelter",
+    "ingredients": [[1, 2, "item@basegame:132"]]
+  },
+  "item@basegame:117": { /* gold */
+    "workbench": "basicsmelter",
+    "ingredients": [[1, 2, "item@basegame:133"]]
+  },
+  "item@basegame:118": { /* silver */
+    "workbench": "basicsmelter",
+    "ingredients": [[1, 2, "item@basegame:134"]]
+  },
+  "item@basegame:119": { /* lead */
+    "workbench": "basicsmelter",
+    "ingredients": [[1, 2, "item@basegame:135"]]
+  }
+}

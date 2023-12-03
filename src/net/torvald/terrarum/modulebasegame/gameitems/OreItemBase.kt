@@ -152,11 +152,51 @@ class OreLead(originalID: ItemID) : OreItemBase(originalID) {
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,6)
 }
+
+class IngotCopper(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_COPPER"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,5)
+}
+class IngotIron(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_IRON"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,5)
+}
 class ItemCoalCoke(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_COAL_COKE"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,6)
 }
+class IngotZinc(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_ZINC"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(4,5)
+}
+class IngotTin(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_TIN"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(5,5)
+}
+class IngotGold(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_GOLD"
+    override val materialId: String = "AURM"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(6, 5)
+}
+class IngotSilver(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_SILVER"
+    override val materialId: String = "ARGN"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(7,5)
+}
+class IngotLead(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_LEAD"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,5)
+}
+
+
 class ItemClayBall(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "BLOCK_CLAY"
     override val itemImage: TextureRegion

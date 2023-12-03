@@ -15,7 +15,7 @@ id;classname
 14;net.torvald.terrarum.modulebasegame.gameitems.PickaxeWood
 15;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerWood
 16;net.torvald.terrarum.modulebasegame.gameitems.ItemWorkbench
-17;net.torvald.terrarum.modulebasegame.gameitems.ItemCoalCoke
+17;net.torvald.terrarum.modulebasegame.gameitems.ItemSmelterBasic
 18;net.torvald.terrarum.modulebasegame.gameitems.OreStick
 19;net.torvald.terrarum.modulebasegame.gameitems.AxeCopper
 20;net.torvald.terrarum.modulebasegame.gameitems.AxeIron
@@ -24,6 +24,16 @@ id;classname
 23;net.torvald.terrarum.modulebasegame.gameitems.PickaxeStone
 24;net.torvald.terrarum.modulebasegame.gameitems.AxeStone
 25;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBall
+
+# ingots
+112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper
+113;net.torvald.terrarum.modulebasegame.gameitems.IngotIron
+114;net.torvald.terrarum.modulebasegame.gameitems.ItemCoalCoke
+115;net.torvald.terrarum.modulebasegame.gameitems.IngotZinc
+116;net.torvald.terrarum.modulebasegame.gameitems.IngotTin
+117;net.torvald.terrarum.modulebasegame.gameitems.IngotGold
+118;net.torvald.terrarum.modulebasegame.gameitems.IngotSilver
+119;net.torvald.terrarum.modulebasegame.gameitems.IngotLead
 
 # ores
 128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper
@@ -34,6 +44,7 @@ id;classname
 133;net.torvald.terrarum.modulebasegame.gameitems.OreGold
 134;net.torvald.terrarum.modulebasegame.gameitems.OreSilver
 135;net.torvald.terrarum.modulebasegame.gameitems.OreLead
+
 
 # gemstones
 #144; gems
