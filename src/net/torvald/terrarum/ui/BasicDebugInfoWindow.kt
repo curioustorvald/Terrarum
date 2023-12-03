@@ -413,7 +413,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val FILTER_BYPASSED = Color(0xf1b934_bf.toInt())
     private val trackBack = listOf(COL_WELL, COL_WELL2)
 
-    private val trackCount = 64//(AudioMixer.tracks + AudioMixer.masterTrack).size
+    private val trackCount = 16 // cannot call AudioMixer now
     private val mixerLastTimeHadClipping = Array(trackCount) { arrayOf(0L, 0L) }
     private val clippingHoldTime = 60000L * 3 // 3 mins
 
@@ -422,7 +422,7 @@ class BasicDebugInfoWindow : UICanvas() {
         val x = App.scr.width - 186 - (AudioMixer.tracks.size + 1) * (stripW + stripGap)
         val y = App.scr.height - 38 - stripH
 
-        val strips = /*AudioMixer.dynamicTracks.sliceArray(0..7) +*/ AudioMixer.tracks + AudioMixer.masterTrack
+        val strips = AudioMixer.tracks + AudioMixer.masterTrack
 
 //        batch.color = COL_MIXER_BACK
 //        Toolkit.fillArea(batch, x - stripGap, y - stripGap, strips.size * (stripW + stripGap) + stripGap, stripH + 2*stripGap)
@@ -436,18 +436,73 @@ class BasicDebugInfoWindow : UICanvas() {
             // draw
             drawStrip(batch, x + index * (stripW + stripGap), y, track, index)
         }
+
+
+        val dss = AudioMixer.dynamicTracks
+        dss.forEachIndexed { index, track ->
+            val px = x - (miniW + 5) * (1 + (index / 11))
+            val py = y + (miniH + stripGap) * (index % 11)
+            drawDynamicSource(batch, px, py, track, index)
+        }
     }
 
     private val dbOver = 6.0
     private val dbLow = 60.0
 
     private val oldPeak = Array(trackCount) { arrayOf(0.0, 0.0) }
+    private val oldPeakDS = Array(256) { arrayOf(0.0, 0.0) }
     private val oldRMS = Array(trackCount) { arrayOf(0.0, 0.0) }
     private val oldComp = Array(trackCount) { arrayOf(0.0, 0.0) }
 
     private fun getSmoothingFactor(sampleCount: Int) = 1.0 - (BUFFER_SIZE / (4.0 * sampleCount))
     private val PEAK_SMOOTHING_FACTOR = getSmoothingFactor(640)
+    private val LAMP_SMOOTHING_FACTOR = getSmoothingFactor(3200)
     private val RMS_SMOOTHING_FACTOR = getSmoothingFactor(12000)
+
+    val miniW = 28
+    val miniH = 35
+    private val LAMP_OVERRANGE = Color(0xff6666aa.toInt())
+
+    private fun drawDynamicSource(batch: SpriteBatch, x: Int, y: Int, track: TerrarumAudioMixerTrack, index: Int) {
+        // back
+        batch.color = if (track.isPlaying) COL_WELL3 else COL_WELL
+        Toolkit.fillArea(batch, x, y, miniW, miniH)
+
+        // pan
+        val panw = (track.filters[0] as BinoPan).pan * 0.5f * miniW
+        batch.color = COL_METER_GRAD
+        Toolkit.fillArea(batch, x.toFloat(), y.toFloat(), miniW.toFloat(), 2f)
+        batch.color = COL_METER_GRAD2
+        Toolkit.fillArea(batch, x + miniW / 2f, y.toFloat(), panw, 2f)
+
+        // voltage lamp
+        for (ch in 0..1) {
+            val fs =
+                FastMath.interpolateLinear(LAMP_SMOOTHING_FACTOR, track.processor.maxSigLevel[ch], oldPeakDS[index][ch])
+            batch.color = COL_METER_TROUGH
+            val intensity = fullscaleToDecibels(fs.coerceAtMost(1.0)).plus(dbLow).div(dbLow).coerceIn(0.0, 1.0).toFloat()
+            Toolkit.fillArea(batch, x, y + 2, miniW, 8)
+            batch.color = if (fs > 1.0) LAMP_OVERRANGE else Color(0.1f, intensity, 0.1f, 0.666f)
+            Toolkit.fillArea(batch, x + 2 + 13*ch, y + 4, 11, 4)
+
+            oldPeakDS[index][ch] = fs
+        }
+
+        // slider level text
+        val dB = track.dBfs
+        val dBstr = dB.toIntAndFrac(3,1).replace("-", " ").substring(1)
+        batch.color = if (track.volume > 1.0) LAMP_OVERRANGE else FILTER_NAME_ACTIVE
+        App.fontSmallNumbers.draw(batch, dBstr, x + 1f, y + 10f)
+
+        // strip/name separator
+        batch.color = COL_METER_GRAD2
+        Toolkit.fillArea(batch, x, y + 22, miniW, 2)
+
+        // track name
+        batch.color = FILTER_NAME_ACTIVE
+        val trackName = track.name.substring(2)
+        App.fontSmallNumbers.draw(batch, trackName, x + 1f + (miniW - trackName.length * 7) / 2, y  + 23f)
+    }
 
     private fun drawStrip(batch: SpriteBatch, x: Int, y: Int, track: TerrarumAudioMixerTrack, index: Int) {
         // back
@@ -458,7 +513,7 @@ class BasicDebugInfoWindow : UICanvas() {
         batch.color = COL_METER_GRAD2
         Toolkit.fillArea(batch, x, y + stripH - 16, stripW, 2)
 
-        // name text
+        // track name
         batch.color = FILTER_NAME_ACTIVE
         App.fontSmallNumbers.draw(batch, track.name, x + 1f + (stripW - track.name.length * 7) / 2, y + stripH - 13f)
 
