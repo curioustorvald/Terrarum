@@ -1587,7 +1587,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
         musicGovernor.dispose()
-        audioCodex.dispose()
         super.dispose()
     }
 }

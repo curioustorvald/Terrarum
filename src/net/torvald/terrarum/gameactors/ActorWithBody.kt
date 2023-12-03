@@ -2047,7 +2047,7 @@ open class ActorWithBody : Actor {
 
     private fun makeNoise(collisionDamage: Double) {
         val DIVIDER = 108.0
-        if (collisionDamage / DIVIDER >= 0.1) { // only make noise when the expected volume is at least -20dBfs
+        if (collisionDamage / DIVIDER >= 0.05) { // only make noise when the expected volume is at least -26dBfs
             val feetTiles = getFeetTiles()
             val volumeMax = collisionDamage / DIVIDER
             val feetTileMats = feetTiles.slice(feetTiles.indices).map { BlockCodex[it.second].material }
