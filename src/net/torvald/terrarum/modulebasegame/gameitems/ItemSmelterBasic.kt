@@ -13,7 +13,7 @@ class ItemSmelterBasic(originalID: ItemID) : FixtureItemBase(originalID, "net.to
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/smelter_basic.tga")
+        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/smelter_tall.tga")
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_SMELTER_BASIC"
