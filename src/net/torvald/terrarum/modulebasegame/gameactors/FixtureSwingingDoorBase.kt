@@ -43,6 +43,7 @@ open class FixtureSwingingDoorBase : FixtureBase {
     private var pixelwiseHitboxHeight = TILE_SIZE * tilewiseHitboxHeight
     private var tilewiseDistToAxis = tw - twClosed
 
+    @Transient override val spawnNeedsWall = true
     @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), Cvec(0)))
     // the Cvec will be calculated dynamically on Update
     @Transient override var shadeBoxList = arrayListOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), Cvec(0)))

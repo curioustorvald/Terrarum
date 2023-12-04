@@ -13,6 +13,8 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 internal class FixtureStorageChest : FixtureBase {
 
+    @Transient override val spawnNeedsFloor = true
+
     constructor() : super(
             BlockBox(BlockBox.ALLOW_MOVE_DOWN, 1, 1),
             mainUI = UIStorageChest(),

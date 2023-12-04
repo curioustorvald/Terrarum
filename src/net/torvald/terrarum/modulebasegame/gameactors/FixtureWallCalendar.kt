@@ -13,6 +13,8 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class FixtureWallCalendar : FixtureBase {
 
+    @Transient override val spawnNeedsWall = true
+
     constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 1),
             nameFun = { Lang["ITEM_CALENDAR"] },

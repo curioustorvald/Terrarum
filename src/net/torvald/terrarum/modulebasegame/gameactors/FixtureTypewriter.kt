@@ -10,6 +10,7 @@ import kotlin.math.roundToInt
  */
 class FixtureTypewriter : FixtureBase {
 
+    @Transient override val spawnNeedsFloor = true
     var typewriterKeymapName = "us_qwerty" // used to control the keyboard input behaviour
         private set
 

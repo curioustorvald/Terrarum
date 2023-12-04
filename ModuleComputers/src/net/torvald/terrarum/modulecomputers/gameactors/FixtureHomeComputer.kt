@@ -18,6 +18,8 @@ import net.torvald.tsvm.peripheral.VMProgramRom
  */
 class FixtureHomeComputer : FixtureBase {
 
+    @Transient override val spawnNeedsFloor = true
+
     // TODO: write serialiser for TSVM && allow mods to have their own serialiser
     private val vm = VM(ModMgr.getGdxFile("dwarventech", "bios").path(), 0x200000, TheRealWorld(), arrayOf(
             VMProgramRom(ModMgr.getGdxFile("dwarventech", "bios/tsvmbios.js").path())

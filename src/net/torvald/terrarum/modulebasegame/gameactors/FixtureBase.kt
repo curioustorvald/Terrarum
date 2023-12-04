@@ -137,6 +137,9 @@ open class Electric : FixtureBase {
  */
 open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
+    @Transient open val spawnNeedsWall: Boolean = false
+    @Transient open val spawnNeedsFloor: Boolean = false
+
     /** Real time, in nanoseconds */
     @Transient var spawnRequestedTime: Long = 0L
         protected set
@@ -215,6 +218,17 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         }
     }
 
+    private fun <S, T> List<S>.cartesianProduct(other: List<T>) = this.flatMap { thisIt ->
+        other.map { otherIt ->
+            thisIt to otherIt
+        }
+    }
+
+    val everyBlockboxPos: List<Pair<Int, Int>>?
+        get() = worldBlockPos?.let { (posX, posY) ->
+            (posX until posX + blockBox.width).toList().cartesianProduct((posY until posY + blockBox.height).toList())
+        }
+
     override fun updateForTerrainChange(cue: IngameInstance.BlockChangeQueueItem) {
         placeActorBlocks()
     }
@@ -237,19 +251,31 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     fun canSpawnHere(posX0: Int, posY0: Int): Boolean {
         val posX = (posX0 - blockBox.width.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
         val posY = posY0 - blockBox.height + 1
+        return canSpawnHere0(posX, posY)
+    }
+
+    private fun canSpawnHere0(posX: Int, posY: Int): Boolean {
+        val everyBlockboxPos = (posX until posX + blockBox.width).toList().cartesianProduct((posY until posY + blockBox.height).toList())
 
         // check for existing blocks (and fixtures)
-        var hasCollision = false
+        var cannotSpawn = false
         worldBlockPos = Point2i(posX, posY)
-        forEachBlockbox { x, y, _, _ ->
-            if (!hasCollision) {
-                val tile = world!!.getTileFromTerrain(x, y)
-                if (!BlockCodex[tile].hasTag("INCONSEQUENTIAL")) {
-                    hasCollision = true
-                }
-            }
+
+        cannotSpawn = everyBlockboxPos.any { (x, y) -> !BlockCodex[world!!.getTileFromTerrain(x, y)].hasTag("INCONSEQUENTIAL") }
+
+        // check for walls, if spawnNeedsWall = true
+        if (spawnNeedsWall) {
+            cannotSpawn = cannotSpawn or everyBlockboxPos.any { (x, y) -> !BlockCodex[world!!.getTileFromWall(x, y)].isSolid }
         }
-        return !hasCollision
+
+        // check for floors, if spawnNeedsFloor == true
+        if (spawnNeedsFloor) {
+            val y = posY + blockBox.height
+            val xs = posX until posX + blockBox.width
+            cannotSpawn = cannotSpawn or xs.any { x -> !BlockCodex[world!!.getTileFromTerrain(x, y)].isSolid }
+        }
+
+        return !cannotSpawn
     }
 
     /**
@@ -329,16 +355,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         )
 
         // check for existing blocks (and fixtures)
-        var hasCollision = false
-        forEachBlockbox { x, y, _, _ ->
-            if (!hasCollision) {
-                val tile = world!!.getTileFromTerrain(x, y)
-                if (!BlockCodex[tile].hasTag("INCONSEQUENTIAL")) {
-                    hasCollision = true
-                }
-            }
-        }
-        if (hasCollision) {
+        if (!canSpawnHere0(posX, posY)) {
             printdbg(this, "cannot spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
             return false
         }

@@ -22,6 +22,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
+    @Transient override val spawnNeedsFloor = true
     @Transient override val tags = listOf("basicsmelter")
 
     constructor() : super(
