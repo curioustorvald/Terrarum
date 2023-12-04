@@ -11,9 +11,7 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
 
     val fftLen: Int
     private val convFFT: Array<ComplexArray>
-    private val convFFTpartd: Array<Array<ComplexArray>> // index: Channel, partition, frequencies
-    private val inputPartd: Array<Array<FloatArray>> // index: Channel, partition, frequencies
-    private val inbuf: Array<FloatArray>
+    private val inbuf: Array<ComplexArray>
 
     private val BLOCKSIZE = TerrarumAudioMixerTrack.BUFFER_SIZE / 4
 
@@ -33,7 +31,7 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
         println("IR '${ir.path}' Sample Count = $sampleCount; FFT Length = $fftLen")
 
         val conv = Array(2) { FloatArray(fftLen) }
-        inbuf = Array(2) { FloatArray(fftLen) }
+        inbuf = Array(2) { ComplexArray(FloatArray(fftLen * 2)) }
 
         ir.inputStream().let {
             for (i in 0 until sampleCount) {
@@ -70,42 +68,6 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
         }
         partSizes = master0.toIntArray()
         partOffsets = master0.toIntArray().also { it[0] = 0 }
-
-
-        convFFTpartd = Array(2) {
-            Array(partSizes.size) {
-                ComplexArray(FloatArray(2*partSizes[it]))
-            }
-        }
-        inputPartd = Array(2) {
-            Array(partSizes.size) {
-                FloatArray(partSizes[it])
-            }
-        }
-        fillUnevenly(convFFT[0], convFFTpartd[0])
-        fillUnevenly(convFFT[1], convFFTpartd[1])
-    }
-
-    private fun fillUnevenly(source: ComplexArray, dest: Array<ComplexArray>) {
-        for (i in partSizes.indices) {
-            val len = 2*partSizes[i]
-            val offset = 2*partOffsets[i]
-            System.arraycopy(source.reim, offset, dest[i].reim, 0, len)
-        }
-    }
-    private fun fillUnevenly(source: FloatArray, dest: Array<FloatArray>) {
-        for (i in partSizes.indices) {
-            val len = partSizes[i]
-            val offset = partOffsets[i]
-            System.arraycopy(source, offset, dest[i], 0, len)
-        }
-    }
-    private fun concatParts(source: List<ComplexArray>, dest: ComplexArray) {
-        for (i in partSizes.indices) {
-            val len = 2*partSizes[i]
-            val offset = 2*partOffsets[i]
-            System.arraycopy(source[i].reim, 0, dest.reim, offset, len)
-        }
     }
 
     private val realtime = (BLOCKSIZE / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L)
@@ -122,14 +84,9 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
 
 
         for (ch in outbuf.indices) {
-            push(inbuf[ch].applyGain(gain), this.inbuf[ch])
+            push(gain, inbuf[ch], this.inbuf[ch])
 
-            for (i in 0 until fftLen) {
-                fftIn.reim[i * 2] = this.inbuf[ch][i]
-                fftIn.reim[i * 2 + 1] = 0f
-            }
-
-            FFT.fft(fftIn)
+            FFT.fftInto(this.inbuf[ch], fftIn)
             fftIn.mult(convFFT[ch], fftMult)
             FFT.ifftAndGetReal(fftMult, fftOut)
             System.arraycopy(fftOut, fftLen - BLOCKSIZE, outbuf[ch], 0, BLOCKSIZE)
@@ -139,6 +96,16 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
         val ptime = System.nanoTime() - t1
         setDebugTime("audio.convolve", ptime)
         processingSpeed = realtime / ptime
+    }
+
+
+    fun push(gain: Float, samples: FloatArray, buf: ComplexArray) {
+        System.arraycopy(buf.reim, samples.size * 2, buf.reim, 0, buf.reim.size - samples.size * 2)
+        val baseI = buf.reim.size - samples.size * 2
+        samples.forEachIndexed { index, fl ->
+            buf.reim[baseI + index * 2 + 0] = fl * gain
+            buf.reim[baseI + index * 2 + 1] = 0f
+        }
     }
 
 }

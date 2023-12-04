@@ -146,6 +146,11 @@ object FFT: Disposable {
         ffts[signal0.size]!!.complexForward(signal0.reim)
     }
 
+    fun fftInto(signal0: ComplexArray, out: ComplexArray) {
+        System.arraycopy(signal0.reim, 0, out.reim, 0, signal0.reim.size)
+        ffts[signal0.size]!!.complexForward(out.reim)
+    }
+
     // org.apache.commons.math3.transform.FastFouriesTransformer.java:404
     fun ifftAndGetReal(signal0: ComplexArray): FloatArray {
 //        val re = FloatArray(signal0.size) { signal0.reim[it * 2] }
