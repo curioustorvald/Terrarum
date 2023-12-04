@@ -703,7 +703,9 @@ object ModMgr {
 
         @JvmStatic operator fun invoke(module: String) {
             audioPath.forEach {
-                getGdxFiles(module, it).forEach { file -> loadAudio("audio.${file.name()}", file) }
+                if (getGdxFile(module, it).let { it.exists() && it.isDirectory }) {
+                    getGdxFiles(module, it).forEach { file -> loadAudio("audio.${file.name()}", file) }
+                }
             }
         }
     }
