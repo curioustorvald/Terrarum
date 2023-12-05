@@ -106,7 +106,9 @@ class CraftingCodex {
 
 
     data class CraftingRecipe(val workbench: String, val ingredients: Array<CraftingIngredients>, val moq: Long, val product: ItemID, val addedBy: String)
-    data class CraftingIngredients(val key: String, val keyMode: CraftingItemKeyMode, val qty: Long)
+    data class CraftingIngredients(val key: String, val keyMode: CraftingItemKeyMode, val qty: Long) {
+        override fun toString() = "$qty ${if (keyMode == CraftingItemKeyMode.TAG) "\$$key" else "$key"}"
+    }
     enum class CraftingItemKeyMode { VERBATIM, TAG }
 }
 

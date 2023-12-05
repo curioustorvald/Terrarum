@@ -61,7 +61,11 @@ class UIItemCraftingCandidateGrid(
         }
 
     private fun isCraftable(player: FixtureInventory, recipe: CraftingCodex.CraftingRecipe, nearbyCraftingStations: List<String>): Boolean {
-        return UICrafting.recipeToIngredientRecord(player, recipe, nearbyCraftingStations).none { it.howManyPlayerHas <= 0L || !it.craftingStationAvailable }
+//        printdbg(this, "Is this recipe craftable? $recipe")
+        return UICrafting.recipeToIngredientRecord(player, recipe, nearbyCraftingStations).none {
+//            printdbg(this, "    considering ingredient ${it.selectedItem}, ${it.howManyRecipeWants} is required and got ${it.howManyPlayerHas}; crafting station available? ${it.craftingStationAvailable}")
+            it.howManyPlayerHas <= 0L || !it.craftingStationAvailable
+        }
     }
 
     override fun scrollItemPage(relativeAmount: Int) {
@@ -74,21 +78,31 @@ class UIItemCraftingCandidateGrid(
     private var currentFilter1 = arrayOf("")
 
     override fun rebuild(filter: Array<String>) {
+//        printdbg(this, "Rebuilding crafting candidate with following filters: ${filter.joinToString()}")
         currentFilter1 = filter
 
         // filtering policy: if the player have all the ingredient item (regardless of the amount!), make the recipe visible
         craftingRecipes.clear()
         CraftingRecipeCodex.props.forEach { (_, recipes) ->
             recipes.forEach {
-                if (isCraftable((parentUI as UICrafting).getPlayerInventory(), it, (parentUI as UICrafting).nearbyCraftingStations)) craftingRecipes.add(it)
+                if (isCraftable((parentUI as UICrafting).getPlayerInventory(), it, (parentUI as UICrafting).nearbyCraftingStations)) {
+                    craftingRecipes.add(it)
+                }
+                else {
+//                    printdbg(this, "  Skipping $recipes: insufficient ingredients")
+                }
             }
         }
 
         recipesSortList.clear() // kinda like the output list
 
         craftingRecipes.forEach {
-            if ((filter.contains((ItemCodex[it.product]?.inventoryCategory ?: throw IllegalArgumentException("Unknown item: ${it.product}"))) || filter[0] == UIItemInventoryCatBar.CAT_ALL))
+            if (
+                filter.contains((ItemCodex[it.product]?.inventoryCategory ?: throw IllegalArgumentException("Unknown item: ${it.product}"))) ||
+                filter[0] == UIItemInventoryCatBar.CAT_ALL
+                ) {
                 recipesSortList.add(it)
+            }
         }
 
         // map sortList to item list

@@ -9,7 +9,7 @@ import net.torvald.terrarum.gameitems.ItemID
 class ItemSmelterBasic(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSmelterBasic") {
 
 
-    override var baseMass = 50.0
+    override var baseMass = 100.0
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion

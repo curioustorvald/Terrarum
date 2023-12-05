@@ -577,7 +577,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
          * For each ingredient of the recipe, returns list of (ingredient, how many the player has the ingredient, how many the recipe wants)
          */
         fun recipeToIngredientRecord(inventory: FixtureInventory, recipe: CraftingCodex.CraftingRecipe, nearbyCraftingStations: List<String>): List<RecipeIngredientRecord> {
-            val hasStation = if (recipe.workbench.isBlank()) true else nearbyCraftingStations.contains(recipe.workbench)
+            val hasStation = if (recipe.workbench.isBlank()) true else nearbyCraftingStations.containsAll(recipe.workbench.split(','))
             return recipe.ingredients.map { ingredient ->
                 val selectedItem = getItemForIngredient(inventory, ingredient)
                 val howManyPlayerHas = inventory.searchByID(selectedItem)?.qty ?: 0L

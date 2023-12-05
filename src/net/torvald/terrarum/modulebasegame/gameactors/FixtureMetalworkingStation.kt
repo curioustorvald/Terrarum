@@ -3,7 +3,6 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
@@ -16,17 +15,15 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
- * No GUI yet!
- *
- * Created by minjaesong on 2023-12-04.
+ * Created by minjaesong on 2023-12-05.
  */
-class FixtureSmelterBasic : FixtureBase, CraftingStation {
+class FixtureMetalworkingStation : FixtureBase, CraftingStation {
 
     @Transient override val spawnNeedsFloor = true
-    @Transient override val tags = listOf("basicsmelter")
+    @Transient override val tags = listOf("metalworking")
 
     constructor() : super(
-        BlockBox(BlockBox.NO_COLLISION, 3, 4), // temporary value, will be overwritten by spawn()
+        BlockBox(BlockBox.NO_COLLISION, 3, 2), // temporary value, will be overwritten by spawn()
         nameFun = { Lang["ITEM_SMELTER_BASIC"] }
     ) {
         CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
@@ -35,8 +32,8 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
         CommonResourcePool.loadAll()
 
 
-        val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/smelter_tall.tga")
-//        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/smelter_tall_illum.tga") // put this sprite to the hypothetical "SpriteIllum"
+        val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/metalworking_furnace_and_anvil.tga")
+//        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/metalworking_furnace_and_anvil_illum.tga") // put this sprite to the hypothetical "SpriteIllum"
 
         density = BlockCodex[Block.STONE].density.toDouble()
         setHitboxDimension(itemImage.texture.width, itemImage.texture.height, 0, 0)
@@ -55,11 +52,9 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
         }
     }
 
-    @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 2*TILE_SIZED, TILE_SIZED * 2, TILE_SIZED * 2), Cvec(0.5f, 0.18f, 0f, 0f)))
+    @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 0.0, TerrarumAppConfiguration.TILE_SIZED * 2, TerrarumAppConfiguration.TILE_SIZED * 2), Cvec(0.5f, 0.18f, 0f, 0f)))
 
     @Transient private val actorBlocks = arrayOf(
-        arrayOf(Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, null),
-        arrayOf(Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, null),
         arrayOf(Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, null),
         arrayOf(Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION),
     )
@@ -71,6 +66,7 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
             }
         }
     }
+
 
     private var nextDelay = 0.25f
     private var spawnTimer = 0f
@@ -92,9 +88,10 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
         if (spawnTimer >= nextDelay) {
             (Terrarum.ingame as TerrarumIngame).addParticle(
                 ParticleVanishingSprite(
-                CommonResourcePool.getAsTextureRegionPack("particles-tiki_smoke.tga"),
-                25f, true, hitbox.startX + TILE_SIZED, hitbox.startY + 16, false, (Math.random() * 256).toInt()
-            ))
+                    CommonResourcePool.getAsTextureRegionPack("particles-tiki_smoke.tga"),
+                    25f, true, hitbox.startX + TerrarumAppConfiguration.TILE_SIZED, hitbox.startY + 21, false, (Math.random() * 256).toInt()
+                )
+            )
 
             spawnTimer -= nextDelay
             nextDelay = Math.random().toFloat() * 0.25f + 0.25f
@@ -104,5 +101,4 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
         spawnTimer += delta
     }
-
 }

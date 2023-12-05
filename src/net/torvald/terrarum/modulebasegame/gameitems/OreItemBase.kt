@@ -153,6 +153,11 @@ class OreLead(originalID: ItemID) : OreItemBase(originalID) {
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,6)
 }
 
+class IngotSteel(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_IRON"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,5)
+}
 class IngotCopper(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_INGOT_COPPER"
     override val itemImage: TextureRegion

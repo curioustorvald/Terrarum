@@ -24,6 +24,8 @@ id;classname
 23;net.torvald.terrarum.modulebasegame.gameitems.PickaxeStone
 24;net.torvald.terrarum.modulebasegame.gameitems.AxeStone
 25;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBall
+26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel
+27;net.torvald.terrarum.modulebasegame.gameitems.ItemMetalworkingStation
 
 # ingots
 112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper

@@ -20,9 +20,15 @@
     ]
   },
   "item@basegame:17": { /* basic smelter */
-    "workbench": "",
+    "workbench": "basiccrafting",
     "ingredients": [
-      [1, 20, "$ROCK", 10, "item@basegame:25"] /* 1 smelter = 20 rocks, 10 clay balls */
+      [1, 40, "$ROCK", 20, "item@basegame:25"] /* 1 smelter = 40 rocks, 20 clay balls */
+    ]
+  },
+  "item@basegame:27": { /* metalworking */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 20, "$ROCK", 10, "item@basegame:25", 10, "item@basegame:113"] /* 1 smelter = 20 rocks, 10 clay balls, 10 iron ingots */
     ]
   },
 
