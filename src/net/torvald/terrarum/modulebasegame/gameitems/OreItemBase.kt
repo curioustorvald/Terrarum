@@ -153,10 +153,10 @@ class OreLead(originalID: ItemID) : OreItemBase(originalID) {
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,6)
 }
 
-class IngotSteel(originalID: ItemID) : OreItemBase(originalID) {
-    override var originalName = "ITEM_INGOT_IRON"
+class ItemCoalCoke(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_COAL_COKE"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,5)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,6)
 }
 class IngotCopper(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_INGOT_COPPER"
@@ -168,10 +168,10 @@ class IngotIron(originalID: ItemID) : OreItemBase(originalID) {
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,5)
 }
-class ItemCoalCoke(originalID: ItemID) : OreItemBase(originalID) {
-    override var originalName = "ITEM_COAL_COKE"
+class IngotSteel(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_STEEL"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,5)
 }
 class IngotZinc(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_INGOT_ZINC"
@@ -199,6 +199,36 @@ class IngotLead(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_INGOT_LEAD"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,5)
+}
+class IngotBronze(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_BRONZE"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,5)
+}
+class IngotBrass(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_BRASS"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(10,5)
+}
+class IngotElectrum(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_ELECTRUM"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(11,5)
+}
+class IngotSilverBillon(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_SILVER_BILLON"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(12,5)
+}
+class IngotRosegold(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_ROSEGOLD"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(13,5)
+}
+class IngotSolder(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_INGOT_SOLDER"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(14,5)
 }
 
 

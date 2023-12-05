@@ -27,7 +27,7 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 3, 4), // temporary value, will be overwritten by spawn()
-        nameFun = { Lang["ITEM_SMELTER_BASIC"] }
+        nameFun = { Lang["ITEM_SMELTER_SMALL"] }
     ) {
         CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/bigger_smoke.tga"), 16, 16)

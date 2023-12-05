@@ -17,14 +17,14 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2023-12-05.
  */
-class FixtureMetalworkingStation : FixtureBase, CraftingStation {
+class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
 
     @Transient override val spawnNeedsFloor = true
     @Transient override val tags = listOf("metalworking")
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 3, 2), // temporary value, will be overwritten by spawn()
-        nameFun = { Lang["ITEM_SMELTER_BASIC"] }
+        nameFun = { Lang["ITEM_FURNACE_AND_ANVIL"] }
     ) {
         CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/bigger_smoke.tga"), 16, 16)

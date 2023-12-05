@@ -6,7 +6,7 @@ import net.torvald.terrarum.gameitems.ItemID
 /**
  * Created by minjaesong on 2023-12-05.
  */
-class ItemMetalworkingStation(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureMetalworkingStation") {
+class ItemFurnaceAndAnvil(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureFurnaceAndAnvil") {
 
 
     override var baseMass = 100.0
@@ -16,6 +16,6 @@ class ItemMetalworkingStation(originalID: ItemID) : FixtureItemBase(originalID, 
         get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/metalworking_furnace_and_anvil.tga")
 
     override var baseToolSize: Double? = baseMass
-    override var originalName = "ITEM_METALWORKING_STATION"
+    override var originalName = "ITEM_FURNACE_AND_ANVIL"
 
 }

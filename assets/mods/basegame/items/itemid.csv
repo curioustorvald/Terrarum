@@ -25,7 +25,7 @@ id;classname
 24;net.torvald.terrarum.modulebasegame.gameitems.AxeStone
 25;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBall
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel
-27;net.torvald.terrarum.modulebasegame.gameitems.ItemMetalworkingStation
+27;net.torvald.terrarum.modulebasegame.gameitems.ItemFurnaceAndAnvil
 
 # ingots
 112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper

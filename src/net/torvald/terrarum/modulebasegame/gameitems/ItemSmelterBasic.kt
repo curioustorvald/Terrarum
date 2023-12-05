@@ -16,6 +16,6 @@ class ItemSmelterBasic(originalID: ItemID) : FixtureItemBase(originalID, "net.to
         get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/smelter_tall.tga")
 
     override var baseToolSize: Double? = baseMass
-    override var originalName = "ITEM_SMELTER_BASIC"
+    override var originalName = "ITEM_SMELTER_SMALL"
 
 }

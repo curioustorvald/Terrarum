@@ -7,6 +7,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.audio.AudioMixer
+import net.torvald.terrarum.audio.decibelsToFullscale
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.Toolkit
@@ -360,7 +361,7 @@ class UIInventoryFull(
         INGAME.setTooltipMessage(null)
 
         AudioMixer.requestLowpassIn(0.25)
-        AudioMixer.requestFadeOut(AudioMixer.fadeBus, 0.25, 0.5)
+        AudioMixer.requestFadeOut(AudioMixer.fadeBus, 0.25, decibelsToFullscale(-3.0))
     }
 
     override fun doClosing(delta: Float) {
