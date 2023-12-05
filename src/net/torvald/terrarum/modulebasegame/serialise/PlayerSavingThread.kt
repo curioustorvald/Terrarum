@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.serialise
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.App
 import net.torvald.terrarum.TerrarumAppConfiguration
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.savegame.*
@@ -43,6 +44,7 @@ class PlayerSavingThread(
         disk.saveOrigin = disk.saveOrigin and 15 // remove flag "imported" if applicable
         disk.capacity = 0L
         disk.snapshot = TerrarumAppConfiguration.VERSION_SNAPSHOT
+        disk.saveMode = VDSaveMode(ingame.actorGamer.actorValue.getAsString(AVKey.GAMEMODE))
 
         WriteSavegame.saveProgress = 0f
 

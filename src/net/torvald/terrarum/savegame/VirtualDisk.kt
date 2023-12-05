@@ -296,6 +296,13 @@ object VDSaveOrigin {
     const val IMPORTED = 16
 }
 
+object VDSaveMode {
+    operator fun invoke(actorvalue: String?) = when (actorvalue?.lowercase()) {
+        "survival" -> 1
+        else -> 0
+    }
+}
+
 object VDFileID {
     const val ROOT = 0L
     const val SAVEGAMEINFO = -1L
