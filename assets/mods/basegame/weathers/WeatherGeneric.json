@@ -3,7 +3,7 @@
   "skyboxGradColourMap": "generic_skybox.tga",
   "daylightClut": "clut_daylight.tga",
   "classification": "generic",
-  "cloudChance": 125,
+  "cloudChance": 60,
   "cloudGamma": [0.9, 2.4],
   "cloudGammaVariance": [0.111, 0.0],
   "windSpeed": 0.35,

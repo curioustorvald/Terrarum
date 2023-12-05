@@ -356,9 +356,25 @@ internal object WeatherMixer : RNGConsumer {
         )
 
     /**
-     * Returns random point for clouds to spawn from, in the opposite side of the current wind vector
+     * Spawn anywhere on the visible field
      */
     private fun getCloudSpawningPosition(cloud: CloudProps, halfCloudSize: Float, windVector: Vector3): Vector3 {
+        val Z_POW_BASE = ALPHA_ROLLOFF_Z / 4f
+
+        val y = takeUniformRand(-cloud.altHigh..-cloud.altLow) * scrHscaler
+        val z = takeUniformRand(1f..Z_POW_BASE).pow(1.5f) // clouds are more likely to spawn with low Z-value
+        val xlow = WeatherObjectCloud.screenXtoWorldX(-halfCloudSize, z)
+        val xhi = WeatherObjectCloud.screenXtoWorldX(App.scr.width + halfCloudSize, z)
+        val x = takeUniformRand(xlow..xhi)
+
+        return Vector3(x, y, z)
+    }
+
+
+    /**
+     * Returns random point for clouds to spawn from, in the opposite side of the current wind vector
+     */
+    private fun getCloudSpawningPositionOLD(cloud: CloudProps, halfCloudSize: Float, windVector: Vector3): Vector3 {
         val Z_LIM = ALPHA_ROLLOFF_Z
         val Z_POW_BASE = ALPHA_ROLLOFF_Z / 4f
         val y = takeUniformRand(-cloud.altHigh..-cloud.altLow) * scrHscaler
@@ -415,6 +431,8 @@ internal object WeatherMixer : RNGConsumer {
 
             else -> throw InternalError()
         }
+
+
 
     }
 
