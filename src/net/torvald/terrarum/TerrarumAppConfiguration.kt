@@ -81,17 +81,26 @@ basegame
     const val TILE_SIZE = 16
     const val TILE_SIZEF = TILE_SIZE.toFloat()
     const val TILE_SIZED = TILE_SIZE.toDouble()
+
+
+    private fun ForcedSnapshot(string: String): Snapshot {
+        val s = Snapshot(string.last().code - 0x61)
+        s.year = string.substring(0, 2).toInt()
+        s.week = string.substring(3, 5).toInt()
+        s.update()
+        return s
+    }
 }
 
 data class Snapshot(var revision: Int) {
-    private var today = Calendar.getInstance();
-    private var year = today.get(Calendar.YEAR) - 2000
-    private var week = today.get(Calendar.WEEK_OF_YEAR)
+    private var today = Calendar.getInstance()
+    internal var year = today.get(Calendar.YEAR) - 2000
+    internal var week = today.get(Calendar.WEEK_OF_YEAR)
 
     private var string = ""
     private var bytes = byteArrayOf()
 
-    private fun update() {
+    internal fun update() {
         string = "${year}w${week}${Char(0x61 + revision)}"
         bytes = byteArrayOf(
             revision.and(4).shl(7).or(year.and(127)).toByte(),

@@ -46,9 +46,15 @@ object PlayerBuilderTestSubject1 {
         //p.actorValue[AVKey.LUMB] = 1.37
         //p.actorValue[AVKey.LUMA] = 1.93
 
+        giveFreeStarterPackUntilPotsWithItemsAreImplemented(p)
+
         p.actorValue[AVKey.AIRJUMPPOINT] = 0
         p.actorValue[AVKey.SCALE] = 1.0
 
         return p
+    }
+
+    private fun giveFreeStarterPackUntilPotsWithItemsAreImplemented(p: IngamePlayer) {
+        p.inventory.add("basegame:176", 20) // torches
     }
 }
