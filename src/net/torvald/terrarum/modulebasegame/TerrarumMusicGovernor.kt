@@ -2,12 +2,22 @@ package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.backends.lwjgl3.audio.Mp3
+import com.badlogic.gdx.backends.lwjgl3.audio.Ogg
+import com.badlogic.gdx.backends.lwjgl3.audio.OggInputStream
+import com.badlogic.gdx.backends.lwjgl3.audio.Wav
+import com.badlogic.gdx.backends.lwjgl3.audio.Wav.WavInputStream
 import com.badlogic.gdx.utils.GdxRuntimeException
+import com.jcraft.jorbis.VorbisFile
+import javazoom.jl.decoder.Bitstream
+import net.torvald.reflection.extortField
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioMixer
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.unicode.EMDASH
 import java.io.File
+import javax.sound.sampled.AudioSystem
 
 data class MusicContainer(
     val name: String,
@@ -15,11 +25,77 @@ data class MusicContainer(
     val gdxMusic: Music,
     val songFinishedHook: (Music) -> Unit
 ) {
+    val samplingRate: Int
+    val codec: String
+
+    var samplesRead = 0L; internal set
+    val samplesTotal: Long
+
     init {
         gdxMusic.setOnCompletionListener(songFinishedHook)
+
+        samplingRate = when (gdxMusic) {
+            is Wav.Music -> {
+                val rate = gdxMusic.extortField<WavInputStream>("input")!!.sampleRate
+
+                printdbg(this, "music $name is WAV; rate = $rate")
+                rate
+            }
+            is Ogg.Music -> {
+                val rate = gdxMusic.extortField<OggInputStream>("input")!!.sampleRate
+
+                printdbg(this, "music $name is OGG; rate = $rate")
+                rate
+            }
+            is Mp3.Music -> {
+                val tempMusic = Gdx.audio.newMusic(Gdx.files.absolute(file.absolutePath))
+                val bitstream = tempMusic.extortField<Bitstream>("bitstream")!!
+                val header = bitstream.readFrame()
+                val rate = header.sampleRate
+                tempMusic.dispose()
+
+//                val bitstream = gdxMusic.extortField<Bitstream>("bitstream")!!
+//                val header = bitstream.readFrame()
+//                val rate = header.sampleRate
+//                gdxMusic.reset()
+
+                printdbg(this, "music $name is MP3; rate = $rate")
+                rate
+            }
+            else -> {
+                printdbg(this, "music $name is ${gdxMusic::class.qualifiedName}; rate = default")
+                SAMPLING_RATE
+            }
+        }
+
+        codec = gdxMusic::class.qualifiedName!!.split('.').let {
+            if (it.last() == "Music") it.dropLast(1).last() else it.last()
+        }
+
+        samplesTotal = when (gdxMusic) {
+            is Wav.Music -> getWavFileSampleCount(file)
+            is Ogg.Music -> getOggFileSampleCount(file)
+            else -> Long.MAX_VALUE
+        }
+
     }
 
-    val samplingRate: Int = 44100 // TODO
+    private fun getWavFileSampleCount(file: File): Long {
+        val ais = AudioSystem.getAudioInputStream(file)
+        val r = ais.frameLength
+        ais.close()
+        return r
+    }
+
+    private fun getOggFileSampleCount(file: File): Long {
+        try {
+            val vorbisFile = VorbisFile(file.absolutePath)
+            return vorbisFile.pcm_total(0)
+        }
+        catch (e: Throwable) {
+            return Long.MAX_VALUE
+        }
+    }
 
     override fun toString() = if (name.isEmpty()) file.nameWithoutExtension else name
 }

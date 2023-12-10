@@ -309,10 +309,11 @@ object AudioMixer: Disposable {
 
                     // stop streaming if fadeBus is muted
                     if (req.fadeTarget == 0.0 && track == fadeBus) {
+                        musicTrack.stop()
                         musicTrack.currentTrack = null
-                        musicTrack.streamPlaying = false
+
+                        ambientTrack.stop()
                         ambientTrack.currentTrack = null
-                        ambientTrack.streamPlaying = false
                     }
                 }
             }

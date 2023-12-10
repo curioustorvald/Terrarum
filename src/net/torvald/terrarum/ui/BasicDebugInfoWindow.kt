@@ -541,7 +541,34 @@ class BasicDebugInfoWindow : UICanvas() {
         val faderY = y + stripFilterHeight * numberOfFilters
 
         // receives (opposite of "sends")
-        if (track != AudioMixer.sfxSumBus) {
+        if (track.trackType == TrackType.STATIC_SOURCE && track.sidechainInputs.isEmpty()) {
+            // show sample rate and codec info instead
+            listOf(
+                (track.currentTrack?.name ?: " -----").let {
+                    if (it.length > 7) it.replace(" ", "").let { it.substring(0 until minOf(it.length, 7)) }
+                    else it
+                },
+                "C:${track.currentTrack?.codec ?: ""}",
+                "R:${track.currentTrack?.samplingRate ?: ""}",
+            ).forEachIndexed { i, s ->
+                // gauge background
+                batch.color = COL_METER_TROUGH
+                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW.toFloat(), 14f)
+
+                // fill the song title line with a progress bar
+                if (i == 0 && track.currentTrack != null) {
+                    val perc = (track.currentTrack!!.samplesRead.toFloat() / track.currentTrack!!.samplesTotal).coerceAtMost(1f)
+                    batch.color = COL_SENDS_GRAD2
+                    Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW * perc, 14f)
+                    batch.color = COL_SENDS_GRAD
+                    Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, stripW * perc, 2f)
+                }
+
+                batch.color = FILTER_NAME_ACTIVE
+                App.fontSmallNumbers.draw(batch, s, x + 3f, faderY - (i + 1) * 16f + 1f)
+            }
+        }
+        else if (track != AudioMixer.sfxSumBus) {
             track.sidechainInputs.reversed().forEachIndexed { i, (side, mix) ->
                 val mixDb = fullscaleToDecibels(mix)
                 val perc = ((mixDb + 24.0).coerceAtLeast(0.0) / 24.0).toFloat()

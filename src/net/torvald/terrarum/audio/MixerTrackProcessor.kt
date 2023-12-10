@@ -1,11 +1,16 @@
 package net.torvald.terrarum.audio
 
+import com.badlogic.gdx.backends.lwjgl3.audio.Mp3
 import com.badlogic.gdx.utils.Queue
+import javazoom.jl.decoder.Bitstream
+import javazoom.jl.decoder.MP3Decoder
+import net.torvald.reflection.extortField
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.dsp.BinoPan
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.relativeXposition
 import net.torvald.terrarum.sqr
 import kotlin.math.*
@@ -44,11 +49,17 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
     }
 
     private fun allocateStreamBuf(track: TerrarumAudioMixerTrack) {
+        printdbg("Allocating a StreamBuf with rate ${track.currentTrack!!.samplingRate}")
         streamBuf = AudioProcessBuf(track.currentTrack!!.samplingRate, {
-            track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
+            val l = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
+            track.currentTrack?.let {
+                it.samplesRead += l!! / 4
+            }
+            l
         }, {
             track.stop()
             this.streamBuf = null
+            printdbg("StreamBuf is now null")
         })
     }
 

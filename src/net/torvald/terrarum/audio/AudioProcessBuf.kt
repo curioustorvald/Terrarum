@@ -1,6 +1,7 @@
 package net.torvald.terrarum.audio
 
 import com.jme3.math.FastMath
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.ceilToInt
@@ -40,7 +41,7 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
     private val samplesIn = inputSamplingRate / gcd // 147 for 44100
     private val samplesOut = SAMPLING_RATE / gcd // 160 for 48000
 
-    private val internalBufferSize = samplesOut * ((BS.toFloat()) / samplesIn).ceilToInt() // (512 / 160) -> 640 for 44100, 48000
+    private val internalBufferSize = if (doResample) (BS.toFloat() / samplesOut).ceilToInt().plus(1) * samplesOut else BS // (512 / 160) -> 640 for 44100, 48000
 
 
     private fun resampleBlock(inn: FloatArray, out: FloatArray) {
@@ -75,7 +76,11 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
         try {
             val bytesRead = audioReadFun(readBuf)
 
-            if (bytesRead == null || bytesRead <= 0) onAudioFinished()
+            if (bytesRead == null || bytesRead <= 0) {
+                printdbg(this, "Music finished; bytesRead = $bytesRead")
+
+                onAudioFinished()
+            }
             else {
                 for(c in 0 until readCount) {
                     val sl = (getFromReadBuf(4 * c + 0, bytesRead) or getFromReadBuf(4 * c + 1, bytesRead).shl(8)).toShort()
@@ -119,6 +124,10 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
         // shift bytes in the fout
         System.arraycopy(foutL, BS, foutL, 0, validSamplesInBuf - BS)
         System.arraycopy(foutR, BS, foutR, 0, validSamplesInBuf - BS)
+        for (i in validSamplesInBuf until BS) {
+            foutL[i] = 0f
+            foutR[i] = 0f
+        }
         // decrement necessary variables
         validSamplesInBuf -= BS
 

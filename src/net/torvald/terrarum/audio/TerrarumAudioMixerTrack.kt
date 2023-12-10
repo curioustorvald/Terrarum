@@ -139,6 +139,7 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, var ma
     override fun equals(other: Any?) = this.hash == (other as TerrarumAudioMixerTrack).hash
 
     fun stop() {
+        currentTrack?.samplesRead = 0L
         currentTrack?.gdxMusic?.forceInvoke<Int>("reset", arrayOf())
         streamPlaying = false
 //        playStartedTime = 0L
@@ -151,6 +152,7 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, var ma
         // fireSoundFinishHook()
 
         trackingTarget = null
+        processor.streamBuf = null
     }
 
     fun fireSongFinishHook() {
