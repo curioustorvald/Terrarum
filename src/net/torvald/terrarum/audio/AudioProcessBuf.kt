@@ -40,7 +40,7 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
     private val samplesIn = inputSamplingRate / gcd // 147 for 44100
     private val samplesOut = SAMPLING_RATE / gcd // 160 for 48000
 
-    private val internalBufferSize = samplesOut * ((BS.toFloat()) / samplesOut).ceilToInt() // (512 / 160) -> 640 for 44100, 48000
+    private val internalBufferSize = samplesOut * ((BS.toFloat()) / samplesIn).ceilToInt() // (512 / 160) -> 640 for 44100, 48000
 
 
     private fun resampleBlock(inn: FloatArray, out: FloatArray) {
