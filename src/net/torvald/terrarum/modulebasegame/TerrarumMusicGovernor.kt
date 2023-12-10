@@ -19,6 +19,8 @@ data class MusicContainer(
         gdxMusic.setOnCompletionListener(songFinishedHook)
     }
 
+    val samplingRate: Int = 44100 // TODO
+
     override fun toString() = if (name.isEmpty()) file.nameWithoutExtension else name
 }
 

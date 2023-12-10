@@ -27,8 +27,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
     private val emptyBuf = FloatArray(bufferSize / 4)
 
 
-    internal val streamBuf = AudioProcessBuf(bufferSize)
-    internal val sideChainBufs = Array(track.sidechainInputs.size) { AudioProcessBuf(bufferSize) }
+    internal var streamBuf: AudioProcessBuf? = null
 
     private var fout1 = listOf(emptyBuf, emptyBuf)
 
@@ -43,6 +42,16 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
     private fun printdbg(msg: Any) {
         if (true) App.printdbg("AudioAdapter ${track.name}", msg)
     }
+
+    private fun allocateStreamBuf(track: TerrarumAudioMixerTrack) {
+        streamBuf = AudioProcessBuf(track.currentTrack!!.samplingRate, {
+            track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
+        }, {
+            track.stop()
+            this.streamBuf = null
+        })
+    }
+
     override fun run() {
 //        while (running) { // uncomment to multithread
             /*synchronized(pauseLock) { // uncomment to multithread
@@ -91,20 +100,8 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
 
             // fetch deviceBufferSize amount of sample from the disk
             if (track.trackType != TrackType.MASTER && track.trackType != TrackType.BUS && track.streamPlaying) {
-                streamBuf.fetchBytes {
-                    try {
-                        val bytesRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
-                        if (bytesRead == null || bytesRead <= 0) { // some class (namely Mp3) may return 0 instead of negative value
-//                        printdbg("Finished reading audio stream")
-                            track.stop()
-                        }
-                    }
-                    catch (e: Throwable) {
-                        e.printStackTrace()
-                        it.fill(0)
-                    }
-
-                }
+                if (streamBuf == null && track.currentTrack != null) allocateStreamBuf(track)
+                streamBuf!!.fetchBytes()
             }
 
             var samplesL1: FloatArray
@@ -129,15 +126,17 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
             }
             // source channel: skip processing if there's no active input
 //            else if (track.getSidechains().any { it != null && !it.isBus && !it.isMaster && !it.streamPlaying } && !track.streamPlaying) {
-            else if (!track.streamPlaying) {
+            else if (!track.streamPlaying || streamBuf == null) {
                 samplesL1 = emptyBuf
                 samplesR1 = emptyBuf
 
                 bufEmpty = true
             }
             else {
-                samplesL1 = streamBuf.getL1(track.volume)
-                samplesR1 = streamBuf.getR1(track.volume)
+                streamBuf!!.getLR(track.volume).let {
+                    samplesL1 = it.first
+                    samplesR1 = it.second
+                }
             }
 
             if (!bufEmpty) {
