@@ -1,7 +1,5 @@
 package net.torvald.terrarum.audio
 
-import com.jme3.math.FastMath
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.ceilToInt
@@ -64,11 +62,11 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
     private val internalBufferSize = getOptimalBufferSize(inputSamplingRate)// fetchSize * 3
 
 
-    private fun resampleBlock(innL: FloatArray, innR: FloatArray, outL: FloatArray, outR: FloatArray) {
-        fun getInnL(i: Int) = if (i > innL.lastIndex) 0f else if (i in innL.indices) innL[i] else 0f//finOldL[TAPS + i]
-        fun getInnR(i: Int) = if (i > innR.lastIndex) 0f else if (i in innR.indices) innR[i] else 0f//finOldR[TAPS + i]
+    private fun resampleBlock(innL: FloatArray, innR: FloatArray, outL: FloatArray, outR: FloatArray, outSampleCount: Int) {
+        fun getInnL(i: Int) = innL[i + (TAPS + 1)]
+        fun getInnR(i: Int) = innR[i + (TAPS + 1)]
 
-        for (sampleIdx in outL.indices) {
+        for (sampleIdx in 0 until outSampleCount) {
             val x = fPhaseL + q * sampleIdx
             var sx = 0.0
             for (i in x.floorToInt() - TAPS + 1..x.floorToInt() + TAPS) {
@@ -76,10 +74,9 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
             }
             outL[sampleIdx] = sx.toFloat()
         }
-        fPhaseL = -((fPhaseL + q * outL.size) % 1.0)
-        innL.takeLast(TAPS).forEachIndexed { index, fl -> finOldL[index] = fl }
+        fPhaseL = ((fPhaseL + q * outSampleCount) % 1.0)
 
-        for (sampleIdx in outR.indices) {
+        for (sampleIdx in 0 until outSampleCount) {
             val x = fPhaseR + q * sampleIdx
             var sx = 0.0
             for (i in x.floorToInt() - TAPS + 1..x.floorToInt() + TAPS) {
@@ -87,32 +84,37 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
             }
             outR[sampleIdx] = sx.toFloat()
         }
-        fPhaseR = -((fPhaseR + q * outR.size) % 1.0)
-        innR.takeLast(TAPS).forEachIndexed { index, fl -> finOldR[index] = fl }
+        fPhaseR = ((fPhaseR + q * outSampleCount) % 1.0)
     }
 
     var validSamplesInBuf = 0
 
-    val finOldL = FloatArray(TAPS)
-    val finOldR = FloatArray(TAPS)
-    var fPhaseL = 0.0
-    var fPhaseR = 0.0
-    val foutL = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
-    val foutR = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
+    private val finL = FloatArray(fetchSize + 2 * (TAPS + 1))
+    private val finR = FloatArray(fetchSize + 2 * (TAPS + 1))
+    private var fPhaseL = 0.0
+    private var fPhaseR = 0.0
+    private val fmidL = FloatArray((fetchSize / q + 1.0).toInt())
+    private val fmidR = FloatArray((fetchSize / q + 1.0).toInt())
+    private val foutL = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
+    private val foutR = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
+    private val readBuf = ByteArray(fetchSize * 4)
+
+    private fun shift(array: FloatArray, size: Int) {
+        System.arraycopy(array, size, array, 0, array.size - size)
+        for (i in array.size - size until array.size) { array[i] = 0f }
+    }
 
     fun fetchBytes() {
         val readCount = if (validSamplesInBuf < BS) fetchSize else 0
         val writeCount = (readCount / q + fPhaseL).toInt()
-        val readBuf = ByteArray(readCount * 4)
-        val finL = FloatArray(readCount)
-        val finR = FloatArray(readCount)
-        val foutL = FloatArray(writeCount)
-        val foutR = FloatArray(writeCount)
 
         fun getFromReadBuf(i: Int, bytesRead: Int) = if (i < bytesRead) readBuf[i].toUint() else 0
 
         if (readCount > 0) {
             try {
+                shift(finL, readCount)
+                shift(finR, readCount)
+
                 val bytesRead = audioReadFun(readBuf)
 //                printdbg(this, "Reading audio $readCount samples, got ${bytesRead?.div(4)} samples")
 
@@ -123,20 +125,14 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
                 }
                 else {
                     for (c in 0 until readCount) {
-                        val sl = (getFromReadBuf(4 * c + 0, bytesRead) or getFromReadBuf(
-                            4 * c + 1,
-                            bytesRead
-                        ).shl(8)).toShort()
-                        val sr = (getFromReadBuf(4 * c + 2, bytesRead) or getFromReadBuf(
-                            4 * c + 3,
-                            bytesRead
-                        ).shl(8)).toShort()
+                        val sl = (getFromReadBuf(4 * c + 0, bytesRead) or getFromReadBuf(4 * c + 1, bytesRead).shl(8)).toShort()
+                        val sr = (getFromReadBuf(4 * c + 2, bytesRead) or getFromReadBuf(4 * c + 3, bytesRead).shl(8)).toShort()
 
                         val fl = sl / 32767f
                         val fr = sr / 32767f
 
-                        finL[c] = fl
-                        finR[c] = fr
+                        finL[2 * (TAPS + 1) + c] = fl
+                        finR[2 * (TAPS + 1) + c] = fr
                     }
                 }
             }
@@ -146,16 +142,16 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
             finally {
                 if (doResample) {
                     // perform resampling
-                    resampleBlock(finL, finR, foutL, foutR)
+                    resampleBlock(finL, finR, fmidL, fmidR, writeCount)
 
                     // fill in the output buffers
-                    System.arraycopy(foutL, 0, this.foutL, validSamplesInBuf, writeCount)
-                    System.arraycopy(foutR, 0, this.foutR, validSamplesInBuf, writeCount)
+                    System.arraycopy(fmidL, 0, foutL, validSamplesInBuf, writeCount)
+                    System.arraycopy(fmidR, 0, foutR, validSamplesInBuf, writeCount)
                 }
                 else {
                     // fill in the output buffers
-                    System.arraycopy(finL, 0, this.foutL, validSamplesInBuf, writeCount)
-                    System.arraycopy(finR, 0, this.foutR, validSamplesInBuf, writeCount)
+                    System.arraycopy(finL, 0, foutL, validSamplesInBuf, writeCount)
+                    System.arraycopy(finR, 0, foutR, validSamplesInBuf, writeCount)
                 }
 
                 validSamplesInBuf += writeCount
