@@ -396,10 +396,16 @@ class BasicDebugInfoWindow : UICanvas() {
     private val COL_FILTER_WELL_BACK = Color(0x222325_aa)
     private val COL_MIXER_BACK = Color(0x0f110c_aa)
     private val COL_METER_TROUGH = Color(0x232527_aa)
+
     private val COL_METER_GRAD = Color(0x1c5075_aa)
     private val COL_METER_GRAD2 = Color(0x25a0f2_aa)
-    private val COL_SENDS_GRAD = Color(0x50751c_aa)
-    private val COL_SENDS_GRAD2 = Color(0xa0f225_aa.toInt())
+
+    private val COL_SENDS_GRAD = Color(0x5b711e_aa)
+    private val COL_SENDS_GRAD2 = Color(0xbff12a_aa.toInt())
+
+    private val COL_PROGRESS_GRAD = Color(0x762340_aa.toInt())
+    private val COL_PROGRESS_GRAD2 = Color(0xf22e7b_aa.toInt())
+
     private val COL_METER_GRAD_YELLOW = Color(0x62471c_aa)
     private val COL_METER_GRAD2_YELLOW = Color(0xc68f24_aa.toInt())
     private val COL_METER_GRAD_RED = Color(0x921c34_aa.toInt())
@@ -558,9 +564,9 @@ class BasicDebugInfoWindow : UICanvas() {
                 // fill the song title line with a progress bar
                 if (i == 0 && track.currentTrack != null) {
                     val perc = (track.currentTrack!!.samplesRead.toFloat() / track.currentTrack!!.samplesTotal).coerceAtMost(1f)
-                    batch.color = COL_SENDS_GRAD2
+                    batch.color = COL_PROGRESS_GRAD2
                     Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW * perc, 14f)
-                    batch.color = COL_SENDS_GRAD
+                    batch.color = COL_PROGRESS_GRAD
                     Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, stripW * perc, 2f)
                 }
 
