@@ -34,13 +34,34 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
             0.0
 
         private val BS = AUDIO_BUFFER_SIZE
-        private val MP3_CHUNK_SIZE = 1152
+        private val MP3_CHUNK_SIZE = 1152 // 1152 for 32k-48k, 576 for 16k-24k, 384 for 8k-12k
+
+
+        private val bufLut = HashMap<Pair<Int, Int>, Int>()
+
+        init {
+            val bl = arrayOf(
+                1152,1380,1812,1792,2304,2634,3500,3456,4608,5137,6870,6912,
+                1280,1508,1939,1920,2304,2762,3630,3584,4608,5269,7000,6912,
+                1536,1764,2197,2176,2560,3018,3886,3840,4608,5525,7260,7168,
+                2048,2276,2708,2688,3072,3530,4397,4352,5120,6037,7772,7680,
+                4096,4553,5419,5376,6144,7061,8794,8704,10240,12035,15544,15360
+            )
+
+            arrayOf(48000,44100,32768,32000,24000,22050,16384,16000,12000,11025,8192,8000).forEachIndexed { ri, r ->
+                arrayOf(128,256,512,1024,2048).forEachIndexed { bi, b ->
+                    bufLut[b to r] = bl[bi * 12 + ri]
+                }
+            }
+        }
+
+        private fun getOptimalBufferSize(rate: Int) = bufLut[BS to rate]!!
     }
 
     private val q = inputSamplingRate.toDouble() / SAMPLING_RATE // <= 1.0
 
     private val fetchSize = (BS.toFloat() / MP3_CHUNK_SIZE).ceilToInt() * MP3_CHUNK_SIZE // fetchSize is always multiple of MP3_CHUNK_SIZE, even if the audio is NOT MP3
-    private val internalBufferSize = fetchSize * 3
+    private val internalBufferSize = getOptimalBufferSize(inputSamplingRate)// fetchSize * 3
 
 
     private fun resampleBlock(innL: FloatArray, innR: FloatArray, outL: FloatArray, outR: FloatArray) {
