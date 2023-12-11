@@ -1,10 +1,9 @@
 package net.torvald.terrarum.audio.dsp
 
 import com.jme3.math.FastMath
-import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.App.setDebugTime
 import net.torvald.terrarum.audio.*
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
 import java.io.File
 
 class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
@@ -13,7 +12,7 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
     private val convFFT: Array<ComplexArray>
     private val inbuf: Array<ComplexArray>
 
-    private val BLOCKSIZE = TerrarumAudioMixerTrack.BUFFER_SIZE / 4
+    private val BLOCKSIZE = TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE
 
     var processingSpeed = 1f; private set
 
@@ -60,7 +59,7 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
 
         // fill up part* dictionary
         // define "master" array
-        var c = BUFFER_SIZE / 4
+        var c = AUDIO_BUFFER_SIZE
         val master0 = arrayListOf(c)
         while (c < fftLen) {
             master0.add(c)

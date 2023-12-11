@@ -1,16 +1,11 @@
 package net.torvald.terrarum.audio
 
-import com.badlogic.gdx.backends.lwjgl3.audio.Mp3
 import com.badlogic.gdx.utils.Queue
-import javazoom.jl.decoder.Bitstream
-import javazoom.jl.decoder.MP3Decoder
-import net.torvald.reflection.extortField
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.dsp.BinoPan
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.relativeXposition
 import net.torvald.terrarum.sqr
 import kotlin.math.*
@@ -18,7 +13,7 @@ import kotlin.math.*
 /**
  * Created by minjaesong on 2023-11-17.
  */
-class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: TerrarumAudioMixerTrack): Runnable {
+class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: TerrarumAudioMixerTrack): Runnable {
 
     companion object {
         val BACK_BUF_COUNT = 1
@@ -29,7 +24,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
     private val pauseLock = java.lang.Object()
 
 
-    private val emptyBuf = FloatArray(bufferSize / 4)
+    private val emptyBuf = FloatArray(buffertaille)
 
 
     internal var streamBuf: AudioProcessBuf? = null
@@ -123,8 +118,8 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
             // get samples and apply the fader
             if (track.trackType == TrackType.MASTER || track.trackType == TrackType.BUS) {
                 // combine all the inputs
-                samplesL1 = FloatArray(bufferSize / 4)
-                samplesR1 = FloatArray(bufferSize / 4)
+                samplesL1 = FloatArray(buffertaille)
+                samplesR1 = FloatArray(buffertaille)
 
                 val sidechains = track.sidechainInputs
                 // add all up
@@ -159,13 +154,13 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                 }
                 else {
                     var fin1 = listOf(samplesL1, samplesR1)
-                    fout1 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
+                    fout1 = listOf(FloatArray(buffertaille), FloatArray(buffertaille))
 
                     filterStack.forEachIndexed { index, it ->
                         it(fin1, fout1)
                         fin1 = fout1
                         if (index < filterStack.lastIndex) {
-                            fout1 = listOf(FloatArray(bufferSize / 4), FloatArray(bufferSize / 4))
+                            fout1 = listOf(FloatArray(buffertaille), FloatArray(buffertaille))
                         }
                     }
                 }
@@ -176,7 +171,7 @@ class MixerTrackProcessor(val bufferSize: Int, val rate: Int, val track: Terraru
                     maxSigLevel[index] = fl.toDouble()
                 }
                 fout1.map { it.sumOf { it.sqr().toDouble() } }.forEachIndexed { index, fl ->
-                    maxRMS[index] = sqrt(fl / (bufferSize / 4))
+                    maxRMS[index] = sqrt(fl / (buffertaille))
                 }
                 hasClipping.fill(false)
                 fout1.forEachIndexed { index, floats ->

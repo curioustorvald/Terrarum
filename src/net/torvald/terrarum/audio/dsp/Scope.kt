@@ -4,10 +4,10 @@ import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import kotlin.math.roundToInt
 
 class Scope : TerrarumAudioFilter() {
-    val backbufL = Array((4096f / TerrarumAudioMixerTrack.BUFFER_SIZE * 4).roundToInt().coerceAtLeast(1)) { FloatArray(
-        TerrarumAudioMixerTrack.BUFFER_SIZE / 4) }
-    val backbufR = Array((4096f / TerrarumAudioMixerTrack.BUFFER_SIZE * 4).roundToInt().coerceAtLeast(1)) { FloatArray(
-        TerrarumAudioMixerTrack.BUFFER_SIZE / 4) }
+    val backbufL = Array((4096f / TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE).roundToInt().coerceAtLeast(1)) { FloatArray(
+        TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE) }
+    val backbufR = Array((4096f / TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE).roundToInt().coerceAtLeast(1)) { FloatArray(
+        TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE) }
 
     private val sqrt2p = 0.7071067811865475
 
@@ -17,11 +17,11 @@ class Scope : TerrarumAudioFilter() {
             backbufL[i] = backbufL[i - 1]
             backbufR[i] = backbufR[i - 1]
         }
-        backbufL[0] = FloatArray(TerrarumAudioMixerTrack.BUFFER_SIZE / 4)
-        backbufR[0] = FloatArray(TerrarumAudioMixerTrack.BUFFER_SIZE / 4)
+        backbufL[0] = FloatArray(TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE)
+        backbufR[0] = FloatArray(TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE)
 
         // plot dots
-        for (i in 0 until TerrarumAudioMixerTrack.BUFFER_SIZE /4) {
+        for (i in 0 until TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE) {
             val y0 = inbuf[0][i] * 0.7
             val x0 = -inbuf[1][i] * 0.7 // rotate the domain by -90 deg
 

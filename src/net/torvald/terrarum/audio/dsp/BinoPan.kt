@@ -17,7 +17,7 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
 
     private val PANNING_CONST = 3.0 // 3dB panning rule
 
-    private val delayLine = FloatArray(TerrarumAudioMixerTrack.BUFFER_SIZE / 4)
+    private val delayLine = FloatArray(TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE)
 
     private fun getFrom(index: Float, buf0: FloatArray, buf1: FloatArray): Float {
         val index = index.toInt() // TODO resampling
@@ -55,7 +55,7 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
         }
 
         for (ch in 0..1) {
-            for (i in 0 until TerrarumAudioMixerTrack.BUFFER_SIZE / 4) {
+            for (i in 0 until TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE) {
                 outbuf[ch][i] = getFrom(i - delays[ch], delayLine, inbuf[0]) * mults[ch]
             }
         }

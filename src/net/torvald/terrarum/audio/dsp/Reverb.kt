@@ -30,7 +30,7 @@ class Reverb(val delayMS: Float = 36f, var feedback: Float = 0.92f, var lowpass:
         val alphaHi = RCHi / (RCHi + dt)
 
         for (ch in outbuf.indices) {
-            for (i in 0 until TerrarumAudioMixerTrack.BUFFER_SIZE / 4) {
+            for (i in 0 until TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE) {
                 val inn = inbuf[ch][i]
 
                 // reverb

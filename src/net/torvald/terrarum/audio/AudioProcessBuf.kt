@@ -2,7 +2,7 @@ package net.torvald.terrarum.audio
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.floorToInt
@@ -33,7 +33,7 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
         else
             0.0
 
-        private val BS = BUFFER_SIZE / 4
+        private val BS = AUDIO_BUFFER_SIZE
     }
 
     private val gcd = FastMath.getGCD(inputSamplingRate, SAMPLING_RATE) // 300 for 44100, 48000
@@ -59,12 +59,12 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
 
     var validSamplesInBuf = 0
 
-    val foutL = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
-    val foutR = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
+    val foutL = FloatArray(internalBufferSize + samplesOut) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
+    val foutR = FloatArray(internalBufferSize + samplesOut) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
 
     fun fetchBytes() {
-        val readCount = ((internalBufferSize - validSamplesInBuf) / samplesOut) * samplesIn // in samples (441 or 588 for 44100, 48000)
-        val writeCount = ((internalBufferSize - validSamplesInBuf) / samplesOut) * samplesOut // in samples (480 or 640 for 44100, 48000)
+        val readCount = ((internalBufferSize - validSamplesInBuf) / samplesOut.toFloat()).ceilToInt() * samplesIn // in samples (441 or 588 for 44100, 48000)
+        val writeCount = ((internalBufferSize - validSamplesInBuf) / samplesOut.toFloat()).ceilToInt() * samplesOut // in samples (480 or 640 for 44100, 48000)
         val readBuf = ByteArray(readCount * 4)
         val finL = FloatArray(readCount)
         val finR = FloatArray(readCount)
@@ -73,47 +73,59 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
 
         fun getFromReadBuf(i: Int, bytesRead: Int) = if (i < bytesRead) readBuf[i].toUint() else 0
 
-        try {
-            val bytesRead = audioReadFun(readBuf)
+        if (readCount > 0) {
+            try {
+                val bytesRead = audioReadFun(readBuf)
+                printdbg(this, "Reading audio $readCount samples, got ${bytesRead?.div(4)} samples")
 
-            if (bytesRead == null || bytesRead <= 0) {
-                printdbg(this, "Music finished; bytesRead = $bytesRead")
+                if (bytesRead == null || bytesRead <= 0) {
+                    printdbg(this, "Music finished; bytesRead = $bytesRead")
 
-                onAudioFinished()
-            }
-            else {
-                for(c in 0 until readCount) {
-                    val sl = (getFromReadBuf(4 * c + 0, bytesRead) or getFromReadBuf(4 * c + 1, bytesRead).shl(8)).toShort()
-                    val sr = (getFromReadBuf(4 * c + 2, bytesRead) or getFromReadBuf(4 * c + 3, bytesRead).shl(8)).toShort()
+                    onAudioFinished()
+                }
+                else {
+                    for (c in 0 until readCount) {
+                        val sl = (getFromReadBuf(4 * c + 0, bytesRead) or getFromReadBuf(
+                            4 * c + 1,
+                            bytesRead
+                        ).shl(8)).toShort()
+                        val sr = (getFromReadBuf(4 * c + 2, bytesRead) or getFromReadBuf(
+                            4 * c + 3,
+                            bytesRead
+                        ).shl(8)).toShort()
 
-                    val fl = sl / 32767f
-                    val fr = sr / 32767f
+                        val fl = sl / 32767f
+                        val fr = sr / 32767f
 
-                    finL[c] = fl
-                    finR[c] = fr
+                        finL[c] = fl
+                        finR[c] = fr
+                    }
                 }
             }
-        }
-        catch (e: Throwable) {
-            e.printStackTrace()
-        }
-        finally {
-            if (doResample) {
-                // perform resampling
-                resampleBlock(finL, foutL)
-                resampleBlock(finR, foutR)
-
-                // fill in the output buffers
-                System.arraycopy(foutL, 0, this.foutL, validSamplesInBuf, writeCount)
-                System.arraycopy(foutR, 0, this.foutR, validSamplesInBuf, writeCount)
+            catch (e: Throwable) {
+                e.printStackTrace()
             }
-            else {
-                // fill in the output buffers
-                System.arraycopy(finL, 0, this.foutL, validSamplesInBuf, writeCount)
-                System.arraycopy(finR, 0, this.foutR, validSamplesInBuf, writeCount)
-            }
+            finally {
+                if (doResample) {
+                    // perform resampling
+                    resampleBlock(finL, foutL)
+                    resampleBlock(finR, foutR)
 
-            validSamplesInBuf += writeCount
+                    // fill in the output buffers
+                    System.arraycopy(foutL, 0, this.foutL, validSamplesInBuf, writeCount)
+                    System.arraycopy(foutR, 0, this.foutR, validSamplesInBuf, writeCount)
+                }
+                else {
+                    // fill in the output buffers
+                    System.arraycopy(finL, 0, this.foutL, validSamplesInBuf, writeCount)
+                    System.arraycopy(finR, 0, this.foutR, validSamplesInBuf, writeCount)
+                }
+
+                validSamplesInBuf += writeCount
+            }
+        }
+        else {
+            printdbg(this, "Reading audio zero samples; Buffer: $validSamplesInBuf / $internalBufferSize samples")
         }
     }
 

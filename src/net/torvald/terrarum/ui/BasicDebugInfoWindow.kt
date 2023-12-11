@@ -14,7 +14,7 @@ import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.audio.AudioMixer.dynamicSourceCount
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.BUFFER_SIZE
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
 import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
@@ -454,7 +454,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val oldRMS = Array(trackCount) { arrayOf(0.0, 0.0) }
     private val oldComp = Array(trackCount) { arrayOf(0.0, 0.0) }
 
-    private fun getSmoothingFactor(sampleCount: Int) = 1.0 - (BUFFER_SIZE / (4.0 * sampleCount))
+    private fun getSmoothingFactor(sampleCount: Int) = 1.0 - (AUDIO_BUFFER_SIZE / sampleCount)
     private val PEAK_SMOOTHING_FACTOR = getSmoothingFactor(640)
     private val LAMP_SMOOTHING_FACTOR = getSmoothingFactor(3200)
     private val RMS_SMOOTHING_FACTOR = getSmoothingFactor(12000)
@@ -756,7 +756,7 @@ class BasicDebugInfoWindow : UICanvas() {
             }
             is Buffer -> {
                 batch.color = FILTER_NAME_ACTIVE
-                App.fontSmallNumbers.draw(batch, "Bs:${BUFFER_SIZE/4}", x+3f, y+1f)
+                App.fontSmallNumbers.draw(batch, "Bs:${AUDIO_BUFFER_SIZE}", x+3f, y+1f)
             }
             is Convolv -> {
                 // processing speed bar
@@ -768,7 +768,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 Toolkit.fillArea(batch, x.toFloat(), y+14f, stripW * perc, 2f)
 
                 // filter length bar
-                val g = FastMath.intLog2(BUFFER_SIZE / 4)
+                val g = FastMath.intLog2(AUDIO_BUFFER_SIZE)
                 val perc2 = (FastMath.intLog2(filter.fftLen).minus(g).toFloat() / (16f - g)).coerceIn(0f, 1f)
                 batch.color = COL_METER_GRAD2
                 Toolkit.fillArea(batch, x.toFloat(), y + 16f, stripW * perc2, 14f)

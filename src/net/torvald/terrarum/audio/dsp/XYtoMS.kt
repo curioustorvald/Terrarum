@@ -4,7 +4,7 @@ import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 
 object XYtoMS: TerrarumAudioFilter() {
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
-        for (i in 0 until TerrarumAudioMixerTrack.BUFFER_SIZE / 4) {
+        for (i in 0 until TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE) {
             val X = inbuf[0][i]
             val Y = inbuf[1][i]
             val M = (X + Y) / 2f
@@ -17,7 +17,7 @@ object XYtoMS: TerrarumAudioFilter() {
 
 object MStoXY: TerrarumAudioFilter() {
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
-        for (i in 0 until TerrarumAudioMixerTrack.BUFFER_SIZE / 4) {
+        for (i in 0 until TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE) {
             val M = inbuf[0][i]
             val S = inbuf[1][i]
             val X = M + S

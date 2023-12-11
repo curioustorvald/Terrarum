@@ -10,7 +10,6 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.audio.dsp.TerrarumAudioFilter
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.getHashStr
 import net.torvald.terrarum.hashStrMap
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -29,7 +28,7 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, var ma
         const val SAMPLING_RATE = 48000
         const val SAMPLING_RATEF = 48000f
         const val SAMPLING_RATED = 48000.0
-        val BUFFER_SIZE = 4 * App.getConfigInt("audio_buffer_size") // n ms -> 384 * n
+        val AUDIO_BUFFER_SIZE = App.getConfigInt("audio_buffer_size") // n ms -> 384 * n
     }
 
     val hash = getHashStr()
@@ -162,7 +161,7 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, var ma
 
     // 1st ring of the hell: the THREADING HELL //
 
-    internal var processor = MixerTrackProcessor(BUFFER_SIZE, SAMPLING_RATE, this)
+    internal var processor = MixerTrackProcessor(AUDIO_BUFFER_SIZE, SAMPLING_RATE, this)
     /*private val processorThread = Thread(processor).also { // uncomment to multithread
         it.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority
         it.start()
@@ -172,8 +171,8 @@ class TerrarumAudioMixerTrack(val name: String, val trackType: TrackType, var ma
     private lateinit var queueDispatcherThread: Thread
 
     init {
-        pcmQueue.addLast(listOf(FloatArray(BUFFER_SIZE / 4), FloatArray(BUFFER_SIZE / 4)))
-        pcmQueue.addLast(listOf(FloatArray(BUFFER_SIZE / 4), FloatArray(BUFFER_SIZE / 4)))
+        pcmQueue.addLast(listOf(FloatArray(AUDIO_BUFFER_SIZE), FloatArray(AUDIO_BUFFER_SIZE)))
+        pcmQueue.addLast(listOf(FloatArray(AUDIO_BUFFER_SIZE), FloatArray(AUDIO_BUFFER_SIZE)))
 
         /*if (isMaster) { // uncomment to multithread
             queueDispatcher = FeedSamplesToAdev(BUFFER_SIZE, SAMPLING_RATE, this)
