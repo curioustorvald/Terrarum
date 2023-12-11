@@ -17,6 +17,7 @@ import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.unicode.EMDASH
 import java.io.File
+import java.io.FileInputStream
 import javax.sound.sampled.AudioSystem
 
 data class MusicContainer(
@@ -75,25 +76,56 @@ data class MusicContainer(
         samplesTotal = when (gdxMusic) {
             is Wav.Music -> getWavFileSampleCount(file)
             is Ogg.Music -> getOggFileSampleCount(file)
+            is Mp3.Music -> getMp3FileSampleCount(file)
             else -> Long.MAX_VALUE
         }
 
     }
 
     private fun getWavFileSampleCount(file: File): Long {
-        val ais = AudioSystem.getAudioInputStream(file)
-        val r = ais.frameLength
-        ais.close()
-        return r
+        return try {
+            val ais = AudioSystem.getAudioInputStream(file)
+            val r = ais.frameLength
+            ais.close()
+            r
+        }
+        catch (e: Throwable) {
+            Long.MAX_VALUE
+        }
     }
 
     private fun getOggFileSampleCount(file: File): Long {
-        try {
+        return try {
             val vorbisFile = VorbisFile(file.absolutePath)
-            return vorbisFile.pcm_total(0)
+            vorbisFile.pcm_total(0)
         }
         catch (e: Throwable) {
-            return Long.MAX_VALUE
+            Long.MAX_VALUE
+        }
+    }
+
+    private fun getMp3FileSampleCount(file: File): Long {
+        return try {
+            val fis = FileInputStream(file)
+            val bs = Bitstream(fis)
+
+            var header = bs.readFrame()
+            val rate = header.frequency()
+            var totalSamples = 0L
+
+            while (header != null) {
+                totalSamples += (header.ms_per_frame() * rate / 1000).toLong()
+                bs.closeFrame()
+                header = bs.readFrame()
+            }
+
+            bs.close()
+            fis.close()
+
+            totalSamples
+        }
+        catch (_: Throwable) {
+            Long.MAX_VALUE
         }
     }
 
