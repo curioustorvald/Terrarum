@@ -34,37 +34,54 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
             0.0
 
         private val BS = AUDIO_BUFFER_SIZE
+        private val MP3_CHUNK_SIZE = 1152
     }
 
-    private val gcd = FastMath.getGCD(inputSamplingRate, SAMPLING_RATE) // 300 for 44100, 48000
+    private val q = inputSamplingRate.toDouble() / SAMPLING_RATE // <= 1.0
 
-    private val samplesIn = inputSamplingRate / gcd // 147 for 44100
-    private val samplesOut = SAMPLING_RATE / gcd // 160 for 48000
-
-    private val internalBufferSize = if (doResample) (BS.toFloat() / samplesOut).ceilToInt().plus(1) * samplesOut else BS // (512 / 160) -> 640 for 44100, 48000
+    private val fetchSize = (BS.toFloat() / MP3_CHUNK_SIZE).ceilToInt() * MP3_CHUNK_SIZE // fetchSize is always multiple of MP3_CHUNK_SIZE, even if the audio is NOT MP3
+    private val internalBufferSize = fetchSize * 3
 
 
-    private fun resampleBlock(inn: FloatArray, out: FloatArray) {
-        fun getInn(i: Int) = if (i in inn.indices) inn[i] else 0f
+    private fun resampleBlock(innL: FloatArray, innR: FloatArray, outL: FloatArray, outR: FloatArray) {
+        fun getInnL(i: Int) = if (i > innL.lastIndex) 0f else if (i in innL.indices) innL[i] else 0f//finOldL[TAPS + i]
+        fun getInnR(i: Int) = if (i > innR.lastIndex) 0f else if (i in innR.indices) innR[i] else 0f//finOldR[TAPS + i]
 
-        for (sampleIdx in out.indices) {
-            val x = (inn.size.toDouble() / out.size) * sampleIdx
+        for (sampleIdx in outL.indices) {
+            val x = fPhaseL + q * sampleIdx
             var sx = 0.0
             for (i in x.floorToInt() - TAPS + 1..x.floorToInt() + TAPS) {
-                sx += getInn(i) * L(x - i)
+                sx += getInnL(i) * L(x - i)
             }
-            out[sampleIdx] = sx.toFloat()
+            outL[sampleIdx] = sx.toFloat()
         }
+        fPhaseL = -((fPhaseL + q * outL.size) % 1.0)
+        innL.takeLast(TAPS).forEachIndexed { index, fl -> finOldL[index] = fl }
+
+        for (sampleIdx in outR.indices) {
+            val x = fPhaseR + q * sampleIdx
+            var sx = 0.0
+            for (i in x.floorToInt() - TAPS + 1..x.floorToInt() + TAPS) {
+                sx += getInnR(i) * L(x - i)
+            }
+            outR[sampleIdx] = sx.toFloat()
+        }
+        fPhaseR = -((fPhaseR + q * outR.size) % 1.0)
+        innR.takeLast(TAPS).forEachIndexed { index, fl -> finOldR[index] = fl }
     }
 
     var validSamplesInBuf = 0
 
-    val foutL = FloatArray(internalBufferSize + samplesOut) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
-    val foutR = FloatArray(internalBufferSize + samplesOut) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
+    val finOldL = FloatArray(TAPS)
+    val finOldR = FloatArray(TAPS)
+    var fPhaseL = 0.0
+    var fPhaseR = 0.0
+    val foutL = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
+    val foutR = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
 
     fun fetchBytes() {
-        val readCount = ((internalBufferSize - validSamplesInBuf) / samplesOut.toFloat()).ceilToInt() * samplesIn // in samples (441 or 588 for 44100, 48000)
-        val writeCount = ((internalBufferSize - validSamplesInBuf) / samplesOut.toFloat()).ceilToInt() * samplesOut // in samples (480 or 640 for 44100, 48000)
+        val readCount = if (validSamplesInBuf < BS) fetchSize else 0
+        val writeCount = (readCount / q + fPhaseL).toInt()
         val readBuf = ByteArray(readCount * 4)
         val finL = FloatArray(readCount)
         val finR = FloatArray(readCount)
@@ -76,10 +93,10 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
         if (readCount > 0) {
             try {
                 val bytesRead = audioReadFun(readBuf)
-                printdbg(this, "Reading audio $readCount samples, got ${bytesRead?.div(4)} samples")
+//                printdbg(this, "Reading audio $readCount samples, got ${bytesRead?.div(4)} samples")
 
                 if (bytesRead == null || bytesRead <= 0) {
-                    printdbg(this, "Music finished; bytesRead = $bytesRead")
+//                    printdbg(this, "Music finished; bytesRead = $bytesRead")
 
                     onAudioFinished()
                 }
@@ -108,8 +125,7 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
             finally {
                 if (doResample) {
                     // perform resampling
-                    resampleBlock(finL, foutL)
-                    resampleBlock(finR, foutR)
+                    resampleBlock(finL, finR, foutL, foutR)
 
                     // fill in the output buffers
                     System.arraycopy(foutL, 0, this.foutL, validSamplesInBuf, writeCount)
@@ -125,7 +141,7 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
             }
         }
         else {
-            printdbg(this, "Reading audio zero samples; Buffer: $validSamplesInBuf / $internalBufferSize samples")
+//            printdbg(this, "Reading audio zero samples; Buffer: $validSamplesInBuf / $internalBufferSize samples")
         }
     }
 

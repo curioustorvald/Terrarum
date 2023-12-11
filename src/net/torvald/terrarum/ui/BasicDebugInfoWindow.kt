@@ -454,7 +454,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val oldRMS = Array(trackCount) { arrayOf(0.0, 0.0) }
     private val oldComp = Array(trackCount) { arrayOf(0.0, 0.0) }
 
-    private fun getSmoothingFactor(sampleCount: Int) = 1.0 - (AUDIO_BUFFER_SIZE / sampleCount)
+    private fun getSmoothingFactor(sampleCount: Int) = 1.0 - (AUDIO_BUFFER_SIZE.toDouble() / sampleCount)
     private val PEAK_SMOOTHING_FACTOR = getSmoothingFactor(640)
     private val LAMP_SMOOTHING_FACTOR = getSmoothingFactor(3200)
     private val RMS_SMOOTHING_FACTOR = getSmoothingFactor(12000)
