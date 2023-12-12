@@ -1,5 +1,7 @@
 package net.torvald.terrarum.audio
 
+import com.jme3.math.FastMath
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.ceilToInt
@@ -8,7 +10,15 @@ import net.torvald.terrarum.serialise.toUint
 import org.dyn4j.Epsilon
 import kotlin.math.PI
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 import kotlin.math.sin
+
+private data class Frac(var nom: Int, val denom: Int) {
+    fun toDouble() = nom.toDouble() / denom.toDouble()
+    fun toFloat() = this.toDouble().toFloat()
+    private val denomStrLen = denom.toString().length
+    override fun toString() = "${nom.toString().padStart(denomStrLen)} / $denom"
+}
 
 /**
  * Audio is assumed to be 2 channels, 16 bits
@@ -39,11 +49,11 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
 
         init {
             val bl = arrayOf(
-                1152,1380,1812,1792,2304,2634,3500,3456,4608,5137,6870,6912,
-                1280,1508,1939,1920,2304,2762,3630,3584,4608,5269,7000,6912,
-                1536,1764,2197,2176,2560,3018,3886,3840,4608,5525,7260,7168,
-                2048,2276,2708,2688,3072,3530,4397,4352,5120,6037,7772,7680,
-                4096,4553,5419,5376,6144,7061,8794,8704,10240,12035,15544,15360
+                1152,1379,1815,1792,2304,2633,3500,3456,4608,5141,6870,6912,
+                1280,1504,1943,1920,2304,2758,3630,3584,4608,5266,7000,6912,
+                1536,1755,2198,2176,2560,3009,3886,3840,4608,5517,7260,7168,
+                2048,2257,2709,2688,3072,3511,4397,4352,5120,6019,7772,7680,
+                4096,4514,5419,5376,6144,7022,8794,8704,10240,12038,15544,15360
             )
 
             arrayOf(48000,44100,32768,32000,24000,22050,16384,16000,12000,11025,8192,8000).forEachIndexed { ri, r ->
@@ -56,43 +66,45 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
         private fun getOptimalBufferSize(rate: Int) = bufLut[BS to rate]!!
     }
 
+    private val denom = SAMPLING_RATE / FastMath.getGCD(inputSamplingRate, SAMPLING_RATE)
     private val q = inputSamplingRate.toDouble() / SAMPLING_RATE // <= 1.0
 
     private val fetchSize = (BS.toFloat() / MP3_CHUNK_SIZE).ceilToInt() * MP3_CHUNK_SIZE // fetchSize is always multiple of MP3_CHUNK_SIZE, even if the audio is NOT MP3
     private val internalBufferSize = getOptimalBufferSize(inputSamplingRate)// fetchSize * 3
 
+    private val PADSIZE = TAPS + 1
 
     private fun resampleBlock(innL: FloatArray, innR: FloatArray, outL: FloatArray, outR: FloatArray, outSampleCount: Int) {
-        fun getInnL(i: Int) = innL[i + (TAPS + 1)]
-        fun getInnR(i: Int) = innR[i + (TAPS + 1)]
+        fun getInnL(i: Int) = innL[i + PADSIZE]
+        fun getInnR(i: Int) = innR[i + PADSIZE]
 
         for (sampleIdx in 0 until outSampleCount) {
-            val x = fPhaseL + q * sampleIdx
+            val x = fPhaseL.toDouble() + q * sampleIdx
             var sx = 0.0
             for (i in x.floorToInt() - TAPS + 1..x.floorToInt() + TAPS) {
                 sx += getInnL(i) * L(x - i)
             }
             outL[sampleIdx] = sx.toFloat()
         }
-        fPhaseL = ((fPhaseL + q * outSampleCount) % 1.0)
+        fPhaseL.nom = ((fPhaseL.toDouble() + q * outSampleCount) * denom).roundToInt() % denom
 
         for (sampleIdx in 0 until outSampleCount) {
-            val x = fPhaseR + q * sampleIdx
+            val x = fPhaseR.toDouble() + q * sampleIdx
             var sx = 0.0
             for (i in x.floorToInt() - TAPS + 1..x.floorToInt() + TAPS) {
                 sx += getInnR(i) * L(x - i)
             }
             outR[sampleIdx] = sx.toFloat()
         }
-        fPhaseR = ((fPhaseR + q * outSampleCount) % 1.0)
+        fPhaseR.nom = ((fPhaseR.toDouble() + q * outSampleCount) * denom).roundToInt() % denom
     }
 
     var validSamplesInBuf = 0
 
-    private val finL = FloatArray(fetchSize + 2 * (TAPS + 1))
-    private val finR = FloatArray(fetchSize + 2 * (TAPS + 1))
-    private var fPhaseL = 0.0
-    private var fPhaseR = 0.0
+    private val finL = FloatArray(fetchSize + 2 * PADSIZE)
+    private val finR = FloatArray(fetchSize + 2 * PADSIZE)
+    private var fPhaseL = Frac(0, denom)
+    private var fPhaseR = Frac(0, denom)
     private val fmidL = FloatArray((fetchSize / q + 1.0).toInt())
     private val fmidR = FloatArray((fetchSize / q + 1.0).toInt())
     private val foutL = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
@@ -106,7 +118,7 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
 
     fun fetchBytes() {
         val readCount = if (validSamplesInBuf < BS) fetchSize else 0
-        val writeCount = (readCount / q + fPhaseL).toInt()
+        val writeCount = (readCount / q + fPhaseL.toDouble()).toInt()
 
         fun getFromReadBuf(i: Int, bytesRead: Int) = if (i < bytesRead) readBuf[i].toUint() else 0
 
@@ -131,8 +143,8 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
                         val fl = sl / 32767f
                         val fr = sr / 32767f
 
-                        finL[2 * (TAPS + 1) + c] = fl
-                        finR[2 * (TAPS + 1) + c] = fr
+                        finL[2 * PADSIZE + c] = fl
+                        finR[2 * PADSIZE + c] = fr
                     }
                 }
             }
@@ -160,6 +172,8 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
         else {
 //            printdbg(this, "Reading audio zero samples; Buffer: $validSamplesInBuf / $internalBufferSize samples")
         }
+
+        printdbg(this, "phase = $fPhaseL")
     }
 
     fun getLR(volume: Double): Pair<FloatArray, FloatArray> {
