@@ -1,7 +1,6 @@
 package net.torvald.terrarum.audio
 
 import com.jme3.math.FastMath
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.ceilToInt
@@ -10,7 +9,6 @@ import net.torvald.terrarum.serialise.toUint
 import org.dyn4j.Epsilon
 import kotlin.math.PI
 import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
 import kotlin.math.sin
 
 private data class Frac(var nom: Int, val denom: Int) {
@@ -32,7 +30,7 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
     companion object {
         private val epsilon: Double = Epsilon.E
 
-        private val TAPS = 8 // 2*a tap lanczos intp. Lower = greater artefacts
+        private val TAPS = 4 // 2*a tap lanczos intp. Lower = greater artefacts
 
         fun L(x: Double): Double = if (x.absoluteValue < epsilon)
             1.0
@@ -49,11 +47,11 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
 
         init {
             val bl = arrayOf(
-                1152,1380,1815,1792,2304,2634,3500,3456,4608,5141,6870,6912,
-                1280,1505,1943,1920,2304,2759,3630,3584,4608,5267,7000,6912,
-                1536,1756,2198,2176,2560,3010,3886,3840,4608,5518,7260,7168,
-                2048,2257,2709,2688,3072,3511,4397,4352,5120,6019,7772,7680,
-                4096,4513,5419,5376,6144,7022,8794,8704,10240,12038,15544,15360
+                1152,1380,1814,1792,2304,2634,3502,3456,4608,5141,6874,6912,
+                1280,1508,1942,1920,2304,2762,3630,3584,4608,5267,7004,6912,
+                1536,1764,2198,2176,2560,3018,3886,3840,4608,5519,7260,7168,
+                2048,2276,2710,2688,3072,3530,4398,4352,5120,6023,7772,7680,
+                4096,4554,5421,5376,6144,7056,8796,8704,10240,12078,15544,15360
             )
 
             arrayOf(48000,44100,32768,32000,24000,22050,16384,16000,12000,11025,8192,8000).forEachIndexed { ri, r ->
@@ -75,28 +73,26 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
     private val PADSIZE = TAPS + 1
 
     private fun resampleBlock(innL: FloatArray, innR: FloatArray, outL: FloatArray, outR: FloatArray, outSampleCount: Int) {
-        fun getInnL(i: Int) = innL[i + PADSIZE]
-        fun getInnR(i: Int) = innR[i + PADSIZE]
-
         for (sampleIdx in 0 until outSampleCount) {
-            val x = fPhaseL.toDouble() + q * sampleIdx
-            var sx = 0.0
-            for (i in x.floorToInt() - TAPS + 1..x.floorToInt() + TAPS) {
-                sx += getInnL(i) * L(x - i)
-            }
-            outL[sampleIdx] = sx.toFloat()
-        }
-        fPhaseL.nom = ((fPhaseL.toDouble() + q * outSampleCount) * denom).roundToInt() % denom
+            val t = sampleIdx.toDouble() * q
+            val leftBound = maxOf(0, (t - TAPS + 1).floorToInt())
+            val rightBound = minOf(innL.size - 1, (t + TAPS).ceilToInt())
 
-        for (sampleIdx in 0 until outSampleCount) {
-            val x = fPhaseR.toDouble() + q * sampleIdx
-            var sx = 0.0
-            for (i in x.floorToInt() - TAPS + 1..x.floorToInt() + TAPS) {
-                sx += getInnR(i) * L(x - i)
+
+            var akkuL = 0.0
+            var akkuR = 0.0
+            var weightedSum = 0.0
+
+            for (j in leftBound..rightBound) {
+                val w = L(t - j.toDouble())
+                akkuL += innL[j] * w
+                akkuR += innR[j] * w
+                weightedSum += w
             }
-            outR[sampleIdx] = sx.toFloat()
+
+            outL[sampleIdx] = (akkuL / weightedSum).toFloat()
+            outR[sampleIdx] = (akkuR / weightedSum).toFloat()
         }
-        fPhaseR.nom = ((fPhaseR.toDouble() + q * outSampleCount) * denom).roundToInt() % denom
     }
 
     var validSamplesInBuf = 0
@@ -110,8 +106,6 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
 
     private val finL = FloatArray(fetchSize + 2 * PADSIZE)
     private val finR = FloatArray(fetchSize + 2 * PADSIZE)
-    private var fPhaseL = Frac(preDelay, denom)
-    private var fPhaseR = Frac(preDelay, denom)
     private val fmidL = FloatArray((fetchSize / q + 1.0).toInt())
     private val fmidR = FloatArray((fetchSize / q + 1.0).toInt())
     private val foutL = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
@@ -125,7 +119,7 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
 
     fun fetchBytes() {
         val readCount = if (validSamplesInBuf < BS) fetchSize else 0
-        val writeCount = (readCount / q + fPhaseL.toDouble()).toInt()
+        val writeCount = (readCount / q).toInt()
 
         fun getFromReadBuf(i: Int, bytesRead: Int) = if (i < bytesRead) readBuf[i].toUint() else 0
 
