@@ -32,12 +32,17 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
 
         private val TAPS = 4 // 2*a tap lanczos intp. Lower = greater artefacts
 
-        fun L(x: Double): Double = if (x.absoluteValue < epsilon)
-            1.0
-        else if (-TAPS <= x && x < TAPS)
-            (TAPS * sin(PI * x) * sin(PI * x / TAPS)) / (PI * PI * x * x)
-        else
-            0.0
+        private val Lcache = HashMap<Long, Double>(1048576)
+        fun L(x: Double): Double {
+            return Lcache.getOrPut(x.toBits()) { // converting double to longbits allows faster cache lookup?!
+                if (x.absoluteValue < epsilon)
+                    1.0
+                else if (-TAPS <= x && x < TAPS)
+                    (TAPS * sin(PI * x) * sin(PI * x / TAPS)) / (PI * PI * x * x)
+                else
+                    0.0
+            }
+        }
 
         private val BS = AUDIO_BUFFER_SIZE
         private val MP3_CHUNK_SIZE = 1152 // 1152 for 32k-48k, 576 for 16k-24k, 384 for 8k-12k
