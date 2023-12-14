@@ -9,6 +9,7 @@ import net.torvald.terrarum.serialise.toUint
 import org.dyn4j.Epsilon
 import kotlin.math.PI
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 private data class Frac(var nom: Int, val denom: Int) {
@@ -69,7 +70,6 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
         private fun getOptimalBufferSize(rate: Int) = bufLut[BS to rate]!!
     }
 
-    private val denom = SAMPLING_RATE / FastMath.getGCD(inputSamplingRate, SAMPLING_RATE)
     private val q = inputSamplingRate.toDouble() / SAMPLING_RATE // <= 1.0
 
     private val fetchSize = (BS.toFloat() / MP3_CHUNK_SIZE).ceilToInt() * MP3_CHUNK_SIZE // fetchSize is always multiple of MP3_CHUNK_SIZE, even if the audio is NOT MP3
@@ -102,13 +102,6 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
 
     var validSamplesInBuf = 0
 
-    private val preDelay = when (denom) {
-        160 -> 31  // 44100
-        320 -> 209 // 22050
-        640 -> 565 // 11025
-        else -> 0
-    }
-
     private val finL = FloatArray(fetchSize + 2 * PADSIZE)
     private val finR = FloatArray(fetchSize + 2 * PADSIZE)
     private val fmidL = FloatArray((fetchSize / q + 1.0).toInt())
@@ -124,7 +117,7 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
 
     fun fetchBytes() {
         val readCount = if (validSamplesInBuf < BS) fetchSize else 0
-        val writeCount = (readCount / q).toInt()
+        val writeCount = (readCount / q).roundToInt()
 
         fun getFromReadBuf(i: Int, bytesRead: Int) = if (i < bytesRead) readBuf[i].toUint() else 0
 
