@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="io.airlift.aircompressor" type="repository">
+    <properties maven-id="io.airlift:aircompressor:0.25" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/aircompressor-0.25.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/aircompressor-0.25-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/aircompressor-0.25-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

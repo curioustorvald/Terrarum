@@ -36,7 +36,8 @@ object Common {
     const val GENVER = TerrarumAppConfiguration.VERSION_RAW
     const val COMP_NONE = 0
     const val COMP_GZIP = 1
-    const val COMP_LZMA = 2
+//    const val COMP_LZMA = 2
+    const val COMP_ZSTD = 3
 
     val CHARSET = Charsets.UTF_8
 

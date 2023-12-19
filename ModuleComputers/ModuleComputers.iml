@@ -18,5 +18,6 @@
     <orderEntry type="library" name="jetbrains.kotlin.test" level="project" />
     <orderEntry type="library" name="io.github.classgraph" level="project" />
     <orderEntry type="library" name="jetbrains.kotlinx.coroutines.core" level="project" />
+    <orderEntry type="library" name="io.airlift.aircompressor" level="project" />
   </component>
 </module>

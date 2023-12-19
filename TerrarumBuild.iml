@@ -29,5 +29,6 @@
     <orderEntry type="library" name="jetbrains.kotlinx.coroutines.core" level="project" />
     <orderEntry type="library" name="github.psambit9791.jdsp" level="project" />
     <orderEntry type="library" name="github.wendykierp.JTransforms" level="project" />
+    <orderEntry type="library" name="io.airlift.aircompressor" level="project" />
   </component>
 </module>
