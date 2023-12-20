@@ -293,9 +293,13 @@ class ByteArray64(initialSize: Long = BANK_SIZE.toLong()) {
             fos.close()
         }*/
 
-        forEach {
+        /*forEach {
             fos.write(it.toInt())
+        }*/
+        forEachUsedBanks { count, bytes ->
+            fos.write(bytes, 0, count)
         }
+
         fos.flush()
         fos.close()
     }
