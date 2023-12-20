@@ -44,6 +44,7 @@ object Common {
     const val COMP_GZIP = 1
 //    const val COMP_LZMA = 2
     const val COMP_ZSTD = 3
+    const val COMP_SNAPPY = 4
 
     val CHARSET = Charsets.UTF_8
 
@@ -529,6 +530,10 @@ object Common {
         }
     }
 
+    fun getCompIndex() = when (App.getConfigString("savegamecomp")) {
+        "snappy" -> COMP_SNAPPY
+        else -> COMP_ZSTD
+    }
 
     fun enasciiToString(ba: ByteArray64): String = enasciiToString(ba.iterator())
     fun enasciiToString(ba: Iterator<Byte>): String {

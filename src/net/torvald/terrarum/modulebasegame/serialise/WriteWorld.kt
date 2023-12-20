@@ -33,7 +33,7 @@ object WriteWorld {
         val world = ingame.world
         val currentPlayTime_t = time_t - ingame.loadedTime_t
 
-        world.comp = Common.COMP_ZSTD
+        world.comp = Common.getCompIndex()
         world.lastPlayTime = time_t
         world.totalPlayTime += currentPlayTime_t
 

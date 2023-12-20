@@ -45,7 +45,7 @@ object WriteSimpleWorld {
     private fun preWrite(ingame: IngameInstance, time_t: Long, world: SimpleGameWorld, actorsList: List<Actor>) {
         val currentPlayTime_t = time_t - ingame.loadedTime_t
 
-        world.comp = Common.COMP_ZSTD
+        world.comp = Common.getCompIndex()
         world.lastPlayTime = time_t
         world.totalPlayTime += currentPlayTime_t
 
