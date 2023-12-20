@@ -1,5 +1,7 @@
 package net.torvald.terrarum.tests
 
+import io.airlift.compress.snappy.SnappyFramedInputStream
+import io.airlift.compress.snappy.SnappyFramedOutputStream
 import io.airlift.compress.zstd.ZstdInputStream
 import io.airlift.compress.zstd.ZstdOutputStream
 import net.torvald.random.HQRNG
@@ -8,6 +10,8 @@ import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import net.torvald.terrarum.savegame.ByteArray64
 import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.savegame.ByteArray64InputStream
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import kotlin.math.roundToInt
@@ -72,10 +76,11 @@ class ZipTest(val mode: String) {
     private val testInput0 = Array(TEST_COUNT) { dataGenerator(CHUNKSIZE) }
     private val testInputG = testInput0.copyOf().also { it.shuffle() }
     private val testInputZ = testInput0.copyOf().also { it.shuffle() }
+    private val testInputS = testInput0.copyOf().also { it.shuffle() }
 
-    private fun compGzip(bytes: ByteArray64): ByteArray64 {
+    private inline fun _comp(bytes: ByteArray64, zf: (ByteArray64GrowableOutputStream) -> OutputStream): ByteArray64 {
         val bo = ByteArray64GrowableOutputStream()
-        val zo = GZIPOutputStream(bo)
+        val zo = zf(bo)
 
         bytes.iterator().forEach {
             zo.write(it.toInt())
@@ -83,10 +88,9 @@ class ZipTest(val mode: String) {
         zo.flush(); zo.close()
         return bo.toByteArray64()
     }
-
-    private fun decompGzip(bytes: ByteArray64): ByteArray64 {
+    private fun _decomp(bytes: ByteArray64, zf: (ByteArray64InputStream) -> InputStream): ByteArray64 {
         val unzipdBytes = ByteArray64()
-        val zi = GZIPInputStream(ByteArray64InputStream(bytes))
+        val zi = zf(ByteArray64InputStream(bytes))
         while (true) {
             val byte = zi.read()
             if (byte == -1) break
@@ -96,74 +100,74 @@ class ZipTest(val mode: String) {
         return unzipdBytes
     }
 
-    private fun compZstd(bytes: ByteArray64): ByteArray64 {
-        val bo = ByteArray64GrowableOutputStream()
-        val zo = ZstdOutputStream(bo)
+    private fun compGzip(bytes: ByteArray64) =  _comp(bytes) { GZIPOutputStream(it) }
+    private fun decompGzip(bytes: ByteArray64) = _decomp(bytes) { GZIPInputStream(it) }
 
-        bytes.iterator().forEach {
-            zo.write(it.toInt())
-        }
-        zo.flush();zo.close()
-        return bo.toByteArray64()
-    }
+    private fun compZstd(bytes: ByteArray64) =  _comp(bytes) { ZstdOutputStream(it) }
+    private fun decompZstd(bytes: ByteArray64) = _decomp(bytes) { ZstdInputStream(it) }
 
-    private fun decompZstd(bytes: ByteArray64): ByteArray64 {
-        val unzipdBytes = ByteArray64()
-        val zi = ZstdInputStream(ByteArray64InputStream(bytes))
-        while (true) {
-            val byte = zi.read()
-            if (byte == -1) break
-            unzipdBytes.appendByte(byte.toByte())
-        }
-        zi.close()
-        return unzipdBytes
-    }
+    private fun compSnappy(bytes: ByteArray64) =  _comp(bytes) { SnappyFramedOutputStream(it) }
+    private fun decompSnappy(bytes: ByteArray64) = _decomp(bytes) { SnappyFramedInputStream(it) }
 
     fun main() {
         val compBufG = arrayOfNulls<ByteArray64>(TEST_COUNT)
         val compBufZ = arrayOfNulls<ByteArray64>(TEST_COUNT)
+        val compBufS = arrayOfNulls<ByteArray64>(TEST_COUNT)
         val decompBufG = arrayOfNulls<ByteArray64>(TEST_COUNT)
         val decompBufZ = arrayOfNulls<ByteArray64>(TEST_COUNT)
+        val decompBufS = arrayOfNulls<ByteArray64>(TEST_COUNT)
 
-//        println("Compressing $TEST_COUNT samples of $CHUNKSIZE bytes using Gzip")
         val gzipCompTime = measureNanoTime {
             for (i in 0 until TEST_COUNT) {
                 compBufG[i] = compGzip(testInputG[i])
             }
         }
-
-//        println("Decompressing $TEST_COUNT samples of $CHUNKSIZE bytes using Gzip")
         val gzipDecompTime = measureNanoTime {
             for (i in 0 until TEST_COUNT) {
                 decompBufG[i] = decompGzip(compBufG[i]!!)
             }
         }
 
-//        println("Compressing $TEST_COUNT samples of $CHUNKSIZE bytes using Zstd")
+
         val zstdCompTime = measureNanoTime {
             for (i in 0 until TEST_COUNT) {
                 compBufZ[i] = compZstd(testInputZ[i])
             }
         }
-
-//        println("Decompressing $TEST_COUNT samples of $CHUNKSIZE bytes using Zstd")
         val zstdDecompTime = measureNanoTime {
             for (i in 0 until TEST_COUNT) {
                 decompBufZ[i] = decompZstd(compBufZ[i]!!)
             }
         }
 
+
+        val snappyCompTime = measureNanoTime {
+            for (i in 0 until TEST_COUNT) {
+                compBufS[i] = compSnappy(testInputS[i])
+            }
+        }
+        val snappyDecompTime = measureNanoTime {
+            for (i in 0 until TEST_COUNT) {
+                decompBufS[i] = decompSnappy(compBufS[i]!!)
+            }
+        }
+
+
         val compSizeG = compBufG.sumOf { it!!.size } / TEST_COUNT
         val compSizeZ = compBufZ.sumOf { it!!.size } / TEST_COUNT
+        val compSizeS = compBufS.sumOf { it!!.size } / TEST_COUNT
         val origSize =  testInput0.sumOf { it.size } / TEST_COUNT
         val ratioG = ((1.0 - (compSizeG.toDouble() / origSize)) * 10000).roundToInt() / 100
         val ratioZ = ((1.0 - (compSizeZ.toDouble() / origSize)) * 10000).roundToInt() / 100
+        val ratioS = ((1.0 - (compSizeS.toDouble() / origSize)) * 10000).roundToInt() / 100
 
         println("==== $mode Data ($origSize bytes x $TEST_COUNT samples) ====")
         println("Gzip   comp: $gzipCompTime ns")
         println("Gzip decomp: $gzipDecompTime ns; ratio: $ratioG% (avr size: $compSizeG)")
         println("Zstd   comp: $zstdCompTime ns")
         println("Zstd decomp: $zstdDecompTime ns; ratio: $ratioZ% (avr size: $compSizeZ)")
+        println("Snpy   comp: $snappyCompTime ns")
+        println("Snpy decomp: $snappyDecompTime ns; ratio: $ratioS% (avr size: $compSizeS)")
         println()
     }
 }
