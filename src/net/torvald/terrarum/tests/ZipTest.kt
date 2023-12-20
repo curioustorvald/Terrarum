@@ -8,7 +8,8 @@ import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import net.torvald.terrarum.savegame.ByteArray64
 import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.savegame.ByteArray64InputStream
-import net.torvald.terrarum.serialise.Common
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 import kotlin.math.roundToInt
 import kotlin.system.measureNanoTime
 
@@ -73,11 +74,26 @@ class ZipTest(val mode: String) {
     private val testInputZ = testInput0.copyOf().also { it.shuffle() }
 
     private fun compGzip(bytes: ByteArray64): ByteArray64 {
-        return Common.zip(bytes)
+        val bo = ByteArray64GrowableOutputStream()
+        val zo = GZIPOutputStream(bo)
+
+        bytes.iterator().forEach {
+            zo.write(it.toInt())
+        }
+        zo.flush(); zo.close()
+        return bo.toByteArray64()
     }
 
     private fun decompGzip(bytes: ByteArray64): ByteArray64 {
-        return Common.unzip(bytes)
+        val unzipdBytes = ByteArray64()
+        val zi = GZIPInputStream(ByteArray64InputStream(bytes))
+        while (true) {
+            val byte = zi.read()
+            if (byte == -1) break
+            unzipdBytes.appendByte(byte.toByte())
+        }
+        zi.close()
+        return unzipdBytes
     }
 
     private fun compZstd(bytes: ByteArray64): ByteArray64 {

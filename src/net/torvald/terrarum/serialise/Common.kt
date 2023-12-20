@@ -3,6 +3,8 @@ package net.torvald.terrarum.serialise
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
+import io.airlift.compress.zstd.ZstdInputStream
+import io.airlift.compress.zstd.ZstdOutputStream
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.console.EchoError
@@ -13,6 +15,7 @@ import net.torvald.terrarum.savegame.ByteArray64
 import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
+import net.torvald.terrarum.toHex
 import net.torvald.terrarum.utils.*
 import net.torvald.terrarum.weather.BaseModularWeather
 import net.torvald.terrarum.weather.WeatherDirBox
@@ -468,7 +471,9 @@ object Common {
     fun bytesToZipdStr(byteIterator: Iterator<Byte>): String = enasciiToString(zip(byteIterator))
 
     fun zip(ba: ByteArray64) = Common.zip(ba.iterator())
-    fun zip(byteIterator: Iterator<Byte>): ByteArray64 {
+
+    @Deprecated("New savegame standard should use Zstd")
+    private fun zipG(byteIterator: Iterator<Byte>): ByteArray64 {
         val bo = ByteArray64GrowableOutputStream()
         val zo = GZIPOutputStream(bo)
 
@@ -479,6 +484,18 @@ object Common {
         zo.flush(); zo.close()
         return bo.toByteArray64()
     }
+    fun zip(byteIterator: Iterator<Byte>): ByteArray64 {
+        val bo = ByteArray64GrowableOutputStream()
+        val zo = ZstdOutputStream(bo)
+
+        // zip
+        byteIterator.forEach {
+            zo.write(it.toInt())
+        }
+        zo.flush(); zo.close()
+        return bo.toByteArray64()
+    }
+
 
     fun enasciiToString(ba: ByteArray64): String = enasciiToString(ba.iterator())
     fun enasciiToString(ba: Iterator<Byte>): String {
@@ -500,7 +517,7 @@ object Common {
         return sb.toString()
     }
 
-    fun unzip(bytes: ByteArray64): ByteArray64 {
+    private fun unzipG(bytes: ByteArray64): ByteArray64 {
         val unzipdBytes = ByteArray64()
         val zi = GZIPInputStream(ByteArray64InputStream(bytes))
         while (true) {
@@ -510,6 +527,28 @@ object Common {
         }
         zi.close()
         return unzipdBytes
+    }
+
+    private fun unzipZ(bytes: ByteArray64): ByteArray64 {
+        val unzipdBytes = ByteArray64()
+        val zi = ZstdInputStream(ByteArray64InputStream(bytes))
+        while (true) {
+            val byte = zi.read()
+            if (byte == -1) break
+            unzipdBytes.appendByte(byte.toByte())
+        }
+        zi.close()
+        return unzipdBytes
+    }
+
+    fun unzip(bytes: ByteArray64): ByteArray64 {
+        val header = bytes[0].toUint().shl(24) or bytes[1].toUint().shl(16) or bytes[2].toUint().shl(8) or bytes[3].toUint()
+
+        return when (header) {
+            in 0x1F8B0000..0x1F8B08FF -> unzipG(bytes)
+            0x28B52FFD -> unzipZ(bytes)
+            else -> throw IllegalArgumentException("Unknown archive with header ${header.toHex()}")
+        }
     }
 
     fun unasciiToBytes(reader: Reader): ByteArray64 {
