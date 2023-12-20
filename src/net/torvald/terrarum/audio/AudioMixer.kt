@@ -247,6 +247,8 @@ object AudioMixer: Disposable {
 
     private var testAudioMixRatio = 0.0
 
+    private var muteLatched = false
+
     fun update(delta: Float) {
         // test the panning
         /*musicTrack.getFilter<BinoPan>().let {
@@ -262,14 +264,20 @@ object AudioMixer: Disposable {
 
             if (Gdx.input.isKeyPressed(Input.Keys.UP))
                 testAudioMixRatio += mixDelta
-            else if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
                 testAudioMixRatio -= mixDelta
-            else if (Gdx.input.isKeyPressed(Input.Keys.NUM_1))
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_1))
                 testAudioMixRatio = -1.0
-            else if (Gdx.input.isKeyPressed(Input.Keys.NUM_2))
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_2))
                 testAudioMixRatio = 0.0
-            else if (Gdx.input.isKeyPressed(Input.Keys.NUM_3))
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_3))
                 testAudioMixRatio = 1.0
+            if (!muteLatched && Gdx.input.isKeyPressed(Input.Keys.NUM_4)) {
+                AudioMixer.sumBus.volume = 1.0 - AudioMixer.sumBus.volume
+                muteLatched = true
+            }
+            else if (!Gdx.input.isKeyPressed(Input.Keys.NUM_4))
+                muteLatched = false
 
             testAudioMixRatio = testAudioMixRatio.coerceIn(MaterialCodex["AIIR"].sondrefl.absoluteValue * -1.0, 1.0)
 

@@ -10,7 +10,8 @@ class Convolv(ir: File, val gain: Float = 1f / 512f): TerrarumAudioFilter() {
 
     val fftLen: Int
     private val convFFT: Array<ComplexArray>
-    private val inbuf: Array<ComplexArray>
+//    private val inbuf: Array<ComplexArray>
+    private val sumbuf: ComplexArray
 
     private val BLOCKSIZE = TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE
 
@@ -30,7 +31,8 @@ class Convolv(ir: File, val gain: Float = 1f / 512f): TerrarumAudioFilter() {
         println("IR '${ir.path}' Sample Count = $sampleCount; FFT Length = $fftLen")
 
         val conv = Array(2) { FloatArray(fftLen) }
-        inbuf = Array(2) { ComplexArray(FloatArray(fftLen * 2)) }
+//        inbuf = Array(2) { ComplexArray(FloatArray(fftLen * 2)) }
+        sumbuf = ComplexArray(FloatArray(fftLen * 2))
 
         ir.inputStream().let {
             for (i in 0 until sampleCount) {
@@ -72,10 +74,8 @@ class Convolv(ir: File, val gain: Float = 1f / 512f): TerrarumAudioFilter() {
     private val realtime = (BLOCKSIZE / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L)
     private val fftIn = ComplexArray(FloatArray(fftLen * 2))
     private val fftMult = ComplexArray(FloatArray(fftLen * 2))
-    private val fftOut_lL = FloatArray(fftLen) // small l/r: input audio
-    private val fftOut_rL = FloatArray(fftLen) // large L/R: impulse response
-    private val fftOut_lR = FloatArray(fftLen)
-    private val fftOut_rR = FloatArray(fftLen)
+    private val fftOutL = FloatArray(fftLen)
+    private val fftOutR = FloatArray(fftLen)
 
     private fun convolve(x: ComplexArray, h: ComplexArray, output: FloatArray) {
         FFT.fftInto(x, fftIn)
@@ -91,17 +91,14 @@ class Convolv(ir: File, val gain: Float = 1f / 512f): TerrarumAudioFilter() {
 
 
 
-        push(gain, inbuf[0], this.inbuf[0])
-        push(gain, inbuf[1], this.inbuf[1])
+        pushSum(gain, inbuf[0], inbuf[1], sumbuf)
 
-        convolve(this.inbuf[0], convFFT[0], fftOut_lL)
-        convolve(this.inbuf[1], convFFT[0], fftOut_rL)
-        convolve(this.inbuf[0], convFFT[1], fftOut_lR)
-        convolve(this.inbuf[1], convFFT[1], fftOut_rR)
+        convolve(sumbuf, convFFT[0], fftOutL)
+        convolve(sumbuf, convFFT[1], fftOutR)
 
         for (i in 0 until BLOCKSIZE) {
-            outbuf[0][i] = fftOut_lL[fftLen - BLOCKSIZE + i] + fftOut_rL[fftLen - BLOCKSIZE + i]
-            outbuf[1][i] = fftOut_rR[fftLen - BLOCKSIZE + i] + fftOut_lR[fftLen - BLOCKSIZE + i]
+            outbuf[0][i] = fftOutL[fftLen - BLOCKSIZE + i]
+            outbuf[1][i] = fftOutR[fftLen - BLOCKSIZE + i]
         }
 
 
@@ -113,10 +110,23 @@ class Convolv(ir: File, val gain: Float = 1f / 512f): TerrarumAudioFilter() {
 
 
     fun push(gain: Float, samples: FloatArray, buf: ComplexArray) {
+        // shift numbers
         System.arraycopy(buf.reim, samples.size * 2, buf.reim, 0, buf.reim.size - samples.size * 2)
+        // fill in the shifted area
         val baseI = buf.reim.size - samples.size * 2
         samples.forEachIndexed { index, fl ->
             buf.reim[baseI + index * 2 + 0] = fl * gain
+            buf.reim[baseI + index * 2 + 1] = 0f
+        }
+    }
+
+    fun pushSum(gain: Float, sampleL: FloatArray, sampleR: FloatArray, buf: ComplexArray) {
+        // shift numbers
+        System.arraycopy(buf.reim, sampleL.size * 2, buf.reim, 0, buf.reim.size - sampleL.size * 2)
+        // fill in the shifted area
+        val baseI = buf.reim.size - sampleL.size * 2
+        for (index in sampleL.indices) {
+            buf.reim[baseI + index * 2 + 0] = (sampleL[index] + sampleR[index]) * gain
             buf.reim[baseI + index * 2 + 1] = 0f
         }
     }
