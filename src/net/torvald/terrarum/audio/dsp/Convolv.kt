@@ -6,7 +6,7 @@ import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
 import java.io.File
 
-class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
+class Convolv(ir: File, val gain: Float = 1f / 512f): TerrarumAudioFilter() {
 
     val fftLen: Int
     private val convFFT: Array<ComplexArray>
@@ -72,24 +72,38 @@ class Convolv(ir: File, val gain: Float = 1f / 256f): TerrarumAudioFilter() {
     private val realtime = (BLOCKSIZE / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L)
     private val fftIn = ComplexArray(FloatArray(fftLen * 2))
     private val fftMult = ComplexArray(FloatArray(fftLen * 2))
-    private val fftOut = FloatArray(fftLen)
+    private val fftOut_lL = FloatArray(fftLen) // small l/r: input audio
+    private val fftOut_rL = FloatArray(fftLen) // large L/R: impulse response
+    private val fftOut_lR = FloatArray(fftLen)
+    private val fftOut_rR = FloatArray(fftLen)
+
+    private fun convolve(x: ComplexArray, h: ComplexArray, output: FloatArray) {
+        FFT.fftInto(x, fftIn)
+        fftIn.mult(h, fftMult)
+        FFT.ifftAndGetReal(fftMult, output)
+    }
 
     /**
      * https://thewolfsound.com/fast-convolution-fft-based-overlap-add-overlap-save-partitioned/
      */
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
-
         val t1 = System.nanoTime()
 
 
-        for (ch in outbuf.indices) {
-            push(gain, inbuf[ch], this.inbuf[ch])
 
-            FFT.fftInto(this.inbuf[ch], fftIn)
-            fftIn.mult(convFFT[ch], fftMult)
-            FFT.ifftAndGetReal(fftMult, fftOut)
-            System.arraycopy(fftOut, fftLen - BLOCKSIZE, outbuf[ch], 0, BLOCKSIZE)
+        push(gain, inbuf[0], this.inbuf[0])
+        push(gain, inbuf[1], this.inbuf[1])
+
+        convolve(this.inbuf[0], convFFT[0], fftOut_lL)
+        convolve(this.inbuf[1], convFFT[0], fftOut_rL)
+        convolve(this.inbuf[0], convFFT[1], fftOut_lR)
+        convolve(this.inbuf[1], convFFT[1], fftOut_rR)
+
+        for (i in 0 until BLOCKSIZE) {
+            outbuf[0][i] = fftOut_lL[fftLen - BLOCKSIZE + i] + fftOut_rL[fftLen - BLOCKSIZE + i]
+            outbuf[1][i] = fftOut_rR[fftLen - BLOCKSIZE + i] + fftOut_lR[fftLen - BLOCKSIZE + i]
         }
+
 
 
         val ptime = System.nanoTime() - t1
