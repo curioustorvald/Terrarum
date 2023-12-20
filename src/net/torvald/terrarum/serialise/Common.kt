@@ -3,9 +3,12 @@ package net.torvald.terrarum.serialise
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
+import io.airlift.compress.snappy.SnappyFramedInputStream
+import io.airlift.compress.snappy.SnappyFramedOutputStream
 import io.airlift.compress.zstd.ZstdInputStream
 import io.airlift.compress.zstd.ZstdOutputStream
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.App
 import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameworld.BlockLayerI16
@@ -484,7 +487,7 @@ object Common {
         zo.flush(); zo.close()
         return bo.toByteArray64()
     }
-    fun zip(byteIterator: Iterator<Byte>): ByteArray64 {
+    private fun zipZ(byteIterator: Iterator<Byte>): ByteArray64 {
         val bo = ByteArray64GrowableOutputStream()
         val zo = ZstdOutputStream(bo)
 
@@ -494,6 +497,36 @@ object Common {
         }
         zo.flush(); zo.close()
         return bo.toByteArray64()
+    }
+    private fun zipS(byteIterator: Iterator<Byte>): ByteArray64 {
+        val bo = ByteArray64GrowableOutputStream()
+        val zo = SnappyFramedOutputStream(bo)
+
+        // zip
+        byteIterator.forEach {
+            zo.write(it.toInt())
+        }
+        zo.flush(); zo.close()
+        return bo.toByteArray64()
+    }
+    /*private fun zipNull(byteIterator: Iterator<Byte>): ByteArray64 {
+        val bo = ByteArray64GrowableOutputStream()
+
+        bo.write(byteArrayOf(0xfe.toByte(), 0xed.toByte(), 0xda.toByte(), 0x7a.toByte()))
+
+        // zip
+        byteIterator.forEach {
+            bo.write(it.toInt())
+        }
+        return bo.toByteArray64()
+    }*/
+
+    fun zip(byteIterator: Iterator<Byte>): ByteArray64 {
+        return when (App.getConfigString("savegamecomp")) {
+            "snappy" -> zipS(byteIterator)
+//            "null" -> zipNull(byteIterator)
+            else -> zipZ(byteIterator)
+        }
     }
 
 
@@ -541,12 +574,32 @@ object Common {
         return unzipdBytes
     }
 
+    private fun unzipS(bytes: ByteArray64): ByteArray64 {
+        val unzipdBytes = ByteArray64()
+        val zi = SnappyFramedInputStream(ByteArray64InputStream(bytes))
+        while (true) {
+            val byte = zi.read()
+            if (byte == -1) break
+            unzipdBytes.appendByte(byte.toByte())
+        }
+        zi.close()
+        return unzipdBytes
+    }
+
+    /*private fun unzipNull(bytes: ByteArray64): ByteArray64 {
+        return bytes.sliceArray64(4 until bytes.size)
+    }*/
+
     fun unzip(bytes: ByteArray64): ByteArray64 {
         val header = bytes[0].toUint().shl(24) or bytes[1].toUint().shl(16) or bytes[2].toUint().shl(8) or bytes[3].toUint()
 
+        // to save yourself from the curiosity: load time of the null compression is no faster than the snappy
+
         return when (header) {
-            in 0x1F8B0000..0x1F8B08FF -> unzipG(bytes)
+            in 0x1F8B0800..0x1F8B08FF -> unzipG(bytes)
             0x28B52FFD -> unzipZ(bytes)
+            0xFF060000.toInt() -> unzipS(bytes)
+//            0xFEEDDA7A.toInt() -> unzipNull(bytes)
             else -> throw IllegalArgumentException("Unknown archive with header ${header.toHex()}")
         }
     }

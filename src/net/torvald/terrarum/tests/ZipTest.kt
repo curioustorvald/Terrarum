@@ -1,5 +1,6 @@
 package net.torvald.terrarum.tests
 
+import com.badlogic.gdx.utils.compression.Lzma
 import io.airlift.compress.snappy.SnappyFramedInputStream
 import io.airlift.compress.snappy.SnappyFramedOutputStream
 import io.airlift.compress.zstd.ZstdInputStream
@@ -10,6 +11,8 @@ import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import net.torvald.terrarum.savegame.ByteArray64
 import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.savegame.ByteArray64InputStream
+import net.torvald.terrarum.serialise.toUint
+import net.torvald.terrarum.toHex
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.zip.GZIPInputStream
@@ -75,6 +78,7 @@ class ZipTest(val mode: String) {
 
     private val testInput0 = Array(TEST_COUNT) { dataGenerator(CHUNKSIZE) }
     private val testInputG = testInput0.copyOf().also { it.shuffle() }
+    private val testInputL = testInput0.copyOf().also { it.shuffle() }
     private val testInputZ = testInput0.copyOf().also { it.shuffle() }
     private val testInputS = testInput0.copyOf().also { it.shuffle() }
 
@@ -128,7 +132,6 @@ class ZipTest(val mode: String) {
             }
         }
 
-
         val zstdCompTime = measureNanoTime {
             for (i in 0 until TEST_COUNT) {
                 compBufZ[i] = compZstd(testInputZ[i])
@@ -169,12 +172,29 @@ class ZipTest(val mode: String) {
         println("Snpy   comp: $snappyCompTime ns")
         println("Snpy decomp: $snappyDecompTime ns; ratio: $ratioS% (avr size: $compSizeS)")
         println()
+
+        repeat(2) { sg.add(compBufG.random()!!.sliceArray(0..15).joinToString { it.toUint().toHex().takeLast(2) }) }
+        repeat(2) { sz.add(compBufZ.random()!!.sliceArray(0..15).joinToString { it.toUint().toHex().takeLast(2) }) }
+        repeat(2) { ss.add(compBufS.random()!!.sliceArray(0..15).joinToString { it.toUint().toHex().takeLast(2) }) }
+
+
+
     }
 }
 
+private val sg = ArrayList<String>()
+private val sz = ArrayList<String>()
+private val ss = ArrayList<String>()
 
 fun main() {
     ZipTest("Simulated Real-World").main()
     ZipTest("Zero-Filled").main()
     ZipTest("Random").main()
+
+    println("Gzip samples:")
+    sg.forEach { println(it) }
+    println("Zstd samples:")
+    sz.forEach { println(it) }
+    println("Snappy samples:")
+    ss.forEach { println(it) }
 }
