@@ -414,6 +414,13 @@ class BasicDebugInfoWindow : UICanvas() {
 
         val FILTER_NAME_ACTIVE = Color(0xeeeeee_bf.toInt())
         val FILTER_BYPASSED = Color(0xf1b934_bf.toInt())
+
+
+        fun getSmoothingFactor(sampleCount: Int) = (1.0 - (256.0 / sampleCount))
+        val PEAK_SMOOTHING_FACTOR = getSmoothingFactor(640)
+        val FFT_SMOOTHING_FACTOR = getSmoothingFactor(960)
+        val LAMP_SMOOTHING_FACTOR = getSmoothingFactor(3200)
+        val RMS_SMOOTHING_FACTOR = getSmoothingFactor(12000)
     }
 
     private val halfStripW = STRIP_W / 2
@@ -465,11 +472,6 @@ class BasicDebugInfoWindow : UICanvas() {
     private val oldPeakDS = Array(256) { arrayOf(0.0, 0.0) }
     private val oldRMS = Array(trackCount) { arrayOf(0.0, 0.0) }
     private val oldComp = Array(trackCount) { arrayOf(0.0, 0.0) }
-
-    private fun getSmoothingFactor(sampleCount: Int) = 1.0 - (AUDIO_BUFFER_SIZE.toDouble() / sampleCount)
-    private val PEAK_SMOOTHING_FACTOR = getSmoothingFactor(640)
-    private val LAMP_SMOOTHING_FACTOR = getSmoothingFactor(3200)
-    private val RMS_SMOOTHING_FACTOR = getSmoothingFactor(12000)
 
     val miniW = 28
     val miniH = 35
