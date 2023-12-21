@@ -1,5 +1,6 @@
 package net.torvald.terrarum.audio.dsp
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import kotlin.math.roundToInt
@@ -46,4 +47,9 @@ class Reverb(val delayMS: Float = 36f, var feedback: Float = 0.92f, var lowpass:
             }
         }
     }
+
+    override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
+    }
+
+    override val debugViewHeight = 0
 }

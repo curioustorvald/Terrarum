@@ -1,6 +1,10 @@
 package net.torvald.terrarum.audio.dsp
 
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.STRIP_W
+import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.roundToInt
 
 class Scope : TerrarumAudioFilter() {
@@ -37,4 +41,26 @@ class Scope : TerrarumAudioFilter() {
             System.arraycopy(inbuf[index], 0, outTrack, 0, outTrack.size)
         }
     }
+
+    private val halfStripW = STRIP_W / 2
+    private val scopePlotCol = Color(0x61b3df_33)
+
+    override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
+        batch.color = scopePlotCol
+        val xxs = backbufR
+        val yys = backbufL
+        for (t in xxs.lastIndex downTo 0) {
+            val xs = xxs[t]
+            val ys = yys[t]
+
+            for (i in xs.indices.reversed()) {
+                val px = xs[i] * halfStripW + halfStripW
+                val py = ys[i] * halfStripW + halfStripW
+                Toolkit.fillArea(batch, x + px, y + py, 1f, 1f)
+            }
+
+        }
+    }
+
+    override val debugViewHeight = STRIP_W
 }

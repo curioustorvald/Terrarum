@@ -1,10 +1,20 @@
 package net.torvald.terrarum.audio.dsp
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
+import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.decibelsToFullscale
+import net.torvald.terrarum.ui.BasicDebugInfoWindow
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD2
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.FILTER_NAME_ACTIVE
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.STRIP_W
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.toIntAndFrac
+import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 /**
  * The input audio must be monaural
@@ -62,4 +72,22 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
 
         push(inbuf[0], delayLine)
     }
+
+    override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
+        val w = pan * 0.5f * STRIP_W
+        batch.color = COL_METER_GRAD2
+        Toolkit.fillArea(batch, x + STRIP_W / 2f, y.toFloat(), w, 14f)
+        batch.color = COL_METER_GRAD
+        Toolkit.fillArea(batch, x + STRIP_W / 2f, y+14f, w, 2f)
+
+        batch.color = FILTER_NAME_ACTIVE
+        val panLabel = if (pan == 0f) "<C>"
+        else if (pan < 0) "L${pan.absoluteValue.times(100).toIntAndFrac(3,1)}"
+        else "R${pan.absoluteValue.times(100).toIntAndFrac(3,1)}"
+        App.fontSmallNumbers.draw(batch, panLabel, x+3f, y+1f)
+
+        App.fontSmallNumbers.draw(batch, "AS:${AudioMixer.SPEED_OF_SOUND.roundToInt()}", x+3f, y+17f)
+    }
+
+    override val debugViewHeight = 32
 }

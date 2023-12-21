@@ -1,5 +1,7 @@
 package net.torvald.terrarum.audio.dsp
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+
 abstract class TerrarumAudioFilter {
     var bypass = false
     protected abstract fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>)
@@ -11,6 +13,8 @@ abstract class TerrarumAudioFilter {
         }
         else thru(inbuf, outbuf)
     }
+    abstract fun drawDebugView(batch: SpriteBatch, x: Int, y: Int)
+    abstract val debugViewHeight: Int
 }
 
 fun FloatArray.applyGain(gain: Float = 1f) = this.map { it * gain }.toFloatArray()

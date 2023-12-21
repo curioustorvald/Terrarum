@@ -114,14 +114,6 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private infix fun Double.pow(b: Double) = Math.pow(this, b)
 
-    private fun Double?.toIntAndFrac(intLen: Int, fracLen: Int = 4): String =
-            if (this == null) "null" else if (this.isNaN()) "NaN" else if (this.isInfinite()) "${if (this >= 0.0) '+' else '-'}Inf" else
-                "${((if (this >= 0.0) "" else "-") + "${this.absoluteValue.toInt()}").padStart(intLen)}." +
-            (10.0 pow fracLen.toDouble()).let { d -> (this.absoluteValue.times(d) % d).toInt().toString().padStart(fracLen, '0').padEnd(fracLen) }
-    private fun Float?.toIntAndFrac(intLen: Int, fracLen: Int = 4): String =
-        if (this == null) "null" else if (this.isNaN()) "NaN" else if (this.isInfinite()) "${if (this >= 0.0) '+' else '-'}Inf" else
-            "${((if (this >= 0.0) "" else "-") + "${this.absoluteValue.toInt()}").padStart(intLen)}." +
-                    (10.0 pow fracLen.toDouble()).let { d -> (this.absoluteValue.times(d) % d).toInt().toString().padStart(fracLen, '0').padEnd(fracLen) }
 
     private val gap = 14f
 
@@ -379,44 +371,58 @@ class BasicDebugInfoWindow : UICanvas() {
     private val meterTroughHeight = meterGradCountMinusOne * meterGradSize + 5
     private val meterHeight = meterTroughHeight - 4
 
-    private val stripW = 54
-    private val halfStripW = stripW / 2
+    companion object {
+        fun Double?.toIntAndFrac(intLen: Int, fracLen: Int = 4): String =
+            if (this == null) "null" else if (this.isNaN()) "NaN" else if (this.isInfinite()) "${if (this >= 0.0) '+' else '-'}Inf" else
+                "${((if (this >= 0.0) "" else "-") + "${this.absoluteValue.toInt()}").padStart(intLen)}." +
+                        (10.0.pow(fracLen)).let { d -> (this.absoluteValue.times(d) % d).toInt().toString().padStart(fracLen, '0').padEnd(fracLen) }
+        fun Float?.toIntAndFrac(intLen: Int, fracLen: Int = 4): String =
+            if (this == null) "null" else if (this.isNaN()) "NaN" else if (this.isInfinite()) "${if (this >= 0.0) '+' else '-'}Inf" else
+                "${((if (this >= 0.0) "" else "-") + "${this.absoluteValue.toInt()}").padStart(intLen)}." +
+                        (10.0.pow(fracLen)).let { d -> (this.absoluteValue.times(d) % d).toInt().toString().padStart(fracLen, '0').padEnd(fracLen) }
+
+
+        val STRIP_W = 54
+
+        val COL_WELL = Color(0x374854_aa)
+        val COL_WELL2 = Color(0x3f5360_aa)
+        val COL_WELL3 = Color(0x485437_aa)
+        val COL_WELL4 = Color(0x543748_aa)
+        val COL_FILTER_TITLE = Color(0x5e656c_aa)
+        val COL_FILTER_TITLE_SHADE = Color(0x3b3f43_aa)
+        val COL_FILTER_WELL_BACK = Color(0x222325_aa)
+        val COL_MIXER_BACK = Color(0x0f110c_aa)
+        val COL_METER_TROUGH = Color(0x232527_aa)
+
+        val COL_METER_GRAD = Color(0x1c5075_aa)
+        val COL_METER_GRAD2 = Color(0x25a0f2_aa)
+
+        val COL_SENDS_GRAD = Color(0x5b711e_aa)
+        val COL_SENDS_GRAD2 = Color(0xbff12a_aa.toInt())
+
+        val COL_PROGRESS_GRAD = Color(0x762340_aa.toInt())
+        val COL_PROGRESS_GRAD2 = Color(0xf22e7b_aa.toInt())
+
+        val COL_METER_GRAD_YELLOW = Color(0x62471c_aa)
+        val COL_METER_GRAD2_YELLOW = Color(0xc68f24_aa.toInt())
+        val COL_METER_GRAD_RED = Color(0x921c34_aa.toInt())
+        val COL_METER_GRAD2_RED = Color(0xfa687d_aa.toInt())
+        val COL_METER_BAR = Color(0x4caee5_aa)
+        val COL_METER_BAR_OVER = Color(0xef8297_aa.toInt())
+        val COL_METER_COMP_BAR = Color(0xf3d458_aa.toInt())
+        val COL_METER_COMP_BAR2 = Color(0x7f6b18_aa.toInt())
+
+        val FILTER_NAME_ACTIVE = Color(0xeeeeee_bf.toInt())
+        val FILTER_BYPASSED = Color(0xf1b934_bf.toInt())
+    }
+
+    private val halfStripW = STRIP_W / 2
     private val stripGap = 1
     private val stripFilterHeight = 16
     private val stripFaderHeight = meterHeight + 20
     private val numberOfFilters = 10
     private val stripH = stripFaderHeight + stripFilterHeight * numberOfFilters + 16
 
-    private val COL_WELL = Color(0x374854_aa)
-    private val COL_WELL2 = Color(0x3f5360_aa)
-    private val COL_WELL3 = Color(0x485437_aa)
-    private val COL_WELL4 = Color(0x543748_aa)
-    private val COL_FILTER_TITLE = Color(0x5e656c_aa)
-    private val COL_FILTER_TITLE_SHADE = Color(0x3b3f43_aa)
-    private val COL_FILTER_WELL_BACK = Color(0x222325_aa)
-    private val COL_MIXER_BACK = Color(0x0f110c_aa)
-    private val COL_METER_TROUGH = Color(0x232527_aa)
-
-    private val COL_METER_GRAD = Color(0x1c5075_aa)
-    private val COL_METER_GRAD2 = Color(0x25a0f2_aa)
-
-    private val COL_SENDS_GRAD = Color(0x5b711e_aa)
-    private val COL_SENDS_GRAD2 = Color(0xbff12a_aa.toInt())
-
-    private val COL_PROGRESS_GRAD = Color(0x762340_aa.toInt())
-    private val COL_PROGRESS_GRAD2 = Color(0xf22e7b_aa.toInt())
-
-    private val COL_METER_GRAD_YELLOW = Color(0x62471c_aa)
-    private val COL_METER_GRAD2_YELLOW = Color(0xc68f24_aa.toInt())
-    private val COL_METER_GRAD_RED = Color(0x921c34_aa.toInt())
-    private val COL_METER_GRAD2_RED = Color(0xfa687d_aa.toInt())
-    private val COL_METER_BAR = Color(0x4caee5_aa)
-    private val COL_METER_BAR_OVER = Color(0xef8297_aa.toInt())
-    private val COL_METER_COMP_BAR = Color(0xf3d458_aa.toInt())
-    private val COL_METER_COMP_BAR2 = Color(0x7f6b18_aa.toInt())
-
-    private val FILTER_NAME_ACTIVE = Color(0xeeeeee_bf.toInt())
-    private val FILTER_BYPASSED = Color(0xf1b934_bf.toInt())
     private val trackBack = listOf(COL_WELL, COL_WELL2)
 
     private val trackCount = 16 // cannot call AudioMixer now
@@ -425,7 +431,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private fun drawAudioMixer(batch: SpriteBatch) {
 
-        val x = App.scr.width - 186 - (AudioMixer.tracks.size + 1) * (stripW + stripGap)
+        val x = App.scr.width - 186 - (AudioMixer.tracks.size + 1) * (STRIP_W + stripGap)
         val y = App.scr.height - 38 - stripH
 
         val strips = AudioMixer.tracks + AudioMixer.masterTrack
@@ -440,7 +446,7 @@ class BasicDebugInfoWindow : UICanvas() {
             }
 
             // draw
-            drawStrip(batch, x + index * (stripW + stripGap), y, track, index)
+            drawStrip(batch, x + index * (STRIP_W + stripGap), y, track, index)
         }
 
 
@@ -513,35 +519,35 @@ class BasicDebugInfoWindow : UICanvas() {
     private fun drawStrip(batch: SpriteBatch, x: Int, y: Int, track: TerrarumAudioMixerTrack, index: Int) {
         // back
         batch.color = if (track.trackType == TrackType.MASTER) COL_WELL4 else if (track.trackType == TrackType.BUS) COL_WELL3 else trackBack[index % 2]
-        Toolkit.fillArea(batch, x, y, stripW, stripH)
+        Toolkit.fillArea(batch, x, y, STRIP_W, stripH)
 
         // strip/name separator
         batch.color = COL_METER_GRAD2
-        Toolkit.fillArea(batch, x, y + stripH - 16, stripW, 2)
+        Toolkit.fillArea(batch, x, y + stripH - 16, STRIP_W, 2)
 
         // track name
         batch.color = FILTER_NAME_ACTIVE
-        App.fontSmallNumbers.draw(batch, track.name, x + 1f + (stripW - track.name.length * 7) / 2, y + stripH - 13f)
+        App.fontSmallNumbers.draw(batch, track.name, x + 1f + (STRIP_W - track.name.length * 7) / 2, y + stripH - 13f)
 
 
         // filterbank back
         batch.color = COL_FILTER_WELL_BACK
-        Toolkit.fillArea(batch, x, y, stripW, stripFilterHeight * numberOfFilters)
+        Toolkit.fillArea(batch, x, y, STRIP_W, stripFilterHeight * numberOfFilters)
 
         var filterBankYcursor = 0
         track.filters.forEachIndexed { i, filter -> if (filter !is NullFilter) {
             // draw filter title back
             batch.color = COL_FILTER_TITLE_SHADE
-            Toolkit.fillArea(batch, x, y + filterBankYcursor, stripW, 16)
+            Toolkit.fillArea(batch, x, y + filterBankYcursor, STRIP_W, 16)
             batch.color = COL_FILTER_TITLE
-            Toolkit.fillArea(batch, x, y + filterBankYcursor, stripW, 14)
+            Toolkit.fillArea(batch, x, y + filterBankYcursor, STRIP_W, 14)
             // draw filter name
             batch.color = if (filter.bypass) FILTER_BYPASSED else FILTER_NAME_ACTIVE
             App.fontSmallNumbers.draw(batch, filter.javaClass.simpleName, x + 3f, y + filterBankYcursor + 1f)
 
             drawFilterParam(batch, x, y + filterBankYcursor + stripFilterHeight, filter, track)
 
-            filterBankYcursor += stripFilterHeight + paramViewHeight.getOrDefault(filter.javaClass.simpleName, 0)
+            filterBankYcursor += stripFilterHeight + filter.debugViewHeight
         } }
 
         val faderY = y + stripFilterHeight * numberOfFilters
@@ -559,15 +565,15 @@ class BasicDebugInfoWindow : UICanvas() {
             ).forEachIndexed { i, s ->
                 // gauge background
                 batch.color = COL_METER_TROUGH
-                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW.toFloat(), 14f)
+                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, STRIP_W.toFloat(), 14f)
 
                 // fill the song title line with a progress bar
                 if (i == 0 && track.currentTrack != null) {
                     val perc = (track.currentTrack!!.samplesRead.toFloat() / track.currentTrack!!.samplesTotal).coerceAtMost(1f)
                     batch.color = COL_PROGRESS_GRAD2
-                    Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW * perc, 14f)
+                    Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, STRIP_W * perc, 14f)
                     batch.color = COL_PROGRESS_GRAD
-                    Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, stripW * perc, 2f)
+                    Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, STRIP_W * perc, 2f)
                 }
 
                 batch.color = FILTER_NAME_ACTIVE
@@ -580,11 +586,11 @@ class BasicDebugInfoWindow : UICanvas() {
                 val perc = ((mixDb + 24.0).coerceAtLeast(0.0) / 24.0).toFloat()
                 // gauge background
                 batch.color = COL_METER_TROUGH
-                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW.toFloat(), 14f)
+                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, STRIP_W.toFloat(), 14f)
                 batch.color = COL_SENDS_GRAD2
-                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW * perc, 14f)
+                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, STRIP_W * perc, 14f)
                 batch.color = COL_SENDS_GRAD
-                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, stripW * perc, 2f)
+                Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, STRIP_W * perc, 2f)
 
                 // label
                 batch.color = FILTER_NAME_ACTIVE
@@ -597,11 +603,11 @@ class BasicDebugInfoWindow : UICanvas() {
             val perc = 1f
             // gauge background
             batch.color = COL_METER_TROUGH
-            Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW.toFloat(), 14f)
+            Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, STRIP_W.toFloat(), 14f)
             batch.color = COL_SENDS_GRAD2
-            Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, stripW * perc, 14f)
+            Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, STRIP_W * perc, 14f)
             batch.color = COL_SENDS_GRAD
-            Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, stripW * perc, 2f)
+            Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, STRIP_W * perc, 2f)
 
             // label
             batch.color = FILTER_NAME_ACTIVE
@@ -610,7 +616,7 @@ class BasicDebugInfoWindow : UICanvas() {
         }
 
         // fader
-        val sliderX = x + stripW - 12
+        val sliderX = x + STRIP_W - 12
 
         // slider text
         val dB = track.dBfs
@@ -710,116 +716,9 @@ class BasicDebugInfoWindow : UICanvas() {
         }
     }
 
-    private val paramViewHeight = hashMapOf(
-        "Lowpass" to 16,
-        "Highpass" to 16,
-        "Buffer" to 16,
-        "BinoPan" to 32,
-        "Convolv" to 32,
-        "Gain" to 16,
-        "Scope" to stripW,
-    )
-
-
-    private val scopePlotCol = Color(0x61b3df_33)
 
     private fun drawFilterParam(batch: SpriteBatch, x: Int, y: Int, filter: TerrarumAudioFilter, track: TerrarumAudioMixerTrack) {
-        when (filter) {
-            is Lowpass -> {
-                val perc = linToLogPerc(filter.cutoff, 24.0, 24000.0).toFloat()
-                batch.color = COL_METER_GRAD2
-                Toolkit.fillArea(batch, x.toFloat(), y.toFloat(), stripW * perc, 14f)
-                batch.color = COL_METER_GRAD
-                Toolkit.fillArea(batch, x.toFloat(), y+14f, stripW * perc, 2f)
-
-                batch.color = FILTER_NAME_ACTIVE
-                App.fontSmallNumbers.draw(batch, "F:${filter.cutoff.toInt()}", x+3f, y+1f)
-            }
-            is Highpass -> {
-                val perc = 1f - linToLogPerc(filter.cutoff, 2.0, 24000.0).toFloat()
-                batch.color = COL_METER_GRAD2
-                Toolkit.fillArea(batch, x.toFloat() + stripW, y.toFloat(), -stripW * perc, 14f)
-                batch.color = COL_METER_GRAD
-                Toolkit.fillArea(batch, x.toFloat() + stripW, y+14f, -stripW * perc, 2f)
-
-                batch.color = FILTER_NAME_ACTIVE
-                App.fontSmallNumbers.draw(batch, "F:${filter.cutoff.toInt()}", x+3f, y+1f)
-            }
-            is BinoPan -> {
-                val w = filter.pan * 0.5f * stripW
-                batch.color = COL_METER_GRAD2
-                Toolkit.fillArea(batch, x + stripW / 2f, y.toFloat(), w, 14f)
-                batch.color = COL_METER_GRAD
-                Toolkit.fillArea(batch, x + stripW / 2f, y+14f, w, 2f)
-
-                batch.color = FILTER_NAME_ACTIVE
-                val panLabel = if (filter.pan == 0f) "<C>"
-                else if (filter.pan < 0) "L${filter.pan.absoluteValue.times(100).toIntAndFrac(3,1)}"
-                else "R${filter.pan.absoluteValue.times(100).toIntAndFrac(3,1)}"
-                App.fontSmallNumbers.draw(batch, panLabel, x+3f, y+1f)
-
-                App.fontSmallNumbers.draw(batch, "AS:${AudioMixer.SPEED_OF_SOUND.roundToInt()}", x+3f, y+17f)
-            }
-            is Buffer -> {
-                batch.color = FILTER_NAME_ACTIVE
-                App.fontSmallNumbers.draw(batch, "Bs:${AUDIO_BUFFER_SIZE}", x+3f, y+1f)
-            }
-            is Convolv -> {
-                // processing speed bar
-                val w = filter.processingSpeed
-                val perc = w.coerceAtMost(2f) / 2f
-                batch.color = if (w > 1.5f) COL_METER_GRAD2 else if (w > 1f) COL_METER_GRAD2_YELLOW else COL_METER_GRAD2_RED
-                Toolkit.fillArea(batch, x.toFloat(), y.toFloat(), stripW * perc, 14f)
-                batch.color = if (w > 1.5f) COL_METER_GRAD else if (w > 1f) COL_METER_GRAD_YELLOW else COL_METER_GRAD_RED
-                Toolkit.fillArea(batch, x.toFloat(), y+14f, stripW * perc, 2f)
-
-                // filter length bar
-                val g = FastMath.intLog2(AUDIO_BUFFER_SIZE)
-                val perc2 = (FastMath.intLog2(filter.fftLen).minus(g).toFloat() / (16f - g)).coerceIn(0f, 1f)
-                batch.color = COL_METER_GRAD2
-                Toolkit.fillArea(batch, x.toFloat(), y + 16f, stripW * perc2, 14f)
-                batch.color = COL_METER_GRAD
-                Toolkit.fillArea(batch, x.toFloat(), y + 16f+14f, stripW * perc2, 2f)
-
-                // texts
-                batch.color = FILTER_NAME_ACTIVE
-                App.fontSmallNumbers.draw(batch, "P:${filter.processingSpeed.times(100).roundToInt().div(100f)}x", x+3f, y+1f)
-                App.fontSmallNumbers.draw(batch, "L:${filter.fftLen}", x+3f, y+17f)
-            }
-            is Gain -> {
-                batch.color = FILTER_NAME_ACTIVE
-                App.fontSmallNumbers.draw(batch, "G:${fullscaleToDecibels(filter.gain.toDouble()).times(100).roundToInt().div(100f)}", x+3f, y+1f)
-            }
-            is Scope -> {
-//                batch.color = COL_FILTER_WELL_BACK
-//                Toolkit.fillArea(batch, 200, 200, 256, 256)
-
-                batch.color = scopePlotCol
-                val xxs = filter.backbufR
-                val yys = filter.backbufL
-//                var scopedSamples = 0
-                for (t in xxs.lastIndex downTo 0) {
-                    val xs = xxs[t]
-                    val ys = yys[t]
-
-                    for (i in xs.indices.reversed()) {
-                        /*val col = COL_METER_BAR.cpy().also {
-                            it.a *= 0.999f
-                        }
-                        batch.color = col*/
-                        val px = xs[i] * halfStripW + halfStripW
-                        val py = ys[i] * halfStripW + halfStripW
-                        Toolkit.fillArea(batch, x + px, y + py, 1f, 1f)
-
-
-//                        Toolkit.fillArea(batch, 328 + xs[i] * 128, 328 + ys[i] * 128, 1f, 1f)
-
-//                        scopedSamples++
-                    }
-
-                }
-            }
-        }
+        filter.drawDebugView(batch, x, y)
     }
 
     private val ICON_GREEN = Color(0x33ff33_bb.toInt())

@@ -1,7 +1,15 @@
 package net.torvald.terrarum.audio.dsp
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
+import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
+import net.torvald.terrarum.audio.linToLogPerc
+import net.torvald.terrarum.ui.BasicDebugInfoWindow
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD2
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.FILTER_NAME_ACTIVE
+import net.torvald.terrarum.ui.Toolkit
 
 class Lowpass(cutoff0: Float): TerrarumAudioFilter() {
 
@@ -47,4 +55,16 @@ class Lowpass(cutoff0: Float): TerrarumAudioFilter() {
         }
     }
 
+    override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
+        val perc = linToLogPerc(cutoff, 24.0, 24000.0).toFloat()
+        batch.color = COL_METER_GRAD2
+        Toolkit.fillArea(batch, x.toFloat(), y.toFloat(), BasicDebugInfoWindow.STRIP_W * perc, 14f)
+        batch.color = COL_METER_GRAD
+        Toolkit.fillArea(batch, x.toFloat(), y+14f, BasicDebugInfoWindow.STRIP_W * perc, 2f)
+
+        batch.color = FILTER_NAME_ACTIVE
+        App.fontSmallNumbers.draw(batch, "F:${cutoff.toInt()}", x+3f, y+1f)
+    }
+
+    override val debugViewHeight = 16
 }

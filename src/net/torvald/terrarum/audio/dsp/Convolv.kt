@@ -1,17 +1,34 @@
 package net.torvald.terrarum.audio.dsp
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
+import net.torvald.terrarum.App
 import net.torvald.terrarum.App.setDebugTime
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
+import net.torvald.terrarum.ui.BasicDebugInfoWindow
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD2
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD2_RED
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD2_YELLOW
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD_RED
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD_YELLOW
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.FILTER_NAME_ACTIVE
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.STRIP_W
+import net.torvald.terrarum.ui.Toolkit
 import java.io.File
+import kotlin.math.roundToInt
 
-class Convolv(ir: File, val gain: Float = 1f / 512f): TerrarumAudioFilter() {
+/**
+ * @param ir Binary file containing MONO IR
+ * @param crossfeed The amount of channel crossfeeding to simulate the stereo ID
+ */
+class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): TerrarumAudioFilter() {
+    private val gain: Float = gain / (1f + crossfeed)
 
     val fftLen: Int
     private val convFFT: Array<ComplexArray>
-//    private val inbuf: Array<ComplexArray>
-    private val sumbuf: ComplexArray
+    private val sumbuf: Array<ComplexArray>
 
     private val BLOCKSIZE = TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE
 
@@ -31,8 +48,7 @@ class Convolv(ir: File, val gain: Float = 1f / 512f): TerrarumAudioFilter() {
         println("IR '${ir.path}' Sample Count = $sampleCount; FFT Length = $fftLen")
 
         val conv = Array(2) { FloatArray(fftLen) }
-//        inbuf = Array(2) { ComplexArray(FloatArray(fftLen * 2)) }
-        sumbuf = ComplexArray(FloatArray(fftLen * 2))
+        sumbuf = Array(2) { ComplexArray(FloatArray(fftLen * 2)) }
 
         ir.inputStream().let {
             for (i in 0 until sampleCount) {
@@ -93,8 +109,8 @@ class Convolv(ir: File, val gain: Float = 1f / 512f): TerrarumAudioFilter() {
 
         pushSum(gain, inbuf[0], inbuf[1], sumbuf)
 
-        convolve(sumbuf, convFFT[0], fftOutL)
-        convolve(sumbuf, convFFT[1], fftOutR)
+        convolve(sumbuf[0], convFFT[0], fftOutL)
+        convolve(sumbuf[1], convFFT[1], fftOutR)
 
         for (i in 0 until BLOCKSIZE) {
             outbuf[0][i] = fftOutL[fftLen - BLOCKSIZE + i]
@@ -109,7 +125,7 @@ class Convolv(ir: File, val gain: Float = 1f / 512f): TerrarumAudioFilter() {
     }
 
 
-    fun push(gain: Float, samples: FloatArray, buf: ComplexArray) {
+    private fun push(gain: Float, samples: FloatArray, buf: ComplexArray) {
         // shift numbers
         System.arraycopy(buf.reim, samples.size * 2, buf.reim, 0, buf.reim.size - samples.size * 2)
         // fill in the shifted area
@@ -120,15 +136,42 @@ class Convolv(ir: File, val gain: Float = 1f / 512f): TerrarumAudioFilter() {
         }
     }
 
-    fun pushSum(gain: Float, sampleL: FloatArray, sampleR: FloatArray, buf: ComplexArray) {
+    private fun pushSum(gain: Float, sampleL: FloatArray, sampleR: FloatArray, sumbuf: Array<ComplexArray>) {
         // shift numbers
-        System.arraycopy(buf.reim, sampleL.size * 2, buf.reim, 0, buf.reim.size - sampleL.size * 2)
+        System.arraycopy(sumbuf[0].reim, sampleL.size * 2, sumbuf[0].reim, 0, sumbuf[0].reim.size - sampleL.size * 2)
+        System.arraycopy(sumbuf[1].reim, sampleL.size * 2, sumbuf[1].reim, 0, sumbuf[1].reim.size - sampleL.size * 2)
         // fill in the shifted area
-        val baseI = buf.reim.size - sampleL.size * 2
+        val baseI = sumbuf[0].reim.size - sampleL.size * 2
         for (index in sampleL.indices) {
-            buf.reim[baseI + index * 2 + 0] = (sampleL[index] + sampleR[index]) * gain
-            buf.reim[baseI + index * 2 + 1] = 0f
+            sumbuf[0].reim[baseI + index * 2 + 0] = (sampleL[index] * 1.000000f + sampleR[index] * crossfeed) * gain
+            sumbuf[0].reim[baseI + index * 2 + 1] = 0f
+            sumbuf[1].reim[baseI + index * 2 + 0] = (sampleL[index] * crossfeed + sampleR[index] * 1.000000f) * gain
+            sumbuf[1].reim[baseI + index * 2 + 1] = 0f
         }
     }
 
+    override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
+    // processing speed bar
+        val w = processingSpeed
+        val perc = w.coerceAtMost(2f) / 2f
+        batch.color = if (w > 1.5f) COL_METER_GRAD2 else if (w > 1f) COL_METER_GRAD2_YELLOW else COL_METER_GRAD2_RED
+        Toolkit.fillArea(batch, x.toFloat(), y.toFloat(), STRIP_W * perc, 14f)
+        batch.color = if (w > 1.5f) COL_METER_GRAD else if (w > 1f) COL_METER_GRAD_YELLOW else COL_METER_GRAD_RED
+        Toolkit.fillArea(batch, x.toFloat(), y+14f, STRIP_W * perc, 2f)
+
+        // filter length bar
+        val g = FastMath.intLog2(AUDIO_BUFFER_SIZE)
+        val perc2 = (FastMath.intLog2(fftLen).minus(g).toFloat() / (16f - g)).coerceIn(0f, 1f)
+        batch.color = COL_METER_GRAD2
+        Toolkit.fillArea(batch, x.toFloat(), y + 16f, STRIP_W * perc2, 14f)
+        batch.color = COL_METER_GRAD
+        Toolkit.fillArea(batch, x.toFloat(), y + 16f+14f, STRIP_W * perc2, 2f)
+
+        // texts
+        batch.color = FILTER_NAME_ACTIVE
+        App.fontSmallNumbers.draw(batch, "P:${processingSpeed.times(100).roundToInt().div(100f)}x", x+3f, y+1f)
+        App.fontSmallNumbers.draw(batch, "L:${fftLen}", x+3f, y+17f)
+    }
+
+    override val debugViewHeight = 32
 }

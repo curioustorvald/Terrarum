@@ -1,5 +1,6 @@
 package net.torvald.terrarum.audio.dsp
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import kotlin.math.absoluteValue
 import kotlin.math.tanh
 
@@ -25,4 +26,9 @@ object SoftClp : TerrarumAudioFilter() {
             }
         }
     }
+
+    override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
+    }
+
+    override val debugViewHeight = 0
 }

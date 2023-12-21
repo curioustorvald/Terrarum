@@ -1,5 +1,6 @@
 package net.torvald.terrarum.audio.dsp
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 
 object XYtoMS: TerrarumAudioFilter() {
@@ -13,6 +14,11 @@ object XYtoMS: TerrarumAudioFilter() {
             outbuf[1][i] = S
         }
     }
+
+    override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
+    }
+
+    override val debugViewHeight = 0
 }
 
 object MStoXY: TerrarumAudioFilter() {
@@ -26,4 +32,9 @@ object MStoXY: TerrarumAudioFilter() {
             outbuf[1][i] = Y
         }
     }
+
+    override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
+    }
+
+    override val debugViewHeight = 0
 }
