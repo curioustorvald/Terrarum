@@ -56,12 +56,6 @@ object ControlPanelCommon {
             val optionsList = arg.subList(1, arg.size).map { it.substringBefore("=") }
 
             val initialSel = optionsList.indexOf(App.getConfigString(optionName))
-
-//            println("labelFuns = ${labelFuns.map { it.invoke() }}")
-//            println("optionsList = $optionsList")
-//            println("optionName = $optionName; value = ${App.getConfigString(optionName)}")
-//            println("initialSel = $initialSel")
-
             if (initialSel < 0) throw IllegalArgumentException("config value '${App.getConfigString(optionName)}' for option '$optionName' is not found on the options list")
 
             UIItemTextSelector(parent, x, y, labelFuns, initialSel, CONFIG_TEXTSEL_WIDTH, clickToShowPalette = false) to { it: UIItem, optionStr: String ->
