@@ -87,7 +87,7 @@ class Scope : TerrarumAudioFilter() {
     private val scopePlotCol = Color(0x61b3df_33)
     private val spectroPlotCol = Color(0xdf6fa0_aa.toInt())
 
-    private val lowlim = -96.0
+    private val lowlim = -60.0
 
     override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
         batch.color = spectroPlotCol

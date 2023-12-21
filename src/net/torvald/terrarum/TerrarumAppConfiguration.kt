@@ -2,6 +2,8 @@ package net.torvald.terrarum
 
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.toUint
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 /**
@@ -83,6 +85,9 @@ basegame
     const val TILE_SIZED = TILE_SIZE.toDouble()
 
 
+    /**
+     * @param string Text representation of the snapshot version, such as "23w50"
+     */
     private fun ForcedSnapshot(string: String): Snapshot {
         val s = Snapshot(string.last().code - 0x61)
         s.year = string.substring(0, 2).toInt()
@@ -93,9 +98,20 @@ basegame
 }
 
 data class Snapshot(var revision: Int) {
-    private var today = Calendar.getInstance()
-    internal var year = today.get(Calendar.YEAR) - 2000
-    internal var week = today.get(Calendar.WEEK_OF_YEAR)
+    private var today = LocalDate.now()
+    /** The ISO year, may NOT correspond with the calendar year */
+    internal var year: Int
+    /** The ISO week number, may NOT correspond with the calendar week */
+    internal var week: Int
+
+    init {
+        // THE CORRECT WAY of deriving ISO WEEK DATE format (test with LocalDate.parse("1976-12-31"); should return 1977 01)
+        // NOTE: Java's implementation seems to think the first day of the week is Sunday, instead of the Monday as in ISO standard. Weird...
+        val formatter = DateTimeFormatter.ofPattern("YYYY ww", Locale.getDefault())
+        val (y, w) = today.format(formatter).split(' ')
+        year = y.toInt() - 2000
+        week = w.toInt()
+    }
 
     private var string = ""
     private var bytes = byteArrayOf()
