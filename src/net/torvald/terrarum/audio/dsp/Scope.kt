@@ -26,7 +26,15 @@ class Scope : TerrarumAudioFilter() {
 
     private val chsum = ComplexArray(FloatArray(2*FFTSIZE))
     private val fftOut = ComplexArray(FloatArray(2*FFTSIZE))
-    private val fftWin = FloatArray(FFTSIZE) { sin2(PI * it / FFTSIZE).toFloat() }
+//    private val fftWin = FloatArray(FFTSIZE) { sin2(PI * it / FFTSIZE).toFloat() } // hann
+
+    private val a0 = 0.21557895
+    private val a1 = 0.41663158
+    private val a2 = 0.277263158
+    private val a3 = 0.083578947
+    private val a4 = 0.006947368
+    private val FT = PI / FFTSIZE
+    private val fftWin = FloatArray(FFTSIZE) { (a0 - a1*cos(2*it*FT) + a2*cos(4*it*FT) - a3*cos(6*it*FT) + a4*cos(8*it*FT)).toFloat() } // flat-top
 
     private val sqrt2p = 0.7071067811865475
 
