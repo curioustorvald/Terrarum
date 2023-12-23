@@ -29,7 +29,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private val maskOffWidth = 8
 
-    private val nameFBO = FrameBuffer(Pixmap.Format.RGBA8888, 400, capsuleHeight, false)
+    private val nameStrMaxLen = 180
+    private val nameFBO = FrameBuffer(Pixmap.Format.RGBA8888, nameStrMaxLen + 2*maskOffWidth, capsuleHeight, false)
 
     private val baloonTexture = ModMgr.getGdxFile("musicplayer", "gui/blob.tga").let {
         TextureRegionPack(it, capsuleMosaicSize, capsuleMosaicSize)
@@ -59,17 +60,41 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     init {
         setAsAlwaysVisible()
+
+        ingame.musicGovernor.addMusicStartHook { music ->
+            setMusicName(music.name)
+        }
+        ingame.musicGovernor.addMusicStopHook { music ->
+            setIntermission()
+        }
+    }
+
+    private var renderFBOreq: String? = ""
+    private var nameOverflown = false
+
+    private fun setIntermission() {
+        renderFBOreq = ""
+        nameOverflown = false
+    }
+
+    private fun setMusicName(str: String) {
+        renderFBOreq = str
     }
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
-        batch.end()
-
-
-        renderNameToFBO(batch, camera, AudioMixer.musicTrack.currentTrack?.name ?: "", 0f..(width - 2*STRIP_W - capsuleHeight + maskOffWidth))
-
-
-
-        batch.begin()
+        if (renderFBOreq != null) {
+            batch.end()
+            width = if (renderFBOreq!!.isEmpty())
+                2*STRIP_W.toInt()
+            else {
+                val slen = App.fontGameFBO.getWidth(renderFBOreq!!)
+                if (slen > nameStrMaxLen) { nameOverflown = true }
+                slen.coerceAtMost(nameStrMaxLen) + 2 * STRIP_W.toInt() + maskOffWidth
+            }
+            renderNameToFBO(batch, camera, renderFBOreq!!, 0f..width.toFloat() - 2*STRIP_W.toInt() - maskOffWidth)
+            batch.begin()
+            renderFBOreq = null
+        }
 
         val posX = ((Toolkit.drawWidth - width) / 2).toFloat()
         val posY = (App.scr.height - App.scr.tvSafeGraphicsHeight - height).toFloat()
@@ -143,7 +168,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val chsum = ComplexArray(FloatArray(FFTSIZE * 2))
     private val fftOut = ComplexArray(FloatArray(FFTSIZE * 2))
     private val binHeights = FloatArray(FFTSIZE / 2)
-    private val FFT_SMOOTHING_FACTOR = BasicDebugInfoWindow.getSmoothingFactor(1600)
+    private val FFT_SMOOTHING_FACTOR = BasicDebugInfoWindow.getSmoothingFactor(2048)
     private val lowlim = -36.0f
     private val STRIP_W = 9f
 

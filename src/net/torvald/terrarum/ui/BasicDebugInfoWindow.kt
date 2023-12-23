@@ -418,7 +418,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         fun getSmoothingFactor(sampleCount: Int) = (1.0 - (256.0 / sampleCount))
         val PEAK_SMOOTHING_FACTOR = getSmoothingFactor(640)
-        val FFT_SMOOTHING_FACTOR = getSmoothingFactor(1200)
+        val FFT_SMOOTHING_FACTOR = getSmoothingFactor(2048)
         val LAMP_SMOOTHING_FACTOR = getSmoothingFactor(3200)
         val RMS_SMOOTHING_FACTOR = getSmoothingFactor(12000)
     }
@@ -427,7 +427,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val stripGap = 1
     private val stripFilterHeight = 16
     private val stripFaderHeight = meterHeight + 20
-    private val numberOfFilters = 10
+    private val numberOfFilters = 14
     private val stripH = stripFaderHeight + stripFilterHeight * numberOfFilters + 16
 
     private val trackBack = listOf(COL_WELL, COL_WELL2)
