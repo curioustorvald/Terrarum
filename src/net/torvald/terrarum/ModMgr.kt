@@ -16,9 +16,11 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.OregenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
@@ -275,16 +277,16 @@ object ModMgr {
                                 digester.reset()
                                 val hash = digester.digest(File(jarFilePath).readBytes()).joinToString("","","") { it.toInt().and(255).toString(16).uppercase().padStart(2,'0') }
 
-                                if (jarHash != hash) {
+                                if (!App.IS_DEVELOPMENT_BUILD && jarHash != hash) {
                                     printdbg(this, "Hash expected: $jarHash, got: $hash")
                                     throw IllegalStateException("Module Jarfile hash mismatch")
                                 }
 
                                 // check for module-info.java
-                                val moduleInfoPath = cl.getResources("module-info.class").toList().filter { it.toString().contains("$moduleName/$jar!/module-info.class") && it.toString().endsWith("module-info.class")}
+                                /*val moduleInfoPath = cl.getResources("module-info.class").toList().filter { it.toString().contains("$moduleName/$jar!/module-info.class") && it.toString().endsWith("module-info.class")}
                                 if (moduleInfoPath.isEmpty()) {
                                     throw IllegalStateException("module-info not found on $moduleName")
-                                }
+                                }*/
 
                                 newClass = cl.loadClass(entryPoint)
                             }
@@ -771,6 +773,14 @@ object ModMgr {
         }
     }
 
+
+    object GameExtraGuiLoader {
+        internal val guis = ArrayList<(TerrarumIngame) -> UICanvas>()
+
+        @JvmStatic fun register(uiCreationFun: (TerrarumIngame) -> UICanvas) {
+            guis.add(uiCreationFun)
+        }
+    }
 }
 
 private class JarFileLoader(urls: Array<URL>) : URLClassLoader(urls) {

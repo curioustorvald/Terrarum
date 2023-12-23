@@ -472,6 +472,11 @@ fun blendMul(batch: SpriteBatch) {
     batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
 }
 
+fun blendAlphaMask(batch: SpriteBatch) {
+    batch.enableBlending()
+    batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
+}
+
 /**
  * Use demultiplier shader on GL Source (foreground) if source has semitransparency
  */

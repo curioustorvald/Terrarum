@@ -641,7 +641,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         ingameUpdateThread = ThreadIngameUpdate(this)
         updateThreadWrapper = Thread(ingameUpdateThread, "Terrarum UpdateThread")
 
-
+        // add extra UIs from the other modules
+        ModMgr.GameExtraGuiLoader.guis.forEach {
+            uiContainer.add(it(this))
+        }
 
         // these need to appear on top of any others
         uiContainer.add(notifier)

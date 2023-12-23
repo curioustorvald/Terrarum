@@ -481,6 +481,7 @@ public class App implements ApplicationListener {
             if (Gdx.app != null) {
                 Gdx.app.exit();
             }
+            e.printStackTrace();
             new GameCrashHandler(e);
         }
     }

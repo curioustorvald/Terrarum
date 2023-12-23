@@ -6,6 +6,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ModuleComputers/ModuleComputers.iml" filepath="$PROJECT_DIR$/ModuleComputers/ModuleComputers.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MusicPlayer/MusicPlayer.iml" filepath="$PROJECT_DIR$/MusicPlayer/MusicPlayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/TerrarumBuild.iml" filepath="$PROJECT_DIR$/TerrarumBuild.iml" />
     </modules>
   </component>

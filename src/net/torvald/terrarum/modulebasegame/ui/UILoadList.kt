@@ -279,7 +279,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        playerCells.forEach { it.touchUp(screenX, screenY, pointer, button) }
+        playerCells.slice(playerCells.indices).forEach { it.touchUp(screenX, screenY, pointer, button) } // to prevent ConcurrentModificationException
         return true
     }
 

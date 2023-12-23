@@ -10,6 +10,7 @@
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="Build Version Number" run_configuration_type="Application" />
       <option name="BuildArtifacts" enabled="true">
         <artifact name="ModuleComputers" />
+        <artifact name="MusicPlayer" />
         <artifact name="TerrarumBuild" />
       </option>
       <option name="RunConfigurationTask" enabled="false" run_configuration_name="QuickDirtyLint" run_configuration_type="Application" />
