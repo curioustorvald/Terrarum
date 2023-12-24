@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.reflection.extortField
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
@@ -44,8 +43,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     }
 
     private val MODE_IDLE = 0
-    private val MODE_NOW_PLAYING = 1
-    private val MODE_PLAYING = 2
+    private val MODE_PLAYING = 1
     private val MODE_MOUSE_UP = 64
     private val MODE_SHOW_LIST = 128
 
@@ -56,8 +54,6 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private var transitionOngoing = false
 
     private var TRANSITION_LENGTH = 0.44444445f
-
-    private var textScroll = 0f
 
     private var colourEdge = Color(0xFFFFFF_40.toInt())
     private val colourBack = Color.BLACK
@@ -79,7 +75,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
         ingame.musicGovernor.addMusicStartHook { music ->
             setMusicName(music.name)
-            transitionRequest = MODE_NOW_PLAYING
+            transitionRequest = MODE_PLAYING
         }
 
         ingame.musicGovernor.addMusicStopHook { music ->
@@ -91,9 +87,13 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     }
 
     private var currentMusicName = ""
-    private var nameLength = 0
-    private var nameLengthOld = 0
+    private var nameLength = 0 // truncated
+    private var nameLengthOld = 0 // truncated
+    private var realNameLength = 0 // NOT truncated
     private var nameOverflown = false
+    private var nameScroll = 0f
+    private var musicPlayingTimer = 0f
+    private val NAME_SCROLL_PER_SECOND = 15f
 
     private fun setIntermission() {
         currentMusicName = ""
@@ -102,12 +102,13 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private fun setMusicName(str: String) {
         currentMusicName = str
-        val realNameLength = App.fontGameFBO.getWidth(str)
+        realNameLength = App.fontGameFBO.getWidth(str)
         nameLength = realNameLength.coerceAtMost(nameStrMaxLen)
         TRANSITION_LENGTH = 0.8f * ((nameLength - nameLengthOld).absoluteValue / nameStrMaxLen)
-        nameOverflown = (nameLength > nameStrMaxLen)
+        nameOverflown = (realNameLength > nameLength)
+        musicPlayingTimer = 0f
 
-        printdbg(this, "setMusicName $str; strLen = $nameLengthOld -> $nameLength; overflown=$nameOverflown; transitionTime=$TRANSITION_LENGTH")
+//        printdbg(this, "setMusicName $str; strLen = $nameLengthOld -> $nameLength; overflown=$nameOverflown; transitionTime=$TRANSITION_LENGTH")
     }
 
     override fun updateUI(delta: Float) {
@@ -131,6 +132,33 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 //                printdbg(this, "Transition complete: nameLengthOld=${nameLengthOld} -> ${nameLength}")
                 nameLengthOld = nameLength
             }
+        }
+
+        // scroll music title
+        if (mode > MODE_IDLE) {
+            if (nameOverflown) {
+                when (musicPlayingTimer % 60f) {
+                    // start scroll
+                    in 0f..5f -> {
+                        nameScroll = 0f
+                    }
+                    in 5f..10f -> {
+                        nameScroll = (nameScroll + NAME_SCROLL_PER_SECOND * delta).coerceIn(0f, (realNameLength - nameLength).toFloat())
+                    }
+                    in 10f..15f -> {
+                        nameScroll = (realNameLength - nameLength).toFloat()
+                    }
+                    // start unscroll
+                    in 15f..20f -> {
+                        nameScroll = (nameScroll - NAME_SCROLL_PER_SECOND * delta).coerceIn(0f, (realNameLength - nameLength).toFloat())
+                    }
+                    else -> {
+                        nameScroll = 0f
+                    }
+                }
+            }
+
+            musicPlayingTimer += delta
         }
 
         updateMeter()
@@ -159,13 +187,13 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private val transitionDB = HashMap<Pair<Int, Int>, (Float) -> Unit>().also {
         it[MODE_IDLE to MODE_IDLE] = { akku -> }
-        it[MODE_IDLE to MODE_NOW_PLAYING] = { akku ->
+        it[MODE_IDLE to MODE_PLAYING] = { akku ->
             setUIwidthFromTextWidth(nameLengthOld, nameLength, akku / TRANSITION_LENGTH)
         }
-        it[MODE_NOW_PLAYING to MODE_NOW_PLAYING] = { akku ->
+        it[MODE_PLAYING to MODE_PLAYING] = { akku ->
             setUIwidthFromTextWidth(nameLengthOld, nameLength, akku / TRANSITION_LENGTH)
         }
-        it[MODE_NOW_PLAYING to MODE_IDLE] = { akku ->
+        it[MODE_PLAYING to MODE_IDLE] = { akku ->
             setUIwidthFromTextWidth(nameLengthOld, nameLength, akku / TRANSITION_LENGTH)
         }
     }
@@ -228,7 +256,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 // draw text
                 gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
                 blendNormalStraightAlpha(batch)
-                App.fontGameFBO.draw(batch, str, maskOffWidth.toFloat() - textScroll, 0f)
+                App.fontGameFBO.draw(batch, str, maskOffWidth.toFloat() - nameScroll, 0f)
 
                 // mask off the area
                 batch.color = Color.WHITE
