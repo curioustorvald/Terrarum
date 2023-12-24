@@ -71,7 +71,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
         // test code
         val diskJockeyingMode = "continuous" // must be read from the playlist.json
-        registerPlaylist(App.customDir + "/MusicShort", false, diskJockeyingMode)
+        registerPlaylist(App.customDir + "/MusicFJ", false, diskJockeyingMode)
     }
 
     fun registerPlaylist(path: String, shuffled: Boolean, diskJockeyingMode: String) {
@@ -102,11 +102,12 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private fun setMusicName(str: String) {
         currentMusicName = str
-        nameLength = App.fontGameFBO.getWidth(str)
-        TRANSITION_LENGTH = 0.8f * ((nameLength.coerceAtMost(nameStrMaxLen).toFloat() - nameLengthOld).absoluteValue / nameStrMaxLen)
+        val realNameLength = App.fontGameFBO.getWidth(str)
+        nameLength = realNameLength.coerceAtMost(nameStrMaxLen)
+        TRANSITION_LENGTH = 0.8f * ((nameLength - nameLengthOld).absoluteValue / nameStrMaxLen)
         nameOverflown = (nameLength > nameStrMaxLen)
 
-//        printdbg(this, "setMusicName $str; strLen = $nameLengthOld -> $nameLength; overflown=$nameOverflown; transitionTime=$TRANSITION_LENGTH")
+        printdbg(this, "setMusicName $str; strLen = $nameLengthOld -> $nameLength; overflown=$nameOverflown; transitionTime=$TRANSITION_LENGTH")
     }
 
     override fun updateUI(delta: Float) {
