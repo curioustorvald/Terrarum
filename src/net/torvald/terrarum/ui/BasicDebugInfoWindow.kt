@@ -459,8 +459,8 @@ class BasicDebugInfoWindow : UICanvas() {
 
         val dss = AudioMixer.dynamicTracks
         dss.forEachIndexed { index, track ->
-            val px = x - (miniW + 5) * (1 + (index / 11))
-            val py = y + (miniH + stripGap) * (index % 11)
+            val px = x - (miniW + 5) * (1 + (index / 13))
+            val py = y + (miniH + stripGap) * (index % 13)
             drawDynamicSource(batch, px, py, track, index)
         }
     }

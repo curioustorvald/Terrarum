@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.reflection.extortField
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
@@ -52,6 +53,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private var modeNext = MODE_IDLE
     private var transitionAkku = 0f
     private var transitionRequest: Int? = null
+    private var transitionOngoing = false
 
     private var TRANSITION_LENGTH = 0.44444445f
 
@@ -67,31 +69,44 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     init {
         setAsAlwaysVisible()
 
+        // test code
+        val diskJockeyingMode = "continuous" // must be read from the playlist.json
+        registerPlaylist(App.customDir + "/MusicShort", false, diskJockeyingMode)
+    }
+
+    fun registerPlaylist(path: String, shuffled: Boolean, diskJockeyingMode: String) {
+        ingame.musicGovernor.queueDirectory(path, shuffled, diskJockeyingMode)
+
         ingame.musicGovernor.addMusicStartHook { music ->
             setMusicName(music.name)
             transitionRequest = MODE_NOW_PLAYING
         }
+
         ingame.musicGovernor.addMusicStopHook { music ->
-            setIntermission()
-            transitionRequest = MODE_IDLE
+            if (diskJockeyingMode == "intermittent") {
+                setIntermission()
+                transitionRequest = MODE_IDLE
+            }
         }
     }
 
-    private var renderFBOreq: String? = ""
-    private var renderFBOhistory: String? = ""
+    private var currentMusicName = ""
     private var nameLength = 0
+    private var nameLengthOld = 0
     private var nameOverflown = false
 
     private fun setIntermission() {
-        renderFBOreq = ""
+        currentMusicName = ""
         nameOverflown = false
     }
 
     private fun setMusicName(str: String) {
-        renderFBOreq = str
+        currentMusicName = str
         nameLength = App.fontGameFBO.getWidth(str)
-        TRANSITION_LENGTH = 0.6666667f * (nameLength.coerceAtMost(nameStrMaxLen).toFloat() / nameStrMaxLen)
+        TRANSITION_LENGTH = 0.8f * ((nameLength.coerceAtMost(nameStrMaxLen).toFloat() - nameLengthOld).absoluteValue / nameStrMaxLen)
         nameOverflown = (nameLength > nameStrMaxLen)
+
+//        printdbg(this, "setMusicName $str; strLen = $nameLengthOld -> $nameLength; overflown=$nameOverflown; transitionTime=$TRANSITION_LENGTH")
     }
 
     override fun updateUI(delta: Float) {
@@ -103,17 +118,17 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         }
 
         // actually do transition
-        if (mode != modeNext) {
+        if (transitionAkku <= TRANSITION_LENGTH) {
             makeTransition()
-
-            if (renderFBOhistory?.isNotBlank() == true) {
-                renderFBOreq = renderFBOhistory // continuously call the renderNameToFBO
-            }
 
             transitionAkku += delta
 
-            if (transitionAkku > TRANSITION_LENGTH) {
+//            printdbg(this, "On transition... ($transitionAkku / $TRANSITION_LENGTH); width = $width")
+
+            if (transitionAkku >= TRANSITION_LENGTH) {
                 mode = modeNext
+//                printdbg(this, "Transition complete: nameLengthOld=${nameLengthOld} -> ${nameLength}")
+                nameLengthOld = nameLength
             }
         }
 
@@ -123,36 +138,43 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private fun smoothstep(x: Float) = (x*x*(3f-2f*x)).coerceIn(0f, 1f)
     private fun smootherstep(x: Float) = (x*x*x*(x*(6f*x-15f)+10f)).coerceIn(0f, 1f)
 
-    private fun setUIwidthFromTextWidth(textW: Int, percentage: Float) {
-        val zeroWidth = METERS_WIDTH
-        val maxWidth = (textW + METERS_WIDTH + maskOffWidth).roundToInt().toFloat()
+    private fun setUIwidthFromTextWidth(widthOld: Int, widthNew: Int, percentage: Float) {
+        val zeroWidth = if (widthOld == 0) METERS_WIDTH else (widthOld + METERS_WIDTH + maskOffWidth).roundToInt().toFloat()
+        val maxWidth = (widthNew + METERS_WIDTH + maskOffWidth).roundToInt().toFloat()
         val step = smootherstep(percentage)
+
+//        printdbg(this, "setUIwidth: $zeroWidth -> $maxWidth; perc = $percentage")
+
         width = FastMath.interpolateLinear(step, zeroWidth, maxWidth).roundToInt()
     }
 
     // changes ui width
     private fun makeTransition() {
-        transitionDB[mode to modeNext]?.invoke(transitionAkku)
+        transitionDB[mode to modeNext].let {
+            if (it == null) throw NullPointerException("No transition for $mode -> $modeNext")
+            it.invoke(transitionAkku)
+        }
     }
 
     private val transitionDB = HashMap<Pair<Int, Int>, (Float) -> Unit>().also {
+        it[MODE_IDLE to MODE_IDLE] = { akku -> }
         it[MODE_IDLE to MODE_NOW_PLAYING] = { akku ->
-            setUIwidthFromTextWidth(nameLength, akku / TRANSITION_LENGTH)
+            setUIwidthFromTextWidth(nameLengthOld, nameLength, akku / TRANSITION_LENGTH)
+        }
+        it[MODE_NOW_PLAYING to MODE_NOW_PLAYING] = { akku ->
+            setUIwidthFromTextWidth(nameLengthOld, nameLength, akku / TRANSITION_LENGTH)
         }
         it[MODE_NOW_PLAYING to MODE_IDLE] = { akku ->
-            setUIwidthFromTextWidth(nameLength, (1f - (akku / TRANSITION_LENGTH).coerceAtMost(1f)))
+            setUIwidthFromTextWidth(nameLengthOld, nameLength, akku / TRANSITION_LENGTH)
         }
     }
 
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
-        if (renderFBOreq != null) {
-            batch.end()
-            renderFBOhistory = renderFBOreq?.substring(0)
-            renderNameToFBO(batch, camera, renderFBOreq!!, 0f..width.toFloat() - METERS_WIDTH.toInt() - maskOffWidth)
-            batch.begin()
-            renderFBOreq = null
-        }
+        batch.end()
+        renderNameToFBO(batch, camera, currentMusicName, 0f..width.toFloat() - METERS_WIDTH.toInt() - maskOffWidth)
+        batch.begin()
+
 
         val posX = ((Toolkit.drawWidth - width) / 2).toFloat()
         val posY = (App.scr.height - App.scr.tvSafeGraphicsHeight - height).toFloat()

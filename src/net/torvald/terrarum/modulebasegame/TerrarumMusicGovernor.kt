@@ -133,9 +133,23 @@ data class MusicContainer(
 }
 
 class TerrarumMusicGovernor : MusicGovernor() {
+    private val STATE_INIT = 0
+    private val STATE_FIREPLAY = 1
+    private val STATE_PLAYING = 2
+    private val STATE_INTERMISSION = 3
 
-    private val songs: List<MusicContainer> =
-        File(App.customMusicDir).listFiles()?.mapNotNull {
+
+    init {
+        musicState = STATE_INTERMISSION
+    }
+
+    private var songs: List<MusicContainer> = emptyList()
+    private var musicBin: ArrayList<Int> = ArrayList()
+    private var shuffled = true
+    private var diskJockeyingMode = "intermittent" // intermittent, continuous
+
+    private fun registerSongsFromDir(musicDir: String) {
+        songs = File(musicDir).listFiles()?.sortedBy { it.name }?.mapNotNull {
             printdbg(this, "Music: ${it.absolutePath}")
             try {
                 MusicContainer(
@@ -151,8 +165,31 @@ class TerrarumMusicGovernor : MusicGovernor() {
                 null
             }
         } ?: emptyList() // TODO test code
+    }
 
-    private var musicBin: ArrayList<Int> = ArrayList(songs.indices.toList().shuffled())
+    private fun restockMUsicBin() {
+        musicBin = if (shuffled) ArrayList(songs.indices.toList().shuffled()) else  ArrayList(songs.indices.toList())
+    }
+
+    /**
+     * @param musicDir where the music files are. Absolute path.
+     * @param shuffled if the tracks are to be shuffled
+     * @param diskJockeyingMode `intermittent` to give random gap between tracks, `continuous` for continuous playback
+     */
+    fun queueDirectory(musicDir: String, shuffled: Boolean, diskJockeyingMode: String) {
+        if (musicState != STATE_INIT && musicState != STATE_INTERMISSION) {
+            AudioMixer.requestFadeOut(AudioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
+            stopMusic(AudioMixer.musicTrack.currentTrack)
+        }
+
+        songs.forEach { it.gdxMusic.tryDispose() }
+        registerSongsFromDir(musicDir)
+
+        this.shuffled = shuffled
+        this.diskJockeyingMode = diskJockeyingMode
+
+        restockMUsicBin()
+    }
 
     private val ambients: List<MusicContainer> =
         File(App.customAmbientDir).listFiles()?.mapNotNull {
@@ -175,6 +212,11 @@ class TerrarumMusicGovernor : MusicGovernor() {
     private val musicStartHooks = ArrayList<(MusicContainer) -> Unit>()
     private val musicStopHooks = ArrayList<(MusicContainer) -> Unit>()
 
+    init {
+        queueDirectory(App.customMusicDir, true, "intermittent")
+    }
+
+
     fun addMusicStartHook(f: (MusicContainer) -> Unit) {
         musicStartHooks.add(f)
     }
@@ -196,10 +238,6 @@ class TerrarumMusicGovernor : MusicGovernor() {
     private var warningPrinted = false
 
 
-    private val STATE_INIT = 0
-    private val STATE_FIREPLAY = 1
-    private val STATE_PLAYING = 2
-    private val STATE_INTERMISSION = 3
 
     protected var ambState = 0
     protected var ambFired = false
@@ -207,17 +245,17 @@ class TerrarumMusicGovernor : MusicGovernor() {
     private fun stopMusic(song: MusicContainer?) {
         musicState = STATE_INTERMISSION
         intermissionAkku = 0f
-        intermissionLength = 30f + 30f * Math.random().toFloat() // 30s-60s
+        intermissionLength = if (diskJockeyingMode == "intermittent") 30f + 30f * Math.random().toFloat() else 0f // 30s-60s
         musicFired = false
-        musicStopHooks.forEach { if (song != null) { it(song) } }
-        printdbg(this, "Intermission: $intermissionLength seconds")
+        if (musicStopHooks.isNotEmpty()) musicStopHooks.forEach { if (song != null) { it(song) } }
+        printdbg(this, "StopMusic Intermission: $intermissionLength seconds")
     }
 
     private fun startMusic(song: MusicContainer) {
         AudioMixer.startMusic(song)
-        printdbg(this, "Now playing: $song")
+        printdbg(this, "startMusic Now playing: $song")
 //        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
-        musicStartHooks.forEach { it(song) }
+        if (musicStartHooks.isNotEmpty()) musicStartHooks.forEach { it(song) }
         musicState = STATE_PLAYING
     }
 
@@ -227,12 +265,12 @@ class TerrarumMusicGovernor : MusicGovernor() {
         intermissionAkku = 0f
         intermissionLength = 30f + 30f * Math.random().toFloat() // 30s-60s
         ambFired = false
-        printdbg(this, "Intermission: $intermissionLength seconds")
+        printdbg(this, "stopAmbient Intermission: $intermissionLength seconds")
     }
 
     private fun startAmbient(song: MusicContainer) {
         AudioMixer.startAmb(song)
-        printdbg(this, "Now playing: $song")
+        printdbg(this, "startAmbient Now playing: $song")
 //        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
         ambState = STATE_PLAYING
     }
@@ -252,7 +290,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
                     val song = songs[musicBin.removeAt(0)]
                     // prevent same song to play twice
                     if (musicBin.isEmpty()) {
-                        musicBin = ArrayList(songs.indices.toList().shuffled())
+                        restockMUsicBin()
                     }
 
                     startMusic(song)
