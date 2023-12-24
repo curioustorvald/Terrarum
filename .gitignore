@@ -9,7 +9,7 @@ buildapp/out/Terrarum*
 buildapp/TerrarumLinux.*
 buildapp/TerrarumMac.*
 buildapp/TerrarumWindows.*
-assets/mods/dwarventech/ModuleComputers.jar
+assets/mods/*/*.jar
 work_files/skylight/hosek_model_source/*.bin
 
 # Java native errors

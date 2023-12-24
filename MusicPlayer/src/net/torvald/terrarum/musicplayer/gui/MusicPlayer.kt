@@ -21,13 +21,16 @@ import kotlin.math.*
  */
 class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
-    override var width = 120
+    private val STRIP_W = 9f
+    private val METERS_WIDTH = 2 * STRIP_W
+    private val maskOffWidth = 8
+
+    override var width = (METERS_WIDTH).roundToInt()
     override var height = 28
-    
+
     private var capsuleHeight = 28
     private var capsuleMosaicSize = capsuleHeight / 2 + 1
 
-    private val maskOffWidth = 8
 
     private val nameStrMaxLen = 180
     private val nameFBO = FrameBuffer(Pixmap.Format.RGBA8888, nameStrMaxLen + 2*maskOffWidth, capsuleHeight, false)
@@ -39,37 +42,44 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         TextureRegionPack(it, maskOffWidth, capsuleHeight)
     }
 
-    private var mode = 0
-    private var modeNext = 0
-    private var transitionAkku = 0f
-
-    private var textScroll = 0f
-
     private val MODE_IDLE = 0
     private val MODE_NOW_PLAYING = 1
     private val MODE_PLAYING = 2
     private val MODE_MOUSE_UP = 64
     private val MODE_SHOW_LIST = 128
 
+    private var mode = MODE_IDLE
+    private var modeNext = MODE_IDLE
+    private var transitionAkku = 0f
+    private var transitionRequest: Int? = null
+
+    private var TRANSITION_LENGTH = 0.44444445f
+
+    private var textScroll = 0f
+
     private var colourEdge = Color(0xFFFFFF_40.toInt())
     private val colourBack = Color.BLACK
 
     private val colourText = Color(0xf0f0f0ff.toInt())
-    private val colourMeter = Color(0xf0f0f0ff.toInt())
-    private val colourMeter2 = Color(0xf0f0f080.toInt())
+    private val colourMeter = Color(0xddddddff.toInt())
+    private val colourMeter2 = Color(0xdddddd80.toInt())
 
     init {
         setAsAlwaysVisible()
 
         ingame.musicGovernor.addMusicStartHook { music ->
             setMusicName(music.name)
+            transitionRequest = MODE_NOW_PLAYING
         }
         ingame.musicGovernor.addMusicStopHook { music ->
             setIntermission()
+            transitionRequest = MODE_IDLE
         }
     }
 
     private var renderFBOreq: String? = ""
+    private var renderFBOhistory: String? = ""
+    private var nameLength = 0
     private var nameOverflown = false
 
     private fun setIntermission() {
@@ -79,19 +89,67 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private fun setMusicName(str: String) {
         renderFBOreq = str
+        nameLength = App.fontGameFBO.getWidth(str)
+        TRANSITION_LENGTH = 0.6666667f * (nameLength.coerceAtMost(nameStrMaxLen).toFloat() / nameStrMaxLen)
+        nameOverflown = (nameLength > nameStrMaxLen)
     }
+
+    override fun updateUI(delta: Float) {
+        // process transition request
+        if (transitionRequest != null) {
+            modeNext = transitionRequest!!
+            transitionAkku = 0f
+            transitionRequest = null
+        }
+
+        // actually do transition
+        if (mode != modeNext) {
+            makeTransition()
+
+            if (renderFBOhistory?.isNotBlank() == true) {
+                renderFBOreq = renderFBOhistory // continuously call the renderNameToFBO
+            }
+
+            transitionAkku += delta
+
+            if (transitionAkku > TRANSITION_LENGTH) {
+                mode = modeNext
+            }
+        }
+
+        updateMeter()
+    }
+
+    private fun smoothstep(x: Float) = (x*x*(3f-2f*x)).coerceIn(0f, 1f)
+    private fun smootherstep(x: Float) = (x*x*x*(x*(6f*x-15f)+10f)).coerceIn(0f, 1f)
+
+    private fun setUIwidthFromTextWidth(textW: Int, percentage: Float) {
+        val zeroWidth = METERS_WIDTH
+        val maxWidth = (textW + METERS_WIDTH + maskOffWidth).roundToInt().toFloat()
+        val step = smootherstep(percentage)
+        width = FastMath.interpolateLinear(step, zeroWidth, maxWidth).roundToInt()
+    }
+
+    // changes ui width
+    private fun makeTransition() {
+        transitionDB[mode to modeNext]?.invoke(transitionAkku)
+    }
+
+    private val transitionDB = HashMap<Pair<Int, Int>, (Float) -> Unit>().also {
+        it[MODE_IDLE to MODE_NOW_PLAYING] = { akku ->
+            setUIwidthFromTextWidth(nameLength, akku / TRANSITION_LENGTH)
+        }
+        it[MODE_NOW_PLAYING to MODE_IDLE] = { akku ->
+            setUIwidthFromTextWidth(nameLength, (1f - (akku / TRANSITION_LENGTH).coerceAtMost(1f)))
+        }
+    }
+
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         if (renderFBOreq != null) {
             batch.end()
-            width = if (renderFBOreq!!.isEmpty())
-                2*STRIP_W.toInt()
-            else {
-                val slen = App.fontGameFBO.getWidth(renderFBOreq!!)
-                if (slen > nameStrMaxLen) { nameOverflown = true }
-                slen.coerceAtMost(nameStrMaxLen) + 2 * STRIP_W.toInt() + maskOffWidth
-            }
-            renderNameToFBO(batch, camera, renderFBOreq!!, 0f..width.toFloat() - 2*STRIP_W.toInt() - maskOffWidth)
+            renderFBOhistory = renderFBOreq?.substring(0)
+            renderNameToFBO(batch, camera, renderFBOreq!!, 0f..width.toFloat() - METERS_WIDTH.toInt() - maskOffWidth)
             batch.begin()
             renderFBOreq = null
         }
@@ -170,7 +228,6 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val binHeights = FloatArray(FFTSIZE / 2)
     private val FFT_SMOOTHING_FACTOR = BasicDebugInfoWindow.getSmoothingFactor(2048)
     private val lowlim = -36.0f
-    private val STRIP_W = 9f
 
     private val fftBinIndices = arrayOf(
         0..3,
@@ -181,7 +238,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     ) // 60-18000 at 1024 (https://www.desmos.com/calculator/vkxhrzfam3)
     private val fftBarHeights = FloatArray(5)
 
-    override fun updateUI(delta: Float) {
+    private fun updateMeter() {
         val inbuf = AudioMixer.musicTrack.extortField<MixerTrackProcessor>("processor")!!.extortField<List<FloatArray>>("fout1")!!
         push(inbuf[0], inBuf[0])
         push(inbuf[1], inBuf[1])
