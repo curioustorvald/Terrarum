@@ -5,14 +5,17 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.utils.JsonValue
 import com.jme3.math.FastMath
 import net.torvald.reflection.extortField
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.*
 
@@ -66,12 +69,25 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         setAsAlwaysVisible()
 
         // test code
-        val diskJockeyingMode = "continuous" // must be read from the playlist.json
-        registerPlaylist(App.customDir + "/MusicFJ", false, diskJockeyingMode)
+        val albumDir = App.customMusicDir + "/FurryJoA 2023 Live"
+        val playlistFile = JsonFetcher.invoke("$albumDir/playlist.json")
+
+        val diskJockeyingMode = playlistFile.get("diskJockeyingMode").asString()
+        val shuffled = playlistFile.get("shuffled").asBoolean()
+        val fileToName = playlistFile.get("files")
+
+        registerPlaylist(albumDir, fileToName, shuffled, diskJockeyingMode)
     }
 
-    fun registerPlaylist(path: String, shuffled: Boolean, diskJockeyingMode: String) {
-        ingame.musicGovernor.queueDirectory(path, shuffled, diskJockeyingMode)
+    fun registerPlaylist(path: String, fileToName: JsonValue, shuffled: Boolean, diskJockeyingMode: String) {
+        ingame.musicGovernor.queueDirectory(path, shuffled, diskJockeyingMode) { filename ->
+            fileToName.get(filename).let {
+                if (it == null)
+                    filename.substringBeforeLast('.').replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" ")
+                else
+                    it.asString()
+            }
+        }
 
         ingame.musicGovernor.addMusicStartHook { music ->
             setMusicName(music.name)
@@ -104,7 +120,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         currentMusicName = str
         realNameLength = App.fontGameFBO.getWidth(str)
         nameLength = realNameLength.coerceAtMost(nameStrMaxLen)
-        TRANSITION_LENGTH = 0.8f * ((nameLength - nameLengthOld).absoluteValue / nameStrMaxLen)
+        TRANSITION_LENGTH = 0.8f * ((nameLength - nameLengthOld).absoluteValue.toFloat() / nameStrMaxLen)
+        if (TRANSITION_LENGTH.isNaN()) TRANSITION_LENGTH = 0f
         nameOverflown = (realNameLength > nameLength)
         musicPlayingTimer = 0f
 

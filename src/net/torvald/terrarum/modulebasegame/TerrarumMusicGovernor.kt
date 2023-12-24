@@ -15,7 +15,6 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
-import net.torvald.unicode.EMDASH
 import java.io.File
 import java.io.FileInputStream
 import javax.sound.sampled.AudioSystem
@@ -148,15 +147,24 @@ class TerrarumMusicGovernor : MusicGovernor() {
     private var shuffled = true
     private var diskJockeyingMode = "intermittent" // intermittent, continuous
 
-    private fun registerSongsFromDir(musicDir: String) {
+    private fun registerSongsFromDir(musicDir: String, fileToName: ((String) -> String)?) {
+        val fileToName = if (fileToName == null) {
+            { name: String -> name.substringBeforeLast('.').replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" ") }
+        }
+        else fileToName
+
+
         songs = File(musicDir).listFiles()?.sortedBy { it.name }?.mapNotNull {
             printdbg(this, "Music: ${it.absolutePath}")
             try {
                 MusicContainer(
-                    it.nameWithoutExtension.replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
+                    fileToName(it.name),
                     it,
                     Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath))
-                ).also {  muscon ->
+                ).also { muscon ->
+
+                    printdbg(this, "MusicTitle: ${muscon.name}")
+
                     muscon.songFinishedHook =  { stopMusic(muscon) }
                 }
             }
@@ -176,14 +184,14 @@ class TerrarumMusicGovernor : MusicGovernor() {
      * @param shuffled if the tracks are to be shuffled
      * @param diskJockeyingMode `intermittent` to give random gap between tracks, `continuous` for continuous playback
      */
-    fun queueDirectory(musicDir: String, shuffled: Boolean, diskJockeyingMode: String) {
+    fun queueDirectory(musicDir: String, shuffled: Boolean, diskJockeyingMode: String, fileToName: ((String) -> String)? = null) {
         if (musicState != STATE_INIT && musicState != STATE_INTERMISSION) {
             AudioMixer.requestFadeOut(AudioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
             stopMusic(AudioMixer.musicTrack.currentTrack)
         }
 
         songs.forEach { it.gdxMusic.tryDispose() }
-        registerSongsFromDir(musicDir)
+        registerSongsFromDir(musicDir, fileToName)
 
         this.shuffled = shuffled
         this.diskJockeyingMode = diskJockeyingMode
@@ -253,7 +261,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
     private fun startMusic(song: MusicContainer) {
         AudioMixer.startMusic(song)
-        printdbg(this, "startMusic Now playing: $song")
+        printdbg(this, "startMusic Now playing: ${song.name}")
 //        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
         if (musicStartHooks.isNotEmpty()) musicStartHooks.forEach { it(song) }
         musicState = STATE_PLAYING
