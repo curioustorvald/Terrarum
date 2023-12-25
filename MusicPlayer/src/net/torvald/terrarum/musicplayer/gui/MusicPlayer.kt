@@ -200,10 +200,12 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 //    private fun smoothstep(x: Float) = (x*x*(3f-2f*x)).coerceIn(0f, 1f)
 //    private fun smootherstep(x: Float) = (x*x*x*(x*(6f*x-15f)+10f)).coerceIn(0f, 1f)
 
+    private fun uiWidthFromTextWidth(tw: Int): Int = if (tw == 0) METERS_WIDTH.toInt() else (tw + METERS_WIDTH + maskOffWidth).roundToInt()
+
     private fun setUIwidthFromTextWidth(widthOld: Int, widthNew: Int, percentage: Float) {
         val percentage = if (percentage.isNaN()) 0f else percentage
-        val zeroWidth = if (widthOld == 0) METERS_WIDTH else (widthOld + METERS_WIDTH + maskOffWidth).roundToInt().toFloat()
-        val maxWidth = (widthNew + METERS_WIDTH + maskOffWidth).roundToInt().toFloat()
+        val zeroWidth = uiWidthFromTextWidth(widthOld).toFloat()
+        val maxWidth = uiWidthFromTextWidth(widthNew).toFloat()
         val step = organicOvershoot(percentage.coerceIn(0f, 1f).toDouble()).toFloat()
 
 //        printdbg(this, "setUIwidth: $zeroWidth -> $maxWidth; perc = $percentage")
@@ -262,6 +264,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private var _posX = 0f // not using provided `posX` as there is one frame delay between update and it actually used to drawing
     private var _posY = 0f
 
+    private var _posXnonStretched = 0f // posXY on PLAYING status
+
     override val mouseUp: Boolean
         get() = relativeMouseX.toFloat() in _posX-capsuleMosaicSize .. _posX+width+capsuleMosaicSize &&
                 relativeMouseY.toFloat() in _posY .. _posY+height
@@ -274,11 +278,23 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
         _posX = ((Toolkit.drawWidth - width) / 2).toFloat()
         _posY = (App.scr.height - App.scr.tvSafeGraphicsHeight - height).toFloat()
+        _posXnonStretched = ((Toolkit.drawWidth - uiWidthFromTextWidth(nameLength)) / 2).toFloat()
+
+
+        val posXforMusicLine = if (transitionOngoing && modeNext >= MODE_MOUSE_UP || mode >= MODE_MOUSE_UP)
+            _posXnonStretched
+        else
+            _posX
+
+        val widthForFreqMeter = if (transitionOngoing && modeNext >= MODE_MOUSE_UP || mode >= MODE_MOUSE_UP)
+            uiWidthFromTextWidth(nameLength)
+        else
+            width
 
         blendNormalStraightAlpha(batch)
         drawBaloon(batch, _posX, _posY, width.toFloat(), (height - capsuleHeight.toFloat()).coerceAtLeast(0f))
-        drawText(batch, _posX, _posY)
-        drawFreqMeter(batch, _posX + width - 18f, _posY + height - (capsuleHeight / 2) + 1f)
+        drawText(batch, posXforMusicLine, _posY)
+        drawFreqMeter(batch, posXforMusicLine + widthForFreqMeter - 18f, _posY + height - (capsuleHeight / 2) + 1f)
 
         batch.color = Color.WHITE
     }
