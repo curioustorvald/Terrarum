@@ -38,7 +38,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
 
     private val nameStrMaxLen = 180
-    private val nameFBO = FrameBuffer(Pixmap.Format.RGBA8888, nameStrMaxLen + 2*maskOffWidth, capsuleHeight, false)
+    private val nameFBO = FrameBuffer(Pixmap.Format.RGBA8888, 1024, capsuleHeight, false)
 
     private val baloonTexture = ModMgr.getGdxFile("musicplayer", "gui/blob.tga").let {
         TextureRegionPack(it, capsuleMosaicSize, capsuleMosaicSize)
@@ -56,7 +56,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private var modeNext = MODE_IDLE
     private var transitionAkku = 0f
     private var transitionRequest: Int? = null
-    private var transitionOngoing = false
+    private val transitionOngoing
+        get() = transitionAkku < TRANSITION_LENGTH
 
     private val TRANSITION_LENGTH = 0.6f
 
@@ -182,6 +183,18 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         }
 
         updateMeter()
+
+
+        if (!transitionOngoing) {
+            if (mouseUp) {
+                transitionRequest = MODE_MOUSE_UP
+            }
+            else if (mode == MODE_MOUSE_UP) {
+                transitionRequest = if (currentMusicName.isEmpty()) MODE_IDLE else MODE_PLAYING
+            }
+        }
+
+//        printdbg(this, "mode = $mode; req = $transitionRequest")
     }
 
 //    private fun smoothstep(x: Float) = (x*x*(3f-2f*x)).coerceIn(0f, 1f)
@@ -196,6 +209,12 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 //        printdbg(this, "setUIwidth: $zeroWidth -> $maxWidth; perc = $percentage")
 
         width = FastMath.interpolateLinearNoClamp(step, zeroWidth, maxWidth).roundToInt()
+    }
+
+    private fun setUIheight(heightOld: Int, heightNew: Int, percentage: Float) {
+        val percentage = if (percentage.isNaN()) 0f else percentage
+        val step = organicOvershoot(percentage.coerceIn(0f, 1f).toDouble()).toFloat()
+        height = FastMath.interpolateLinearNoClamp(step, heightOld.toFloat(), heightNew.toFloat()).roundToInt().coerceAtLeast(capsuleHeight)
     }
 
     // changes ui width
@@ -217,24 +236,49 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         it[MODE_PLAYING to MODE_IDLE] = { akku ->
             setUIwidthFromTextWidth(nameLengthOld, nameLength, akku / TRANSITION_LENGTH)
         }
+
+        it[MODE_IDLE to MODE_MOUSE_UP] = { akku ->
+            setUIwidthFromTextWidth(nameLengthOld, (nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt(), akku / TRANSITION_LENGTH)
+            setUIheight(28, 80, akku / TRANSITION_LENGTH)
+        }
+        it[MODE_PLAYING to MODE_MOUSE_UP] = { akku ->
+            setUIwidthFromTextWidth(nameLengthOld, (nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt(), akku / TRANSITION_LENGTH)
+            setUIheight(28, 80, akku / TRANSITION_LENGTH)
+        }
+        it[MODE_MOUSE_UP to MODE_PLAYING] = { akku ->
+            setUIwidthFromTextWidth((nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt(), nameLength, akku / TRANSITION_LENGTH)
+            setUIheight(80, 28, akku / TRANSITION_LENGTH)
+        }
+        it[MODE_MOUSE_UP to MODE_IDLE] = { akku ->
+            setUIwidthFromTextWidth((nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt(), 0, akku / TRANSITION_LENGTH)
+            setUIheight(80, 28, akku / TRANSITION_LENGTH)
+        }
+
+        it[MODE_MOUSE_UP to MODE_MOUSE_UP] = { akku -> }
+
+
     }
 
+    private var _posX = 0f // not using provided `posX` as there is one frame delay between update and it actually used to drawing
+    private var _posY = 0f
+
     override val mouseUp: Boolean
-        get() = (relativeMouseX) in -capsuleMosaicSize until width+capsuleMosaicSize && relativeMouseY in 0 until height
+        get() = relativeMouseX.toFloat() in _posX-capsuleMosaicSize .. _posX+width+capsuleMosaicSize &&
+                relativeMouseY.toFloat() in _posY .. _posY+height
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
-        renderNameToFBO(batch, camera, currentMusicName, 0f..width.toFloat() - METERS_WIDTH.toInt() - maskOffWidth)
+        renderNameToFBO(batch, camera, currentMusicName)
         batch.begin()
 
 
-        posX = ((Toolkit.drawWidth - width) / 2)
-        posY = (App.scr.height - App.scr.tvSafeGraphicsHeight - height)
+        _posX = ((Toolkit.drawWidth - width) / 2).toFloat()
+        _posY = (App.scr.height - App.scr.tvSafeGraphicsHeight - height).toFloat()
 
         blendNormalStraightAlpha(batch)
-        drawBaloon(batch, 0f, 0f, width.toFloat(), height - capsuleHeight.toFloat())
-        drawText(batch, 0f, 0f)
-        drawFreqMeter(batch, width - 18f, height - (capsuleHeight / 2) + 1f)
+        drawBaloon(batch, _posX, _posY, width.toFloat(), (height - capsuleHeight.toFloat()).coerceAtLeast(0f))
+        drawText(batch, _posX, _posY)
+        drawFreqMeter(batch, _posX + width - 18f, _posY + height - (capsuleHeight / 2) + 1f)
 
         batch.color = Color.WHITE
     }
@@ -245,49 +289,51 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             batch.color = if (k == 0) colourEdge else colourBack// (if (mouseUp) Color.MAROON else colourBack)
 
             // top left
-            batch.draw(baloonTexture.get(k, 0), x, y)
+            batch.draw(baloonTexture.get(k+0, 0), x, y, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
             // top
             batch.draw(baloonTexture.get(k+1, 0), x + capsuleMosaicSize, y, width, capsuleMosaicSize.toFloat())
             // top right
-            batch.draw(baloonTexture.get(k+2, 0), x + capsuleMosaicSize + width, y)
-            if (height > 0) {
-                // left
-                batch.draw(baloonTexture.get(k, 1), x, y + capsuleMosaicSize)
-                // centre
-                batch.draw(baloonTexture.get(k+1, 1), x + capsuleMosaicSize, y + capsuleMosaicSize, width, height)
-                // right
-                batch.draw(baloonTexture.get(k+2, 1), x + capsuleMosaicSize + width, y + capsuleMosaicSize)
-            }
+            batch.draw(baloonTexture.get(k+2, 0), x + capsuleMosaicSize + width, y, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
+
+            // left
+            batch.draw(baloonTexture.get(k+0, 1), x, y + capsuleMosaicSize, capsuleMosaicSize.toFloat(), height)
+            // centre
+            batch.draw(baloonTexture.get(k+1, 1), x + capsuleMosaicSize, y + capsuleMosaicSize, width, height)
+            // right
+            batch.draw(baloonTexture.get(k+2, 1), x + capsuleMosaicSize + width, y + capsuleMosaicSize, capsuleMosaicSize.toFloat(), height)
+
             // bottom left
-            batch.draw(baloonTexture.get(k, 2), x, y + capsuleMosaicSize + height)
+            batch.draw(baloonTexture.get(k+0, 2), x, y + capsuleMosaicSize + height, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
             // bottom
             batch.draw(baloonTexture.get(k+1, 2), x + capsuleMosaicSize, y + capsuleMosaicSize + height, width, capsuleMosaicSize.toFloat())
             // bottom right
-            batch.draw(baloonTexture.get(k+2, 2), x + capsuleMosaicSize + width, y + capsuleMosaicSize + height)
+            batch.draw(baloonTexture.get(k+2, 2), x + capsuleMosaicSize + width, y + capsuleMosaicSize + height, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
         }
     }
 
     private fun drawText(batch: SpriteBatch, posX: Float, posY: Float) {
         batch.color = colourText
-        batch.draw(nameFBO.colorBufferTexture, posX - maskOffWidth, posY - 1)
+        batch.draw(nameFBO.colorBufferTexture, posX - maskOffWidth, posY + height - capsuleHeight + 1)
     }
 
-    private fun renderNameToFBO(batch: SpriteBatch, camera: OrthographicCamera, str: String, window: ClosedFloatingPointRange<Float>) {
+    private fun renderNameToFBO(batch: SpriteBatch, camera: OrthographicCamera, str: String) {
+        val windowEnd = width.toFloat() - METERS_WIDTH - maskOffWidth
+
         nameFBO.inAction(camera, batch) {
             batch.inUse {
                 batch.color = Color.WHITE
                 // draw text
                 gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
                 blendNormalStraightAlpha(batch)
-                App.fontGameFBO.draw(batch, str, maskOffWidth.toFloat() - nameScroll, 0f)
+                App.fontGameFBO.draw(batch, str, maskOffWidth.toFloat() - nameScroll, 2f)
 
                 // mask off the area
                 batch.color = Color.WHITE
                 blendAlphaMask(batch)
-                batch.draw(textmask.get(0, 0), window.start, 0f)
-                batch.draw(textmask.get(1, 0), window.start + maskOffWidth, 0f, window.endInclusive - window.start, capsuleHeight.toFloat())
-                batch.draw(textmask.get(2, 0), window.start + window.endInclusive + maskOffWidth, 0f)
-                batch.draw(textmask.get(3, 0), window.start + window.endInclusive + 2 * maskOffWidth, 0f, 1000f, capsuleHeight.toFloat())
+                batch.draw(textmask.get(0, 0), 0f, 0f)
+                batch.draw(textmask.get(1, 0), maskOffWidth.toFloat(), 0f, windowEnd, capsuleHeight.toFloat())
+                batch.draw(textmask.get(2, 0), windowEnd + maskOffWidth, 0f)
+                batch.draw(textmask.get(3, 0), windowEnd + 2 * maskOffWidth, 0f, 1000f, capsuleHeight.toFloat())
             }
         }
     }
