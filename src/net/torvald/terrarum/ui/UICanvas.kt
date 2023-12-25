@@ -113,7 +113,7 @@ abstract class UICanvas(
         get() = mouseUp && Terrarum.mouseDown
 
     private val _mouseUpThis: Boolean
-        get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
+        get() = relativeMouseX in 0 until width && relativeMouseY in 0 until height
 
     /** Called by the screen */
     fun update(delta: Float) {

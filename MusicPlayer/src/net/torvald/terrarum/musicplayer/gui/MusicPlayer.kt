@@ -219,6 +219,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         }
     }
 
+    override val mouseUp: Boolean
+        get() = (relativeMouseX) in -capsuleMosaicSize until width+capsuleMosaicSize && relativeMouseY in 0 until height
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
@@ -226,13 +228,13 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         batch.begin()
 
 
-        val posX = ((Toolkit.drawWidth - width) / 2).toFloat()
-        val posY = (App.scr.height - App.scr.tvSafeGraphicsHeight - height).toFloat()
+        posX = ((Toolkit.drawWidth - width) / 2)
+        posY = (App.scr.height - App.scr.tvSafeGraphicsHeight - height)
 
         blendNormalStraightAlpha(batch)
-        drawBaloon(batch, posX, posY, width.toFloat(), height - capsuleHeight.toFloat())
-        drawText(batch, posX, posY)
-        drawFreqMeter(batch, posX + width - 18, posY + height - (capsuleHeight / 2) + 1)
+        drawBaloon(batch, 0f, 0f, width.toFloat(), height - capsuleHeight.toFloat())
+        drawText(batch, 0f, 0f)
+        drawFreqMeter(batch, width - 18f, height - (capsuleHeight / 2) + 1f)
 
         batch.color = Color.WHITE
     }
@@ -240,7 +242,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private fun drawBaloon(batch: SpriteBatch, x: Float, y: Float, width: Float, height: Float) {
         val x = x - capsuleMosaicSize
         for (k in 0..3 step 3) {
-            batch.color = if (k == 0) colourEdge else colourBack
+            batch.color = if (k == 0) colourEdge else colourBack// (if (mouseUp) Color.MAROON else colourBack)
 
             // top left
             batch.draw(baloonTexture.get(k, 0), x, y)
