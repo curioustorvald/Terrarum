@@ -166,6 +166,10 @@ final public class FastMath {
         return ((1f - scale) * startValue) + (scale * endValue);
     }
 
+    public static float interpolateLinearNoClamp(float scale, float startValue, float endValue) {
+        return ((1f - scale) * startValue) + (scale * endValue);
+    }
+
     public static double interpolateLinear(double scale, double startValue, double endValue) {
         if (startValue == endValue) {
             return startValue;

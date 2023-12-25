@@ -12,5 +12,6 @@
     <orderEntry type="library" scope="PROVIDED" name="badlogicgames.gdx" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="io.airlift.aircompressor" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="TerrarumSansBitmap" level="project" />
+    <orderEntry type="library" name="apache.commons.math3" level="project" />
   </component>
 </module>

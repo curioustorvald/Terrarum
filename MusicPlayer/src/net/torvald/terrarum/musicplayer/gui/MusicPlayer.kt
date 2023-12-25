@@ -17,6 +17,8 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator
 import kotlin.math.*
 
 /**
@@ -56,7 +58,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private var transitionRequest: Int? = null
     private var transitionOngoing = false
 
-    private var TRANSITION_LENGTH = 0.44444445f
+    private val TRANSITION_LENGTH = 0.6f
 
     private var colourEdge = Color(0xFFFFFF_40.toInt())
     private val colourBack = Color.BLACK
@@ -69,12 +71,13 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         setAsAlwaysVisible()
 
         // test code
+//        val albumDir = App.customMusicDir + "/Gapless Test"
         val albumDir = App.customMusicDir + "/FurryJoA 2023 Live"
         val playlistFile = JsonFetcher.invoke("$albumDir/playlist.json")
 
         val diskJockeyingMode = playlistFile.get("diskJockeyingMode").asString()
         val shuffled = playlistFile.get("shuffled").asBoolean()
-        val fileToName = playlistFile.get("files")
+        val fileToName = playlistFile.get("titles")
 
         registerPlaylist(albumDir, fileToName, shuffled, diskJockeyingMode)
     }
@@ -120,8 +123,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         currentMusicName = str
         realNameLength = App.fontGameFBO.getWidth(str)
         nameLength = realNameLength.coerceAtMost(nameStrMaxLen)
-        TRANSITION_LENGTH = 0.8f * ((nameLength - nameLengthOld).absoluteValue.toFloat() / nameStrMaxLen)
-        if (TRANSITION_LENGTH.isNaN()) TRANSITION_LENGTH = 0f
+//        TRANSITION_LENGTH = 1.5f * ((nameLength - nameLengthOld).absoluteValue.toFloat() / nameStrMaxLen)
+//        if (TRANSITION_LENGTH.isNaN()) TRANSITION_LENGTH = 0f
         nameOverflown = (realNameLength > nameLength)
         musicPlayingTimer = 0f
 
@@ -181,17 +184,18 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         updateMeter()
     }
 
-    private fun smoothstep(x: Float) = (x*x*(3f-2f*x)).coerceIn(0f, 1f)
-    private fun smootherstep(x: Float) = (x*x*x*(x*(6f*x-15f)+10f)).coerceIn(0f, 1f)
+//    private fun smoothstep(x: Float) = (x*x*(3f-2f*x)).coerceIn(0f, 1f)
+//    private fun smootherstep(x: Float) = (x*x*x*(x*(6f*x-15f)+10f)).coerceIn(0f, 1f)
 
     private fun setUIwidthFromTextWidth(widthOld: Int, widthNew: Int, percentage: Float) {
+        val percentage = if (percentage.isNaN()) 0f else percentage
         val zeroWidth = if (widthOld == 0) METERS_WIDTH else (widthOld + METERS_WIDTH + maskOffWidth).roundToInt().toFloat()
         val maxWidth = (widthNew + METERS_WIDTH + maskOffWidth).roundToInt().toFloat()
-        val step = smootherstep(percentage)
+        val step = organicOvershoot(percentage.coerceIn(0f, 1f).toDouble()).toFloat()
 
 //        printdbg(this, "setUIwidth: $zeroWidth -> $maxWidth; perc = $percentage")
 
-        width = FastMath.interpolateLinear(step, zeroWidth, maxWidth).roundToInt()
+        width = FastMath.interpolateLinearNoClamp(step, zeroWidth, maxWidth).roundToInt()
     }
 
     // changes ui width
@@ -363,5 +367,20 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             // write to the buf
             System.arraycopy(samples, 0, buf, buf.size - samples.size, samples.size)
         }
+    }
+
+    private fun generateCubicSpline(x: DoubleArray, y: DoubleArray): PolynomialSplineFunction {
+        val interpolator = SplineInterpolator()
+        return interpolator.interpolate(x, y)
+    }
+
+    // Function to calculate values using the generated cubic spline
+    // Spline fit of the cubic-bezier(0.5, 0, 0.25,1.25) (https://www.desmos.com/calculator/k436wurcij)
+    private val curveDataX = doubleArrayOf(0.0, 0.15576171875, 0.26171875, 0.40625, 0.59765625, 0.76220703125, 1.0)
+    private val curveDataY = doubleArrayOf(0.0, 0.05322265625, 0.19140625, 0.59375, 0.94921875, 1.02880859375, 1.0)
+    private val splineFunction = generateCubicSpline(curveDataX, curveDataY)
+
+    fun organicOvershoot(x: Double): Double {
+        return splineFunction.value(x)
     }
 }
