@@ -36,6 +36,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private var capsuleHeight = 28
     private var capsuleMosaicSize = capsuleHeight / 2 + 1
 
+    private val BUTTON_SIZE = 40
 
     private val nameStrMaxLen = 180
     private val nameFBO = FrameBuffer(Pixmap.Format.RGBA8888, 1024, capsuleHeight, false)
@@ -45,6 +46,9 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     }
     private val textmask = ModMgr.getGdxFile("musicplayer", "gui/textmask.tga").let {
         TextureRegionPack(it, maskOffWidth, capsuleHeight)
+    }
+    private val controlButtons = ModMgr.getGdxFile("musicplayer", "gui/control_buttons.tga").let {
+        TextureRegionPack(it, BUTTON_SIZE, BUTTON_SIZE)
     }
 
     private val MODE_IDLE = 0
@@ -67,6 +71,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val colourText = Color(0xf0f0f0ff.toInt())
     private val colourMeter = Color(0xddddddff.toInt())
     private val colourMeter2 = Color(0xdddddd80.toInt())
+
+    private val colourControlButton = Color(0xddddddff.toInt())
 
     init {
         setAsAlwaysVisible()
@@ -227,6 +233,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         }
     }
 
+    private val transitionPercentage = 0f
+
     private val transitionDB = HashMap<Pair<Int, Int>, (Float) -> Unit>().also {
         it[MODE_IDLE to MODE_IDLE] = { akku -> }
         it[MODE_IDLE to MODE_PLAYING] = { akku ->
@@ -295,6 +303,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         drawBaloon(batch, _posX, _posY, width.toFloat(), (height - capsuleHeight.toFloat()).coerceAtLeast(0f))
         drawText(batch, posXforMusicLine, _posY)
         drawFreqMeter(batch, posXforMusicLine + widthForFreqMeter - 18f, _posY + height - (capsuleHeight / 2) + 1f)
+        drawControls(batch, _posX, _posY)
 
         batch.color = Color.WHITE
     }
@@ -324,6 +333,28 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             batch.draw(baloonTexture.get(k+1, 2), x + capsuleMosaicSize, y + capsuleMosaicSize + height, width, capsuleMosaicSize.toFloat())
             // bottom right
             batch.draw(baloonTexture.get(k+2, 2), x + capsuleMosaicSize + width, y + capsuleMosaicSize + height, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
+        }
+    }
+
+    private fun drawControls(batch: SpriteBatch, posX: Float, posY: Float) {
+        val (alpha, reverse) = if (mode < MODE_MOUSE_UP && modeNext == MODE_MOUSE_UP)
+            (transitionAkku / TRANSITION_LENGTH).let { if (it.isNaN()) 0f else it } to false
+        else if (mode == MODE_MOUSE_UP && modeNext < MODE_MOUSE_UP)
+            (transitionAkku / TRANSITION_LENGTH).let { if (it.isNaN()) 0f else it } to true
+        else if (mode == MODE_MOUSE_UP)
+            1f to false
+        else
+            0f to false
+
+        if (alpha > 0f) {
+            val alpha0 = alpha.coerceIn(0f, 1f).organicOvershoot().coerceAtMost(1f)
+            batch.color = colourControlButton mul Color(1f, 1f, 1f, (if (reverse) 1f - alpha0 else alpha0).pow(2f))
+            val posX = Toolkit.hdrawWidthf - 100f
+            val posY = posY + 10f
+            for (i in 0..4) {
+                val iconY = if (!AudioMixer.musicTrack.isPlaying && i == 2) 1 else 0
+                batch.draw(controlButtons.get(i, iconY), posX + i * BUTTON_SIZE, posY)
+            }
         }
     }
 
@@ -447,4 +478,6 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     fun organicOvershoot(x: Double): Double {
         return splineFunction.value(x)
     }
+
+    private fun Float.organicOvershoot() = splineFunction.value(this.toDouble()).toFloat()
 }
