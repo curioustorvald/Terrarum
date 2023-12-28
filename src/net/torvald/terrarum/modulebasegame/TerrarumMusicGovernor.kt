@@ -277,12 +277,14 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     // MixerTrackProcessor will call this function externally to make gapless playback work
-    fun pullNextMusicTrack(): MusicContainer {
+    fun pullNextMusicTrack(callNextMusicHook: Boolean = false): MusicContainer {
         // prevent same song to play twice in row (for the most time)
         if (musicBin.isEmpty()) {
             restockMUsicBin()
         }
-        return songs[musicBin.removeAt(0)]
+        return songs[musicBin.removeAt(0)].also { mus ->
+            if (musicStartHooks.isNotEmpty()) musicStartHooks.forEach { it(mus) }
+        }
     }
 
     // MixerTrackProcessor will call this function externally to make gapless playback work

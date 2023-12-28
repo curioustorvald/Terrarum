@@ -179,8 +179,10 @@ object AudioMixer: Disposable {
         masterTrack.filters[2] = Spectro()
         masterTrack.filters[3] = Vecto(2f)
 
-        musicTrack.filters[1] = Spectro()
-        ambientTrack.filters[1] = Spectro()
+        musicTrack.filters[1] = Vecto()
+        musicTrack.filters[2] = Spectro()
+        ambientTrack.filters[1] = Vecto()
+        ambientTrack.filters[2] = Spectro()
 
         listOf(sumBus, convolveBusOpen, convolveBusCave).forEach {
             it.addSidechainInput(musicTrack, 1.0)

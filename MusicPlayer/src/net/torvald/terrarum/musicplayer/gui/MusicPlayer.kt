@@ -91,7 +91,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             track.doGaplessPlayback = (diskJockeyingMode == "continuous")
             if (track.doGaplessPlayback) {
                 track.pullNextTrack = {
-                    track.currentTrack = ingame.musicGovernor.pullNextMusicTrack()
+                    track.currentTrack = ingame.musicGovernor.pullNextMusicTrack(true)
                     setMusicName(track.currentTrack?.name ?: "")
                 }
             }
@@ -113,13 +113,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
         ingame.musicGovernor.addMusicStartHook { music ->
             setMusicName(music.name)
-            transitionRequest = MODE_PLAYING
+            if (mode <= MODE_PLAYING)
+                transitionRequest = MODE_PLAYING
         }
 
         ingame.musicGovernor.addMusicStopHook { music ->
             if (diskJockeyingMode == "intermittent") {
                 setIntermission()
-                transitionRequest = MODE_IDLE
+                if (mode <= MODE_PLAYING)
+                    transitionRequest = MODE_IDLE
             }
             else if (diskJockeyingMode == "continuous") {
 
@@ -287,14 +289,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private var _posX = 0f // not using provided `posX` as there is one frame delay between update and it actually used to drawing
     private var _posY = 0f
 
-    private var _posXnonStretched = 0f // posXY on PLAYING status
+    private var widthForFreqMeter = 0
+    private var posXforMusicLine = 0f
 
     override val mouseUp: Boolean
         get() = relativeMouseX.toFloat() in _posX-capsuleMosaicSize .. _posX+width+capsuleMosaicSize &&
                 relativeMouseY.toFloat() in _posY .. _posY+height
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
-        val widthForFreqMeter = if (transitionOngoing && modeNext >= MODE_MOUSE_UP || mode >= MODE_MOUSE_UP)
+        widthForFreqMeter = if (transitionOngoing && modeNext >= MODE_MOUSE_UP || mode >= MODE_MOUSE_UP)
             uiWidthFromTextWidth(nameLength)
         else
             width
@@ -308,10 +311,10 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
         _posX = ((Toolkit.drawWidth - width) / 2).toFloat()
         _posY = (App.scr.height - App.scr.tvSafeGraphicsHeight - height).toFloat()
-        _posXnonStretched = ((Toolkit.drawWidth - uiWidthFromTextWidth(nameLength)) / 2).toFloat()
+        val _posXnonStretched = ((Toolkit.drawWidth - uiWidthFromTextWidth(nameLength)) / 2).toFloat()
 
 
-        val posXforMusicLine = if (transitionOngoing && modeNext >= MODE_MOUSE_UP || mode >= MODE_MOUSE_UP)
+        posXforMusicLine = if (transitionOngoing && modeNext >= MODE_MOUSE_UP || mode >= MODE_MOUSE_UP)
             _posXnonStretched
         else
             _posX
