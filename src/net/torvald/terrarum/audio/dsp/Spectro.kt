@@ -11,7 +11,7 @@ import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.STRIP_W
 import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.*
 
-class Spectro : TerrarumAudioFilter() {
+class Spectro(val gain: Float = 1f) : TerrarumAudioFilter() {
     private val FFTSIZE = 1024
     private val inBuf = Array(2) { FloatArray(FFTSIZE) }
 
@@ -51,7 +51,7 @@ class Spectro : TerrarumAudioFilter() {
         push(inbuf[0], inBuf[0])
         push(inbuf[1], inBuf[1])
         for (i in 0 until FFTSIZE) {
-            chsum.reim[2*i] = ((inBuf[0][i] + inBuf[1][i]) / 2f) * fftWin[i]
+            chsum.reim[2*i] = ((inBuf[0][i] + inBuf[1][i]) / 2f) * fftWin[i] * gain
         }
 
         // do fft
@@ -74,7 +74,7 @@ class Spectro : TerrarumAudioFilter() {
         for (bin in 0 until FFTSIZE / 2) {
             val freqL = (SAMPLING_RATED / FFTSIZE) * bin
             val freqR = (SAMPLING_RATED / FFTSIZE) * (bin + 1)
-            val magn0 = fftOut.reim[2 * bin].absoluteValue / FFTSIZE * (freqR / 10.0) // apply slope
+            val magn0 = fftOut.reim[2 * bin].absoluteValue / FFTSIZE * (freqR / 20.0) // apply slope
             val magn = FastMath.interpolateLinear(BasicDebugInfoWindow.FFT_SMOOTHING_FACTOR, magn0, oldFFTmagn[bin])
             val magnLog = fullscaleToDecibels(magn)
 
@@ -94,7 +94,7 @@ class Spectro : TerrarumAudioFilter() {
 }
 
 
-class Vecto : TerrarumAudioFilter() {
+class Vecto(val gain: Float = 1f) : TerrarumAudioFilter() {
     val backbufL = Array((6144f / AUDIO_BUFFER_SIZE).roundToInt().coerceAtLeast(1)) {
         FloatArray(AUDIO_BUFFER_SIZE)
     }
@@ -115,8 +115,8 @@ class Vecto : TerrarumAudioFilter() {
 
         // plot dots
         for (i in 0 until TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE) {
-            val y0 = +inbuf[0][i] * 2f
-            val x0 = -inbuf[1][i] * 2f// rotate the domain by -90 deg
+            val y0 = +inbuf[0][i] * gain
+            val x0 = -inbuf[1][i] * gain// rotate the domain by -90 deg
 
             val x = (+x0*sqrt2p -y0*sqrt2p) * 1.4142
             val y = (-x0*sqrt2p -y0*sqrt2p) * 1.4142 // further rotate by -45 deg then flip along the y axis

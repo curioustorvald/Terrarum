@@ -148,6 +148,9 @@ class TerrarumMusicGovernor : MusicGovernor() {
     private var diskJockeyingMode = "intermittent" // intermittent, continuous
 
     private fun registerSongsFromDir(musicDir: String, fileToName: ((String) -> String)?) {
+        printdbg(this, "registerSongsFromDir $musicDir")
+
+
         val fileToName = if (fileToName == null) {
             { name: String -> name.substringBeforeLast('.').replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" ") }
         }
@@ -295,11 +298,11 @@ class TerrarumMusicGovernor : MusicGovernor() {
                 if (!musicFired) {
                     musicFired = true
 
-                    val song = songs[musicBin.removeAt(0)]
                     // prevent same song to play twice
                     if (musicBin.isEmpty()) {
                         restockMUsicBin()
                     }
+                    val song = songs[musicBin.removeAt(0)]
 
                     startMusic(song)
                 }
@@ -322,11 +325,11 @@ class TerrarumMusicGovernor : MusicGovernor() {
                 if (!ambFired) {
                     ambFired = true
 
-                    val song = ambients[ambientsBin.removeAt(0)]
                     // prevent same song to play twice
                     if (ambientsBin.isEmpty()) {
                         ambientsBin = ArrayList(ambients.indices.toList().shuffled())
                     }
+                    val song = ambients[ambientsBin.removeAt(0)]
 
                     startAmbient(song)
                 }

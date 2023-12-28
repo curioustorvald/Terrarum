@@ -65,21 +65,21 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private val TRANSITION_LENGTH = 0.6f
 
-    private var colourEdge = Color(0xFFFFFF_40.toInt())
-    private val colourBack = Color.BLACK
+    private val colourBack = Color(0xffffff_99.toInt())
 
-    private val colourText = Color(0xf0f0f0ff.toInt())
-    private val colourMeter = Color(0xddddddff.toInt())
-    private val colourMeter2 = Color(0xdddddd80.toInt())
+    private val colourText = Color(0xffffff_cc.toInt())
+    private val colourMeter = Color(0xeeeeee_cc.toInt())
+    private val colourMeter2 = Color(0xeeeeee_66.toInt())
 
-    private val colourControlButton = Color(0xddddddff.toInt())
+    private val colourControlButton = Color(0xeeeeee_cc.toInt())
 
     init {
         setAsAlwaysVisible()
 
         // test code
-//        val albumDir = App.customMusicDir + "/Gapless Test"
-        val albumDir = App.customMusicDir + "/FurryJoA 2023 Live"
+        val albumDir = App.customMusicDir + "/Gapless Test"
+//        val albumDir = App.customMusicDir + "/FurryJoA 2023 Live"
+//        val albumDir = App.customMusicDir + "/Audio Test"
         val playlistFile = JsonFetcher.invoke("$albumDir/playlist.json")
 
         val diskJockeyingMode = playlistFile.get("diskJockeyingMode").asString()
@@ -279,8 +279,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 relativeMouseY.toFloat() in _posY .. _posY+height
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+        val widthForFreqMeter = if (transitionOngoing && modeNext >= MODE_MOUSE_UP || mode >= MODE_MOUSE_UP)
+            uiWidthFromTextWidth(nameLength)
+        else
+            width
+
+
+
         batch.end()
-        renderNameToFBO(batch, camera, currentMusicName)
+        renderNameToFBO(batch, camera, currentMusicName, widthForFreqMeter.toFloat())
         batch.begin()
 
 
@@ -294,10 +301,6 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         else
             _posX
 
-        val widthForFreqMeter = if (transitionOngoing && modeNext >= MODE_MOUSE_UP || mode >= MODE_MOUSE_UP)
-            uiWidthFromTextWidth(nameLength)
-        else
-            width
 
         blendNormalStraightAlpha(batch)
         drawBaloon(batch, _posX, _posY, width.toFloat(), (height - capsuleHeight.toFloat()).coerceAtLeast(0f))
@@ -310,30 +313,28 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private fun drawBaloon(batch: SpriteBatch, x: Float, y: Float, width: Float, height: Float) {
         val x = x - capsuleMosaicSize
-        for (k in 0..3 step 3) {
-            batch.color = if (k == 0) colourEdge else colourBack// (if (mouseUp) Color.MAROON else colourBack)
+        batch.color = colourBack// (if (mouseUp) Color.MAROON else colourBack)
 
-            // top left
-            batch.draw(baloonTexture.get(k+0, 0), x, y, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
-            // top
-            batch.draw(baloonTexture.get(k+1, 0), x + capsuleMosaicSize, y, width, capsuleMosaicSize.toFloat())
-            // top right
-            batch.draw(baloonTexture.get(k+2, 0), x + capsuleMosaicSize + width, y, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
+        // top left
+        batch.draw(baloonTexture.get(0, 0), x, y, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
+        // top
+        batch.draw(baloonTexture.get(1, 0), x + capsuleMosaicSize, y, width, capsuleMosaicSize.toFloat())
+        // top right
+        batch.draw(baloonTexture.get(2, 0), x + capsuleMosaicSize + width, y, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
 
-            // left
-            batch.draw(baloonTexture.get(k+0, 1), x, y + capsuleMosaicSize, capsuleMosaicSize.toFloat(), height)
-            // centre
-            batch.draw(baloonTexture.get(k+1, 1), x + capsuleMosaicSize, y + capsuleMosaicSize, width, height)
-            // right
-            batch.draw(baloonTexture.get(k+2, 1), x + capsuleMosaicSize + width, y + capsuleMosaicSize, capsuleMosaicSize.toFloat(), height)
+        // left
+        batch.draw(baloonTexture.get(0, 1), x, y + capsuleMosaicSize, capsuleMosaicSize.toFloat(), height)
+        // centre
+        batch.draw(baloonTexture.get(1, 1), x + capsuleMosaicSize, y + capsuleMosaicSize, width, height)
+        // right
+        batch.draw(baloonTexture.get(2, 1), x + capsuleMosaicSize + width, y + capsuleMosaicSize, capsuleMosaicSize.toFloat(), height)
 
-            // bottom left
-            batch.draw(baloonTexture.get(k+0, 2), x, y + capsuleMosaicSize + height, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
-            // bottom
-            batch.draw(baloonTexture.get(k+1, 2), x + capsuleMosaicSize, y + capsuleMosaicSize + height, width, capsuleMosaicSize.toFloat())
-            // bottom right
-            batch.draw(baloonTexture.get(k+2, 2), x + capsuleMosaicSize + width, y + capsuleMosaicSize + height, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
-        }
+        // bottom left
+        batch.draw(baloonTexture.get(0, 2), x, y + capsuleMosaicSize + height, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
+        // bottom
+        batch.draw(baloonTexture.get(1, 2), x + capsuleMosaicSize, y + capsuleMosaicSize + height, width, capsuleMosaicSize.toFloat())
+        // bottom right
+        batch.draw(baloonTexture.get(2, 2), x + capsuleMosaicSize + width, y + capsuleMosaicSize + height, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
     }
 
     private fun drawControls(batch: SpriteBatch, posX: Float, posY: Float) {
@@ -348,12 +349,12 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
         if (alpha > 0f) {
             val alpha0 = alpha.coerceIn(0f, 1f).organicOvershoot().coerceAtMost(1f)
-            batch.color = colourControlButton mul Color(1f, 1f, 1f, (if (reverse) 1f - alpha0 else alpha0).pow(2f))
-            val posX = Toolkit.hdrawWidthf - 100f
+            batch.color = colourControlButton mul Color(1f, 1f, 1f, (if (reverse) 1f - alpha0 else alpha0).pow(3f))
+            val posX = Toolkit.hdrawWidthf - 120f
             val posY = posY + 10f
             for (i in 0..4) {
                 val iconY = if (!AudioMixer.musicTrack.isPlaying && i == 2) 1 else 0
-                batch.draw(controlButtons.get(i, iconY), posX + i * BUTTON_SIZE, posY)
+                batch.draw(controlButtons.get(i, iconY), posX + i * (BUTTON_SIZE + 8) + 4, posY)
             }
         }
     }
@@ -363,8 +364,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         batch.draw(nameFBO.colorBufferTexture, posX - maskOffWidth, posY + height - capsuleHeight + 1)
     }
 
-    private fun renderNameToFBO(batch: SpriteBatch, camera: OrthographicCamera, str: String) {
-        val windowEnd = width.toFloat() - METERS_WIDTH - maskOffWidth
+    private fun renderNameToFBO(batch: SpriteBatch, camera: OrthographicCamera, str: String, width: Float) {
+        val windowEnd = width - METERS_WIDTH - maskOffWidth
 
         nameFBO.inAction(camera, batch) {
             batch.inUse {
@@ -420,7 +421,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         // apply slope to the fft bins, also converts fullscale to decibels
         for (bin in binHeights.indices) {
             val freqR = (TerrarumAudioMixerTrack.SAMPLING_RATED / FFTSIZE) * (bin + 1)
-            val magn0 = fftOut.reim[2 * bin].absoluteValue / FFTSIZE * (freqR / 10.0) // apply slope
+            val magn0 = fftOut.reim[2 * bin].absoluteValue / FFTSIZE * (freqR / 20.0) // apply slope
             val magn = FastMath.interpolateLinear(FFT_SMOOTHING_FACTOR, magn0, oldFFTmagn[bin])
             val magnLog = fullscaleToDecibels(magn)
 

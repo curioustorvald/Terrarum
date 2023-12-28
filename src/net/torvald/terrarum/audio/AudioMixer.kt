@@ -177,7 +177,10 @@ object AudioMixer: Disposable {
         masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer
         masterTrack.filters[2] = Spectro()
-        masterTrack.filters[3] = Vecto()
+        masterTrack.filters[3] = Vecto(2f)
+
+        musicTrack.filters[1] = Spectro()
+        ambientTrack.filters[1] = Spectro()
 
         listOf(sumBus, convolveBusOpen, convolveBusCave).forEach {
             it.addSidechainInput(musicTrack, 1.0)
@@ -201,7 +204,7 @@ object AudioMixer: Disposable {
         masterTrack.addSidechainInput(fadeBus, 1.0)
         masterTrack.addSidechainInput(guiTrack, 1.0)
 
-        musicTrack.filters[1] = Gain(0.5f)
+        musicTrack.filters[3] = Gain(0.5f)
 
         dynamicTracks.forEach {
             it.filters[0] = BinoPan(0f)
