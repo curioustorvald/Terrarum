@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jcraft.jorbis.VorbisFile
 import javazoom.jl.decoder.Bitstream
 import net.torvald.reflection.extortField
+import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioMixer
@@ -129,6 +130,11 @@ data class MusicContainer(
     }
 
     override fun toString() = if (name.isEmpty()) file.nameWithoutExtension else name
+
+    fun reset() {
+        samplesRead = 0L
+        gdxMusic.forceInvoke<Int>("reset", arrayOf())
+    }
 }
 
 class TerrarumMusicGovernor : MusicGovernor() {
@@ -270,6 +276,23 @@ class TerrarumMusicGovernor : MusicGovernor() {
         musicState = STATE_PLAYING
     }
 
+    // MixerTrackProcessor will call this function externally to make gapless playback work
+    fun pullNextMusicTrack(): MusicContainer {
+        // prevent same song to play twice in row (for the most time)
+        if (musicBin.isEmpty()) {
+            restockMUsicBin()
+        }
+        return songs[musicBin.removeAt(0)]
+    }
+
+    // MixerTrackProcessor will call this function externally to make gapless playback work
+    fun pullNextAmbientTrack(): MusicContainer {
+        // prevent same song to play twice in row (for the most time)
+        if (ambientsBin.isEmpty()) {
+            ambientsBin = ArrayList(ambients.indices.toList().shuffled())
+        }
+        return ambients[ambientsBin.removeAt(0)]
+    }
 
     private fun stopAmbient() {
         ambState = STATE_INTERMISSION
@@ -297,14 +320,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
             STATE_FIREPLAY -> {
                 if (!musicFired) {
                     musicFired = true
-
-                    // prevent same song to play twice
-                    if (musicBin.isEmpty()) {
-                        restockMUsicBin()
-                    }
-                    val song = songs[musicBin.removeAt(0)]
-
-                    startMusic(song)
+                    startMusic(pullNextMusicTrack())
                 }
             }
             STATE_PLAYING -> {
@@ -324,14 +340,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
             STATE_FIREPLAY -> {
                 if (!ambFired) {
                     ambFired = true
-
-                    // prevent same song to play twice
-                    if (ambientsBin.isEmpty()) {
-                        ambientsBin = ArrayList(ambients.indices.toList().shuffled())
-                    }
-                    val song = ambients[ambientsBin.removeAt(0)]
-
-                    startAmbient(song)
+                    startAmbient(pullNextAmbientTrack())
                 }
             }
             STATE_PLAYING -> {

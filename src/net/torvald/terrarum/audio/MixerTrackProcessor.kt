@@ -45,12 +45,27 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
 
     private fun allocateStreamBuf(track: TerrarumAudioMixerTrack) {
         printdbg("Allocating a StreamBuf with rate ${track.currentTrack!!.samplingRate}")
-        streamBuf = AudioProcessBuf(track.currentTrack!!.samplingRate, {
-            val l = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(it))
-            track.currentTrack?.let {
-                it.samplesRead += l!! / 4
+        streamBuf = AudioProcessBuf(track.currentTrack!!.samplingRate, { buffer ->
+            var bytesRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(buffer)) ?: 0
+
+            // increment samplesRead of the current track
+            track.currentTrack?.let { it.samplesRead += bytesRead / 4 }
+
+            // do gapless fetch if there is space in the buffer
+            if (track.doGaplessPlayback && bytesRead < buffer.size) {
+                track.currentTrack?.reset()
+                track.pullNextTrack()
+
+                val tmpBuf = ByteArray(buffer.size - bytesRead)
+                val newRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(tmpBuf)) ?: 0
+
+                track.currentTrack?.let { it.samplesRead += newRead / 4 }
+                System.arraycopy(tmpBuf, 0, buffer, bytesRead, tmpBuf.size)
+
+                bytesRead += newRead
             }
-            l
+
+            bytesRead
         }, {
             track.stop()
             this.streamBuf = null

@@ -86,6 +86,18 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         val shuffled = playlistFile.get("shuffled").asBoolean()
         val fileToName = playlistFile.get("titles")
 
+
+        AudioMixer.musicTrack.let { track ->
+            track.doGaplessPlayback = (diskJockeyingMode == "continuous")
+            if (track.doGaplessPlayback) {
+                track.pullNextTrack = {
+                    track.currentTrack = ingame.musicGovernor.pullNextMusicTrack()
+                    setMusicName(track.currentTrack?.name ?: "")
+                }
+            }
+        }
+
+
         registerPlaylist(albumDir, fileToName, shuffled, diskJockeyingMode)
     }
 
@@ -108,6 +120,9 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             if (diskJockeyingMode == "intermittent") {
                 setIntermission()
                 transitionRequest = MODE_IDLE
+            }
+            else if (diskJockeyingMode == "continuous") {
+
             }
         }
     }
