@@ -259,13 +259,30 @@ class TerrarumMusicGovernor : MusicGovernor() {
     protected var ambState = 0
     protected var ambFired = false
 
-    private fun stopMusic(song: MusicContainer?) {
-        musicState = STATE_INTERMISSION
-        intermissionAkku = 0f
-        intermissionLength = if (diskJockeyingMode == "intermittent") 30f + 30f * Math.random().toFloat() else 0f // 30s-60s
-        musicFired = false
-        if (musicStopHooks.isNotEmpty()) musicStopHooks.forEach { if (song != null) { it(song) } }
-        printdbg(this, "StopMusic Intermission: $intermissionLength seconds")
+    private fun stopMusic(song: MusicContainer?, callStopMusicHook: Boolean = true) {
+        if (intermissionLength < Float.POSITIVE_INFINITY) {
+            musicState = STATE_INTERMISSION
+            intermissionAkku = 0f
+            intermissionLength =
+                if (diskJockeyingMode == "intermittent") 30f + 30f * Math.random().toFloat() else 0f // 30s-60s
+            musicFired = false
+            if (callStopMusicHook && musicStopHooks.isNotEmpty()) musicStopHooks.forEach {
+                if (song != null) {
+                    it(song)
+                }
+            }
+            printdbg(this, "StopMusic Intermission: $intermissionLength seconds")
+        }
+    }
+
+    fun stopMusic(callStopMusicHook: Boolean = true, pauseLen: Float = Float.POSITIVE_INFINITY) {
+        stopMusic(AudioMixer.musicTrack.currentTrack, callStopMusicHook)
+        intermissionLength = pauseLen
+        printdbg(this, "StopMusic Intermission2: $intermissionLength seconds")
+    }
+
+    fun startMusic() {
+        startMusic(pullNextMusicTrack())
     }
 
     private fun startMusic(song: MusicContainer) {
@@ -274,16 +291,19 @@ class TerrarumMusicGovernor : MusicGovernor() {
 //        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
         if (musicStartHooks.isNotEmpty()) musicStartHooks.forEach { it(song) }
         musicState = STATE_PLAYING
+        intermissionLength = 42.42424f
     }
 
     // MixerTrackProcessor will call this function externally to make gapless playback work
     fun pullNextMusicTrack(callNextMusicHook: Boolean = false): MusicContainer {
+//        printStackTrace(this)
+
         // prevent same song to play twice in row (for the most time)
         if (musicBin.isEmpty()) {
             restockMUsicBin()
         }
         return songs[musicBin.removeAt(0)].also { mus ->
-            if (musicStartHooks.isNotEmpty()) musicStartHooks.forEach { it(mus) }
+            if (callNextMusicHook && musicStartHooks.isNotEmpty()) musicStartHooks.forEach { it(mus) }
         }
     }
 

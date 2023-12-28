@@ -6,6 +6,7 @@ import com.badlogic.gdx.backends.lwjgl3.audio.Lwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.audio.dsp.*
@@ -235,6 +236,7 @@ object AudioMixer: Disposable {
         var fadeinFired: Boolean = false,
         var fadeTarget: Double = 0.0,
         var fadeStart: Double = 0.0,
+        var callback: () -> Unit = {},
     )
 
     private val fadeReqs = HashMap<TerrarumAudioMixerTrack, FadeRequest>().also { map ->
@@ -322,13 +324,16 @@ object AudioMixer: Disposable {
                     track.volume = req.fadeTarget
 
                     // stop streaming if fadeBus is muted
-                    if (req.fadeTarget == 0.0 && track == fadeBus) {
+                    if (req.fadeTarget == 0.0 && (track == musicTrack || track == fadeBus)) {
                         musicTrack.stop()
                         musicTrack.currentTrack = null
-
+                    }
+                    if (req.fadeTarget == 0.0 && (track == musicTrack || track == fadeBus)) {
                         ambientTrack.stop()
                         ambientTrack.currentTrack = null
                     }
+
+                    req.callback()
                 }
             }
             else if (req.fadeinFired) {
@@ -340,6 +345,8 @@ object AudioMixer: Disposable {
                     track.volume = req.fadeTarget
                     req.fadeinFired = false
                 }
+
+                req.callback
             }
         }
 
@@ -369,18 +376,20 @@ object AudioMixer: Disposable {
         if (!musicTrack.isPlaying && musicTrack.nextTrack != null) {
             musicTrack.queueNext(null)
             fadeBus.volume = 1.0
+            musicTrack.volume = 1.0
             musicTrack.play()
         }
 
         if (!ambientTrack.isPlaying && ambientTrack.nextTrack != null) {
             ambientTrack.queueNext(null)
             requestFadeIn(ambientTrack, DEFAULT_FADEOUT_LEN * 4, 1.0, 0.00001)
+            ambientTrack.volume = 1.0
             ambientTrack.play()
         }
     }
 
     fun startMusic(song: MusicContainer) {
-        if (musicTrack.isPlaying == true) {
+        if (musicTrack.isPlaying) {
             requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
         }
         musicTrack.nextTrack = song
@@ -402,7 +411,7 @@ object AudioMixer: Disposable {
         requestFadeOut(ambientTrack, DEFAULT_FADEOUT_LEN * 4)
     }
 
-    fun requestFadeOut(track: TerrarumAudioMixerTrack, length: Double, target: Double = 0.0, source: Double? = null) {
+    fun requestFadeOut(track: TerrarumAudioMixerTrack, length: Double, target: Double = 0.0, source: Double? = null, jobAfterFadeout: () -> Unit = {}) {
         val req = fadeReqs[track]!!
         if (!req.fadeoutFired) {
             req.fadeLength = length.coerceAtLeast(1.0/1024.0)
@@ -410,10 +419,11 @@ object AudioMixer: Disposable {
             req.fadeoutFired = true
             req.fadeTarget = target * track.maxVolume
             req.fadeStart = source ?: fadeBus.volume
+            req.callback = jobAfterFadeout
         }
     }
 
-    fun requestFadeIn(track: TerrarumAudioMixerTrack, length: Double, target: Double = 1.0, source: Double? = null) {
+    fun requestFadeIn(track: TerrarumAudioMixerTrack, length: Double, target: Double = 1.0, source: Double? = null, jobAfterFadeout: () -> Unit = {}) {
         val req = fadeReqs[track]!!
         if (!req.fadeinFired) {
             req.fadeLength = length.coerceAtLeast(1.0/1024.0)
@@ -421,6 +431,7 @@ object AudioMixer: Disposable {
             req.fadeinFired = true
             req.fadeTarget = target * track.maxVolume
             req.fadeStart = source ?: fadeBus.volume
+            req.callback = jobAfterFadeout
         }
     }
 

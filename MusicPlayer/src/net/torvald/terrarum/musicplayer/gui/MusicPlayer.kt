@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.JsonValue
 import com.jme3.math.FastMath
 import net.torvald.reflection.extortField
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
@@ -36,7 +35,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private var capsuleHeight = 28
     private var capsuleMosaicSize = capsuleHeight / 2 + 1
 
-    private val BUTTON_SIZE = 40
+    private val BUTTON_WIDTH = 48
+    private val BUTTON_HEIGHT = 40
 
     private val nameStrMaxLen = 180
     private val nameFBO = FrameBuffer(Pixmap.Format.RGBA8888, 1024, capsuleHeight, false)
@@ -48,7 +48,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         TextureRegionPack(it, maskOffWidth, capsuleHeight)
     }
     private val controlButtons = ModMgr.getGdxFile("musicplayer", "gui/control_buttons.tga").let {
-        TextureRegionPack(it, BUTTON_SIZE, BUTTON_SIZE)
+        TextureRegionPack(it, BUTTON_WIDTH, BUTTON_HEIGHT)
     }
 
     private val MODE_IDLE = 0
@@ -77,8 +77,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         setAsAlwaysVisible()
 
         // test code
-        val albumDir = App.customMusicDir + "/Gapless Test"
-//        val albumDir = App.customMusicDir + "/FurryJoA 2023 Live"
+//        val albumDir = App.customMusicDir + "/Gapless Test 2"
+        val albumDir = App.customMusicDir + "/FurryJoA 2023 Live"
 //        val albumDir = App.customMusicDir + "/Audio Test"
         val playlistFile = JsonFetcher.invoke("$albumDir/playlist.json")
 
@@ -155,6 +155,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 //        printdbg(this, "setMusicName $str; strLen = $nameLengthOld -> $nameLength; overflown=$nameOverflown; transitionTime=$TRANSITION_LENGTH")
     }
 
+    private var mouseOnButton: Int? = null
+
     override fun updateUI(delta: Float) {
         // process transition request
         if (transitionRequest != null) {
@@ -217,8 +219,57 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             }
         }
 
+        // mouse is over which button?
+        if (mode == MODE_MOUSE_UP && relativeMouseY.toFloat() in _posY + 10f .. _posY + 10f + BUTTON_HEIGHT) {
+            mouseOnButton = if (relativeMouseX.toFloat() in Toolkit.hdrawWidthf - 120f ..  Toolkit.hdrawWidthf - 120f + 5 * BUTTON_WIDTH) {
+                ((relativeMouseX.toFloat() - (Toolkit.hdrawWidthf - 120f)) / BUTTON_WIDTH).toInt()
+            }
+            else null
+        }
+        else {
+            mouseOnButton = null
+        }
+
+
+        // make button work
+        if (!playControlButtonLatched && mouseOnButton != null && Terrarum.mouseDown) {
+            playControlButtonLatched = true
+            when (mouseOnButton) {
+                0 -> { // album
+
+                }
+                1 -> { // prev
+//                    ingame.musicGovernor.playPrevMusic()
+                }
+                2 -> { // stop
+                    if (AudioMixer.musicTrack.isPlaying) {
+                        AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
+                        AudioMixer.musicTrack.nextTrack = null
+                        ingame.musicGovernor.stopMusic()
+                    }
+                    else {
+                        ingame.musicGovernor.startMusic()
+                    }
+                }
+                3 -> { // next
+                    AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
+//                        ingame.musicGovernor.startMusic() // it works without this?
+                    }
+                }
+                4 -> { // playlist
+
+                }
+            }
+        }
+        else if (!Terrarum.mouseDown) {
+            playControlButtonLatched = false
+        }
+
+
 //        printdbg(this, "mode = $mode; req = $transitionRequest")
     }
+
+    private var playControlButtonLatched = false
 
 //    private fun smoothstep(x: Float) = (x*x*(3f-2f*x)).coerceIn(0f, 1f)
 //    private fun smootherstep(x: Float) = (x*x*x*(x*(6f*x-15f)+10f)).coerceIn(0f, 1f)
@@ -324,7 +375,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         drawBaloon(batch, _posX, _posY, width.toFloat(), (height - capsuleHeight.toFloat()).coerceAtLeast(0f))
         drawText(batch, posXforMusicLine, _posY)
         drawFreqMeter(batch, posXforMusicLine + widthForFreqMeter - 18f, _posY + height - (capsuleHeight / 2) + 1f)
-        drawControls(batch, _posX, _posY)
+        drawControls(App.UPDATE_RATE, batch, _posX, _posY)
 
         batch.color = Color.WHITE
     }
@@ -355,7 +406,10 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         batch.draw(baloonTexture.get(2, 2), x + capsuleMosaicSize + width, y + capsuleMosaicSize + height, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
     }
 
-    private fun drawControls(batch: SpriteBatch, posX: Float, posY: Float) {
+    private val playControlAnimAkku = FloatArray(5)
+    private val playControlAnimLength = 0.2f
+
+    private fun drawControls(delta: Float, batch: SpriteBatch, posX: Float, posY: Float) {
         val (alpha, reverse) = if (mode < MODE_MOUSE_UP && modeNext == MODE_MOUSE_UP)
             (transitionAkku / TRANSITION_LENGTH).let { if (it.isNaN()) 0f else it } to false
         else if (mode == MODE_MOUSE_UP && modeNext < MODE_MOUSE_UP)
@@ -367,13 +421,29 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
         if (alpha > 0f) {
             val alpha0 = alpha.coerceIn(0f, 1f).organicOvershoot().coerceAtMost(1f)
-            batch.color = colourControlButton mul Color(1f, 1f, 1f, (if (reverse) 1f - alpha0 else alpha0).pow(3f))
-            val posX = Toolkit.hdrawWidthf - 120f
+            val internalWidth =minOf(240f, width - 20f)
+            val separation = internalWidth / 5f
+            val anchorX = Toolkit.hdrawWidthf
             val posY = posY + 10f
             for (i in 0..4) {
+                batch.color = Color(1f, 1f, 1f,
+                            0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f) + (playControlAnimAkku[i].pow(2f) * 1.2f)
+                        )
+
+                val offset = i - 2
+                val posX = anchorX + offset * separation
+
                 val iconY = if (!AudioMixer.musicTrack.isPlaying && i == 2) 1 else 0
-                batch.draw(controlButtons.get(i, iconY), posX + i * (BUTTON_SIZE + 8) + 4, posY)
+                batch.draw(controlButtons.get(i, iconY), (posX - BUTTON_WIDTH / 2).roundToFloat(), posY.roundToFloat())
+
+                // update playControlAnimAkku
+                if (mouseOnButton == i && mode == MODE_MOUSE_UP && modeNext == MODE_MOUSE_UP)
+                    playControlAnimAkku[i] = (playControlAnimAkku[i] + (delta / playControlAnimLength)).coerceIn(0f, 1f)
+                else
+                    playControlAnimAkku[i] = (playControlAnimAkku[i] - (delta / playControlAnimLength)).coerceIn(0f, 1f)
             }
+
+//            printdbg(this, "playControlAnimAkku=${playControlAnimAkku.joinToString()}")
         }
     }
 
