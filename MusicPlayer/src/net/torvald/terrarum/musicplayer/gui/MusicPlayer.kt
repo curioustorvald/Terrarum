@@ -9,7 +9,10 @@ import com.badlogic.gdx.utils.JsonValue
 import com.jme3.math.FastMath
 import net.torvald.reflection.extortField
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.*
+import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.Toolkit
@@ -74,32 +77,37 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val colourControlButton = Color(0xeeeeee_cc.toInt())
 
     init {
-        setAsAlwaysVisible()
+        if (App.getConfigBoolean("musicplayer:usemusicplayer")) {
+            setAsAlwaysVisible()
 
-        // test code
+            // test code
 //        val albumDir = App.customMusicDir + "/Gapless Test 2"
-        val albumDir = App.customMusicDir + "/FurryJoA 2023 Live"
+            val albumDir = App.customMusicDir + "/FurryJoA 2023 Live"
 //        val albumDir = App.customMusicDir + "/Audio Test"
-        val playlistFile = JsonFetcher.invoke("$albumDir/playlist.json")
+            val playlistFile = JsonFetcher.invoke("$albumDir/playlist.json")
 
-        val diskJockeyingMode = playlistFile.get("diskJockeyingMode").asString()
-        val shuffled = playlistFile.get("shuffled").asBoolean()
-        val fileToName = playlistFile.get("titles")
+            val diskJockeyingMode = playlistFile.get("diskJockeyingMode").asString()
+            val shuffled = playlistFile.get("shuffled").asBoolean()
+            val fileToName = playlistFile.get("titles")
 
 
-        AudioMixer.musicTrack.let { track ->
-            track.doGaplessPlayback = (diskJockeyingMode == "continuous")
-            if (track.doGaplessPlayback) {
-                track.pullNextTrack = {
-                    track.currentTrack = ingame.musicGovernor.pullNextMusicTrack(true)
-                    setMusicName(track.currentTrack?.name ?: "")
+            AudioMixer.musicTrack.let { track ->
+                track.doGaplessPlayback = (diskJockeyingMode == "continuous")
+                if (track.doGaplessPlayback) {
+                    track.pullNextTrack = {
+                        track.currentTrack = ingame.musicGovernor.pullNextMusicTrack(true)
+                        setMusicName(track.currentTrack?.name ?: "")
+                    }
                 }
             }
+
+
+            registerPlaylist(albumDir, fileToName, shuffled, diskJockeyingMode)
         }
-
-
-        registerPlaylist(albumDir, fileToName, shuffled, diskJockeyingMode)
     }
+
+    private val playlist: List<MusicContainer>
+        get() = ingame.musicGovernor.extortField<List<MusicContainer>>("songs")!!
 
     fun registerPlaylist(path: String, fileToName: JsonValue, shuffled: Boolean, diskJockeyingMode: String) {
         ingame.musicGovernor.queueDirectory(path, shuffled, diskJockeyingMode) { filename ->
@@ -239,13 +247,16 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
                 }
                 1 -> { // prev
-//                    ingame.musicGovernor.playPrevMusic()
+                    getPrevSongFromPlaylist()?.let { ingame.musicGovernor.unshiftPlaylist(it) }
+                    AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
                 }
                 2 -> { // stop
                     if (AudioMixer.musicTrack.isPlaying) {
+                        val thisMusic = AudioMixer.musicTrack.currentTrack
                         AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
                         AudioMixer.musicTrack.nextTrack = null
                         ingame.musicGovernor.stopMusic()
+                        thisMusic?.let { ingame.musicGovernor.queueMusicToPlayNext(it) }
                     }
                     else {
                         ingame.musicGovernor.startMusic()
@@ -270,6 +281,18 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     }
 
     private var playControlButtonLatched = false
+
+    private fun getPrevSongFromPlaylist(): MusicContainer? {
+        val list = playlist.slice(playlist.indices) // make copy of the list
+        val nowPlaying = AudioMixer.musicTrack.currentTrack ?: return null
+
+        // find current index
+        val currentIndex = list.indexOfFirst { it == nowPlaying }
+        if (currentIndex < 0) return null
+
+        val prevIndex = (currentIndex - 1).fmod(list.size)
+        return list[prevIndex]
+    }
 
 //    private fun smoothstep(x: Float) = (x*x*(3f-2f*x)).coerceIn(0f, 1f)
 //    private fun smootherstep(x: Float) = (x*x*x*(x*(6f*x-15f)+10f)).coerceIn(0f, 1f)

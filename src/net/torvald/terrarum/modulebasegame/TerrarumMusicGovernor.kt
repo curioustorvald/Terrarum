@@ -16,6 +16,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
+import net.torvald.terrarum.gameworld.fmod
 import java.io.File
 import java.io.FileInputStream
 import javax.sound.sampled.AudioSystem
@@ -135,6 +136,8 @@ data class MusicContainer(
         samplesRead = 0L
         gdxMusic.forceInvoke<Int>("reset", arrayOf())
     }
+
+    override fun equals(other: Any?) = this.file.path == (other as MusicContainer).file.path
 }
 
 class TerrarumMusicGovernor : MusicGovernor() {
@@ -149,7 +152,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     private var songs: List<MusicContainer> = emptyList()
-    private var musicBin: ArrayList<Int> = ArrayList()
+    private var musicBin: ArrayList<MusicContainer> = ArrayList()
     private var shuffled = true
     private var diskJockeyingMode = "intermittent" // intermittent, continuous
 
@@ -184,8 +187,8 @@ class TerrarumMusicGovernor : MusicGovernor() {
         } ?: emptyList() // TODO test code
     }
 
-    private fun restockMUsicBin() {
-        musicBin = if (shuffled) ArrayList(songs.indices.toList().shuffled()) else  ArrayList(songs.indices.toList())
+    private fun restockMusicBin() {
+        musicBin = ArrayList(if (shuffled) songs.shuffled() else songs.slice(songs.indices))
     }
 
     /**
@@ -205,7 +208,30 @@ class TerrarumMusicGovernor : MusicGovernor() {
         this.shuffled = shuffled
         this.diskJockeyingMode = diskJockeyingMode
 
-        restockMUsicBin()
+        restockMusicBin()
+    }
+
+    /**
+     * Adds a song to the head of the internal playlist (`musicBin`)
+     */
+    fun queueMusicToPlayNext(music: MusicContainer) {
+        musicBin.add(0, music)
+    }
+
+    /**
+     * Unshifts an internal playlist (`musicBin`). The `music` argument must be the song that exists on the `songs`.
+     */
+    fun unshiftPlaylist(music: MusicContainer) {
+        val indexAtMusicBin = songs.indexOf(music)
+        if (indexAtMusicBin < 0) throw IllegalArgumentException("The music does not exist on the interal songs list ($music)")
+
+        // rewrite musicBin
+        val newMusicBin = Array(songs.size - indexAtMusicBin) { offset ->
+            val k = offset + indexAtMusicBin
+            songs[k]
+        }
+
+        musicBin = ArrayList(newMusicBin.toList())
     }
 
     private val ambients: List<MusicContainer> =
@@ -300,9 +326,9 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
         // prevent same song to play twice in row (for the most time)
         if (musicBin.isEmpty()) {
-            restockMUsicBin()
+            restockMusicBin()
         }
-        return songs[musicBin.removeAt(0)].also { mus ->
+        return musicBin.removeAt(0).also { mus ->
             if (callNextMusicHook && musicStartHooks.isNotEmpty()) musicStartHooks.forEach { it(mus) }
         }
     }
