@@ -351,7 +351,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
             STATE_INTERMISSION -> {
                 intermissionAkku += delta
 
-                if (intermissionAkku >= intermissionLength) {
+                if (intermissionAkku >= intermissionLength && songs.isNotEmpty()) {
                     intermissionAkku = 0f
                     musicState = STATE_FIREPLAY
                 }
