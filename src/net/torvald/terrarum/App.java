@@ -922,7 +922,9 @@ public class App implements ApplicationListener {
             audioManagerThread.interrupt();
         }
 
-        AudioMixer.INSTANCE.dispose();
+        if (audioMixerInitialised) {
+            AudioMixer.INSTANCE.dispose();
+        }
 
         if (currentScreen != null) {
             currentScreen.hide();
@@ -1043,6 +1045,8 @@ public class App implements ApplicationListener {
 
         printdbg("AppLoader-Static", "Screen transition complete: " + currentScreen.getClass().getCanonicalName());
     }
+
+    private static Boolean audioMixerInitialised = false;
 
     /**
      * Init stuffs which needs GL context
@@ -1196,6 +1200,7 @@ public class App implements ApplicationListener {
 
 
         AudioMixer.INSTANCE.getMasterVolume();
+        audioMixerInitialised = true;
         audioManagerThread = new Thread(new AudioManagerRunnable(), "TerrarumAudioManager");
         audioManagerThread.setPriority(MAX_PRIORITY); // higher = more predictable; audio delay is very noticeable so it gets high priority
         audioManagerThread.start();
