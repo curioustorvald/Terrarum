@@ -583,8 +583,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     // Function to calculate values using the generated cubic spline
     // Spline fit of the cubic-bezier(0.5, 0, 0.25,1.25) (https://www.desmos.com/calculator/k436wurcij)
-    private val curveDataX = doubleArrayOf(0.0, 0.15576171875, 0.26171875, 0.40625, 0.59765625, 0.76220703125, 1.0)
-    private val curveDataY = doubleArrayOf(0.0, 0.05322265625, 0.19140625, 0.59375, 0.94921875, 1.02880859375, 1.0)
+    private val curveDataX = doubleArrayOf(0.0, 0.0853881835938, 0.15576171875, 0.26171875, 0.40625, 0.59765625, 0.76220703125, 0.8706665030906, 1.0)
+    private val curveDataY = doubleArrayOf(0.0, 0.0139770507813, 0.05322265625, 0.19140625, 0.59375, 0.94921875, 1.02880859375, 1.02996826172, 1.0)
     private val splineFunction = generateCubicSpline(curveDataX, curveDataY)
 
     fun organicOvershoot(x: Double): Double {
