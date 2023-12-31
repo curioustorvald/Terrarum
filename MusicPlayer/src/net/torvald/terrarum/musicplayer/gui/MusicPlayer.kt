@@ -66,7 +66,16 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val transitionOngoing
         get() = transitionAkku < TRANSITION_LENGTH
 
+    private var currentListMode: Int? = null // 0: album, 1: playlist
+    private var currentListModeNext: Int? = null // 0: album, 1: playlist
+    private var listModeTransitionAkku = 0f
+    private var currentListTransitionRequest: Int? = null // 0: album, 1: playlist
+    private val listModeTransitionOngoing
+        get() = listModeTransitionAkku < LIST_MODE_TRANS_LENGTH
+
+
     private val TRANSITION_LENGTH = 0.6f
+    private val LIST_MODE_TRANS_LENGTH = 0.3f
 
     private val colourBack = Color(0xffffff_99.toInt())
 
@@ -185,6 +194,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 mode = modeNext
 //                printdbg(this, "Transition complete: nameLengthOld=${nameLengthOld} -> ${nameLength}")
                 nameLengthOld = nameLength
+                setFinalWidthHeight()
             }
         }
 
@@ -219,16 +229,16 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
 
         if (!transitionOngoing) {
-            if (mouseUp) {
+            if (mouseUp && mode < MODE_MOUSE_UP) {
                 transitionRequest = MODE_MOUSE_UP
             }
-            else if (mode == MODE_MOUSE_UP) {
+            else if (!mouseUp && mode == MODE_MOUSE_UP) {
                 transitionRequest = if (currentMusicName.isEmpty()) MODE_IDLE else MODE_PLAYING
             }
         }
 
         // mouse is over which button?
-        if (mode == MODE_MOUSE_UP && relativeMouseY.toFloat() in _posY + 10f .. _posY + 10f + BUTTON_HEIGHT) {
+        if (mode >= MODE_MOUSE_UP && relativeMouseY.toFloat() in posYforControls + 10f .. posYforControls + 10f + BUTTON_HEIGHT) {
             mouseOnButton = if (relativeMouseX.toFloat() in Toolkit.hdrawWidthf - 120f ..  Toolkit.hdrawWidthf - 120f + 5 * BUTTON_WIDTH) {
                 ((relativeMouseX.toFloat() - (Toolkit.hdrawWidthf - 120f)) / BUTTON_WIDTH).toInt()
             }
@@ -244,7 +254,20 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             playControlButtonLatched = true
             when (mouseOnButton) {
                 0 -> { // album
-
+                    if (mode < MODE_SHOW_LIST) {
+                        if (!transitionOngoing) {
+                            transitionRequest = MODE_SHOW_LIST
+                            currentListMode = 0
+                        }
+                    }
+                    else if (currentListMode != 0) {
+                        if (!listModeTransitionOngoing)
+                            currentListTransitionRequest = 0
+                    }
+                    else {
+                        if (!transitionOngoing)
+                            transitionRequest = AudioMixer.musicTrack.isPlaying.toInt() * MODE_MOUSE_UP
+                    }
                 }
                 1 -> { // prev
                     getPrevSongFromPlaylist()?.let { ingame.musicGovernor.unshiftPlaylist(it) }
@@ -268,7 +291,20 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     }
                 }
                 4 -> { // playlist
-
+                    if (mode < MODE_SHOW_LIST) {
+                        if (!transitionOngoing) {
+                            transitionRequest = MODE_SHOW_LIST
+                            currentListMode = 1
+                        }
+                    }
+                    else if (currentListMode != 1) {
+                        if (!listModeTransitionOngoing)
+                            currentListTransitionRequest = 1
+                    }
+                    else {
+                        if (!transitionOngoing)
+                            transitionRequest = AudioMixer.musicTrack.isPlaying.toInt() * MODE_MOUSE_UP
+                    }
                 }
             }
         }
@@ -324,40 +360,85 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         }
     }
 
-    private val transitionPercentage = 0f
+    private val widthForMouseUp = (nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt()
+    private val widthForList = 320
+    private val heightThin = 28
+    private val heightControl = 80
+    private val heightList = 360
 
     private val transitionDB = HashMap<Pair<Int, Int>, (Float) -> Unit>().also {
         it[MODE_IDLE to MODE_IDLE] = { akku -> }
         it[MODE_IDLE to MODE_PLAYING] = { akku ->
             setUIwidthFromTextWidth(nameLengthOld, nameLength, akku / TRANSITION_LENGTH)
         }
+        it[MODE_IDLE to MODE_MOUSE_UP] = { akku ->
+            setUIwidthFromTextWidth(nameLengthOld, widthForMouseUp, akku / TRANSITION_LENGTH)
+            setUIheight(heightThin, heightControl, akku / TRANSITION_LENGTH)
+        }
+
+
         it[MODE_PLAYING to MODE_PLAYING] = { akku ->
             setUIwidthFromTextWidth(nameLengthOld, nameLength, akku / TRANSITION_LENGTH)
         }
         it[MODE_PLAYING to MODE_IDLE] = { akku ->
             setUIwidthFromTextWidth(nameLengthOld, nameLength, akku / TRANSITION_LENGTH)
         }
-
-        it[MODE_IDLE to MODE_MOUSE_UP] = { akku ->
-            setUIwidthFromTextWidth(nameLengthOld, (nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt(), akku / TRANSITION_LENGTH)
-            setUIheight(28, 80, akku / TRANSITION_LENGTH)
-        }
         it[MODE_PLAYING to MODE_MOUSE_UP] = { akku ->
-            setUIwidthFromTextWidth(nameLengthOld, (nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt(), akku / TRANSITION_LENGTH)
-            setUIheight(28, 80, akku / TRANSITION_LENGTH)
+            setUIwidthFromTextWidth(nameLengthOld, widthForMouseUp, akku / TRANSITION_LENGTH)
+            setUIheight(heightThin, heightControl, akku / TRANSITION_LENGTH)
         }
+
+
         it[MODE_MOUSE_UP to MODE_PLAYING] = { akku ->
-            setUIwidthFromTextWidth((nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt(), nameLength, akku / TRANSITION_LENGTH)
-            setUIheight(80, 28, akku / TRANSITION_LENGTH)
+            setUIwidthFromTextWidth(widthForMouseUp, nameLength, akku / TRANSITION_LENGTH)
+            setUIheight(heightControl, heightThin, akku / TRANSITION_LENGTH)
         }
         it[MODE_MOUSE_UP to MODE_IDLE] = { akku ->
-            setUIwidthFromTextWidth((nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt(), 0, akku / TRANSITION_LENGTH)
-            setUIheight(80, 28, akku / TRANSITION_LENGTH)
+            setUIwidthFromTextWidth(widthForMouseUp, 0, akku / TRANSITION_LENGTH)
+            setUIheight(heightControl, heightThin, akku / TRANSITION_LENGTH)
         }
-
+        it[MODE_MOUSE_UP to MODE_SHOW_LIST] = { akku ->
+            setUIwidthFromTextWidth(widthForMouseUp, widthForList, akku / TRANSITION_LENGTH)
+            setUIheight(heightControl, heightList, akku / TRANSITION_LENGTH)
+        }
         it[MODE_MOUSE_UP to MODE_MOUSE_UP] = { akku -> }
 
 
+        it[MODE_SHOW_LIST to MODE_MOUSE_UP] = { akku ->
+            setUIwidthFromTextWidth(widthForList, widthForMouseUp, akku / TRANSITION_LENGTH)
+            setUIheight(heightList, heightControl, akku / TRANSITION_LENGTH)
+        }
+        it[MODE_SHOW_LIST to MODE_PLAYING] = { akku ->
+            setUIwidthFromTextWidth(widthForList, nameLength, akku / TRANSITION_LENGTH)
+            setUIheight(heightList, heightThin, akku / TRANSITION_LENGTH)
+        }
+        it[MODE_SHOW_LIST to MODE_IDLE] = { akku ->
+            setUIwidthFromTextWidth(widthForList, nameLength, akku / TRANSITION_LENGTH)
+            setUIheight(heightList, heightThin, akku / TRANSITION_LENGTH)
+        }
+        it[MODE_SHOW_LIST to MODE_SHOW_LIST] = { akku -> }
+
+    }
+
+    private fun setFinalWidthHeight() {
+        when (mode) {
+            MODE_IDLE -> {
+                width = uiWidthFromTextWidth(0)
+                height = heightThin
+            }
+            MODE_PLAYING -> {
+                width = uiWidthFromTextWidth(nameLength)
+                height = heightThin
+            }
+            MODE_MOUSE_UP -> {
+                width = uiWidthFromTextWidth(widthForMouseUp)
+                height = heightControl
+            }
+            MODE_SHOW_LIST -> {
+                width = uiWidthFromTextWidth(widthForList)
+                height = heightList
+            }
+        }
     }
 
     private var _posX = 0f // not using provided `posX` as there is one frame delay between update and it actually used to drawing
@@ -365,6 +446,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private var widthForFreqMeter = 0
     private var posXforMusicLine = 0f
+    private var posYforMusicLine = 0f
+    private var posYforControls = 0f
 
     override val mouseUp: Boolean
         get() = relativeMouseX.toFloat() in _posX-capsuleMosaicSize .. _posX+width+capsuleMosaicSize &&
@@ -385,6 +468,13 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
         _posX = ((Toolkit.drawWidth - width) / 2).toFloat()
         _posY = (App.scr.height - App.scr.tvSafeGraphicsHeight - height).toFloat()
+
+        posYforControls = if
+            (mode <= MODE_MOUSE_UP && modeNext <= MODE_MOUSE_UP) _posY
+        else
+            (App.scr.height - App.scr.tvSafeGraphicsHeight - minOf(height, heightControl)).toFloat()
+
+
         val _posXnonStretched = ((Toolkit.drawWidth - uiWidthFromTextWidth(nameLength)) / 2).toFloat()
 
 
@@ -394,11 +484,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             _posX
 
 
+        posYforMusicLine = _posY + height - capsuleHeight + 1
+
+
+
         blendNormalStraightAlpha(batch)
         drawBaloon(batch, _posX, _posY, width.toFloat(), (height - capsuleHeight.toFloat()).coerceAtLeast(0f))
-        drawText(batch, posXforMusicLine, _posY)
+        drawText(batch, posXforMusicLine, posYforMusicLine)
         drawFreqMeter(batch, posXforMusicLine + widthForFreqMeter - 18f, _posY + height - (capsuleHeight / 2) + 1f)
-        drawControls(App.UPDATE_RATE, batch, _posX, _posY)
+        drawControls(App.UPDATE_RATE, batch, _posX, posYforControls)
 
         batch.color = Color.WHITE
     }
@@ -437,14 +531,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             (transitionAkku / TRANSITION_LENGTH).let { if (it.isNaN()) 0f else it } to false
         else if (mode == MODE_MOUSE_UP && modeNext < MODE_MOUSE_UP)
             (transitionAkku / TRANSITION_LENGTH).let { if (it.isNaN()) 0f else it } to true
-        else if (mode == MODE_MOUSE_UP)
+        else if (mode >= MODE_MOUSE_UP)
             1f to false
         else
             0f to false
+        // TODO fade away the << o >>, replacing with the page buttons
 
         if (alpha > 0f) {
             val alpha0 = alpha.coerceIn(0f, 1f).organicOvershoot().coerceAtMost(1f)
-            val internalWidth =minOf(240f, width - 20f)
+            val internalWidth =minOf(widthForMouseUp.toFloat(), width - 20f)
             val separation = internalWidth / 5f
             val anchorX = Toolkit.hdrawWidthf
             val posY = posY + 10f
@@ -460,19 +555,18 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 batch.draw(controlButtons.get(i, iconY), (posX - BUTTON_WIDTH / 2).roundToFloat(), posY.roundToFloat())
 
                 // update playControlAnimAkku
-                if (mouseOnButton == i && mode == MODE_MOUSE_UP && modeNext == MODE_MOUSE_UP)
+                if (mouseOnButton == i && mode >= MODE_MOUSE_UP && modeNext >= MODE_MOUSE_UP)
                     playControlAnimAkku[i] = (playControlAnimAkku[i] + (delta / playControlAnimLength)).coerceIn(0f, 1f)
                 else
                     playControlAnimAkku[i] = (playControlAnimAkku[i] - (delta / playControlAnimLength)).coerceIn(0f, 1f)
             }
-
 //            printdbg(this, "playControlAnimAkku=${playControlAnimAkku.joinToString()}")
         }
     }
 
     private fun drawText(batch: SpriteBatch, posX: Float, posY: Float) {
         batch.color = colourText
-        batch.draw(nameFBO.colorBufferTexture, posX - maskOffWidth, posY + height - capsuleHeight + 1)
+        batch.draw(nameFBO.colorBufferTexture, posX - maskOffWidth, posY)
     }
 
     private fun renderNameToFBO(batch: SpriteBatch, camera: OrthographicCamera, str: String, width: Float) {
@@ -506,7 +600,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val fftOut = ComplexArray(FloatArray(FFTSIZE * 2))
     private val binHeights = FloatArray(FFTSIZE / 2)
     private val FFT_SMOOTHING_FACTOR = BasicDebugInfoWindow.getSmoothingFactor(2048)
-    private val lowlim = -36.0f
+    private val lowlim = -34.0f // -40dB to -6dB scale will be used
+    private val dbOffset = fullscaleToDecibels(0.5) // -6.02
 
     private val fftBinIndices = arrayOf(
         0..3,
@@ -534,11 +629,11 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             val freqR = (TerrarumAudioMixerTrack.SAMPLING_RATED / FFTSIZE) * (bin + 1)
             val magn0 = fftOut.reim[2 * bin].absoluteValue / FFTSIZE * (freqR / 20.0) // apply slope
             val magn = FastMath.interpolateLinear(FFT_SMOOTHING_FACTOR, magn0, oldFFTmagn[bin])
-            val magnLog = fullscaleToDecibels(magn)
+            val magnLog = fullscaleToDecibels(magn) - dbOffset
 
             val h = (-(magnLog - lowlim) / lowlim * STRIP_W).toFloat().coerceAtLeast(0.5f)
 
-            binHeights[bin] = h
+            binHeights[bin] = h.coerceAtMost(STRIP_W)
 
             oldFFTmagn[bin] = magn
         }
