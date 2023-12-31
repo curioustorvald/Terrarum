@@ -117,7 +117,7 @@ data class Snapshot(var revision: Int) {
     private var bytes = byteArrayOf()
 
     internal fun update() {
-        string = "${year}w${week}${Char(0x61 + revision)}"
+        string = "${year}w${week.toString().padStart(2,'0')}${Char(0x61 + revision)}"
         bytes = byteArrayOf(
             revision.and(4).shl(7).or(year.and(127)).toByte(),
             week.shl(2).or(revision.and(3)).toByte()
