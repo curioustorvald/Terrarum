@@ -609,7 +609,7 @@ public class App implements ApplicationListener {
 
 
         FrameBufferManager.begin(renderFBO);
-        gdxClearAndEnableBlend(.063f, .070f, .086f, 1f);
+        gdxClearAndEnableBlend(1f, 0f, 1f, 1f);
         setCameraPosition(0, 0);
 
 

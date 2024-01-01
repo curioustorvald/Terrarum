@@ -114,7 +114,7 @@ object TerrarumPostProcessor : Disposable {
         outFBO.inAction(camera, batch) {
             App.measureDebugTime("Renderer.PostProcessor") {
 
-                gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
+                gdxClearAndEnableBlend(0f, 1f, 0f, 1f)
 
                 fbo.colorBufferTexture.setFilter(
                         Texture.TextureFilter.Linear,

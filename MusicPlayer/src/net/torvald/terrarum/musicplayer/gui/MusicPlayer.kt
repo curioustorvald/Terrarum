@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.JsonValue
 import com.jme3.math.FastMath
 import net.torvald.reflection.extortField
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -359,12 +360,6 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         }
     }
 
-    private val widthForMouseUp = (nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt()
-    private val widthForList = 320
-    private val heightThin = 28
-    private val heightControl = 80
-    private val heightList = 360
-
     private val transitionDB = HashMap<Pair<Int, Int>, (Float) -> Unit>().also {
         it[MODE_IDLE to MODE_IDLE] = { akku -> }
         it[MODE_IDLE to MODE_PLAYING] = { akku ->
@@ -492,6 +487,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         drawText(batch, posXforMusicLine, posYforMusicLine)
         drawFreqMeter(batch, posXforMusicLine + widthForFreqMeter - 18f, _posY + height - (capsuleHeight / 2) + 1f)
         drawControls(App.UPDATE_RATE, batch, _posX, posYforControls)
+        drawList(camera, App.UPDATE_RATE, batch, _posX, _posY)
 
         batch.color = Color.WHITE
     }
@@ -499,7 +495,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val playListAnimAkku = FloatArray(8) // how many lines on the list view?
     private val playListAnimLength = 0.2f
 
-    private fun drawList(delta: Float, batch: SpriteBatch, x: Float, y: Float) {
+    private fun drawList(camera: OrthographicCamera, delta: Float, batch: SpriteBatch, x: Float, y: Float) {
         val (alpha, reverse) = if (mode < MODE_SHOW_LIST && modeNext == MODE_SHOW_LIST)
             (transitionAkku / TRANSITION_LENGTH).let { if (it.isNaN()) 0f else it } to false
         else if (mode == MODE_SHOW_LIST && modeNext < MODE_SHOW_LIST)
@@ -508,6 +504,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             1f to false
         else
             0f to false
+
+        val anchorX = Toolkit.hdrawWidthf - width / 2
 
         if (alpha > 0f) {
             val alpha0 = alpha.coerceIn(0f, 1f).organicOvershoot().coerceAtMost(1f)
@@ -522,13 +520,13 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             else {
                 0f to 0f
             }
-            val offX1 = offX2 - widthForList
+            val offX1 = 0f//offX2 - widthForList
             val alpha1 = 1f - alpha2
             val drawAlpha = 0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f)// + (playListAnimAkku[i].pow(2f) * 1.2f)
 
             // assuming both view has the same list dimension
-            drawAlbumList(delta, batch, x + offX2, y, drawAlpha * alpha1)
-            drawPlayList(delta, batch, x + offX1, y, drawAlpha * alpha2)
+            drawAlbumList(camera, delta, batch, (anchorX + offX2).roundToFloat(), (y + 15).roundToFloat(), drawAlpha * alpha1, width / (widthForList + METERS_WIDTH + maskOffWidth))
+            drawPlayList(camera, delta, batch, (anchorX + offX1).roundToFloat(), (y + 15).roundToFloat(), drawAlpha * alpha2, width / (widthForList + METERS_WIDTH + maskOffWidth))
 
             // update playListAnimAkku
             for (i in playListAnimAkku.indices) {
@@ -540,13 +538,71 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         }
     }
 
-    private fun drawPlayList(delta: Float, batch: SpriteBatch, x: Float, y: Float, alpha: Float) {
+    private val widthForList = 320
+
+    private val PLAYLIST_LEFT_GAP = METERS_WIDTH.toInt() + maskOffWidth
+    private val PLAYLIST_NAME_LEN = widthForList
+    private val PLAYLIST_LINE_HEIGHT = 28f
+    private val PLAYLIST_LINES = 10
+
+    private val widthForMouseUp = (nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt()
+    private val heightThin = 28
+    private val heightControl = 80
+    private val heightList = 113 + PLAYLIST_LINES * PLAYLIST_LINE_HEIGHT.toInt()
+
+    private val playlistFBOs = Array(10) {
+        FrameBuffer(Pixmap.Format.RGBA8888, PLAYLIST_NAME_LEN, PLAYLIST_LINE_HEIGHT.toInt(), false)
+    }
+
+    private fun drawPlayList(camera: OrthographicCamera, delta: Float, batch: SpriteBatch, x: Float, y: Float, alpha: Float, scale: Float) {
+        batch.end()
+
+        playlistFBOs.forEachIndexed { i, it ->
+            it.inAction(camera, batch) {
+                batch.inUse {
+                    batch.color = Color.WHITE
+                    gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
+                    blendNormalStraightAlpha(batch)
+
+                    // draw text
+                    App.fontGameFBO.draw(batch, playlist[i % playlist.size].name, maskOffWidth.toFloat(), (PLAYLIST_LINE_HEIGHT - 24) / 2)
+
+                    // mask off the area
+                    batch.color = Color.WHITE
+                    blendAlphaMask(batch)
+                    batch.draw(textmask.get(0, 0), 0f, 0f, maskOffWidth.toFloat(), PLAYLIST_LINE_HEIGHT)
+                    batch.draw(textmask.get(1, 0), maskOffWidth.toFloat(), 0f, PLAYLIST_NAME_LEN - 2f * maskOffWidth, PLAYLIST_LINE_HEIGHT)
+                    batch.draw(textmask.get(2, 0), PLAYLIST_NAME_LEN - maskOffWidth.toFloat(), 0f, maskOffWidth.toFloat(), PLAYLIST_LINE_HEIGHT)
+
+                    blendNormalStraightAlpha(batch) // qnd hack to make sure this line gets called, otherwise the screen briefly goes blank when the playlist view is closed
+                    Toolkit.fillArea(batch, 999f, 999f, 1f, 1f)
+                }
+            }
+        }
+
+        batch.begin()
+        blendNormalStraightAlpha(batch)
         if (alpha > 0f) {
-            batch.color = Color(1f, 1f, 1f, alpha)
+            playlistFBOs.forEachIndexed { i, it ->
+                batch.color = Color(1f, 1f, 1f, alpha)
+
+                // print number
+                val xoff = maskOffWidth + (if (i < 9) 3 else 0)
+                val yoff = 8 + (PLAYLIST_LINE_HEIGHT - 24) / 2
+                App.fontSmallNumbers.draw(batch, "${i + 1}", x + xoff, y + yoff + PLAYLIST_LINE_HEIGHT * i * scale)
+                // TODO draw playing marker if the song is being played
+
+                // print the name
+                batch.draw(it.colorBufferTexture, x + PLAYLIST_LEFT_GAP * scale, y + PLAYLIST_LINE_HEIGHT * i * scale, it.width * scale, it.height * scale)
+
+                // separator
+                batch.color = Color(1f, 1f, 1f, alpha * 0.25f)
+                Toolkit.drawStraightLine(batch, x, y + PLAYLIST_LINE_HEIGHT * (i + 1) * scale, x + width * scale, 1f, false)
+            }
         }
     }
 
-    private fun drawAlbumList(delta: Float, batch: SpriteBatch, x: Float, y: Float, alpha: Float) {
+    private fun drawAlbumList(camera: OrthographicCamera, delta: Float, batch: SpriteBatch, x: Float, y: Float, alpha: Float, scale: Float) {
         if (alpha > 0f) {
             batch.color = Color(1f, 1f, 1f, alpha)
         }
@@ -630,9 +686,10 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         nameFBO.inAction(camera, batch) {
             batch.inUse {
                 batch.color = Color.WHITE
-                // draw text
                 gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
                 blendNormalStraightAlpha(batch)
+
+                // draw text
                 App.fontGameFBO.draw(batch, str, maskOffWidth.toFloat() - nameScroll, 2f)
 
                 // mask off the area
@@ -710,6 +767,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     override fun dispose() {
         baloonTexture.dispose()
+        nameFBO.dispose()
+        playlistFBOs.forEach { it.dispose() }
     }
 
 
