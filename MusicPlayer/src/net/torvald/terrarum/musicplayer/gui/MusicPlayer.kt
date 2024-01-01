@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.JsonValue
 import com.jme3.math.FastMath
 import net.torvald.reflection.extortField
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -497,6 +496,62 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         batch.color = Color.WHITE
     }
 
+    private val playListAnimAkku = FloatArray(8) // how many lines on the list view?
+    private val playListAnimLength = 0.2f
+
+    private fun drawList(delta: Float, batch: SpriteBatch, x: Float, y: Float) {
+        val (alpha, reverse) = if (mode < MODE_SHOW_LIST && modeNext == MODE_SHOW_LIST)
+            (transitionAkku / TRANSITION_LENGTH).let { if (it.isNaN()) 0f else it } to false
+        else if (mode == MODE_SHOW_LIST && modeNext < MODE_SHOW_LIST)
+            (transitionAkku / TRANSITION_LENGTH).let { if (it.isNaN()) 0f else it } to true
+        else if (mode >= MODE_SHOW_LIST)
+            1f to false
+        else
+            0f to false
+
+        if (alpha > 0f) {
+            val alpha0 = alpha.coerceIn(0f, 1f).organicOvershoot().coerceAtMost(1f)
+
+            // TODO draw album/playlist
+            val (offX2, alpha2) = if (listModeTransitionOngoing) {
+                if (currentListModeNext == 0)
+                    widthForList - widthForList * (listModeTransitionAkku / LIST_MODE_TRANS_LENGTH) to (listModeTransitionAkku / LIST_MODE_TRANS_LENGTH)
+                else
+                    -widthForList * (listModeTransitionAkku / LIST_MODE_TRANS_LENGTH) to 1f - (listModeTransitionAkku / LIST_MODE_TRANS_LENGTH)
+            }
+            else {
+                0f to 0f
+            }
+            val offX1 = offX2 - widthForList
+            val alpha1 = 1f - alpha2
+            val drawAlpha = 0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f)// + (playListAnimAkku[i].pow(2f) * 1.2f)
+
+            // assuming both view has the same list dimension
+            drawAlbumList(delta, batch, x + offX2, y, drawAlpha * alpha1)
+            drawPlayList(delta, batch, x + offX1, y, drawAlpha * alpha2)
+
+            // update playListAnimAkku
+            for (i in playListAnimAkku.indices) {
+                if (mouseOnButton == i && mode >= MODE_MOUSE_UP && modeNext >= MODE_MOUSE_UP)
+                    playListAnimAkku[i] = (playListAnimAkku[i] + (delta / playListAnimLength)).coerceIn(0f, 1f)
+                else
+                    playListAnimAkku[i] = (playListAnimAkku[i] - (delta / playListAnimLength)).coerceIn(0f, 1f)
+            }
+        }
+    }
+
+    private fun drawPlayList(delta: Float, batch: SpriteBatch, x: Float, y: Float, alpha: Float) {
+        if (alpha > 0f) {
+            batch.color = Color(1f, 1f, 1f, alpha)
+        }
+    }
+
+    private fun drawAlbumList(delta: Float, batch: SpriteBatch, x: Float, y: Float, alpha: Float) {
+        if (alpha > 0f) {
+            batch.color = Color(1f, 1f, 1f, alpha)
+        }
+    }
+
     private fun drawBaloon(batch: SpriteBatch, x: Float, y: Float, width: Float, height: Float) {
         val x = x - capsuleMosaicSize
         batch.color = colourBack// (if (mouseUp) Color.MAROON else colourBack)
@@ -523,7 +578,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         batch.draw(baloonTexture.get(2, 2), x + capsuleMosaicSize + width, y + capsuleMosaicSize + height, capsuleMosaicSize.toFloat(), capsuleMosaicSize.toFloat())
     }
 
-    private val playControlAnimAkku = FloatArray(5)
+    private val playControlAnimAkku = FloatArray(5) // how many control buttons?
     private val playControlAnimLength = 0.2f
 
     private fun drawControls(delta: Float, batch: SpriteBatch, posX: Float, posY: Float) {
