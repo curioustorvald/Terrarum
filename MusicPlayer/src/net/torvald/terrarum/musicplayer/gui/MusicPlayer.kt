@@ -117,6 +117,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private val playlist: List<MusicContainer>
         get() = ingame.musicGovernor.extortField<List<MusicContainer>>("songs")!!
+    private val playlistName: String
+        get() = ingame.musicGovernor.playlistName
 
     fun registerPlaylist(path: String, fileToName: JsonValue, shuffled: Boolean, diskJockeyingMode: String) {
         ingame.musicGovernor.queueDirectory(path, shuffled, diskJockeyingMode) { filename ->
@@ -525,8 +527,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             val drawAlpha = 0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f)// + (playListAnimAkku[i].pow(2f) * 1.2f)
 
             // assuming both view has the same list dimension
-            drawAlbumList(camera, delta, batch, (anchorX + offX2).roundToFloat(), (y + 15).roundToFloat(), drawAlpha * alpha1, width / (widthForList + METERS_WIDTH + maskOffWidth))
-            drawPlayList(camera, delta, batch, (anchorX + offX1).roundToFloat(), (y + 15).roundToFloat(), drawAlpha * alpha2, width / (widthForList + METERS_WIDTH + maskOffWidth))
+            drawAlbumList(camera, delta, batch, (anchorX + offX2).roundToFloat(), (y + 11).roundToFloat(), drawAlpha * alpha1, width / (widthForList + METERS_WIDTH + maskOffWidth))
+            drawPlayList(camera, delta, batch, (anchorX + offX1).roundToFloat(), (y + 11).roundToFloat(), drawAlpha * alpha2, width / (widthForList + METERS_WIDTH + maskOffWidth))
 
             // update playListAnimAkku
             for (i in playListAnimAkku.indices) {
@@ -543,14 +545,16 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val PLAYLIST_LEFT_GAP = METERS_WIDTH.toInt() + maskOffWidth
     private val PLAYLIST_NAME_LEN = widthForList
     private val PLAYLIST_LINE_HEIGHT = 28f
-    private val PLAYLIST_LINES = 10
+    private val PLAYLIST_LINES = 8
 
     private val widthForMouseUp = (nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt()
     private val heightThin = 28
     private val heightControl = 80
-    private val heightList = 113 + PLAYLIST_LINES * PLAYLIST_LINE_HEIGHT.toInt()
+    private val heightList = 109 + PLAYLIST_LINES * PLAYLIST_LINE_HEIGHT.toInt()
 
-    private val playlistFBOs = Array(10) {
+    private var playlistScroll = 0
+
+    private val playlistFBOs = Array(PLAYLIST_LINES) {
         FrameBuffer(Pixmap.Format.RGBA8888, PLAYLIST_NAME_LEN, PLAYLIST_LINE_HEIGHT.toInt(), false)
     }
 
@@ -565,7 +569,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     blendNormalStraightAlpha(batch)
 
                     // draw text
-                    App.fontGameFBO.draw(batch, playlist[i % playlist.size].name, maskOffWidth.toFloat(), (PLAYLIST_LINE_HEIGHT - 24) / 2)
+                    App.fontGameFBO.draw(batch, if (i + playlistScroll in playlist.indices) playlist[i].name else "", maskOffWidth.toFloat(), (PLAYLIST_LINE_HEIGHT - 24) / 2)
 
                     // mask off the area
                     batch.color = Color.WHITE
@@ -589,7 +593,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 // print number
                 val xoff = maskOffWidth + (if (i < 9) 3 else 0)
                 val yoff = 8 + (PLAYLIST_LINE_HEIGHT - 24) / 2
-                App.fontSmallNumbers.draw(batch, "${i + 1}", x + xoff, y + yoff + PLAYLIST_LINE_HEIGHT * i * scale)
+                App.fontSmallNumbers.draw(batch, if (i + playlistScroll in playlist.indices) "${i + playlistScroll + 1}" else "", x + xoff, y + yoff + PLAYLIST_LINE_HEIGHT * i * scale)
                 // TODO draw playing marker if the song is being played
 
                 // print the name
@@ -599,6 +603,10 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 batch.color = Color(1f, 1f, 1f, alpha * 0.25f)
                 Toolkit.drawStraightLine(batch, x, y + PLAYLIST_LINE_HEIGHT * (i + 1) * scale, x + width * scale, 1f, false)
             }
+
+            // print the album name
+            batch.color = Color(1f, 1f, 1f, alpha * 0.75f)
+            Toolkit.drawTextCentered(batch, App.fontGame, playlistName, width, x.roundToInt(), 4 + (y + PLAYLIST_LINE_HEIGHT * PLAYLIST_LINES * scale).roundToInt())
         }
     }
 

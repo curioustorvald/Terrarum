@@ -152,19 +152,21 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     private var songs: List<MusicContainer> = emptyList()
+    var playlistName = ""; private set
     private var musicBin: ArrayList<MusicContainer> = ArrayList()
     private var shuffled = true
     private var diskJockeyingMode = "intermittent" // intermittent, continuous
 
     private fun registerSongsFromDir(musicDir: String, fileToName: ((String) -> String)?) {
+        val musicDir = musicDir.replace('\\', '/')
         printdbg(this, "registerSongsFromDir $musicDir")
-
 
         val fileToName = if (fileToName == null) {
             { name: String -> name.substringBeforeLast('.').replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" ") }
         }
         else fileToName
 
+        playlistName = musicDir.substringAfterLast('/')
 
         songs = File(musicDir).listFiles()?.sortedBy { it.name }?.mapNotNull {
             printdbg(this, "Music: ${it.absolutePath}")
