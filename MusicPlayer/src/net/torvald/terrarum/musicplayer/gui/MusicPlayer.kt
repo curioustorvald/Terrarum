@@ -21,6 +21,7 @@ import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator
+import java.util.BitSet
 import kotlin.math.*
 
 /**
@@ -85,36 +86,6 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private val colourControlButton = Color(0xeeeeee_cc.toInt())
 
-    init {
-        if (App.getConfigBoolean("musicplayer:usemusicplayer")) {
-            setAsAlwaysVisible()
-
-            // test code
-//        val albumDir = App.customMusicDir + "/Gapless Test 2"
-            val albumDir = App.customMusicDir + "/FurryJoA 2023 Live"
-//        val albumDir = App.customMusicDir + "/Audio Test"
-            val playlistFile = JsonFetcher.invoke("$albumDir/playlist.json")
-
-            val diskJockeyingMode = playlistFile.get("diskJockeyingMode").asString()
-            val shuffled = playlistFile.get("shuffled").asBoolean()
-            val fileToName = playlistFile.get("titles")
-
-
-            AudioMixer.musicTrack.let { track ->
-                track.doGaplessPlayback = (diskJockeyingMode == "continuous")
-                if (track.doGaplessPlayback) {
-                    track.pullNextTrack = {
-                        track.currentTrack = ingame.musicGovernor.pullNextMusicTrack(true)
-                        setMusicName(track.currentTrack?.name ?: "")
-                    }
-                }
-            }
-
-
-            registerPlaylist(albumDir, fileToName, shuffled, diskJockeyingMode)
-        }
-    }
-
     private val playlist: List<MusicContainer>
         get() = ingame.musicGovernor.extortField<List<MusicContainer>>("songs")!!
     private val playlistName: String
@@ -146,6 +117,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
             }
         }
+
+        setPlaylistDisplayVars(playlist)
     }
 
     private var currentMusicName = ""
@@ -220,6 +193,32 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     }
                     else -> {
                         nameScroll = 0f
+                    }
+                }
+            }
+            
+            if (mode >= MODE_SHOW_LIST) {
+                for (i in playlistNameScrolls.indices) {
+                    if (playlistNameOverflown[i]) { // name overflown
+                        when (musicPlayingTimer % 60f) {
+                            // start scroll
+                            in 0f..5f -> {
+                                playlistNameScrolls[i] = 0f
+                            }
+                            in 5f..10f -> {
+                                playlistNameScrolls[i] = (playlistNameScrolls[i] + NAME_SCROLL_PER_SECOND * delta).coerceIn(0f, (playlistRealNameLen[i] - playlistNameLenMax).toFloat())
+                            }
+                            in 10f..15f -> {
+                                playlistNameScrolls[i] = (playlistRealNameLen[i] - playlistNameLenMax).toFloat()
+                            }
+                            // start unscroll
+                            in 15f..20f -> {
+                                playlistNameScrolls[i] = (playlistNameScrolls[i] - NAME_SCROLL_PER_SECOND * delta).coerceIn(0f, (playlistRealNameLen[i] - playlistNameLenMax).toFloat())
+                            }
+                            else -> {
+                                playlistNameScrolls[i] = 0f
+                            }
+                        }
                     }
                 }
             }
@@ -527,8 +526,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             val drawAlpha = 0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f)// + (playListAnimAkku[i].pow(2f) * 1.2f)
 
             // assuming both view has the same list dimension
-            drawAlbumList(camera, delta, batch, (anchorX + offX2).roundToFloat(), (y + 11).roundToFloat(), drawAlpha * alpha1, width / (widthForList + METERS_WIDTH + maskOffWidth))
-            drawPlayList(camera, delta, batch, (anchorX + offX1).roundToFloat(), (y + 11).roundToFloat(), drawAlpha * alpha2, width / (widthForList + METERS_WIDTH + maskOffWidth))
+            drawAlbumList(camera, delta, batch, (anchorX + offX2).roundToFloat(), (y + 5).roundToFloat(), drawAlpha * alpha1, width / (widthForList + METERS_WIDTH + maskOffWidth))
+            drawPlayList(camera, delta, batch, (anchorX + offX1).roundToFloat(), (y + 5).roundToFloat(), drawAlpha * alpha2, width / (widthForList + METERS_WIDTH + maskOffWidth))
 
             // update playListAnimAkku
             for (i in playListAnimAkku.indices) {
@@ -550,12 +549,32 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val widthForMouseUp = (nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt()
     private val heightThin = 28
     private val heightControl = 80
-    private val heightList = 109 + PLAYLIST_LINES * PLAYLIST_LINE_HEIGHT.toInt()
+    private val heightList = 103 + PLAYLIST_LINES * PLAYLIST_LINE_HEIGHT.toInt()
 
+    private val playlistNameLenMax = widthForList - 2*maskOffWidth
     private var playlistScroll = 0
 
     private val playlistFBOs = Array(PLAYLIST_LINES) {
         FrameBuffer(Pixmap.Format.RGBA8888, PLAYLIST_NAME_LEN, PLAYLIST_LINE_HEIGHT.toInt(), false)
+    }
+    private val playlistNameScrolls = FloatArray(1024) // use absolute index
+    private val playlistRealNameLen = IntArray(1024) // use absolute index
+    private val playlistNameOverflown = BitSet(1024) // use absolute index
+
+    private fun resetPlaylistDisplay() {
+        playlistScroll = 0
+        playlistNameScrolls.fill(0f)
+        playlistNameOverflown.clear()
+    }
+    
+    private fun setPlaylistDisplayVars(plist: List<MusicContainer>) {
+        resetPlaylistDisplay()
+        plist.forEachIndexed { i, music ->
+            val len = App.fontGameFBO.getWidth(music.name)
+            val overflown = (len >= playlistNameLenMax)
+            playlistRealNameLen[i] = len
+            if (overflown) playlistNameOverflown.set(i)
+        }
     }
 
     private fun drawPlayList(camera: OrthographicCamera, delta: Float, batch: SpriteBatch, x: Float, y: Float, alpha: Float, scale: Float) {
@@ -569,7 +588,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     blendNormalStraightAlpha(batch)
 
                     // draw text
-                    App.fontGameFBO.draw(batch, if (i + playlistScroll in playlist.indices) playlist[i].name else "", maskOffWidth.toFloat(), (PLAYLIST_LINE_HEIGHT - 24) / 2)
+                    App.fontGameFBO.draw(batch, if (i + playlistScroll in playlist.indices) playlist[i].name else "", maskOffWidth - playlistNameScrolls[i + playlistScroll], (PLAYLIST_LINE_HEIGHT - 24) / 2)
 
                     // mask off the area
                     batch.color = Color.WHITE
@@ -588,15 +607,33 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         blendNormalStraightAlpha(batch)
         if (alpha > 0f) {
             playlistFBOs.forEachIndexed { i, it ->
-                batch.color = Color(1f, 1f, 1f, alpha)
+                val m1 = playlist.getOrNull(i + playlistScroll)
+                val m2 = AudioMixer.musicTrack.currentTrack
+                val currentlyPlaying = if (m1 == null || m2 == null) false else (m1 == m2)
 
                 // print number
-                val xoff = maskOffWidth + (if (i < 9) 3 else 0)
-                val yoff = 8 + (PLAYLIST_LINE_HEIGHT - 24) / 2
-                App.fontSmallNumbers.draw(batch, if (i + playlistScroll in playlist.indices) "${i + playlistScroll + 1}" else "", x + xoff, y + yoff + PLAYLIST_LINE_HEIGHT * i * scale)
-                // TODO draw playing marker if the song is being played
+
+                // print bars instead of numbers if the song is currently being played
+                if (currentlyPlaying) {
+                    val xoff = 5
+                    val yoff = 5 + 7 + (PLAYLIST_LINE_HEIGHT - 24) / 2
+                    // it will set the colour on its own
+                    drawFreqMeter(batch, x + xoff, y + yoff + PLAYLIST_LINE_HEIGHT * i * scale, alpha)
+                }
+                else {
+                    val xoff = maskOffWidth + (if (i < 9) 3 else 0)
+                    val yoff = 7 + (PLAYLIST_LINE_HEIGHT - 24) / 2
+                    batch.color = Color(1f, 1f, 1f, alpha * 0.75f)
+                    App.fontSmallNumbers.draw(
+                        batch,
+                        if (i + playlistScroll in playlist.indices) "${i + playlistScroll + 1}" else "",
+                        x + xoff,
+                        y + yoff + PLAYLIST_LINE_HEIGHT * i * scale
+                    )
+                }
 
                 // print the name
+                batch.color = Color(1f, 1f, 1f, alpha)
                 batch.draw(it.colorBufferTexture, x + PLAYLIST_LEFT_GAP * scale, y + PLAYLIST_LINE_HEIGHT * i * scale, it.width * scale, it.height * scale)
 
                 // separator
@@ -741,9 +778,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         }
 
         FFT.fftInto(chsum, fftOut)
-    }
 
-    private fun drawFreqMeter(batch: SpriteBatch, posX: Float, posY: Float) {
         // apply slope to the fft bins, also converts fullscale to decibels
         for (bin in binHeights.indices) {
             val freqR = (TerrarumAudioMixerTrack.SAMPLING_RATED / FFTSIZE) * (bin + 1)
@@ -757,17 +792,19 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
             oldFFTmagn[bin] = magn
         }
+    }
 
+    private fun drawFreqMeter(batch: SpriteBatch, posX: Float, posY: Float, alpha: Float = 1f) {
         fftBinIndices.mapIndexed { i, range ->
             fftBarHeights[i] = binHeights.slice(range).average().toFloat()
         }
 
-        batch.color = colourMeter2
+        batch.color = colourMeter2 mul Color(1f, 1f, 1f, alpha)
         fftBarHeights.forEachIndexed { index, h ->
             Toolkit.fillArea(batch, posX + index*4f, posY - h, 3f, 2*h + 1)
         }
 
-        batch.color = colourMeter
+        batch.color = colourMeter mul Color(1f, 1f, 1f, alpha)
         fftBarHeights.forEachIndexed { index, h ->
             Toolkit.fillArea(batch, posX + index*4f, posY - h, 2f, 2*h)
         }
@@ -809,4 +846,36 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     }
 
     private fun Float.organicOvershoot() = splineFunction.value(this.toDouble()).toFloat()
+
+
+
+    init {
+        if (App.getConfigBoolean("musicplayer:usemusicplayer")) {
+            setAsAlwaysVisible()
+
+            // test code
+//        val albumDir = App.customMusicDir + "/Gapless Test 2"
+            val albumDir = App.customMusicDir + "/FurryJoA 2023 Live"
+//        val albumDir = App.customMusicDir + "/Audio Test"
+            val playlistFile = JsonFetcher.invoke("$albumDir/playlist.json")
+
+            val diskJockeyingMode = playlistFile.get("diskJockeyingMode").asString()
+            val shuffled = playlistFile.get("shuffled").asBoolean()
+            val fileToName = playlistFile.get("titles")
+
+
+            AudioMixer.musicTrack.let { track ->
+                track.doGaplessPlayback = (diskJockeyingMode == "continuous")
+                if (track.doGaplessPlayback) {
+                    track.pullNextTrack = {
+                        track.currentTrack = ingame.musicGovernor.pullNextMusicTrack(true)
+                        setMusicName(track.currentTrack?.name ?: "")
+                    }
+                }
+            }
+
+
+            registerPlaylist(albumDir, fileToName, shuffled, diskJockeyingMode)
+        }
+    }
 }
