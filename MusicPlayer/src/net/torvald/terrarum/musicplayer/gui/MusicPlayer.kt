@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.JsonValue
 import com.jme3.math.FastMath
@@ -21,6 +22,7 @@ import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator
+import java.io.File
 import java.util.BitSet
 import kotlin.math.*
 
@@ -86,16 +88,40 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private val colourControlButton = Color(0xeeeeee_cc.toInt())
 
+    private var currentlySelectedAlbum: AlbumProp? = null
+
+    /** Returns the internal playlist of the MusicGovernor */
     private val playlist: List<MusicContainer>
         get() = ingame.musicGovernor.extortField<List<MusicContainer>>("songs")!!
+
+    /** Returns the playlist name from the MusicGovernor. Getting the value from the MusicGovernor
+     * is recommended as an ingame interaction may cancel the playback from the playlist from the MusicPlayer
+     * (e.g. interacting with a jukebox) */
     private val playlistName: String
         get() = ingame.musicGovernor.playlistName
 
-    fun registerPlaylist(path: String, fileToName: JsonValue, shuffled: Boolean, diskJockeyingMode: String) {
+    fun registerPlaylist(path: String, fileToName: JsonValue?, shuffled: Boolean, diskJockeyingMode: String) {
+        fun String.isNum(): Boolean {
+            try {
+                this.toInt()
+                return true
+            }
+            catch (e: NumberFormatException) {
+                return false
+            }
+        }
+
         ingame.musicGovernor.queueDirectory(path, shuffled, diskJockeyingMode) { filename ->
-            fileToName.get(filename).let {
+            fileToName?.get(filename).let {
                 if (it == null)
-                    filename.substringBeforeLast('.').replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" ")
+                    filename.substringBeforeLast('.').replace('_', ' ').split(" ").map { it.capitalize() }.let {
+                        // if the first token in the list is numeral, drop it
+                        if (it.first().isNum())
+                            it.subList(1, it.size).joinToString(" ")
+                        else
+                            it.joinToString(" ")
+
+                    }
                 else
                     it.asString()
             }
@@ -847,35 +873,64 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private fun Float.organicOvershoot() = splineFunction.value(this.toDouble()).toFloat()
 
+    /**
+     * Preferably called whenever an "album list view" is requested
+     */
+    private fun listAlbumsQuick(): List<File> {
+        val out = ArrayList<File>()
+        File(App.customMusicDir).listFiles()?.filter { it.isDirectory }?.forEach {
+            out.add(it)
+        }
+        return out
+    }
 
+    private fun getAlbumProp(albumDir: File): AlbumProp {
+        if (!albumDir.exists()) throw IllegalArgumentException("Album dir does not exist: $albumDir")
+        val playlistFile = File(albumDir, "playlist.json")
+        if (playlistFile.exists()) {
+            val playlistFile = JsonFetcher.invoke(playlistFile)
+            val albumName = playlistFile.get("albumName")?.asString() ?: albumDir.name
+            val diskJockeyingMode = playlistFile.get("diskJockeyingMode").asString()
+            val shuffled = playlistFile.get("shuffled").asBoolean()
+            val fileToName = playlistFile.get("titles")
+            return AlbumProp(albumDir, albumName, diskJockeyingMode, shuffled, fileToName)
+        }
+        else {
+            return AlbumProp(albumDir, albumDir.name, "intermittent", true, null)
+        }
+    }
+
+    private data class AlbumProp(
+        val ref: File, val name: String,
+        val diskJockeyingMode: String, val shuffled: Boolean, val fileToName: JsonValue?,
+        val albumArt: TextureRegion? = null
+    )
+
+    private fun loadNewAlbum(albumDir: File) {
+        val albumProp = getAlbumProp(albumDir)
+
+        AudioMixer.musicTrack.let { track ->
+            track.doGaplessPlayback = (albumProp.diskJockeyingMode == "continuous")
+            if (track.doGaplessPlayback) {
+                track.pullNextTrack = {
+                    track.currentTrack = ingame.musicGovernor.pullNextMusicTrack(true)
+                    setMusicName(track.currentTrack?.name ?: "")
+                }
+            }
+        }
+
+        currentlySelectedAlbum = albumProp
+
+        registerPlaylist(albumDir.absolutePath, albumProp.fileToName, albumProp.shuffled, albumProp.diskJockeyingMode)
+    }
 
     init {
         if (App.getConfigBoolean("musicplayer:usemusicplayer")) {
             setAsAlwaysVisible()
 
-            // test code
-//        val albumDir = App.customMusicDir + "/Gapless Test 2"
-            val albumDir = App.customMusicDir + "/FurryJoA 2023 Live"
-//        val albumDir = App.customMusicDir + "/Audio Test"
-            val playlistFile = JsonFetcher.invoke("$albumDir/playlist.json")
-
-            val diskJockeyingMode = playlistFile.get("diskJockeyingMode").asString()
-            val shuffled = playlistFile.get("shuffled").asBoolean()
-            val fileToName = playlistFile.get("titles")
-
-
-            AudioMixer.musicTrack.let { track ->
-                track.doGaplessPlayback = (diskJockeyingMode == "continuous")
-                if (track.doGaplessPlayback) {
-                    track.pullNextTrack = {
-                        track.currentTrack = ingame.musicGovernor.pullNextMusicTrack(true)
-                        setMusicName(track.currentTrack?.name ?: "")
-                    }
-                }
+            listAlbumsQuick().let {
+                if (it.isNotEmpty()) loadNewAlbum(it.random())
             }
-
-
-            registerPlaylist(albumDir, fileToName, shuffled, diskJockeyingMode)
         }
     }
 }
