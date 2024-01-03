@@ -570,7 +570,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val PLAYLIST_LEFT_GAP = METERS_WIDTH.toInt() + maskOffWidth
     private val PLAYLIST_NAME_LEN = widthForList
     private val PLAYLIST_LINE_HEIGHT = 28f
-    private val PLAYLIST_LINES = 8
+    private val PLAYLIST_LINES = 7
 
     private val widthForMouseUp = (nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt()
     private val heightThin = 28
@@ -669,7 +669,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
             // print the album name
             batch.color = Color(1f, 1f, 1f, alpha * 0.75f)
-            Toolkit.drawTextCentered(batch, App.fontGame, playlistName, width, x.roundToInt(), 4 + (y + PLAYLIST_LINE_HEIGHT * PLAYLIST_LINES * scale).roundToInt())
+            Toolkit.drawTextCentered(batch, App.fontGame, playlistName, width, x.roundToInt(), 3 + (y + PLAYLIST_LINE_HEIGHT * PLAYLIST_LINES * scale).roundToInt())
         }
     }
 
@@ -724,7 +724,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             val internalWidth =minOf(widthForMouseUp.toFloat(), width - 20f)
             val separation = internalWidth / 5f
             val anchorX = Toolkit.hdrawWidthf
-            val posY = posY + 10f
+            val posY = posY + 12f
             for (i in 0..4) {
                 batch.color = Color(1f, 1f, 1f,
                             0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f) + (playControlAnimAkku[i].pow(2f) * 1.2f)
