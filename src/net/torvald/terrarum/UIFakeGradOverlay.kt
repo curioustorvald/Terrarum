@@ -10,10 +10,12 @@ import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UINotControllable
 
 /**
  * Created by minjaesong on 2021-09-09.
  */
+@UINotControllable
 class UIFakeGradOverlay : UICanvas() {
     init {
         handler.allowESCtoClose = false
@@ -68,6 +70,7 @@ class UIFakeGradOverlay : UICanvas() {
     override fun dispose() {}
 }
 
+@UINotControllable
 class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas() {
     init {
         handler.allowESCtoClose = false

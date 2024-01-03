@@ -10,6 +10,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OPEN_CLOSE
 import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UINotControllable
 import net.torvald.unicode.EMDASH
 import net.torvald.unicode.getKeycapPC
 import kotlin.math.roundToInt
@@ -19,6 +20,7 @@ import kotlin.math.roundToInt
  *
  * Created by minjaesong on 2019-08-11.
  */
+@UINotControllable
 class UIScreenZoom : UICanvas(
         "control_key_zoom"
 ) {

@@ -144,7 +144,14 @@ object TerrarumPostProcessor : Disposable {
                 if (KeyToggler.isOn(Input.Keys.F10)) {
                     batch.color = Color.WHITE
                     batch.inUse {
-                        App.fontSmallNumbers.draw(it, "Wire draw class: ${(Terrarum.ingame as? net.torvald.terrarum.modulebasegame.TerrarumIngame)?.selectedWireRenderClass}", 2f, 2f)
+                        // print wire draw class
+                        App.fontSmallNumbers.draw(it, "${ccY}Wire draw class: $ccG${(Terrarum.ingame as? net.torvald.terrarum.modulebasegame.TerrarumIngame)?.selectedWireRenderClass}", 2f, 2f)
+
+                        // print UIs under cursor
+                        App.fontSmallNumbers.draw(it, "${ccY}UIs under mouse:", 2f, 15f)
+                        Terrarum.ingame?.uiContainer?.UIsUnderMouse?.forEachIndexed { i, ui ->
+                            App.fontSmallNumbers.draw(it, "${ccY}-$ccG ${ui.javaClass.simpleName}", 2f, 28f + 13*i)
+                        }
                     }
                 }
 

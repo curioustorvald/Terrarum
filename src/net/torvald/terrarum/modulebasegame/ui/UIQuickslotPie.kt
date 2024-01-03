@@ -13,6 +13,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OP
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.SLOT_COUNT
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UINotControllable
 import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
 
@@ -21,6 +22,7 @@ import kotlin.math.roundToInt
  *
  * Created by minjaesong on 2016-07-20.
  */
+@UINotControllable
 class UIQuickslotPie : UICanvas() {
 
     init {

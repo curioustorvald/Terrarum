@@ -10,12 +10,14 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UINotControllable
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2017-06-11.
  */
+@UINotControllable
 class UIWatchLargeDigital() : UICanvas() {
     override var width = 162
     override var height = 25

@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UINotControllable
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -18,6 +19,7 @@ import kotlin.math.sin
 /**
  * Created by minjaesong on 2023-09-09.
  */
+@UINotControllable
 class UIWatchLargeAnalogue() : UICanvas() {
 
     override var width = 76

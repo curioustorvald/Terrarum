@@ -32,6 +32,7 @@ import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UINotControllable
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import net.torvald.unsafe.UnsafeHelper
@@ -40,6 +41,7 @@ import org.dyn4j.geometry.Vector2
 import java.io.File
 import java.io.PrintStream
 import kotlin.math.*
+import kotlin.reflect.full.findAnnotation
 
 
 typealias RGBA8888 = Int
@@ -750,6 +752,26 @@ class UIContainer {
     fun <T> map(transformation: (UICanvas?) -> T) = iterator().asSequence().map(transformation)
 
     fun filter(predicate: (Any) -> Boolean) = data.filter(predicate)
+
+    fun filterNotNull(): List<UICanvas> = data.filter {
+        if (it is UICanvas) true
+        else if (it is Id_UICanvasNullable) it.get() != null
+        else false
+    }.map {
+        if (it is UICanvas) it
+        else if (it is Id_UICanvasNullable) it.get()!!
+        else throw InternalError()
+    }
+
+    val UIsUnderMouse: List<UICanvas>
+        get() = filterNotNull().filter { it.isVisible && it.mouseUp && it::class.findAnnotation<UINotControllable>() == null }
+
+    val hasNoUIsUnderMouse: Boolean
+        get() = UIsUnderMouse.isEmpty()
+
+    val hasUIunderMouse: Boolean
+        get() = UIsUnderMouse.isNotEmpty()
+
 }
 
 interface Id_UICanvasNullable {

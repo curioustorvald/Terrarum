@@ -11,6 +11,7 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UINotControllable
 import kotlin.math.roundToInt
 
 /**
@@ -18,6 +19,7 @@ import kotlin.math.roundToInt
  *
  * Created by minjaesong on 2016-07-20.
  */
+@UINotControllable
 class UIQuickslotBar : UICanvas() {
 
     init {

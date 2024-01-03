@@ -87,8 +87,6 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     val uiGetPoiName = UIBuildingMakerGetFilename() // used for both import and export
 
-    val uiContainer = UIContainer()
-
     val keyboardUsedByTextInput: Boolean
         get() = uiGetPoiName.textInput.isEnabled
 

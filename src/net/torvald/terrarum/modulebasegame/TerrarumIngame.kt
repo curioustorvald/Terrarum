@@ -88,7 +88,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     //val ACTORCONTAINER_INITIAL_SIZE = 64
     val PARTICLES_MAX = App.getConfigInt("maxparticles")
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX, true)
-    val uiContainer = UIContainer()
 
     // these are required because actors always change their position
     private var visibleActorsRenderBehind: ArrayList<ActorWithBody> = ArrayList(1)

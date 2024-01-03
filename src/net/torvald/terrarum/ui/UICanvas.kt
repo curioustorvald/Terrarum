@@ -431,3 +431,10 @@ abstract class UICanvas(
 
     override fun toString(): String = "${this.javaClass.simpleName}@${this.hashCode().toString(16)}"
 }
+
+/**
+ * Annotation added to the UI that is not meant to have a user interaction in any way, so that even if
+ * the mouse cursor is above it, the UI is not recognised as such. This is useful on UIs that spawn a
+ * tooltip and the said UI is checking if the mouse cursor is NOT above any other overlaid UI (e.g. a message box)
+ */
+annotation class UINotControllable

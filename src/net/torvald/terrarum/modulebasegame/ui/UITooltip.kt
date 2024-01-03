@@ -9,10 +9,12 @@ import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UINotControllable
 
 /**
  * Created by minjaesong on 2017-11-25.
  */
+@UINotControllable
 class UITooltip : UICanvas() {
 
     init {

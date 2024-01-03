@@ -12,6 +12,7 @@ import kotlin.math.roundToInt
 /**
  * Created by minjaesong on 2021-10-01.
  */
+@UINotControllable
 class UIAutosaveNotifier : UICanvas() {
 
     init {

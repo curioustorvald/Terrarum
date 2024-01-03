@@ -16,6 +16,7 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar
+import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.dyn4j.geometry.Vector2
 import java.util.*
@@ -131,7 +132,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
 
         // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
         // don't separate Player from this! Physics will break, esp. airborne manoeuvre
-        if (!terrarumIngame.paused) {
+        if (!terrarumIngame.paused && terrarumIngame.uiContainer.hasNoUIsUnderMouse) {
             val actor = terrarumIngame.actorNowPlaying
             val itemOnGrip = terrarumIngame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
@@ -158,7 +159,6 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             }
 
         }
-
 
         updateKeyboard()
     }
@@ -272,7 +272,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        if (!terrarumIngame.paused) {
+        if (!terrarumIngame.paused && terrarumIngame.uiContainer.hasNoUIsUnderMouse) {
             // quickslot by wheel
             terrarumIngame.actorNowPlaying?.let {
                 var selection = it.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)!!

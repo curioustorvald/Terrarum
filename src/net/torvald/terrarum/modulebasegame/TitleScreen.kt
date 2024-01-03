@@ -146,7 +146,6 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private val gradWhiteBottom = Color(0xd8d8d8ff.toInt())
 
 
-    val uiContainer = UIContainer()
     internal lateinit var uiRemoCon: UIRemoCon
     internal lateinit var uiFakeBlurOverlay: UICanvas
 
