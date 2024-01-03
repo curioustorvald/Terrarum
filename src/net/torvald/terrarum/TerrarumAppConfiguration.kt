@@ -16,7 +16,7 @@ object TerrarumAppConfiguration {
     // CONFIGURATION FOR THE APP ITSELF //
     //////////////////////////////////////
     const val GAME_NAME = "Terrarum"
-    const val COPYRIGHT_DATE_NAME = "Copyright 2013-2023 CuriousToꝛvald (minjaesong)"
+    const val COPYRIGHT_DATE_NAME = "Copyright 2013-2024 CuriousToꝛvald (minjaesong)"
     val COPYRIGHT_LICENSE: String; get() = Lang["COPYRIGHT_GNU_GPL_3"]
     const val COPYRIGHT_LICENSE_ENGLISH = "Distributed under GNU GPL 3"
     const val COPYRIGHT_LICENSE_TERMS_SHORT = """
