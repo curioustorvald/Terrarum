@@ -228,8 +228,16 @@ class TerrarumMusicGovernor : MusicGovernor() {
         if (indexAtMusicBin < 0) throw IllegalArgumentException("The music does not exist on the internal songs list ($music)")
 
         // rewrite musicBin
-        // TODO take shuffing into account
-        val newMusicBin = Array(songs.size - indexAtMusicBin) { offset ->
+        val newMusicBin = if (shuffled) songs.shuffled().toTypedArray().also {
+            // if shuffled,
+            // 1. create a shuffled version of songlist
+            // 2. swap two songs such that the songs[indexAtMusicBin] comes first
+            val swapTo = it.indexOf(songs[indexAtMusicBin])
+            val tmp = it[swapTo]
+            it[swapTo] = it[0]
+            it[0] = tmp
+        }
+        else Array(songs.size - indexAtMusicBin) { offset ->
             val k = offset + indexAtMusicBin
             songs[k]
         }
@@ -241,8 +249,16 @@ class TerrarumMusicGovernor : MusicGovernor() {
         if (indexAtMusicBin !in songs.indices) throw IndexOutOfBoundsException("The index is outside of the internal songs list ($indexAtMusicBin/${songs.size})")
 
         // rewrite musicBin
-        // TODO take shuffing into account
-        val newMusicBin = Array(songs.size - indexAtMusicBin) { offset ->
+        val newMusicBin =  if (shuffled) songs.shuffled().toTypedArray().also {
+            // if shuffled,
+            // 1. create a shuffled version of songlist
+            // 2. swap two songs such that the songs[indexAtMusicBin] comes first
+            val swapTo = it.indexOf(songs[indexAtMusicBin])
+            val tmp = it[swapTo]
+            it[swapTo] = it[0]
+            it[0] = tmp
+        }
+        else Array(songs.size - indexAtMusicBin) { offset ->
             val k = offset + indexAtMusicBin
             songs[k]
         }
