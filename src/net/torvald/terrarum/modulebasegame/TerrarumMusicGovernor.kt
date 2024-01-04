@@ -153,12 +153,15 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
     private var songs: List<MusicContainer> = emptyList()
     var playlistName = ""; private set
+    /** canonicalPath with path separators converted to forward slash */
+    var playlistSource = "" ; private set
     private var musicBin: ArrayList<MusicContainer> = ArrayList()
     private var shuffled = true
     private var diskJockeyingMode = "intermittent" // intermittent, continuous
 
     private fun registerSongsFromDir(musicDir: String, fileToName: ((String) -> String)?) {
         val musicDir = musicDir.replace('\\', '/')
+        playlistSource = musicDir
         printdbg(this, "registerSongsFromDir $musicDir")
 
         val fileToName = if (fileToName == null) {
