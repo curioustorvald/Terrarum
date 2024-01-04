@@ -225,9 +225,23 @@ class TerrarumMusicGovernor : MusicGovernor() {
      */
     fun unshiftPlaylist(music: MusicContainer) {
         val indexAtMusicBin = songs.indexOf(music)
-        if (indexAtMusicBin < 0) throw IllegalArgumentException("The music does not exist on the interal songs list ($music)")
+        if (indexAtMusicBin < 0) throw IllegalArgumentException("The music does not exist on the internal songs list ($music)")
 
         // rewrite musicBin
+        // TODO take shuffing into account
+        val newMusicBin = Array(songs.size - indexAtMusicBin) { offset ->
+            val k = offset + indexAtMusicBin
+            songs[k]
+        }
+
+        musicBin = ArrayList(newMusicBin.toList())
+    }
+
+    fun queueIndexFromPlaylist(indexAtMusicBin: Int) {
+        if (indexAtMusicBin !in songs.indices) throw IndexOutOfBoundsException("The index is outside of the internal songs list ($indexAtMusicBin/${songs.size})")
+
+        // rewrite musicBin
+        // TODO take shuffing into account
         val newMusicBin = Array(songs.size - indexAtMusicBin) { offset ->
             val k = offset + indexAtMusicBin
             songs[k]

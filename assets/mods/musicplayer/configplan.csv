@@ -1,1 +1,2 @@
 usemusicplayer->Lang:MENU_OPTIONS_USE_MUSIC_PLAYER->toggle
+playlistlines->Lang:MENU_OPTIONS_MUSIC_PLAYLIST_LINES->spinner,4,16,1

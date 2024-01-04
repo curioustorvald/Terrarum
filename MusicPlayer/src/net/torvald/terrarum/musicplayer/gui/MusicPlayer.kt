@@ -1,6 +1,5 @@
 package net.torvald.terrarum.musicplayer.gui
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
@@ -11,7 +10,6 @@ import com.badlogic.gdx.utils.JsonValue
 import com.jme3.math.FastMath
 import net.torvald.reflection.extortField
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -28,6 +26,8 @@ import java.util.BitSet
 import kotlin.math.*
 
 /**
+ * When the current music is controlled by the ingame (e.g. Jukebox) the MusicPlayer gets disabled.
+ *
  * Created by minjaesong on 2023-12-23.
  */
 class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
@@ -92,13 +92,13 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private var currentlySelectedAlbum: AlbumProp? = null
 
     /** Returns the internal playlist of the MusicGovernor */
-    private val playlist: List<MusicContainer>
+    private val songsInGovernor: List<MusicContainer>
         get() = ingame.musicGovernor.extortField<List<MusicContainer>>("songs")!!
 
     /** Returns the playlist name from the MusicGovernor. Getting the value from the MusicGovernor
      * is recommended as an ingame interaction may cancel the playback from the playlist from the MusicPlayer
      * (e.g. interacting with a jukebox) */
-    private val playlistName: String
+    private val internalPlaylistName: String
         get() = ingame.musicGovernor.playlistName
 
     fun registerPlaylist(path: String, fileToName: JsonValue?, shuffled: Boolean, diskJockeyingMode: String) {
@@ -145,7 +145,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             }
         }
 
-        setPlaylistDisplayVars(playlist)
+        setPlaylistDisplayVars(songsInGovernor)
     }
 
     private var currentMusicName = ""
@@ -311,7 +311,9 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     // prev song
                     if (mode < MODE_SHOW_LIST) {
                         getPrevSongFromPlaylist()?.let { ingame.musicGovernor.unshiftPlaylist(it) }
-                        AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
+                        AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
+                            ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                        }
                     }
                     // prev page in the list
                     else {
@@ -337,7 +339,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     // next song
                     if (mode < MODE_SHOW_LIST) {
                         AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
-//                        ingame.musicGovernor.startMusic() // it works without this?
+                            ingame.musicGovernor.startMusic() // required for "intermittent" mode, does seemingly nothing on "continuous" mode
                         }
                     }
                     // next page in the list
@@ -352,7 +354,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                             transitionRequest = MODE_SHOW_LIST
                             currentListMode = 1
                             // reset list scroll
-                            val currentlyPlaying = playlist.indexOf(AudioMixer.musicTrack.currentTrack)
+                            val currentlyPlaying = songsInGovernor.indexOf(AudioMixer.musicTrack.currentTrack)
                             if (currentlyPlaying >= 0) {
                                 playlistScroll = (currentlyPlaying / PLAYLIST_LINES) * PLAYLIST_LINES
                             }
@@ -372,6 +374,25 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 }
             }
         }
+        // make playlist clicking work
+        else if (!playControlButtonLatched && mouseOnList != null && Terrarum.mouseDown) {
+            playControlButtonLatched = true
+            val index = playlistScroll + mouseOnList!!
+            val list = songsInGovernor
+            if (index < list.size) {
+                // if selected song != currently playing
+                if (AudioMixer.musicTrack.currentTrack == null || list[index] != AudioMixer.musicTrack.currentTrack) {
+                    // rebuild playlist
+                    ingame.musicGovernor.queueIndexFromPlaylist(index)
+
+                    // fade out
+                    AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
+                        ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                    }
+                }
+            }
+        }
+        // unlatch the click latch
         else if (!Terrarum.mouseDown) {
             playControlButtonLatched = false
         }
@@ -383,7 +404,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private var playControlButtonLatched = false
 
     private fun getPrevSongFromPlaylist(): MusicContainer? {
-        val list = playlist.slice(playlist.indices) // make copy of the list
+        val list = songsInGovernor.slice(songsInGovernor.indices) // make copy of the list
         val nowPlaying = AudioMixer.musicTrack.currentTrack ?: return null
 
         // find current index
@@ -653,7 +674,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     blendNormalStraightAlpha(batch)
 
                     // draw text
-                    App.fontGameFBO.draw(batch, if (pnum in playlist.indices) playlist[pnum].name else "", maskOffWidth - playlistNameScrolls[pnum], (PLAYLIST_LINE_HEIGHT - 24) / 2)
+                    App.fontGameFBO.draw(batch, if (pnum in songsInGovernor.indices) songsInGovernor[pnum].name else "", maskOffWidth - playlistNameScrolls[pnum], (PLAYLIST_LINE_HEIGHT - 24) / 2)
 
                     // mask off the area
                     batch.color = Color.WHITE
@@ -675,7 +696,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 val alpha2 = alpha + (playListAnimAkku[i] * 0.2f)
                 val pnum = i + playlistScroll
 
-                val m1 = playlist.getOrNull(pnum)
+                val m1 = songsInGovernor.getOrNull(pnum)
                 val m2 = AudioMixer.musicTrack.currentTrack
                 val currentlyPlaying = if (m1 == null || m2 == null) false else (m1 == m2)
 
@@ -694,7 +715,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     batch.color = Color(1f, 1f, 1f, alpha * 0.75f)
                     App.fontSmallNumbers.draw(
                         batch,
-                        if (pnum in playlist.indices) "${pnum + 1}" else "",
+                        if (pnum in songsInGovernor.indices) "${pnum + 1}" else "",
                         x + xoff,
                         y + yoff + PLAYLIST_LINE_HEIGHT * i * scale
                     )
@@ -711,7 +732,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
             // print the album name
             batch.color = Color(1f, 1f, 1f, alpha * 0.75f)
-            Toolkit.drawTextCentered(batch, App.fontGame, playlistName, width, x.roundToInt(), 3 + (y + PLAYLIST_LINE_HEIGHT * PLAYLIST_LINES * scale).roundToInt())
+            Toolkit.drawTextCentered(batch, App.fontGame, internalPlaylistName, width, x.roundToInt(), 3 + (y + PLAYLIST_LINE_HEIGHT * PLAYLIST_LINES * scale).roundToInt())
         }
     }
 
