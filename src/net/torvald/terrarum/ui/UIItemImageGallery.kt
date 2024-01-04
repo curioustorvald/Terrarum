@@ -24,7 +24,7 @@ class UIItemImageGallery(
     override fun update(delta: Float) {
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         fun column(i: Int) = i % column
         fun row(i: Int) = i / column
 

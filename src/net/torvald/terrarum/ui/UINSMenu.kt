@@ -186,7 +186,7 @@ class UINSMenu(
 
     private val borderCol = Color(1f, 1f, 1f, 0.35f)
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         listStack.forEach {
             // draw title bar
             batch.color = titleBackCol
@@ -199,7 +199,7 @@ class UINSMenu(
 
             // draw the list
             batch.color = Color.WHITE
-            it.ui.render(batch, camera)
+            it.ui.render(frameDelta, batch, camera)
 
             // draw border
             batch.color = borderCol

@@ -188,39 +188,39 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
     // `screens` order
     private val screenRenders = arrayOf(
-        { batch: SpriteBatch, camera: OrthographicCamera ->
+        { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
             App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
             // text buttons
-            gameMenuButtons.render(batch, camera)
+            gameMenuButtons.render(frameDelta, batch, camera)
         },
-        { batch: SpriteBatch, camera: OrthographicCamera ->
+        { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
             App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
-            keyboardSetupUI.render(batch, camera)
+            keyboardSetupUI.render(frameDelta, batch, camera)
         },
-        { batch: SpriteBatch, camera: OrthographicCamera ->
+        { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
             App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
-            areYouSureMainMenuButtons.render(batch, camera)
+            areYouSureMainMenuButtons.render(frameDelta, batch, camera)
         },
-        { batch: SpriteBatch, camera: OrthographicCamera ->
-            savingUI.render(batch, camera)
+        { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
+            savingUI.render(frameDelta, batch, camera)
         },
-        { batch: SpriteBatch, camera: OrthographicCamera ->
+        { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
             App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
-            keyConfigUI.render(batch, camera)
+            keyConfigUI.render(frameDelta, batch, camera)
         },
-        { batch: SpriteBatch, camera: OrthographicCamera ->
+        { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
             App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
-            languageUI.render(batch, camera)
+            languageUI.render(frameDelta, batch, camera)
         },
-        { batch: SpriteBatch, camera: OrthographicCamera ->
+        { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
             App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
-            shareUI.render(batch, camera)
+            shareUI.render(frameDelta, batch, camera)
         },
     )
 
@@ -300,10 +300,10 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             yeet.update(delta)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
         batch.color = Color.WHITE
-        screenRenders[screen](batch, camera)
+        screenRenders[screen](frameDelta, batch, camera)
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

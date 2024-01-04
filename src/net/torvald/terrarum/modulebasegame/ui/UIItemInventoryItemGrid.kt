@@ -306,21 +306,21 @@ open class UIItemInventoryItemGrid(
 //    private fun getIconPosY(index: Int) =
 //        posY + 8 + 26 * index
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val posXDelta = posX - oldPosX
         itemGrid.forEach { it.posX += posXDelta }
         itemList.forEach { it.posX += posXDelta }
         // define each button's highlighted status from the list of forceHighlighted, then render the button
         items.forEach {
             if (useHighlightingManager) it.forceHighlighted = forceHighlightList.contains(it.item?.dynamicID)
-            it.render(batch, camera)
+            it.render(frameDelta, batch, camera)
         }
 
         if (!hideSidebar) {
-            navRemoCon.render(batch, camera)
+            navRemoCon.render(frameDelta, batch, camera)
         }
 
-        super.render(batch, camera)
+        super.render(frameDelta, batch, camera)
 
         oldPosX = posX
     }

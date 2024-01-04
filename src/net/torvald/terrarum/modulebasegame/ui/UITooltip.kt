@@ -48,7 +48,7 @@ class UITooltip : UICanvas() {
         get() = 36 * 2 + font.lineHeight.toInt()
         set(value) { throw Error("You are not supposed to set the height of the tooltip manually.") }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val mouseXoff = 28f
         val mouseYoff = 0f
         val txtW = msgWidth + 2f * textMarginX

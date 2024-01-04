@@ -87,7 +87,7 @@ class UIElemTest : ApplicationAdapter() {
         gdxClearAndEnableBlend(0.1f, 0.1f, 0.1f, 1f)
 
         ui.update(Gdx.graphics.deltaTime)
-        ui.render(batch, camera)
+        ui.render(Gdx.graphics.deltaTime, batch, camera)
 
         Gdx.graphics.setTitle("Terrarum UIElemTest $EMDASH F: ${Gdx.graphics.framesPerSecond}")
     }
@@ -122,13 +122,13 @@ class DummyTogglePane : UICanvas() {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.inUse {
             batch.color = Color.CORAL
             Toolkit.fillArea(batch, 0f, 0f, 800f, 600f)
 
             batch.color = Color.WHITE
-            uiItems.forEach { it.render(batch, camera) }
+            uiItems.forEach { it.render(frameDelta, batch, camera) }
         }
     }
 

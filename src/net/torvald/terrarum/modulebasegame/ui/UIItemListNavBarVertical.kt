@@ -111,7 +111,7 @@ class UIItemListNavBarVertical(
     var itemPage = 0
 
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val posXDelta = posX - oldPosX
 
         gridModeButtons.forEach { it.posX += posXDelta }
@@ -131,9 +131,9 @@ class UIItemListNavBarVertical(
         batch.color = colourTheme.cellHighlightNormalCol
         Toolkit.drawBoxBorder(batch, iconPosX - 4, getIconPosY(0) - 8, width, height)
 
-        if (hasGridModeButtons) gridModeButtons.forEach { it.render(batch, camera) }
-        scrollUpButton.render(batch, camera)
-        scrollDownButton.render(batch, camera)
+        if (hasGridModeButtons) gridModeButtons.forEach { it.render(frameDelta, batch, camera) }
+        scrollUpButton.render(frameDelta, batch, camera)
+        scrollDownButton.render(frameDelta, batch, camera)
 
         // draw scroll dots
         for (i in 0 until itemPageCount) {
@@ -151,7 +151,7 @@ class UIItemListNavBarVertical(
 
         extraDrawOpOnBottom(this, batch)
 
-        super.render(batch, camera)
+        super.render(frameDelta, batch, camera)
 
         oldPosX = posX
     }

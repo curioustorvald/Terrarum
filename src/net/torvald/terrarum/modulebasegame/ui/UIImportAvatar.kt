@@ -113,7 +113,7 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
     }
     private lateinit var wotKeys: List<String>
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
         val textboxWidth = wotKeys.maxOf { App.fontGame.getWidth(it) }
         val textX = (Toolkit.drawWidth - textboxWidth) / 2
@@ -126,7 +126,7 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
         App.fontGame.draw(batch, App.importDir, (Toolkit.drawWidth - pathW) / 2, textY)
 
 
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
 
 
         if (importReturnCode != 0) {
@@ -262,7 +262,7 @@ class UIItemCodeBox(parent: UIImportAvatar, initialX: Int, initialY: Int, val co
         }
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // draw box backgrounds
         batch.color = UIInventoryFull.CELL_COL
         Toolkit.fillArea(batch, posX, posY, width, height)

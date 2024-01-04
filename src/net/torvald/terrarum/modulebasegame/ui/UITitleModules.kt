@@ -138,7 +138,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
         moduleCells.clear()
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
 
         lateinit var savePixmap: Pixmap
@@ -151,7 +151,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
                 for (index in 0 until moduleCells.size) {
                     val it = moduleCells[index]
                     if (index in listScroll - 2 until listScroll + savesVisible + 2) {
-                        it.render(batch, camera)
+                        it.render(frameDelta, batch, camera)
                     }
                 }
             }

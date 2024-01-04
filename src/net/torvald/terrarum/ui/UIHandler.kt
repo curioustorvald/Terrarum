@@ -281,7 +281,7 @@ void main() {
         subUIs.forEach { it.update(delta) }
     }
 
-    fun render(ui: UICanvas, batch: SpriteBatch, camera: OrthographicCamera, parentOpacity: Float) {
+    fun render(ui: UICanvas, frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera, parentOpacity: Float) {
 
         if (isVisible) {
             // camera SHOULD BE CENTERED to HALFX and HALFY (see StateInGame) //
@@ -301,7 +301,7 @@ void main() {
 
             batch.shader = shader
             shader.setUniformf("opacity", opacity * parentOpacity)
-            ui.renderUI(batch, camera)
+            ui.renderUI(frameDelta, batch, camera)
             //ingameGraphics.flush()
 
             batch.shader = null
@@ -313,7 +313,7 @@ void main() {
 
 
         subUIs.forEach {
-            it.render(batch, camera)
+            it.render(frameDelta, batch, camera)
             batch.color = Color.WHITE
         }
 

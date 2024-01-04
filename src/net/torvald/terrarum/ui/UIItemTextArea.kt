@@ -34,7 +34,7 @@ class UIItemTextArea(
         if (scrollPos < 0) scrollPos = 0
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         for (i in scrollPos until min(lineCount + scrollPos, entireText.size)) {
             val yPtr = i - scrollPos
 

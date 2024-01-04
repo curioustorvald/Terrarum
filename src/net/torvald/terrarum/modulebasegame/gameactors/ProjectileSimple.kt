@@ -93,7 +93,7 @@ open class ProjectileSimple : ActorWithBody, Projectile {
     /**
      * WARNING! ends and begins Batch
      */
-    override fun drawBody(batch: SpriteBatch) {
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         val colourTail = displayColour.cpy() // clone a colour
         colourTail.a = 0.16f
 
@@ -113,7 +113,7 @@ open class ProjectileSimple : ActorWithBody, Projectile {
         batch.begin()*/
     }
 
-    override fun drawGlow(batch: SpriteBatch) = drawBody(batch)
+    override fun drawGlow(frameDelta: Float, batch: SpriteBatch) = drawBody(frameDelta, batch)
 
     companion object {
         val OFFSET_DAMAGE = 0

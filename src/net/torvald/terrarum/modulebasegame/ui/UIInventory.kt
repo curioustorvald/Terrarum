@@ -213,7 +213,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
     private val weightBarWidth = 60f
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // background
         blendNormal()
         batch.color = backgroundColour
@@ -225,14 +225,14 @@ package net.torvald.terrarum.modulebasegame.ui
         batch.color = Color(0xcccccc_ff.toInt())
         Toolkit.fillArea(batch, 0f, 0f, catButtons.width.toFloat(), height.toFloat())
 
-        catButtons.render(batch, camera)
+        catButtons.render(frameDelta, batch, camera)
 
         // left/right page mover
-        scrollLeftButton.render(batch, camera)
-        scrollRightButton.render(batch, camera)
+        scrollLeftButton.render(frameDelta, batch, camera)
+        scrollRightButton.render(frameDelta, batch, camera)
 
         items.forEach {
-            it.render(batch, camera)
+            it.render(frameDelta, batch, camera)
         }
 
         // texts

@@ -166,7 +166,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
 
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
 
         // border
@@ -182,14 +182,14 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         Toolkit.fillArea(batch, 0, 0, MENUBAR_SIZE, height)
 
         // the actual buttons
-        tabs.render(batch, camera)
-        closeButton.render(batch, camera)
+        tabs.render(frameDelta, batch, camera)
+        closeButton.render(frameDelta, batch, camera)
 
         currentPalette.visible.forEach {
-            it.render(batch, camera)
+            it.render(frameDelta, batch, camera)
         }
 
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
     }
 
     private var dragOriginX = 0 // relative mousepos

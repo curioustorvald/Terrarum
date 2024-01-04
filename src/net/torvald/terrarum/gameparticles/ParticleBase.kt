@@ -74,7 +74,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, var despawnUponCollision
         }
     }
 
-    open fun drawBody(batch: SpriteBatch) {
+    open fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         if (!flagDespawn) {
             batch.color = drawColour
             drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
@@ -83,7 +83,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, var despawnUponCollision
         }
     }
 
-    open fun drawGlow(batch: SpriteBatch) {
+    open fun drawGlow(frameDelta: Float, batch: SpriteBatch) {
         if (!flagDespawn && glow != null) {
             batch.color = drawColour
             drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->

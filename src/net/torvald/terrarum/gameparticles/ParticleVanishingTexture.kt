@@ -87,7 +87,7 @@ class ParticleVanishingText(val text: String, x: Double, y: Double, noCollision:
         drawColour.a = (lifetimeMax - lifetimeCounter) / lifetimeMax
     }
 
-    override fun drawBody(batch: SpriteBatch) {
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         if (!flagDespawn) {
             val oldColour = batch.color.cpy()
             batch.color = drawColour
@@ -135,7 +135,7 @@ open class ParticleVanishingSprite(val sprite: TextureRegionPack, val delay: Flo
         frameAdvanceCounter += delta
     }
 
-    override fun drawBody(batch: SpriteBatch) {
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         if (!flagDespawn) {
             val oldColour = batch.color.cpy()
             batch.color = drawColour

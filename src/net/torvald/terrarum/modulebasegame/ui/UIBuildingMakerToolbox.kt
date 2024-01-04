@@ -38,8 +38,8 @@ class UIBuildingMakerToolbox : UICanvas() {
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
-        tools.forEach { it.render(batch, camera) }
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        tools.forEach { it.render(frameDelta, batch, camera) }
     }
 
     override fun doOpening(delta: Float) { }

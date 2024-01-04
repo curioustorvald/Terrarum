@@ -119,7 +119,7 @@ class WearableWorldRadarUI(val device: VM) : UICanvas() {
         device.update(delta)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
 
         batch.color = Color.WHITE

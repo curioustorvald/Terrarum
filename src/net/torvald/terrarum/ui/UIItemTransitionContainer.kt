@@ -59,8 +59,8 @@ open class UIItemTransitionContainer(
     open val currentUI: UICanvas
         get() = uis[currentPosition.roundToInt()]
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
-        super.render(batch, camera)
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        super.render(frameDelta, batch, camera)
 
         if (transitionRequested && !transitionOngoing) {
             transitionRequested = false
@@ -69,7 +69,7 @@ open class UIItemTransitionContainer(
         }
 
         if (transitionOngoing) {
-            transitionTimer += Gdx.graphics.deltaTime
+            transitionTimer += frameDelta
 
             currentPosition = Movement.moveLinear(transitionReqSource, transitionReqTarget, transitionTimer, transitionLength)
 
@@ -84,7 +84,7 @@ open class UIItemTransitionContainer(
         uis.forEachIndexed { index, ui ->
             if (currentPosition > index - 1 + epsilon && currentPosition < index + 1 - epsilon) {
                 if (!ui.isOpened && !ui.isOpening) ui.setAsOpen()
-                ui.render(batch, camera, parent.opacity)
+                ui.render(frameDelta, batch, camera, parent.opacity)
 
                 if (debugvals) {
                     App.fontSmallNumbers.draw(batch, "$index", 300f + (20 * index), 10f)

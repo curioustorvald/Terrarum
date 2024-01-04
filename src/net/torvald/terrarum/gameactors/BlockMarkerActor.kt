@@ -50,7 +50,7 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
     }
 
 
-    override fun drawBody(batch: SpriteBatch) {
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         if (isVisible) {
             if (markerMode == MarkerMode.FIXTURE_GHOST) {
                 if (INGAME.actorNowPlaying != null) {
@@ -60,7 +60,7 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
                         if (ghost != null) {
 //                            batch.color = ghostColour
                             batch.shader.setUniformf("ghostColour", ghostColour.r, ghostColour.g, ghostColour.b, ghostColour.a)
-                            drawSpriteInGoodPosition(ghost!!, batch)
+                            drawSpriteInGoodPosition(frameDelta, ghost!!, batch)
                         }
 //                        0L
 //                    }
@@ -70,7 +70,7 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
                     if (ghost != null) {
 //                        batch.color = ghostColour
                         batch.shader.setUniformf("ghostColour", ghostColour.r, ghostColour.g, ghostColour.b, ghostColour.a)
-                        drawSpriteInGoodPosition(ghost!!, batch)
+                        drawSpriteInGoodPosition(frameDelta, ghost!!, batch)
                     }
                 }
             }
@@ -86,7 +86,7 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
         batch.color = Color.WHITE
     }
 
-    override fun drawGlow(batch: SpriteBatch) {
+    override fun drawGlow(frameDelta: Float, batch: SpriteBatch) {
         batch.color = Color.WHITE
     }
 

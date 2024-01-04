@@ -93,11 +93,11 @@ class UIItemVertSlider(
 
     private val renderOrderMouseUp = arrayOf(0,2,3,1).map { renderJobs[it] }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
         renderOrderMouseUp.forEach { it(batch) }
 
-        super.render(batch, camera)
+        super.render(frameDelta, batch, camera)
     }
 
     override fun dispose() {

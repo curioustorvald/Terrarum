@@ -87,7 +87,7 @@ class UIQuickslotBar : UICanvas() {
 
     private val itemCntTextCol = Color(0x404040ff)
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.let { actor ->
             for (i in 0 until SLOT_COUNT) {

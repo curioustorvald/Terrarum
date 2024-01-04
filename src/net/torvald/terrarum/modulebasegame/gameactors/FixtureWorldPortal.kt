@@ -53,9 +53,9 @@ class FixtureWorldPortal : Electric {
 
     @Transient internal var teleportRequest: TeleportRequest? = null
 
-    override fun drawBody(batch: SpriteBatch) {
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         (sprite as SheetSpriteAnimation).currentFrame = (Math.random() * 3).toInt()
-        super.drawBody(batch)
+        super.drawBody(frameDelta, batch)
     }
 
     override fun onRisingEdge(readFrom: BlockBoxIndex) {

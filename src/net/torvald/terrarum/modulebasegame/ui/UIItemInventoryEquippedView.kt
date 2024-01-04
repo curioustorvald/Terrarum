@@ -68,7 +68,7 @@ class UIItemInventoryEquippedView(
         itemGrid.forEach { it.update(delta) }
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
 
         val posXDelta = posX - oldPosX
@@ -109,7 +109,7 @@ class UIItemInventoryEquippedView(
 
         // slot image on each cells
         itemGrid.forEachIndexed { index, cell ->
-            cell.render(batch, camera)
+            cell.render(frameDelta, batch, camera)
             if (cell.item == null) {
                 batch.color = equipPosIconCol
                 batch.draw(equipPosIcon.get(cellToIcon[index], 1), 15f + cell.posX, 15f + cell.posY)

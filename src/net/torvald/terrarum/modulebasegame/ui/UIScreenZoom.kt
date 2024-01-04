@@ -45,7 +45,7 @@ class UIScreenZoom : UICanvas(
     override fun updateUI(delta: Float) {
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
 
         val offX = (App.scr.tvSafeGraphicsWidth * 1.25f).roundToInt().toFloat()

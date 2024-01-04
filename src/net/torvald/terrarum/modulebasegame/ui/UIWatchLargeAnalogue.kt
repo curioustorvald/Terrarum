@@ -49,7 +49,7 @@ class UIWatchLargeAnalogue() : UICanvas() {
 
     private val TWO_PI = 2.0 * Math.PI
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         TerrarumIngame.setCameraPosition(batch, App.shapeRender, camera, posX.toFloat(), posY.toFloat())
 
         val day = INGAME.world.worldTime.calendarDay - 1

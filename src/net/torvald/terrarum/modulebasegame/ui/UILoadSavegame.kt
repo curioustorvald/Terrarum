@@ -147,8 +147,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         transitionPanel.update(delta)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
-        transitionPanel.render(batch, camera)
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        transitionPanel.render(frameDelta, batch, camera)
     }
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {

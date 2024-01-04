@@ -525,7 +525,7 @@ class UIItemTextLineInput(
 
     private var textDrawOffset = 0
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         val posXDelta = posX - oldPosX
 
@@ -683,7 +683,7 @@ class UIItemTextLineInput(
         }
 
         batch.color = Color.WHITE
-        super.render(batch, camera)
+        super.render(frameDelta, batch, camera)
 
 
         oldPosX = posX

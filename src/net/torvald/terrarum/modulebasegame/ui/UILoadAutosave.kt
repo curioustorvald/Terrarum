@@ -122,7 +122,7 @@ import java.util.zip.GZIPInputStream
 
     private var loadFiredFrameCounter = 0
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         if (mode == MODE_INIT) {
             // "The Autosave is more recent than the manual save"
             Toolkit.drawTextCentered(batch, App.fontGame, Lang["GAME_MORE_RECENT_AUTOSAVE1"], Toolkit.drawWidth, 0, altSelDrawY)
@@ -131,10 +131,10 @@ import java.util.zip.GZIPInputStream
             Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_IO_MANUAL_SAVE"], altSelHdrawW, (Toolkit.drawWidth - altSelDrawW)/2, altSelDrawY + 80)
             Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_IO_AUTOSAVE"], altSelHdrawW, Toolkit.drawWidth/2, altSelDrawY + 80)
 
-            if (::loadAutoThumbButton.isInitialized) loadAutoThumbButton.render(batch, camera)
-            if (::loadManualThumbButton.isInitialized) loadManualThumbButton.render(batch, camera)
+            if (::loadAutoThumbButton.isInitialized) loadAutoThumbButton.render(frameDelta, batch, camera)
+            if (::loadManualThumbButton.isInitialized) loadManualThumbButton.render(frameDelta, batch, camera)
 
-            mainBackButton.render(batch, camera)
+            mainBackButton.render(frameDelta, batch, camera)
         }
         else if (mode == MODE_LOAD) {
             loadFiredFrameCounter += 1

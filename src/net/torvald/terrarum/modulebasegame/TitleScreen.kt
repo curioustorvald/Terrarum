@@ -358,15 +358,16 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         if (!demoWorld.layerTerrain.ptr.destroyed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
             IngameRenderer.invoke(
-                    false,
-                    1f,
-                    listOf(),
-                    listOf(),
-                    listOf(),
-                    listOf(),
-                    listOf(),
-                    particles,
-                    uiContainer = uiContainer
+                delta,
+                false,
+                1f,
+                listOf(),
+                listOf(),
+                listOf(),
+                listOf(),
+                listOf(),
+                particles,
+                uiContainer = uiContainer
             )
 
             if (KeyToggler.isOn(Input.Keys.F10)) {
@@ -598,8 +599,8 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             )
         }
 
-        override fun drawBody(batch: SpriteBatch) { }
-        override fun drawGlow(batch: SpriteBatch) { }
+        override fun drawBody(frameDelta: Float, batch: SpriteBatch) { }
+        override fun drawGlow(frameDelta: Float, batch: SpriteBatch) { }
 
         override fun update(delta: Float) {
             ai.update(this, delta)

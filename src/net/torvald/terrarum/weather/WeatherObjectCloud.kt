@@ -86,7 +86,7 @@ class WeatherObjectCloud(
         return java.lang.Float.intBitsToFloat(hi)
     }
 
-    fun render(batch: UnpackedColourSpriteBatch, cloudDrawColour0: Color, shadiness: Float) {
+    fun render(frameDelta: Float, batch: UnpackedColourSpriteBatch, cloudDrawColour0: Color, shadiness: Float) {
         val sc = screenCoord
 
 //        printdbg(this, "gamma: (${rgbGamma}, ${aGamma}) index: ($rgbGammaIndex, $aGammaIndex)")
@@ -107,7 +107,7 @@ class WeatherObjectCloud(
      * X/Y position is a bottom-centre point of the image
      * Shader must be prepared prior to the render() call
      */
-    override fun render(batch: SpriteBatch, offsetX: Float, offsetY: Float) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, offsetX: Float, offsetY: Float) {
         throw UnsupportedOperationException()
     }
 

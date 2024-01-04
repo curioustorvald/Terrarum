@@ -389,7 +389,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private var selectedWorldThumb: TextureRegion? = null
 
     val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val memoryGaugeXpos = hx - memoryGaugeWidth - gridGap/2
         val memoryGaugeYpos = y + listHeight - buttonHeight
         val textXpos = memoryGaugeXpos + 3
@@ -454,8 +454,8 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }
 
 
-        uiItems.forEach { it.render(batch, camera) }
-        if (::worldCells.isInitialized) worldCells.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
+        if (::worldCells.isInitialized) worldCells.forEach { it.render(frameDelta, batch, camera) }
 
         // control hints
         batch.color = Color.WHITE
@@ -565,8 +565,8 @@ class UIItemWorldCellsSimple(
         super.update(delta)
     }
 
-    fun render(batch: SpriteBatch, camera: OrthographicCamera, offX: Int, offY: Int) {
-        super.render(batch, camera)
+    fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera, offX: Int, offY: Int) {
+        super.render(frameDelta, batch, camera)
 
         val posX = posX + offX
         val posY = posY + offY
@@ -597,8 +597,8 @@ class UIItemWorldCellsSimple(
     }
 
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
-        render(batch, camera, 0, 0)
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        render(frameDelta, batch, camera, 0, 0)
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {

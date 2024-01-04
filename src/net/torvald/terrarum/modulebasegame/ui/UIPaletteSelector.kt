@@ -69,7 +69,7 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
 
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // draw title bar
         batch.color = UINSMenu.DEFAULT_TITLEBACKCOL
         blendNormalStraightAlpha(batch)

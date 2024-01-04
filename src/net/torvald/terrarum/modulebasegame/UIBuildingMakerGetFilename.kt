@@ -84,7 +84,7 @@ class UIBuildingMakerGetFilename : UICanvas() {
     }
 
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
 
         // draw border
@@ -111,7 +111,7 @@ class UIBuildingMakerGetFilename : UICanvas() {
             App.fontGame.draw(batch, str, 0 + LINE_HEIGHT / 2, 0 + LINE_HEIGHT / 2 + LINE_HEIGHT * index)
         }
 
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
     }
 
     private var dragOriginX = 0 // relative mousepos

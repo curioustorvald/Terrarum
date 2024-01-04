@@ -180,16 +180,16 @@ internal class UIStorageChest : UICanvas(
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]} "
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // background fill
         UIInventoryFull.drawBackground(batch, 1f)
 
         // UI items
         batch.color = Color.WHITE
 
-        catBar.render(batch, camera)
-        itemListChest.render(batch, camera)
-        itemListPlayer.render(batch, camera)
+        catBar.render(frameDelta, batch, camera)
+        itemListChest.render(frameDelta, batch, camera)
+        itemListPlayer.render(frameDelta, batch, camera)
 
 
         blendNormalStraightAlpha(batch)

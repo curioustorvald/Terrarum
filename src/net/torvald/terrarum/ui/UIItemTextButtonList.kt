@@ -224,7 +224,7 @@ class UIItemTextButtonList(
         oldPosX = posX
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         /*if (kinematic) {
             batch.color = backgroundCol
@@ -243,7 +243,7 @@ class UIItemTextButtonList(
         Toolkit.fillArea(batch, posX, posY, width, height)
 
 
-        buttons.forEach { it.render(batch, camera) }
+        buttons.forEach { it.render(frameDelta, batch, camera) }
 
 
         if (iconSpriteSheet != null) {

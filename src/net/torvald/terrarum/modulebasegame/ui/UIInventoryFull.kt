@@ -320,13 +320,13 @@ class UIInventoryFull(
     internal var yEnd = -YPOS_CORRECTION + (App.scr.height + internalHeight).div(2).toFloat()
         private set
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         drawBackground(batch, 1f)
 
         // UI items
-        catBar.render(batch, camera)
-        transitionPanel.render(batch, camera)
+        catBar.render(frameDelta, batch, camera)
+        transitionPanel.render(frameDelta, batch, camera)
 
 //        if (transitionPanel.currentPosition != 1f) INGAME.setTooltipMessage(null)
     }

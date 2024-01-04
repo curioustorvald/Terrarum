@@ -173,7 +173,7 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
 
         val txt1 = Lang["MENU_LABEL_KEYBOARD_LAYOUT"]; val tw1 = App.fontGame.getWidth(txt1)
@@ -198,7 +198,7 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
 
 
         batch.color = Color.WHITE
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
 
         shiftin = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)
         altgrin = Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT) || (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT) && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))
@@ -271,8 +271,8 @@ private class UIItemInputKeycap(
             c in 0x1DC0..0x1DFF || c in 0x20D0..0x20FF || c in 0xFE20..0xFE2F ||
             c == 0xE31 || c in 0xE33..0xE3A || c in 0xE47..0xE4E
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
-        super.render(batch, camera)
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        super.render(frameDelta, batch, camera)
 
         // key background
         batch.color = keycapFill

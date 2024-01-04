@@ -72,8 +72,8 @@ internal class FixtureTikiTorch : FixtureBase {
         spawnTimer += delta
     }
 
-    override fun drawBody(batch: SpriteBatch) {
-        super.drawBody(batch)
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
+        super.drawBody(frameDelta, batch)
     }
 
     companion object {

@@ -646,7 +646,7 @@ public class App implements ApplicationListener {
             firePostInit();
 
             currentScreen.render(UPDATE_RATE);
-            postProcessorOutFBO = TerrarumPostProcessor.INSTANCE.draw(camera.combined, renderFBO);
+            postProcessorOutFBO = TerrarumPostProcessor.INSTANCE.draw(Gdx.graphics.getDeltaTime(), camera.combined, renderFBO);
         }
 
 

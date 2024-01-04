@@ -110,11 +110,11 @@ internal class UIInventoryCells(
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         //itemList.posX = itemList.initialX + inventoryScrOffX.roundToInt()
-        itemList.render(batch, camera)
+        itemList.render(frameDelta, batch, camera)
         //equipped.posX = equipped.initialX + inventoryScrOffX.roundToInt()
-        equipped.render(batch, camera)
+        equipped.render(frameDelta, batch, camera)
 
 
         // control hints

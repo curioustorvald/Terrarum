@@ -79,7 +79,7 @@ class UIItemInventoryElemWide(
     var textHighlightMouseUpCol = Toolkit.Theme.COL_MOUSE_UP
     var textHighlightNormalCol = Color.WHITE
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
 
         highlightToMainCol = customHighlightRuleMain?.invoke(this) ?: (equippedSlot != null && highlightEquippedItem) || forceHighlighted

@@ -63,7 +63,7 @@ class UIVitalMetre(
     /**
      * g must be same as World Graphics!
      */
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // TODO now that we just can't draw arcs, we need to re-think about this
         
         /*if (vitalGetterVal() != null && vitalGetterMax() != null && player != null) {

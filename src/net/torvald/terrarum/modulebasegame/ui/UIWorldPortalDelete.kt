@@ -45,14 +45,14 @@ class UIWorldPortalDelete(private val full: UIWorldPortal) : UICanvas() {
     }
 
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         full.selectedButton?.let {
             val buttonYdelta = (App.scr.tvSafeGraphicsHeight + 172 + 36) - it.posY
             val buttonXdelta = (Toolkit.drawWidth - it.width) / 2 - it.posX
-            it.render(batch, camera, buttonXdelta, buttonYdelta)
+            it.render(frameDelta, batch, camera, buttonXdelta, buttonYdelta)
         }
 
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
 
         batch.color = Color.WHITE
         // ui title

@@ -66,7 +66,7 @@ class Notification : UICanvas() {
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
         fontCol.a = handler.opacity * OPACITY
 

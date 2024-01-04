@@ -112,7 +112,7 @@ class UIWorldPortalUseInvitation(val full: UIWorldPortal) : UICanvas() {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // error messages
         if (importReturnCode != 0) {
             batch.color = Toolkit.Theme.COL_RED
@@ -128,7 +128,7 @@ class UIWorldPortalUseInvitation(val full: UIWorldPortal) : UICanvas() {
         // control hints
         App.fontGame.draw(batch, full.portalListingControlHelp, 2 + (Toolkit.drawWidth - 560)/2 + 2, (full.yEnd - 20).toInt())
 
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
     }
 
     override fun dispose() {

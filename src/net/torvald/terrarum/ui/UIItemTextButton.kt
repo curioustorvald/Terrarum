@@ -75,7 +75,7 @@ open class UIItemTextButton(
         super.update(delta)
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val textW = font.getWidth(label)
         val fontX = when (alignment) {
             Alignment.CENTRE -> posX + width.minus(textW).div(2) + (paddingLeft - paddingRight).div(2)

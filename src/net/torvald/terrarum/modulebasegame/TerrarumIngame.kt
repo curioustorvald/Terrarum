@@ -50,6 +50,7 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.toIntAndFrac
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.Toolkit.hdrawWidth
 import net.torvald.terrarum.ui.UIAutosaveNotifier
@@ -971,10 +972,20 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             paused = true
         }
 
+
+        if (KeyToggler.isOn(Input.Keys.F10)) {
+            batch.inUse {
+                batch.color = Color.WHITE
+                App.fontSmallNumbers.draw(batch, "$ccY\u00DCupd $ccG${delta.toIntAndFrac(1)}", 2f, App.scr.height - 16f)
+                _dbgDeltaUpd = delta
+            }
+        }
     }
 
+    private var _dbgDeltaUpd = 0f
 
-    private val renderGame = { delta: Float ->
+
+    private val renderGame = { frameDelta: Float ->
         Gdx.graphics.setTitle(getCanonicalTitle())
 
         WorldCamera.update(world, actorNowPlaying)
@@ -994,16 +1005,17 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         if (uiFixture?.isClosed == true) { uiFixture = null }
 
         IngameRenderer.invoke(
-                paused,
-                screenZoom,
-                visibleActorsRenderBehind,
-                visibleActorsRenderMiddle,
-                visibleActorsRenderMidTop,
-                visibleActorsRenderFront,
-                visibleActorsRenderOverlay,
-                particlesContainer,
-                actorNowPlaying,
-                uiContainer// + uiFixture
+            frameDelta,
+            paused,
+            screenZoom,
+            visibleActorsRenderBehind,
+            visibleActorsRenderMiddle,
+            visibleActorsRenderMidTop,
+            visibleActorsRenderFront,
+            visibleActorsRenderOverlay,
+            particlesContainer,
+            actorNowPlaying,
+            uiContainer// + uiFixture
         )
 
         // quick and dirty way to show
@@ -1033,6 +1045,16 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                         )
                     }
                 }
+            }
+        }
+
+
+        if (KeyToggler.isOn(Input.Keys.F10)) {
+            batch.inUse {
+                batch.color = Color.WHITE
+                App.fontSmallNumbers.draw(batch, "$ccY\u00DCupd $ccG${_dbgDeltaUpd.toIntAndFrac(1)}", 2f, App.scr.height - 16f)
+                App.fontSmallNumbers.draw(batch, "$ccY\u00DCren $ccG${frameDelta.toIntAndFrac(1)}", 2f + 7*12, App.scr.height - 16f)
+                App.fontSmallNumbers.draw(batch, "$ccY\u00DCgdx $ccG${Gdx.graphics.deltaTime.toIntAndFrac(1)}", 2f + 7*24, App.scr.height - 16f)
             }
         }
     }

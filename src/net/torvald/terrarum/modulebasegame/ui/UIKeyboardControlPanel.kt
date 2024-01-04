@@ -206,13 +206,13 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         controlPalette.update(delta)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 //        batch.color = borderNormal
 //        Toolkit.drawBoxBorder(batch, drawX, drawY, width, height)
 //        batch.color = fillCol
 //        Toolkit.fillArea(batch, drawX, drawY, width, height)
-        uiItems.forEach { it.render(batch, camera) }
-        presetSelector.render(batch, camera)
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
+        presetSelector.render(frameDelta, batch, camera)
 
         // title
         // todo show "Keyboard"/"Gamepad" accordingly
@@ -228,7 +228,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         // action palette
         batch.color = Color.WHITE
         if (keycapClicked >= 0 && controlSelected < 0) {
-            controlPalette.render(batch, camera)
+            controlPalette.render(frameDelta, batch, camera)
         }
     }
 
@@ -342,8 +342,8 @@ private class UIItemKeycap(
         super.update(delta)
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
-        super.render(batch, camera)
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        super.render(frameDelta, batch, camera)
 
         batch.color = if (key == null)
             borderKeyForbidden
@@ -455,21 +455,21 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
         )
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
-        super.render(batch, camera)
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        super.render(frameDelta, batch, camera)
 
         Toolkit.drawBaloon(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
 
         iconButtons.forEach {
             batch.color = buttonBackground
             Toolkit.fillArea(batch, it.posX-4, it.posY-4, 28, 28)
-            it.render(batch, camera)
+            it.render(frameDelta, batch, camera)
             batch.color = Color(batch.color.r, batch.color.g, batch.color.b, batch.color.a * (if (it.mouseUp) 0.9f else 0.6f))
             Toolkit.drawBoxBorder(batch, it.posX-4, it.posY-4, 28, 28)
         }
 
-        closeButton1.render(batch, camera)
-        closeButton2.render(batch, camera)
+        closeButton1.render(frameDelta, batch, camera)
+        closeButton2.render(frameDelta, batch, camera)
 
         // texts. Sorted in the same way as UIItemControlPaletteBaloon.iconButtons
         batch.color = Color.WHITE

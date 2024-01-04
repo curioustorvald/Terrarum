@@ -64,7 +64,7 @@ class UIWorldPortalRename(private val full: UIWorldPortal) : UICanvas() {
 
     private var oldPosX = full.posX
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val posXDelta = posX - oldPosX
 
         // ugh why won't you just scroll along??
@@ -78,14 +78,14 @@ class UIWorldPortalRename(private val full: UIWorldPortal) : UICanvas() {
         full.selectedButton?.let {
             val buttonYdelta = (App.scr.tvSafeGraphicsHeight + 172 + 36) - it.posY
             val buttonXdelta = (Toolkit.drawWidth - it.width) / 2 - it.posX
-            it.render(batch, camera, buttonXdelta, buttonYdelta)
+            it.render(frameDelta, batch, camera, buttonXdelta, buttonYdelta)
         }
 
         // control hints
         batch.color = Color.WHITE
         App.fontGame.draw(batch, full.portalListingControlHelp, (Toolkit.drawWidth - width)/2 + 2, (full.yEnd - 20).toInt())
 
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
 
         oldPosX = posX
     }

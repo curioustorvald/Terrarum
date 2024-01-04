@@ -92,10 +92,10 @@ class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
         deferred(); deferred = {}
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // the actual control panel
         ControlPanelCommon.render("basegame.modcontrolpanel.$currentlySelectedModule", width, batch)
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
     }
 
     override fun dispose() {

@@ -36,8 +36,8 @@ class BTeXDocument {
         pages.last().appendDrawCall(drawCall)
     }
 
-    fun render(batch: SpriteBatch, page: Int, x: Int, y: Int) {
-        pages[page].render(batch, x, y)
+    fun render(frameDelta: Float, batch: SpriteBatch, page: Int, x: Int, y: Int) {
+        pages[page].render(frameDelta, batch, x, y)
     }
 }
 
@@ -52,7 +52,7 @@ class BTeXPage(
         drawCalls.add(drawCall)
     }
 
-    fun render(batch: SpriteBatch, x: Int, y: Int) {
+    fun render(frameDelta: Float, batch: SpriteBatch, x: Int, y: Int) {
         batch.color = back
         Toolkit.fillArea(batch, x, y, width, height)
         drawCalls.forEach {

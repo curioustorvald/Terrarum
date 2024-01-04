@@ -25,7 +25,7 @@ class UIProxyNewRandomGame(val remoCon: UIRemoCon) : UICanvas() {
     override fun updateUI(delta: Float) {
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
     }
 
     override fun doOpening(delta: Float) {

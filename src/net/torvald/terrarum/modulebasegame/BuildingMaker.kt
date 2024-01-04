@@ -118,12 +118,12 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             this.actorValue[AVKey.LUMG] = 1.0
         }
 
-        override fun drawBody(batch: SpriteBatch) {
+        override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
             batch.color = toolCursorColour[currentPenMode]
             batch.draw(blockMarkings.get(currentPenMode, 0), hitbox.startX.toFloat(), hitbox.startY.toFloat())
         }
 
-        override fun drawGlow(batch: SpriteBatch) { }
+        override fun drawGlow(frameDelta: Float, batch: SpriteBatch) { }
 
         override fun dispose() {
         }
@@ -152,7 +152,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         override var referenceID: ActorID = blockPosToRefID(x, y) // custom refID
         override val hitbox = Hitbox(x * 16.0, y * 16.0, 16.0, 16.0)
 
-        override fun drawBody(batch: SpriteBatch) {
+        override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
             batch.color = blockMarkerColour
             drawSpriteInGoodPosition(blockMarkings.get(2,0), batch)
         }
@@ -188,7 +188,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             }
         }
 
-        override fun drawGlow(batch: SpriteBatch) { }
+        override fun drawGlow(frameDelta: Float, batch: SpriteBatch) { }
 
         override fun update(delta: Float) { }
 
@@ -458,7 +458,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private val renderGame = { delta: Float ->
         _testMarkerDrawCalls = 0L
 
-        IngameRenderer.invoke(false,
+        IngameRenderer.invoke(delta, false,
                 screenZoom,
                 listOf(),
                 listOf(),
@@ -696,10 +696,10 @@ class MovableWorldCamera(val parent: BuildingMaker) : ActorHumanoid(0, physProp 
         this.hitbox.hitboxStart.setCoerceIn(coerceInStart, coerceInEnd)
     }
 
-    override fun drawBody(batch: SpriteBatch) {
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
     }
 
-    override fun drawGlow(batch: SpriteBatch) {
+    override fun drawGlow(frameDelta: Float, batch: SpriteBatch) {
     }
 
     override fun onActorValueChange(key: String, value: Any?) {

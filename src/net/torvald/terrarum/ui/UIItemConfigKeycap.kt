@@ -40,7 +40,7 @@ class UIItemConfigKeycap(
         super.update(delta)
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // draw keycap
         batch.draw(capTex.get(0, 0), posX.toFloat(), posY.toFloat())
         batch.draw(capTex.get(1, 0), (posX + capTex.tileW).toFloat(), posY.toFloat(),
@@ -54,7 +54,7 @@ class UIItemConfigKeycap(
         // draw icon
         
 
-        super.render(batch, camera)
+        super.render(frameDelta, batch, camera)
     }
 
     override fun dispose() {

@@ -104,7 +104,7 @@ class ConsoleWindow : UICanvas() {
         textinput.isEnabled = (isOpened && !isClosing)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // background
         batch.color = UIColour
         Toolkit.fillArea(batch, drawOffX, drawOffY, width.toFloat(), height.toFloat())
@@ -132,7 +132,7 @@ class ConsoleWindow : UICanvas() {
             App.fontGame.draw(batch, message, 1f + drawOffX, (LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT - i)).toFloat() + drawOffY + inputToMsgboxGap)
         }
 
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
     }
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {

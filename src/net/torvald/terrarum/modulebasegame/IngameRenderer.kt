@@ -202,16 +202,17 @@ object IngameRenderer : Disposable {
     private var oldCamX = 0
 
     operator fun invoke(
-            gamePaused: Boolean,
-            zoom: Float = 1f,
-            actorsRenderBehind : List<ActorWithBody>,
-            actorsRenderMiddle : List<ActorWithBody>,
-            actorsRenderMidTop : List<ActorWithBody>,
-            actorsRenderFront  : List<ActorWithBody>,
-            actorsRenderOverlay: List<ActorWithBody>,
-            particlesContainer : CircularArray<ParticleBase>,
-            player: ActorWithBody? = null,
-            uiContainer: UIContainer? = null,
+        frameDelta: Float,
+        gamePaused: Boolean,
+        zoom: Float = 1f,
+        actorsRenderBehind : List<ActorWithBody>,
+        actorsRenderMiddle : List<ActorWithBody>,
+        actorsRenderMidTop : List<ActorWithBody>,
+        actorsRenderFront  : List<ActorWithBody>,
+        actorsRenderOverlay: List<ActorWithBody>,
+        particlesContainer : CircularArray<ParticleBase>,
+        player: ActorWithBody? = null,
+        uiContainer: UIContainer? = null,
     ) {
         renderingActorsCount = (actorsRenderBehind.size) +
                                (actorsRenderMiddle.size) +
@@ -239,9 +240,9 @@ object IngameRenderer : Disposable {
 
             prepLightmapRGBA()
             BlocksDrawer.renderData()
-            drawToRGB(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
-            drawToA(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
-            drawOverlayActors(actorsRenderOverlay)
+            drawToRGB(frameDelta, actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
+            drawToA(frameDelta, actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
+            drawOverlayActors(frameDelta, actorsRenderOverlay)
         }
 
         batch.color = Color.WHITE
@@ -263,7 +264,7 @@ object IngameRenderer : Disposable {
 
             // draw sky
             measureDebugTime("WeatherMixer.render") {
-                WeatherMixer.render(camera, batch, world)
+                WeatherMixer.render(frameDelta, camera, batch, world)
             }
 
 
@@ -403,7 +404,7 @@ object IngameRenderer : Disposable {
 
             if (!KeyToggler.isOn(Input.Keys.F4)) {
                 uiContainer?.forEach {
-                    it?.render(batch, camera)
+                    it?.render(frameDelta, batch, camera)
                 }
             }
         }
@@ -449,12 +450,13 @@ object IngameRenderer : Disposable {
     }
 
     private fun drawToRGB(
-            actorsRenderBehind: List<ActorWithBody>?,
-            actorsRenderMiddle: List<ActorWithBody>?,
-            actorsRenderMidTop: List<ActorWithBody>?,
-            actorsRenderFront : List<ActorWithBody>?,
-            actorsOverlay : List<ActorWithBody>?,
-            particlesContainer: CircularArray<ParticleBase>?
+        frameDelta: Float,
+        actorsRenderBehind: List<ActorWithBody>?,
+        actorsRenderMiddle: List<ActorWithBody>?,
+        actorsRenderMidTop: List<ActorWithBody>?,
+        actorsRenderFront : List<ActorWithBody>?,
+        actorsOverlay : List<ActorWithBody>?,
+        particlesContainer: CircularArray<ParticleBase>?
     ) {
         fboRGB.inAction(null, null) { clearBuffer() }
         fboRGB_lightMixed.inAction(null, null) { clearBuffer() }
@@ -468,8 +470,8 @@ object IngameRenderer : Disposable {
                 batch.shader = shaderForActors
                 batch.color = Color.WHITE
                 moveCameraToWorldCoord()
-                actorsRenderBehind?.forEach { it.drawBody(batch) }
-                particlesContainer?.forEach { it.drawBody(batch) }
+                actorsRenderBehind?.forEach { it.drawBody(frameDelta, batch) }
+                particlesContainer?.forEach { it.drawBody(frameDelta, batch) }
             }
 
             setCameraPosition(0f, 0f)
@@ -483,10 +485,10 @@ object IngameRenderer : Disposable {
                 // draw actors //
                 /////////////////
                 moveCameraToWorldCoord()
-                actorsRenderMiddle?.forEach { it.drawBody(batch) }
-                actorsRenderMidTop?.forEach { it.drawBody(batch) }
-                player?.drawBody(batch)
-                actorsRenderFront?.forEach { it.drawBody(batch) }
+                actorsRenderMiddle?.forEach { it.drawBody(frameDelta, batch) }
+                actorsRenderMidTop?.forEach { it.drawBody(frameDelta, batch) }
+                player?.drawBody(frameDelta, batch)
+                actorsRenderFront?.forEach { it.drawBody(frameDelta, batch) }
                 // --> Change of blend mode <-- introduced by children of ActorWithBody //
             }
 
@@ -558,12 +560,13 @@ object IngameRenderer : Disposable {
     }
 
     private fun drawToA(
-            actorsRenderBehind: List<ActorWithBody>?,
-            actorsRenderMiddle: List<ActorWithBody>?,
-            actorsRenderMidTop: List<ActorWithBody>?,
-            actorsRenderFront : List<ActorWithBody>?,
-            actorsOverlay : List<ActorWithBody>?,
-            particlesContainer: CircularArray<ParticleBase>?
+        frameDelta: Float,
+        actorsRenderBehind: List<ActorWithBody>?,
+        actorsRenderMiddle: List<ActorWithBody>?,
+        actorsRenderMidTop: List<ActorWithBody>?,
+        actorsRenderFront : List<ActorWithBody>?,
+        actorsOverlay : List<ActorWithBody>?,
+        particlesContainer: CircularArray<ParticleBase>?
     ) {
         fboA.inAction(null, null) {
             clearBuffer()
@@ -582,8 +585,8 @@ object IngameRenderer : Disposable {
                 batch.color = Color.WHITE
 
                 moveCameraToWorldCoord()
-                actorsRenderBehind?.forEach { it.drawGlow(batch) }
-                particlesContainer?.forEach { it.drawGlow(batch) }
+                actorsRenderBehind?.forEach { it.drawGlow(frameDelta, batch) }
+                particlesContainer?.forEach { it.drawGlow(frameDelta, batch) }
             }
 
             setCameraPosition(0f, 0f)
@@ -594,10 +597,10 @@ object IngameRenderer : Disposable {
                 // draw actors //
                 /////////////////
                 moveCameraToWorldCoord()
-                actorsRenderMiddle?.forEach { it.drawGlow(batch) }
-                actorsRenderMidTop?.forEach { it.drawGlow(batch) }
-                player?.drawGlow(batch)
-                actorsRenderFront?.forEach { it.drawGlow(batch) }
+                actorsRenderMiddle?.forEach { it.drawGlow(frameDelta, batch) }
+                actorsRenderMidTop?.forEach { it.drawGlow(frameDelta, batch) }
+                player?.drawGlow(frameDelta, batch)
+                actorsRenderFront?.forEach { it.drawGlow(frameDelta, batch) }
                 // --> Change of blend mode <-- introduced by children of ActorWithBody //
             }
         }
@@ -647,7 +650,7 @@ object IngameRenderer : Disposable {
         blendNormalStraightAlpha(batch)
     }
 
-    private fun drawOverlayActors(actors: List<ActorWithBody>?) {
+    private fun drawOverlayActors(frameDelta: Float, actors: List<ActorWithBody>?) {
         fboRGB_lightMixed.inActionF(camera, batch) {
 
             setCameraPosition(0f, 0f)
@@ -659,7 +662,7 @@ object IngameRenderer : Disposable {
 
                 moveCameraToWorldCoord()
                 actors?.forEach {
-                    it.drawBody(batch)
+                    it.drawBody(frameDelta, batch)
                 }
             }
 

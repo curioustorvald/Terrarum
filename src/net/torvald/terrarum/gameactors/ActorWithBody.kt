@@ -1782,17 +1782,17 @@ open class ActorWithBody : Actor {
         )
     }
 
-    open fun drawGlow(batch: SpriteBatch) {
+    open fun drawGlow(frameDelta: Float, batch: SpriteBatch) {
         if (isVisible && spriteGlow != null) {
             blendNormalStraightAlpha(batch)
-            drawSpriteInGoodPosition(spriteGlow!!, batch)
+            drawSpriteInGoodPosition(frameDelta, spriteGlow!!, batch)
         }
     }
 
-    open fun drawBody(batch: SpriteBatch) {
+    open fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         if (isVisible && sprite != null) {
             BlendMode.resolve(drawMode, batch)
-            drawSpriteInGoodPosition(sprite!!, batch)
+            drawSpriteInGoodPosition(frameDelta, sprite!!, batch)
         }
 
         // debug display of hIntTilewiseHitbox
@@ -1813,7 +1813,7 @@ open class ActorWithBody : Actor {
         }
     }
 
-    protected fun drawSpriteInGoodPosition(sprite: SpriteAnimation, batch: SpriteBatch) {
+    protected fun drawSpriteInGoodPosition(frameDelta: Float, sprite: SpriteAnimation, batch: SpriteBatch) {
         if (world == null) return
 
         val offsetX = 0f
@@ -1823,7 +1823,7 @@ open class ActorWithBody : Actor {
         val posY = hitbox.startY.plus(PHYS_EPSILON_DIST).toFloat()
 
         drawBodyInGoodPosition(posX, posY) { x, y ->
-            sprite.render(batch, x + offsetX, y + offsetY, scale.toFloat())
+            sprite.render(frameDelta, batch, x + offsetX, y + offsetY, scale.toFloat())
         }
     }
 

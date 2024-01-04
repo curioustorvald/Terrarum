@@ -49,9 +49,9 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         ControlPanelCommon.render("basegame.graphicscontrolpanel", width, batch)
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
 
         if (App.getConfigBoolean("fx_streamerslayout")) {
             val xstart = App.scr.width - App.scr.chatWidth

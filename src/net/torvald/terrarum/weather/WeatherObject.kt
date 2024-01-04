@@ -28,6 +28,6 @@ abstract class WeatherObject : Disposable {
     var flagToDespawn = false
 
     abstract fun update()
-    abstract fun render(batch: SpriteBatch, offsetX: Float, offsetY: Float)
+    abstract fun render(frameDelta: Float, batch: SpriteBatch, offsetX: Float, offsetY: Float)
 
 }

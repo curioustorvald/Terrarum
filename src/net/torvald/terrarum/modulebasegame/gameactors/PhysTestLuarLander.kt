@@ -41,10 +41,10 @@ class PhysTestLuarLander : ActorWithBody(RenderOrder.MIDTOP, PhysProperties.PHYS
         return true
     }
 
-    override fun drawGlow(batch: SpriteBatch) {
+    override fun drawGlow(frameDelta: Float, batch: SpriteBatch) {
     }
 
-    override fun drawBody(batch: SpriteBatch) {
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         batch.color = Color.WHITE
         batch.draw(texture, hitbox.startX.toFloat(), hitbox.endY.toFloat(), hitbox.width.toFloat(), -hitbox.height.toFloat())
     }

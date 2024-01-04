@@ -150,7 +150,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
         parent.tappedOnUI = true
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // draw back
         batch.color = backCol
         Toolkit.fillCircle(batch,0, 0, SIZE, SIZE)
@@ -194,7 +194,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
 
         // draw icons
         toolButtons.forEach {
-            it.render(batch, camera)
+            it.render(frameDelta, batch, camera)
         }
     }
 

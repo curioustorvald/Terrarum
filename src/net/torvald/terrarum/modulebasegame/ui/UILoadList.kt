@@ -171,7 +171,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
 
         val cells = playerCells
@@ -190,7 +190,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
                         it.posX += uiXdiffChatOverlay
 
                     if (index in listScroll - 2 until listScroll + savesVisible + 2)
-                        it.render(batch, camera)
+                        it.render(frameDelta, batch, camera)
 
                     if (App.getConfigBoolean("fx_streamerslayout"))
                         it.posX -= uiXdiffChatOverlay

@@ -54,7 +54,7 @@ open class UIItemImageButton(
     var highlighted = false
     var extraDrawOp: (UIItem, SpriteBatch) -> Unit = { _,_ -> }
 
-    fun render(batch: SpriteBatch, camera: OrthographicCamera, offX: Int, offY: Int) {
+    fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera, offX: Int, offY: Int) {
         val posX = this.posX + offX
         val posY = this.posY + offY
 
@@ -93,8 +93,8 @@ open class UIItemImageButton(
         extraDrawOp(this, batch)
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
-        render(batch, camera, 0, 0)
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        render(frameDelta, batch, camera, 0, 0)
     }
 
     override fun dispose() {

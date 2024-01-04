@@ -16,7 +16,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 abstract class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
     protected abstract val currentDelay: Second
     abstract fun update(delta: Float)
-    abstract fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float = 1f)
+    abstract fun render(frameDelta: Float, batch: SpriteBatch, posX: Float, posY: Float, scale: Float = 1f)
 
     var flipHorizontal = false
     var flipVertical = false
@@ -143,7 +143,7 @@ class SheetSpriteAnimation(parentActor: ActorWithBody) : SpriteAnimation(parentA
      * *
      * @param scale
      */
-    override fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, posX: Float, posY: Float, scale: Float) {
         assert(cellWidth > 0 || cellHeight > 0) {
             "Sprite width or height is set to zero! ($cellWidth, $cellHeight); master: $parentActor"
         }

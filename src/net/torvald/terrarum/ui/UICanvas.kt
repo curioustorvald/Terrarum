@@ -120,8 +120,8 @@ abstract class UICanvas(
         handler.update(this, delta)
     }
     /** Called by the screen */
-    fun render(batch: SpriteBatch, camera: OrthographicCamera, parentOpacity: Float = 1f) {
-        handler.render(this, batch, camera, parentOpacity)
+    fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera, parentOpacity: Float = 1f) {
+        handler.render(this, frameDelta, batch, camera, parentOpacity)
     }
 
 
@@ -156,7 +156,7 @@ abstract class UICanvas(
      * The transparency of the handler is independent of the draw, you must set the drawing color yourself
      * (use handler.opacity or handler.opacityColour)
      */
-    abstract fun renderUI(batch: SpriteBatch, camera: OrthographicCamera)
+    abstract fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera)
 
     /**
      * Do not modify ui.handler.openCloseCounter here.

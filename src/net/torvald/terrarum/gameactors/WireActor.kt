@@ -72,7 +72,7 @@ class WireActor : ActorWithBody, NoSerialise {
     override fun update(delta: Float) {
     }
 
-    override fun drawBody(batch: SpriteBatch) {
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         if (isVisible && sprite != null) {
             if (WireCodex[wireID].accepts == "digital_3bits") {
                 // "digital_3bits" must come right after three wires it bundles
@@ -89,7 +89,7 @@ class WireActor : ActorWithBody, NoSerialise {
             }
 
             BlendMode.resolve(drawMode, batch)
-            drawSpriteInGoodPosition(sprite!!, batch)
+            drawSpriteInGoodPosition(frameDelta, sprite!!, batch)
         }
     }
 }

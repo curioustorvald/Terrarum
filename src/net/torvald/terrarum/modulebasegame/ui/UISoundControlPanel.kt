@@ -41,9 +41,9 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         ControlPanelCommon.render("basegame.soundcontrolpanel", width, batch)
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
     }
 
     override fun dispose() {

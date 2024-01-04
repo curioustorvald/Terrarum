@@ -49,10 +49,10 @@ open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
         scrollbar?.update(delta)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
-        textArea.render(batch, camera)
-        scrollbar?.render(batch, camera)
+        textArea.render(frameDelta, batch, camera)
+        scrollbar?.render(frameDelta, batch, camera)
 
         //AppLoader.printdbg(this, "Rendering texts of length ${text.size}")
     }
@@ -120,7 +120,7 @@ class UISystemInfo(val remoCon: UIRemoCon) : UICanvas() {
         uptime = App.getTIME_T() - App.startupTime
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         var i = 0
 
         v.forEach { (k, v0) ->

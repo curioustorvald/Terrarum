@@ -165,7 +165,7 @@ class AssembledSpriteAnimation(
         } ?: throw NullPointerException("Animation with name '$animNameRoot' is not found")
     }
 
-    override fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, posX: Float, posY: Float, scale: Float) {
         if (parentActor.isVisible) {
             batch.color = colourFilter
             renderThisAnimation(batch, posX, posY, scale, "${currentAnimation}_${1+currentFrame}")

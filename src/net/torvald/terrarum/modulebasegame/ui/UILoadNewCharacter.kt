@@ -22,7 +22,7 @@ class UILoadNewCharacter(val full: UILoadSavegame) : UICanvas() {
         TODO("Not yet implemented")
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         TODO("Not yet implemented")
     }
 

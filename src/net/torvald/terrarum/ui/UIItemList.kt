@@ -121,7 +121,7 @@ class UIItemList<Item: UIItem>(
         oldPosX = posX
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = backgroundCol
         BlendMode.resolve(backgroundBlendMode, batch)
         Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
@@ -132,7 +132,7 @@ class UIItemList<Item: UIItem>(
             Toolkit.fillArea(batch, posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
         }
 
-        itemList.forEach { it.render(batch, camera) }
+        itemList.forEach { it.render(frameDelta, batch, camera) }
 
         batch.color = backgroundCol
     }

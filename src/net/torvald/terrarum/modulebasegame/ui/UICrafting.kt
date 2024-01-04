@@ -443,9 +443,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         if (openingClickLatched && !Terrarum.mouseDown) openingClickLatched = false
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // NO super.render due to an infinite recursion
-        this.uiItems.forEach { it.render(batch, camera) }
+        this.uiItems.forEach { it.render(frameDelta, batch, camera) }
 
         batch.color = Color.WHITE
 

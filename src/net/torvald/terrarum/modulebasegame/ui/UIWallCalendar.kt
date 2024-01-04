@@ -79,7 +79,7 @@ class UIWallCalendar : UICanvas(
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         UIInventoryFull.drawBackground(batch, 1f)
 
         val thisYear = INGAME.world.worldTime.years

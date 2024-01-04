@@ -344,15 +344,15 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
     private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         if (mode != MODE_SHOW_LOAD_ORDER) {
             val buttonYdelta = (full.titleTopGradEnd) - full.playerButtonSelected!!.posY
-            full.playerButtonSelected!!.render(batch, camera, 0, buttonYdelta)
+            full.playerButtonSelected!!.render(frameDelta, batch, camera, 0, buttonYdelta)
         }
 
         when (mode) {
             MODE_INIT -> {
-                mainButtons.forEach { it.render(batch, camera) }
+                mainButtons.forEach { it.render(frameDelta, batch, camera) }
 
                 // draw thumbnails of the most recent game
 //                val tex = screencap ?: CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
@@ -378,11 +378,11 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                 Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_SAVE_WILL_BE_DELETED"], Toolkit.drawWidth, 0, full.titleTopGradEnd + full.cellInterval + SAVE_CELL_HEIGHT + 36)
                 Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_ARE_YOU_SURE"], Toolkit.drawWidth, 0, full.titleTopGradEnd + full.cellInterval + SAVE_CELL_HEIGHT + 36 + 24)
 
-                delButtons.forEach { it.render(batch, camera) }
+                delButtons.forEach { it.render(frameDelta, batch, camera) }
             }
             MODE_RENAME -> {
-                renameInput.render(batch, camera)
-                renameButtons.forEach { it.render(batch, camera) }
+                renameInput.render(frameDelta, batch, camera)
+                renameButtons.forEach { it.render(frameDelta, batch, camera) }
             }
             MODE_LOAD -> {
                 loadFiredFrameCounter += 1
@@ -417,7 +417,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                     App.fontGame.draw(batch, s, wx64, modulesBoxBaseY + 32 + App.fontGame.lineHeight.toInt() * index)
                 }
 
-                modulesBackButton.render(batch, camera)
+                modulesBackButton.render(frameDelta, batch, camera)
             }
             MODE_PREV_SAVES -> {
                 val modulesBoxBaseY2 = full.titleTopGradEnd + SAVE_CELL_HEIGHT + listGap + 4
@@ -449,7 +449,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                     }
                 }
 
-                modulesBackButton.render(batch, camera)
+                modulesBackButton.render(frameDelta, batch, camera)
             }
         }
     }

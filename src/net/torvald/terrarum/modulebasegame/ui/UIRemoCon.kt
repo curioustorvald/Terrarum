@@ -220,9 +220,9 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
         openUI = external
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
-        remoConTray.render(batch, camera)
-        openUI?.render(batch, camera)
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        remoConTray.render(frameDelta, batch, camera)
+        openUI?.render(frameDelta, batch, camera)
     }
 
     override fun doOpening(delta: Float) {
@@ -314,8 +314,8 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
             menubar.update(delta)
         }
 
-        fun render(batch: SpriteBatch, camera: OrthographicCamera) {
-            menubar.render(batch, camera)
+        fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+            menubar.render(frameDelta, batch, camera)
         }
 
         // nullifies currently selected item

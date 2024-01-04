@@ -307,7 +307,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         if (mode == 2) {
             loadFired += 1
@@ -348,7 +348,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
                             it.posX += uiXdiffChatOverlay
 
                         if (index in listScroll - 2 until listScroll + savesVisible + 2)
-                            it.render(batch, camera)
+                            it.render(frameDelta, batch, camera)
 
                         if (App.getConfigBoolean("fx_streamerslayout"))
                             it.posX -= uiXdiffChatOverlay
@@ -607,7 +607,7 @@ class UIItemPlayerCells(
 
     private val avatarViewWidth = 120
 
-    fun render(batch: SpriteBatch, camera: OrthographicCamera, offX: Int, offY: Int) {
+    fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera, offX: Int, offY: Int) {
         // try to generate a texture
         if (!hasTexture) { acquirePlayerAvatar(); hasTexture = true }
 
@@ -677,8 +677,8 @@ class UIItemPlayerCells(
         }
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
-        render(batch, camera, 0, 0)
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        render(frameDelta, batch, camera, 0, 0)
     }
 
     private fun acquirePlayerAvatar() {
@@ -846,7 +846,7 @@ class UIItemWorldCells(
         highlightCol = if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_LIST_DEFAULT
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // try to generate a texture
         if (skimmer.initialised && !hasTexture) {
             // load thumbnail or use stock if the file is not there
@@ -904,7 +904,7 @@ class UIItemWorldCells(
         if (saveDamaged) batch.color = colourBad
         App.fontGame.draw(batch, saveName, x + 3f, y + -1f)
 
-        super.render(batch, camera)
+        super.render(frameDelta, batch, camera)
         batch.color = Color.WHITE
     }
 

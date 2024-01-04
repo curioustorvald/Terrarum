@@ -110,11 +110,11 @@ class UITitleLanguage(remoCon: UIRemoCon?) : UICanvas() {
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         batch.color = Color.WHITE
-        textArea1.render(batch, camera)
-        textArea2.render(batch, camera)
+        textArea1.render(frameDelta, batch, camera)
+        textArea2.render(frameDelta, batch, camera)
     }
 
     override fun show() {

@@ -118,7 +118,7 @@ class UIItemSpinner(
         fboUpdateLatch = true
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         batch.end()
 
@@ -186,7 +186,7 @@ class UIItemSpinner(
 //        batch.draw(fbo.colorBufferTexture, posX + buttonW + 3f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
         App.fontGame.draw(batch, textCache, posX + buttonW + 3f + (fboWidth - textCacheLen).div(2), posY.toFloat())
 
-        super.render(batch, camera)
+        super.render(frameDelta, batch, camera)
 
 //        batch.color = Color.WHITE
 //        App.fontSmallNumbers.draw(batch, "${valueType.simpleName}", posX.toFloat(), posY.toFloat()) // draws "Integer" or "Double"

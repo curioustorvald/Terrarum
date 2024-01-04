@@ -35,7 +35,7 @@ abstract class UIItemInventoryCellBase(
         var colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme
 ) : UIItem(parentUI, initialX, initialY) {
     abstract override fun update(delta: Float)
-    abstract override fun render(batch: SpriteBatch, camera: OrthographicCamera)
+    abstract override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera)
 
     /** Custom highlight rule to highlight tihs button to primary accent colour (blue by default).
      * Set to `null` to use default rule:

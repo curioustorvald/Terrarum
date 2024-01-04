@@ -33,7 +33,7 @@ class UIItemSaving(parentUI: UICanvas, initialX: Int, initialY: Int) : UIItem(pa
     init {
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // these things will not scroll along with the parent GUI!
         val t = if ((INGAME as TerrarumIngame).uiAutosaveNotifier.isVisible) Lang["MENU_IO_WAITING_AUTOSAVE_TO_FINISH"] else Lang["MENU_IO_SAVING"]
         val tlen = App.fontGame.getWidth(t)

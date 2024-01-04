@@ -96,7 +96,7 @@ open class DroppedItem : ActorWithBody {
     }
 
 
-    override fun drawBody(batch: SpriteBatch) {
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         // deserialiser won't call setter of the fields
         if (visualItemID == "") {
             visualItemID = BlockCodex.getOrNull(itemID)?.world ?: itemID

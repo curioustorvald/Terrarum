@@ -159,7 +159,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")
 
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val memoryGaugeXpos = hx - memoryGaugeWidth/2
         val memoryGaugeYpos = drawY + sizeSelY + buttonHeight + 10
         val textXpos = memoryGaugeXpos + 3
@@ -233,7 +233,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
         batch.color = Color.WHITE
         App.fontGame.draw(batch, full.portalListingControlHelp, 2 + (Toolkit.drawWidth - 560)/2 + 2, (full.yEnd - 20).toInt())
 
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
 
         oldPosX = posX
     }

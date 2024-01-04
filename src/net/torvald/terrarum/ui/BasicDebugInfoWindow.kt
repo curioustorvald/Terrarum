@@ -128,7 +128,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val tileCursX = 0; private val tileCursY = 4
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         TerrarumIngame.setCameraPosition(batch, App.shapeRender, camera, 0f, 0f)
 
         // toggle show-something

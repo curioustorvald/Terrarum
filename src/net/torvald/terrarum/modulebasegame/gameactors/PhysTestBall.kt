@@ -24,7 +24,7 @@ class PhysTestBall : ActorWithBody(RenderOrder.MIDDLE, PhysProperties.PHYSICS_OB
         color = RoguelikeRandomiser.composeColourFrom(RoguelikeRandomiser.POTION_PRIMARY_COLSET)
     }
 
-    override fun drawBody(batch: SpriteBatch) {
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         /*Terrarum.inShapeRenderer {
             it.color = color
             it.circle(

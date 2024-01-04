@@ -119,11 +119,11 @@ class UIWorldPortal : UICanvas(
         transitionPanel.update(delta)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         drawBackground(batch, 1f)
 
         // UI items
-        transitionPanel.render(batch, camera)
+        transitionPanel.render(frameDelta, batch, camera)
     }
 
     internal fun addWorldToPlayersDict(uuid: UUID) {
@@ -280,11 +280,11 @@ class UIItemWorldPortalTopBar(
         }
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
-        super.render(batch, camera)
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        super.render(frameDelta, batch, camera)
 
         // button
-        /*buttons.forEach { it.render(batch, camera) }
+        /*buttons.forEach { it.render(frameDelta, batch, camera) }
 
         // label
         batch.color = Color.WHITE

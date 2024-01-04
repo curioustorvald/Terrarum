@@ -86,7 +86,7 @@ object TerrarumPostProcessor : Disposable {
 
     private var deltatBenchStr = "ΔF: Gathering data"
 
-    fun draw(projMat: Matrix4, fbo: FrameBuffer): FrameBuffer {
+    fun draw(frameDelta: Float, projMat: Matrix4, fbo: FrameBuffer): FrameBuffer {
 
         // init
         if (!init) {
@@ -157,7 +157,7 @@ object TerrarumPostProcessor : Disposable {
 
                 if (KeyToggler.isOn(Input.Keys.F3)) {
                     if (!debugUI.isOpened && !debugUI.isOpening) debugUI.setAsOpen()
-                    batch.inUse { debugUI.renderUI(batch, camera) }
+                    batch.inUse { debugUI.renderUI(frameDelta, batch, camera) }
                 }
                 else {
                     if (!debugUI.isClosed && !debugUI.isClosing) debugUI.setAsClose()

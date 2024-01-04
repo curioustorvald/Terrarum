@@ -87,7 +87,7 @@ class UIBasicInfo() : UICanvas() {
 
     private val lcdLitCol: Color = lcdLitColELoff
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = drawCol
         batch.draw(atlas.get(0, 0), 0f, 0f)
 

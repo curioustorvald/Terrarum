@@ -272,7 +272,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
         // ui title
 //        val titlestr = Lang["CONTEXT_WORLD_NEW"]
@@ -322,7 +322,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             }
         }
 
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
     }
 
     override fun dispose() {

@@ -275,13 +275,13 @@ class UIItemInventoryCatBar(
         }
     }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
-        super.render(batch, camera)
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        super.render(frameDelta, batch, camera)
 
         // button
         // colour determined by UI items themselves
-        mainButtons.forEach { it.render(batch, camera) }
-        if (showSideButtons) sideButtons.forEach { it.render(batch, camera) }
+        mainButtons.forEach { it.render(frameDelta, batch, camera) }
+        if (showSideButtons) sideButtons.forEach { it.render(frameDelta, batch, camera) }
 
 
         blendNormalStraightAlpha(batch)

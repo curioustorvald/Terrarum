@@ -42,7 +42,7 @@ class UIShare : UICanvas() {
 
     private lateinit var wotKeys: List<String>
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
 
         val textY = drawY + (height/2) - App.fontGame.lineHeight.toInt() * 4 - 2
@@ -68,7 +68,7 @@ class UIShare : UICanvas() {
         }
 
 
-        uiItems.forEach { it.render(batch, camera) }
+        uiItems.forEach { it.render(frameDelta, batch, camera) }
 
     }
 

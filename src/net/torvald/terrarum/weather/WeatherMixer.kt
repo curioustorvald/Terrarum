@@ -567,7 +567,7 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
      */
-    internal fun render(camera: OrthographicCamera, batch: FlippingSpriteBatch, world: GameWorld) {
+    internal fun render(frameDelta: Float, camera: OrthographicCamera, batch: FlippingSpriteBatch, world: GameWorld) {
         solarElev = if (forceSolarElev != null)
             forceSolarElev!!
         else if (forceTimeAt != null)
@@ -576,7 +576,7 @@ internal object WeatherMixer : RNGConsumer {
             world.worldTime.solarElevationDeg
 
         drawSkybox(camera, batch, world)
-        drawClouds(batch, world)
+        drawClouds(frameDelta, batch, world)
         batch.color = Color.WHITE
     }
 
@@ -598,7 +598,7 @@ internal object WeatherMixer : RNGConsumer {
      * Dependent on the `drawSkybox(camera, batch, world)` for the `cloudDrawColour`
      *
      */
-    private fun drawClouds(batch: SpriteBatch, world: GameWorld) {
+    private fun drawClouds(frameDelta: Float, batch: SpriteBatch, world: GameWorld) {
         val currentWeather = world.weatherbox.currentWeather
         val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
 
@@ -617,7 +617,7 @@ internal object WeatherMixer : RNGConsumer {
                 val shadiness = (1.0 / cosh(altOfSolarRay * 0.5)).toFloat().coerceAtLeast(if (altOfSolarRay < 0) 0.6666f else 0f)
 
 //                printdbg(this, "cloudY=${-it.posY}\tsolarElev=$solarElev\trayAlt=$altOfSolarRay\tshady=$shadiness")
-                it.render(batch as UnpackedColourSpriteBatch, cloudDrawColour.toGdxColor(), shadiness)
+                it.render(frameDelta, batch as UnpackedColourSpriteBatch, cloudDrawColour.toGdxColor(), shadiness)
             }
         }
     }

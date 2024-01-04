@@ -37,14 +37,14 @@ object ConsistentUpdateRate : GameUpdateGovernor {
 
         var i = 0L
         while (akku >= tickInterval) {
-            App.measureDebugTime("Ingame.Update") { updateFunction(tickInterval) }
+            App.measureDebugTime("Ingame.Update") { updateFunction(tickInterval) } // update-delta
             akku -= tickInterval
             i += 1
         }
         App.setDebugTime("Ingame.UpdateCounter", i)
 
         /** RENDER CODE GOES HERE */
-        App.measureDebugTime("Ingame.Render") { renderFunction(tickInterval) }
+        App.measureDebugTime("Ingame.Render") { renderFunction(deltaTime) } // frame-delta, should be identical to Gdx.graphics.deltaTime
     }
 
     override fun reset() {
