@@ -1,5 +1,6 @@
 package net.torvald.terrarum.musicplayer.gui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
@@ -174,6 +175,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     }
 
     private var mouseOnButton: Int? = null
+    private var mouseOnList: Int? = null
 
     override fun updateUI(delta: Float) {
         // process transition request
@@ -265,7 +267,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         }
 
         // mouse is over which button?
-        if (mode >= MODE_MOUSE_UP && relativeMouseY.toFloat() in posYforControls + 10f .. posYforControls + 10f + BUTTON_HEIGHT) {
+        if (mode >= MODE_MOUSE_UP && relativeMouseY.toFloat() in posYforControls + 12f .. posYforControls + 12f + BUTTON_HEIGHT) {
             mouseOnButton = if (relativeMouseX.toFloat() in Toolkit.hdrawWidthf - 120f ..  Toolkit.hdrawWidthf - 120f + 5 * BUTTON_WIDTH) {
                 ((relativeMouseX.toFloat() - (Toolkit.hdrawWidthf - 120f)) / BUTTON_WIDTH).toInt()
             }
@@ -274,6 +276,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         else {
             mouseOnButton = null
         }
+
+        // mouse is over which list
+        mouseOnList = if (mode >= MODE_SHOW_LIST &&
+            relativeMouseY.toFloat() in _posY + 9.._posY + 9 + PLAYLIST_LINES*PLAYLIST_LINE_HEIGHT &&
+            relativeMouseX.toFloat() in _posX.._posX + width) {
+
+            ((relativeMouseY - (_posY + 9)) / PLAYLIST_LINE_HEIGHT).toInt()
+        }
+        else null
 
 
         // make button work
@@ -297,24 +308,42 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     }
                 }
                 1 -> { // prev
-                    getPrevSongFromPlaylist()?.let { ingame.musicGovernor.unshiftPlaylist(it) }
-                    AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
+                    // prev song
+                    if (mode < MODE_SHOW_LIST) {
+                        getPrevSongFromPlaylist()?.let { ingame.musicGovernor.unshiftPlaylist(it) }
+                        AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
+                    }
+                    // prev page in the list
+                    else {
+                        val scrollMax = ((currentlySelectedAlbum?.length ?: 0).toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
+                        playlistScroll = (playlistScroll - PLAYLIST_LINES) fmod scrollMax
+                    }
                 }
                 2 -> { // stop
-                    if (AudioMixer.musicTrack.isPlaying) {
-                        val thisMusic = AudioMixer.musicTrack.currentTrack
-                        AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
-                        AudioMixer.musicTrack.nextTrack = null
-                        ingame.musicGovernor.stopMusic()
-                        thisMusic?.let { ingame.musicGovernor.queueMusicToPlayNext(it) }
-                    }
-                    else {
-                        ingame.musicGovernor.startMusic()
+                    if (mode < MODE_SHOW_LIST) { // disable stop button entirely on MODE_SHOW_LIST
+                        if (AudioMixer.musicTrack.isPlaying) {
+                            val thisMusic = AudioMixer.musicTrack.currentTrack
+                            AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
+                            AudioMixer.musicTrack.nextTrack = null
+                            ingame.musicGovernor.stopMusic()
+                            thisMusic?.let { ingame.musicGovernor.queueMusicToPlayNext(it) }
+                        }
+                        else {
+                            ingame.musicGovernor.startMusic()
+                        }
                     }
                 }
                 3 -> { // next
-                    AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
+                    // next song
+                    if (mode < MODE_SHOW_LIST) {
+                        AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
 //                        ingame.musicGovernor.startMusic() // it works without this?
+                        }
+                    }
+                    // next page in the list
+                    else {
+                        val scrollMax = ((currentlySelectedAlbum?.length ?: 0).toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
+                        playlistScroll = (playlistScroll + PLAYLIST_LINES) fmod scrollMax
                     }
                 }
                 4 -> { // playlist
@@ -322,6 +351,14 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                         if (!transitionOngoing) {
                             transitionRequest = MODE_SHOW_LIST
                             currentListMode = 1
+                            // reset list scroll
+                            val currentlyPlaying = playlist.indexOf(AudioMixer.musicTrack.currentTrack)
+                            if (currentlyPlaying >= 0) {
+                                playlistScroll = (currentlyPlaying / PLAYLIST_LINES) * PLAYLIST_LINES
+                            }
+                            else {
+                                playlistScroll = 0
+                            }
                         }
                     }
                     else if (currentListMode != 1) {
@@ -474,7 +511,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         get() = relativeMouseX.toFloat() in _posX-capsuleMosaicSize .. _posX+width+capsuleMosaicSize &&
                 relativeMouseY.toFloat() in _posY .. _posY+height
 
-    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         widthForFreqMeter = if (transitionOngoing && modeNext >= MODE_MOUSE_UP || mode >= MODE_MOUSE_UP)
             uiWidthFromTextWidth(nameLength)
         else
@@ -513,13 +550,20 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         drawBaloon(batch, _posX, _posY, width.toFloat(), (height - capsuleHeight.toFloat()).coerceAtLeast(0f))
         drawText(batch, posXforMusicLine, posYforMusicLine)
         drawFreqMeter(batch, posXforMusicLine + widthForFreqMeter - 18f, _posY + height - (capsuleHeight / 2) + 1f)
-        drawControls(App.UPDATE_RATE, batch, _posX, posYforControls)
-        drawList(camera, App.UPDATE_RATE, batch, _posX, _posY)
+        drawControls(frameDelta, batch, _posX, posYforControls)
+        drawList(camera, frameDelta, batch, _posX, _posY)
 
         batch.color = Color.WHITE
     }
 
-    private val playListAnimAkku = FloatArray(8) // how many lines on the list view?
+    private val widthForList = 320
+
+    private val PLAYLIST_LEFT_GAP = METERS_WIDTH.toInt() + maskOffWidth
+    private val PLAYLIST_NAME_LEN = widthForList
+    private val PLAYLIST_LINE_HEIGHT = 28f
+    private val PLAYLIST_LINES = App.getConfigInt("musicplayer:playlistlines").let { if (it < 4) 4 else it }
+
+    private val playListAnimAkku = FloatArray(PLAYLIST_LINES) // how many control buttons?
     private val playListAnimLength = 0.2f
 
     private fun drawList(camera: OrthographicCamera, delta: Float, batch: SpriteBatch, x: Float, y: Float) {
@@ -557,7 +601,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
             // update playListAnimAkku
             for (i in playListAnimAkku.indices) {
-                if (mouseOnButton == i && mode >= MODE_MOUSE_UP && modeNext >= MODE_MOUSE_UP)
+                if (mouseOnList == i && mode >= MODE_SHOW_LIST && modeNext >= MODE_SHOW_LIST)
                     playListAnimAkku[i] = (playListAnimAkku[i] + (delta / playListAnimLength)).coerceIn(0f, 1f)
                 else
                     playListAnimAkku[i] = (playListAnimAkku[i] - (delta / playListAnimLength)).coerceIn(0f, 1f)
@@ -565,12 +609,6 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         }
     }
 
-    private val widthForList = 320
-
-    private val PLAYLIST_LEFT_GAP = METERS_WIDTH.toInt() + maskOffWidth
-    private val PLAYLIST_NAME_LEN = widthForList
-    private val PLAYLIST_LINE_HEIGHT = 28f
-    private val PLAYLIST_LINES = 7
 
     private val widthForMouseUp = (nameStrMaxLen + METERS_WIDTH + maskOffWidth).toInt()
     private val heightThin = 28
@@ -607,6 +645,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         batch.end()
 
         playlistFBOs.forEachIndexed { i, it ->
+            val pnum = i + playlistScroll
             it.inAction(camera, batch) {
                 batch.inUse {
                     batch.color = Color.WHITE
@@ -614,7 +653,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     blendNormalStraightAlpha(batch)
 
                     // draw text
-                    App.fontGameFBO.draw(batch, if (i + playlistScroll in playlist.indices) playlist[i].name else "", maskOffWidth - playlistNameScrolls[i + playlistScroll], (PLAYLIST_LINE_HEIGHT - 24) / 2)
+                    App.fontGameFBO.draw(batch, if (pnum in playlist.indices) playlist[pnum].name else "", maskOffWidth - playlistNameScrolls[pnum], (PLAYLIST_LINE_HEIGHT - 24) / 2)
 
                     // mask off the area
                     batch.color = Color.WHITE
@@ -633,7 +672,10 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         blendNormalStraightAlpha(batch)
         if (alpha > 0f) {
             playlistFBOs.forEachIndexed { i, it ->
-                val m1 = playlist.getOrNull(i + playlistScroll)
+                val alpha2 = alpha + (playListAnimAkku[i] * 0.2f)
+                val pnum = i + playlistScroll
+
+                val m1 = playlist.getOrNull(pnum)
                 val m2 = AudioMixer.musicTrack.currentTrack
                 val currentlyPlaying = if (m1 == null || m2 == null) false else (m1 == m2)
 
@@ -641,25 +683,25 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
                 // print bars instead of numbers if the song is currently being played
                 if (currentlyPlaying) {
-                    val xoff = 5
+                    val xoff = 6
                     val yoff = 5 + 7 + (PLAYLIST_LINE_HEIGHT - 24) / 2
                     // it will set the colour on its own
                     drawFreqMeter(batch, x + xoff, y + yoff + PLAYLIST_LINE_HEIGHT * i * scale, alpha)
                 }
                 else {
-                    val xoff = maskOffWidth + (if (i < 9) 3 else 0)
+                    val xoff = maskOffWidth + (if (pnum < 9) 3 else 0)
                     val yoff = 7 + (PLAYLIST_LINE_HEIGHT - 24) / 2
                     batch.color = Color(1f, 1f, 1f, alpha * 0.75f)
                     App.fontSmallNumbers.draw(
                         batch,
-                        if (i + playlistScroll in playlist.indices) "${i + playlistScroll + 1}" else "",
+                        if (pnum in playlist.indices) "${pnum + 1}" else "",
                         x + xoff,
                         y + yoff + PLAYLIST_LINE_HEIGHT * i * scale
                     )
                 }
 
                 // print the name
-                batch.color = Color(1f, 1f, 1f, alpha)
+                batch.color = Color(1f, 1f, 1f, alpha2)
                 batch.draw(it.colorBufferTexture, x + PLAYLIST_LEFT_GAP * scale, y + PLAYLIST_LINE_HEIGHT * i * scale, it.width * scale, it.height * scale)
 
                 // separator
@@ -717,7 +759,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             1f to false
         else
             0f to false
-        // TODO fade away the << o >>, replacing with the page buttons
+
+        val p = transitionAkku / TRANSITION_LENGTH
+        val buttonFadePerc =
+                if (modeNext == MODE_SHOW_LIST)
+                    p
+                else if (mode == MODE_SHOW_LIST && modeNext == MODE_MOUSE_UP)
+                    1f - p
+                else
+                    0f
 
         if (alpha > 0f) {
             val alpha0 = alpha.coerceIn(0f, 1f).organicOvershoot().coerceAtMost(1f)
@@ -726,15 +776,48 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             val anchorX = Toolkit.hdrawWidthf
             val posY = posY + 12f
             for (i in 0..4) {
-                batch.color = Color(1f, 1f, 1f,
-                            0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f) + (playControlAnimAkku[i].pow(2f) * 1.2f)
-                        )
+                val alphaBase  = 0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f) + (playControlAnimAkku[i] * 0.2f)
+                val alphaBase2 = 0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f)
 
                 val offset = i - 2
                 val posX = anchorX + offset * separation
 
-                val iconY = if (!AudioMixer.musicTrack.isPlaying && i == 2) 1 else 0
-                batch.draw(controlButtons.get(i, iconY), (posX - BUTTON_WIDTH / 2).roundToFloat(), posY.roundToFloat())
+
+                val btnX = (posX - BUTTON_WIDTH / 2).roundToFloat()
+                val btnY = posY.roundToFloat()
+
+                // actually draw icon
+                // prev/next button
+                if (i == 1 || i == 3) {
+                    // prev/next song button
+                    batch.color = Color(1f, 1f, 1f, alphaBase * (1f - buttonFadePerc))
+                    batch.draw(controlButtons.get(i, 0), btnX, btnY)
+                    // prev/next page button
+                    batch.color = Color(1f, 1f, 1f, alphaBase * buttonFadePerc)
+                    batch.draw(controlButtons.get(i, 1), btnX, btnY)
+                }
+                // stop button
+                else if (i == 2) {
+                    // get correct stop/play button
+                    val iconY = if (!AudioMixer.musicTrack.isPlaying) 1 else 0
+                    // fade if avaliable
+                    batch.color = Color(1f, 1f, 1f, alphaBase * (1f - buttonFadePerc))
+                    batch.draw(controlButtons.get(i, iconY), btnX, btnY)
+                    // page number
+                    batch.color = Color(1f, 1f, 1f, alphaBase2 * buttonFadePerc) // don't use mouse-up effect
+                    Toolkit.drawTextCentered(
+                        batch, App.fontSmallNumbers,
+                        "${(playlistScroll.div(PLAYLIST_LINES).plus(1).toString().padStart(4,' '))}/" +
+                                "${((currentlySelectedAlbum?.length ?: 0).toFloat().div(PLAYLIST_LINES).ceilToInt().toString().padEnd(4,' '))}",
+                        120, anchorX.toInt() - 60, btnY.toInt() + 14
+                    )
+                }
+                // else button
+                else {
+                    batch.color = Color(1f, 1f, 1f, alphaBase)
+                    batch.draw(controlButtons.get(i, 0), btnX, btnY)
+                }
+
 
                 // update playControlAnimAkku
                 if (mouseOnButton == i && mode >= MODE_MOUSE_UP && modeNext >= MODE_MOUSE_UP)
@@ -884,8 +967,11 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         return out
     }
 
+    private val permittedExts = hashSetOf("WAV", "OGG", "MP3")
+
     private fun getAlbumProp(albumDir: File): AlbumProp {
         if (!albumDir.exists()) throw IllegalArgumentException("Album dir does not exist: $albumDir")
+        val fileCount = albumDir.listFiles { _, name -> permittedExts.contains(name.substringAfterLast('.').uppercase()) }?.size ?: 0
         val playlistFile = File(albumDir, "playlist.json")
         if (playlistFile.exists()) {
             val playlistFile = JsonFetcher.invoke(playlistFile)
@@ -893,16 +979,17 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             val diskJockeyingMode = playlistFile.get("diskJockeyingMode").asString()
             val shuffled = playlistFile.get("shuffled").asBoolean()
             val fileToName = playlistFile.get("titles")
-            return AlbumProp(albumDir, albumName, diskJockeyingMode, shuffled, fileToName)
+            return AlbumProp(albumDir, albumName, diskJockeyingMode, shuffled, fileToName, fileCount)
         }
         else {
-            return AlbumProp(albumDir, albumDir.name, "intermittent", true, null)
+            return AlbumProp(albumDir, albumDir.name, "intermittent", true, null, fileCount)
         }
     }
 
     private data class AlbumProp(
         val ref: File, val name: String,
         val diskJockeyingMode: String, val shuffled: Boolean, val fileToName: JsonValue?,
+        val length: Int,
         val albumArt: TextureRegion? = null
     )
 
