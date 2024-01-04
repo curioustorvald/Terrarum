@@ -585,7 +585,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val PLAYLIST_LINES = App.getConfigInt("musicplayer:playlistlines").let { if (it < 4) 4 else it }
 
     private val playListAnimAkku = FloatArray(PLAYLIST_LINES) // how many control buttons?
-    private val playListAnimLength = 0.2f
+    private val playListAnimLength = 0.16f
 
     private fun drawList(camera: OrthographicCamera, delta: Float, batch: SpriteBatch, x: Float, y: Float) {
         val (alpha, reverse) = if (mode < MODE_SHOW_LIST && modeNext == MODE_SHOW_LIST)
@@ -781,7 +781,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         else
             0f to false
 
-        val p = transitionAkku / TRANSITION_LENGTH
+        val p = organicOvershoot((transitionAkku / TRANSITION_LENGTH.toDouble()).coerceIn(0.0, 1.0)).coerceIn(0.0, 1.0).toFloat()
         val buttonFadePerc =
                 if (modeNext == MODE_SHOW_LIST)
                     p
