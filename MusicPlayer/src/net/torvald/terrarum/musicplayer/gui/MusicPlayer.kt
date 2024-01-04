@@ -159,6 +159,9 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private fun setIntermission() {
         currentMusicName = ""
+        nameLength = 0
+        realNameLength = 0
+        nameScroll = 0f
         nameOverflown = false
     }
 
