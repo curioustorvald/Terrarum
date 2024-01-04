@@ -254,7 +254,7 @@ object ControlPanelCommon {
     fun getMenuHeight(identifier: String) = optionsYposCache[identifier]!!.last()
 
     fun render(identifier: String, width: Int, batch: SpriteBatch) {
-        val height = optionsYposCache[identifier]!!.last()
+        val height = (optionsYposCache[identifier] ?: throw NullPointerException("No options for identifier $identifier")).last()
         val drawX = (App.scr.width - width) / 2
         val drawY = (App.scr.height - height) / 2
 
