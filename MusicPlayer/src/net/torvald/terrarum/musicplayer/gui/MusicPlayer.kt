@@ -399,7 +399,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             }
         }
         // make playlist clicking work
-        else if (!playControlButtonLatched && mouseOnList != null && Terrarum.mouseDown) {
+        else if (listViewPanelScroll == 1f && !playControlButtonLatched && mouseOnList != null && Terrarum.mouseDown) {
             playControlButtonLatched = true
             val index = playlistScroll + mouseOnList!!
             val list = songsInGovernor
@@ -415,6 +415,13 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     }
                 }
             }
+        }
+        // make album list clicking work
+        else if (listViewPanelScroll == 0f && !playControlButtonLatched && mouseOnList != null && Terrarum.mouseDown) {
+            playControlButtonLatched = true
+            val index = albumlistScroll + mouseOnList!!
+            val list = albumsList//.map { albumPropCache[it] }
+
         }
         // unlatch the click latch
         else if (!Terrarum.mouseDown) {

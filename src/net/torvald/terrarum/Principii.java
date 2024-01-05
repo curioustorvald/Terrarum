@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Bootstrapper that launches the bundled JVM and injects VM configs such as -Xmx
+ * The headless launcher for the game.
+ *
+ * The launcher retrieves the information about the host operating system, and reads the `config.json`
+ * to set up the flags for the JVM then launches the main game.
  *
  * Created by minjaesong on 2023-06-22.
  */
