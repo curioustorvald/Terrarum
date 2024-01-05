@@ -70,16 +70,16 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val transitionOngoing
         get() = transitionAkku < TRANSITION_LENGTH
 
-    private var currentListMode: Int? = null // 0: album, 1: playlist
-    private var currentListModeNext: Int? = null // 0: album, 1: playlist
+    private var currentListMode = 0 // 0: album, 1: playlist
+    private var currentListModeNext = 0 // 0: album, 1: playlist
     private var listModeTransitionAkku = 0f
     private var currentListTransitionRequest: Int? = null // 0: album, 1: playlist
     private val listModeTransitionOngoing
         get() = listModeTransitionAkku < LIST_MODE_TRANS_LENGTH
 
 
-    private val TRANSITION_LENGTH = 0.6f
-    private val LIST_MODE_TRANS_LENGTH = 0.3f
+    private val TRANSITION_LENGTH = 0.45f
+    private val LIST_MODE_TRANS_LENGTH = 0.15f
 
     private val colourBack = Color(0xffffff_99.toInt())
 
@@ -187,6 +187,11 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             transitionAkku = 0f
             transitionRequest = null
         }
+        if (currentListTransitionRequest != null) {
+            currentListModeNext = currentListTransitionRequest!!
+            listModeTransitionAkku = 0f
+            currentListTransitionRequest = null
+        }
 
         // actually do transition
         if (transitionAkku <= TRANSITION_LENGTH) {
@@ -201,6 +206,20 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 //                printdbg(this, "Transition complete: nameLengthOld=${nameLengthOld} -> ${nameLength}")
                 nameLengthOld = nameLength
                 setFinalWidthHeight()
+            }
+        }
+        if (listModeTransitionAkku <= LIST_MODE_TRANS_LENGTH) {
+            listViewPanelScroll = FastMath.interpolateLinear(listModeTransitionAkku / LIST_MODE_TRANS_LENGTH, currentListMode.toFloat(), currentListModeNext.toFloat())
+
+
+            listModeTransitionAkku += delta
+
+//            printdbg(this, "On transition... ($transitionAkku / $TRANSITION_LENGTH); width = $width")
+
+            if (listModeTransitionAkku >= LIST_MODE_TRANS_LENGTH) {
+                currentListMode = currentListModeNext!!
+                listViewPanelScroll = currentListMode.toFloat()
+//                printdbg(this, "Transition complete: nameLengthOld=${nameLengthOld} -> ${nameLength}")
             }
         }
 
@@ -582,11 +601,12 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         batch.color = Color.WHITE
 
 
-        TEST_LIST_TRANSITION_PERCENTAGE = (TEST_LIST_TRANSITION_PERCENTAGE + frameDelta / 2f) % 1f
+        // TEST CODE
+        listViewPanelScroll = currentListMode.toFloat()
     }
 
     private val widthForList = 320
-    private val hwidthForList = widthForList / 2
+    private val hwidthForList = widthForList / 2f
 
     private val PLAYLIST_LEFT_GAP = METERS_WIDTH.toInt() + maskOffWidth
     private val PLAYLIST_NAME_LEN = widthForList
@@ -596,51 +616,41 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val playListAnimAkku = FloatArray(PLAYLIST_LINES) // how many control buttons?
     private val playListAnimLength = 0.16f
 
-    private var TEST_LIST_TRANSITION_PERCENTAGE = 0f // 0: show albums, 1: show playlist, anything inbetween: transition ongoing
+    private var listViewPanelScroll = 0f // 0: show albums, 1: show playlist, anything inbetween: transition ongoing
+
 
     private fun drawList(camera: OrthographicCamera, delta: Float, batch: SpriteBatch, x: Float, y: Float) {
-        val (alpha, reverse) = /*if (mode < MODE_SHOW_LIST && modeNext == MODE_SHOW_LIST)
+        val alphaLeft = (1f - listViewPanelScroll).pow(2f)
+        val alphaRight = listViewPanelScroll.pow(2f)
+
+        var (drawAlpha, reverse) = if (mode < MODE_SHOW_LIST && modeNext == MODE_SHOW_LIST)
             (transitionAkku / TRANSITION_LENGTH).let { if (it.isNaN()) 0f else it } to false
         else if (mode == MODE_SHOW_LIST && modeNext < MODE_SHOW_LIST)
             (transitionAkku / TRANSITION_LENGTH).let { if (it.isNaN()) 0f else it } to true
         else if (mode >= MODE_SHOW_LIST)
             1f to false
         else
-            0f to false*/
-            TEST_LIST_TRANSITION_PERCENTAGE to false
+            0f to false
+
+        drawAlpha = drawAlpha.coerceIn(0f, 1f).organicOvershoot().coerceAtMost(1f)
+        drawAlpha = 0.75f * (if (reverse) 1f - drawAlpha else drawAlpha).pow(3f)
 
         val anchorX = Toolkit.hdrawWidthf - width / 2
 
-        if (alpha > 0f) {
-            val alpha0 = alpha.coerceIn(0f, 1f).organicOvershoot().coerceAtMost(1f)
+        val posXLeft = FastMath.interpolateLinear(listViewPanelScroll, 0f, -hwidthForList)
+        val posXRight = FastMath.interpolateLinear(listViewPanelScroll, hwidthForList, 0f)
 
-            // TODO draw album/playlist
-            val (offX2, alpha2) = /*if (listModeTransitionOngoing) {
-                if (currentListModeNext == 0)
-                    hwidthForList - hwidthForList * (listModeTransitionAkku / LIST_MODE_TRANS_LENGTH) to (listModeTransitionAkku / LIST_MODE_TRANS_LENGTH)
-                else
-                    -hwidthForList * (listModeTransitionAkku / LIST_MODE_TRANS_LENGTH) to 1f - (listModeTransitionAkku / LIST_MODE_TRANS_LENGTH)
-            }
-            else {
-                0f to 0f
-            }*/
-                hwidthForList - hwidthForList * TEST_LIST_TRANSITION_PERCENTAGE to 1f - TEST_LIST_TRANSITION_PERCENTAGE
 
-            val offX1 = offX2 - hwidthForList
-            val alpha1 = 1f - alpha2
-            val drawAlpha = 0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f)// + (playListAnimAkku[i].pow(2f) * 1.2f)
+        // assuming both view has the same list dimension
+        drawAlbumList(camera, delta, batch, (anchorX + posXLeft).roundToFloat(), (y + 5).roundToFloat(), drawAlpha * alphaLeft, width / (widthForList + METERS_WIDTH + maskOffWidth))
+        drawPlayList(camera, delta, batch, (anchorX + posXRight).roundToFloat(), (y + 5).roundToFloat(), drawAlpha * alphaRight, width / (widthForList + METERS_WIDTH + maskOffWidth))
 
-            // assuming both view has the same list dimension
-            drawAlbumList(camera, delta, batch, (anchorX + offX2).roundToFloat(), (y + 5).roundToFloat(), drawAlpha * alpha1, width / (widthForList + METERS_WIDTH + maskOffWidth))
-            drawPlayList(camera, delta, batch, (anchorX + offX1).roundToFloat(), (y + 5).roundToFloat(), drawAlpha * alpha2, width / (widthForList + METERS_WIDTH + maskOffWidth))
-
-            // update playListAnimAkku
-            for (i in playListAnimAkku.indices) {
-                if (mouseOnList == i && mode >= MODE_SHOW_LIST && modeNext >= MODE_SHOW_LIST)
-                    playListAnimAkku[i] = (playListAnimAkku[i] + (delta / playListAnimLength)).coerceIn(0f, 1f)
-                else
-                    playListAnimAkku[i] = (playListAnimAkku[i] - (delta / playListAnimLength)).coerceIn(0f, 1f)
-            }
+        // update playListAnimAkku
+        for (i in playListAnimAkku.indices) {
+            if (mouseOnList == i && mode >= MODE_SHOW_LIST && modeNext >= MODE_SHOW_LIST)
+                playListAnimAkku[i] = (playListAnimAkku[i] + (delta / playListAnimLength)).coerceIn(0f, 1f)
+            else
+                playListAnimAkku[i] = (playListAnimAkku[i] - (delta / playListAnimLength)).coerceIn(0f, 1f)
         }
     }
 
