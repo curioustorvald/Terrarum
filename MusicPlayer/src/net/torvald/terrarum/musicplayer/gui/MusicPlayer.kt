@@ -1051,14 +1051,31 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             fftBarHeights[i] = binHeights.slice(range).average().toFloat()
         }
 
-        batch.color = colourMeter2 mul Color(1f, 1f, 1f, alpha)
-        fftBarHeights.forEachIndexed { index, h ->
-            Toolkit.fillArea(batch, posX + index*4f, posY - h, 3f, 2*h + 1)
-        }
 
-        batch.color = colourMeter mul Color(1f, 1f, 1f, alpha)
+
         fftBarHeights.forEachIndexed { index, h ->
-            Toolkit.fillArea(batch, posX + index*4f, posY - h, 2f, 2*h)
+            val hInt = h.toInt().toFloat()
+            val hFrac = h - hInt
+
+            // top fraction part shade
+            batch.color = colourMeter2 mul Color(1f, 1f, 1f, alpha * hFrac)
+            Toolkit.fillArea(batch, posX + index*4f, posY - hInt - 1, 3f, 1f)
+            // integer part shade
+            batch.color = colourMeter2 mul Color(1f, 1f, 1f, alpha)
+            Toolkit.fillArea(batch, posX + index*4f, posY - hInt, 3f, 2*hInt)
+            // bottom fraction part shade
+            batch.color = colourMeter2 mul Color(1f, 1f, 1f, alpha * hFrac)
+            Toolkit.fillArea(batch, posX + index*4f, posY + hInt, 3f, 2f)
+
+            // top fraction part
+            batch.color = colourMeter mul Color(1f, 1f, 1f, alpha * hFrac)
+            Toolkit.fillArea(batch, posX + index*4f, posY - hInt - 1, 2f, 1f)
+            // integer part
+            batch.color = colourMeter mul Color(1f, 1f, 1f, alpha)
+            Toolkit.fillArea(batch, posX + index*4f, posY - hInt, 2f, 2*hInt)
+            // bottom fraction part
+            batch.color = colourMeter mul Color(1f, 1f, 1f, alpha * hFrac)
+            Toolkit.fillArea(batch, posX + index*4f, posY + hInt, 2f, 1f)
         }
     }
 
