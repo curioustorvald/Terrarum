@@ -93,9 +93,15 @@ class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
     }
 
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
-        // the actual control panel
-        ControlPanelCommon.render("basegame.modcontrolpanel.$currentlySelectedModule", width, batch)
-        uiItems.forEach { it.render(frameDelta, batch, camera) }
+        try {
+            // the actual control panel
+            ControlPanelCommon.render("basegame.modcontrolpanel.$currentlySelectedModule", width, batch)
+            uiItems.forEach { it.render(frameDelta, batch, camera) }
+        }
+        catch (e: NullPointerException) {
+            // there will be NPE for first render frame, must ignore it to make the game continue working
+            e.printStackTrace()
+        }
     }
 
     override fun dispose() {
