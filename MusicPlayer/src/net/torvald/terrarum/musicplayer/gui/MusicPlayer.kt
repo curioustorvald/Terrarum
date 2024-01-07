@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.JsonValue
 import com.jme3.math.FastMath
 import net.torvald.reflection.extortField
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -319,7 +320,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     if (mode < MODE_SHOW_LIST) {
                         if (!transitionOngoing) {
                             transitionRequest = MODE_SHOW_LIST
-                            currentListMode = 0
+                            currentListMode = 0 // no list transition anim is needed this time, just set the variable
+                            resetAlbumlistScroll()
                         }
                     }
                     else if (currentListMode != 0) {
@@ -386,15 +388,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     if (mode < MODE_SHOW_LIST) {
                         if (!transitionOngoing) {
                             transitionRequest = MODE_SHOW_LIST
-                            currentListMode = 1
-                            // reset list scroll
-                            val currentlyPlaying = songsInGovernor.indexOf(AudioMixer.musicTrack.currentTrack)
-                            if (currentlyPlaying >= 0) {
-                                playlistScroll = (currentlyPlaying / PLAYLIST_LINES) * PLAYLIST_LINES
-                            }
-                            else {
-                                playlistScroll = 0
-                            }
+                            currentListMode = 1 // no list transition anim is needed this time, just set the variable
+                            resetPlaylistScroll()
                         }
                     }
                     else if (currentListMode != 1) {
@@ -440,6 +435,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
                         loadNewAlbum(albumsList[index])
                         ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                        resetPlaylistScroll(AudioMixer.musicTrack.nextTrack)
                     }
                 }
             }
@@ -454,6 +450,26 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     }
 
     private var playControlButtonLatched = false
+
+    private fun resetAlbumlistScroll() {
+        val currentlyPlaying = albumsList.indexOfFirst { it.canonicalPath.replace('\\', '/') == ingame.musicGovernor.playlistSource }
+        if (currentlyPlaying >= 0) {
+            albumlistScroll = (currentlyPlaying / PLAYLIST_LINES) * PLAYLIST_LINES
+        }
+        else {
+            albumlistScroll = 0
+        }
+    }
+
+    private fun resetPlaylistScroll(song: MusicContainer? = null) {
+        val currentlyPlaying = songsInGovernor.indexOf(song ?: AudioMixer.musicTrack.currentTrack)
+        if (currentlyPlaying >= 0) {
+            playlistScroll = (currentlyPlaying / PLAYLIST_LINES) * PLAYLIST_LINES
+        }
+        else {
+            playlistScroll = 0
+        }
+    }
 
     private fun getPrevSongFromPlaylist(): MusicContainer? {
         val list = songsInGovernor.slice(songsInGovernor.indices) // make copy of the list
@@ -967,18 +983,23 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     // fade if avaliable
                     batch.color = Color(1f, 1f, 1f, alphaBase * (1f - buttonFadePerc))
                     batch.draw(controlButtons.get(i, iconY), btnX, btnY)
-                    // page number
-                    batch.color = Color(1f, 1f, 1f, alphaBase2 * buttonFadePerc) // don't use mouse-up effect
-                    val (thisPage, totalPage) = if (listViewPanelScroll >= 0.5f)
-                        playlistScroll.div(PLAYLIST_LINES).plus(1) to (currentlySelectedAlbum?.length ?: 0).toFloat().div(PLAYLIST_LINES).ceilToInt()
-                    else
-                        albumlistScroll.div(PLAYLIST_LINES).plus(1) to albumsList.size.toFloat().div(PLAYLIST_LINES).ceilToInt()
-                    Toolkit.drawTextCentered(
-                        batch, App.fontSmallNumbers,
-                        "${thisPage.toString().padStart(4,' ')}/" +
-                                "${totalPage.toString().padEnd(4,' ')}",
-                        120, anchorX.toInt() - 60, btnY.toInt() + 14
-                    )
+                    // page number with fade
+
+                    for (mode in 0..1) {
+                        val alphaNum = if (mode == 0) 1f - listViewPanelScroll else listViewPanelScroll
+                        batch.color = Color(1f, 1f, 1f, alphaBase2 * buttonFadePerc * alphaNum) // don't use mouse-up effect
+                        val (thisPage, totalPage) = if (mode == 0)
+                            albumlistScroll.div(PLAYLIST_LINES).plus(1) to albumsList.size.toFloat().div(PLAYLIST_LINES).ceilToInt()
+                        else
+                            playlistScroll.div(PLAYLIST_LINES).plus(1) to (currentlySelectedAlbum?.length ?: 0).toFloat().div(PLAYLIST_LINES).ceilToInt()
+                        Toolkit.drawTextCentered(
+                            batch, App.fontSmallNumbers,
+                            "${thisPage.toString().padStart(4,' ')}/" +
+                                    "${totalPage.toString().padEnd(4,' ')}",
+                            120, anchorX.toInt() - 60, btnY.toInt() + 14
+                        )
+                    }
+
                 }
                 // else button
                 else {
@@ -1218,6 +1239,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         currentlySelectedAlbum = albumProp
 
         registerPlaylist(albumDir.absolutePath, albumProp.fileToName, albumProp.shuffled, albumProp.diskJockeyingMode)
+
+        // scroll playlist to the page current song is
     }
 
     init {
