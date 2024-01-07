@@ -1697,6 +1697,46 @@ public class App implements ApplicationListener {
     public static String csiK = "\u001B[37m";
     public static String csi0 = "\u001B[m";
 
+    static String[] csis = {
+            "\u001B[32m",
+            "\u001B[33m",
+            "\u001B[34m",
+            "\u001B[35m",
+            "\u001B[36m",
+
+            "\u001B[38;5;22m",
+            "\u001B[38;5;23m",
+            "\u001B[38;5;24m",
+            "\u001B[38;5;25m",
+            "\u001B[38;5;26m",
+            "\u001B[38;5;27m", // 10
+            "\u001B[38;5;28m",
+            "\u001B[38;5;29m",
+            "\u001B[38;5;30m",
+            "\u001B[38;5;31m",
+            "\u001B[38;5;32m",
+            "\u001B[38;5;33m",
+
+            "\u001B[38;5;54m",
+            "\u001B[38;5;56m",
+            "\u001B[38;5;57m",
+            "\u001B[38;5;58m", // 20
+            "\u001B[38;5;63m",
+
+            "\u001B[38;5;126m",
+            "\u001B[38;5;127m",
+            "\u001B[38;5;128m",
+            "\u001B[38;5;129m", // 24
+            "\u001B[38;5;130m",
+            "\u001B[38;5;131m",
+
+            "\u001B[38;5;162m", // 27
+            "\u001B[38;5;163m",
+            "\u001B[38;5;164m",
+            "\u001B[38;5;165m",
+            "\u001B[38;5;166m",
+    };
+
     public static void printdbg(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD) {
             var timeNow = System.currentTimeMillis();
@@ -1705,7 +1745,8 @@ public class App implements ApplicationListener {
             var hh = (timeNow / 3600000) % 24;
             var ms = timeNow % 1000;
             String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
-            String prompt = csiG+String.format("%02d:%02d:%02d.%03d%s [%s] ",hh,mm,ss,ms,csi0,out);
+            var hash = (out.hashCode() & 0x7FFFFFFF) % csis.length;
+            String prompt = csis[hash]+String.format("%02d:%02d:%02d.%03d [%s]%s ",hh,mm,ss,ms,out,csi0);
             if (message == null) {
                 System.out.println(prompt+"null");
             }

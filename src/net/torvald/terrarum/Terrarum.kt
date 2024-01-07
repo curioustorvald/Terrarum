@@ -699,7 +699,8 @@ fun printStackTrace(obj: Any, out: PrintStream = System.out) {
         val hh = timeNow / 3600000 % 24
         val ms = timeNow % 1000
         val objName = if (obj is String) obj else obj.javaClass.simpleName
-        val prompt = csiG + String.format("%02d:%02d:%02d.%03d%s [%s] ", hh, mm, ss, ms, csi0, objName)
+        val hash = objName.hashCode().and(0x7FFFFFFF) % csis.size
+        val prompt = csis[hash] + String.format("%02d:%02d:%02d.%03d [%s]%s ", hh, mm, ss, ms, objName, csi0)
         val indentation = " ".repeat(objName.length + 16)
         Thread.currentThread().stackTrace.forEachIndexed { index, it ->
             if (index == 1)
