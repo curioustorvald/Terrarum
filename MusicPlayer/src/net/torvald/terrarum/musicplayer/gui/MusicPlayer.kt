@@ -422,6 +422,17 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
             val index = albumlistScroll + mouseOnList!!
             val list = albumsList//.map { albumPropCache[it] }
 
+            if (index < list.size) {
+                // if selected album is not the same album currently playing, queue that album immediately
+                // (navigating into the selected album involves too much complication :p)
+                if (ingame.musicGovernor.playlistSource != albumsList[index].canonicalPath) {
+                    // fade out
+                    AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
+                        loadNewAlbum(albumsList[index])
+                        ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                    }
+                }
+            }
         }
         // unlatch the click latch
         else if (!Terrarum.mouseDown) {
