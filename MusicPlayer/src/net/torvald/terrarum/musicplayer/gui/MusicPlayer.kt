@@ -339,10 +339,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                             ingame.musicGovernor.startMusic() // required for "intermittent" mode
                         }
                     }
-                    // prev page in the list
-                    else {
+                    // prev page in the playlist
+                    else if (listViewPanelScroll == 1f) {
                         val scrollMax = ((currentlySelectedAlbum?.length ?: 0).toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
                         playlistScroll = (playlistScroll - PLAYLIST_LINES) fmod scrollMax
+                    }
+                    // prev page in the albumlist
+                    else if (listViewPanelScroll == 0f) {
+                        val scrollMax = (albumsList.size.toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
+                        albumlistScroll = (albumlistScroll - PLAYLIST_LINES) fmod scrollMax
                     }
                 }
                 2 -> { // stop
@@ -366,10 +371,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                             ingame.musicGovernor.startMusic() // required for "intermittent" mode, does seemingly nothing on "continuous" mode
                         }
                     }
-                    // next page in the list
-                    else {
+                    // next page in the playlist
+                    else if (listViewPanelScroll == 1f) {
                         val scrollMax = ((currentlySelectedAlbum?.length ?: 0).toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
                         playlistScroll = (playlistScroll + PLAYLIST_LINES) fmod scrollMax
+                    }
+                    // next page in the albumlist
+                    else if (listViewPanelScroll == 0f) {
+                        val scrollMax = (albumsList.size.toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
+                        albumlistScroll = (albumlistScroll + PLAYLIST_LINES) fmod scrollMax
                     }
                 }
                 4 -> { // playlist
@@ -959,10 +969,14 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     batch.draw(controlButtons.get(i, iconY), btnX, btnY)
                     // page number
                     batch.color = Color(1f, 1f, 1f, alphaBase2 * buttonFadePerc) // don't use mouse-up effect
+                    val (thisPage, totalPage) = if (listViewPanelScroll >= 0.5f)
+                        playlistScroll.div(PLAYLIST_LINES).plus(1) to (currentlySelectedAlbum?.length ?: 0).toFloat().div(PLAYLIST_LINES).ceilToInt()
+                    else
+                        albumlistScroll.div(PLAYLIST_LINES).plus(1) to albumsList.size.toFloat().div(PLAYLIST_LINES).ceilToInt()
                     Toolkit.drawTextCentered(
                         batch, App.fontSmallNumbers,
-                        "${(playlistScroll.div(PLAYLIST_LINES).plus(1).toString().padStart(4,' '))}/" +
-                                "${((currentlySelectedAlbum?.length ?: 0).toFloat().div(PLAYLIST_LINES).ceilToInt().toString().padEnd(4,' '))}",
+                        "${thisPage.toString().padStart(4,' ')}/" +
+                                "${totalPage.toString().padEnd(4,' ')}",
                         120, anchorX.toInt() - 60, btnY.toInt() + 14
                     )
                 }
