@@ -158,11 +158,11 @@ class UIItemTextButtonList(
     private var highlighterYStart = highlightY
     private var highlighterYEnd = highlightY
 
-    private var clickLatched = false
+    private var clickLatch = MouseLatch()
 
     override fun show() {
 //        printdbg(this, "${this.javaClass.simpleName} show()")
-        clickLatched = true
+        clickLatch.forceLatch()
     }
 
     /** (oldIndex: Int?, newIndex: Int) -> Unit */
@@ -196,9 +196,7 @@ class UIItemTextButtonList(
         buttons.forEachIndexed { index, btn ->
             btn.update(delta)
 
-
-            if (!clickLatched && btn.mousePushed) {
-                clickLatched = true
+            if (btn.mouseUp) clickLatch.latchNoRelease {
                 val oldIndex = selectedIndex
 
 //                if (kinematic) {
@@ -217,9 +215,7 @@ class UIItemTextButtonList(
             btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
         }
 
-        if (clickLatched && !Terrarum.mouseDown) {
-            clickLatched = false
-        }
+        clickLatch.latch {  } // update to unlatch
 
         oldPosX = posX
     }

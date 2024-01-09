@@ -58,10 +58,10 @@ class UIItemList<Item: UIItem>(
     /** (oldIndex: Int?, newIndex: Int) -> Unit */
     var selectionChangeListener: ((Int?, Int) -> Unit)? = null
 
-    private var clickLatched = false
+    private var clickLatch = MouseLatch()
 
     override fun show() {
-        clickLatched = true
+        clickLatch.forceLatch()
     }
 
 
@@ -94,7 +94,7 @@ class UIItemList<Item: UIItem>(
             item.update(delta)
 
 
-            if (!clickLatched && item.mousePushed) {
+            if (item.mouseUp) clickLatch.latchNoRelease {
                 val oldIndex = selectedIndex
 
                 if (kinematic) {
@@ -114,9 +114,7 @@ class UIItemList<Item: UIItem>(
 
         }
 
-        if (!Terrarum.mouseDown) {
-            clickLatched = false
-        }
+        clickLatch.latch {  } // update to unlatch
 
         oldPosX = posX
     }

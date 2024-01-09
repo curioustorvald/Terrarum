@@ -41,6 +41,8 @@ class UIItemHorzSlider(
     var value: Double = initialValue; private set
     var selectionChangeListener: (Double) -> Unit = {}
 
+    private var mouseLatched = false // trust me this one needs its own binary latch
+
     override fun update(delta: Float) {
         super.update(delta)
 

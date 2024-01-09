@@ -314,7 +314,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
 
         // make button work
-        mouseLatch.latch {
+        if (mouseUp) mouseLatch.latch {
             if (mouseOnButton != null) {
                 when (mouseOnButton) {
                     0 -> { // album

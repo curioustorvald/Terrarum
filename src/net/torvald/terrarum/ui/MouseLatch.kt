@@ -44,6 +44,24 @@ class MouseLatch(val button: List<Int> = listOf(App.getConfigInt("config_mousepr
         }
     }
 
+    /**
+     * Your usual latch except it does not auto-unlatch
+     */
+    fun latchNoRelease(action: () -> Unit) {
+        if (isNotLatched() && button.any { Gdx.input.isButtonPressed(it) }) {
+            status.set(true)
+            action()
+        }
+    }
+
+    fun forceLatch() {
+        status.set(true)
+    }
+
+    fun forceUnlatch() {
+        status.set(false)
+    }
+
     fun unlatch() {
         if (button.none { Gdx.input.isButtonPressed(it) }) {
             status.set(false)

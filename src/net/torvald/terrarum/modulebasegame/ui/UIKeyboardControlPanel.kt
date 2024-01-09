@@ -495,7 +495,7 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
         iconButtons.forEachIndexed { index, it ->
             it.update(delta)
             if (it.mousePushed) {
-                selected  = index
+                selected = index
             }
         }
 
@@ -503,13 +503,10 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
         closeButton2.update(delta)
 
         // close
-        if (!mouseLatched && mousePushed) {
-            mouseLatched = true
+        if (mouseUp) mouseLatch.latch {
             parent.setControlOf(parent.keycapClicked, selected)
             parent.keycapClicked = -13372
         }
-
-        if (!mouseDown) mouseLatched = false
     }
 }
 

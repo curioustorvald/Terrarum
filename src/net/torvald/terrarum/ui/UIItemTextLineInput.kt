@@ -133,7 +133,7 @@ class UIItemTextLineInput(
         set(value) {
             field = value
             if (!value) {
-                mouseLatched = false
+                mouseLatch.forceUnlatch()
                 fboUpdateLatch = false
                 isEnabled = false
                 cursorOn = false
@@ -449,17 +449,15 @@ class UIItemTextLineInput(
                 }
             }
 
-            if (mouseDown && !mouseLatched && mouseUpOnIMEButton) {
-                toggleIME()
-                mouseLatched = true
+            mouseLatch.latch {
+                if (mouseUpOnIMEButton) {
+                    toggleIME()
+                }
+                else if (mouseUpOnPasteButton) {
+                    endComposing()
+                    paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
+                }
             }
-            else if (mouseDown && !mouseLatched && mouseUpOnPasteButton) {
-                endComposing()
-                paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
-                mouseLatched = true
-            }
-
-            if (!mouseDown) mouseLatched = false
 
             imeOn = KeyToggler.isOn(ControlPresets.getKey("control_key_toggleime"))
         }

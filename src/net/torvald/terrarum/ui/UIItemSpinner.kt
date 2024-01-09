@@ -101,14 +101,11 @@ class UIItemSpinner(
                 else
                     0
 
-        if (!mouseLatched && Terrarum.mouseDown && mouseOnButton in 1..2) {
-            mouseLatched = true
-
+        if (mouseOnButton in 1..2) mouseLatch.latch {
             changeValueBy((mouseOnButton * 2) - 3)
             fboUpdateLatch = true
             selectionChangeListener(value)
         }
-        else if (!Terrarum.mouseDown) mouseLatched = false
     }
 
     private var textCache = ""

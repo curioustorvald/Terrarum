@@ -98,7 +98,7 @@ class UIItemTextSelector(
         }
 
 
-        if (!mouseLatched && Terrarum.mouseDown) {
+        mouseLatch.latch {
             if (paletteShowing && mouseOnPaletteItem != null ) {
                 selection = mouseOnPaletteItem!!
                 fboUpdateLatch = true
@@ -125,10 +125,7 @@ class UIItemTextSelector(
             else {
                 paletteShowing = false
             }
-
-            mouseLatched = true
         }
-        else if (!Terrarum.mouseDown) mouseLatched = false
     }
 
     private val leftIcon = if (useSpinnerButtons) labels.get(9,2) else labels.get(16,0)

@@ -99,7 +99,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
 
     /** to be used by customised mouse handling */
-    protected var mouseLatched = false
+    protected var mouseLatch = MouseLatch()
 
     /** UI to call (show up) while mouse is up */
     open var mouseOverCall: UICanvas? = null

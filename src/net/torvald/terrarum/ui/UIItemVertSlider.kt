@@ -36,6 +36,8 @@ class UIItemVertSlider(
     var value: Double = initialValue; private set
     var selectionChangeListener: (Double) -> Unit = {}
 
+    private var mouseLatched = false // trust me this one needs its own binary latch
+
     init {
         printdbg(this, "slider max=$max")
     }
