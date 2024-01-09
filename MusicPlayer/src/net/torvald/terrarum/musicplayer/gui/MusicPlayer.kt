@@ -16,6 +16,7 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
+import net.torvald.terrarum.ui.MouseLatch
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.utils.JsonFetcher
@@ -178,6 +179,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 //        printdbg(this, "setMusicName $str; strLen = $nameLengthOld -> $nameLength; overflown=$nameOverflown; transitionTime=$TRANSITION_LENGTH")
     }
 
+    private val mouseLatch = MouseLatch()
+
     private var mouseOnButton: Int? = null
     private var mouseOnList: Int? = null
 
@@ -311,150 +314,151 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
 
         // make button work
-        if (!playControlButtonLatched && mouseOnButton != null && Terrarum.mouseDown) {
-            playControlButtonLatched = true
-            when (mouseOnButton) {
-                0 -> { // album
-                    albumsListCacheIsStale = true // clicking the button will refresh the album list, even if the current view is the album list
+        mouseLatch.latch {
+            if (mouseOnButton != null) {
+                when (mouseOnButton) {
+                    0 -> { // album
+                        albumsListCacheIsStale =
+                            true // clicking the button will refresh the album list, even if the current view is the album list
 
-                    if (mode < MODE_SHOW_LIST) {
-                        if (!transitionOngoing) {
-                            transitionRequest = MODE_SHOW_LIST
-                            currentListMode = 0 // no list transition anim is needed this time, just set the variable
-                            resetAlbumlistScroll()
+                        if (mode < MODE_SHOW_LIST) {
+                            if (!transitionOngoing) {
+                                transitionRequest = MODE_SHOW_LIST
+                                currentListMode =
+                                    0 // no list transition anim is needed this time, just set the variable
+                                resetAlbumlistScroll()
+                            }
+                        }
+                        else if (currentListMode != 0) {
+                            if (!listModeTransitionOngoing)
+                                currentListTransitionRequest = 0
+                        }
+                        else {
+                            if (!transitionOngoing)
+                                transitionRequest = AudioMixer.musicTrack.isPlaying.toInt() * MODE_MOUSE_UP
                         }
                     }
-                    else if (currentListMode != 0) {
-                        if (!listModeTransitionOngoing)
-                            currentListTransitionRequest = 0
+
+                    1 -> { // prev
+                        // prev song
+                        if (mode < MODE_SHOW_LIST) {
+                            getPrevSongFromPlaylist()?.let { ingame.musicGovernor.unshiftPlaylist(it) }
+                            AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
+                                ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                            }
+                        }
+                        // prev page in the playlist
+                        else if (listViewPanelScroll == 1f) {
+                            val scrollMax = ((currentlySelectedAlbum?.length
+                                ?: 0).toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
+                            playlistScroll = (playlistScroll - PLAYLIST_LINES) fmod scrollMax
+                        }
+                        // prev page in the albumlist
+                        else if (listViewPanelScroll == 0f) {
+                            val scrollMax = (albumsList.size.toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
+                            albumlistScroll = (albumlistScroll - PLAYLIST_LINES) fmod scrollMax
+                        }
                     }
-                    else {
-                        if (!transitionOngoing)
-                            transitionRequest = AudioMixer.musicTrack.isPlaying.toInt() * MODE_MOUSE_UP
+
+                    2 -> { // stop
+                        if (mode < MODE_SHOW_LIST) { // disable stop button entirely on MODE_SHOW_LIST
+                            if (AudioMixer.musicTrack.isPlaying) {
+                                val thisMusic = AudioMixer.musicTrack.currentTrack
+                                AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
+                                AudioMixer.musicTrack.nextTrack = null
+                                ingame.musicGovernor.stopMusic()
+                                thisMusic?.let { ingame.musicGovernor.queueMusicToPlayNext(it) }
+                            }
+                            else {
+                                ingame.musicGovernor.startMusic()
+                            }
+                        }
+                    }
+
+                    3 -> { // next
+                        // next song
+                        if (mode < MODE_SHOW_LIST) {
+                            AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
+                                ingame.musicGovernor.startMusic() // required for "intermittent" mode, does seemingly nothing on "continuous" mode
+                            }
+                        }
+                        // next page in the playlist
+                        else if (listViewPanelScroll == 1f) {
+                            val scrollMax = ((currentlySelectedAlbum?.length
+                                ?: 0).toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
+                            playlistScroll = (playlistScroll + PLAYLIST_LINES) fmod scrollMax
+                        }
+                        // next page in the albumlist
+                        else if (listViewPanelScroll == 0f) {
+                            val scrollMax = (albumsList.size.toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
+                            albumlistScroll = (albumlistScroll + PLAYLIST_LINES) fmod scrollMax
+                        }
+                    }
+
+                    4 -> { // playlist
+                        if (mode < MODE_SHOW_LIST) {
+                            if (!transitionOngoing) {
+                                transitionRequest = MODE_SHOW_LIST
+                                currentListMode =
+                                    1 // no list transition anim is needed this time, just set the variable
+                                resetPlaylistScroll()
+                            }
+                        }
+                        else if (currentListMode != 1) {
+                            if (!listModeTransitionOngoing)
+                                currentListTransitionRequest = 1
+                        }
+                        else {
+                            if (!transitionOngoing)
+                                transitionRequest = AudioMixer.musicTrack.isPlaying.toInt() * MODE_MOUSE_UP
+                        }
                     }
                 }
-                1 -> { // prev
-                    // prev song
-                    if (mode < MODE_SHOW_LIST) {
-                        getPrevSongFromPlaylist()?.let { ingame.musicGovernor.unshiftPlaylist(it) }
+            }
+            // make playlist clicking work
+            else if (listViewPanelScroll == 1f && mouseOnList != null) {
+                val index = playlistScroll + mouseOnList!!
+                val list = songsInGovernor
+                if (index < list.size) {
+                    // if selected song != currently playing
+                    if (AudioMixer.musicTrack.currentTrack == null || list[index] != AudioMixer.musicTrack.currentTrack) {
+                        // rebuild playlist
+                        ingame.musicGovernor.queueIndexFromPlaylist(index)
+
+                        // fade out
                         AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
                             ingame.musicGovernor.startMusic() // required for "intermittent" mode
                         }
                     }
-                    // prev page in the playlist
-                    else if (listViewPanelScroll == 1f) {
-                        val scrollMax = ((currentlySelectedAlbum?.length ?: 0).toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
-                        playlistScroll = (playlistScroll - PLAYLIST_LINES) fmod scrollMax
-                    }
-                    // prev page in the albumlist
-                    else if (listViewPanelScroll == 0f) {
-                        val scrollMax = (albumsList.size.toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
-                        albumlistScroll = (albumlistScroll - PLAYLIST_LINES) fmod scrollMax
-                    }
                 }
-                2 -> { // stop
-                    if (mode < MODE_SHOW_LIST) { // disable stop button entirely on MODE_SHOW_LIST
-                        if (AudioMixer.musicTrack.isPlaying) {
-                            val thisMusic = AudioMixer.musicTrack.currentTrack
-                            AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
-                            AudioMixer.musicTrack.nextTrack = null
-                            ingame.musicGovernor.stopMusic()
-                            thisMusic?.let { ingame.musicGovernor.queueMusicToPlayNext(it) }
-                        }
-                        else {
-                            ingame.musicGovernor.startMusic()
-                        }
-                    }
-                }
-                3 -> { // next
-                    // next song
-                    if (mode < MODE_SHOW_LIST) {
+            }
+            // make album list clicking work
+            else if (listViewPanelScroll == 0f && mouseOnList != null) {
+                val index = albumlistScroll + mouseOnList!!
+                val list = albumsList//.map { albumPropCache[it] }
+
+                if (index < list.size) {
+                    // if selected album is not the same album currently playing, queue that album immediately
+                    // (navigating into the selected album involves too much complication :p)
+                    if (ingame.musicGovernor.playlistSource != albumsList[index].canonicalPath) {
+                        // fade out
                         AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
-                            ingame.musicGovernor.startMusic() // required for "intermittent" mode, does seemingly nothing on "continuous" mode
+                            loadNewAlbum(albumsList[index])
+                            ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                            resetPlaylistScroll(AudioMixer.musicTrack.nextTrack)
                         }
                     }
-                    // next page in the playlist
-                    else if (listViewPanelScroll == 1f) {
-                        val scrollMax = ((currentlySelectedAlbum?.length ?: 0).toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
-                        playlistScroll = (playlistScroll + PLAYLIST_LINES) fmod scrollMax
-                    }
-                    // next page in the albumlist
-                    else if (listViewPanelScroll == 0f) {
-                        val scrollMax = (albumsList.size.toFloat() / PLAYLIST_LINES).ceilToInt() * PLAYLIST_LINES
-                        albumlistScroll = (albumlistScroll + PLAYLIST_LINES) fmod scrollMax
-                    }
-                }
-                4 -> { // playlist
-                    if (mode < MODE_SHOW_LIST) {
-                        if (!transitionOngoing) {
-                            transitionRequest = MODE_SHOW_LIST
-                            currentListMode = 1 // no list transition anim is needed this time, just set the variable
-                            resetPlaylistScroll()
-                        }
-                    }
-                    else if (currentListMode != 1) {
-                        if (!listModeTransitionOngoing)
-                            currentListTransitionRequest = 1
-                    }
-                    else {
-                        if (!transitionOngoing)
-                            transitionRequest = AudioMixer.musicTrack.isPlaying.toInt() * MODE_MOUSE_UP
-                    }
                 }
             }
-        }
-        // make playlist clicking work
-        else if (listViewPanelScroll == 1f && !playControlButtonLatched && mouseOnList != null && Terrarum.mouseDown) {
-            playControlButtonLatched = true
-            val index = playlistScroll + mouseOnList!!
-            val list = songsInGovernor
-            if (index < list.size) {
-                // if selected song != currently playing
-                if (AudioMixer.musicTrack.currentTrack == null || list[index] != AudioMixer.musicTrack.currentTrack) {
-                    // rebuild playlist
-                    ingame.musicGovernor.queueIndexFromPlaylist(index)
-
-                    // fade out
-                    AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
-                        ingame.musicGovernor.startMusic() // required for "intermittent" mode
-                    }
-                }
+            // click on the music title to return to MODE_MOUSE_UP
+            else if (mouseUp && relativeMouseY.toFloat() in _posY + height - capsuleHeight.._posY + height && !transitionOngoing && mode > MODE_MOUSE_UP) {
+                transitionRequest = MODE_MOUSE_UP
             }
-        }
-        // make album list clicking work
-        else if (listViewPanelScroll == 0f && !playControlButtonLatched && mouseOnList != null && Terrarum.mouseDown) {
-            playControlButtonLatched = true
-            val index = albumlistScroll + mouseOnList!!
-            val list = albumsList//.map { albumPropCache[it] }
-
-            if (index < list.size) {
-                // if selected album is not the same album currently playing, queue that album immediately
-                // (navigating into the selected album involves too much complication :p)
-                if (ingame.musicGovernor.playlistSource != albumsList[index].canonicalPath) {
-                    // fade out
-                    AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
-                        loadNewAlbum(albumsList[index])
-                        ingame.musicGovernor.startMusic() // required for "intermittent" mode
-                        resetPlaylistScroll(AudioMixer.musicTrack.nextTrack)
-                    }
-                }
-            }
-        }
-        // click on the music title to return to MODE_MOUSE_UP
-        else if (mouseUp && relativeMouseY.toFloat() in _posY + height - capsuleHeight .. _posY + height && Terrarum.mouseDown && !transitionOngoing && mode > MODE_MOUSE_UP) {
-            playControlButtonLatched = true
-            transitionRequest = MODE_MOUSE_UP
-        }
-        // unlatch the click latch
-        else if (!Terrarum.mouseDown) {
-            playControlButtonLatched = false
         }
 
 
 //        printdbg(this, "mode = $mode; req = $transitionRequest")
     }
-
-    private var playControlButtonLatched = false
 
     private fun resetAlbumlistScroll() {
         val currentlyPlaying = albumsList.indexOfFirst { it.canonicalPath.replace('\\', '/') == ingame.musicGovernor.playlistSource }
