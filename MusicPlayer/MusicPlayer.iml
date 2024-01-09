@@ -7,11 +7,12 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="jetbrains.kotlin.test" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="jetbrains.kotlin.test" level="project" />
     <orderEntry type="module" module-name="TerrarumBuild" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="badlogicgames.gdx" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="io.airlift.aircompressor" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="TerrarumSansBitmap" level="project" />
-    <orderEntry type="library" name="apache.commons.math3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="apache.commons.math3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="jetbrains.kotlin.test1" level="project" />
   </component>
 </module>

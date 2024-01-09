@@ -440,6 +440,11 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 }
             }
         }
+        // click on the music title to return to MODE_MOUSE_UP
+        else if (mouseUp && relativeMouseY.toFloat() in _posY + height - capsuleHeight .. _posY + height && Terrarum.mouseDown && !transitionOngoing && mode > MODE_MOUSE_UP) {
+            playControlButtonLatched = true
+            transitionRequest = MODE_MOUSE_UP
+        }
         // unlatch the click latch
         else if (!Terrarum.mouseDown) {
             playControlButtonLatched = false
