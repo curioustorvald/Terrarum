@@ -1,5 +1,8 @@
-# Build-related
-out/*
+### IntelliJ IDEA ###
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
 bin/*
 build/*
 assets_release/*
