@@ -35,13 +35,15 @@ Requires 64 bit processor and operation system.
 
 - Playing the game on the Minimum Requirement is ill advised: framerate will be sub-20 and the world generation will take more than 10 minutes
 
-## Dev Setup ##
+## Development Environment ##
 
 - Requirements:
     - JDK 17 or higher
     - IntelliJ IDEA Community Edition
 
-Required libraries are included in the repository.
+Kotlin runtimes must be downloaded using the IntelliJ IDEA. All other libraries are included in the repository.
+
+The project includes modified version of the GraalVM-JS, in which the only difference is the `regex-22.3.1-edit.jar` is a modification of `regex-22.3.1.jar` where the only difference is its `MANIFEST.MD`
 
 ## Copyright ##
 

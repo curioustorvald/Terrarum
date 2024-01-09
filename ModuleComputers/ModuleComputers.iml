@@ -16,7 +16,6 @@
     <orderEntry type="library" scope="PROVIDED" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="jetbrains.kotlin.reflect" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="jetbrains.kotlin.test" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="jetbrains.kotlinx.coroutines.core" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="io.airlift.aircompressor" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="jetbrains.kotlin.test1" level="project" />
   </component>
