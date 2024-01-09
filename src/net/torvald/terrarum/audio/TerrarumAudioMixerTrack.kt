@@ -77,7 +77,8 @@ class TerrarumAudioMixerTrack(
             throw IllegalArgumentException("Cannot add master track as a sidechain")
 
         if (sidechainInputs.map { it.first }.any { it.hash == input.hash })
-            throw IllegalArgumentException("The track '${input.hash}' already exists")
+            //throw IllegalArgumentException("The track '${input.hash}' already exists")
+            return
 
         if (getSidechains().any { mySidechain ->
             val theirSidechains = mySidechain?.getSidechains()

@@ -391,12 +391,16 @@ public class App implements ApplicationListener {
                 processorVendor = "Unknown CPU";
             }
 
-            if (processor.startsWith("Apple M") && systemArch.equals("aarch64")) {
+            if (processor != null && processor.startsWith("Apple M") && systemArch.equals("aarch64")) {
                 isAppleM = true;
                 System.out.println("Apple Proprietary "+processor+" detected; don't expect smooth sailing...");
             }
-            if (processor.startsWith("Apple M") && !systemArch.equals("aarch64")) {
+            if (processor != null && processor.startsWith("Apple M") && !systemArch.equals("aarch64")) {
                 undesirableConditions = "apple_execution_through_rosetta";
+            }
+
+            if (processor == null) {
+                processor = "null";
             }
 
             if (!IS_DEVELOPMENT_BUILD) {
