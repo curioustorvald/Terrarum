@@ -18,8 +18,9 @@ class UIItemCatBar(
         val showSideButtons: Boolean = false,
 
         val catIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_category"),
-        private val catArrangement: IntArray, // icon order
-        internal val catIconsMeaning: List<Array<String>>, // sortedBy: catArrangement
+        /** XY index of the icon in the `catIcons`. When the number is written in decimal, low three digits denote X-axis (index=YYYXXX in decimal). The indices are ordered so that the first element is the icon on the left in the catbar. */
+        private val catArrangement: IntArray,
+        internal val catIconsMeaning: List<Array<String>>,
         internal val catIconsLabels: List<() -> String>,
 
         val panelTransitionReqFun: (Int) -> Unit = {} // for side buttons; for the selection change, override selectionChangeListener
