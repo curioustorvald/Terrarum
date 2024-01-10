@@ -8,15 +8,19 @@ import net.torvald.terrarum.App.*
 import net.torvald.terrarum.App.setToGameConfig
 import net.torvald.terrarum.audio.AudioCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.blockproperties.OreCodex
 import net.torvald.terrarum.blockproperties.WireCodex
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.IME
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameitems.BlockBase
 import net.torvald.terrarum.modulebasegame.worldgenerator.OregenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.serialise.Common
@@ -531,8 +535,74 @@ object ModMgr {
         }
 
         @JvmStatic operator fun invoke(module: String) {
-            Terrarum.blockCodex.fromModule(module, "blocks/blocks.csv")
+            Terrarum.blockCodex.fromModule(module, "blocks/blocks.csv") { tile ->
+                // register blocks as items
+                ItemCodex[tile.id] = makeNewItemObj(tile, false)
+
+                if (IS_DEVELOPMENT_BUILD) print(tile.id+" ")
+
+                if (BlockCodex[tile.id].isWallable) {
+                    ItemCodex["wall@" + tile.id] = makeNewItemObj(tile, true).also {
+                        it.tags.add("WALL")
+                    }
+                    if (IS_DEVELOPMENT_BUILD) print("wall@" + tile.id + " ")
+                }
+
+
+                // crafting recipes: tile -> 2x wall
+                if (tile.isWallable && tile.isSolid && !tile.isActorBlock) {
+                    CraftingRecipeCodex.addRecipe(
+                        CraftingCodex.CraftingRecipe(
+                        "",
+                        arrayOf(
+                            CraftingCodex.CraftingIngredients(
+                            tile.id, CraftingCodex.CraftingItemKeyMode.VERBATIM, 1
+                        )),
+                        2,
+                        "wall@"+tile.id,
+                        module
+                    ))
+                }
+            }
             Terrarum.wireCodex.fromModule(module, "wires/")
+        }
+
+        private fun makeNewItemObj(tile: BlockProp, isWall: Boolean) = object : GameItem(
+            if (isWall) "wall@"+tile.id else tile.id
+        ) {
+            override var baseMass: Double = tile.density / 100.0
+            override var baseToolSize: Double? = null
+            override var inventoryCategory = if (isWall) Category.WALL else Category.BLOCK
+            override var isDynamic = false
+            override val materialId = tile.material
+            override var equipPosition = EquipPosition.HAND_GRIP
+            //        override val itemImage: TextureRegion
+//            get() {
+//                val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(originalID)
+//                val bucket =  if (isWall) BlocksDrawer.tileItemWall else BlocksDrawer.tileItemTerrain
+//                return bucket.get(
+//                        itemSheetNumber % App.tileMaker.ITEM_ATLAS_TILES_X,
+//                        itemSheetNumber / App.tileMaker.ITEM_ATLAS_TILES_X
+//                )
+//            }
+
+            init {
+                tags.addAll(tile.tags)
+                originalName =
+                    if (isWall && tags.contains("UNLIT")) "${tile.nameKey}>>=BLOCK_UNLIT_TEMPLATE>>=BLOCK_WALL_NAME_TEMPLATE"
+                    else if (isWall) "${tile.nameKey}>>=BLOCK_WALL_NAME_TEMPLATE"
+                    else if (tags.contains("UNLIT")) "${tile.nameKey}>>=BLOCK_UNLIT_TEMPLATE"
+                    else tile.nameKey
+            }
+
+
+            override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
+                return BlockBase.blockStartPrimaryUse(actor, this, dynamicID, delta)
+            }
+
+            override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
+                BlockBase.blockEffectWhenEquipped(actor, delta)
+            }
         }
     }
 

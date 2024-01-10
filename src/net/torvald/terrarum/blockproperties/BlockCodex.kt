@@ -55,15 +55,15 @@ class BlockCodex {
     /**
      * Later entry (possible from other modules) will replace older ones
      */
-    fun fromModule(module: String, path: String) {
+    fun fromModule(module: String, path: String, blockRegisterHook: (BlockProp) -> Unit) {
         printdbg(this, "Building block properties table")
         try {
-            register(module, CSVFetcher.readFromModule(module, path))
+            register(module, CSVFetcher.readFromModule(module, path), blockRegisterHook)
         }
         catch (e: IOException) { e.printStackTrace() }
     }
 
-    fun fromCSV(module: String, csvString: String) {
+    fun fromCSV(module: String, csvString: String, blockRegisterHook: (BlockProp) -> Unit) {
         printdbg(this, "Building block properties table for module $module")
 
         val csvParser = org.apache.commons.csv.CSVParser.parse(
@@ -73,10 +73,10 @@ class BlockCodex {
         val csvRecordList = csvParser.records
         csvParser.close()
 
-        register(module, csvRecordList)
+        register(module, csvRecordList, blockRegisterHook)
     }
 
-    private fun register(module: String, records: List<CSVRecord>) {
+    private fun register(module: String, records: List<CSVRecord>, blockRegisterHook: (BlockProp) -> Unit) {
         records.forEach {
             /*if (it.intVal("id") == -1) {
                 setProp(nullProp, it)
@@ -107,6 +107,9 @@ class BlockCodex {
                 }
                 tileToVirtual[tileId] = virtualChunk.sorted().toList()
             }
+
+
+            blockProps[tileId]?.let(blockRegisterHook)
         }
     }
 

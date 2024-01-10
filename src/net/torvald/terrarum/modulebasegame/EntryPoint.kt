@@ -56,79 +56,7 @@ class EntryPoint : ModuleEntryPoint() {
             }
         }
 
-        /////////////////////////////////
-        // load customised item loader //
-        /////////////////////////////////
-
-        printdbg(this, "recording item ID ")
-
-        // blocks.csvs are loaded by ModMgr beforehand
-        // register blocks as items
-        for (tile in BlockCodex.getAll()) {
-            ItemCodex[tile.id] = makeNewItemObj(tile, false)
-
-            if (IS_DEVELOPMENT_BUILD) print(tile.id+" ")
-
-            if (BlockCodex[tile.id].isWallable) {
-                ItemCodex["wall@" + tile.id] = makeNewItemObj(tile, true).also {
-                    it.tags.add("WALL")
-                }
-                if (IS_DEVELOPMENT_BUILD) print("wall@" + tile.id + " ")
-            }
-        }
-
-        // crafting recipes: tile -> 2x wall
-        BlockCodex.getAll().filter { it.isWallable && it.isSolid && !it.isActorBlock }.forEach { tile ->
-            CraftingRecipeCodex.addRecipe(CraftingCodex.CraftingRecipe(
-                "",
-                arrayOf(CraftingCodex.CraftingIngredients(
-                    tile.id, CraftingCodex.CraftingItemKeyMode.VERBATIM, 1
-                )),
-                2,
-                "wall@"+tile.id,
-                moduleName
-            ))
-        }
-
         println("\n[Basegame.EntryPoint] Welcome back!")
-    }
-
-    private fun makeNewItemObj(tile: BlockProp, isWall: Boolean) = object : GameItem(
-            if (isWall) "wall@"+tile.id else tile.id
-    ) {
-        override var baseMass: Double = tile.density / 100.0
-        override var baseToolSize: Double? = null
-        override var inventoryCategory = if (isWall) Category.WALL else Category.BLOCK
-        override var isDynamic = false
-        override val materialId = tile.material
-        override var equipPosition = EquipPosition.HAND_GRIP
-        //        override val itemImage: TextureRegion
-//            get() {
-//                val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(originalID)
-//                val bucket =  if (isWall) BlocksDrawer.tileItemWall else BlocksDrawer.tileItemTerrain
-//                return bucket.get(
-//                        itemSheetNumber % App.tileMaker.ITEM_ATLAS_TILES_X,
-//                        itemSheetNumber / App.tileMaker.ITEM_ATLAS_TILES_X
-//                )
-//            }
-
-        init {
-            tags.addAll(tile.tags)
-            originalName =
-                if (isWall && tags.contains("UNLIT")) "${tile.nameKey}>>=BLOCK_UNLIT_TEMPLATE>>=BLOCK_WALL_NAME_TEMPLATE"
-                else if (isWall) "${tile.nameKey}>>=BLOCK_WALL_NAME_TEMPLATE"
-                else if (tags.contains("UNLIT")) "${tile.nameKey}>>=BLOCK_UNLIT_TEMPLATE"
-                else tile.nameKey
-        }
-
-
-        override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
-            return BlockBase.blockStartPrimaryUse(actor, this, dynamicID, delta)
-        }
-
-        override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
-            BlockBase.blockEffectWhenEquipped(actor, delta)
-        }
     }
 
 
