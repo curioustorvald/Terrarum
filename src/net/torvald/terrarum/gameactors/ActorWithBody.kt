@@ -419,6 +419,8 @@ open class ActorWithBody : Actor {
     /**
      * ONLY FOR INITIAL SETUP
      *
+     * For the fixtures, `ty` of `0` will plant the fixture to the ground (they will spawn 1 px lower). Use value `1` to spawn them flush to the block grids.
+     *
      * @param w
      * @param h
      * @param tx positive: translate sprite to LEFT.
@@ -428,7 +430,7 @@ open class ActorWithBody : Actor {
         baseHitboxH = h
         baseHitboxW = w
         hitboxTranslateX = tx
-        hitboxTranslateY = ty
+        hitboxTranslateY = ty - 1 // plant the fixture to the ground
         hitbox.setDimension(w.toDouble(), h.toDouble())
     }
 

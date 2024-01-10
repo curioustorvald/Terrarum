@@ -37,7 +37,7 @@ class FixtureHomeComputer : FixtureBase {
             nameFun = { "Computer" }
     ) {
         density = 1400.0
-        setHitboxDimension(TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE, 0, -1)
+        setHitboxDimension(TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE, 0, 0)
 
         makeNewSprite(FixtureBase.getSpritesheet("dwarventech", "sprites/fixtures/desktop_computer.tga", TILE_SIZE, TILE_SIZE)).let {
             it.setRowsAndFrames(1,1)

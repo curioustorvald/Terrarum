@@ -23,7 +23,7 @@ class FixtureWallCalendar : FixtureBase {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/calendar.tga")
 
         density = 600.0
-        setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 0)
+        setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 1)
 
         makeNewSprite(TextureRegionPack(itemImage.texture, TILE_SIZE, TILE_SIZE)).let {
             it.setRowsAndFrames(1,1)

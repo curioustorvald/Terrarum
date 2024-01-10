@@ -127,7 +127,7 @@ open class FixtureSwingingDoorBase : FixtureBase {
         (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList)[0].light = opacity
 
         // define physical size
-        setHitboxDimension(TILE_SIZE * tilewiseHitboxWidth, TILE_SIZE * tilewiseHitboxHeight, 0, 0)
+        setHitboxDimension(TILE_SIZE * tilewiseHitboxWidth, TILE_SIZE * tilewiseHitboxHeight, 0, 1)
         blockBox = BlockBox(BlockBox.FULL_COLLISION, tilewiseHitboxWidth, tilewiseHitboxHeight)
 
         doorHoldLength = hashMapOf(
