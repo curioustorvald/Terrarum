@@ -1,9 +1,8 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.CraftingRecipeCodex
 import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.UIItemInventoryCatBar
+import net.torvald.terrarum.ui.UIItemCatBar
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -15,12 +14,12 @@ import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
  * Created by minjaesong on 2022-06-28.
  */
 class UIItemCraftingCandidateGrid(
-        parentUI: UICrafting, catBar: UIItemInventoryCatBar,
-        initialX: Int, initialY: Int,
-        horizontalCells: Int, verticalCells: Int,
-        drawScrollOnRightside: Boolean = false,
-        keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, keyed button
-        touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit // Item, Amount, Button, extra info, clicked button
+    parentUI: UICrafting, catBar: UIItemCatBar,
+    initialX: Int, initialY: Int,
+    horizontalCells: Int, verticalCells: Int,
+    drawScrollOnRightside: Boolean = false,
+    keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, keyed button
+    touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit // Item, Amount, Button, extra info, clicked button
 ) : UIItemInventoryItemGrid(
         parentUI, catBar,
         { TODO() /* UNUSED and MUST NOT BE USED! */ },
@@ -99,7 +98,7 @@ class UIItemCraftingCandidateGrid(
         craftingRecipes.forEach {
             if (
                 filter.contains((ItemCodex[it.product]?.inventoryCategory ?: throw IllegalArgumentException("Unknown item: ${it.product}"))) ||
-                filter[0] == UIItemInventoryCatBar.CAT_ALL
+                filter[0] == UIItemCatBar.CAT_ALL
                 ) {
                 recipesSortList.add(it)
             }

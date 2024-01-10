@@ -8,12 +8,10 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.decibelsToFullscale
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIHandler
-import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
+import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.*
 
@@ -200,13 +198,43 @@ class UIInventoryFull(
     }
     fun requestTransition(target: Int) = transitionPanel.requestTransition(target)
 
-    val catBar = UIItemInventoryCatBar(
-            this,
-            (width - catBarWidth) / 2,
-            42 - YPOS_CORRECTION + (App.scr.height - internalHeight) / 2,
-            internalWidth,
-            catBarWidth,
-            true
+    val catBar = UIItemCatBar(
+        this,
+        (width - catBarWidth) / 2,
+        42 - YPOS_CORRECTION + (scr.height - internalHeight) / 2,
+        internalWidth,
+        catBarWidth,
+        true,
+
+        catIcons = CommonResourcePool.getAsTextureRegionPack("inventory_category"),
+        catArrangement = intArrayOf(9,6,7,1,0,2,1_011,3,4,5,8), // icon order
+        catIconsMeaning = listOf( // sortedBy: catArrangement
+            arrayOf(UIItemCatBar.CAT_ALL),
+            arrayOf(GameItem.Category.BLOCK),
+            arrayOf(GameItem.Category.WALL),
+            arrayOf(GameItem.Category.TOOL, GameItem.Category.WIRE),
+            arrayOf(GameItem.Category.WEAPON),
+            arrayOf(GameItem.Category.ARMOUR),
+            arrayOf(GameItem.Category.FIXTURE),
+            arrayOf(GameItem.Category.GENERIC),
+            arrayOf(GameItem.Category.POTION),
+            arrayOf(GameItem.Category.MAGIC),
+            arrayOf(GameItem.Category.MISC),
+        ),
+        catIconsLabels = listOf(
+            { Lang["MENU_LABEL_ALL"] },
+            { Lang["GAME_INVENTORY_BLOCKS"] },
+            { Lang["GAME_INVENTORY_WALLS"] },
+            { Lang["CONTEXT_ITEM_TOOL_PLURAL"] },
+            { Lang["GAME_INVENTORY_WEAPONS"] },
+            { Lang["CONTEXT_ITEM_ARMOR"] },
+            { Lang["CONTEXT_ITEM_FIXTURES"] },
+            { Lang["GAME_INVENTORY_INGREDIENTS"] },
+            { Lang["GAME_INVENTORY_POTIONS"] },
+            { Lang["CONTEXT_ITEM_MAGIC"] },
+            { Lang["GAME_GENRE_MISC"] },
+        ),
+
     ) { i -> if (!panelTransitionLocked) requestTransition(i) }
 
 

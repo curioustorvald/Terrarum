@@ -5,14 +5,14 @@ import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
-import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.*
 
 /**
  * Suite of objects for showing player inventory for various crafting UIs.
  *
  * Created by minjaesong on 2023-10-04.
  */
-class CraftingPlayerInventory(val full: UIInventoryFull, val crafting: UICanvas) {
+class CraftingPlayerInventory(val full: UIInventoryFull, val crafting: UICanvas) : UITemplate(crafting) {
 
     val itemList: UIItemInventoryItemGrid
 
@@ -68,4 +68,7 @@ class CraftingPlayerInventory(val full: UIInventoryFull, val crafting: UICanvas)
         itemList.getInventory = getter
     }
 
+    override fun getUIitems(): List<UIItem> {
+        return listOf(itemList)
+    }
 }

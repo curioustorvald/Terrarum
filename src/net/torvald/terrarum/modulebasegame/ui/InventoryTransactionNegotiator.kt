@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
+import net.torvald.terrarum.ui.UIItemCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 

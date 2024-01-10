@@ -192,6 +192,9 @@ abstract class UICanvas(
     fun addUIitem(uiItem: UIItem) {
         if (!uiItems.contains(uiItem)) uiItems.add(uiItem)
     }
+    fun addUIitem(template: UITemplate) {
+        template.getUIitems().forEach { addUIitem(it) }
+    }
 
     fun mouseInScreen(x: Int, y: Int) = x in 0 until App.scr.windowW && y in 0 until App.scr.windowH
 

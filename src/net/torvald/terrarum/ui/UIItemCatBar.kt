@@ -1,59 +1,33 @@
-package net.torvald.terrarum
+package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.gameitems.GameItem
-import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.ui.*
+import net.torvald.terrarum.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2017-10-20.
  */
-class UIItemInventoryCatBar(
+class UIItemCatBar(
         parentUI: UICanvas,
         initialX: Int,
         initialY: Int,
         uiInternalWidth: Int,
         override val width: Int,
         val showSideButtons: Boolean = false,
+
+        val catIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_category"),
+        private val catArrangement: IntArray, // icon order
+        internal val catIconsMeaning: List<Array<String>>, // sortedBy: catArrangement
+        internal val catIconsLabels: List<() -> String>,
+
         val panelTransitionReqFun: (Int) -> Unit = {} // for side buttons; for the selection change, override selectionChangeListener
 ) : UIItem(parentUI, initialX, initialY) {
 
     companion object {
         const val CAT_ALL = "__all__"
     }
-
-    internal val catIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_category")
-    private val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,1_011,3,4,5,8) // icon order
-    internal val catIconsMeaning = listOf( // sortedBy: catArrangement
-        arrayOf(CAT_ALL),
-        arrayOf(GameItem.Category.BLOCK),
-        arrayOf(GameItem.Category.WALL),
-        arrayOf(GameItem.Category.TOOL, GameItem.Category.WIRE),
-        arrayOf(GameItem.Category.WEAPON),
-        arrayOf(GameItem.Category.ARMOUR),
-        arrayOf(GameItem.Category.FIXTURE),
-        arrayOf(GameItem.Category.GENERIC),
-        arrayOf(GameItem.Category.POTION),
-        arrayOf(GameItem.Category.MAGIC),
-        arrayOf(GameItem.Category.MISC),
-    )
-
-    internal val catIconsLabels = listOf(
-        { Lang["MENU_LABEL_ALL"] },
-        { Lang["GAME_INVENTORY_BLOCKS"] },
-        { Lang["GAME_INVENTORY_WALLS"] },
-        { Lang["CONTEXT_ITEM_TOOL_PLURAL"] },
-        { Lang["GAME_INVENTORY_WEAPONS"] },
-        { Lang["CONTEXT_ITEM_ARMOR"] },
-        { Lang["CONTEXT_ITEM_FIXTURES"] },
-        { Lang["GAME_INVENTORY_INGREDIENTS"] },
-        { Lang["GAME_INVENTORY_POTIONS"] },
-        { Lang["CONTEXT_ITEM_MAGIC"] },
-        { Lang["GAME_GENRE_MISC"] },
-    )
 
 
     private val inventoryUI = parentUI

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
-import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
+import net.torvald.terrarum.ui.UIItemCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -16,10 +16,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.CraftingStation
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItemSpinner
-import net.torvald.terrarum.ui.UIItemTextButton
+import net.torvald.terrarum.ui.*
 import net.torvald.unicode.getKeycapPC
 import kotlin.math.ceil
 import kotlin.math.max
@@ -32,7 +29,7 @@ import kotlin.math.min
  */
 class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
-    private val catBar: UIItemInventoryCatBar
+    private val catBar: UIItemCatBar
         get() = full.catBar
 
     override var width = App.scr.width
@@ -311,7 +308,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
         addUIitem(itemListCraftable)
         addUIitem(itemListIngredients)
-        addUIitem(playerThings.itemList)
+        addUIitem(playerThings)
         addUIitem(spinnerCraftCount)
         addUIitem(buttonCraft)
     }

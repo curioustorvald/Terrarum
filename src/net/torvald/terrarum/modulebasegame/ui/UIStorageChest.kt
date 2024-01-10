@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -10,8 +9,7 @@ import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.getWidthOfCells
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.*
 import net.torvald.unicode.getKeycapPC
 import kotlin.math.max
 import kotlin.math.min
@@ -46,7 +44,7 @@ internal class UIStorageChest : UICanvas(
     override fun getFixtureInventory(): FixtureInventory = chestInventory
     override fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
 
-    private val catBar: UIItemInventoryCatBar
+    private val catBar: UIItemCatBar
     private val itemListChest: UIItemInventoryItemGrid
     private val itemListPlayer: UIItemInventoryItemGrid
 
@@ -56,13 +54,43 @@ internal class UIStorageChest : UICanvas(
     private var halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap * 2) / 2
 
     init {
-        catBar = UIItemInventoryCatBar(
+        catBar = UIItemCatBar(
             this,
             (width - UIInventoryFull.catBarWidth) / 2,
             42 - UIInventoryFull.YPOS_CORRECTION + (App.scr.height - UIInventoryFull.internalHeight) / 2,
             UIInventoryFull.internalWidth,
             UIInventoryFull.catBarWidth,
-            false
+            false,
+
+            catIcons = CommonResourcePool.getAsTextureRegionPack("inventory_category"),
+            catArrangement = intArrayOf(9,6,7,1,0,2,1_011,3,4,5,8), // icon order
+            catIconsMeaning = listOf( // sortedBy: catArrangement
+                arrayOf(UIItemCatBar.CAT_ALL),
+                arrayOf(GameItem.Category.BLOCK),
+                arrayOf(GameItem.Category.WALL),
+                arrayOf(GameItem.Category.TOOL, GameItem.Category.WIRE),
+                arrayOf(GameItem.Category.WEAPON),
+                arrayOf(GameItem.Category.ARMOUR),
+                arrayOf(GameItem.Category.FIXTURE),
+                arrayOf(GameItem.Category.GENERIC),
+                arrayOf(GameItem.Category.POTION),
+                arrayOf(GameItem.Category.MAGIC),
+                arrayOf(GameItem.Category.MISC),
+            ),
+            catIconsLabels = listOf(
+                { Lang["MENU_LABEL_ALL"] },
+                { Lang["GAME_INVENTORY_BLOCKS"] },
+                { Lang["GAME_INVENTORY_WALLS"] },
+                { Lang["CONTEXT_ITEM_TOOL_PLURAL"] },
+                { Lang["GAME_INVENTORY_WEAPONS"] },
+                { Lang["CONTEXT_ITEM_ARMOR"] },
+                { Lang["CONTEXT_ITEM_FIXTURES"] },
+                { Lang["GAME_INVENTORY_INGREDIENTS"] },
+                { Lang["GAME_INVENTORY_POTIONS"] },
+                { Lang["CONTEXT_ITEM_MAGIC"] },
+                { Lang["GAME_GENRE_MISC"] },
+            ),
+
         )
         catBar.selectionChangeListener = { old, new -> itemListUpdate() }
         itemListChest = UIItemInventoryItemGrid(

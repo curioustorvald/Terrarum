@@ -1,13 +1,11 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
+import net.torvald.terrarum.ui.UIItemCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -17,9 +15,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defaultInventoryCellTheme
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItem
+import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.floor
 
@@ -35,21 +31,21 @@ import kotlin.math.floor
  * Created by minjaesong on 2017-10-21.
  */
 open class UIItemInventoryItemGrid(
-        parentUI: UICanvas,
-        val catBar: UIItemInventoryCatBar,
-        var getInventory: () -> FixtureInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
-        initialX: Int,
-        initialY: Int,
-        val horizontalCells: Int,
-        val verticalCells: Int,
-        val drawScrollOnRightside: Boolean = false,
-        val drawWallet: Boolean = true,
-        val hideSidebar: Boolean = false,
-        keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
-        touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
-        protected val useHighlightingManager: Boolean = true, // only used by UIItemCraftingCandidateGrid which addresses buttons directly to set highlighting
-        open protected val highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
-        private val colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme
+    parentUI: UICanvas,
+    val catBar: UIItemCatBar,
+    var getInventory: () -> FixtureInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
+    initialX: Int,
+    initialY: Int,
+    val horizontalCells: Int,
+    val verticalCells: Int,
+    val drawScrollOnRightside: Boolean = false,
+    val drawWallet: Boolean = true,
+    val hideSidebar: Boolean = false,
+    keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
+    touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
+    protected val useHighlightingManager: Boolean = true, // only used by UIItemCraftingCandidateGrid which addresses buttons directly to set highlighting
+    open protected val highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
+    private val colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme
 ) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position

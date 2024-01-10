@@ -1,18 +1,18 @@
-package net.torvald.terrarum
+package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.App
+import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.ui.InventoryCellColourTheme
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defaultInventoryCellTheme
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.mul
 import kotlin.math.roundToInt
 
 /**
@@ -39,8 +39,8 @@ class UIItemInventoryElemSimple(
         val height = UIItemInventoryElemWide.height
     }
 
-    override val width = UIItemInventoryElemSimple.height
-    override val height = UIItemInventoryElemSimple.height
+    override val width = Companion.height
+    override val height = Companion.height
 
     private val imgOffsetY: Float
         get() = (this.height - itemImage!!.regionHeight).div(2).toFloat() // to snap to the pixel grid
