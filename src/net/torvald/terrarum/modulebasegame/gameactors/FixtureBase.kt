@@ -381,6 +381,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     /** force disable despawn when inventory is not empty */
     val canBeDespawned: Boolean get() = inventory?.isEmpty() ?: true
 
+    @Transient open var despawnHook: (FixtureBase) -> Unit = {}
+
     /**
      * Removes this instance of the fixture from the world
      */
@@ -405,6 +407,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
                 wireEmission.clear()
                 wireConsumption.clear()
             }
+
+            despawnHook(this)
         }
         else {
             printdbg(this, "failed to despawn at T${INGAME.WORLD_UPDATE_TIMER}: ${nameFun()}")

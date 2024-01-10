@@ -37,7 +37,7 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
 
     private var breakBomb = false
 
-    private val distFalloff = 2048.0
+    private val distFalloff = 1024.0
 
     private fun printdbg(msg: Any) {
         if (true) App.printdbg("AudioAdapter ${track.name}", msg)

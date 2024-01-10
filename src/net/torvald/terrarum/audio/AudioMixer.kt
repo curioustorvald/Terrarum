@@ -411,7 +411,7 @@ object AudioMixer: Disposable {
         requestFadeOut(ambientTrack, DEFAULT_FADEOUT_LEN * 4)
     }
 
-    fun requestFadeOut(track: TerrarumAudioMixerTrack, length: Double, target: Double = 0.0, source: Double? = null, jobAfterFadeout: () -> Unit = {}) {
+    fun requestFadeOut(track: TerrarumAudioMixerTrack, length: Double = DEFAULT_FADEOUT_LEN, target: Double = 0.0, source: Double? = null, jobAfterFadeout: () -> Unit = {}) {
         val req = fadeReqs[track]!!
         if (!req.fadeoutFired) {
             req.fadeLength = length.coerceAtLeast(1.0/1024.0)

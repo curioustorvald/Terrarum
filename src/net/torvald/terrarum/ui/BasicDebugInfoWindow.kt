@@ -496,7 +496,7 @@ class BasicDebugInfoWindow : UICanvas() {
             batch.color = COL_METER_TROUGH
             val intensity = fullscaleToDecibels(fs.coerceAtMost(1.0)).plus(dbLow).div(dbLow).coerceIn(0.0, 1.0).toFloat()
             Toolkit.fillArea(batch, x, y + 2, miniW, 8)
-            batch.color = if (fs > 1.0) LAMP_OVERRANGE else Color(0.1f, intensity, 0.1f, 0.666f)
+            batch.color = if (fs > 1.0) LAMP_OVERRANGE else Color(0.1f, intensity, 0.1f, 1f)
             Toolkit.fillArea(batch, x + 2 + 13*ch, y + 4, 11, 4)
 
             oldPeakDS[index][ch] = fs

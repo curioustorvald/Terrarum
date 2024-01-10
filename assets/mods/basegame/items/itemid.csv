@@ -26,6 +26,7 @@ id;classname
 25;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBall
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel
 27;net.torvald.terrarum.modulebasegame.gameitems.ItemFurnaceAndAnvil
+28;net.torvald.terrarum.modulebasegame.gameitems.ItemJukebox
 
 # ingots
 112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper
