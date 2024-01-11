@@ -19,8 +19,6 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class FixtureWorldPortal : Electric {
 
-    @Transient override val spawnNeedsFloor = true
-
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 5, 2),
         nameFun = { Lang["ITEM_WORLD_PORTAL"] },

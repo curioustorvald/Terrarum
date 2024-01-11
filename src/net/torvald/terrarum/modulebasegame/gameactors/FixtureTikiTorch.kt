@@ -20,7 +20,6 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 internal class FixtureTikiTorch : FixtureBase {
 
-    @Transient override val spawnNeedsFloor = true
 
     private val rndHash1 = (Math.random() * 256).toInt()
     private val rndHash2 = (Math.random() * 256).toInt()

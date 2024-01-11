@@ -7,7 +7,6 @@ import net.torvald.terrarum.blockproperties.Block
  * Created by minjaesong on 2022-07-28.
  */
 class FixtureSwingingDoorOak : FixtureSwingingDoorBase {
-    @Transient override val spawnNeedsWall = true
     constructor() : super() {
         _construct(
                 2,
@@ -25,7 +24,6 @@ class FixtureSwingingDoorOak : FixtureSwingingDoorBase {
 }
 
 class FixtureSwingingDoorEbony : FixtureSwingingDoorBase {
-    @Transient override val spawnNeedsWall = true
     constructor() : super() {
         _construct(
                 2,
@@ -43,7 +41,6 @@ class FixtureSwingingDoorEbony : FixtureSwingingDoorBase {
 }
 
 class FixtureSwingingDoorBirch : FixtureSwingingDoorBase {
-    @Transient override val spawnNeedsWall = true
     constructor() : super() {
         _construct(
                 2,
@@ -61,7 +58,6 @@ class FixtureSwingingDoorBirch : FixtureSwingingDoorBase {
 }
 
 class FixtureSwingingDoorRosewood : FixtureSwingingDoorBase {
-    @Transient override val spawnNeedsWall = true
     constructor() : super() {
         _construct(
                 2,

@@ -19,7 +19,6 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
 
-    @Transient override val spawnNeedsFloor = true
     @Transient override val tags = listOf("metalworking")
 
     constructor() : super(

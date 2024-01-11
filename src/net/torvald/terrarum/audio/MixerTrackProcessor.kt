@@ -37,7 +37,7 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
 
     private var breakBomb = false
 
-    private val distFalloff = 1024.0
+    private val distFalloff = 1536.0
 
     private fun printdbg(msg: Any) {
         if (true) App.printdbg("AudioAdapter ${track.name}", msg)
@@ -111,10 +111,12 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
                         (track.filters[0] as BinoPan).pan = 0f
                     }
                     else if (track.trackingTarget is ActorWithBody) {
-                        // FIXME this may cause filter to fill the output buffer with NaNs?
                         val relativeXpos = relativeXposition(AudioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
-                        track.volume = track.maxVolume * (1.0 - relativeXpos.absoluteValue.pow(0.5) / distFalloff)
-                        (track.filters[0] as BinoPan).pan = ((2*asin(relativeXpos / distFalloff)) / Math.PI).toFloat()
+                        track.volume = track.maxVolume * (1.0 - (relativeXpos.absoluteValue / distFalloff).pow(0.5)).coerceAtLeast(0.0)
+                        (track.filters[0] as BinoPan).pan =
+                            if (relativeXpos <= -distFalloff) -1f
+                            else if (relativeXpos >= distFalloff) 1f
+                            else ((2*asin(relativeXpos / distFalloff)) / Math.PI).toFloat()
                     }
                 }
             }

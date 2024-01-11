@@ -50,6 +50,7 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
         val delayInSamples = (timeDiffMax * FastMath.sin(angle)).absoluteValue
         val volMultDbThis = PANNING_CONST * pan.absoluteValue
         val volMultFsThis = decibelsToFullscale(volMultDbThis).toFloat()
+
         val volMUltFsOther = 1f / volMultFsThis
 
         if (pan >= 0) {

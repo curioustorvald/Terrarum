@@ -19,6 +19,7 @@ import kotlin.properties.Delegates
 internal class FixtureTapestry : FixtureBase {
 
     @Transient override val spawnNeedsWall = true
+    @Transient override val spawnNeedsFloor = false
 
     var artName = ""; private set
     var artAuthor = ""; private set

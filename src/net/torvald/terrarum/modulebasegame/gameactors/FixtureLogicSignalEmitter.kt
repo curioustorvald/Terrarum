@@ -9,6 +9,8 @@ import org.dyn4j.geometry.Vector2
 
 class FixtureLogicSignalEmitter : Electric {
 
+    @Transient override val spawnNeedsFloor = false
+
     constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 1),
             nameFun = { Lang["ITEM_LOGIC_SIGNAL_EMITTER"] }

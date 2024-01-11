@@ -339,7 +339,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     fun stopMusic(callStopMusicHook: Boolean = true, pauseLen: Float = Float.POSITIVE_INFINITY) {
         stopMusic(AudioMixer.musicTrack.currentTrack, callStopMusicHook)
         intermissionLength = pauseLen
-        printdbg(this, "StopMusic Intermission2: $intermissionLength seconds")
+//        printdbg(this, "StopMusic Intermission2: $intermissionLength seconds")
     }
 
     fun startMusic() {

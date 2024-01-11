@@ -138,7 +138,7 @@ open class Electric : FixtureBase {
 open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
     @Transient open val spawnNeedsWall: Boolean = false
-    @Transient open val spawnNeedsFloor: Boolean = false
+    @Transient open val spawnNeedsFloor: Boolean = true
 
     /** Real time, in nanoseconds */
     @Transient var spawnRequestedTime: Long = 0L

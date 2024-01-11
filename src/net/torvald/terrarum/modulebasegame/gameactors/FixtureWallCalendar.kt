@@ -14,6 +14,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 class FixtureWallCalendar : FixtureBase {
 
     @Transient override val spawnNeedsWall = true
+    @Transient override val spawnNeedsFloor = false
 
     constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 1),
