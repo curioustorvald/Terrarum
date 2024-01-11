@@ -463,6 +463,20 @@ object AudioMixer: Disposable {
         }
     }
 
+    fun reset() {
+        dynamicTracks.forEach { it.stop() }
+        tracks.filter { it.trackType == TrackType.STATIC_SOURCE }.forEach { it.stop() }
+        tracks.forEach {
+            it.processor.purgeBuffer()
+        }
+        fadeBus.getFilter<Lowpass>().setCutoff(TerrarumAudioMixerTrack.SAMPLING_RATEF / 2)
+        // give some time for the cave bus to decay before ramping the volume up
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                fadeBus.volume = 1.0
+            }
+        }, 500L)
+    }
 
     override fun dispose() {
         processingExecutor.killAll()

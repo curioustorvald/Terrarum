@@ -46,8 +46,6 @@ class TerrarumAudioMixerTrack(
     var currentTrack: MusicContainer? = null
     var nextTrack: MusicContainer? = null
 
-    var currentSound: Sound? = null // DYNAMIC_SOURCE only
-
     var volume: TrackVolume = 1.0
         get() = field
         set(value) {

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.Gdx
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
@@ -73,6 +74,8 @@ class FixtureJukebox : Electric {
 
 
     private fun playDisc(index: Int) {
+        printdbg(this, "Play disc $index!")
+
         musicNowPlaying = testMusic // todo use index
 
         AudioMixer.requestFadeOut(AudioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
@@ -80,8 +83,14 @@ class FixtureJukebox : Electric {
         }
     }
 
+    private fun forceStop() {
+        musicNowPlaying?.let {
+            stopAudio(it)
+        }
+    }
+
     @Transient override var despawnHook: (FixtureBase) -> Unit = {
-        musicNowPlaying?.let { stopAudio(it) }
+        forceStop()
         (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(pauseLen = Math.random().toFloat() * 30f + 30f)
     }
 

@@ -39,6 +39,17 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
     val maxRMS = arrayOf(0.0, 0.0)
     val hasClipping = arrayOf(false, false)
 
+    internal fun purgeBuffer() {
+        fout1.forEach { it.fill(0f) }
+        purgeStreamBuf()
+    }
+
+    private fun purgeStreamBuf() {
+        track.stop()
+        streamBuf = null
+        printdbg("StreamBuf is now null")
+    }
+
     private var breakBomb = false
 
     private val distFalloff = 1600.0
@@ -70,11 +81,7 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
             }
 
             bytesRead
-        }, {
-            track.stop()
-            this.streamBuf = null
-            printdbg("StreamBuf is now null")
-        })
+        }, { purgeStreamBuf() })
     }
 
     override fun run() {
@@ -111,6 +118,7 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
             if (track.trackType == TrackType.DYNAMIC_SOURCE && track.isPlaying) {
                 if (AudioMixer.actorNowPlaying != null) {
                     if (track.trackingTarget == null || track.trackingTarget == AudioMixer.actorNowPlaying) {
+                        // "reset" the track
                         track.volume = track.maxVolume
                         (track.filters[0] as BinoPan).pan = 0f
                         (track.filters[1] as Lowpass).setCutoff(SAMPLING_RATE / 2f)
@@ -130,6 +138,12 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
 
 //                        printdbg("dist=$distFromActor\tvol=${fullscaleToDecibels(vol)}\tcutoff=${(track.filters[1] as Lowpass).cutoff}")
                     }
+                }
+                else {
+                    // "reset" the track
+                    track.volume = track.maxVolume
+                    (track.filters[0] as BinoPan).pan = 0f
+                    (track.filters[1] as Lowpass).setCutoff(SAMPLING_RATE / 2f)
                 }
             }
 
