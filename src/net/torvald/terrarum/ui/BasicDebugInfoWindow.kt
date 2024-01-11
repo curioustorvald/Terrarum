@@ -469,7 +469,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val dbLow = 60.0
 
     private val oldPeak = Array(trackCount) { arrayOf(0.0, 0.0) }
-    private val oldPeakDS = Array(256) { arrayOf(0.0, 0.0) }
+    private val oldPeakDS = Array(App.getConfigInt("audio_dynamic_source_max")) { arrayOf(0.0, 0.0) }
     private val oldRMS = Array(trackCount) { arrayOf(0.0, 0.0) }
     private val oldComp = Array(trackCount) { arrayOf(0.0, 0.0) }
 
