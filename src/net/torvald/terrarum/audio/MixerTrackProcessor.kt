@@ -5,6 +5,7 @@ import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.dsp.BinoPan
 import net.torvald.terrarum.audio.dsp.NullFilter
+import net.torvald.terrarum.distBetweenActors
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.relativeXposition
 import net.torvald.terrarum.sqr
@@ -111,11 +112,13 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
                     }
                     else if (track.trackingTarget is ActorWithBody) {
                         val relativeXpos = relativeXposition(AudioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
-                        track.volume = track.maxVolume * (1.0 - (relativeXpos.absoluteValue / distFalloff).pow(0.5)).coerceAtLeast(0.0)
+                        val distFromActor = distBetweenActors(AudioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
+                        track.volume = track.maxVolume * getVolFun(distFromActor / distFalloff).coerceAtLeast(0.0)
                         (track.filters[0] as BinoPan).pan =
                             if (relativeXpos <= -distFalloff) -1f
                             else if (relativeXpos >= distFalloff) 1f
                             else ((2*asin(relativeXpos / distFalloff)) / Math.PI).toFloat()
+                        // TODO lowpass filter by dist
                     }
                 }
             }
@@ -232,6 +235,14 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
                 resumeSidechainsRecursively(track, track.name)
             }
 //        } // uncomment to multithread
+    }
+
+    // https://www.desmos.com/calculator/blcd4s69gl
+    private fun getVolFun(x: Double): Double {
+//        val K = 1.225
+//        fun q(x: Double) = if (x >= 1.0) 0.5 else (K*x - K).pow(2.0) + 0.5
+//        val x2 = x.pow(q(x))
+        return decibelsToFullscale(-20.0 * x)
     }
 
     private fun FloatArray.applyVolume(volume: Float) = FloatArray(this.size) { (this[it] * volume) }

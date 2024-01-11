@@ -3,6 +3,7 @@ package net.torvald.terrarum.audio.dsp
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
@@ -23,13 +24,9 @@ import kotlin.math.roundToInt
  */
 class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter() {
 
-    private val PANNING_CONST = 3.0 // 3dB panning rule
-
-    private val panUp = decibelsToFullscale(PANNING_CONST / 2.0).toFloat()
-    private val panDn = decibelsToFullscale(-PANNING_CONST / 2.0).toFloat()
-
     private val delayLineL = FloatArray(AUDIO_BUFFER_SIZE)
     private val delayLineR = FloatArray(AUDIO_BUFFER_SIZE)
+
 
     private fun getFrom(index: Float, buf0: FloatArray, buf1: FloatArray): Float {
         val index = index.toInt() // TODO resampling
@@ -44,47 +41,64 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
     private val outRs = Array(2) { FloatArray(AUDIO_BUFFER_SIZE) }
 
 
-    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
-        val angle = pan * 1.5707963f
+    companion object {
+        private val PANNING_CONST = 6.0
+        private const val L = 0
+        private const val R = 1
+
+        private val HALF_PI = (Math.PI / 2.0).toFloat()
+    }
+
+
+    private fun thru(sym: String, angleOffset: Float, inbuf: FloatArray, sumbuf: Array<FloatArray>, delayLine: FloatArray) {
+        val pan = (pan + angleOffset / 90f).coerceIn(-1f, 1f)
+
+        val angle = pan * HALF_PI
         val timeDiffMax = earDist / AudioMixer.SPEED_OF_SOUND * TerrarumAudioMixerTrack.SAMPLING_RATEF
         val delayInSamples = (timeDiffMax * FastMath.sin(angle)).absoluteValue
         val volMultDbThis = PANNING_CONST * pan.absoluteValue
         val volMultFsThis = decibelsToFullscale(volMultDbThis).toFloat()
 
-        val volMUltFsOther = 1f / volMultFsThis
+        val volMultFsOther = 1f / volMultFsThis
 
         if (pan >= 0) {
-            delays[0] = delayInSamples
-            delays[1] = 0f
+            delays[L] = delayInSamples
+            delays[R] = 0f
         }
         else {
-            delays[0] = 0f
-            delays[1] = delayInSamples
+            delays[L] = 0f
+            delays[R] = delayInSamples
         }
 
         if (pan >= 0) {
-            mults[0] = volMUltFsOther
-            mults[1] = volMultFsThis
+            mults[L] = volMultFsOther
+            mults[R] = volMultFsThis
         }
         else {
-            mults[0] = volMultFsThis
-            mults[1] = volMUltFsOther
-        }
-
-        for (ch in 0..1) {
-            for (i in 0 until AUDIO_BUFFER_SIZE) {
-                outLs[ch][i] = getFrom(i - delays[ch], delayLineL, inbuf[0]) * mults[ch]
-                outRs[ch][i] = getFrom(i - delays[ch], delayLineR, inbuf[1]) * mults[ch]
-            }
+            mults[L] = volMultFsThis
+            mults[R] = volMultFsOther
         }
 
         for (i in 0 until AUDIO_BUFFER_SIZE) {
-            outbuf[0][i] = (outLs[0][i] * panUp + outLs[1][i] * panDn) / 2f
-            outbuf[1][i] = (outRs[0][i] * panDn + outRs[1][i] * panUp) / 2f
+            sumbuf[L][i] = mults[L] * getFrom(i - delays[L], delayLine, inbuf)
+            sumbuf[R][i] = mults[R] * getFrom(i - delays[R], delayLine, inbuf)
         }
 
-        push(inbuf[0], delayLineL)
-        push(inbuf[1], delayLineR)
+//        printdbg(this, "$sym\tpan=$pan, mults=${mults[L]}\t${mults[R]}")
+    }
+    override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
+        thru("L", -90f, inbuf[L], outLs, delayLineL)
+        thru("R", +90f, inbuf[R], outRs, delayLineR)
+
+        for (i in 0 until AUDIO_BUFFER_SIZE) {
+            val outL = (outLs[L][i] + outRs[L][i]) / 2f
+            val outR = (outLs[R][i] + outRs[R][i]) / 2f
+            outbuf[L][i] = outL
+            outbuf[R][i] = outR
+        }
+
+        push(inbuf[L], delayLineL)
+        push(inbuf[R], delayLineR)
     }
 
     override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
