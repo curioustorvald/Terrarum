@@ -14,6 +14,7 @@
   "MENU_IO_IMPORT": "Import",
   "MENU_IO_MANUAL_SAVE": "Manual Save",
   "MENU_LABEL_AMBIENT_SOUNDS": "Ambient Sounds",
+  "MENU_LABEL_AUDIO_ENGINE": "Audio Engine",
   "MENU_LABEL_COPYRIGHT": "Copyright",
   "MENU_LABEL_DELETE": "Delete",
   "MENU_LABEL_EXTRA_JVM_ARGUMENTS": "Extra Arguments",
@@ -40,6 +41,7 @@
   "MENU_OPTIONS_JVM_HEAP_MAX": "Max Heap Memory",
   "MENU_OPTIONS_LIGHT_UPDATE_PASSES": "Light Calculation Depth",
   "MENU_OPTIONS_MASTER_VOLUME": "Master Volume",
+  "MENU_OPTIONS_NONE" : "None",
   "MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION": "Show notification for",
   "MENU_OPTIONS_PARTICLES": "Particles",
   "MENU_OPTIONS_PERFORMANCE": "Performance",
@@ -47,7 +49,6 @@
   "MENU_OPTIONS_SAVEFORMAT_FAST": "Faster Load",
   "MENU_OPTIONS_SAVEFORMAT_SMALL": "Smaller Size",
   "MENU_OPTIONS_STREAMERS_LAYOUT": "Chat Overlay",
-  "MENU_OPTIONS_NONE" : "None",
 
   "MENU_CREDIT_GPL_DNT" : "GPL",
   "MENU_LABEL_JVM_DNT" : "JVM",

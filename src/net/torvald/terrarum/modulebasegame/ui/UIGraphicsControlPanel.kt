@@ -30,6 +30,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
                 arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
                 arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
+                arrayOf("lightpasses", { Lang["MENU_OPTIONS_LIGHT_UPDATE_PASSES"] }, "spinner,2,4,1"),
             arrayOf("", { Lang["MENU_OPTIONS_DISPLAY"] }, "h1"),
                 arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION"] }, "typeinres"),
                 arrayOf("fullscreen", { Lang["MENU_OPTIONS_FULLSCREEN"] }, "toggle"),

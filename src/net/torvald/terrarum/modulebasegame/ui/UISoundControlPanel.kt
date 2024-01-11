@@ -27,7 +27,7 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 arrayOf("sfxvolume", { Lang["CREDITS_SFX"] }, "sliderd,0,1"),
                 arrayOf("", { "" }, "pp"),
                 arrayOf("guivolume", { Lang["MENU_LABEL_INTERFACE"] }, "sliderd,0,1"),
-            arrayOf("", { Lang["MENU_LABEL_HARDWARE"] }, "h1"),
+            arrayOf("", { Lang["MENU_LABEL_AUDIO_ENGINE"] }, "h1"),
                 arrayOf("audio_buffer_size", { Lang["MENU_OPTIONS_AUDIO_BUFFER_SIZE"] }, "spinnersel,128,256,512,1024,2048"),
                 arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
                 arrayOf("", { "${Lang["MENU_LABEL_AUDIO_BUFFER_INSTRUCTION"]}" }, "p"),

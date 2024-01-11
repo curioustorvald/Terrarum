@@ -21,7 +21,7 @@ class FixtureJukebox : Electric {
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 2, 3),
-        nameFun = { Lang["ITEM_LOGIC_SIGNAL_EMITTER"] }
+        nameFun = { Lang["ITEM_JUKEBOX"] }
     )
 
     @Transient private var discCurrentlyPlaying: Int? = null
