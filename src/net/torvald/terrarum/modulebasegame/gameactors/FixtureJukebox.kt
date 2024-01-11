@@ -25,10 +25,12 @@ class FixtureJukebox : Electric {
     )
 
     @Transient private var discCurrentlyPlaying: Int? = null
+    @Transient private var musicNowPlaying: MusicContainer? = null
 
     @Transient private val testMusic = ModMgr.getGdxFile("basegame", "audio/music/discs/01 Thousands of Shards.ogg").let {
         MusicContainer("Thousands of Shards", it.file(), Gdx.audio.newMusic(it)) {
             discCurrentlyPlaying = null
+            musicNowPlaying = null
             (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(pauseLen = Math.random().toFloat() * 30f + 30f)
         }
     }
@@ -69,13 +71,17 @@ class FixtureJukebox : Electric {
         }
     }
 
+
     private fun playDisc(index: Int) {
+        musicNowPlaying = testMusic // todo use index
+
         AudioMixer.requestFadeOut(AudioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
-            startAudio(testMusic)
+            startAudio(musicNowPlaying!!)
         }
     }
 
     @Transient override var despawnHook: (FixtureBase) -> Unit = {
+        musicNowPlaying?.let { stopAudio(it) }
         (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(pauseLen = Math.random().toFloat() * 30f + 30f)
     }
 
@@ -83,6 +89,7 @@ class FixtureJukebox : Electric {
         super.reload()
         // cannot resume playback, just stop the music
         discCurrentlyPlaying = null
+        musicNowPlaying = null
     }
 
     override fun dispose() {

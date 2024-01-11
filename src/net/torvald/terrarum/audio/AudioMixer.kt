@@ -216,6 +216,7 @@ object AudioMixer: Disposable {
 
         dynamicTracks.forEach {
             it.filters[0] = BinoPan(0f)
+            it.filters[1] = Lowpass(SAMPLING_RATE / 2f)
             sfxSumBus.addSidechainInput(it, 1.0)
         }
 

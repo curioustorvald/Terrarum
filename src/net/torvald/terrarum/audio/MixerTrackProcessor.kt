@@ -1,9 +1,13 @@
 package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Queue
+import com.jme3.math.FastMath
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.audio.dsp.BinoPan
+import net.torvald.terrarum.audio.dsp.Lowpass
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.distBetweenActors
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -37,7 +41,7 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
 
     private var breakBomb = false
 
-    private val distFalloff = 1536.0
+    private val distFalloff = 1600.0
 
     private fun printdbg(msg: Any) {
         if (true) App.printdbg("AudioAdapter ${track.name}", msg)
@@ -109,16 +113,22 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
                     if (track.trackingTarget == null || track.trackingTarget == AudioMixer.actorNowPlaying) {
                         track.volume = track.maxVolume
                         (track.filters[0] as BinoPan).pan = 0f
+                        (track.filters[1] as Lowpass).setCutoff(SAMPLING_RATE / 2f)
                     }
                     else if (track.trackingTarget is ActorWithBody) {
                         val relativeXpos = relativeXposition(AudioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
                         val distFromActor = distBetweenActors(AudioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
-                        track.volume = track.maxVolume * getVolFun(distFromActor / distFalloff).coerceAtLeast(0.0)
+                        val vol = track.maxVolume * getVolFun(distFromActor / distFalloff).coerceAtLeast(0.0)
+                        track.volume = vol
                         (track.filters[0] as BinoPan).pan =
                             if (relativeXpos <= -distFalloff) -1f
                             else if (relativeXpos >= distFalloff) 1f
                             else ((2*asin(relativeXpos / distFalloff)) / Math.PI).toFloat()
-                        // TODO lowpass filter by dist
+                        (track.filters[1] as Lowpass).setCutoff(
+                            (SAMPLING_RATED*0.5) / (24.0 * (distFromActor / distFalloff).sqr() + 1.0)
+                        )
+
+//                        printdbg("dist=$distFromActor\tvol=${fullscaleToDecibels(vol)}\tcutoff=${(track.filters[1] as Lowpass).cutoff}")
                     }
                 }
             }
@@ -237,12 +247,20 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
 //        } // uncomment to multithread
     }
 
-    // https://www.desmos.com/calculator/blcd4s69gl
     private fun getVolFun(x: Double): Double {
+        // https://www.desmos.com/calculator/blcd4s69gl
 //        val K = 1.225
 //        fun q(x: Double) = if (x >= 1.0) 0.5 else (K*x - K).pow(2.0) + 0.5
 //        val x2 = x.pow(q(x))
-        return decibelsToFullscale(-20.0 * x)
+
+        // method 1.
+        //https://www.desmos.com/calculator/uzbjw10lna
+        val K = 512.0
+        return K.pow(-sqrt(1.0+x.sqr())) * K
+
+
+        // method 2.
+        // https://www.desmos.com/calculator/xxp5ipp85w
     }
 
     private fun FloatArray.applyVolume(volume: Float) = FloatArray(this.size) { (this[it] * volume) }
