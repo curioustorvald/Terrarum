@@ -6,11 +6,13 @@ import com.badlogic.gdx.backends.lwjgl3.audio.Lwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.THREAD_COUNT
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.concurrent.ThreadExecutor
+import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import java.lang.Thread.MAX_PRIORITY
@@ -214,13 +216,13 @@ object AudioMixer: Disposable {
             sfxSumBus.addSidechainInput(it, 1.0)
         }
 
-        parallelProcessingSchedule = arrayOf(
-            arrayOf(musicTrack, ambientTrack, guiTrack),
-            dynamicTracks,
-            arrayOf(sfxSumBus, sumBus, convolveBusOpen, convolveBusCave),
-            arrayOf(fadeBus),
+        parallelProcessingSchedule =
+            arrayOf(musicTrack, ambientTrack, guiTrack).sliceEvenly(THREAD_COUNT / 2).toTypedArray() +
+            dynamicTracks.sliceEvenly(THREAD_COUNT / 2).toTypedArray() +
+            arrayOf(sfxSumBus, sumBus, convolveBusOpen, convolveBusCave).sliceEvenly(THREAD_COUNT / 2).toTypedArray() +
+            arrayOf(fadeBus) +
             arrayOf(masterTrack)
-        )
+
 
         processingThread.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority
         processingThread.start()
