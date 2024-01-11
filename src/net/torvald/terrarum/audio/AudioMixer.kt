@@ -115,27 +115,33 @@ object AudioMixer: Disposable {
     }
 
     private val processingExecutor = ThreadExecutor()
-//    private lateinit var processingSubthreads: List<Thread>
     val processingThread = Thread {
-        /*while (processing) {
+        // serial precessing
+        while (processing) {
+            actorNowPlaying = Terrarum.ingame?.actorNowPlaying
+
             // process
+            dynamicTracks.forEach {
+                if (!it.processor.paused) {
+                    try { it.processor.run() }
+                    catch (e: Throwable) { e.printStackTrace() }
+                }
+            }
             tracks.forEach {
                 if (!it.processor.paused) {
-                    it.processor.run()
+                    try { it.processor.run() }
+                    catch (e: Throwable) { e.printStackTrace() }
                 }
             }
             masterTrack.processor.run()
 
-            /*while (masterTrack.pcmQueue.size >= BACK_BUF_COUNT && masterTrack.processor.running && processing) {
-                Thread.sleep(1)
-            }*/
-
-            while (!masterTrack.pcmQueue.isEmpty) {
+            while (processing && !masterTrack.pcmQueue.isEmpty) {
                 masterTrack.adev!!.writeSamples(masterTrack.pcmQueue.removeFirst()) // it blocks until the queue is consumed
             }
-        }*/
+        }
 
-        while (processing) {
+        // parallel processing, it seems even on the 7950X this is less efficient than serial processing...
+        /*while (processing) {
             actorNowPlaying = Terrarum.ingame?.actorNowPlaying
 
             for (tracks in parallelProcessingSchedule) {
@@ -161,13 +167,10 @@ object AudioMixer: Disposable {
             while (processing && !masterTrack.pcmQueue.isEmpty) {
                 masterTrack.adev!!.writeSamples(masterTrack.pcmQueue.removeFirst()) // it blocks until the queue is consumed
             }
-        }
+        }*/
     }
 
-    val parallelProcessingSchedule: Array<Array<TerrarumAudioMixerTrack>>
-
-//    val feeder = FeedSamplesToAdev(BUFFER_SIZE, SAMPLING_RATE, masterTrack)
-//    val feedingThread = Thread(feeder)
+//    val parallelProcessingSchedule: Array<Array<TerrarumAudioMixerTrack>>
 
 
     init {
@@ -216,12 +219,13 @@ object AudioMixer: Disposable {
             sfxSumBus.addSidechainInput(it, 1.0)
         }
 
-        parallelProcessingSchedule =
+        // unused for now
+        /*parallelProcessingSchedule =
             arrayOf(musicTrack, ambientTrack, guiTrack).sliceEvenly(THREAD_COUNT / 2).toTypedArray() +
             dynamicTracks.sliceEvenly(THREAD_COUNT / 2).toTypedArray() +
             arrayOf(sfxSumBus, sumBus, convolveBusOpen, convolveBusCave).sliceEvenly(THREAD_COUNT / 2).toTypedArray() +
             arrayOf(fadeBus) +
-            arrayOf(masterTrack)
+            arrayOf(masterTrack)*/
 
 
         processingThread.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority

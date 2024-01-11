@@ -16,7 +16,6 @@ import kotlin.math.*
 class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: TerrarumAudioMixerTrack): Runnable {
 
     companion object {
-        val BACK_BUF_COUNT = 1
     }
 
     @Volatile var running = true; private set
