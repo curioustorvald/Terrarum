@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.backends.lwjgl3.audio.Lwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
+import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.THREAD_COUNT
 import net.torvald.terrarum.App.printdbg
@@ -13,11 +14,13 @@ import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RAT
 import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import java.lang.Thread.MAX_PRIORITY
 import java.util.*
 import java.util.concurrent.Callable
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.*
 
 /**
@@ -114,11 +117,23 @@ object AudioMixer: Disposable {
         return dynamicTracks.filter { it.trackingTarget == null && !it.isPlaying }.minByOrNull { it.playStartedTime }
     }
 
+    var listenerHeadSize = BinoPan.EARDIST_DEFAULT; private set
+
+    private fun setHeadSize(actor: ActorWithBody?): Float {
+        val scale = actor?.scale?.toFloat() ?: 1f
+        val headSize0 = if (actor?.sprite is AssembledSpriteAnimation)
+            (actor.sprite as AssembledSpriteAnimation).headSizeInMeter
+        else null
+
+        return (headSize0 ?: 0f).times(scale).coerceAtLeast(BinoPan.EARDIST_DEFAULT)
+    }
+
     private val processingExecutor = ThreadExecutor()
     val processingThread = Thread {
         // serial precessing
         while (processing) {
             actorNowPlaying = Terrarum.ingame?.actorNowPlaying
+            listenerHeadSize = setHeadSize(actorNowPlaying)
 
             // process
             dynamicTracks.forEach {
@@ -143,6 +158,7 @@ object AudioMixer: Disposable {
         // parallel processing, it seems even on the 7950X this is less efficient than serial processing...
         /*while (processing) {
             actorNowPlaying = Terrarum.ingame?.actorNowPlaying
+            listenerHeadSize = setHeadSize(actorNowPlaying)
 
             for (tracks in parallelProcessingSchedule) {
                 if (!processing) break

@@ -3,6 +3,7 @@ package net.torvald.terrarum.audio
 import com.badlogic.gdx.utils.Queue
 import com.jme3.math.FastMath
 import net.torvald.reflection.forceInvoke
+import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
@@ -55,7 +56,7 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
     private val distFalloff = 1600.0
 
     private fun printdbg(msg: Any) {
-        if (true) App.printdbg("AudioAdapter ${track.name}", msg)
+        if (true) App.printdbg("MixerTrackProcessor ${track.name}", msg)
     }
 
     private fun allocateStreamBuf(track: TerrarumAudioMixerTrack) {
@@ -116,6 +117,8 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
 
             // update panning and shits
             if (track.trackType == TrackType.DYNAMIC_SOURCE && track.isPlaying) {
+                (track.filters[0] as BinoPan).earDist = AudioMixer.listenerHeadSize
+
                 if (AudioMixer.actorNowPlaying != null) {
                     if (track.trackingTarget == null || track.trackingTarget == AudioMixer.actorNowPlaying) {
                         // "reset" the track
@@ -128,10 +131,7 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
                         val distFromActor = distBetweenActors(AudioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
                         val vol = track.maxVolume * getVolFun(distFromActor / distFalloff).coerceAtLeast(0.0)
                         track.volume = vol
-                        (track.filters[0] as BinoPan).pan =
-                            if (relativeXpos <= -distFalloff) -1f
-                            else if (relativeXpos >= distFalloff) 1f
-                            else ((2*asin(relativeXpos / distFalloff)) / Math.PI).toFloat()
+                        (track.filters[0] as BinoPan).pan = tanh(1.5 * relativeXpos / distFalloff).toFloat()
                         (track.filters[1] as Lowpass).setCutoff(
                             (SAMPLING_RATED*0.5) / (24.0 * (distFromActor / distFalloff).sqr() + 1.0)
                         )
@@ -268,13 +268,13 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
 //        val x2 = x.pow(q(x))
 
         // method 1.
-        //https://www.desmos.com/calculator/uzbjw10lna
+        // https://www.desmos.com/calculator/uzbjw10lna
         val K = 512.0
         return K.pow(-sqrt(1.0+x.sqr())) * K
 
 
         // method 2.
-        // https://www.desmos.com/calculator/xxp5ipp85w
+        // https://www.desmos.com/calculator/3xsac66rsp
     }
 
     private fun FloatArray.applyVolume(volume: Float) = FloatArray(this.size) { (this[it] * volume) }

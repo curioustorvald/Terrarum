@@ -19,6 +19,11 @@ abstract class TerrarumAudioFilter {
 
 fun FloatArray.applyGain(gain: Float = 1f) = this.map { it * gain }.toFloatArray()
 fun push(samples: FloatArray, buf: FloatArray) {
-    System.arraycopy(buf, samples.size, buf, 0, buf.size - samples.size)
-    System.arraycopy(samples, 0, buf, buf.size - samples.size, samples.size)
+    if (samples.size >= buf.size) {
+        System.arraycopy(samples, samples.size - buf.size, buf, 0, buf.size)
+    }
+    else {
+        System.arraycopy(buf, samples.size, buf, 0, buf.size - samples.size)
+        System.arraycopy(samples, 0, buf, buf.size - samples.size, samples.size)
+    }
 }

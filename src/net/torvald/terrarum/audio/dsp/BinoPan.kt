@@ -7,7 +7,9 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.audio.decibelsToFullscale
+import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD2
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.FILTER_NAME_ACTIVE
@@ -20,12 +22,14 @@ import kotlin.math.roundToInt
 /**
  * @param pan -1 for far-left, 0 for centre, 1 for far-right
  * @param soundSpeed speed of the sound in meters per seconds
- * @param earDist distance between ears in meters
+ * @param earDist distance between ears in meters. Maximum: 16.0
  */
-class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter() {
+class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAudioFilter() {
 
-    private val delayLineL = FloatArray(AUDIO_BUFFER_SIZE)
-    private val delayLineR = FloatArray(AUDIO_BUFFER_SIZE)
+    private val MAX_DELAY = (EARDIST_MAX / AudioMixer.SPEED_OF_SOUND * SAMPLING_RATEF).ceilToInt()
+
+    private val delayLineL = FloatArray(MAX_DELAY)
+    private val delayLineR = FloatArray(MAX_DELAY)
 
 
     private fun getFrom(index: Float, buf0: FloatArray, buf1: FloatArray): Float {
@@ -42,6 +46,9 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
 
 
     companion object {
+        const val EARDIST_DEFAULT = 0.18f
+        const val EARDIST_MAX = 16f
+
         private val PANNING_CONST = 6.0
         private const val L = 0
         private const val R = 1
@@ -50,11 +57,14 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
     }
 
 
+    /**
+     * @param angleOffset must be smaller than ±90 deg
+     */
     private fun thru(sym: String, angleOffset: Float, inbuf: FloatArray, sumbuf: Array<FloatArray>, delayLine: FloatArray) {
-        val pan = (pan + angleOffset / 90f).coerceIn(-1f, 1f)
+        val pan = (pan + angleOffset / (90f - angleOffset.absoluteValue)).coerceIn(-1f, 1f)
 
+        val timeDiffMax = earDist.coerceAtMost(EARDIST_MAX) / AudioMixer.SPEED_OF_SOUND * SAMPLING_RATEF
         val angle = pan * HALF_PI
-        val timeDiffMax = earDist / AudioMixer.SPEED_OF_SOUND * TerrarumAudioMixerTrack.SAMPLING_RATEF
         val delayInSamples = (timeDiffMax * FastMath.sin(angle)).absoluteValue
         val volMultDbThis = PANNING_CONST * pan.absoluteValue
         val volMultFsThis = decibelsToFullscale(volMultDbThis).toFloat()
@@ -87,8 +97,8 @@ class BinoPan(var pan: Float, var earDist: Float = 0.18f): TerrarumAudioFilter()
 //        printdbg(this, "$sym\tpan=$pan, mults=${mults[L]}\t${mults[R]}")
     }
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
-        thru("L", -90f, inbuf[L], outLs, delayLineL)
-        thru("R", +90f, inbuf[R], outRs, delayLineR)
+        thru("L", -30f, inbuf[L], outLs, delayLineL)
+        thru("R", +30f, inbuf[R], outRs, delayLineR)
 
         for (i in 0 until AUDIO_BUFFER_SIZE) {
             val outL = (outLs[L][i] + outRs[L][i]) / 2f

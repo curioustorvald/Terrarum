@@ -5,10 +5,9 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
-import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.floorToFloat
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.ActorWithBody.Companion.METER
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.savegame.ByteArray64Reader
@@ -19,7 +18,6 @@ import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.spriteassembler.ADPropertyObject
 import net.torvald.terrarum.spriteassembler.AssembleFrameBase
 import net.torvald.terrarum.spriteassembler.AssembleSheetPixmap
-import net.torvald.terrarum.tryDispose
 import java.io.InputStream
 import java.util.*
 
@@ -61,6 +59,9 @@ class AssembledSpriteAnimation(
 
     @Transient private val res = HashMap<String, TextureRegion?>()
 
+    @Transient var headSprite: TextureRegion? = null
+    @Transient var headSizeInMeter: Float? = null
+
     init {
 //        init = true
 
@@ -73,6 +74,25 @@ class AssembledSpriteAnimation(
         else AssembleSheetPixmap.getAssetsDirFileGetter(adp)
 
         adp.bodyparts.forEach { res[it] = getPartTexture(fileGetter, it) }
+
+        val (mugPixmap, headSprite0) = if (disk != null)
+            AssembleSheetPixmap.getMugshotFromVirtualDisk(disk, -1025L, adp)
+        else
+            AssembleSheetPixmap.getMugshotFromAssetsDir(adp)
+
+        headSprite = headSprite0
+
+        mugPixmap?.let { pixmap ->
+            // measure width
+            val m = (0 until pixmap.height).map { y ->
+                (0 until pixmap.width).fold(0) { acc, x ->
+                    acc + (pixmap.getPixel(x, y).and(255) > 128).toInt()
+                }
+            }.filter { it > 0 }.average() / METER
+            if (m > 0) headSizeInMeter = m.toFloat() * 0.36f
+        }
+
+        mugPixmap?.dispose()
     }
 
     private var delta = 0f
