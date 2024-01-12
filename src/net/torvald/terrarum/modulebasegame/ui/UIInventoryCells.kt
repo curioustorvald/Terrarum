@@ -44,7 +44,6 @@ internal class UIInventoryCells(
     internal val itemList: UIItemInventoryItemGrid =
             UIItemInventoryItemGrid(
                     full,
-                    full.catBar,
                     { full.actor.inventory },
                     INVENTORY_CELLS_OFFSET_X(),
                     INVENTORY_CELLS_OFFSET_Y(),

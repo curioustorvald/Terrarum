@@ -21,7 +21,7 @@ class UIItemCraftingCandidateGrid(
     keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, keyed button
     touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit // Item, Amount, Button, extra info, clicked button
 ) : UIItemInventoryItemGrid(
-        parentUI, catBar,
+        parentUI,
         { TODO() /* UNUSED and MUST NOT BE USED! */ },
         initialX, initialY,
         horizontalCells, verticalCells,

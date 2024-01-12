@@ -22,9 +22,9 @@ class UIItemInventoryElemSimple(
         parentUI: UICanvas,
         initialX: Int,
         initialY: Int,
-        override var item: GameItem?,
-        override var amount: Long,
-        override var itemImage: TextureRegion?,
+        override var item: GameItem? = null,
+        override var amount: Long = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
+        override var itemImage: TextureRegion? = null,
         override var quickslot: Int? = null,
         override var equippedSlot: Int? = null, // remnants of wide cell displaying slot number and highlighting; in this style of cell this field only determines highlightedness at render
         val drawBackOnNull: Boolean = true,

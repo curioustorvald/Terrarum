@@ -72,4 +72,6 @@ id;classname
 
 320;net.torvald.terrarum.modulebasegame.gameitems.ItemWorldPortal
 
+65536;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc01
+
 999999;net.torvald.terrarum.modulebasegame.gameitems.ItemTapestry

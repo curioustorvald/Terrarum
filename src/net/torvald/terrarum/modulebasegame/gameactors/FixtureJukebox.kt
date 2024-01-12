@@ -22,6 +22,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.modulebasegame.TerrarumMusicGovernor
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
+import net.torvald.terrarum.modulebasegame.ui.UIJukebox
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
@@ -32,7 +33,8 @@ class FixtureJukebox : Electric {
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 2, 3),
-        nameFun = { Lang["ITEM_JUKEBOX"] }
+        nameFun = { Lang["ITEM_JUKEBOX"] },
+        mainUI = UIJukebox()
     )
 
     @Transient private var discCurrentlyPlaying: Int? = null

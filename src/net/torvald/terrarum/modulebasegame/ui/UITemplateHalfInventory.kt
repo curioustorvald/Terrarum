@@ -1,18 +1,29 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.ui.*
 
 /**
- * Suite of objects for showing player inventory for various crafting UIs.
+ * Suite of objects for showing player inventory for various UIs involving inventory management.
+ *
+ * @param parent the parent UI
+ * @param drawOnLeft if the inventory should be drawn on the left panel
+ * @param getInventoryFun function that returns an inventory. Default value is for player's
  *
  * Created by minjaesong on 2023-10-04.
  */
-class CraftingPlayerInventory(val full: UIInventoryFull, val crafting: UICanvas) : UITemplate(crafting) {
+class UITemplateHalfInventory(
+    parent: UICanvas,
+    drawOnLeft: Boolean,
+    getInventoryFun: () -> FixtureInventory = { INGAME.actorNowPlaying!!.inventory }
+) : UITemplate(parent) {
 
     val itemList: UIItemInventoryItemGrid
 
@@ -30,13 +41,12 @@ class CraftingPlayerInventory(val full: UIInventoryFull, val crafting: UICanvas)
 
     init {
         itemList = UIItemInventoryItemGrid(
-            crafting,
-            full.catBar,
-            { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
-            thisOffsetX2,
+            parent,
+            getInventoryFun,
+            if (drawOnLeft) thisOffsetX else thisOffsetX2,
             thisOffsetY,
             6, UIInventoryFull.CELLS_VRT,
-            drawScrollOnRightside = true,
+            drawScrollOnRightside = !drawOnLeft,
             drawWallet = false,
             highlightEquippedItem = false,
             keyDownFun = { a, b, c, d, e -> itemListKeyDownFun(a, b, c, d, e) },
@@ -67,6 +77,20 @@ class CraftingPlayerInventory(val full: UIInventoryFull, val crafting: UICanvas)
     inline fun setGetInventoryFun(noinline getter: () -> ActorInventory) {
         itemList.getInventory = getter
     }
+
+    inline fun update(delta: Float) = itemList.update(delta)
+    inline fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) = itemList.render(frameDelta, batch, camera)
+
+    var posX: Int
+        get() = itemList.posX
+        set(value) { itemList.posX = value }
+    var posY: Int
+        get() = itemList.posY
+        set(value) { itemList.posY = value }
+    val width: Int
+        get() = itemList.width
+    val height: Int
+        get() = itemList.height
 
     override fun getUIitems(): List<UIItem> {
         return listOf(itemList)

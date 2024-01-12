@@ -35,7 +35,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     override var width = App.scr.width
     override var height = App.scr.height
 
-    private val playerThings = CraftingPlayerInventory(full, this).also {
+    private val playerThings = UITemplateHalfInventory(this, false).also {
         it.itemListTouchDownFun = { gameItem, _, _, _, _ -> recipeClicked?.let { recipe -> gameItem?.let { gameItem ->
             val itemID = gameItem.dynamicID
             // don't rely on highlightedness of the button to determine the item on the button is the selected
@@ -77,7 +77,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 //            TODO()
         }
 
-        override fun reject(fixture: FixtureInventory, player: FixtureInventory, item: GameItem, amount: Long) {
+        override fun refund(fixture: FixtureInventory, player: FixtureInventory, item: GameItem, amount: Long) {
 //            TODO()
         }
     }
@@ -126,7 +126,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         // ingredient list
         itemListIngredients =  UIItemInventoryItemGrid(
                 this,
-                catBar,
                 { ingredients },
                 thisOffsetX,
                 thisOffsetY + LAST_LINE_IN_GRID,

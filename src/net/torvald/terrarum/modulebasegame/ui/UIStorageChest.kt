@@ -34,7 +34,7 @@ internal class UIStorageChest : UICanvas(
             fixture.add(item, amount)
         }
 
-        override fun reject(fixture: FixtureInventory, player: FixtureInventory, item: GameItem, amount: Long) {
+        override fun refund(fixture: FixtureInventory, player: FixtureInventory, item: GameItem, amount: Long) {
             fixture.remove(item, amount)
             player.add(item, amount)
         }
@@ -45,8 +45,8 @@ internal class UIStorageChest : UICanvas(
     override fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
 
     private val catBar: UIItemCatBar
-    private val itemListChest: UIItemInventoryItemGrid
-    private val itemListPlayer: UIItemInventoryItemGrid
+    private val itemListChest: UITemplateHalfInventory
+    private val itemListPlayer: UITemplateHalfInventory
 
     private var encumbrancePerc = 0f
     private var isEncumbered = false
@@ -93,40 +93,27 @@ internal class UIStorageChest : UICanvas(
 
         )
         catBar.selectionChangeListener = { old, new -> itemListUpdate() }
-        itemListChest = UIItemInventoryItemGrid(
-            this,
-            catBar,
-            { getFixtureInventory() },
-            Toolkit.hdrawWidth - getWidthOfCells(6) - halfSlotOffset,
-            UIInventoryFull.INVENTORY_CELLS_OFFSET_Y(),
-            6, UIInventoryFull.CELLS_VRT,
-            drawScrollOnRightside = false,
-            drawWallet = false,
-            keyDownFun = { _, _, _, _, _ -> Unit },
-            touchDownFun = { gameItem, amount, button, _, _ ->
+
+
+        itemListChest = UITemplateHalfInventory(this, true) { getFixtureInventory() }.also {
+            it.itemListKeyDownFun = { _, _, _, _, _ -> Unit }
+            it.itemListTouchDownFun = { gameItem, amount, button, _, _ ->
                 if (button == App.getConfigInt("config_mouseprimary")) {
                     if (gameItem != null) {
-                        negotiator.reject(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
+                        negotiator.refund(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
                     }
                     itemListUpdate()
                 }
             }
-        )
+        }
         // make grid mode buttons work together
-        itemListChest.navRemoCon.listButtonListener = { _,_ -> setCompact(false) }
-        itemListChest.navRemoCon.gridButtonListener = { _,_ -> setCompact(true) }
+        itemListChest.itemList.navRemoCon.listButtonListener = { _,_ -> setCompact(false) }
+        itemListChest.itemList.navRemoCon.gridButtonListener = { _,_ -> setCompact(true) }
 
-        itemListPlayer = UIItemInventoryItemGrid(
-            this,
-            catBar,
-            { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
-            Toolkit.hdrawWidth + halfSlotOffset,
-            UIInventoryFull.INVENTORY_CELLS_OFFSET_Y(),
-            6, UIInventoryFull.CELLS_VRT,
-            drawScrollOnRightside = true,
-            drawWallet = false,
-            keyDownFun = { _, _, _, _, _ -> Unit },
-            touchDownFun = { gameItem, amount, button, _, _ ->
+
+        itemListPlayer = UITemplateHalfInventory(this, false).also {
+            it.itemListKeyDownFun = { _, _, _, _, _ -> Unit }
+            it.itemListTouchDownFun = { gameItem, amount, button, _, _ ->
                 if (button == App.getConfigInt("config_mouseprimary")) {
                     if (gameItem != null) {
                         negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
@@ -134,9 +121,9 @@ internal class UIStorageChest : UICanvas(
                     itemListUpdate()
                 }
             }
-        )
-        itemListPlayer.navRemoCon.listButtonListener = { _,_ -> setCompact(false) }
-        itemListPlayer.navRemoCon.gridButtonListener = { _,_ -> setCompact(true) }
+        }
+        itemListPlayer.itemList.navRemoCon.listButtonListener = { _,_ -> setCompact(false) }
+        itemListPlayer.itemList.navRemoCon.gridButtonListener = { _,_ -> setCompact(true) }
 
         handler.allowESCtoClose = true
 
@@ -148,7 +135,7 @@ internal class UIStorageChest : UICanvas(
     private var openingClickLatched = false
 
     override fun show() {
-        itemListPlayer.getInventory = { INGAME.actorNowPlaying!!.inventory }
+        itemListPlayer.itemList.getInventory = { INGAME.actorNowPlaying!!.inventory }
 
         itemListUpdate()
 
@@ -167,16 +154,16 @@ internal class UIStorageChest : UICanvas(
     }
 
     private fun setCompact(yes: Boolean) {
-        itemListChest.isCompactMode = yes
-        itemListChest.navRemoCon.gridModeButtons[0].highlighted = !yes
-        itemListChest.navRemoCon.gridModeButtons[1].highlighted = yes
-        itemListChest.itemPage = 0
+        itemListChest.itemList.isCompactMode = yes
+        itemListChest.itemList.navRemoCon.gridModeButtons[0].highlighted = !yes
+        itemListChest.itemList.navRemoCon.gridModeButtons[1].highlighted = yes
+        itemListChest.itemList.itemPage = 0
         itemListChest.rebuild(catBar.catIconsMeaning[catBar.selectedIndex])
 
-        itemListPlayer.isCompactMode = yes
-        itemListPlayer.navRemoCon.gridModeButtons[0].highlighted = !yes
-        itemListPlayer.navRemoCon.gridModeButtons[1].highlighted = yes
-        itemListPlayer.itemPage = 0
+        itemListPlayer.itemList.isCompactMode = yes
+        itemListPlayer.itemList.navRemoCon.gridModeButtons[0].highlighted = !yes
+        itemListPlayer.itemList.navRemoCon.gridModeButtons[1].highlighted = yes
+        itemListPlayer.itemList.itemPage = 0
         itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIndex])
 
         itemListUpdate()

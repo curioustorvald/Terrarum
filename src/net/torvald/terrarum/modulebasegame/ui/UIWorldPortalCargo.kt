@@ -27,7 +27,7 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
             fixture.add(item, amount)
         }
 
-        override fun reject(fixture: FixtureInventory, player: FixtureInventory, item: GameItem, amount: Long) {
+        override fun refund(fixture: FixtureInventory, player: FixtureInventory, item: GameItem, amount: Long) {
             fixture.remove(item, amount)
             player.add(item, amount)
         }
@@ -88,7 +88,6 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
         catBar.selectionChangeListener = { old, new -> itemListUpdate() }
         itemListChest = UIItemInventoryItemGrid(
             this,
-            catBar,
             { getFixtureInventory() },
             Toolkit.hdrawWidth - UIInventoryFull.getWidthOfCells(6) - halfSlotOffset,
             UIInventoryFull.INVENTORY_CELLS_OFFSET_Y(),
@@ -99,7 +98,7 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
             touchDownFun = { gameItem, amount, button, _, _ ->
                 if (button == App.getConfigInt("config_mouseprimary")) {
                     if (gameItem != null) {
-                        negotiator.reject(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
+                        negotiator.refund(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
                     }
                     itemListUpdate()
                 }
@@ -111,7 +110,6 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
 
         itemListPlayer = UIItemInventoryItemGrid(
             this,
-            catBar,
             { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
             Toolkit.hdrawWidth + halfSlotOffset,
             UIInventoryFull.INVENTORY_CELLS_OFFSET_Y(),

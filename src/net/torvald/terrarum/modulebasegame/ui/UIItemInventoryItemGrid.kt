@@ -32,7 +32,6 @@ import kotlin.math.floor
  */
 open class UIItemInventoryItemGrid(
     parentUI: UICanvas,
-    val catBar: UIItemCatBar,
     var getInventory: () -> FixtureInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
     initialX: Int,
     initialY: Int,
@@ -189,10 +188,6 @@ open class UIItemInventoryItemGrid(
                 parentUI = inventoryUI,
                 initialX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % horizontalCells),
                 initialY = this.posY + (UIItemInventoryElemSimple.height + listGap) * (it / horizontalCells),
-                item = null,
-                amount = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
-                itemImage = null,
-                drawBackOnNull = true,
                 keyDownFun = keyDownFun,
                 touchDownFun = touchDownFun,
                 highlightEquippedItem = highlightEquippedItem,
@@ -209,10 +204,6 @@ open class UIItemInventoryItemGrid(
                 initialX = this.posX + (largeListWidth + listGap) * (it % itemListColumnCount),
                 initialY = this.posY + (UIItemInventoryElemWide.height + listGap) * (it / itemListColumnCount),
                 width = largeListWidth,
-                item = null,
-                amount = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
-                itemImage = null,
-                drawBackOnNull = true,
                 keyDownFun = keyDownFun,
                 touchDownFun = touchDownFun,
                 highlightEquippedItem = highlightEquippedItem,

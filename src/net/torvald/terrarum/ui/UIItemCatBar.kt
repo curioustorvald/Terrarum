@@ -44,7 +44,7 @@ class UIItemCatBar(
 //    val selectedIcon: Int
 //        get() = catArrangement[selectedIndex]
 
-    private val sideButtons: Array<UIItemImageButton>
+    private lateinit var sideButtons: Array<UIItemImageButton>
 
     // set up all the buttons
     init {
@@ -71,30 +71,32 @@ class UIItemCatBar(
         }
 
 
-        // side buttons
-        // NOTE: < > arrows must "highlightable = false"; "true" otherwise
-        //  determine gaps: hacky way exploiting that we already know the catbar is always at the c of the ui
-        val relativeStartX = posX - (uiInternalWidth - width) / 2
-        val sideButtonsGap = (((uiInternalWidth - width) / 2) - 2f * catIcons.tileW) / 3f
-        val iconIndex = arrayOf(
-                catIcons.get(9,1),
-                catIcons.get(16,0),
-                catIcons.get(17,0),
-                catIcons.get(13,0)
-        )
+        if (showSideButtons) {
+
+            // side buttons
+            // NOTE: < > arrows must "highlightable = false"; "true" otherwise
+            //  determine gaps: hacky way exploiting that we already know the catbar is always at the c of the ui
+            val relativeStartX = posX - (uiInternalWidth - width) / 2
+            val sideButtonsGap = (((uiInternalWidth - width) / 2) - 2f * catIcons.tileW) / 3f
+            val iconIndex = arrayOf(
+                catIcons.get(9, 1),
+                catIcons.get(16, 0),
+                catIcons.get(17, 0),
+                catIcons.get(13, 0)
+            )
 
 
-        //println("[UIItemInventoryCatBar] relativeStartX: $relativeStartX")
-        //println("[UIItemInventoryCatBar] posX: $posX")
+            //println("[UIItemInventoryCatBar] relativeStartX: $relativeStartX")
+            //println("[UIItemInventoryCatBar] posX: $posX")
 
-        sideButtons = Array(iconIndex.size) { index ->
-            val iconPosX = if (index < 2)
-                (relativeStartX + sideButtonsGap + (sideButtonsGap + catIcons.tileW) * index).roundToInt()
-            else
-                (relativeStartX + width + 2 * sideButtonsGap + (sideButtonsGap + catIcons.tileW) * index).roundToInt()
-            val iconPosY = 0
+            sideButtons = Array(iconIndex.size) { index ->
+                val iconPosX = if (index < 2)
+                    (relativeStartX + sideButtonsGap + (sideButtonsGap + catIcons.tileW) * index).roundToInt()
+                else
+                    (relativeStartX + width + 2 * sideButtonsGap + (sideButtonsGap + catIcons.tileW) * index).roundToInt()
+                val iconPosY = 0
 
-            UIItemImageButton(
+                UIItemImageButton(
                     inventoryUI,
                     iconIndex[index],
                     activeBackCol = Color(0),
@@ -106,7 +108,8 @@ class UIItemCatBar(
                     inactiveCol = if (index == 0 || index == 3) Color.WHITE else Color(0xffffff7f.toInt()),
                     activeCol = if (index == 0 || index == 3) Toolkit.Theme.COL_MOUSE_UP else Color(0xffffff7f.toInt()),
                     highlightable = (index == 0 || index == 3)
-            )
+                )
+            }
         }
     }
 
@@ -136,9 +139,9 @@ class UIItemCatBar(
         if (n !in 0..2) throw IllegalArgumentException("$n")
         selectedPanel = n
 
-        sideButtons[0].highlighted = (n == 0)
+        if (showSideButtons) sideButtons[0].highlighted = (n == 0)
         mainButtons[selectedIndex].highlighted = (n == 1)
-        sideButtons[3].highlighted = (n == 2)
+        if (showSideButtons) sideButtons[3].highlighted = (n == 2)
     }
 
 
@@ -214,8 +217,10 @@ class UIItemCatBar(
             if (selectedPanel == 1) {
                 btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
 
-                sideButtons[0].highlighted = false
-                sideButtons[3].highlighted = false
+                if (showSideButtons) {
+                    sideButtons[0].highlighted = false
+                    sideButtons[3].highlighted = false
+                }
             }
         }
 

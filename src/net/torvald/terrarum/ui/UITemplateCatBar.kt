@@ -12,6 +12,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class UITemplateCatBar(
     parent: UICanvas,
+    showSidebuttons: Boolean,
 
     catIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_category"),
     catArrangement: IntArray, // icon order
@@ -26,7 +27,7 @@ class UITemplateCatBar(
         42 - UIInventoryFull.YPOS_CORRECTION + (App.scr.height - UIInventoryFull.internalHeight) / 2,
         UIInventoryFull.internalWidth,
         UIInventoryFull.catBarWidth,
-        true,
+        showSidebuttons,
         catIcons, catArrangement, catIconsMeaning, catIconsLabels
     )
 
