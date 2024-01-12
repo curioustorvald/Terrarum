@@ -198,13 +198,15 @@ object AudioMixer: Disposable {
 
         masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer
-        masterTrack.filters[2] = Spectro()
-        masterTrack.filters[3] = Vecto(2f)
+        masterTrack.filters[2] = Vecto(1.4142f)
+        masterTrack.filters[3] = Spectro()
 
         musicTrack.filters[1] = Vecto()
         musicTrack.filters[2] = Spectro()
         ambientTrack.filters[1] = Vecto()
         ambientTrack.filters[2] = Spectro()
+        sfxSumBus.filters[1] = Vecto(0.7071f)
+        sfxSumBus.filters[2] = Spectro()
 
         listOf(sumBus, convolveBusOpen, convolveBusCave).forEach {
             it.addSidechainInput(musicTrack, 1.0)

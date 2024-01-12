@@ -537,6 +537,9 @@ class BasicDebugInfoWindow : UICanvas() {
         Toolkit.fillArea(batch, x, y, STRIP_W, stripFilterHeight * numberOfFilters)
 
         var filterBankYcursor = 0
+        var filterBankYforVecto = 0
+
+        // draw filter banks. The filter view for Vecto will be drawn separately
         track.filters.forEachIndexed { i, filter -> if (filter !is NullFilter) {
             // draw filter title back
             batch.color = COL_FILTER_TITLE_SHADE
@@ -547,7 +550,10 @@ class BasicDebugInfoWindow : UICanvas() {
             batch.color = if (filter.bypass) FILTER_BYPASSED else FILTER_NAME_ACTIVE
             App.fontSmallNumbers.draw(batch, filter.javaClass.simpleName, x + 3f, y + filterBankYcursor + 1f)
 
-            drawFilterParam(batch, x, y + filterBankYcursor + stripFilterHeight, filter, track)
+            if (filter !is Vecto)
+                drawFilterParam(batch, x, y + filterBankYcursor + stripFilterHeight, filter, track)
+            else
+                filterBankYforVecto = filterBankYcursor
 
             filterBankYcursor += stripFilterHeight + filter.debugViewHeight
         } }
@@ -715,6 +721,11 @@ class BasicDebugInfoWindow : UICanvas() {
             if (timeNow - time < clippingHoldTime) {
                 Toolkit.fillArea(batch, x + 19 + channel*7, faderY + 16, 6, 2)
             }
+        }
+
+        // draw a view for Vecto
+        track.getFilterOrNull<Vecto>()?.let {
+            drawFilterParam(batch, x, y + filterBankYforVecto + stripFilterHeight, it, track)
         }
     }
 

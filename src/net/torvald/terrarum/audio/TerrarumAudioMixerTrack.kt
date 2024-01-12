@@ -67,6 +67,7 @@ class TerrarumAudioMixerTrack(
     var playStartedTime = 0L; private set
 
     inline fun <reified T> getFilter() = filters.filterIsInstance<T>().first()!!
+    inline fun <reified T> getFilterOrNull() = filters.filterIsInstance<T>().firstOrNull()
 
     internal val sidechainInputs = ArrayList<Pair<TerrarumAudioMixerTrack, TrackVolume>>()
     internal fun getSidechains(): List<TerrarumAudioMixerTrack?> = sidechainInputs.map { it.first }

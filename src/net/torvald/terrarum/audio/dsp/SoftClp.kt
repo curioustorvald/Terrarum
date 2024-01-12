@@ -2,6 +2,8 @@ package net.torvald.terrarum.audio.dsp
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import kotlin.math.absoluteValue
+import kotlin.math.pow
+import kotlin.math.sqrt
 import kotlin.math.tanh
 
 object SoftClp : TerrarumAudioFilter() {
@@ -15,8 +17,8 @@ object SoftClp : TerrarumAudioFilter() {
             val out = outbuf[ch]
 
             for (i in inn.indices) {
-                val u = inn[i] * 0.95f
-                val v = tanh(u)
+                val u = inn[i]
+                val v = clipfun0(u / 2.0).toFloat() * 2f
                 val diff = (v.absoluteValue / u.absoluteValue)
                 out[i] = v
 
@@ -25,6 +27,28 @@ object SoftClp : TerrarumAudioFilter() {
                 }
             }
         }
+    }
+
+    /**
+     * https://www.desmos.com/calculator/syqd1byzzl
+     * @param x0 -0.5..0.5 ish
+     * @return -0.5..0.5
+     */
+    private fun clipfun0(x0: Double): Double {
+        val p = 0.44444 // knee of around -6.02dB
+        val p1 = sqrt(1.0 - 2.0 * p)
+
+        val x = x0 * (1.0 + p1) / 2.0
+
+        val t = 0.5 * p1
+        val y0 = if (x < -t)
+            (1.0 / p) * (x + 0.5).pow(2) - 0.5
+        else if (x > t)
+            -(1.0 / p) * (x - 0.5).pow(2) + 0.5
+        else
+            x * 2.0 / (1.0 + p1)
+
+        return y0
     }
 
     override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {

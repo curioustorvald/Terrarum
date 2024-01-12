@@ -133,7 +133,7 @@ class Vecto(val gain: Float = 1f) : TerrarumAudioFilter() {
 
     private val halfStripW = STRIP_W / 2
 
-    private val scopePlotCol = Color(0x61b3df_33)
+    private val scopePlotCol = Color(0xdf6fa0_33.toInt())
 
     override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
         // vectorscope
