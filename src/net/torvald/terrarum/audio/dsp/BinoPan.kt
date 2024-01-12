@@ -18,6 +18,7 @@ import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.toIntAndFrac
 import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
 import kotlin.math.tanh
 
 /**
@@ -50,7 +51,7 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
         const val EARDIST_DEFAULT = 0.18f
         const val EARDIST_MAX = 16f
 
-        private val PANNING_CONST = 6.0
+        private val PANNING_CONST = 6.0 / 2.0
         private const val L = 0
         private const val R = 1
 
@@ -58,10 +59,11 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
     }
 
     /**
-     * @param intensity -2 to 2
+     * @param intensity -inf to +inf
      */
     private fun panningFieldMap(intensity: Float): Float {
-        return tanh(intensity)
+        // https://www.desmos.com/calculator/0c6ivoqr52
+        return tanh(sqrt(2f) * intensity)
     }
 
 
@@ -105,8 +107,8 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
 //        printdbg(this, "$sym\tpan=$pan, mults=${mults[L]}\t${mults[R]}")
     }
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
-        thru("L", -60f, inbuf[L], outLs, delayLineL)
-        thru("R", +60f, inbuf[R], outRs, delayLineR)
+        thru("L", -50f, inbuf[L], outLs, delayLineL) // 50 will become 59.036 on panningFieldMap
+        thru("R", +50f, inbuf[R], outRs, delayLineR)
 
         for (i in 0 until AUDIO_BUFFER_SIZE) {
             val outL = (outLs[L][i] + outRs[L][i]) / 2f

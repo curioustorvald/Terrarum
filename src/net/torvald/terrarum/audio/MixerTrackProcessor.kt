@@ -131,7 +131,7 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
                         val distFromActor = distBetweenActors(AudioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
                         val vol = track.maxVolume * getVolFun(distFromActor / distFalloff).coerceAtLeast(0.0)
                         track.volume = vol
-                        (track.filters[0] as BinoPan).pan = tanh(1.5 * relativeXpos / distFalloff).toFloat()
+                        (track.filters[0] as BinoPan).pan = (1.3f * relativeXpos / distFalloff).toFloat()
                         (track.filters[1] as Lowpass).setCutoff(
                             (SAMPLING_RATED*0.5) / (24.0 * (distFromActor / distFalloff).sqr() + 1.0)
                         )
