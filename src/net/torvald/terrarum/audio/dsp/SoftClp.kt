@@ -35,6 +35,7 @@ object SoftClp : TerrarumAudioFilter() {
      * @return -0.5..0.5
      */
     private fun clipfun0(x0: Double): Double {
+//        val p = 0.277777 // knee of around -1.94dB
         val p = 0.44444 // knee of around -6.02dB
         val p1 = sqrt(1.0 - 2.0 * p)
 
