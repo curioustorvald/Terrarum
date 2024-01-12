@@ -127,12 +127,13 @@ abstract class Actor : Comparable<Actor>, Runnable {
         return track
     }
 
-    open fun startAudio(music: MusicContainer, volume: TrackVolume = 1.0) {
+    open fun startAudio(music: MusicContainer, volume: TrackVolume = 1.0, doSomethingWithTrack: (TerrarumAudioMixerTrack) -> Unit = {}) {
         getTrackByAudio(music)?.let {
             it.stop()
             it.trackingTarget = this
             it.currentTrack = music
             it.maxVolumeFun = { volume }
+            doSomethingWithTrack(it)
             it.play()
         }
     }
@@ -141,8 +142,11 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
     }*/
 
-    open fun stopAudio(music: MusicContainer) {
-        musicTracks[music]?.stop()
+    open fun stopAudio(music: MusicContainer, doSomethingWithTrack: (TerrarumAudioMixerTrack) -> Unit = {}) {
+        musicTracks[music]?.let {
+            doSomethingWithTrack(it)
+            it.stop()
+        }
     }
 
     /*open fun onAudioInterrupt(sound: Sound) {

@@ -7,6 +7,8 @@ import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.AudioMixer.DEFAULT_FADEOUT_LEN
+import net.torvald.terrarum.audio.dsp.Convolv
+import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -30,6 +32,7 @@ class FixtureJukebox : Electric {
 
     @Transient private val testMusic = ModMgr.getGdxFile("basegame", "audio/music/discs/01 Thousands of Shards.ogg").let {
         MusicContainer("Thousands of Shards", it.file(), Gdx.audio.newMusic(it)) {
+            unloadConvolver(musicNowPlaying)
             discCurrentlyPlaying = null
             musicNowPlaying = null
             (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(pauseLen = Math.random().toFloat() * 30f + 30f)
@@ -79,13 +82,24 @@ class FixtureJukebox : Electric {
         musicNowPlaying = testMusic // todo use index
 
         AudioMixer.requestFadeOut(AudioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
-            startAudio(musicNowPlaying!!)
+            startAudio(musicNowPlaying!!) {
+                it.filters[2] = Convolv(ModMgr.getFile("basegame", "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin"), 0f, 5f / 16f)
+            }
         }
     }
 
     private fun forceStop() {
         musicNowPlaying?.let {
             stopAudio(it)
+            unloadConvolver(it)
+        }
+    }
+
+    private fun unloadConvolver(music: MusicContainer?) {
+        if (music != null) {
+            musicTracks[music]?.let {
+                it.filters[2] = NullFilter
+            }
         }
     }
 
