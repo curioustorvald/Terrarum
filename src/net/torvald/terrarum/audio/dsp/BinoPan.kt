@@ -18,6 +18,7 @@ import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.toIntAndFrac
 import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
+import kotlin.math.tanh
 
 /**
  * @param pan -1 for far-left, 0 for centre, 1 for far-right
@@ -56,12 +57,19 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
         private val HALF_PI = (Math.PI / 2.0).toFloat()
     }
 
+    /**
+     * @param intensity -2 to 2
+     */
+    private fun panningFieldMap(intensity: Float): Float {
+        return tanh(intensity)
+    }
+
 
     /**
      * @param angleOffset must be smaller than ±90 deg
      */
     private fun thru(sym: String, angleOffset: Float, inbuf: FloatArray, sumbuf: Array<FloatArray>, delayLine: FloatArray) {
-        val pan = (pan + angleOffset / (90f - angleOffset.absoluteValue)).coerceIn(-1f, 1f)
+        val pan = panningFieldMap(pan + angleOffset / 90f)
 
         val timeDiffMax = earDist.coerceAtMost(EARDIST_MAX) / AudioMixer.SPEED_OF_SOUND * SAMPLING_RATEF
         val angle = pan * HALF_PI
@@ -97,8 +105,8 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
 //        printdbg(this, "$sym\tpan=$pan, mults=${mults[L]}\t${mults[R]}")
     }
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
-        thru("L", -30f, inbuf[L], outLs, delayLineL)
-        thru("R", +30f, inbuf[R], outRs, delayLineR)
+        thru("L", -60f, inbuf[L], outLs, delayLineL)
+        thru("R", +60f, inbuf[R], outRs, delayLineR)
 
         for (i in 0 until AUDIO_BUFFER_SIZE) {
             val outL = (outLs[L][i] + outRs[L][i]) / 2f
