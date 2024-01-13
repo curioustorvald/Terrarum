@@ -1338,8 +1338,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 uiAutosaveNotifier.setAsClose()
                 autosaveTimer = 0f
 
-                debugTimers.put("Last Autosave Duration", System.nanoTime() - start)
-                printdbg(this, "Last Autosave Duration: ${(System.nanoTime() - start) / 1000000000} s")
+                val timeDiff = System.nanoTime() - start
+                debugTimers.put("Last Autosave Duration", timeDiff)
+                printdbg(this, "Last Autosave Duration: ${(timeDiff) / 1000000000} s")
             }
         }
 

@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
-import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defaultInventoryCellTheme
@@ -59,14 +56,9 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
 
                         // remove the disc
                         fixtureDiscCell[index].item = null
-                        parent.discInventory[index] = null
+                        parent.discInventory.removeAt(index)
                         playerInventory.add(gameItem)
 
-                        // shift discs
-                        for (i in index + 1 until SLOT_SIZE) {
-                            parent.discInventory[i - 1] = parent.discInventory[i]
-                        }
-                        parent.discInventory[SLOT_SIZE - 1] = null
 
                         rebuild()
                     }
@@ -79,12 +71,9 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
 
     private val playerInventoryUI = UITemplateHalfInventory(this, false).also {
         it.itemListTouchDownFun = { gameItem, _, _, _, _ ->
-            val currentFreeSlot = parent.discInventory.filterNotNull().size
 
-            if (operatedByTheInstaller && currentFreeSlot < SLOT_SIZE && gameItem != null) {
-                fixtureDiscCell[currentFreeSlot].item = gameItem
-                fixtureDiscCell[currentFreeSlot].itemImage = gameItem.itemImage
-                parent.discInventory[currentFreeSlot] = gameItem.dynamicID
+            if (operatedByTheInstaller && parent.discInventory.size < SLOT_SIZE && gameItem != null) {
+                parent.discInventory.add(gameItem.dynamicID)
                 playerInventory.remove(gameItem)
 
                 rebuild()
@@ -119,6 +108,19 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
 
     private fun rebuild() {
         playerInventoryUI.rebuild(playerInventoryFilterFun)
+
+        for (index in 0 until SLOT_SIZE) {
+            if (index in parent.discInventory.indices) {
+                val itemID = parent.discInventory[index]
+                val gameItem = ItemCodex[itemID]
+                fixtureDiscCell[index].item = gameItem
+                fixtureDiscCell[index].itemImage = gameItem?.itemImage
+            }
+            else {
+                fixtureDiscCell[index].item = null
+                fixtureDiscCell[index].itemImage = null
+            }
+        }
     }
 
 }
@@ -168,10 +170,16 @@ class UIJukeboxSonglistPanel(val parent: UIJukebox) : UICanvas() {
     fun rebuild() {
 
         jukeboxPlayButtons.forEachIndexed { index, button ->
-            parent.discInventory[index].let {
-                val item = ItemCodex[it] as? ItemFileRef
-                button.title = item?.name ?: ""
-                button.artist = item?.author ?: ""
+            if (index in parent.discInventory.indices) {
+                parent.discInventory[index].let {
+                    val item = ItemCodex[it] as? ItemFileRef
+                    button.title = item?.name ?: ""
+                    button.artist = item?.author ?: ""
+                }
+            }
+            else {
+                button.title = ""
+                button.artist = ""
             }
         }
     }
@@ -235,8 +243,6 @@ class UIItemJukeboxSonglist(
     /** Custom highlight rule to highlight this button to secondary accent colour (yellow by default). Set to `null` to use default rule (which does nothing). */
     var customHighlightRule2: ((UIItemJukeboxSonglist) -> Boolean)? = null
 
-    var forceHighlighted = false
-
 
     override fun keyDown(keycode: Int): Boolean {
         keyDownFun(index, keycode, this)
@@ -259,7 +265,8 @@ class UIItemJukeboxSonglist(
     override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
 
-        highlightToMainCol = customHighlightRuleMain?.invoke(this) ?: false || forceHighlighted
+        val isPlaying = (index == (parentUI as UIJukeboxSonglistPanel).parent.parent.discCurrentlyPlaying)
+        highlightToMainCol = customHighlightRuleMain?.invoke(this) ?: false || isPlaying
         highlightToSubCol = customHighlightRule2?.invoke(this) ?: false
 
         // cell background
@@ -277,13 +284,13 @@ class UIItemJukeboxSonglist(
         if (title.isNotEmpty()) {
             blendNormalStraightAlpha(batch)
 
+
             // if mouse is over, text lights up
             // highlight item name and count (blocks/walls) if the item is equipped
-            batch.color =
-                    if (highlightToMainCol) colourTheme.textHighlightMainCol
-                    else if (highlightToSubCol) colourTheme.textHighlightSubCol
-                    else if (mouseUp && title.isNotEmpty()) colourTheme.textHighlightMouseUpCol
-                    else colourTheme.textHighlightNormalCol
+            batch.color = if (highlightToMainCol) colourTheme.textHighlightMainCol
+                else if (highlightToSubCol) colourTheme.textHighlightSubCol
+                else if (mouseUp && title.isNotEmpty()) colourTheme.textHighlightMouseUpCol
+                else colourTheme.textHighlightNormalCol
 
             // draw title
             Toolkit.drawTextCentered(batch, App.fontGame, title, width, posX, posY + textOffsetY)

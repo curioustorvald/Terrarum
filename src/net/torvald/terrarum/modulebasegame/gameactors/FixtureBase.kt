@@ -379,7 +379,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     /** force disable despawn when inventory is not empty */
-    val canBeDespawned: Boolean get() = inventory?.isEmpty() ?: true
+    open val canBeDespawned: Boolean get() = inventory?.isEmpty() ?: true
 
     @Transient open var despawnHook: (FixtureBase) -> Unit = {}
 

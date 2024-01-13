@@ -55,7 +55,7 @@ class UIJukebox : UICanvas(
         listOf(transitionalDiscInventory)
     )
 
-    internal val discInventory: Array<ItemID?>
+    internal val discInventory: ArrayList<ItemID>
         get() = parent.discInventory
 
     init {

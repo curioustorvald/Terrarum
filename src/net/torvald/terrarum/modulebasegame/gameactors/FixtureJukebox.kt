@@ -20,9 +20,8 @@ import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.modulebasegame.TerrarumMusicGovernor
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
+import net.torvald.terrarum.modulebasegame.gameitems.MusicDiscHelper
 import net.torvald.terrarum.modulebasegame.ui.UIJukebox
-import net.torvald.terrarum.modulebasegame.ui.UIJukebox.Companion.SLOT_SIZE
-import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
@@ -42,7 +41,7 @@ class FixtureJukebox : Electric {
 
     @Transient private val backLamp: SheetSpriteAnimation
 
-    internal val discInventory = arrayOfNulls<ItemID>(SLOT_SIZE)
+    internal val discInventory = ArrayList<ItemID>()
 
     val musicIsPlaying: Boolean
         get() = musicNowPlaying != null
@@ -73,6 +72,9 @@ class FixtureJukebox : Electric {
 
     private var waitAkku = 0f
 
+    override val canBeDespawned: Boolean
+        get() = discInventory.isEmpty()
+
     override fun update(delta: Float) {
         super.update(delta)
 
@@ -84,27 +86,27 @@ class FixtureJukebox : Electric {
 
 
     fun playDisc(index: Int) {
+        if (index !in discInventory.indices) return
+
+
         printdbg(this, "Play disc $index!")
 
         val disc = discInventory[index]
         val musicFile = (ItemCodex[disc] as? ItemFileRef)?.getAsGdxFile()
 
         if (musicFile != null) {
-            val musicdbFile = musicFile.sibling("_musicdb.json")
-            val musicdb = JsonFetcher.invoke(musicdbFile.file())
-            val propForThisFile = musicdb.get(musicFile.name())
-
-            val artist = propForThisFile.get("artist").asString()
-            val title = propForThisFile.get("title").asString()
+            val (title, artist) = MusicDiscHelper.getMetadata(musicFile)
 
             printdbg(this, "Title: $title, artist: $artist")
-
 
             musicNowPlaying = MusicContainer(title, musicFile.file(), Gdx.audio.newMusic(musicFile)) {
                 unloadConvolver(musicNowPlaying)
                 discCurrentlyPlaying = null
                 musicNowPlaying?.gdxMusic?.tryDispose()
                 musicNowPlaying = null
+
+                printdbg(this, "Stop music $title - $artist")
+
                 (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(pauseLen = Math.random().toFloat() * 30f + 30f)
             }
 
