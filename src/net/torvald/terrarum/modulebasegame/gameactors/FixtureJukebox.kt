@@ -18,11 +18,13 @@ import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.blendScreen
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.modulebasegame.TerrarumMusicGovernor
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.UIJukebox
+import net.torvald.terrarum.modulebasegame.ui.UIJukebox.Companion.SLOT_SIZE
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
@@ -51,7 +53,11 @@ class FixtureJukebox : Electric {
 
     @Transient private val backLamp: SheetSpriteAnimation
 
+    internal val discInventory = arrayOfNulls<ItemID>(SLOT_SIZE)
+
     init {
+        (mainUI as UIJukebox).parent = this
+
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/jukebox.tga")
 
         density = 1400.0

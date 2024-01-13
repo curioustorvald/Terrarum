@@ -12,6 +12,8 @@ import java.util.UUID
  */
 open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
 
+    var author = ""
+
     open var uuid: UUID = UUID(0, 0)
 
     /**

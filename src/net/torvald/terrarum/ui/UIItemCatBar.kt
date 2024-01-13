@@ -28,6 +28,7 @@ class UIItemCatBar(
 
     companion object {
         const val CAT_ALL = "__all__"
+        val FILTER_CAT_ALL = arrayOf(CAT_ALL)
     }
 
 

@@ -51,7 +51,7 @@ internal class UIStorageChest : UICanvas(
     private var encumbrancePerc = 0f
     private var isEncumbered = false
 
-    private var halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap * 2) / 2
+    private val halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap * 2) / 2
 
     init {
         catBar = UIItemCatBar(

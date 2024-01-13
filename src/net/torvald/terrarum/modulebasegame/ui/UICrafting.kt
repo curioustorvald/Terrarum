@@ -17,6 +17,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 import net.torvald.terrarum.ui.*
+import net.torvald.terrarum.ui.UIItemCatBar.Companion.FILTER_CAT_ALL
 import net.torvald.unicode.getKeycapPC
 import kotlin.math.ceil
 import kotlin.math.max
@@ -87,7 +88,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
     override fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
 
-    private var halfSlotOffset = (UIItemInventoryElemSimple.height + listGap) / 2
+    private val halfSlotOffset = (UIItemInventoryElemSimple.height + listGap) / 2
 
     private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + listGap - halfSlotOffset
     private val thisOffsetX2 = thisOffsetX + (listGap + UIItemInventoryElemWide.height) * 7
@@ -99,8 +100,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     private val LAST_LINE_IN_GRID = ((UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 2)) + 22//359 // TEMPORARY VALUE!
 
     private var recipeClicked: CraftingCodex.CraftingRecipe? = null
-
-    private val catAll = arrayOf(CAT_ALL)
 
     private val controlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
@@ -181,9 +180,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                                 it.removeFromForceHighlightList(oldSelectedItems)
                                 filterPlayerListUsing(recipeClicked)
                                 it.addToForceHighlightList(selectedItems)
-                                it.rebuild(catAll)
+                                it.rebuild(FILTER_CAT_ALL)
                             }
-                            _getItemListIngredients().rebuild(catAll)
+                            _getItemListIngredients().rebuild(FILTER_CAT_ALL)
 
                             // highlighting CraftingCandidateButton by searching for the buttons that has the recipe
                             _getItemListCraftables().let {
@@ -254,7 +253,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                     _getItemListPlayer().addToForceHighlightList(selectedItems)
                     _getItemListPlayer().itemPage = 0
                     filterPlayerListUsing(recipeClicked)
-                    _getItemListIngredients().rebuild(catAll)
+                    _getItemListIngredients().rebuild(FILTER_CAT_ALL)
 
                     highlightCraftingCandidateButton(recipe)
 
@@ -270,9 +269,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, App.getConfigInt("basegame:gameplay_max_crafting"), 1, buttonWidth, numberToTextFunction = {"×\u200A${it.toInt()}"})
         spinnerCraftCount.selectionChangeListener = {
             itemListIngredients.numberMultiplier = it.toLong()
-            itemListIngredients.rebuild(catAll)
+            itemListIngredients.rebuild(FILTER_CAT_ALL)
             itemListCraftable.numberMultiplier = it.toLong()
-            itemListCraftable.rebuild(catAll)
+            itemListCraftable.rebuild(FILTER_CAT_ALL)
             refreshCraftButtonStatus()
         }
 
@@ -293,8 +292,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
                     // reset selection status after a crafting to hide the possible artefact where no-longer-craftable items are still displayed due to ingredient depletion
                     resetUI() // also clears forcehighlightlist
-                    playerThings.rebuild(catAll)
-                    itemListCraftable.rebuild(catAll)
+                    playerThings.rebuild(FILTER_CAT_ALL)
+                    itemListCraftable.rebuild(FILTER_CAT_ALL)
                 }
             } }
             refreshCraftButtonStatus()
@@ -314,7 +313,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
     private fun filterPlayerListUsing(recipe: CraftingCodex.CraftingRecipe?) {
         if (recipe == null)
-            playerThings.rebuild(catAll)
+            playerThings.rebuild(FILTER_CAT_ALL)
         else {
             val items = recipe.ingredients.flatMap {
                 getItemCandidatesForIngredient(getPlayerInventory(), it).map { it.itm }
@@ -353,12 +352,12 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
             it.remove(old.itm, amount)
             it.add(new, amount)
         }
-        itemListIngredients.rebuild(catAll)
+        itemListIngredients.rebuild(FILTER_CAT_ALL)
     }
 
     private fun highlightCraftingCandidateButton(recipe: CraftingCodex.CraftingRecipe?) { // a proxy function
         itemListCraftable.highlightRecipe(recipe)
-        itemListCraftable.rebuild(catAll)
+        itemListCraftable.rebuild(FILTER_CAT_ALL)
     }
 
     /**
@@ -386,7 +385,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         highlightCraftingCandidateButton(null)
         ingredients.clear()
         playerThings.removeFromForceHighlightList(oldSelectedItems)
-        itemListIngredients.rebuild(catAll)
+        itemListIngredients.rebuild(FILTER_CAT_ALL)
 
         refreshCraftButtonStatus()
     }
@@ -418,8 +417,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
     private fun itemListUpdate() {
         // let itemlists be sorted
-        itemListCraftable.rebuild(catAll)
-        playerThings.rebuild(catAll)
+        itemListCraftable.rebuild(FILTER_CAT_ALL)
+        playerThings.rebuild(FILTER_CAT_ALL)
         encumbrancePerc = getPlayerInventory().let {
             it.capacity.toFloat() / it.maxCapacity
         }

@@ -1,68 +1,85 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameitems.GameItem
-import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
+import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItemInventoryElemSimple
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defaultInventoryCellTheme
+import net.torvald.terrarum.modulebasegame.ui.UIJukebox.Companion.SLOT_SIZE
+import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemInventoryElemWide
 
 /**
  * Created by minjaesong on 2024-01-13.
  */
-class UIJukeboxInventory(val parent: UICanvas) : UICanvas(), HasInventory {
+class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
 
     override var width = Toolkit.drawWidth
     override var height = App.scr.height
 
-    private val negotiator = object : InventoryTransactionNegotiator() {
-        override fun accept(player: FixtureInventory, fixture: FixtureInventory, item: GameItem, amount: Long) {
-            if (item is ItemFileRef && item.mediumIdentifier == "music_disc") {
-                player.remove(item, amount)
-                fixture.add(item, amount)
-            }
-        }
-
-        override fun refund(fixture: FixtureInventory, player: FixtureInventory, item: GameItem, amount: Long) {
-            fixture.remove(item, amount)
-            player.add(item, amount)
-        }
-
-    }
-
-    private val thisInventory = FixtureInventory()
-
-    private var halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) / 2
+    private val halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) / 2
     private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
     private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
 
-    private val fixtureInventoryCells = (0..7).map {
-        UIItemInventoryElemWide(this,
-            thisOffsetX, thisOffsetY + (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) * it,
+    private var currentFreeSlot = 0
+
+    private val playerInventory: ActorInventory
+        get() = INGAME.actorNowPlaying!!.inventory
+
+    private val fixtureDiscCell: List<UIItemJukeboxSonglist> = (0 until SLOT_SIZE).map { index ->
+        UIItemJukeboxSonglist(this,
+            thisOffsetX, thisOffsetY + (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) * index,
             6 * UIItemInventoryElemSimple.height + 5 * UIItemInventoryItemGrid.listGap,
             keyDownFun = { _, _, _, _, _ -> Unit },
-            touchDownFun = { gameItem, amount, button, _, _ ->
-                if (button == App.getConfigInt("config_mouseprimary")) {
+            touchDownFun = { gameItem, amount, mouseButton, _, _ ->
+                if (mouseButton == App.getConfigInt("config_mouseprimary")) {
                     if (gameItem != null) {
-                        negotiator.refund(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
+                        parent.discInventory[index] = null
+                        playerInventory.add(gameItem, 1)
+
+                        // shift discs
+                        for (i in index + 1 until SLOT_SIZE) {
+                            parent.discInventory[i - 1] = parent.discInventory[i]
+                        }
+                        parent.discInventory[SLOT_SIZE - 1] = null
                     }
                 }
-            }
+            },
         )
     }
-    private val playerInventoryUI = UITemplateHalfInventory(this, false)
+
+    private val playerInventoryUI = UITemplateHalfInventory(this, false).also {
+        it.itemListTouchDownFun = { gameItem, _, _, _, _ ->
+            if (currentFreeSlot < SLOT_SIZE) {
+                fixtureDiscCell[currentFreeSlot].title = (gameItem as ItemFileRef).name
+                fixtureDiscCell[currentFreeSlot].artist = (gameItem as ItemFileRef).author
+                currentFreeSlot += 1
+            }
+        }
+    }
 
     init {
-        fixtureInventoryCells.forEach {
-            addUIitem(it)
+        fixtureDiscCell.forEach { thisButton ->
+            addUIitem(thisButton)
         }
         addUIitem(playerInventoryUI)
     }
 
+    private val playerInventoryFilterFun = { (itm, _): InventoryPair ->
+        ItemCodex[itm].let {
+            it is ItemFileRef && it.mediumIdentifier == "music_disc"
+        }
+    }
+
+    override fun show() {
+        super.show()
+        playerInventoryUI.rebuild(playerInventoryFilterFun)
+    }
+
     override fun updateUI(delta: Float) {
         uiItems.forEach { it.update(delta) }
     }
@@ -74,27 +91,58 @@ class UIJukeboxInventory(val parent: UICanvas) : UICanvas(), HasInventory {
     override fun dispose() {
     }
 
-    override fun getNegotiator() = negotiator
-
-    override fun getFixtureInventory(): FixtureInventory {
-        TODO()
-    }
-
-    override fun getPlayerInventory(): FixtureInventory {
-        TODO()
-    }
 
 
 }
 
 
 
-class UIJukeboxSonglistPanel(val parent: UICanvas) : UICanvas() {
+class UIJukeboxSonglistPanel(val parent: UIJukebox) : UICanvas() {
 
     override var width = Toolkit.drawWidth
     override var height = App.scr.height
 
+    private val halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) / 2
 
+    private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
+    private val thisOffsetX2 = thisOffsetX + (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 7
+    private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
+
+    private val songButtonColourTheme = defaultInventoryCellTheme.copy(
+        cellHighlightNormalCol = Color(0xfec753c8.toInt()),
+        cellBackgroundCol = Color(0x704c20c8.toInt())
+    )
+
+    private val jukeboxPlayButtons = (0 until SLOT_SIZE).map { index ->
+        UIItemJukeboxSonglist(this,
+            if (index % 2 == 0) thisOffsetX else thisOffsetX2,
+            thisOffsetY + (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) * index.shr(1),
+            6 * UIItemInventoryElemSimple.height + 5 * UIItemInventoryItemGrid.listGap,
+            colourTheme = songButtonColourTheme,
+            keyDownFun = { _, _, _, _, _ -> Unit },
+            touchDownFun = { gameItem, amount, button, _, _ ->
+                if (button == App.getConfigInt("config_mouseprimary")) {
+
+                }
+            }
+        )
+    }
+
+    fun rebuild() {
+        jukeboxPlayButtons.forEachIndexed { index, button ->
+            parent.discInventory[index].let {
+                val item = ItemCodex[it] as? ItemFileRef
+                button.title = item?.name ?: ""
+                button.artist = item?.author ?: ""
+            }
+        }
+    }
+
+    init {
+        jukeboxPlayButtons.forEach {
+            addUIitem(it)
+        }
+    }
 
     override fun updateUI(delta: Float) {
         uiItems.forEach { it.update(delta) }
@@ -110,3 +158,87 @@ class UIJukeboxSonglistPanel(val parent: UICanvas) : UICanvas() {
 
 }
 
+
+class UIItemJukeboxSonglist(
+    parentUI: UICanvas,
+    initialX: Int,
+    initialY: Int,
+    override val width: Int,
+    var title: String = "",
+    var artist: String = "",
+
+    var keyDownFun: (GameItem?, Long, Int, Any?, UIItemJukeboxSonglist) -> Unit, // Item, Amount, Keycode, extra info, self
+    var touchDownFun: (GameItem?, Long, Int, Any?, UIItemJukeboxSonglist) -> Unit, // Item, Amount, Button, extra info, self
+
+    var colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme
+) : UIItem(parentUI, initialX, initialY) {
+
+    companion object {
+        val height = 48
+    }
+
+    override val height = Companion.height
+
+    private val textOffsetX = 50f
+    private val textOffsetY = 8f
+
+
+    /** Custom highlight rule to highlight tihs button to primary accent colour (blue by default).
+     * Set to `null` to use default rule:
+     *
+     * "`equippedSlot` defined and set to `highlightEquippedItem`" or "`forceHighlighted`" */
+    var customHighlightRuleMain: ((UIItemJukeboxSonglist) -> Boolean)? = null
+    /** Custom highlight rule to highlight this button to secondary accent colour (yellow by default). Set to `null` to use default rule (which does nothing). */
+    var customHighlightRule2: ((UIItemJukeboxSonglist) -> Boolean)? = null
+
+    var forceHighlighted = false
+
+
+
+
+    private var highlightToMainCol = false
+    private var highlightToSubCol = false
+
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        blendNormalStraightAlpha(batch)
+
+        highlightToMainCol = customHighlightRuleMain?.invoke(this) ?: false || forceHighlighted
+        highlightToSubCol = customHighlightRule2?.invoke(this) ?: false
+
+        // cell background
+        batch.color = colourTheme.cellBackgroundCol
+        Toolkit.fillArea(batch, posX, posY, width, height)
+
+        // cell border
+        batch.color = if (highlightToMainCol) colourTheme.cellHighlightMainCol
+        else if (highlightToSubCol) colourTheme.cellHighlightSubCol
+        else if (mouseUp && title.isNotEmpty()) colourTheme.cellHighlightMouseUpCol
+        else colourTheme.cellHighlightNormalCol
+        Toolkit.drawBoxBorder(batch, posX, posY, width, height)
+
+
+        if (title.isNotEmpty()) {
+            blendNormalStraightAlpha(batch)
+
+            // if mouse is over, text lights up
+            // highlight item name and count (blocks/walls) if the item is equipped
+            batch.color =
+                    if (highlightToMainCol) colourTheme.textHighlightMainCol
+                    else if (highlightToSubCol) colourTheme.textHighlightSubCol
+                    else if (mouseUp && title.isNotEmpty()) colourTheme.textHighlightMouseUpCol
+                    else colourTheme.textHighlightNormalCol
+
+            // draw title
+            App.fontGame.draw(batch, title, posX + textOffsetX, posY + textOffsetY)
+            // draw artist
+            App.fontGame.draw(batch, artist, posX + textOffsetX, posY + textOffsetY + 24f)
+        }
+
+        // see IFs above?
+        batch.color = Color.WHITE
+
+    }
+
+    override fun dispose() {
+    }
+}

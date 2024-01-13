@@ -3,6 +3,10 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureJukebox
+import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -13,6 +17,12 @@ class UIJukebox : UICanvas(
     toggleKeyLiteral = "control_key_inventory",
     toggleButtonLiteral = "control_gamepad_start",
 ) {
+
+    lateinit var parent: FixtureJukebox
+
+    companion object {
+        const val SLOT_SIZE = 8
+    }
 
     init {
         CommonResourcePool.addToLoadingList("basegame-gui-jukebox_caticons") {
@@ -30,17 +40,23 @@ class UIJukebox : UICanvas(
         intArrayOf(0, 1),
         emptyList(),
         listOf({ "" }, { "" })
-    )
+    ).also {
+        it.catBar.selectionChangeListener = { old, new ->
+            transitionPanel.requestTransition(new)
+        }
+    }
 
     private val transitionalSonglistPanel = UIJukeboxSonglistPanel(this)
     private val transitionalDiscInventory = UIJukeboxInventory(this)
-
     private val transitionPanel = UIItemHorizontalFadeSlide(
         this,
         0, 0, width, height, 0f,
         listOf(transitionalSonglistPanel),
         listOf(transitionalDiscInventory)
     )
+
+    internal val discInventory: Array<ItemID?>
+        get() = parent.discInventory
 
     init {
         addUIitem(catbar)
