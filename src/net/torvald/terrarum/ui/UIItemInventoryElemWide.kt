@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.ui.InventoryCellColourTheme
@@ -46,10 +48,13 @@ class UIItemInventoryElemWide(
 
     override val height = Companion.height
 
+    private val itemImageOrDefault: TextureRegion
+        get() = itemImage ?: CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
+
     private val imgOffsetY: Float
-        get() = (this.height - itemImage!!.regionHeight).div(2).toFloat() // to snap to the pixel grid
+        get() = (this.height - itemImageOrDefault.regionHeight).div(2).toFloat() // to snap to the pixel grid
     private val imgOffsetX: Float
-        get() = (this.height - itemImage!!.regionWidth).div(2).toFloat() // NOTE we're using this.height to get horizontal value; this is absofreakinlutely intentional (otherwise images would draw center of this wide cell which is not something we want)
+        get() = (this.height - itemImageOrDefault.regionWidth).div(2).toFloat() // NOTE we're using this.height to get horizontal value; this is absofreakinlutely intentional (otherwise images would draw center of this wide cell which is not something we want)
 
     private val textOffsetX = 50f
     private val textOffsetY = 8f
@@ -88,14 +93,14 @@ class UIItemInventoryElemWide(
         Toolkit.drawBoxBorder(batch, posX, posY, width, height)
 
 
-        if (item != null && itemImage != null) {
+        if (item != null) {
             val amountString = amount.toItemCountText()
 
             blendNormalStraightAlpha(batch)
             
             // item image
             batch.color = Color.WHITE
-            batch.draw(itemImage, posX + imgOffsetX, posY + imgOffsetY)
+            batch.draw(itemImageOrDefault, posX + imgOffsetX, posY + imgOffsetY)
 
             // if mouse is over, text lights up
             // highlight item name and count (blocks/walls) if the item is equipped

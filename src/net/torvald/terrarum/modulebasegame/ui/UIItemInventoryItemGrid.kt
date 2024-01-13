@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ui.UIItemCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem

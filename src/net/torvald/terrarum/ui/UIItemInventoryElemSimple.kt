@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.ui.InventoryCellColourTheme
@@ -42,10 +43,13 @@ class UIItemInventoryElemSimple(
     override val width = Companion.height
     override val height = Companion.height
 
+    private val itemImageOrDefault: TextureRegion
+        get() = itemImage ?: CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
+
     private val imgOffsetY: Float
-        get() = (this.height - itemImage!!.regionHeight).div(2).toFloat() // to snap to the pixel grid
+        get() = (this.height - itemImageOrDefault.regionHeight).div(2).toFloat() // to snap to the pixel grid
     private val imgOffsetX: Float
-        get() = (this.height - itemImage!!.regionWidth).div(2).toFloat() // to snap to the pixel grid
+        get() = (this.height - itemImageOrDefault.regionWidth).div(2).toFloat() // to snap to the pixel grid
 
     override fun update(delta: Float) {
 
@@ -76,11 +80,11 @@ class UIItemInventoryElemSimple(
         // quickslot and equipped slot indicator is not needed as it's intended for blocks and walls
         // and you can clearly see the quickslot UI anyway
 
-        if (item != null && itemImage != null) {
+        if (item != null) {
 
             // item image
             batch.color = Color.WHITE
-            batch.draw(itemImage, posX + imgOffsetX, posY + imgOffsetY)
+            batch.draw(itemImageOrDefault, posX + imgOffsetX, posY + imgOffsetY)
 
 
 

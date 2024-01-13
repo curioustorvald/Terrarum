@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
@@ -30,8 +31,8 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
     private val playerInventory: ActorInventory
         get() = INGAME.actorNowPlaying!!.inventory
 
-    private val fixtureDiscCell: List<UIItemJukeboxSonglist> = (0 until SLOT_SIZE).map { index ->
-        UIItemJukeboxSonglist(this,
+    private val fixtureDiscCell: Array<UIItemInventoryElemWide> = (0 until SLOT_SIZE).map { index ->
+        UIItemInventoryElemWide(this,
             thisOffsetX, thisOffsetY + (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) * index,
             6 * UIItemInventoryElemSimple.height + 5 * UIItemInventoryItemGrid.listGap,
             keyDownFun = { _, _, _, _, _ -> Unit },
@@ -39,25 +40,29 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
                 if (mouseButton == App.getConfigInt("config_mouseprimary")) {
                     if (gameItem != null) {
                         parent.discInventory[index] = null
-                        playerInventory.add(gameItem, 1)
+                        playerInventory.add(gameItem)
 
                         // shift discs
                         for (i in index + 1 until SLOT_SIZE) {
                             parent.discInventory[i - 1] = parent.discInventory[i]
                         }
                         parent.discInventory[SLOT_SIZE - 1] = null
+
+                        rebuild()
                     }
                 }
             },
         )
-    }
+    }.toTypedArray()
 
     private val playerInventoryUI = UITemplateHalfInventory(this, false).also {
         it.itemListTouchDownFun = { gameItem, _, _, _, _ ->
-            if (currentFreeSlot < SLOT_SIZE) {
-                fixtureDiscCell[currentFreeSlot].title = (gameItem as ItemFileRef).name
-                fixtureDiscCell[currentFreeSlot].artist = (gameItem as ItemFileRef).author
+            if (currentFreeSlot < SLOT_SIZE && gameItem != null) {
+                fixtureDiscCell[currentFreeSlot].item = gameItem
+                playerInventory.remove(gameItem)
                 currentFreeSlot += 1
+
+                rebuild()
             }
         }
     }
@@ -77,7 +82,7 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
 
     override fun show() {
         super.show()
-        playerInventoryUI.rebuild(playerInventoryFilterFun)
+        rebuild()
     }
 
     override fun updateUI(delta: Float) {
@@ -91,7 +96,9 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
     override fun dispose() {
     }
 
-
+    private fun rebuild() {
+        playerInventoryUI.rebuild(playerInventoryFilterFun)
+    }
 
 }
 
@@ -113,10 +120,19 @@ class UIJukeboxSonglistPanel(val parent: UIJukebox) : UICanvas() {
         cellBackgroundCol = Color(0x704c20c8.toInt())
     )
 
+    private val rows = SLOT_SIZE / 2
+    private val vgap = 48
+    private val internalHeight = (UIItemJukeboxSonglist.height + vgap) * (rows - 1)
+
+    private val ys = (0 until rows).map {
+        App.scr.halfh - (internalHeight / 2) + (UIItemJukeboxSonglist.height + vgap) * it
+    }
+
+
     private val jukeboxPlayButtons = (0 until SLOT_SIZE).map { index ->
         UIItemJukeboxSonglist(this,
             if (index % 2 == 0) thisOffsetX else thisOffsetX2,
-            thisOffsetY + (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) * index.shr(1),
+            ys[index.shr(1)],
             6 * UIItemInventoryElemSimple.height + 5 * UIItemInventoryItemGrid.listGap,
             colourTheme = songButtonColourTheme,
             keyDownFun = { _, _, _, _, _ -> Unit },
@@ -126,16 +142,21 @@ class UIJukeboxSonglistPanel(val parent: UIJukebox) : UICanvas() {
                 }
             }
         )
-    }
+    }.toTypedArray()
 
     fun rebuild() {
         jukeboxPlayButtons.forEachIndexed { index, button ->
             parent.discInventory[index].let {
                 val item = ItemCodex[it] as? ItemFileRef
-                button.title = item?.name ?: ""
-                button.artist = item?.author ?: ""
+                button.title = "${index+1} ${item?.name}"// ?: ""
+                button.artist = "${index+1} ${item?.author}"// ?: ""
             }
         }
+    }
+
+    override fun show() {
+        super.show()
+        rebuild()
     }
 
     init {
