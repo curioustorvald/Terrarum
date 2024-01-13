@@ -2,6 +2,7 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import net.torvald.unicode.BULLET
+import net.torvald.unicode.EMDASH
 import net.torvald.unicode.ENDASH
 
 object CreditSingleton {
@@ -299,7 +300,13 @@ Sound from <https://freesound.org/people/Nox_Sound>
 
 $BULLET EchoThief Impulse Response Library
 
-Copyright 2013-2023 Chris Warren <cwarren@sdsu.edu> 
+Copyright 2013-2023 Chris Warren <cwarren@sdsu.edu>
+
+
+
+$BULLET Soundwoofer $EMDASH Free Impulse Response Library
+
+Copyright 2018 Soundwoofer Team <https://soundwoofer.com/User/Index?uid=soundwoofer>
 """).split('\n')
 
 
