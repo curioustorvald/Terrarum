@@ -1,5 +1,8 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
+import com.badlogic.gdx.Gdx
+import net.torvald.terrarum.App
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import java.io.File
@@ -63,4 +66,14 @@ open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
     override val isDynamic = false
     override val materialId = ""
     override var equipPosition = EquipPosition.HAND_GRIP
+
+    fun getAsGdxFile() = if (refIsShared)
+        Gdx.files.external(App.saveSharedDir + "/$refPath")
+    else
+        ModMgr.getGdxFile(refModuleName, refPath)
+
+    fun getAsFile() = if (refIsShared)
+        File(App.saveSharedDir + "/$refPath")
+    else
+        ModMgr.getFile(refModuleName, refPath)
 }

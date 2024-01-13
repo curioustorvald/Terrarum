@@ -157,7 +157,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
     @Transient var mainUIopenFun: ((UICanvas) -> Unit)? = null
 
-    protected var actorThatInstalledThisFixture: UUID? = null
+    internal var actorThatInstalledThisFixture: UUID? = null
 
     protected constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)
     protected constructor(renderOrder: RenderOrder, physProp: PhysProperties, id: ActorID?) : super(renderOrder, physProp, id)

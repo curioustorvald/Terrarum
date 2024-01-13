@@ -20,19 +20,19 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2017-10-22.
  */
 abstract class UIItemInventoryCellBase(
-        parentUI: UICanvas,
-        initialX: Int,
-        initialY: Int,
-        open var item: GameItem?,
-        open var amount: Long,
-        open var itemImage: TextureRegion?,
-        open var quickslot: Int? = null,
-        open var equippedSlot: Int? = null,
-        val keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
-        val touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
-        open var extraInfo: Any?,
-        open protected val highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
-        var colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme
+    parentUI: UICanvas,
+    initialX: Int,
+    initialY: Int,
+    open var item: GameItem?,
+    open var amount: Long,
+    open var itemImage: TextureRegion?,
+    open var quickslot: Int? = null,
+    open var equippedSlot: Int? = null,
+    var keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
+    var touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
+    open var extraInfo: Any?,
+    open protected val highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
+    var colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme
 ) : UIItem(parentUI, initialX, initialY) {
     abstract override fun update(delta: Float)
     abstract override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera)

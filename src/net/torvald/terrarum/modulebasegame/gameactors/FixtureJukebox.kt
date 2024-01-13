@@ -4,27 +4,25 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
 import net.torvald.spriteanimation.SheetSpriteAnimation
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.INGAME
-import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.AudioMixer.DEFAULT_FADEOUT_LEN
 import net.torvald.terrarum.audio.dsp.Convolv
 import net.torvald.terrarum.audio.dsp.NullFilter
-import net.torvald.terrarum.blendNormalStraightAlpha
-import net.torvald.terrarum.blendScreen
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.modulebasegame.TerrarumMusicGovernor
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
+import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.modulebasegame.ui.UIJukebox
 import net.torvald.terrarum.modulebasegame.ui.UIJukebox.Companion.SLOT_SIZE
+import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
@@ -39,21 +37,15 @@ class FixtureJukebox : Electric {
         mainUI = UIJukebox()
     )
 
-    @Transient private var discCurrentlyPlaying: Int? = null
-    @Transient private var musicNowPlaying: MusicContainer? = null
-
-    @Transient private val testMusic = ModMgr.getGdxFile("basegame", "audio/music/discs/01 Thousands of Shards.ogg").let {
-        MusicContainer("Thousands of Shards", it.file(), Gdx.audio.newMusic(it)) {
-            unloadConvolver(musicNowPlaying)
-            discCurrentlyPlaying = null
-            musicNowPlaying = null
-            (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(pauseLen = Math.random().toFloat() * 30f + 30f)
-        }
-    }
+    @Transient var discCurrentlyPlaying: Int? = null; private set
+    @Transient var musicNowPlaying: MusicContainer? = null; private set
 
     @Transient private val backLamp: SheetSpriteAnimation
 
     internal val discInventory = arrayOfNulls<ItemID>(SLOT_SIZE)
+
+    val musicIsPlaying: Boolean
+        get() = musicNowPlaying != null
 
     init {
         (mainUI as UIJukebox).parent = this
@@ -84,35 +76,63 @@ class FixtureJukebox : Electric {
     override fun update(delta: Float) {
         super.update(delta)
 
-        if (discCurrentlyPlaying == null) {
-            // wait 3 seconds
-            if (waitAkku >= 3f) {
-                discCurrentlyPlaying = 0
-                playDisc(discCurrentlyPlaying!!)
-                waitAkku = 0f
-            }
-
-            waitAkku += delta
-        }
-        else if (!flagDespawn) {
+        // supress the normal background music playback
+        if (musicIsPlaying && !flagDespawn) {
             (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic()
         }
     }
 
 
-    private fun playDisc(index: Int) {
+    fun playDisc(index: Int) {
         printdbg(this, "Play disc $index!")
 
-        musicNowPlaying = testMusic // todo use index
+        val disc = discInventory[index]
+        val musicFile = (ItemCodex[disc] as? ItemFileRef)?.getAsGdxFile()
 
-        AudioMixer.requestFadeOut(AudioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
-            startAudio(musicNowPlaying!!) {
-                it.filters[2] = Convolv(ModMgr.getFile("basegame", "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin"), 0f, 5f / 16f)
+        if (musicFile != null) {
+            val musicdbFile = musicFile.sibling("_musicdb.json")
+            val musicdb = JsonFetcher.invoke(musicdbFile.file())
+            val propForThisFile = musicdb.get(musicFile.name())
+
+            val artist = propForThisFile.get("artist").asString()
+            val title = propForThisFile.get("title").asString()
+
+            printdbg(this, "Title: $title, artist: $artist")
+
+
+            musicNowPlaying = MusicContainer(title, musicFile.file(), Gdx.audio.newMusic(musicFile)) {
+                unloadConvolver(musicNowPlaying)
+                discCurrentlyPlaying = null
+                musicNowPlaying?.gdxMusic?.tryDispose()
+                musicNowPlaying = null
+                (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(pauseLen = Math.random().toFloat() * 30f + 30f)
+            }
+
+            discCurrentlyPlaying = index
+
+            AudioMixer.requestFadeOut(AudioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
+                startAudio(musicNowPlaying!!) {
+                    it.filters[2] = Convolv(
+                        ModMgr.getFile(
+                            "basegame",
+                            "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin"
+                        ), 0f, 5f / 16f
+                    )
+                }
             }
         }
+
     }
 
     @Transient private var lampDecay = 0f
+
+    /**
+     * Try to stop the disc being played, and reset the background music cue
+     */
+    fun stopGracefully() {
+        stopDiscPlayback()
+        (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(pauseLen = Math.random().toFloat() * 30f + 30f)
+    }
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         blendNormalStraightAlpha(batch)
@@ -130,7 +150,7 @@ class FixtureJukebox : Electric {
         }
     }
 
-    private fun forceStop() {
+    private fun stopDiscPlayback() {
         musicNowPlaying?.let {
             stopAudio(it)
             unloadConvolver(it)
@@ -145,10 +165,7 @@ class FixtureJukebox : Electric {
         }
     }
 
-    @Transient override var despawnHook: (FixtureBase) -> Unit = {
-        forceStop()
-        (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(pauseLen = Math.random().toFloat() * 30f + 30f)
-    }
+    @Transient override var despawnHook: (FixtureBase) -> Unit = { stopGracefully() }
 
     override fun reload() {
         super.reload()

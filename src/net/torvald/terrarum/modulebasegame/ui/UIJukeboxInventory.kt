@@ -7,6 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defaultInventoryCellTheme
@@ -26,7 +27,7 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
     private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
     private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
 
-    private var currentFreeSlot = 0
+//    private var currentFreeSlot: Int
 
     private val playerInventory: ActorInventory
         get() = INGAME.actorNowPlaying!!.inventory
@@ -36,9 +37,28 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
             thisOffsetX, thisOffsetY + (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) * index,
             6 * UIItemInventoryElemSimple.height + 5 * UIItemInventoryItemGrid.listGap,
             keyDownFun = { _, _, _, _, _ -> Unit },
-            touchDownFun = { gameItem, amount, mouseButton, _, _ ->
-                if (mouseButton == App.getConfigInt("config_mouseprimary")) {
+            touchDownFun = { _, _, _, _, _ -> Unit },
+        )
+    }.toTypedArray()
+
+    private val operatedByTheInstaller: Boolean
+        get() = true/*if (parent.parent.actorThatInstalledThisFixture == null) true
+                else if (parent.parent.actorThatInstalledThisFixture != null && INGAME.actorNowPlaying is IngamePlayer)
+                    (parent.parent.actorThatInstalledThisFixture == (INGAME.actorNowPlaying as IngamePlayer).uuid)
+                else false*/
+
+    init {
+        fixtureDiscCell.forEachIndexed { index, thisButton ->
+            thisButton.touchDownFun = { gameItem, amount, mouseButton, _, _ ->
+                if (operatedByTheInstaller && mouseButton == App.getConfigInt("config_mouseprimary")) {
                     if (gameItem != null) {
+                        // if the disc being removed is the same disc being played, stop the playback
+                        if (index == parent.parent.discCurrentlyPlaying) {
+                            parent.parent.stopGracefully()
+                        }
+
+                        // remove the disc
+                        fixtureDiscCell[index].item = null
                         parent.discInventory[index] = null
                         playerInventory.add(gameItem)
 
@@ -51,28 +71,29 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
                         rebuild()
                     }
                 }
-            },
-        )
-    }.toTypedArray()
+            }
+
+            addUIitem(thisButton)
+        }
+    }
 
     private val playerInventoryUI = UITemplateHalfInventory(this, false).also {
         it.itemListTouchDownFun = { gameItem, _, _, _, _ ->
-            if (currentFreeSlot < SLOT_SIZE && gameItem != null) {
+            val currentFreeSlot = parent.discInventory.filterNotNull().size
+
+            if (operatedByTheInstaller && currentFreeSlot < SLOT_SIZE && gameItem != null) {
                 fixtureDiscCell[currentFreeSlot].item = gameItem
+                fixtureDiscCell[currentFreeSlot].itemImage = gameItem.itemImage
+                parent.discInventory[currentFreeSlot] = gameItem.dynamicID
                 playerInventory.remove(gameItem)
-                currentFreeSlot += 1
 
                 rebuild()
             }
         }
+
+        addUIitem(it)
     }
 
-    init {
-        fixtureDiscCell.forEach { thisButton ->
-            addUIitem(thisButton)
-        }
-        addUIitem(playerInventoryUI)
-    }
 
     private val playerInventoryFilterFun = { (itm, _): InventoryPair ->
         ItemCodex[itm].let {
@@ -113,7 +134,6 @@ class UIJukeboxSonglistPanel(val parent: UIJukebox) : UICanvas() {
 
     private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
     private val thisOffsetX2 = thisOffsetX + (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 7
-    private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
 
     private val songButtonColourTheme = defaultInventoryCellTheme.copy(
         cellHighlightNormalCol = Color(0xfec753c8.toInt()),
@@ -134,22 +154,24 @@ class UIJukeboxSonglistPanel(val parent: UIJukebox) : UICanvas() {
             if (index % 2 == 0) thisOffsetX else thisOffsetX2,
             ys[index.shr(1)],
             6 * UIItemInventoryElemSimple.height + 5 * UIItemInventoryItemGrid.listGap,
+            index = index,
             colourTheme = songButtonColourTheme,
-            keyDownFun = { _, _, _, _, _ -> Unit },
-            touchDownFun = { gameItem, amount, button, _, _ ->
-                if (button == App.getConfigInt("config_mouseprimary")) {
-
+            keyDownFun = { _, _, _ -> Unit },
+            touchDownFun = { index, button, _ ->
+                if (button == App.getConfigInt("config_mouseprimary") && !parent.parent.musicIsPlaying) {
+                    parent.parent.playDisc(index)
                 }
             }
         )
     }.toTypedArray()
 
     fun rebuild() {
+
         jukeboxPlayButtons.forEachIndexed { index, button ->
             parent.discInventory[index].let {
                 val item = ItemCodex[it] as? ItemFileRef
-                button.title = "${index+1} ${item?.name}"// ?: ""
-                button.artist = "${index+1} ${item?.author}"// ?: ""
+                button.title = item?.name ?: ""
+                button.artist = item?.author ?: ""
             }
         }
     }
@@ -185,11 +207,12 @@ class UIItemJukeboxSonglist(
     initialX: Int,
     initialY: Int,
     override val width: Int,
+    val index: Int,
     var title: String = "",
     var artist: String = "",
 
-    var keyDownFun: (GameItem?, Long, Int, Any?, UIItemJukeboxSonglist) -> Unit, // Item, Amount, Keycode, extra info, self
-    var touchDownFun: (GameItem?, Long, Int, Any?, UIItemJukeboxSonglist) -> Unit, // Item, Amount, Button, extra info, self
+    var keyDownFun: (Int, Int, UIItemJukeboxSonglist) -> Unit, // Index, Keycode, self
+    var touchDownFun: (Int, Int, UIItemJukeboxSonglist) -> Unit, // Index, Button,  self
 
     var colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme
 ) : UIItem(parentUI, initialX, initialY) {
@@ -200,8 +223,8 @@ class UIItemJukeboxSonglist(
 
     override val height = Companion.height
 
-    private val textOffsetX = 50f
-    private val textOffsetY = 8f
+    private val textOffsetX = 6
+    private val textOffsetY = 1
 
 
     /** Custom highlight rule to highlight tihs button to primary accent colour (blue by default).
@@ -215,6 +238,19 @@ class UIItemJukeboxSonglist(
     var forceHighlighted = false
 
 
+    override fun keyDown(keycode: Int): Boolean {
+        keyDownFun(index, keycode, this)
+        super.keyDown(keycode)
+        return true
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        if (mouseUp) {
+            touchDownFun(index, button, this)
+            super.touchDown(screenX, screenY, pointer, button)
+        }
+        return true
+    }
 
 
     private var highlightToMainCol = false
@@ -250,9 +286,10 @@ class UIItemJukeboxSonglist(
                     else colourTheme.textHighlightNormalCol
 
             // draw title
-            App.fontGame.draw(batch, title, posX + textOffsetX, posY + textOffsetY)
+            Toolkit.drawTextCentered(batch, App.fontGame, title, width, posX, posY + textOffsetY)
             // draw artist
-            App.fontGame.draw(batch, artist, posX + textOffsetX, posY + textOffsetY + 24f)
+            batch.color = batch.color.cpy().mul(0.75f, 0.75f, 0.75f, 1f)
+            Toolkit.drawTextCentered(batch, App.fontGame, artist, width, posX, posY + App.fontGame.lineHeight.toInt() - 2*textOffsetY)
         }
 
         // see IFs above?
