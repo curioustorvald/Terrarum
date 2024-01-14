@@ -59,21 +59,29 @@ open class MusicDiscPrototype(originalID: ItemID, module: String, path: String) 
         val authorHash = XXHash64.hash(author.encodeToByteArray(), 54)
         val albumHash = XXHash64.hash(collection.encodeToByteArray(), 32)
         val nameHash = XXHash64.hash(name.encodeToByteArray(), 10)
-        
+
         val authorRand = HQRNG(authorHash)
         val albumRand = HQRNG(albumHash)
         val nameRand = HQRNG(nameHash)
 
+        val discLumSats = listOf(
+            (20f to 0f), (20f to 1f),
+            (50f to 90f),
+            (35f to 60f), (30f to 80f),
+        )
+
+        val (discLum, discSat) = discLumSats.get(albumRand.nextInt(discLumSats.size))
+
         val discColour = floatArrayOf(
             albumRand.nextFloat() * 360f,
-            albumRand.nextFloat() * 70f + 10f,
-            albumRand.nextFloat() * 40f + 5f,
+            discSat,
+            discLum
         ) // HSLuv
 
         val labelColour = floatArrayOf(
             nameRand.nextFloat() * 360f,
             nameRand.nextFloat() * 20f + 75f,
-            nameRand.nextFloat() * 30f + 50f
+            nameRand.nextFloat() * 30f + 60f
         ) // HSLuv
 
         val pixmap = Pixmap(ModMgr.getGdxFile("basegame", "items/record_sprite_base.tga"))
