@@ -58,7 +58,7 @@ class UIItemCatBar(
             val iconIndexX = iconIndex % 1000
             val iconIndexY = iconIndex / 1000
 
-            UIItemImageButton(
+            object : UIItemImageButton(
                     inventoryUI,
                     catIcons.get(iconIndexX, iconIndexY),
                     activeBackCol = Color(0),
@@ -68,7 +68,10 @@ class UIItemCatBar(
                     initialX = posX + iconPosX,
                     initialY = posY + iconPosY,
                     highlightable = true
-            )
+            ) {
+                override val mouseUp: Boolean // true if mouse is on its occupying section on the bar, not just on the icon's bounding box
+                    get() = getButtonIndexUnderMouseOnTray() == index && itemRelativeMouseY in 0 until height
+            }
         }
 
 
@@ -170,6 +173,15 @@ class UIItemCatBar(
     /** (oldIndex: Int?, newIndex: Int) -> Unit
      * Indices are raw index. That is, not re-arranged. */
     var selectionChangeListener: ((Int?, Int) -> Unit)? = null
+
+    // returns the index of the button under mouse by checkig if cursur is on the "virtual rectangle" on the tray,
+    // rather than if the cursor is directly above the button
+    private fun getButtonIndexUnderMouseOnTray(): Int? {
+        return if (itemRelativeMouseX in 0 until width) {
+            (itemRelativeMouseX / (width.toFloat() / mainButtons.size)).toInt()
+        }
+        else null
+    }
 
     override fun update(delta: Float) {
         super.update(delta)
