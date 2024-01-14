@@ -24,9 +24,18 @@ private data class Frac(var nom: Int, val denom: Int) {
  *
  * Created by minjaesong on 2023-11-17.
  */
-class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> Int?, val onAudioFinished: () -> Unit) {
+class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) -> Int?, val onAudioFinished: () -> Unit) {
 
-    private val doResample = inputSamplingRate != SAMPLING_RATE
+    var playbackSpeed = 1f
+        set(value) {
+            field = value.coerceIn(0.5f, 2f)
+        }
+
+    private val internalSamplingRate
+        get() = inputSamplingRate * playbackSpeed
+
+    private val doResample
+        get() = (internalSamplingRate - SAMPLING_RATE).absoluteValue >= 0.5f
 
     companion object {
         private val epsilon: Double = Epsilon.E
@@ -62,7 +71,7 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
 
             arrayOf(48000,44100,32768,32000,24000,22050,16384,16000,12000,11025,8192,8000).forEachIndexed { ri, r ->
                 arrayOf(128,256,512,1024,2048).forEachIndexed { bi, b ->
-                    bufLut[b to r] = bl[bi * 12 + ri]
+                    bufLut[b to r] = bl[bi * 12 + ri] * 2
                 }
             }
         }
@@ -70,7 +79,8 @@ class AudioProcessBuf(inputSamplingRate: Int, val audioReadFun: (ByteArray) -> I
         private fun getOptimalBufferSize(rate: Int) = bufLut[BS to rate]!!
     }
 
-    private val q = inputSamplingRate.toDouble() / SAMPLING_RATE // <= 1.0
+    private val q
+    get() = internalSamplingRate.toDouble() / SAMPLING_RATE // <= 1.0
 
     private val fetchSize = (BS.toFloat() / MP3_CHUNK_SIZE).ceilToInt() * MP3_CHUNK_SIZE // fetchSize is always multiple of MP3_CHUNK_SIZE, even if the audio is NOT MP3
     private val internalBufferSize = getOptimalBufferSize(inputSamplingRate)// fetchSize * 3

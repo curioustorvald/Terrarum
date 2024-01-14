@@ -75,11 +75,16 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
 
         val timeDiffMax = earDist.coerceAtMost(EARDIST_MAX) / AudioMixer.SPEED_OF_SOUND * SAMPLING_RATEF
         val angle = pan * HALF_PI
-        val delayInSamples = (timeDiffMax * FastMath.sin(angle)).absoluteValue
+        val delayInSamples = if (App.getConfigString("audio_speaker_setup") == "headphone")
+                (timeDiffMax * FastMath.sin(angle)).absoluteValue
+        else 0f
         val volMultDbThis = PANNING_CONST * pan.absoluteValue
         val volMultFsThis = decibelsToFullscale(volMultDbThis).toFloat()
 
-        val volMultFsOther = 1f / volMultFsThis
+        val volMultFsOther = if (App.getConfigString("audio_speaker_setup") == "headphone")
+            1f / volMultFsThis
+        else
+            (1f - pan.absoluteValue).coerceIn(0f, 1f)
 
         if (pan >= 0) {
             delays[L] = delayInSamples
