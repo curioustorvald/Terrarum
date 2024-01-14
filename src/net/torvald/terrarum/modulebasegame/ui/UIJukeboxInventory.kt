@@ -33,6 +33,7 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
         UIItemInventoryElemWide(this,
             thisOffsetX, thisOffsetY + (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) * index,
             6 * UIItemInventoryElemSimple.height + 5 * UIItemInventoryItemGrid.listGap,
+            showItemCount = false,
             keyDownFun = { _, _, _, _, _ -> Unit },
             touchDownFun = { _, _, _, _, _ -> Unit },
         )
@@ -72,7 +73,8 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
     private val playerInventoryUI = UITemplateHalfInventory(this, false).also {
         it.itemListTouchDownFun = { gameItem, _, _, _, _ ->
 
-            if (operatedByTheInstaller && parent.discInventory.size < SLOT_SIZE && gameItem != null) {
+            // accept disc but not duplicates
+            if (operatedByTheInstaller && parent.discInventory.size < SLOT_SIZE && gameItem != null && !parent.discInventory.contains(gameItem.dynamicID)) {
                 parent.discInventory.add(gameItem.dynamicID)
                 playerInventory.remove(gameItem)
 

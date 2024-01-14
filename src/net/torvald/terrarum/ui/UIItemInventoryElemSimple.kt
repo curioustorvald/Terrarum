@@ -20,20 +20,21 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2017-10-20.
  */
 class UIItemInventoryElemSimple(
-        parentUI: UICanvas,
-        initialX: Int,
-        initialY: Int,
-        override var item: GameItem? = null,
-        override var amount: Long = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
-        override var itemImage: TextureRegion? = null,
-        override var quickslot: Int? = null,
-        override var equippedSlot: Int? = null, // remnants of wide cell displaying slot number and highlighting; in this style of cell this field only determines highlightedness at render
-        val drawBackOnNull: Boolean = true,
-        keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
-        touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
-        extraInfo: Any? = null,
-        highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
-        colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme
+    parentUI: UICanvas,
+    initialX: Int,
+    initialY: Int,
+    override var item: GameItem? = null,
+    override var amount: Long = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
+    override var itemImage: TextureRegion? = null,
+    override var quickslot: Int? = null,
+    override var equippedSlot: Int? = null, // remnants of wide cell displaying slot number and highlighting; in this style of cell this field only determines highlightedness at render
+    val drawBackOnNull: Boolean = true,
+    keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
+    touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
+    extraInfo: Any? = null,
+    highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
+    colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme,
+    var showItemCount: Boolean = true,
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo, highlightEquippedItem, colourTheme) {
     
     companion object {
@@ -104,7 +105,7 @@ class UIItemInventoryElemSimple(
                 Toolkit.drawStraightLine(batch, barOffset, posY + height - thickness, barOffset + (barFullLen * percentage).roundToInt(), thickness, false)
             }
             // draw item count when applicable
-            else if (item!!.stackable) {
+            else if (item!!.stackable && showItemCount) {
                 val amountString = amount.toItemCountText()
 
                 // if mouse is over, text lights up

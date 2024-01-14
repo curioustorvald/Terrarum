@@ -35,9 +35,6 @@ class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): Terrarum
 
     var processingSpeed = 1f; private set
 
-    private val partSizes: IntArray
-    private val partOffsets: IntArray
-
     init {
         if (!ir.exists()) {
             throw IllegalArgumentException("Impulse Response file '${ir.path}' does not exist.")
@@ -72,20 +69,6 @@ class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): Terrarum
         convFFT = Array(2) {
             FFT.fft(conv[it])
         }
-
-//        println("convFFT Length = ${convFFT[0].size}")
-
-
-        // fill up part* dictionary
-        // define "master" array
-        var c = AUDIO_BUFFER_SIZE
-        val master0 = arrayListOf(c)
-        while (c < fftLen) {
-            master0.add(c)
-            c *= 2
-        }
-        partSizes = master0.toIntArray()
-        partOffsets = master0.toIntArray().also { it[0] = 0 }
     }
 
     private val realtime = (BLOCKSIZE / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L)

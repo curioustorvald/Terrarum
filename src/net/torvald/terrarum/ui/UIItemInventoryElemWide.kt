@@ -22,21 +22,22 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2017-03-16.
  */
 class UIItemInventoryElemWide(
-        parentUI: UICanvas,
-        initialX: Int,
-        initialY: Int,
-        override val width: Int,
-        override var item: GameItem? = null,
-        override var amount: Long = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
-        override var itemImage: TextureRegion? = null,
-        override var quickslot: Int? = null,
-        override var equippedSlot: Int? = null,
-        val drawBackOnNull: Boolean = true,
-        keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
-        touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
-        extraInfo: Any? = null,
-        highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
-        colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme
+    parentUI: UICanvas,
+    initialX: Int,
+    initialY: Int,
+    override val width: Int,
+    override var item: GameItem? = null,
+    override var amount: Long = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
+    override var itemImage: TextureRegion? = null,
+    override var quickslot: Int? = null,
+    override var equippedSlot: Int? = null,
+    val drawBackOnNull: Boolean = true,
+    keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
+    touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
+    extraInfo: Any? = null,
+    highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
+    colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme,
+    var showItemCount: Boolean = true,
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo, highlightEquippedItem, colourTheme) {
 
     companion object {
@@ -113,10 +114,13 @@ class UIItemInventoryElemWide(
             // draw name of the item
             App.fontGame.draw(batch,
                     // print name and amount in parens
-                    item!!.name + (if (amount > 0 && item!!.stackable) "\u3000($amountString)" else if (amount != 1L) "\u3000!!$amountString!!" else ""),
+                if (showItemCount)
+                    item!!.name + (if (amount > 0 && item!!.stackable) "\u3000($amountString)" else if (amount != 1L) "\u3000!!$amountString!!" else "")
+                else
+                    item!!.name,
 
-                    posX + textOffsetX,
-                    posY + textOffsetY
+                posX + textOffsetX,
+                posY + textOffsetY
             )
 
 

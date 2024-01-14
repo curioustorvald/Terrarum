@@ -70,8 +70,6 @@ class FixtureJukebox : Electric {
         }
     }
 
-    private var waitAkku = 0f
-
     override val canBeDespawned: Boolean
         get() = discInventory.isEmpty()
 
