@@ -181,7 +181,10 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     var isJumpDown = false; protected set
     var isJumpJustDown = false; protected set // TODO if jump key is held in current update frame
     protected inline val isGamer: Boolean
-        get() = if (Terrarum.ingame == null) false else this == INGAME.actorNowPlaying
+        get() = if (Terrarum.ingame?.playerControlDisabled != false) // if (ingame is null) or (playerControlDisabled is true)
+            false
+        else
+            (this == INGAME.actorNowPlaying)
 
     private var jumpJustPressedLatched = false
 

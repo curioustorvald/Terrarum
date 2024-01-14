@@ -132,7 +132,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
 
         // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
         // don't separate Player from this! Physics will break, esp. airborne manoeuvre
-        if (!terrarumIngame.paused && terrarumIngame.uiContainer.hasNoUIsUnderMouse) {
+        if (!terrarumIngame.paused && !terrarumIngame.playerControlDisabled && terrarumIngame.uiContainer.hasNoUIsUnderMouse) {
             val actor = terrarumIngame.actorNowPlaying
             val itemOnGrip = terrarumIngame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
@@ -166,8 +166,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     private var f12Down = false
 
     private fun tKeyDown(keycode: Int): Boolean {
-
-        if (!terrarumIngame.paused) {
+        if (!terrarumIngame.paused && !terrarumIngame.playerControlDisabled) {
             terrarumIngame.actorNowPlaying?.keyDown(keycode)
 
             // quickslot by number keys
@@ -245,7 +244,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
 
     private fun tTouchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         // don't separate Player from this! Physics will break, esp. airborne manoeuvre
-        if (!terrarumIngame.paused) {
+        if (!terrarumIngame.paused && !terrarumIngame.playerControlDisabled) {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
             if (terrarumIngame.uiContainer.map { if ((it?.isOpening == true || it?.isOpened == true) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
@@ -272,7 +271,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        if (!terrarumIngame.paused && terrarumIngame.uiContainer.hasNoUIsUnderMouse) {
+        if (!terrarumIngame.paused && !terrarumIngame.playerControlDisabled && terrarumIngame.uiContainer.hasNoUIsUnderMouse) {
             // quickslot by wheel
             terrarumIngame.actorNowPlaying?.let {
                 var selection = it.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)!!

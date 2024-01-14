@@ -115,13 +115,13 @@ class UIJukebox : UICanvas(
 
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
-        INGAME.pause()
+        INGAME.disablePlayerControl()
         INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
-        INGAME.resume()
+        INGAME.resumePlayerControl()
         INGAME.setTooltipMessage(null)
     }
 

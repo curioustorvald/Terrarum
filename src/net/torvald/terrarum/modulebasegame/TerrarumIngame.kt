@@ -994,6 +994,14 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
         uiContainer.forEach {
+
+            // suppress inventory opening if fixture inventory is opened
+            if (uiFixture?.isClosed == false)
+                uiInventoryPlayer.handler.lockToggle()
+            else
+                uiInventoryPlayer.handler.unlockToggle()
+
+
             when (it) {
                 is Id_UICanvasNullable -> it.get()?.update(Gdx.graphics.deltaTime)
                 is UICanvas -> it.update(Gdx.graphics.deltaTime)

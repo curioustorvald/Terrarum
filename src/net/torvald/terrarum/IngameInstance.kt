@@ -77,6 +77,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     open var consoleHandler: ConsoleWindow = ConsoleWindow()
 
     var paused: Boolean = false; protected set
+    var playerControlDisabled = false; protected set
     val consoleOpened: Boolean
         get() = consoleHandler.isOpened || consoleHandler.isOpening
 
@@ -198,6 +199,14 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
 
     override fun resume() {
         paused = false
+    }
+
+    open fun disablePlayerControl() {
+        playerControlDisabled = true
+    }
+
+    open fun resumePlayerControl() {
+        playerControlDisabled = false
     }
 
     override fun resize(width: Int, height: Int) {
