@@ -1,14 +1,26 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.colourutil.HUSLColorConverter
+import net.torvald.colourutil.OKLCh
+import net.torvald.random.HQRNG
+import net.torvald.random.XXHash32
+import net.torvald.random.XXHash64
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.savegame.toHex
 import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.terrarum.worlddrawer.toRGBA
 
 /**
  * Created by minjaesong on 2024-01-13.
  */
-data class MusicDiscMetadata(val title: String, val author: String)
+data class MusicDiscMetadata(val title: String, val author: String, val album: String)
 
 object MusicDiscHelper {
     fun getMetadata(musicFile: FileHandle): MusicDiscMetadata {
@@ -18,8 +30,9 @@ object MusicDiscHelper {
 
         val artist = propForThisFile.get("artist").asString()
         val title = propForThisFile.get("title").asString()
+        val album = propForThisFile.get("album").asString()
 
-        return MusicDiscMetadata(title, artist)
+        return MusicDiscMetadata(title, artist, album)
     }
 }
 
@@ -34,6 +47,80 @@ open class MusicDiscPrototype(originalID: ItemID, module: String, path: String) 
         val meta = MusicDiscHelper.getMetadata(getAsGdxFile())
         name = meta.title
         author = meta.author
+        collection = meta.album
+    }
+
+    @Transient override val itemImage: TextureRegion = generateSprite()
+
+    /**
+     * Reads a channel-wise black and white image and tints it using HSLuv colour space
+     */
+    private fun generateSprite(): TextureRegion {
+        val authorHash = XXHash64.hash(author.encodeToByteArray(), 54)
+        val albumHash = XXHash64.hash(collection.encodeToByteArray(), 32)
+        val nameHash = XXHash64.hash(name.encodeToByteArray(), 10)
+        
+        val authorRand = HQRNG(authorHash)
+        val albumRand = HQRNG(albumHash)
+        val nameRand = HQRNG(nameHash)
+
+        val discColour = floatArrayOf(
+            albumRand.nextFloat() * 360f,
+            albumRand.nextFloat() * 70f + 10f,
+            albumRand.nextFloat() * 40f + 5f,
+        ) // HSLuv
+
+        val labelColour = floatArrayOf(
+            nameRand.nextFloat() * 360f,
+            nameRand.nextFloat() * 20f + 75f,
+            nameRand.nextFloat() * 30f + 50f
+        ) // HSLuv
+
+        val pixmap = Pixmap(ModMgr.getGdxFile("basegame", "items/record_sprite_base.tga"))
+
+        // tint the pixmap
+        for (y in 0 until pixmap.height) {
+            for (x in 0 until pixmap.width) {
+                val pixel = pixmap.getPixel(x, y) // RGBA
+
+                if (pixel and 0xFF == 0xFF) {
+                    // red part
+                    if (pixel and 0xFF000000.toInt() != 0) {
+                        val b = pixel.ushr(24).and(255).toFloat() / 255f
+
+                        val B = discColour.copyOf().also {
+                            it[2] *= b
+                        }
+
+                        val outCol = HUSLColorConverter.hsluvToRgb(B).let {
+                            Color(it[0], it[1], it[2], 1f)
+                        }
+
+                        pixmap.drawPixel(x, y, outCol.toRGBA())
+                    }
+                    // green part
+                    else if (pixel and 0x00FF0000.toInt() != 0) {
+                        val b = pixel.ushr(16).and(255).toFloat() / 255f
+
+                        val B = labelColour.copyOf().also {
+                            it[2] *= b
+                        }
+
+                        val outCol = HUSLColorConverter.hsluvToRgb(B).let {
+                            Color(it[0], it[1], it[2], 1f)
+                        }
+
+                        pixmap.drawPixel(x, y, outCol.toRGBA())
+                    }
+
+                }
+            }
+        }
+
+        val ret = TextureRegion(Texture(pixmap))
+        pixmap.dispose()
+
+        return ret
     }
 }
 

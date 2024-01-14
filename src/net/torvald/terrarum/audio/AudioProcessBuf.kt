@@ -35,7 +35,7 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
         get() = inputSamplingRate * playbackSpeed
 
     private val doResample
-        get() = inputSamplingRate == SAMPLING_RATE && (playbackSpeed - 1f).absoluteValue < (1f / 1024f)
+        get() = !(inputSamplingRate == SAMPLING_RATE && (playbackSpeed - 1f).absoluteValue < (1f / 1024f))
 
     companion object {
         private val epsilon: Double = Epsilon.E

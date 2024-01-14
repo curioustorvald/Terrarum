@@ -4,11 +4,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureJukebox
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.unicode.getKeycapPC
 
 /**
  * Created by minjaesong on 2024-01-13.
@@ -45,6 +47,14 @@ class UIJukebox : UICanvas(
             transitionPanel.requestTransition(new)
         }
     }
+
+
+    private val controlHelp: String
+        get() = if (App.environment == RunningEnvironment.PC)
+            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
+        else
+            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]} "
+
 
     private val transitionalSonglistPanel = UIJukeboxSonglistPanel(this)
     private val transitionalDiscInventory = UIJukeboxInventory(this)
@@ -85,7 +95,16 @@ class UIJukebox : UICanvas(
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         UIInventoryFull.drawBackground(batch, 1f)
         uiItems.forEach { it.render(frameDelta, batch, camera) }
+
+        val controlHintXPos = thisOffsetX + 2f
+        App.fontGame.draw(batch, controlHelp, controlHintXPos, yEnd - 20)
     }
+
+
+    private val halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) / 2
+    private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
+    private val yEnd = -UIInventoryFull.YPOS_CORRECTION + (App.scr.height + UIInventoryFull.internalHeight).div(2).toFloat()
+
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (!openingClickLatched) {
