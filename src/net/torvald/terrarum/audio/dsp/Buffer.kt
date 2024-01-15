@@ -18,8 +18,5 @@ object Buffer : TerrarumAudioFilter() {
         App.fontSmallNumbers.draw(batch, "Bs:${App.audioBufferSize}", x+3f, y+1f)
     }
 
-    override fun reset() {
-    }
-
     override val debugViewHeight = 16
 }

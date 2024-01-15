@@ -67,6 +67,9 @@ class FixtureJukebox : Electric {
             it.setSpriteImage(TextureRegionPack(backLampTex, TILE_SIZE * 2, TILE_SIZE * 3))
             it.setRowsAndFrames(1, 1)
         }
+
+
+        App.audioMixerRenewHooks[this] = { stopGracefully() }
     }
 
     override val canBeDespawned: Boolean
@@ -174,6 +177,7 @@ class FixtureJukebox : Electric {
     }
 
     override fun dispose() {
+        App.audioMixerRenewHooks.remove(this)
         super.dispose()
 //        testMusic.gdxMusic.dispose()
     }

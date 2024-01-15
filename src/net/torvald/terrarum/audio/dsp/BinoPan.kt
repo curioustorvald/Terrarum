@@ -55,13 +55,6 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
         private val HALF_PI = (Math.PI / 2.0).toFloat()
     }
 
-    override fun reset() {
-        outLs = Array(2) { FloatArray(App.audioBufferSize) }
-        outRs = Array(2) { FloatArray(App.audioBufferSize) }
-        delayLineL.fill(0f)
-        delayLineR.fill(0f)
-    }
-
     /**
      * @param intensity -inf to +inf
      */

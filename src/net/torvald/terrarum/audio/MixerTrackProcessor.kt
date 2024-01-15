@@ -21,15 +21,6 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
 
     private var buffertaille = bufferSize
 
-    fun reset(newBufferSize: Int) {
-        buffertaille = newBufferSize
-//        printdbg("new buffertaille = $buffertaille")
-        emptyBuf = FloatArray(buffertaille)
-        fout1 = listOf(emptyBuf, emptyBuf)
-        purgeStreamBuf()
-    }
-
-
     companion object {
     }
 
@@ -178,13 +169,7 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                 // add all up
                 sidechains.forEach { (side, mix) ->
                     for (i in samplesL1.indices) {
-//                        try {
-                            samplesL1[i] += side.processor.fout1[0][i] * (mix * track.volume).toFloat()
-//                        }
-//                        catch (e: ArrayIndexOutOfBoundsException) {
-//                            printdbg("buffertaille = $buffertaille, samplesL1 size = ${samplesL1.size}, side.processor.fout1[0] size = ${side.processor.fout1[0].size}")
-//                            throw e
-//                        }
+                        samplesL1[i] += side.processor.fout1[0][i] * (mix * track.volume).toFloat()
                         samplesR1[i] += side.processor.fout1[1][i] * (mix * track.volume).toFloat()
                     }
                 }

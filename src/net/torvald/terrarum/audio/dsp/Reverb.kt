@@ -53,8 +53,4 @@ class Reverb(val delayMS: Float = 36f, var feedback: Float = 0.92f, var lowpass:
     }
 
     override val debugViewHeight = 0
-
-    override fun reset() {
-        buf.forEach { it.fill(0f) }
-    }
 }

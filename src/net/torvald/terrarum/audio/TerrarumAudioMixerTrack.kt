@@ -187,16 +187,6 @@ class TerrarumAudioMixerTrack(
         }*/
     }
 
-    fun updateBufferSizeChange() {
-//        printdbg(this, "new buffer size: $App.audioMixerBufferSize")
-        pcmQueue.clear()
-        pcmQueue.addLast(listOf(FloatArray(App.audioBufferSize), FloatArray(App.audioBufferSize)))
-        pcmQueue.addLast(listOf(FloatArray(App.audioBufferSize), FloatArray(App.audioBufferSize)))
-        processor.reset(App.audioBufferSize)
-        filters.forEach { it.reset() }
-    }
-
-
     override fun hashCode() = hashCode0
 }
 

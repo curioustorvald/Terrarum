@@ -19,9 +19,6 @@ object XYtoMS: TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = 0
-
-    override fun reset() {
-    }
 }
 
 object MStoXY: TerrarumAudioFilter() {
@@ -40,7 +37,4 @@ object MStoXY: TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = 0
-
-    override fun reset() {
-    }
 }

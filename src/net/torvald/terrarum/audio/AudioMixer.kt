@@ -498,35 +498,6 @@ class AudioMixer(val bufferSize: Int): Disposable {
         }, 500L)
     }
 
-    fun updateBufferSizeChange() {
-        processing = false
-        processingThread.interrupt()
-
-
-
-        dynamicTracks.forEach { it.stop() }
-        tracks.filter { it.trackType == TrackType.STATIC_SOURCE }.forEach { it.stop() }
-        masterTrack.volume = 0.0
-
-        dynamicTracks.forEach { it.updateBufferSizeChange() }
-        tracks.forEach { it.updateBufferSizeChange() }
-        masterTrack.updateBufferSizeChange()
-
-
-
-        processingThread = createProcessingThread()
-        processing = true
-        processingThread.start()
-
-
-        // give some time for the cave bus to decay before ramping the volume up
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                masterTrack.volume = 1.0
-            }
-        }, 500L)
-    }
-
     override fun dispose() {
         processingExecutor.killAll()
 //        processingSubthreads.forEach { it.interrupt() }

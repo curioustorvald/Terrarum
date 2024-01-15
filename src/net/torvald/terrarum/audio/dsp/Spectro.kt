@@ -91,9 +91,6 @@ class Spectro(val gain: Float = 1f) : TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = STRIP_W
-
-    override fun reset() {
-    }
 }
 
 
@@ -157,13 +154,4 @@ class Vecto(val gain: Float = 1f) : TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = STRIP_W
-
-    override fun reset() {
-        backbufL = Array((6144f / App.audioBufferSize).roundToInt().coerceAtLeast(1)) {
-            FloatArray(App.audioBufferSize)
-        }
-        backbufR = Array((6144f / App.audioBufferSize).roundToInt().coerceAtLeast(1)) {
-            FloatArray(App.audioBufferSize)
-        }
-    }
 }

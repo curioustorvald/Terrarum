@@ -67,9 +67,4 @@ class Lowpass(cutoff0: Float): TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = 16
-
-    override fun reset() {
-        in0.fill(0f)
-        out0.fill(0f)
-    }
 }

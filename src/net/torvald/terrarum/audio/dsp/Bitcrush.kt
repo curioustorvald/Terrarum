@@ -34,8 +34,5 @@ class Bitcrush(var steps: Int, var inputGain: Float = 1f): TerrarumAudioFilter()
         App.fontSmallNumbers.draw(batch, "B:$bits", x+3f, y+1f)
     }
 
-    override fun reset() {
-    }
-
     override val debugViewHeight = 16
 }

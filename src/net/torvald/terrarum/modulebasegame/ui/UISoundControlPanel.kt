@@ -31,7 +31,7 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 arrayOf("", { "" }, "pp"),
             arrayOf("", { Lang["MENU_LABEL_AUDIO_ENGINE"] }, "h1"),
                 arrayOf("audio_speaker_setup", { Lang["MENU_OPTIONS_SPEAKER_SETUP"] }, "textsel,headphone=MENU_OPTIONS_SPEAKER_HEADPHONE,stereo=MENU_OPTIONS_SPEAKER_STEREO"),
-                arrayOf("audio_buffer_size", { Lang["MENU_OPTIONS_App.audioMixerBufferSize"] }, "spinnersel,128,256,512,1024,2048"),
+                arrayOf("audio_buffer_size", { Lang["MENU_OPTIONS_AUDIO_BUFFER_SIZE"] }, "spinnersel,128,256,512,1024,2048"),
 //                arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
                 arrayOf("", { "${Lang["MENU_LABEL_AUDIO_BUFFER_INSTRUCTION"]}" }, "p"),
 

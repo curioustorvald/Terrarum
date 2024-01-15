@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
 import com.github.strikerx3.jxinput.XInputDevice;
+import kotlin.jvm.functions.Function0;
 import kotlin.text.Charsets;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.audio.AudioMixer;
@@ -1056,6 +1057,12 @@ public class App implements ApplicationListener {
     public static int audioBufferSize;
 
     /**
+     * Make sure to call App.audioMixerRenewHooks.remove(Object) whenever the class gets disposed of
+     * Key: the class that calls the hook, value: the actual operation (function)
+     */
+    public static HashMap<Object, Function0> audioMixerRenewHooks = new HashMap<>();
+
+    /**
      * Init stuffs which needs GL context
      */
     private void postInit() {
@@ -1243,6 +1250,16 @@ public class App implements ApplicationListener {
         audioManagerThread = new Thread(new AudioManagerRunnable(audioMixer), "TerrarumAudioManager");
         audioManagerThread.setPriority(MAX_PRIORITY); // higher = more predictable; audio delay is very noticeable so it gets high priority
         audioManagerThread.start();
+
+
+        for (var it : audioMixerRenewHooks.values()) {
+            try {
+                it.invoke();
+            }
+            catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 

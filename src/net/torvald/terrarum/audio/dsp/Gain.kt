@@ -19,9 +19,5 @@ class Gain(var gain: Float): TerrarumAudioFilter() {
         App.fontSmallNumbers.draw(batch, "G:${fullscaleToDecibels(gain.toDouble()).times(100).roundToInt().div(100f)}", x+3f, y+1f)
     }
 
-
-    override fun reset() {
-    }
-
     override val debugViewHeight = 16
 }

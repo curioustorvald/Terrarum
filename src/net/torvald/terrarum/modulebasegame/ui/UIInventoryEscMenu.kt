@@ -34,6 +34,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         "MENU_IO_SAVE_GAME",
         "MENU_OPTIONS_CONTROLS",
         "MENU_LABEL_IME",
+        "MENU_LABEL_SOUND",
         "MENU_LABEL_LANGUAGE",
         "MENU_LABEL_SHARE",
         "MENU_LABEL_QUIT",
@@ -86,6 +87,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val languageUI = UITitleLanguage(null)
     private val keyboardSetupUI = UIIMEConfig(null)
     private val shareUI = UIShare()
+    private val audioUI = UISoundControlPanel(null)
 
     private var oldScreen = 0
     private var screen = 0
@@ -156,12 +158,15 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                     screen = 1; gameMenuButtons.deselect()
                 }
                 3 -> {
-                    screen = 5; gameMenuButtons.deselect()
+                    screen = 7; gameMenuButtons.deselect()
                 }
                 4 -> {
-                    screen = 6; gameMenuButtons.deselect()
+                    screen = 5; gameMenuButtons.deselect()
                 }
                 5 -> {
+                    screen = 6; gameMenuButtons.deselect()
+                }
+                6 -> {
                     screen = 2; gameMenuButtons.deselect()
                 }
             }
@@ -183,7 +188,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
     // Completely unrelated to the gameMenuButtons order
     private val screens = arrayOf(
-        gameMenuButtons, keyboardSetupUI, areYouSureMainMenuButtons, savingUI, keyConfigUI, languageUI, shareUI
+        gameMenuButtons, keyboardSetupUI, areYouSureMainMenuButtons, savingUI, keyConfigUI, languageUI, shareUI, audioUI
     )
 
     // `screens` order
@@ -222,6 +227,11 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
             shareUI.render(frameDelta, batch, camera)
         },
+        { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
+            // control hints
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            audioUI.render(frameDelta, batch, camera)
+        },
     )
 
     // `screens` order
@@ -235,6 +245,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         { screenX: Int, screenY: Int, pointer: Int, button: Int ->
             keyConfigUI.touchDown(screenX, screenY, pointer, button)
         },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
         { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
         { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
     )
@@ -252,6 +263,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         },
         { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
         { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
     )
 
     // `screens` order
@@ -260,6 +272,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         { amountX: Float, amountY: Float ->
             keyboardSetupUI.scrolled(amountX, amountY)
         },
+        { amountX: Float, amountY: Float ->  },
         { amountX: Float, amountY: Float ->  },
         { amountX: Float, amountY: Float ->  },
         { amountX: Float, amountY: Float ->  },

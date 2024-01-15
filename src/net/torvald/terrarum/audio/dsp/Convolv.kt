@@ -74,12 +74,6 @@ class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): Terrarum
     private val fftOutL = FloatArray(fftLen)
     private val fftOutR = FloatArray(fftLen)
 
-    override fun reset() {
-        realtime = (App.audioBufferSize / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L)
-        processingSpeed = 1f
-        sumbuf.forEach { it.reim.fill(0f) }
-    }
-
     private fun convolve(x: ComplexArray, h: ComplexArray, output: FloatArray) {
         FFT.fftInto(x, fftIn)
         fftIn.mult(h, fftMult)
