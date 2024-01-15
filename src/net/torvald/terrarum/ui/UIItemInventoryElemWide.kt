@@ -4,16 +4,13 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.ui.InventoryCellColourTheme
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
-import net.torvald.terrarum.mul
 import kotlin.math.roundToInt
 
 /***
@@ -105,11 +102,17 @@ class UIItemInventoryElemWide(
 
             // if mouse is over, text lights up
             // highlight item name and count (blocks/walls) if the item is equipped
-            batch.color = item!!.nameColour mul (
+            val nameColour = item!!.nameColour mul (
                     if (highlightToMainCol) colourTheme.textHighlightMainCol
                     else if (highlightToSubCol) colourTheme.textHighlightSubCol
                     else if (mouseUp && item != null) colourTheme.textHighlightMouseUpCol
                     else colourTheme.textHighlightNormalCol)
+            val nameColour2 = nameColour mul Color(0.75f, 0.75f, 0.75f, 1f)
+
+            batch.color = nameColour
+            val hasSecondaryName = (item?.nameSecondary?.isNotBlank() == true)
+            val itemNameRow1Y = if (hasSecondaryName) 1f else if (item!!.maxDurability > 0.0) textOffsetY else ((height - App.fontGame.lineHeight) / 2).roundToFloat()
+            val itemNameRow2Y = App.fontGame.lineHeight.toInt() - 2*itemNameRow1Y
 
             // draw name of the item
             App.fontGame.draw(batch,
@@ -120,7 +123,7 @@ class UIItemInventoryElemWide(
                     item!!.name,
 
                 posX + textOffsetX,
-                posY + textOffsetY
+                posY + itemNameRow1Y
             )
 
 
@@ -135,6 +138,15 @@ class UIItemInventoryElemWide(
                 Toolkit.drawStraightLine(batch, barOffset, posY + durabilityBarOffY, barOffset + barFullLen, durabilityBarThickness, false)
                 batch.color = durabilityCol
                 Toolkit.drawStraightLine(batch, barOffset, posY + durabilityBarOffY, barOffset + (barFullLen * percentage).roundToInt(), durabilityBarThickness, false)
+            }
+            // secondary name
+            else if (hasSecondaryName) {
+                batch.color = nameColour2
+                App.fontGame.draw(batch,
+                    item!!.nameSecondary,
+                    posX + textOffsetX,
+                    posY + itemNameRow2Y
+                )
             }
 
 

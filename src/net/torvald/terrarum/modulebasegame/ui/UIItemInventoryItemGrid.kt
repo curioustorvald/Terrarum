@@ -329,13 +329,16 @@ open class UIItemInventoryItemGrid(
             // set tooltip accordingly
             if ((App.IS_DEVELOPMENT_BUILD || isCompactMode) && tooltipShowing[hash] != true && it.item != null && it.mouseUp) {
 //                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
+
+                val grey = App.fontGame.toColorCode(11, 11, 11)
+                val itemIDstr = "\n$grey(${it.item?.originalID}${if (it.item?.originalID == it.item?.dynamicID) "" else "/${it.item?.dynamicID}"})"
+                val nameStr = if (it.item?.nameSecondary?.isNotBlank() == true) "${it.item?.name}\n$grey${it.item?.nameSecondary}" else "${it.item?.name}"
+
                 INGAME.setTooltipMessage(
-                        if (App.IS_DEVELOPMENT_BUILD) {
-                            it.item?.name + "\n(${it.item?.originalID}${if (it.item?.originalID == it.item?.dynamicID) "" else "/${it.item?.dynamicID}"})"
-                        }
-                        else {
-                            it.item?.name
-                        }
+                    if (App.IS_DEVELOPMENT_BUILD)
+                        nameStr + itemIDstr
+                    else
+                        nameStr
                 )
 
                 tooltipShowing[hash] = true

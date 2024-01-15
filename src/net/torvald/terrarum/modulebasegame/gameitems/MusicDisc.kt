@@ -49,7 +49,8 @@ open class MusicDiscPrototype(originalID: ItemID, module: String, path: String) 
         originalName = meta.title
         author = meta.author
         collection = meta.album
-        name = "$author $EMDASH $originalName"
+        name = meta.title
+        nameSecondary = "${meta.author} $EMDASH ${meta.album}"
     }
 
     @Transient override val itemImage: TextureRegion = generateSprite()
