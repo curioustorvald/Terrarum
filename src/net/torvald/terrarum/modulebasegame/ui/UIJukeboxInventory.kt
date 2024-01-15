@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
@@ -11,6 +13,12 @@ import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defau
 import net.torvald.terrarum.modulebasegame.ui.UIJukebox.Companion.SLOT_SIZE
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemInventoryElemWide
+
+
+private val songButtonColourTheme = defaultInventoryCellTheme.copy(
+    cellHighlightNormalCol = Color(0xfec753c8.toInt()),
+    cellBackgroundCol = Color(0x704c20c8.toInt())
+)
 
 /**
  * Created by minjaesong on 2024-01-13.
@@ -21,8 +29,11 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
     override var height = App.scr.height
 
     private val halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) / 2
+
     private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
-    private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
+    private val thisOffsetX2 = thisOffsetX + (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 7
+    private val thisOffsetY = UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
+    private val cellsWidth = (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 6 - UIItemInventoryItemGrid.listGap
 
 //    private var currentFreeSlot: Int
 
@@ -32,7 +43,7 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
     private val fixtureDiscCell: Array<UIItemInventoryElemWide> = (0 until SLOT_SIZE).map { index ->
         UIItemInventoryElemWide(this,
             thisOffsetX, thisOffsetY + (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) * index,
-            6 * UIItemInventoryElemSimple.height + 5 * UIItemInventoryItemGrid.listGap,
+            cellsWidth,
             showItemCount = false,
             keyDownFun = { _, _, _, _, _ -> Unit },
             touchDownFun = { _, _, _, _, _ -> Unit },
@@ -103,6 +114,15 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
 
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         uiItems.forEach { it.render(frameDelta, batch, camera) }
+
+        // chest name text
+        val chestName = Lang["ITEM_JUKEBOX"]
+        val playerName = INGAME.actorNowPlaying!!.actorValue.getAsString(AVKey.NAME).orEmpty().let { it.ifBlank { Lang["GAME_INVENTORY"] } }
+
+        batch.color = Color.WHITE
+        App.fontGame.draw(batch, chestName, thisOffsetX + (cellsWidth - App.fontGame.getWidth(chestName)) / 2, thisOffsetY - 30)
+        App.fontGame.draw(batch, playerName, thisOffsetX2 + (cellsWidth - App.fontGame.getWidth(playerName)) / 2, thisOffsetY - 30)
+
     }
 
     override fun dispose() {
@@ -138,11 +158,7 @@ class UIJukeboxSonglistPanel(val parent: UIJukebox) : UICanvas() {
 
     private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
     private val thisOffsetX2 = thisOffsetX + (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 7
-
-    private val songButtonColourTheme = defaultInventoryCellTheme.copy(
-        cellHighlightNormalCol = Color(0xfec753c8.toInt()),
-        cellBackgroundCol = Color(0x704c20c8.toInt())
-    )
+    private val cellsWidth = (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 6 - UIItemInventoryItemGrid.listGap
 
     private val rows = SLOT_SIZE / 2
     private val vgap = 48
@@ -157,7 +173,7 @@ class UIJukeboxSonglistPanel(val parent: UIJukebox) : UICanvas() {
         UIItemJukeboxSonglist(this,
             if (index % 2 == 0) thisOffsetX else thisOffsetX2,
             ys[index.shr(1)],
-            6 * UIItemInventoryElemSimple.height + 5 * UIItemInventoryItemGrid.listGap,
+            cellsWidth,
             index = index,
             colourTheme = songButtonColourTheme,
             keyDownFun = { _, _, _ -> Unit },
