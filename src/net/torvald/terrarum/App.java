@@ -927,7 +927,7 @@ public class App implements ApplicationListener {
         }
 
         if (audioMixerInitialised) {
-            AudioMixer.INSTANCE.dispose();
+            audioMixer.dispose();
         }
 
         if (currentScreen != null) {
@@ -1051,6 +1051,9 @@ public class App implements ApplicationListener {
     }
 
     private static Boolean audioMixerInitialised = false;
+
+    public static AudioMixer audioMixer;
+    public static int audioBufferSize;
 
     /**
      * Init stuffs which needs GL context
@@ -1203,9 +1206,10 @@ public class App implements ApplicationListener {
         }
 
 
-        AudioMixer.INSTANCE.getMasterVolume();
+        audioBufferSize = getConfigInt("audio_buffer_size");
+        audioMixer = new AudioMixer(audioBufferSize);
         audioMixerInitialised = true;
-        audioManagerThread = new Thread(new AudioManagerRunnable(), "TerrarumAudioManager");
+        audioManagerThread = new Thread(new AudioManagerRunnable(audioMixer), "TerrarumAudioManager");
         audioManagerThread.setPriority(MAX_PRIORITY); // higher = more predictable; audio delay is very noticeable so it gets high priority
         audioManagerThread.start();
 
@@ -1228,6 +1232,17 @@ public class App implements ApplicationListener {
         long t2 = System.nanoTime();
         double tms = (t2 - t1) / 1000000000.0;
         printdbg(this, "PostInit done; took "+tms+" seconds");
+    }
+
+    public static void renewAudioProcessor(int bufferSize) {
+        audioManagerThread.interrupt();
+        audioMixer.dispose();
+
+        audioBufferSize = bufferSize;
+        audioMixer = new AudioMixer(audioBufferSize);
+        audioManagerThread = new Thread(new AudioManagerRunnable(audioMixer), "TerrarumAudioManager");
+        audioManagerThread.setPriority(MAX_PRIORITY); // higher = more predictable; audio delay is very noticeable so it gets high priority
+        audioManagerThread.start();
     }
 
 

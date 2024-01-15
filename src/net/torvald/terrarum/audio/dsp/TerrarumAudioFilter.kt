@@ -13,6 +13,7 @@ abstract class TerrarumAudioFilter {
         }
         else thru(inbuf, outbuf)
     }
+    abstract fun reset()
     abstract fun drawDebugView(batch: SpriteBatch, x: Int, y: Int)
     abstract val debugViewHeight: Int
 }

@@ -8,14 +8,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
-import net.torvald.terrarum.Terrarum.audioCodex
 import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
 import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
-import net.torvald.terrarum.audio.AudioMixer
-import net.torvald.terrarum.audio.dsp.Lowpass
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.blockstats.TileSurvey
@@ -298,7 +294,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         IngameRenderer.setRenderedWorld(world)
         blockMarkingActor.isVisible = true
 
-        AudioMixer.reset()
+        App.audioMixer.reset()
 
         super.show() // this function sets gameInitialised = true
 
@@ -893,13 +889,13 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             val ratio = (TileSurvey.getRatio("basegame.Ingame.audioReflection") ?: 0.0)
             if (ratio >= 0.0) {
                 val ratio1 = ratio.coerceIn(0.0, 1.0)
-                AudioMixer.convolveBusCave.volume = ratio1
-                AudioMixer.convolveBusOpen.volume = 1.0 - ratio1
+                App.audioMixer.convolveBusCave.volume = ratio1
+                App.audioMixer.convolveBusOpen.volume = 1.0 - ratio1
             }
             else {
                 val ratio1 = (ratio / MaterialCodex["AIIR"].sondrefl).absoluteValue.coerceIn(0.0, 1.0)
-                AudioMixer.convolveBusOpen.volume = (1.0 - ratio1).pow(0.75)
-                AudioMixer.convolveBusCave.volume = 0.0
+                App.audioMixer.convolveBusOpen.volume = (1.0 - ratio1).pow(0.75)
+                App.audioMixer.convolveBusCave.volume = 0.0
             }
 
 

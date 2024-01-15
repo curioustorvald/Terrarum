@@ -1,7 +1,7 @@
 package net.torvald.terrarum.audio
 
-import com.jme3.math.FastMath
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.floorToInt
@@ -54,7 +54,6 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
             }
         }
 
-        private val BS = AUDIO_BUFFER_SIZE
         private val MP3_CHUNK_SIZE = 1152 // 1152 for 32k-48k, 576 for 16k-24k, 384 for 8k-12k
 
 
@@ -76,13 +75,13 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
             }
         }
 
-        private fun getOptimalBufferSize(rate: Int) = bufLut[BS to rate]!!
+        private fun getOptimalBufferSize(rate: Int) = bufLut[App.audioBufferSize to rate]!!
     }
 
     private val q
     get() = internalSamplingRate.toDouble() / SAMPLING_RATE // <= 1.0
 
-    private val fetchSize = (BS.toFloat() / MP3_CHUNK_SIZE).ceilToInt() * MP3_CHUNK_SIZE // fetchSize is always multiple of MP3_CHUNK_SIZE, even if the audio is NOT MP3
+    private val fetchSize = (App.audioBufferSize.toFloat() / MP3_CHUNK_SIZE).ceilToInt() * MP3_CHUNK_SIZE // fetchSize is always multiple of MP3_CHUNK_SIZE, even if the audio is NOT MP3
     private val internalBufferSize = getOptimalBufferSize(inputSamplingRate)// fetchSize * 3
 
     private val PADSIZE = TAPS + 1
@@ -120,13 +119,17 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
     private val foutR = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
     private val readBuf = ByteArray(fetchSize * 4)
 
+    init {
+        printdbg(this, "App.audioMixerBufferSize=${App.audioBufferSize}")
+    }
+
     private fun shift(array: FloatArray, size: Int) {
         System.arraycopy(array, size, array, 0, array.size - size)
         for (i in array.size - size until array.size) { array[i] = 0f }
     }
 
     fun fetchBytes() {
-        val readCount = if (validSamplesInBuf < BS) fetchSize else 0
+        val readCount = if (validSamplesInBuf < App.audioBufferSize) fetchSize else 0
         val writeCount = (readCount / q).roundToInt()
 
         fun getFromReadBuf(i: Int, bytesRead: Int) = if (i < bytesRead) readBuf[i].toUint() else 0
@@ -187,17 +190,17 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
 
     fun getLR(volume: Double): Pair<FloatArray, FloatArray> {
         // copy into the out
-        val outL = FloatArray(BS) { (foutL[it] * volume).toFloat() }
-        val outR = FloatArray(BS) { (foutR[it] * volume).toFloat() }
+        val outL = FloatArray(App.audioBufferSize) { (foutL[it] * volume).toFloat() }
+        val outR = FloatArray(App.audioBufferSize) { (foutR[it] * volume).toFloat() }
         // shift bytes in the fout
-        System.arraycopy(foutL, BS, foutL, 0, validSamplesInBuf - BS)
-        System.arraycopy(foutR, BS, foutR, 0, validSamplesInBuf - BS)
-        for (i in validSamplesInBuf until BS) {
+        System.arraycopy(foutL, App.audioBufferSize, foutL, 0, validSamplesInBuf - App.audioBufferSize)
+        System.arraycopy(foutR, App.audioBufferSize, foutR, 0, validSamplesInBuf - App.audioBufferSize)
+        for (i in validSamplesInBuf until App.audioBufferSize) {
             foutL[i] = 0f
             foutR[i] = 0f
         }
         // decrement necessary variables
-        validSamplesInBuf -= BS
+        validSamplesInBuf -= App.audioBufferSize
 
         return outL to outR
     }

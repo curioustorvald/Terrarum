@@ -1,13 +1,9 @@
 package net.torvald.terrarum.gameactors
 
-import com.badlogic.gdx.audio.Music
-import com.badlogic.gdx.audio.Sound
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.App
 import net.torvald.terrarum.INGAME
-import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.TrackVolume
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -113,9 +109,9 @@ abstract class Actor : Comparable<Actor>, Runnable {
         // if there is no existing track, try to get one
         if (track == null) {
             track = if (this == Terrarum.ingame?.actorNowPlaying)
-                AudioMixer.getFreeTrackNoMatterWhat()
+                App.audioMixer.getFreeTrackNoMatterWhat()
             else
-                AudioMixer.getFreeTrack()
+                App.audioMixer.getFreeTrack()
             // if the request was successful, put it into the hashmap
             if (track != null) {
                 musicTracks[music] = track

@@ -1,9 +1,7 @@
 package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Queue
-import com.jme3.math.FastMath
 import net.torvald.reflection.forceInvoke
-import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
@@ -19,7 +17,18 @@ import kotlin.math.*
 /**
  * Created by minjaesong on 2023-11-17.
  */
-class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: TerrarumAudioMixerTrack): Runnable {
+class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAudioMixerTrack): Runnable {
+
+    private var buffertaille = bufferSize
+
+    fun reset(newBufferSize: Int) {
+        buffertaille = newBufferSize
+//        printdbg("new buffertaille = $buffertaille")
+        emptyBuf = FloatArray(buffertaille)
+        fout1 = listOf(emptyBuf, emptyBuf)
+        purgeStreamBuf()
+    }
+
 
     companion object {
     }
@@ -29,7 +38,7 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
     private val pauseLock = java.lang.Object()
 
 
-    private val emptyBuf = FloatArray(buffertaille)
+    private var emptyBuf = FloatArray(buffertaille)
 
 
     internal var streamBuf: AudioProcessBuf? = null
@@ -117,18 +126,18 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
 
             // update panning and shits
             if (track.trackType == TrackType.DYNAMIC_SOURCE && track.isPlaying) {
-                (track.filters[0] as BinoPan).earDist = AudioMixer.listenerHeadSize
+                (track.filters[0] as BinoPan).earDist = App.audioMixer.listenerHeadSize
 
-                if (AudioMixer.actorNowPlaying != null) {
-                    if (track.trackingTarget == null || track.trackingTarget == AudioMixer.actorNowPlaying) {
+                if (App.audioMixer.actorNowPlaying != null) {
+                    if (track.trackingTarget == null || track.trackingTarget == App.audioMixer.actorNowPlaying) {
                         // "reset" the track
                         track.volume = track.maxVolume
                         (track.filters[0] as BinoPan).pan = 0f
                         (track.filters[1] as Lowpass).setCutoff(SAMPLING_RATE / 2f)
                     }
                     else if (track.trackingTarget is ActorWithBody) {
-                        val relativeXpos = relativeXposition(AudioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
-                        val distFromActor = distBetweenActors(AudioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
+                        val relativeXpos = relativeXposition(App.audioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
+                        val distFromActor = distBetweenActors(App.audioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
                         val vol = track.maxVolume * getVolFun(distFromActor / distFalloff).coerceAtLeast(0.0)
                         track.volume = vol
                         (track.filters[0] as BinoPan).pan = (1.3f * relativeXpos / distFalloff).toFloat()
@@ -169,7 +178,13 @@ class MixerTrackProcessor(val buffertaille: Int, val rate: Int, val track: Terra
                 // add all up
                 sidechains.forEach { (side, mix) ->
                     for (i in samplesL1.indices) {
-                        samplesL1[i] += side.processor.fout1[0][i] * (mix * track.volume).toFloat()
+//                        try {
+                            samplesL1[i] += side.processor.fout1[0][i] * (mix * track.volume).toFloat()
+//                        }
+//                        catch (e: ArrayIndexOutOfBoundsException) {
+//                            printdbg("buffertaille = $buffertaille, samplesL1 size = ${samplesL1.size}, side.processor.fout1[0] size = ${side.processor.fout1[0].size}")
+//                            throw e
+//                        }
                         samplesR1[i] += side.processor.fout1[1][i] * (mix * track.volume).toFloat()
                     }
                 }

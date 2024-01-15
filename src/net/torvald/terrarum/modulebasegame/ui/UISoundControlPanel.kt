@@ -1,8 +1,9 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.App
+import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.UICanvas
 
@@ -28,10 +29,10 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 arrayOf("", { "" }, "pp"),
                 arrayOf("guivolume", { Lang["MENU_LABEL_INTERFACE"] }, "sliderd,0,1"),
                 arrayOf("", { "" }, "pp"),
-                arrayOf("audio_speaker_setup", { Lang["MENU_OPTIONS_SPEAKER_SETUP"] }, "textsel,headphone=MENU_OPTIONS_SPEAKER_HEADPHONE,stereo=MENU_OPTIONS_SPEAKER_STEREO"),
             arrayOf("", { Lang["MENU_LABEL_AUDIO_ENGINE"] }, "h1"),
-                arrayOf("audio_buffer_size", { Lang["MENU_OPTIONS_AUDIO_BUFFER_SIZE"] }, "spinnersel,128,256,512,1024,2048"),
-                arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
+                arrayOf("audio_speaker_setup", { Lang["MENU_OPTIONS_SPEAKER_SETUP"] }, "textsel,headphone=MENU_OPTIONS_SPEAKER_HEADPHONE,stereo=MENU_OPTIONS_SPEAKER_STEREO"),
+                arrayOf("audio_buffer_size", { Lang["MENU_OPTIONS_App.audioMixerBufferSize"] }, "spinnersel,128,256,512,1024,2048"),
+//                arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
                 arrayOf("", { "${Lang["MENU_LABEL_AUDIO_BUFFER_INSTRUCTION"]}" }, "p"),
 
         ))
@@ -39,8 +40,18 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     override var height = ControlPanelCommon.getMenuHeight("basegame.soundcontrolpanel")
 
+    private var oldBufferSize = App.getConfigInt("audio_buffer_size")
+
     override fun updateUI(delta: Float) {
         uiItems.forEach { it.update(delta) }
+
+        App.getConfigInt("audio_buffer_size").let {
+            if (it != oldBufferSize) {
+                oldBufferSize = it
+
+                App.renewAudioProcessor(it)
+            }
+        }
     }
 
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {

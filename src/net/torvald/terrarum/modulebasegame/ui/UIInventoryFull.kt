@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
-import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.decibelsToFullscale
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
@@ -388,8 +387,8 @@ class UIInventoryFull(
         INGAME.pause()
         INGAME.setTooltipMessage(null)
 
-        AudioMixer.requestLowpassIn(0.25)
-        AudioMixer.requestFadeOut(AudioMixer.fadeBus, 0.25, decibelsToFullscale(-3.0))
+        App.audioMixer.requestLowpassIn(0.25)
+        App.audioMixer.requestFadeOut(App.audioMixer.fadeBus, 0.25, decibelsToFullscale(-3.0))
     }
 
     override fun doClosing(delta: Float) {
@@ -398,8 +397,8 @@ class UIInventoryFull(
         INGAME.resume()
         INGAME.setTooltipMessage(null)
 
-        AudioMixer.requestLowpassOut(0.25)
-        AudioMixer.requestFadeIn(AudioMixer.fadeBus, 0.25, 1.0)
+        App.audioMixer.requestLowpassOut(0.25)
+        App.audioMixer.requestFadeIn(App.audioMixer.fadeBus, 0.25, 1.0)
     }
 
     override fun endOpening(delta: Float) {

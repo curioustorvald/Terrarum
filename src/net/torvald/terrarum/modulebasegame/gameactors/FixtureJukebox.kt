@@ -9,8 +9,7 @@ import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.audio.AudioMixer
-import net.torvald.terrarum.audio.AudioMixer.DEFAULT_FADEOUT_LEN
+import net.torvald.terrarum.audio.AudioMixer.Companion.DEFAULT_FADEOUT_LEN
 import net.torvald.terrarum.audio.dsp.Convolv
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.gameactors.AVKey
@@ -110,7 +109,7 @@ class FixtureJukebox : Electric {
 
             discCurrentlyPlaying = index
 
-            AudioMixer.requestFadeOut(AudioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
+            App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
                 startAudio(musicNowPlaying!!) {
                     it.filters[2] = Convolv(
                         ModMgr.getFile(

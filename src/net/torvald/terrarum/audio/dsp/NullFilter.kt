@@ -13,4 +13,7 @@ object NullFilter : TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = 0
+
+    override fun reset() {
+    }
 }

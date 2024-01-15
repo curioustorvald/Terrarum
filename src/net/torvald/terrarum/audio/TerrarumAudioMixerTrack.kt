@@ -1,11 +1,9 @@
 package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.backends.lwjgl3.audio.OpenALLwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Queue
-import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.audio.dsp.TerrarumAudioFilter
@@ -35,7 +33,6 @@ class TerrarumAudioMixerTrack(
         const val SAMPLING_RATE = 48000
         const val SAMPLING_RATEF = 48000f
         const val SAMPLING_RATED = 48000.0
-        val AUDIO_BUFFER_SIZE = App.getConfigInt("audio_buffer_size") // n ms -> 384 * n
     }
 
     val hash = getHashStr()
@@ -168,7 +165,7 @@ class TerrarumAudioMixerTrack(
 
     // 1st ring of the hell: the THREADING HELL //
 
-    internal var processor = MixerTrackProcessor(AUDIO_BUFFER_SIZE, SAMPLING_RATE, this)
+    internal var processor = MixerTrackProcessor(App.audioBufferSize, SAMPLING_RATE, this)
     /*private val processorThread = Thread(processor).also { // uncomment to multithread
         it.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority
         it.start()
@@ -178,8 +175,8 @@ class TerrarumAudioMixerTrack(
     private lateinit var queueDispatcherThread: Thread
 
     init {
-        pcmQueue.addLast(listOf(FloatArray(AUDIO_BUFFER_SIZE), FloatArray(AUDIO_BUFFER_SIZE)))
-        pcmQueue.addLast(listOf(FloatArray(AUDIO_BUFFER_SIZE), FloatArray(AUDIO_BUFFER_SIZE)))
+        pcmQueue.addLast(listOf(FloatArray(App.audioBufferSize), FloatArray(App.audioBufferSize)))
+        pcmQueue.addLast(listOf(FloatArray(App.audioBufferSize), FloatArray(App.audioBufferSize)))
 
         /*if (isMaster) { // uncomment to multithread
             queueDispatcher = FeedSamplesToAdev(BUFFER_SIZE, SAMPLING_RATE, this)
@@ -189,6 +186,16 @@ class TerrarumAudioMixerTrack(
             }
         }*/
     }
+
+    fun updateBufferSizeChange() {
+//        printdbg(this, "new buffer size: $App.audioMixerBufferSize")
+        pcmQueue.clear()
+        pcmQueue.addLast(listOf(FloatArray(App.audioBufferSize), FloatArray(App.audioBufferSize)))
+        pcmQueue.addLast(listOf(FloatArray(App.audioBufferSize), FloatArray(App.audioBufferSize)))
+        processor.reset(App.audioBufferSize)
+        filters.forEach { it.reset() }
+    }
+
 
     override fun hashCode() = hashCode0
 }

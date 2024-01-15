@@ -3,8 +3,8 @@ package net.torvald.terrarum.audio.dsp
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
+import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.*
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.STRIP_W
@@ -91,15 +91,18 @@ class Spectro(val gain: Float = 1f) : TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = STRIP_W
+
+    override fun reset() {
+    }
 }
 
 
 class Vecto(val gain: Float = 1f) : TerrarumAudioFilter() {
-    val backbufL = Array((6144f / AUDIO_BUFFER_SIZE).roundToInt().coerceAtLeast(1)) {
-        FloatArray(AUDIO_BUFFER_SIZE)
+    var backbufL = Array((6144f / App.audioBufferSize).roundToInt().coerceAtLeast(1)) {
+        FloatArray(App.audioBufferSize)
     }
-    val backbufR = Array((6144f / AUDIO_BUFFER_SIZE).roundToInt().coerceAtLeast(1)) {
-        FloatArray(AUDIO_BUFFER_SIZE)
+    var backbufR = Array((6144f / App.audioBufferSize).roundToInt().coerceAtLeast(1)) {
+        FloatArray(App.audioBufferSize)
     }
 
     private val sqrt2p = 0.7071067811865475
@@ -110,11 +113,11 @@ class Vecto(val gain: Float = 1f) : TerrarumAudioFilter() {
             backbufL[i] = backbufL[i - 1]
             backbufR[i] = backbufR[i - 1]
         }
-        backbufL[0] = FloatArray(TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE)
-        backbufR[0] = FloatArray(TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE)
+        backbufL[0] = FloatArray(App.audioBufferSize)
+        backbufR[0] = FloatArray(App.audioBufferSize)
 
         // plot dots
-        for (i in 0 until TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE) {
+        for (i in 0 until App.audioBufferSize) {
             val y0 = +inbuf[0][i] * gain
             val x0 = -inbuf[1][i] * gain// rotate the domain by -90 deg
 
@@ -154,4 +157,13 @@ class Vecto(val gain: Float = 1f) : TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = STRIP_W
+
+    override fun reset() {
+        backbufL = Array((6144f / App.audioBufferSize).roundToInt().coerceAtLeast(1)) {
+            FloatArray(App.audioBufferSize)
+        }
+        backbufR = Array((6144f / App.audioBufferSize).roundToInt().coerceAtLeast(1)) {
+            FloatArray(App.audioBufferSize)
+        }
+    }
 }

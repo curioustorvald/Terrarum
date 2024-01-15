@@ -7,20 +7,15 @@ import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.THREAD_COUNT
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.concurrent.ThreadExecutor
-import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import java.lang.Thread.MAX_PRIORITY
 import java.util.*
-import java.util.concurrent.Callable
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.*
 
 /**
@@ -28,13 +23,16 @@ import kotlin.math.*
  *
  * Created by minjaesong on 2023-11-07.
  */
-object AudioMixer: Disposable {
-    var SPEED_OF_SOUND = 340f
+class AudioMixer(val bufferSize: Int): Disposable {
 
-    const val SPEED_OF_SOUND_AIR = 340f
-    const val SPEED_OF_SOUND_WATER = 1480f
+    companion object {
+        const val SPEED_OF_SOUND_AIR = 340f
+        const val SPEED_OF_SOUND_WATER = 1480f
+        const val SPEED_OF_SOUND = 340f
 
-    const val DEFAULT_FADEOUT_LEN = 1.8
+        const val DEFAULT_FADEOUT_LEN = 1.8
+    }
+
 
     val masterVolume: Double
         get() = App.getConfigDouble("mastervolume")
@@ -99,7 +97,7 @@ object AudioMixer: Disposable {
     val fadeBus: TerrarumAudioMixerTrack
         get() = tracks[7]
 
-    var processing = true
+    var processing = false
 
     var actorNowPlaying = Terrarum.ingame?.actorNowPlaying; private set
 
@@ -128,8 +126,7 @@ object AudioMixer: Disposable {
         return (headSize0 ?: 0f).times(scale).coerceAtLeast(BinoPan.EARDIST_DEFAULT)
     }
 
-    private val processingExecutor = ThreadExecutor()
-    val processingThread = Thread {
+    fun createProcessingThread(): Thread = Thread {
         // serial precessing
         while (processing) {
             actorNowPlaying = Terrarum.ingame?.actorNowPlaying
@@ -184,7 +181,12 @@ object AudioMixer: Disposable {
                 masterTrack.adev!!.writeSamples(masterTrack.pcmQueue.removeFirst()) // it blocks until the queue is consumed
             }
         }*/
+    }.also {
+        it.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority
     }
+
+    private val processingExecutor = ThreadExecutor()
+    lateinit var processingThread: Thread
 
 //    val parallelProcessingSchedule: Array<Array<TerrarumAudioMixerTrack>>
 
@@ -246,8 +248,8 @@ object AudioMixer: Disposable {
             arrayOf(fadeBus) +
             arrayOf(masterTrack)*/
 
-
-        processingThread.priority = MAX_PRIORITY // higher = more predictable; audio delay is very noticeable so it gets high priority
+        processingThread = createProcessingThread()
+        processing = true
         processingThread.start()
 //        feedingThread.priority = MAX_PRIORITY
 //        feedingThread.start()
@@ -306,7 +308,7 @@ object AudioMixer: Disposable {
             if (Gdx.input.isKeyPressed(Input.Keys.NUM_3))
                 testAudioMixRatio = 1.0
             if (!muteLatched && Gdx.input.isKeyPressed(Input.Keys.NUM_4)) {
-                AudioMixer.sumBus.volume = 1.0 - AudioMixer.sumBus.volume
+                sumBus.volume = 1.0 - sumBus.volume
                 muteLatched = true
             }
             else if (!Gdx.input.isKeyPressed(Input.Keys.NUM_4))
@@ -316,13 +318,13 @@ object AudioMixer: Disposable {
 
             if (testAudioMixRatio >= 0.0) {
                 val ratio1 = testAudioMixRatio.coerceIn(0.0, 1.0)
-                AudioMixer.convolveBusCave.volume = ratio1
-                AudioMixer.convolveBusOpen.volume = 1.0 - ratio1
+                convolveBusCave.volume = ratio1
+                convolveBusOpen.volume = 1.0 - ratio1
             }
             else {
                 val ratio1 = (testAudioMixRatio / MaterialCodex["AIIR"].sondrefl).absoluteValue.coerceIn(0.0, 1.0)
-                AudioMixer.convolveBusOpen.volume = (1.0 - ratio1).pow(0.75)
-                AudioMixer.convolveBusCave.volume = 0.0
+                convolveBusOpen.volume = (1.0 - ratio1).pow(0.75)
+                convolveBusCave.volume = 0.0
             }
         }
 
@@ -492,6 +494,35 @@ object AudioMixer: Disposable {
         Timer().schedule(object : TimerTask() {
             override fun run() {
                 fadeBus.volume = 1.0
+            }
+        }, 500L)
+    }
+
+    fun updateBufferSizeChange() {
+        processing = false
+        processingThread.interrupt()
+
+
+
+        dynamicTracks.forEach { it.stop() }
+        tracks.filter { it.trackType == TrackType.STATIC_SOURCE }.forEach { it.stop() }
+        masterTrack.volume = 0.0
+
+        dynamicTracks.forEach { it.updateBufferSizeChange() }
+        tracks.forEach { it.updateBufferSizeChange() }
+        masterTrack.updateBufferSizeChange()
+
+
+
+        processingThread = createProcessingThread()
+        processing = true
+        processingThread.start()
+
+
+        // give some time for the cave bus to decay before ramping the volume up
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                masterTrack.volume = 1.0
             }
         }, 500L)
     }

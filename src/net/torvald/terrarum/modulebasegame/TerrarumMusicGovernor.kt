@@ -16,7 +16,6 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
-import net.torvald.terrarum.gameworld.fmod
 import java.io.File
 import java.io.FileInputStream
 import javax.sound.sampled.AudioSystem
@@ -203,8 +202,8 @@ class TerrarumMusicGovernor : MusicGovernor() {
      */
     fun queueDirectory(musicDir: String, shuffled: Boolean, diskJockeyingMode: String, fileToName: ((String) -> String)? = null) {
         if (musicState != STATE_INIT && musicState != STATE_INTERMISSION) {
-            AudioMixer.requestFadeOut(AudioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
-            stopMusic(AudioMixer.musicTrack.currentTrack)
+            App.audioMixer.requestFadeOut(App.audioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
+            stopMusic(App.audioMixer.musicTrack.currentTrack)
         }
 
         songs.forEach { it.gdxMusic.tryDispose() }
@@ -337,7 +336,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     fun stopMusic(callStopMusicHook: Boolean = true, pauseLen: Float = Float.POSITIVE_INFINITY) {
-        stopMusic(AudioMixer.musicTrack.currentTrack, callStopMusicHook)
+        stopMusic(App.audioMixer.musicTrack.currentTrack, callStopMusicHook)
         intermissionLength = pauseLen
 //        printdbg(this, "StopMusic Intermission2: $intermissionLength seconds")
     }
@@ -347,7 +346,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     private fun startMusic(song: MusicContainer) {
-        AudioMixer.startMusic(song)
+        App.audioMixer.startMusic(song)
         printdbg(this, "startMusic Now playing: ${song.name}")
 //        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
         if (musicStartHooks.isNotEmpty()) musicStartHooks.forEach { it(song) }
@@ -386,7 +385,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     private fun startAmbient(song: MusicContainer) {
-        AudioMixer.startAmb(song)
+        App.audioMixer.startAmb(song)
         printdbg(this, "startAmbient Now playing: $song")
 //        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
         ambState = STATE_PLAYING
@@ -438,8 +437,8 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     override fun dispose() {
-        AudioMixer.requestFadeOut(AudioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
-        stopMusic(AudioMixer.musicTrack.currentTrack)
+        App.audioMixer.requestFadeOut(App.audioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
+        stopMusic(App.audioMixer.musicTrack.currentTrack)
         stopAmbient()
     }
 }

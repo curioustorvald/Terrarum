@@ -3,10 +3,7 @@ package net.torvald.terrarum.audio.dsp
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioMixer
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.audio.decibelsToFullscale
 import net.torvald.terrarum.ceilToInt
@@ -43,8 +40,8 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
     private val delays = arrayOf(0f, 0f)
     private val mults = arrayOf(1f, 1f)
 
-    private val outLs = Array(2) { FloatArray(AUDIO_BUFFER_SIZE) }
-    private val outRs = Array(2) { FloatArray(AUDIO_BUFFER_SIZE) }
+    private var outLs = Array(2) { FloatArray(App.audioBufferSize) }
+    private var outRs = Array(2) { FloatArray(App.audioBufferSize) }
 
 
     companion object {
@@ -56,6 +53,13 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
         private const val R = 1
 
         private val HALF_PI = (Math.PI / 2.0).toFloat()
+    }
+
+    override fun reset() {
+        outLs = Array(2) { FloatArray(App.audioBufferSize) }
+        outRs = Array(2) { FloatArray(App.audioBufferSize) }
+        delayLineL.fill(0f)
+        delayLineR.fill(0f)
     }
 
     /**
@@ -104,7 +108,7 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
             mults[R] = volMultFsOther
         }
 
-        for (i in 0 until AUDIO_BUFFER_SIZE) {
+        for (i in 0 until App.audioBufferSize) {
             sumbuf[L][i] = mults[L] * getFrom(i - delays[L], delayLine, inbuf)
             sumbuf[R][i] = mults[R] * getFrom(i - delays[R], delayLine, inbuf)
         }
@@ -115,7 +119,7 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
         thru("L", -50f, inbuf[L], outLs, delayLineL) // 50 will become 59.036 on panningFieldMap
         thru("R", +50f, inbuf[R], outRs, delayLineR)
 
-        for (i in 0 until AUDIO_BUFFER_SIZE) {
+        for (i in 0 until App.audioBufferSize) {
             val outL = (outLs[L][i] + outRs[L][i]) / 2f
             val outR = (outLs[R][i] + outRs[R][i]) / 2f
             outbuf[L][i] = outL

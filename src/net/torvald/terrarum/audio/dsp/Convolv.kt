@@ -5,8 +5,6 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.setDebugTime
 import net.torvald.terrarum.audio.*
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
-import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD2
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD2_RED
@@ -25,13 +23,12 @@ import kotlin.math.roundToInt
  * @param gain output gain. Fullscale (0.0 - 1.0)
  */
 class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): TerrarumAudioFilter() {
+
     private val gain: Float = gain / (1f + crossfeed)
 
     val fftLen: Int
     private val convFFT: Array<ComplexArray>
     private val sumbuf: Array<ComplexArray>
-
-    private val BLOCKSIZE = TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE
 
     var processingSpeed = 1f; private set
 
@@ -71,11 +68,17 @@ class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): Terrarum
         }
     }
 
-    private val realtime = (BLOCKSIZE / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L)
+    private var realtime = (App.audioBufferSize / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L)
     private val fftIn = ComplexArray(FloatArray(fftLen * 2))
     private val fftMult = ComplexArray(FloatArray(fftLen * 2))
     private val fftOutL = FloatArray(fftLen)
     private val fftOutR = FloatArray(fftLen)
+
+    override fun reset() {
+        realtime = (App.audioBufferSize / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L)
+        processingSpeed = 1f
+        sumbuf.forEach { it.reim.fill(0f) }
+    }
 
     private fun convolve(x: ComplexArray, h: ComplexArray, output: FloatArray) {
         FFT.fftInto(x, fftIn)
@@ -96,9 +99,9 @@ class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): Terrarum
         convolve(sumbuf[0], convFFT[0], fftOutL)
         convolve(sumbuf[1], convFFT[1], fftOutR)
 
-        for (i in 0 until BLOCKSIZE) {
-            outbuf[0][i] = fftOutL[fftLen - BLOCKSIZE + i]
-            outbuf[1][i] = fftOutR[fftLen - BLOCKSIZE + i]
+        for (i in 0 until App.audioBufferSize) {
+            outbuf[0][i] = fftOutL[fftLen - App.audioBufferSize + i]
+            outbuf[1][i] = fftOutR[fftLen - App.audioBufferSize + i]
         }
 
 
@@ -144,7 +147,7 @@ class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): Terrarum
         Toolkit.fillArea(batch, x.toFloat(), y+14f, STRIP_W * perc, 2f)
 
         // filter length bar
-        val g = FastMath.intLog2(AUDIO_BUFFER_SIZE)
+        val g = FastMath.intLog2(App.audioBufferSize)
         val perc2 = (FastMath.intLog2(fftLen).minus(g).toFloat() / (16f - g)).coerceIn(0f, 1f)
         batch.color = COL_METER_GRAD2
         Toolkit.fillArea(batch, x.toFloat(), y + 16f, STRIP_W * perc2, 14f)

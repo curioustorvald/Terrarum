@@ -3,7 +3,6 @@ package net.torvald.terrarum.audio.dsp
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.linToLogPerc
 import net.torvald.terrarum.roundToFloat
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
@@ -13,7 +12,7 @@ import net.torvald.terrarum.ui.Toolkit
 class Bitcrush(var steps: Int, var inputGain: Float = 1f): TerrarumAudioFilter() {
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         for (ch in outbuf.indices) {
-            for (i in 0 until TerrarumAudioMixerTrack.AUDIO_BUFFER_SIZE) {
+            for (i in 0 until App.audioBufferSize) {
                 val inn = ((inbuf[ch][i] * inputGain).coerceIn(-1f, 1f) + 1f) / 2f // 0f..1f
                 val stepped = (inn * (steps - 1)).roundToFloat() / (steps - 1)
                 val out = (stepped * 2f) - 1f // -1f..1f
@@ -33,6 +32,9 @@ class Bitcrush(var steps: Int, var inputGain: Float = 1f): TerrarumAudioFilter()
 
         batch.color = BasicDebugInfoWindow.FILTER_NAME_ACTIVE
         App.fontSmallNumbers.draw(batch, "B:$bits", x+3f, y+1f)
+    }
+
+    override fun reset() {
     }
 
     override val debugViewHeight = 16

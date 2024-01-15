@@ -335,7 +335,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                         }
                         else {
                             if (!transitionOngoing)
-                                transitionRequest = AudioMixer.musicTrack.isPlaying.toInt() * MODE_MOUSE_UP
+                                transitionRequest = App.audioMixer.musicTrack.isPlaying.toInt() * MODE_MOUSE_UP
                         }
                     }
 
@@ -343,7 +343,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                         // prev song
                         if (mode < MODE_SHOW_LIST) {
                             getPrevSongFromPlaylist()?.let { ingame.musicGovernor.unshiftPlaylist(it) }
-                            AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
+                            App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
                                 ingame.musicGovernor.startMusic() // required for "intermittent" mode
                             }
                         }
@@ -362,10 +362,10 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
                     2 -> { // stop
                         if (mode < MODE_SHOW_LIST) { // disable stop button entirely on MODE_SHOW_LIST
-                            if (AudioMixer.musicTrack.isPlaying) {
-                                val thisMusic = AudioMixer.musicTrack.currentTrack
-                                AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
-                                AudioMixer.musicTrack.nextTrack = null
+                            if (App.audioMixer.musicTrack.isPlaying) {
+                                val thisMusic = App.audioMixer.musicTrack.currentTrack
+                                App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
+                                App.audioMixer.musicTrack.nextTrack = null
                                 ingame.musicGovernor.stopMusic()
                                 thisMusic?.let { ingame.musicGovernor.queueMusicToPlayNext(it) }
                             }
@@ -378,7 +378,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     3 -> { // next
                         // next song
                         if (mode < MODE_SHOW_LIST) {
-                            AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
+                            App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
                                 ingame.musicGovernor.startMusic() // required for "intermittent" mode, does seemingly nothing on "continuous" mode
                             }
                         }
@@ -410,7 +410,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                         }
                         else {
                             if (!transitionOngoing)
-                                transitionRequest = AudioMixer.musicTrack.isPlaying.toInt() * MODE_MOUSE_UP
+                                transitionRequest = App.audioMixer.musicTrack.isPlaying.toInt() * MODE_MOUSE_UP
                         }
                     }
                 }
@@ -421,12 +421,12 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 val list = songsInGovernor
                 if (index < list.size) {
                     // if selected song != currently playing
-                    if (AudioMixer.musicTrack.currentTrack == null || list[index] != AudioMixer.musicTrack.currentTrack) {
+                    if (App.audioMixer.musicTrack.currentTrack == null || list[index] != App.audioMixer.musicTrack.currentTrack) {
                         // rebuild playlist
                         ingame.musicGovernor.queueIndexFromPlaylist(index)
 
                         // fade out
-                        AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
+                        App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
                             ingame.musicGovernor.startMusic() // required for "intermittent" mode
                         }
                     }
@@ -442,10 +442,10 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     // (navigating into the selected album involves too much complication :p)
                     if (ingame.musicGovernor.playlistSource != albumsList[index].canonicalPath) {
                         // fade out
-                        AudioMixer.requestFadeOut(AudioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
+                        App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
                             loadNewAlbum(albumsList[index])
                             ingame.musicGovernor.startMusic() // required for "intermittent" mode
-                            resetPlaylistScroll(AudioMixer.musicTrack.nextTrack)
+                            resetPlaylistScroll(App.audioMixer.musicTrack.nextTrack)
                         }
                     }
                 }
@@ -471,7 +471,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     }
 
     private fun resetPlaylistScroll(song: MusicContainer? = null) {
-        val currentlyPlaying = songsInGovernor.indexOf(song ?: AudioMixer.musicTrack.currentTrack)
+        val currentlyPlaying = songsInGovernor.indexOf(song ?: App.audioMixer.musicTrack.currentTrack)
         if (currentlyPlaying >= 0) {
             playlistScroll = (currentlyPlaying / PLAYLIST_LINES) * PLAYLIST_LINES
         }
@@ -482,7 +482,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
     private fun getPrevSongFromPlaylist(): MusicContainer? {
         val list = songsInGovernor.slice(songsInGovernor.indices) // make copy of the list
-        val nowPlaying = AudioMixer.musicTrack.currentTrack ?: return null
+        val nowPlaying = App.audioMixer.musicTrack.currentTrack ?: return null
 
         // find current index
         val currentIndex = list.indexOfFirst { it == nowPlaying }
@@ -796,7 +796,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 val pnum = i + playlistScroll
 
                 val m1 = songsInGovernor.getOrNull(pnum)
-                val m2 = AudioMixer.musicTrack.currentTrack
+                val m2 = App.audioMixer.musicTrack.currentTrack
                 val currentlyPlaying = if (m1 == null || m2 == null) false else (m1 == m2)
 
                 // print number
@@ -988,7 +988,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                 // stop button
                 else if (i == 2) {
                     // get correct stop/play button
-                    val iconY = if (!AudioMixer.musicTrack.isPlaying) 1 else 0
+                    val iconY = if (!App.audioMixer.musicTrack.isPlaying) 1 else 0
                     // fade if avaliable
                     batch.color = Color(1f, 1f, 1f, alphaBase * (1f - buttonFadePerc))
                     batch.draw(controlButtons.get(i, iconY), btnX, btnY)
@@ -1077,7 +1077,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private val fftBarHeights = FloatArray(5)
 
     private fun updateMeter() {
-        val inbuf = AudioMixer.musicTrack.extortField<MixerTrackProcessor>("processor")!!.extortField<List<FloatArray>>("fout1")!!
+        val inbuf = App.audioMixer.musicTrack.extortField<MixerTrackProcessor>("processor")!!.extortField<List<FloatArray>>("fout1")!!
         push(inbuf[0], inBuf[0])
         push(inbuf[1], inBuf[1])
         for (i in 0 until FFTSIZE) {
@@ -1235,7 +1235,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private fun loadNewAlbum(albumDir: File) {
         val albumProp = albumPropCache[albumDir]
 
-        AudioMixer.musicTrack.let { track ->
+        App.audioMixer.musicTrack.let { track ->
             track.doGaplessPlayback = (albumProp.diskJockeyingMode == "continuous")
             if (track.doGaplessPlayback) {
                 track.pullNextTrack = {

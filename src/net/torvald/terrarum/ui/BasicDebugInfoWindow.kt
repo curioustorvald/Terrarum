@@ -13,8 +13,6 @@ import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.audio.*
-import net.torvald.terrarum.audio.AudioMixer.dynamicSourceCount
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.AUDIO_BUFFER_SIZE
 import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
@@ -136,7 +134,7 @@ class BasicDebugInfoWindow : UICanvas() {
         showWeatherInfo = showWeatherInfo xor (Gdx.input.isKeyJustPressed(KEY_WEATHERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
         showAudioMixer = showAudioMixer xor (Gdx.input.isKeyJustPressed(KEY_AUDIOMIXER) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
 
-        AudioMixer.masterTrack.filters[2].bypass = !showAudioMixer
+        App.audioMixer.masterTrack.filters[2].bypass = !showAudioMixer
 
         drawMain(batch)
         if (showTimers) drawTimers(batch)
@@ -438,10 +436,10 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private fun drawAudioMixer(batch: SpriteBatch) {
 
-        val x = App.scr.width - 186 - (AudioMixer.tracks.size + 1) * (STRIP_W + stripGap)
+        val x = App.scr.width - 186 - (App.audioMixer.tracks.size + 1) * (STRIP_W + stripGap)
         val y = App.scr.height - 38 - stripH
 
-        val strips = AudioMixer.tracks + AudioMixer.masterTrack
+        val strips = App.audioMixer.tracks + App.audioMixer.masterTrack
 
 //        batch.color = COL_MIXER_BACK
 //        Toolkit.fillArea(batch, x - stripGap, y - stripGap, strips.size * (stripW + stripGap) + stripGap, stripH + 2*stripGap)
@@ -457,7 +455,7 @@ class BasicDebugInfoWindow : UICanvas() {
         }
 
 
-        val dss = AudioMixer.dynamicTracks
+        val dss = App.audioMixer.dynamicTracks
         dss.forEachIndexed { index, track ->
             val px = x - (miniW + 5) * (1 + (index / 13))
             val py = y + (miniH + stripGap) * (index % 13)
@@ -588,7 +586,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 App.fontSmallNumbers.draw(batch, s, x + 3f, faderY - (i + 1) * 16f + 1f)
             }
         }
-        else if (track != AudioMixer.sfxSumBus) {
+        else if (track != App.audioMixer.sfxSumBus) {
             track.sidechainInputs.reversed().forEachIndexed { i, (side, mix) ->
                 val mixDb = fullscaleToDecibels(mix)
                 val perc = ((mixDb + 24.0).coerceAtLeast(0.0) / 24.0).toFloat()
@@ -620,7 +618,7 @@ class BasicDebugInfoWindow : UICanvas() {
             // label
             batch.color = FILTER_NAME_ACTIVE
             App.fontSmallNumbers.draw(batch, "\u00C0", x.toFloat(), faderY - (i + 1) * 16f + 1f)
-            App.fontSmallNumbers.draw(batch, "DS($dynamicSourceCount)", x + 10f, faderY - (i + 1) * 16f + 1f)
+            App.fontSmallNumbers.draw(batch, "DS(${net.torvald.terrarum.App.audioMixer.dynamicSourceCount})", x + 10f, faderY - (i + 1) * 16f + 1f)
         }
 
         // fader
@@ -1001,7 +999,7 @@ class BasicDebugInfoWindow : UICanvas() {
     }
 
     override fun endClosing(delta: Float) {
-        AudioMixer.masterTrack.filters[2].bypass = true
+        App.audioMixer.masterTrack.filters[2].bypass = true
     }
 
     override fun dispose() {

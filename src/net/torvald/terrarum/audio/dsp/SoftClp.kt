@@ -56,4 +56,7 @@ object SoftClp : TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = 0
+
+    override fun reset() {
+    }
 }
