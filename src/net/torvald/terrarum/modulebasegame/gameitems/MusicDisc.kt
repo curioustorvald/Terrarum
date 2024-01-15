@@ -16,6 +16,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.savegame.toHex
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.toRGBA
+import net.torvald.unicode.EMDASH
 
 /**
  * Created by minjaesong on 2024-01-13.
@@ -45,9 +46,10 @@ open class MusicDiscPrototype(originalID: ItemID, module: String, path: String) 
 
     init {
         val meta = MusicDiscHelper.getMetadata(getAsGdxFile())
-        name = meta.title
+        originalName = meta.title
         author = meta.author
         collection = meta.album
+        name = "$author $EMDASH $originalName"
     }
 
     @Transient override val itemImage: TextureRegion = generateSprite()

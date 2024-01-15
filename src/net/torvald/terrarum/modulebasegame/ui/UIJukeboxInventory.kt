@@ -175,12 +175,14 @@ class UIJukeboxSonglistPanel(val parent: UIJukebox) : UICanvas() {
             if (index in parent.discInventory.indices) {
                 parent.discInventory[index].let {
                     val item = ItemCodex[it] as? ItemFileRef
-                    button.title = item?.name ?: ""
+                    button.title = item?.originalName ?: ""
+                    button.album = item?.collection ?: ""
                     button.artist = item?.author ?: ""
                 }
             }
             else {
                 button.title = ""
+                button.album = ""
                 button.artist = ""
             }
         }
@@ -219,6 +221,7 @@ class UIItemJukeboxSonglist(
     override val width: Int,
     val index: Int,
     var title: String = "",
+    var album: String = "",
     var artist: String = "",
 
     var keyDownFun: (Int, Int, UIItemJukeboxSonglist) -> Unit, // Index, Keycode, self
@@ -298,7 +301,7 @@ class UIItemJukeboxSonglist(
             Toolkit.drawTextCentered(batch, App.fontGame, title, width, posX, posY + textOffsetY)
             // draw artist
             batch.color = batch.color.cpy().mul(0.75f, 0.75f, 0.75f, 1f)
-            Toolkit.drawTextCentered(batch, App.fontGame, artist, width, posX, posY + App.fontGame.lineHeight.toInt() - 2*textOffsetY)
+            Toolkit.drawTextCentered(batch, App.fontGame, album, width, posX, posY + App.fontGame.lineHeight.toInt() - 2*textOffsetY)
         }
 
         // see IFs above?
