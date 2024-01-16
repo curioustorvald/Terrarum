@@ -11,7 +11,7 @@ import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.STRIP_W
 import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.*
 
-class Spectro(val gain: Float = 1f) : TerrarumAudioFilter() {
+class Spectro(var gain: Float = 1f) : TerrarumAudioFilter() {
     private val FFTSIZE = 1024
     private val inBuf = Array(2) { FloatArray(FFTSIZE) }
 
@@ -91,10 +91,16 @@ class Spectro(val gain: Float = 1f) : TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = STRIP_W
+
+    override fun copyParamsFrom(other: TerrarumAudioFilter) {
+        if (other is Spectro) {
+            this.gain = other.gain
+        }
+    }
 }
 
 
-class Vecto(val gain: Float = 1f) : TerrarumAudioFilter() {
+class Vecto(var gain: Float = 1f) : TerrarumAudioFilter() {
     var backbufL = Array((6144f / App.audioBufferSize).roundToInt().coerceAtLeast(1)) {
         FloatArray(App.audioBufferSize)
     }
@@ -154,4 +160,10 @@ class Vecto(val gain: Float = 1f) : TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = STRIP_W
+
+    override fun copyParamsFrom(other: TerrarumAudioFilter) {
+        if (other is Vecto) {
+            this.gain = other.gain
+        }
+    }
 }

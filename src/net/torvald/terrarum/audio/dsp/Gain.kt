@@ -20,4 +20,10 @@ class Gain(var gain: Float): TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = 16
+
+    override fun copyParamsFrom(other: TerrarumAudioFilter) {
+        if (other is Gain) {
+            this.gain = other.gain
+        }
+    }
 }

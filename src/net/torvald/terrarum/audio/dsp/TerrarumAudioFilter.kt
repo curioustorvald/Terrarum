@@ -15,6 +15,7 @@ abstract class TerrarumAudioFilter {
     }
     abstract fun drawDebugView(batch: SpriteBatch, x: Int, y: Int)
     abstract val debugViewHeight: Int
+    abstract fun copyParamsFrom(other: TerrarumAudioFilter)
 }
 
 fun FloatArray.applyGain(gain: Float = 1f) = this.map { it * gain }.toFloatArray()

@@ -69,7 +69,7 @@ class FixtureJukebox : Electric {
         }
 
 
-        App.audioMixerRenewHooks[this] = { stopGracefully() }
+//        App.audioMixerRenewHooks[this] = { stopGracefully() }
     }
 
     override val canBeDespawned: Boolean
@@ -177,7 +177,7 @@ class FixtureJukebox : Electric {
     }
 
     override fun dispose() {
-        App.audioMixerRenewHooks.remove(this)
+//        App.audioMixerRenewHooks.remove(this)
         super.dispose()
 //        testMusic.gdxMusic.dispose()
     }

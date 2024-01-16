@@ -19,6 +19,9 @@ object XYtoMS: TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = 0
+
+    override fun copyParamsFrom(other: TerrarumAudioFilter) {
+    }
 }
 
 object MStoXY: TerrarumAudioFilter() {
@@ -37,4 +40,7 @@ object MStoXY: TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = 0
+
+    override fun copyParamsFrom(other: TerrarumAudioFilter) {
+    }
 }

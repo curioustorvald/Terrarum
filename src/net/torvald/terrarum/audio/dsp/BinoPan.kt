@@ -140,4 +140,11 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
     }
 
     override val debugViewHeight = 32
+
+    override fun copyParamsFrom(other: TerrarumAudioFilter) {
+        if (other is BinoPan) {
+            this.pan = other.pan
+            this.earDist = other.earDist
+        }
+    }
 }

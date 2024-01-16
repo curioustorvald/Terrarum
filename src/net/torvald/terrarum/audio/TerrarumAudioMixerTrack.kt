@@ -61,7 +61,23 @@ class TerrarumAudioMixerTrack(
 
     var trackingTarget: Actor? = null
 
-    var playStartedTime = 0L; private set
+    internal var streamPlaying = false
+    var playStartedTime = 0L; internal set
+
+
+    fun copyStatusFrom(other: TerrarumAudioMixerTrack) {
+        other.pullNextTrack = this.pullNextTrack
+        other.currentTrack = this.currentTrack
+        other.nextTrack = this.nextTrack
+        other.volume = this.volume
+        other.trackingTarget = this.trackingTarget
+        other.streamPlaying = this.streamPlaying
+        other.playStartedTime = this.playStartedTime
+        filters.indices.forEach { i ->
+            other.filters[i].copyParamsFrom(this.filters[i])
+        }
+    }
+
 
     inline fun <reified T> getFilter() = filters.filterIsInstance<T>().first()!!
     inline fun <reified T> getFilterOrNull() = filters.filterIsInstance<T>().firstOrNull()
@@ -119,7 +135,6 @@ class TerrarumAudioMixerTrack(
     }
 
 
-    internal var streamPlaying = false
     fun play() {
         playStartedTime = System.nanoTime()
         streamPlaying = true

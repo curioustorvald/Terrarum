@@ -506,6 +506,7 @@ class AudioMixer(val bufferSize: Int): Disposable {
 //        feeder.stop()
 //        feedingThread.join()
         tracks.forEach { it.tryDispose() }
+        dynamicTracks.forEach { it.tryDispose() }
         masterTrack.tryDispose()
     }
 }

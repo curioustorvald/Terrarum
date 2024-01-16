@@ -155,4 +155,7 @@ class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): Terrarum
     }
 
     override val debugViewHeight = 32
+
+    override fun copyParamsFrom(other: TerrarumAudioFilter) {
+    }
 }

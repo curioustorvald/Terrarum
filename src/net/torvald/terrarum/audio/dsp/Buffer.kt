@@ -19,4 +19,7 @@ object Buffer : TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = 16
+
+    override fun copyParamsFrom(other: TerrarumAudioFilter) {
+    }
 }

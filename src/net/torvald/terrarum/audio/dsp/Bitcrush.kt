@@ -35,4 +35,11 @@ class Bitcrush(var steps: Int, var inputGain: Float = 1f): TerrarumAudioFilter()
     }
 
     override val debugViewHeight = 16
+
+    override fun copyParamsFrom(other: TerrarumAudioFilter) {
+        if (other is Bitcrush) {
+            this.steps = other.steps
+            this.inputGain = other.inputGain
+        }
+    }
 }

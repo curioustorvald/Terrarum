@@ -67,4 +67,10 @@ class Highpass(cutoff0: Float): TerrarumAudioFilter() {
     }
 
     override val debugViewHeight = 16
+
+    override fun copyParamsFrom(other: TerrarumAudioFilter) {
+        if (other is Highpass) {
+            setCutoff(other.cutoff)
+        }
+    }
 }
