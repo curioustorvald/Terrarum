@@ -29,11 +29,13 @@ class UIItemCatBar(
     companion object {
         const val CAT_ALL = "__all__"
         val FILTER_CAT_ALL = arrayOf(CAT_ALL)
+
+        const val CATBAR_UNDERLINE_OFFSET = 5
     }
 
 
     private val inventoryUI = parentUI
-    override val height = catIcons.tileH + 5
+    override val height = catIcons.tileH + CATBAR_UNDERLINE_OFFSET
     
 
     private val mainButtons: Array<UIItemImageButton>
@@ -70,7 +72,7 @@ class UIItemCatBar(
                     highlightable = true
             ) {
                 override val mouseUp: Boolean // true if mouse is on its occupying section on the bar, not just on the icon's bounding box
-                    get() = getButtonIndexUnderMouseOnTray() == index && itemRelativeMouseY in 0 until height
+                    get() = getButtonIndexUnderMouseOnTray() == index && itemRelativeMouseY in -CATBAR_UNDERLINE_OFFSET until (catIcons.tileH + CATBAR_UNDERLINE_OFFSET)
             }
         }
 
