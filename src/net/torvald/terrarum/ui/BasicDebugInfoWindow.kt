@@ -12,6 +12,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.controller.TerrarumController
@@ -21,6 +22,9 @@ import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
+import net.torvald.terrarum.serialise.toUint
 import net.torvald.terrarum.weather.WeatherDirBox
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.weather.WeatherStateBox
@@ -72,10 +76,12 @@ class BasicDebugInfoWindow : UICanvas() {
     private val KEY_TIMERS = Input.Keys.T // + CONTROL_LEFT
     private val KEY_WEATHERS = Input.Keys.W // + CONTROL_LEFT
     private val KEY_AUDIOMIXER = Input.Keys.M // + CONTROL_LEFT
+    private val KEY_CHUNKS = Input.Keys.C // + CONTROL_LEFT
 
     private var showTimers = false
     private var showWeatherInfo = false
     private var showAudioMixer = false
+    private var showChunks = false
 
     override fun show() {
         ingame = Terrarum.ingame
@@ -133,6 +139,7 @@ class BasicDebugInfoWindow : UICanvas() {
         showTimers = showTimers xor (Gdx.input.isKeyJustPressed(KEY_TIMERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
         showWeatherInfo = showWeatherInfo xor (Gdx.input.isKeyJustPressed(KEY_WEATHERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
         showAudioMixer = showAudioMixer xor (Gdx.input.isKeyJustPressed(KEY_AUDIOMIXER) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
+        showChunks = showChunks xor (Gdx.input.isKeyJustPressed(KEY_CHUNKS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
 
         App.audioMixer.masterTrack.filters[2].bypass = !showAudioMixer
 
@@ -140,6 +147,35 @@ class BasicDebugInfoWindow : UICanvas() {
         if (showTimers) drawTimers(batch)
         if (showWeatherInfo) drawWeatherInfo(batch)
         if (showAudioMixer) drawAudioMixer(batch)
+        if (showChunks) drawChunks(batch)
+    }
+
+
+    private val chunkStatColours = arrayOf(
+        Color(0x23252899),
+        Color(0x11bb2299),
+        Color(0xffffff99.toInt())
+    )
+    private val chunkStatCurrentChunk = Color(0xff008899.toInt())
+
+    private fun drawChunks(batch: SpriteBatch) {
+        val xo = 224
+        val yo = 78
+
+
+        world?.let { world ->
+            val ppos = ingame?.actorNowPlaying?.centrePosVector
+            val pcx = (ppos?.x?.div(TILE_SIZED)?.fmod(world.width.toDouble())?.div(CHUNK_W)?.toInt() ?: -999)
+            val pcy = (ppos?.y?.div(TILE_SIZED)?.fmod(world.height.toDouble())?.div(CHUNK_H)?.toInt() ?: -999)
+            
+            for (y in 0 until world.height / CHUNK_H) {
+                for (x in 0 until world.width / CHUNK_W) {
+                    val chunkStat = world.chunkFlags[y][x].toUint()
+                    batch.color = if (pcx == x && pcy == y) chunkStatCurrentChunk else chunkStatColours[chunkStat]
+                    Toolkit.fillArea(batch, xo + 3*x, yo + 3*y, 2, 2)
+                }
+            }
+        }
 
     }
 

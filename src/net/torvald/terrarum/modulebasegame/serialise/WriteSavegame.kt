@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.BlockLayerI16F16
 import net.torvald.terrarum.gameworld.BlockLayerI16I8
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.GameWorld.Companion.CHUNK_LOADED
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.FancyWorldReadLoadScreen
 import net.torvald.terrarum.modulebasegame.IngameRenderer
@@ -21,6 +22,7 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
 import java.io.Reader
 import java.util.logging.Level
+import kotlin.experimental.or
 
 /**
  * It's your responsibility to create a new VirtualDisk if your save is new, and create a backup for modifying existing save.
@@ -145,10 +147,12 @@ object LoadSavegame {
         val worldDiskSavegameInfo = ByteArray64Reader(worldDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)
         val world = ReadWorld(worldDiskSavegameInfo, worldDisk.diskFile)
 
+
         world.layerTerrain = BlockLayerI16(world.width, world.height)
         world.layerWall = BlockLayerI16(world.width, world.height)
         world.layerOres = BlockLayerI16I8(world.width, world.height)
         world.layerFluids = BlockLayerI16F16(world.width, world.height)
+        world.chunkFlags = Array(world.height / LandUtil.CHUNK_H) { ByteArray(world.width / LandUtil.CHUNK_W) }
 
         newIngame.world = world // must be set before the loadscreen, otherwise the loadscreen will try to read from the NullWorld which is already destroyed
         newIngame.worldDisk =  VDUtil.readDiskArchive(worldDisk.diskFile, Level.INFO)
@@ -183,6 +187,7 @@ object LoadSavegame {
             newIngame.gameLoadInfoPayload = worldParam
             newIngame.gameLoadMode = TerrarumIngame.GameLoadMode.LOAD_FROM
 
+            printdbg(this, "World dim: ${world.width}x${world.height}, ${world.width / LandUtil.CHUNK_W}x${world.height / LandUtil.CHUNK_H}")
 
             // load all the world blocklayer chunks
             val cw = LandUtil.CHUNK_W
@@ -196,9 +201,11 @@ object LoadSavegame {
                     loadscreen.addMessage(Lang["MENU_IO_LOADING"])
 
                     val chunkFile = newIngame.worldDisk.getFile(0x1_0000_0000L or layer.toLong().shl(24) or chunk)!!
-                    val chunkXY = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
+                    val (cx, cy) = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
 
-                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer]!!, chunkXY.x, chunkXY.y)
+                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer]!!, cx, cy)
+
+                    world.chunkFlags[cy][cx] = world.chunkFlags[cy][cx] or CHUNK_LOADED
                 }
                 loadscreen.progress.getAndAdd(1)
             }

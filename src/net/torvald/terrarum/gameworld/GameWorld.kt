@@ -14,6 +14,8 @@ import net.torvald.terrarum.itemproperties.ItemRemapTable
 import net.torvald.terrarum.itemproperties.ItemTable
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import net.torvald.terrarum.utils.*
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.weather.Weatherbox
@@ -81,14 +83,14 @@ open class GameWorld(
     }
 
     //layers
-    @Transient lateinit open var layerWall: BlockLayerI16
-    @Transient lateinit open var layerTerrain: BlockLayerI16
-    @Transient lateinit open var layerOres: BlockLayerI16I8 // damage to the block follows `terrainDamages`
-    @Transient lateinit open var layerFluids: BlockLayerI16F16
+    @Transient open lateinit var layerWall: BlockLayerI16
+    @Transient open lateinit var layerTerrain: BlockLayerI16
+    @Transient open lateinit var layerOres: BlockLayerI16I8 // damage to the block follows `terrainDamages`
+    @Transient open lateinit var layerFluids: BlockLayerI16F16
     val wallDamages = HashArray<Float>()
     val terrainDamages = HashArray<Float>()
 
-
+    @Transient open lateinit var chunkFlags: Array<ByteArray>
 
     //val layerThermal: MapLayerHalfFloat // in Kelvins
     //val layerFluidPressure: MapLayerHalfFloat // (milibar - 1000)
@@ -220,6 +222,7 @@ open class GameWorld(
         layerWall = BlockLayerI16(width, height)
         layerOres = BlockLayerI16I8(width, height)
         layerFluids = BlockLayerI16F16(width, height)
+        chunkFlags = Array(height / CHUNK_H) { ByteArray(width / CHUNK_W) }
 
         // temperature layer: 2x2 is one cell
         //layerThermal = MapLayerHalfFloat(width, height, averageTemperature)
@@ -818,6 +821,10 @@ open class GameWorld(
         }
 
         val DEFAULT_GRAVITATION = Vector2(0.0, 9.8)
+
+        @Transient const val CHUNK_NULL = 0x00.toByte()
+        @Transient const val CHUNK_GENERATING = 0x01.toByte()
+        @Transient const val CHUNK_LOADED = 0x02.toByte()
     }
 
     open fun updateWorldTime(delta: Float) {
