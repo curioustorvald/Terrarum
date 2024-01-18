@@ -2,11 +2,9 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
-import net.torvald.random.XXHash32
 import net.torvald.terrarum.App
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
@@ -23,9 +21,11 @@ class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache
         const val YHEIGHT_DIVISOR = 2.0 / 7.0
     }
 
-    override fun getDone(loadscreen: LoadScreenBase) {
-        loadscreen.stageValue += 1
-        loadscreen.progress.set(0L)
+    override fun getDone(loadscreen: LoadScreenBase?) {
+        loadscreen?.let {
+            it.stageValue += 1
+            it.progress.set(0L)
+        }
 
         Worldgen.threadExecutor.renew()
         submitJob(loadscreen)

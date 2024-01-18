@@ -193,19 +193,21 @@ object LoadSavegame {
             val cw = LandUtil.CHUNK_W
             val ch = LandUtil.CHUNK_H
             val chunkCount = world.width * world.height / (cw * ch)
-            val hasOreLayer = (newIngame.worldDisk.getFile(0x1_0000_0000L or 2L.shl(24)) != null)
-            val worldLayer = (if (hasOreLayer) intArrayOf(0,1,2) else intArrayOf(0,1)).map { world.getLayer(it) }
-            val layerCount = worldLayer.size
-            for (chunk in 0L until (world.width * world.height) / (cw * ch)) {
+            val worldLayer = intArrayOf(0,1,2).map { world.getLayer(it) }
+            for (chunk in 0L until chunkCount) {
                 for (layer in worldLayer.indices) {
                     loadscreen.addMessage(Lang["MENU_IO_LOADING"])
 
-                    val chunkFile = newIngame.worldDisk.getFile(0x1_0000_0000L or layer.toLong().shl(24) or chunk)!!
-                    val (cx, cy) = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
+                    newIngame.worldDisk.getFile(0x1_0000_0000L or layer.toLong().shl(24) or chunk)?.let { chunkFile ->
+                        val (cx, cy) = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
 
-                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer]!!, cx, cy)
+                        if (layer == 2) {
+                            printdbg(this, "Loading ore layer chunk ($cx, $cy) size: ${chunkFile.getSizePure()}")
+                        }
 
-                    world.chunkFlags[cy][cx] = world.chunkFlags[cy][cx] or CHUNK_LOADED
+                        ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer]!!, cx, cy)
+                        world.chunkFlags[cy][cx] = world.chunkFlags[cy][cx] or CHUNK_LOADED
+                    }
                 }
                 loadscreen.progress.getAndAdd(1)
             }

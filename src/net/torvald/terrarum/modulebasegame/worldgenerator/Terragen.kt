@@ -29,9 +29,11 @@ class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCac
     private val dirtStoneDitherSize = 3 // actual dither size will be double of this value
     private val stoneSlateDitherSize = 4
 
-    override fun getDone(loadscreen: LoadScreenBase) {
-        loadscreen.stageValue += 1
-        loadscreen.progress.set(0L)
+    override fun getDone(loadscreen: LoadScreenBase?) {
+        loadscreen?.let {
+            it.stageValue += 1
+            it.progress.set(0L)
+        }
 
         Worldgen.threadExecutor.renew()
         submitJob(loadscreen)
@@ -98,7 +100,7 @@ class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCac
         %
         * - where the stone layer actually begins
          */
-            if (dirtStoneTransition > 0) {
+            /*if (dirtStoneTransition > 0) {
                 for (pos in 0 until dirtStoneDitherSize * 2) {
                     val y = pos + dirtStoneTransition - (dirtStoneDitherSize * 2) + 1
                     if (y >= world.height) break
@@ -116,14 +118,14 @@ class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCac
                         world.setTileWall(x, y, newTile, true)
                     }
                 }
-            }
+            }*/
 
             /*
         #
         # - stone-to-slate transition, height = stoneSlateDitherSize
         #
          */
-            if (stoneSlateTransition > 0) {
+            /*if (stoneSlateTransition > 0) {
                 for (pos in 0 until stoneSlateDitherSize) {
                     val y = pos + stoneSlateTransition - stoneSlateDitherSize + 1
                     if (y >= world.height) break
@@ -138,7 +140,7 @@ class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCac
                         world.setTileWall(x, y, newTile, true)
                     }
                 }
-            }
+            }*/
         }
     }
 

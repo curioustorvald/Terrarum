@@ -28,6 +28,7 @@ import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
@@ -43,6 +44,8 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
@@ -62,6 +65,7 @@ import org.khelekore.prtree.PRTree
 import java.io.File
 import java.util.*
 import java.util.logging.Level
+import kotlin.experimental.and
 import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.pow
@@ -363,6 +367,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 //            Terrarum.itemCodex.loadFromSave(codices.item)
 //            Terrarum.apocryphas = HashMap(codices.apocryphas)
 
+
+            // feed info to the worldgen
+            Worldgen.attachMap(world, WorldgenParams(world.generatorSeed))
         }
     }
 
@@ -898,6 +905,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 App.audioMixer.convolveBusCave.volume = 0.0
             }
 
+            actorNowPlaying?.let { if (WORLD_UPDATE_TIMER % 4 == 1) updateWorldGenerator(actorNowPlaying!!) }
+
 
 
             WORLD_UPDATE_TIMER += 1
@@ -1059,6 +1068,24 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 App.fontSmallNumbers.draw(batch, "$ccY\u00DCren $ccG${frameDelta.toIntAndFrac(1)}", 2f + 7*12, App.scr.height - 16f)
                 App.fontSmallNumbers.draw(batch, "$ccY\u00DCgdx $ccG${Gdx.graphics.deltaTime.toIntAndFrac(1)}", 2f + 7*24, App.scr.height - 16f)
             }
+        }
+    }
+
+    private fun Point2iMod(x: Int, y: Int) = Point2i(x fmod world.width, y)
+
+    private fun updateWorldGenerator(actor: ActorWithBody) {
+        val pcx = (actor.intTilewiseHitbox.canonicalX.toInt() fmod world.width) / CHUNK_W
+        val pcy = (actor.intTilewiseHitbox.canonicalY.toInt() fmod world.width) / CHUNK_H
+        listOf(
+            Point2iMod(pcx - 1, pcy - 2), Point2iMod(pcx, pcy - 2), Point2iMod(pcx + 1, pcy - 2),
+            Point2iMod(pcx - 2, pcy - 1), Point2iMod(pcx - 1, pcy - 1), Point2iMod(pcx, pcy - 1), Point2iMod(pcx + 1, pcy - 1),  Point2iMod(pcx + 2, pcy - 1),
+            Point2iMod(pcx - 2, pcy), Point2iMod(pcx - 1, pcy), Point2iMod(pcx + 1, pcy),  Point2iMod(pcx + 2, pcy),
+            Point2iMod(pcx - 2, pcy + 1), Point2iMod(pcx - 1, pcy + 1), Point2iMod(pcx, pcy + 1), Point2iMod(pcx + 1, pcy + 1),  Point2iMod(pcx + 2, pcy + 1),
+            Point2iMod(pcx - 1, pcy + 2), Point2iMod(pcx, pcy + 2), Point2iMod(pcx + 1, pcy + 2),
+        ).filter { it.y in 0 until world.height }.filter {  (cx, cy) ->
+            world.chunkFlags[cy][cx].and(0x7F) == 0.toByte()
+        }.forEach { (cx, cy) ->
+            Worldgen.generateChunkIngame(cx, cy) { cx, cy -> }
         }
     }
 

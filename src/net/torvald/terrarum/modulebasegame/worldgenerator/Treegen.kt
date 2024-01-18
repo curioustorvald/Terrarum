@@ -2,32 +2,28 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.sudoplay.joise.Joise
 import net.torvald.random.HQRNG
+import net.torvald.random.XXHash32
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIOME_KEY_PLAINS
-import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIOME_KEY_SPARSE_WOODS
-import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIOME_KEY_WOODLANDS
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_DIVISOR
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
-import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import net.torvald.terrarum.serialise.toUint
-import kotlin.math.absoluteValue
 
 /**
  * Created by minjaesong on 2023-11-10.
  */
 class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams: TerragenParams, params: TreegenParams, val biomeMap: HashMap<BlockAddress, Byte>) : Gen(world, isFinal, seed, params) {
 
-    override fun getDone(loadscreen: LoadScreenBase) {
-        loadscreen.stageValue += 1
-        loadscreen.progress.set(0L)
+    override fun getDone(loadscreen: LoadScreenBase?) {
+        loadscreen?.let {
+            it.stageValue += 1
+            it.progress.set(0L)
+        }
 
         Worldgen.threadExecutor.renew()
         submitJob(loadscreen)
@@ -40,7 +36,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
     override fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double) {
         for (i in 0 until 10) {
             val xs = (xStart + 9*i) until (xStart + 9*i) + 9
-            tryToPlant(xs, makeGrassMap(xs), HQRNG(seed shake xs.last.toLong()))
+            tryToPlant(xs, 986578287, makeGrassMap(xs), HQRNG(seed shake xs.last.toLong()))
         }
     }
 
@@ -74,9 +70,19 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
         return r
     }
 
-    private val treePlot1 = arrayOf(2, 3)
-    private val treePlot2 = arrayOf(6, 7)
-    private val treePlotM = arrayOf(4, 5)
+    private val treePlot1 = intArrayOf(2, 3)
+    private val treePlot2 = intArrayOf(6, 7)
+    private val treePlotM = intArrayOf(4, 5)
+
+    private fun IntArray.takeRand(x: Int, y: Int, h: Int): Int {
+        val r = ((XXHash32.hashGeoCoord(x, y) * 31 + h) and 0xFFFFFF) / 16777216f
+        return this[(r * this.size).toInt()]
+    }
+
+    private fun List<Int>.takeRand(x: Int, y: Int, h: Int): Int {
+        val r = ((XXHash32.hashGeoCoord(x, y) * 31 + h) and 0xFFFFFF) / 16777216f
+        return this[(r * this.size).toInt()]
+    }
 
     private fun Double.toDitherredInt(rng: HQRNG): Int {
         val ibase = this.floorToInt()
@@ -84,7 +90,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
         return if (rng.nextDouble() < 1.0 - thre) ibase else ibase + 1
     }
 
-    private fun tryToPlant(xs: IntProgression, grassMap: Array<List<Int>>, rng: HQRNG) {
+    private fun tryToPlant(xs: IntProgression, ys: Int, grassMap: Array<List<Int>>, rng: HQRNG) {
         val treeSpecies = 0
 
 
@@ -130,28 +136,28 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
 
         when (treeToSpawn.size) {
             2 -> {
-                val plot1 = if (treeToSpawn[0] < 3) treePlot1.random() else treePlot1[0]
-                val plot2 = if (treeToSpawn[1] < 3) treePlot2.random() else treePlot2[0]
+                val plot1 = if (treeToSpawn[0] < 3) treePlot1.takeRand(xs.first, ys, 123) else treePlot1[0]
+                val plot2 = if (treeToSpawn[1] < 3) treePlot2.takeRand(xs.first, ys, 456) else treePlot2[0]
 
                 // if there is no grass, grassMap[x] is an empty list
                 if (treeToSpawn[0] != 0) {
-                    grassMap[plot1].let { if (it.isEmpty()) null else it.random() }?.let {
+                    grassMap[plot1].let { if (it.isEmpty()) null else it.takeRand(xs.first + plot1, ys, 1234) }?.let {
                         plantTree(xs.first + plot1, it, treeSpecies, 1, rng) // TODO use treeSize from the treeToSpawn
                     }
                 }
                 if (treeToSpawn[1] != 0) {
-                    grassMap[plot2].let { if (it.isEmpty()) null else it.random() }?.let {
+                    grassMap[plot2].let { if (it.isEmpty()) null else it.takeRand(xs.first + plot2, ys, 2345) }?.let {
                         plantTree(xs.first + plot2, it, treeSpecies, 1, rng) // TODO use treeSize from the treeToSpawn
                     }
                 }
             }
             1 -> {
-                val plot1 = if (treeToSpawn[0] < 3) treePlotM.random() else treePlotM[0]
+                val plot1 = if (treeToSpawn[0] < 3) treePlotM.takeRand(xs.first, ys, 3456) else treePlotM[0]
 
                 // if there is no grass, grassMap[x] is an empty list
                 if (treeToSpawn[0] != 0) {
                     val treeSize = arrayOf(null, 0, 1, 2)[treeToSpawn[0]]
-                    grassMap[plot1].let { if (it.isEmpty()) null else it.random() }?.let {
+                    grassMap[plot1].let { if (it.isEmpty()) null else it.takeRand(xs.first + plot1, ys, 4567) }?.let {
                         plantTree(xs.first + plot1, it, treeSpecies, treeSize!!, rng)
                     }
                 }
@@ -367,7 +373,9 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
         val xEnd = xStart + width
         var xStart2 = xStart
         var xEnd2 = xEnd
-        Math.random().let {
+
+        val r = (XXHash32.hashGeoCoord(x, y) * width * height + growCnt).and(0xffffff) / 16777216f
+        r.let {
             if (it < 0.25) xStart2 += 1
             else if (it < 0.5) xEnd2 -= 1
         }

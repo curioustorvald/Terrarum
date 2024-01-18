@@ -162,20 +162,22 @@ class BasicDebugInfoWindow : UICanvas() {
         val xo = 224
         val yo = 78
 
+        try {
+            world?.let { world ->
+                val ppos = ingame?.actorNowPlaying?.centrePosVector
+                val pcx = (ppos?.x?.div(TILE_SIZED)?.fmod(world.width.toDouble())?.div(CHUNK_W)?.toInt() ?: -999)
+                val pcy = (ppos?.y?.div(TILE_SIZED)?.fmod(world.height.toDouble())?.div(CHUNK_H)?.toInt() ?: -999)
 
-        world?.let { world ->
-            val ppos = ingame?.actorNowPlaying?.centrePosVector
-            val pcx = (ppos?.x?.div(TILE_SIZED)?.fmod(world.width.toDouble())?.div(CHUNK_W)?.toInt() ?: -999)
-            val pcy = (ppos?.y?.div(TILE_SIZED)?.fmod(world.height.toDouble())?.div(CHUNK_H)?.toInt() ?: -999)
-
-            for (y in 0 until world.height / CHUNK_H) {
-                for (x in 0 until world.width / CHUNK_W) {
-                    val chunkStat = world.chunkFlags[y][x].toUint()
-                    batch.color = if (pcx == x && pcy == y) chunkStatCurrentChunk else chunkStatColours[chunkStat]
-                    Toolkit.fillArea(batch, xo + 3*x, yo + 3*y, 2, 2)
+                for (y in 0 until world.height / CHUNK_H) {
+                    for (x in 0 until world.width / CHUNK_W) {
+                        val chunkStat = world.chunkFlags[y][x].toUint()
+                        batch.color = if (pcx == x && pcy == y) chunkStatCurrentChunk else chunkStatColours[chunkStat]
+                        Toolkit.fillArea(batch, xo + 3 * x, yo + 3 * y, 2, 2)
+                    }
                 }
             }
         }
+        catch (_: UninitializedPropertyAccessException) {}
 
     }
 

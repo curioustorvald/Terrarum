@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.serialise
 
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameworld.GameWorld.Companion.CHUNK_LOADED
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
@@ -12,6 +13,7 @@ import net.torvald.terrarum.savegame.*
 import net.torvald.terrarum.serialise.Common
 import java.io.File
 import java.util.zip.GZIPOutputStream
+import kotlin.experimental.and
 
 /**
  * Created by minjaesong on 2021-09-14.
@@ -129,17 +131,20 @@ class WorldSavingThread(
         for (layer in layers.indices) {
             for (cx in 0 until cw) {
                 for (cy in 0 until ch) {
+                    val chunkFlag = ingame.world.chunkFlags[cy][cx]
                     val chunkNumber = LandUtil.chunkXYtoChunkNum(ingame.world, cx, cy).toLong()
 
+                    if (chunkFlag and 0x7F == CHUNK_LOADED) {
 //                    Echo("Writing chunks... ${(cw*ch*layer) + chunkNumber + 1}/${cw*ch*layers.size}")
 
-                    val chunkBytes = WriteWorld.encodeChunk(layers[layer]!!, cx, cy)
-                    val entryID = 0x1_0000_0000L or layer.toLong().shl(24) or chunkNumber
+                        val chunkBytes = WriteWorld.encodeChunk(layers[layer]!!, cx, cy)
+                        val entryID = 0x1_0000_0000L or layer.toLong().shl(24) or chunkNumber
 
-                    val entryContent = EntryFile(chunkBytes)
-                    val entry = DiskEntry(entryID, VDFileID.ROOT, creation_t, time_t, entryContent)
-                    // "W1L0-92,15"
-                    addFile(disk, entry)
+                        val entryContent = EntryFile(chunkBytes)
+                        val entry = DiskEntry(entryID, VDFileID.ROOT, creation_t, time_t, entryContent)
+                        // "W1L0-92,15"
+                        addFile(disk, entry)
+                    }
 
                     WriteSavegame.saveProgress += 1
                 }

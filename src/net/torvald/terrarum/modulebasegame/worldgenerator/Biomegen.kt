@@ -5,7 +5,6 @@ import com.sudoplay.joise.module.*
 import net.torvald.terrarum.App
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
@@ -28,9 +27,11 @@ class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val 
     private lateinit var THISWORLD_SANDSTONE: ItemID
 
 
-    override fun getDone(loadscreen: LoadScreenBase) {
-        loadscreen.stageValue += 1
-        loadscreen.progress.set(0L)
+    override fun getDone(loadscreen: LoadScreenBase?) {
+        loadscreen?.let {
+            it.stageValue += 1
+            it.progress.set(0L)
+        }
 
 
         val SAND_RND = (seed shake "SANDYCOLOURS").ushr(7).xor(seed and 255L).and(255L).toInt()

@@ -34,6 +34,10 @@ object Worldgen {
     fun attachMap(world: GameWorld, genParams: WorldgenParams) {
         this.world = world
         params = genParams
+
+        highlandLowlandSelectCache = getHighlandLowlandSelectCache(params.terragenParams, params.seed)
+        caveAttenuateBiasScaledCache = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
+        biomeMap = HashMap()
     }
 
     internal lateinit var highlandLowlandSelectCache: ModuleCache
@@ -74,11 +78,6 @@ object Worldgen {
     }
 
     fun generateMap(loadscreen: LoadScreenBase) {
-        highlandLowlandSelectCache = getHighlandLowlandSelectCache(params.terragenParams, params.seed)
-        caveAttenuateBiasScaledCache = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
-        biomeMap = HashMap()
-
-
         val jobs = getJobs()
 
 
@@ -99,6 +98,28 @@ object Worldgen {
 
         printdbg(this, "Generation job finished")
 
+    }
+
+    /**
+     * Chunk flags will be set automatically
+     */
+    fun generateChunkIngame(cx: Int, cy: Int, callback: (Int, Int) -> Unit) {
+        val jobs = getJobs()
+        printdbg(this, "Generating chunk on ($cx, $cy)")
+        Thread {
+            world.chunkFlags[cy][cx] = GameWorld.CHUNK_GENERATING
+
+            for (i in jobs.indices) {
+                val it = jobs[i]
+                it.theWork.getChunkDone(cx, cy)
+            }
+
+            world.chunkFlags[cy][cx] = GameWorld.CHUNK_LOADED
+            callback(cx, cy)
+        }.let {
+            it.priority = 2
+            it.start()
+        }
     }
 
     data class Work(val loadingScreenName: String, val theWork: Gen, val tags: List<String>)
@@ -122,6 +143,7 @@ object Worldgen {
         val yInit = getChunkGenStrip(world).first
         val tallies = ArrayList<Pair<Point2i, Vector2f>>() // xypos, score (0..1+)
         var tries = 0
+        var found = false
         while (tries < 99) {
             val posX = (Math.random() * world.width).toInt()
             var posY = yInit * CHUNK_H
@@ -166,12 +188,23 @@ object Worldgen {
 
             printdbg(this, "...Survey says: $rocks/$rockScoreMin rocks, $trees/$treeScoreMin trees")
 
-            if (score.x >= 1f && score.y >= 1f) break
+            if (score.x >= 1f && score.y >= 1f) {
+                found = true
+                break
+            }
 
             tries += 1
         }
 
+        if (found)
+            return tallies.last().first
+
         return tallies.toTypedArray().also {
+            it.map { it.second.let {
+                it.x = (it.x).coerceAtMost(1f)
+                it.y = (it.y).coerceAtMost(1f)
+            } }
+
             it.shuffle()
             it.sortByDescending { it.second.lengthSquared() }
 
@@ -342,29 +375,35 @@ object Worldgen {
 
 abstract class Gen(val world: GameWorld, val isFinal: Boolean, val seed: Long, val params: Any? = null) {
 
-    open fun getDone(loadscreen: LoadScreenBase) { } // trying to use different name so that it won't be confused with Runnable or Callable
+    open fun getDone(loadscreen: LoadScreenBase?) { } // trying to use different name so that it won't be confused with Runnable or Callable
     protected abstract fun getGenerator(seed: Long, params: Any?): List<Joise>
     protected abstract fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double)
 
-    protected open fun getChunksRange(): List<Int> {
+    private fun getChunksRange(): List<Int> {
         val (yStart, yEnd) = Worldgen.getChunkGenStrip(world)
         return (0 until world.width / CHUNK_W).flatMap { cx ->
             (LandUtil.chunkXYtoChunkNum(world, cx, yStart)..LandUtil.chunkXYtoChunkNum(world, cx, yEnd)).toList()
         }
     }
 
-    open fun submitJob(loadscreen: LoadScreenBase) {
+    fun submitJob(loadscreen: LoadScreenBase?) {
         getChunksRange().forEach { chunkNum ->
             val (chunkX, chunkY) = LandUtil.chunkNumToChunkXY(world, chunkNum)
             Worldgen.threadExecutor.submit {
                 val localJoise = getGenerator(seed, params)
                 val sampleOffset = world.width / 8.0
                 draw(chunkX * LandUtil.CHUNK_W, chunkY * CHUNK_H, localJoise, sampleOffset)
-                loadscreen.progress.addAndGet(1L)
+                loadscreen?.progress?.addAndGet(1L)
 
                 world.chunkFlags[chunkY][chunkX] = if (isFinal) GameWorld.CHUNK_LOADED else GameWorld.CHUNK_GENERATING
             }
         }
+    }
+
+    fun getChunkDone(chunkX: Int, chunkY: Int) {
+        val localJoise = getGenerator(seed, params)
+        val sampleOffset = world.width / 8.0
+        draw(chunkX * LandUtil.CHUNK_W, chunkY * CHUNK_H, localJoise, sampleOffset)
     }
 }
 

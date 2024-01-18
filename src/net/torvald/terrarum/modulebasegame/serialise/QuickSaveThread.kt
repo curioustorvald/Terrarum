@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.serialise
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -15,6 +16,7 @@ import net.torvald.terrarum.toInt
 import net.torvald.terrarum.utils.PlayerLastStatus
 import java.io.File
 import java.util.zip.GZIPOutputStream
+import kotlin.experimental.and
 
 /**
  * Created by minjaesong on 2021-09-29.
@@ -111,17 +113,20 @@ class QuickSingleplayerWorldSavingThread(
 
                         printdbg(this, "Writing chunks... $chunksWrote/$chunkCount (chunk# $chunkNumber at layer# $layerNum)")
 
-                        val chunkXY = LandUtil.chunkNumToChunkXY(ingame.world, chunkNumber)
+                        val (cx, cy) = LandUtil.chunkNumToChunkXY(ingame.world, chunkNumber)
+                        val chunkFlag = ingame.world.chunkFlags[cy][cx]
 
 //                    println("Chunk xy from number $chunkNumber -> (${chunkXY.x}, ${chunkXY.y})")
 
-                        val chunkBytes = WriteWorld.encodeChunk(layer, chunkXY.x, chunkXY.y)
-                        val entryID = 0x1_0000_0000L or layerNum.toLong().shl(24) or chunkNumber.toLong()
+                        if (chunkFlag and 0x7F == GameWorld.CHUNK_LOADED) {
+                            val chunkBytes = WriteWorld.encodeChunk(layer, cx, cy)
+                            val entryID = 0x1_0000_0000L or layerNum.toLong().shl(24) or chunkNumber.toLong()
 
-                        val entryContent = EntryFile(chunkBytes)
-                        val entry = DiskEntry(entryID, ROOT, creation_t, time_t, entryContent)
-                        // "W1L0-92,15"
-                        addFile(disk, entry); skimmer.appendEntry(entry)
+                            val entryContent = EntryFile(chunkBytes)
+                            val entry = DiskEntry(entryID, ROOT, creation_t, time_t, entryContent)
+                            // "W1L0-92,15"
+                            addFile(disk, entry); skimmer.appendEntry(entry)
+                        }
 
                         WriteSavegame.saveProgress += chunkProgressMultiplier
                         chunksWrote += 1

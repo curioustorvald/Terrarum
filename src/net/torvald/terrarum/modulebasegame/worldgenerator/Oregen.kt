@@ -3,11 +3,9 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.terrarum.*
-import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_DIVISOR
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_MAGIC
-import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import kotlin.math.cos
@@ -18,9 +16,11 @@ import kotlin.math.sqrt
  * Created by minjaesong on 2023-10-25.
  */
 class Oregen(world: GameWorld, isFinal: Boolean, private val caveAttenuateBiasScaledCache: ModuleCache, seed: Long, private val ores: List<OregenParams>) : Gen(world, isFinal, seed) {
-    override fun getDone(loadscreen: LoadScreenBase) {
-        loadscreen.stageValue += 1
-        loadscreen.progress.set(0L)
+    override fun getDone(loadscreen: LoadScreenBase?) {
+        loadscreen?.let {
+            it.stageValue += 1
+            it.progress.set(0L)
+        }
 
         Worldgen.threadExecutor.renew()
         submitJob(loadscreen)

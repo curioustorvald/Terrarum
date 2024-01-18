@@ -4,12 +4,10 @@ import com.sudoplay.joise.Joise
 import net.torvald.random.XXHash64
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.Point2i
-import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.isOre
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
@@ -24,7 +22,7 @@ import kotlin.math.max
  */
 class OregenAutotiling(world: GameWorld, isFinal: Boolean, seed: Long, val tilingModes: HashMap<ItemID, String>) : Gen(world, isFinal, seed) {
 
-    override fun getDone(loadscreen: LoadScreenBase) {
+    override fun getDone(loadscreen: LoadScreenBase?) {
         Worldgen.threadExecutor.renew()
         submitJob(loadscreen)
         Worldgen.threadExecutor.join()
