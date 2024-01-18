@@ -111,8 +111,8 @@ object Worldgen {
      * @return starting chunk Y index, ending chunk Y index (inclusive)
      */
     fun getChunkGenStrip(world: GameWorld): Pair<Int, Int> {
-        val start = (0.00342f * world.height - 3.22f).floorToInt().coerceAtLeast(0)
-        return start to start + 6
+        val start = (0.00342f * world.height - 3.22f).floorToInt().coerceAtLeast(1)
+        return start - 1 to start + 6
     }
 
     private val rockScoreMin = 40
