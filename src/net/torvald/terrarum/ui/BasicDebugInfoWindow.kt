@@ -167,7 +167,7 @@ class BasicDebugInfoWindow : UICanvas() {
             val ppos = ingame?.actorNowPlaying?.centrePosVector
             val pcx = (ppos?.x?.div(TILE_SIZED)?.fmod(world.width.toDouble())?.div(CHUNK_W)?.toInt() ?: -999)
             val pcy = (ppos?.y?.div(TILE_SIZED)?.fmod(world.height.toDouble())?.div(CHUNK_H)?.toInt() ?: -999)
-            
+
             for (y in 0 until world.height / CHUNK_H) {
                 for (x in 0 until world.width / CHUNK_W) {
                     val chunkStat = world.chunkFlags[y][x].toUint()

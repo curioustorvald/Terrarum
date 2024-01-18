@@ -1,16 +1,16 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
+import com.jme3.math.Vector2f
 import com.sudoplay.joise.module.*
 import net.torvald.random.XXHash64
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
-import net.torvald.terrarum.BlockCodex
-import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import kotlin.math.roundToLong
 
 /**
@@ -91,22 +91,11 @@ object Worldgen {
             it.theWork.getDone(loadscreen)
         }
 
+
         // determine spawn point
-        world.spawnX = 0
-        world.spawnY = 180
-        // go up?
-        if (BlockCodex[world.getTileFromTerrain(world.spawnX, world.spawnY)].isSolid) {
-            // go up!
-            while (BlockCodex[world.getTileFromTerrain(world.spawnX, world.spawnY)].isSolid) {
-                world.spawnY -= 1
-            }
-        }
-        else {
-            // go down!
-            while (!BlockCodex[world.getTileFromTerrain(world.spawnX, world.spawnY)].isSolid) {
-                world.spawnY += 1
-            }
-        }
+        val (spawnX, spawnY) = tryForSpawnPoint(world)
+        world.spawnX = spawnX
+        world.spawnY = spawnY
 
         printdbg(this, "Generation job finished")
 
@@ -116,6 +105,80 @@ object Worldgen {
 
     fun getEstimationSec(width: Int, height: Int): Long {
         return (38.0 * 1.25 * (48600000.0 / bogoflops) * ((width * height) / 20095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
+    }
+
+    /**
+     * @return starting chunk Y index, ending chunk Y index (inclusive)
+     */
+    fun getChunkGenStrip(world: GameWorld): Pair<Int, Int> {
+        val start = (0.00342f * world.height - 3.22f).floorToInt()
+        return start to start + 6
+    }
+
+    private val rockScoreMin = 40
+    private val treeScoreMin = 25
+
+    private fun tryForSpawnPoint(world: GameWorld): Point2i {
+        val yInit = getChunkGenStrip(world).first
+        val tallies = ArrayList<Pair<Point2i, Vector2f>>() // xypos, score (0..1+)
+        var tries = 0
+        while (tries < 99) {
+            val posX = (Math.random() * world.width).toInt()
+            var posY = yInit * CHUNK_H
+            // go up?
+            if (BlockCodex[world.getTileFromTerrain(posX, posY)].isSolid) {
+                // go up!
+                while (BlockCodex[world.getTileFromTerrain(posX, posY)].isSolid) {
+                    posY -= 1
+                }
+            }
+            else {
+                // go down!
+                while (!BlockCodex[world.getTileFromTerrain(posX, posY)].isSolid) {
+                    posY += 1
+                }
+            }
+
+            printdbg(this, "Trying spawn point #${tries + 1} at ($posX, $posY)")
+
+            var rocks = 0
+            var trees = 0
+
+            // make survey
+            for (sx in -80..80) {
+                for (sy in -30..30) {
+                    val x = posX + sx
+                    val y = posY + sy
+                    val tile = BlockCodex[world.getTileFromTerrain(x, y)]
+                    if (tile.hasTag("ROCK")) {
+                        rocks += 1
+                    }
+                    else if (tile.hasTag("TREETRUNK")) {
+                        trees += 1
+                    }
+                }
+            }
+            val rockScore = rocks / rockScoreMin.toFloat()
+            val treeScore = trees / treeScoreMin.toFloat()
+            val score = Vector2f(rockScore, treeScore)
+
+            tallies.add(Point2i(posX, posY) to score)
+
+            printdbg(this, "...Survey says: $rocks/$rockScoreMin rocks, $trees/$treeScoreMin trees")
+
+            if (score.x >= 1f && score.y >= 1f) break
+
+            tries += 1
+        }
+
+        return tallies.toTypedArray().also {
+            it.shuffle()
+            it.sortByDescending { it.second.lengthSquared() }
+
+            it.first().let {
+                printdbg(this, "Final answer: ${it.first} with score ${it.second}")
+            }
+        }.first().first
     }
 
     private fun getHighlandLowlandSelectCache(params: TerragenParams, seed: Long): ModuleCache {
