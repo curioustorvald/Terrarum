@@ -14,6 +14,8 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
+import kotlin.math.ln
+import kotlin.math.pow
 import kotlin.math.roundToLong
 
 /**
@@ -125,7 +127,14 @@ object Worldgen {
     data class Work(val loadingScreenName: String, val theWork: Gen, val tags: List<String>)
 
     fun getEstimationSec(width: Int, height: Int): Long {
-        return (38.0 * 1.25 * (48600000.0 / bogoflops) * ((width * height) / 20095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
+        val testMachineBogoFlops = 48000000
+        val testMachineThreads = 32
+        val dataPoints = intArrayOf(9, 15, 23, 32)
+        val eqMult = 0.0214 // use google sheet to get trend line equation
+        val eqPow = 0.396 // use google sheet to get trend line equation
+
+        val f = eqMult * (width.toDouble() * height).pow(eqPow)
+        return (1.2 * (testMachineBogoFlops.toDouble() / bogoflops) * f * (testMachineThreads.toDouble() / THREAD_COUNT)).roundToLong()
     }
 
     /**
