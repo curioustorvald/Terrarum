@@ -1071,7 +1071,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    private fun Point2iMod(x: Int, y: Int) = Point2i(x fmod world.width, y)
+    private fun Point2iMod(x: Int, y: Int) = Point2i(x fmod (world.width / CHUNK_W), y)
 
     private fun updateWorldGenerator(actor: ActorWithBody) {
         val pcx = (actor.intTilewiseHitbox.canonicalX.toInt() fmod world.width) / CHUNK_W

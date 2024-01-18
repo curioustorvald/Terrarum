@@ -34,9 +34,10 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
 
 
     override fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double) {
+        val phi = (1.0 + Math.sqrt(5.0)) / 2.0
         for (i in 0 until 10) {
             val xs = (xStart + 9*i) until (xStart + 9*i) + 9
-            tryToPlant(xs, 986578287, makeGrassMap(xs), HQRNG(seed shake xs.last.toLong()))
+            tryToPlant(xs, seed.shake(java.lang.Double.doubleToLongBits(phi * (i + 1))).toInt(), makeGrassMap(xs))
         }
     }
 
@@ -84,13 +85,20 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
         return this[(r * this.size).toInt()]
     }
 
-    private fun Double.toDitherredInt(rng: HQRNG): Int {
+    private fun Double.toDitherredInt(x: Int, y: Int, h: Int): Int {
         val ibase = this.floorToInt()
         val thre = this - ibase
-        return if (rng.nextDouble() < 1.0 - thre) ibase else ibase + 1
+        return if (nextDouble(x, y, h) < 1.0 - thre) ibase else ibase + 1
     }
 
-    private fun tryToPlant(xs: IntProgression, ys: Int, grassMap: Array<List<Int>>, rng: HQRNG) {
+    private fun nextDouble(x: Int, y: Int, h: Int): Double {
+        return ((XXHash32.hashGeoCoord(x, y) * 31 + h) and 0xFFFFFF) / 16777216.0
+    }
+    private fun nextFloat(x: Int, y: Int, h: Int): Float {
+        return ((XXHash32.hashGeoCoord(x, y) * 31 + h) and 0xFFFFFF) / 16777216f
+    }
+
+    private fun tryToPlant(xs: IntProgression, ys: Int, grassMap: Array<List<Int>>) {
         val treeSpecies = 0
 
 
@@ -100,8 +108,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
         }
         // larger value = more likely to spawn large tree
         // range: [0, 3]
-        val woodsWgtD = treePlantable.map { (x, y) -> (biomeMap[LandUtil.getBlockAddr(world, x, y)] ?: 0).toUint().and(3) }.average()
-        val woodsWgt = treePlantable.map { (x, y) -> (biomeMap[LandUtil.getBlockAddr(world, x, y)] ?: 0).toUint().and(3) }.average().toDitherredInt(rng)
+        val woodsWgt = treePlantable.map { (x, y) -> (biomeMap[LandUtil.getBlockAddr(world, x, y)] ?: 0).toUint().and(3) }.average().toDitherredInt(xs.first, ys, 234571)
 
         val treeToSpawn = when (woodsWgt) { // . - none (0) o - shrub (1) ! - small tree (2) $ - large tree (3)
             // 0: . .
@@ -109,25 +116,25 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
             // 2: ! . / . !
             // 3: ! ! /  $
             3 -> {
-                val tree = if (rng.nextDouble() > 0.5)
+                val tree = if (nextDouble(xs.first, ys, 541035097) > 0.5)
                     listOf(3)
                 else
                     listOf(2, 2)
 
-                if (rng.nextDouble() < (params as TreegenParams).deepForestTreeProb) tree else listOf()
+                if (nextDouble(xs.first, ys, 6431534) < (params as TreegenParams).deepForestTreeProb) tree else listOf()
             }
             2 -> {
-                val tree = if (rng.nextDouble() > 0.5)
+                val tree = if (nextDouble(xs.first, ys, 51216464) > 0.5)
                     listOf(0, 2)
                 else
                     listOf(2, 0)
 
-                if (rng.nextDouble() < (params as TreegenParams).sparseForestTreeProb) tree else listOf()
+                if (nextDouble(xs.first, ys, 125098) < (params as TreegenParams).sparseForestTreeProb) tree else listOf()
             }
             1 -> {
                 val tree = listOf(1)
 
-                if (rng.nextDouble() < (params as TreegenParams).plainsShrubProb) tree else listOf()
+                if (nextDouble(xs.first, ys, 150983) < (params as TreegenParams).plainsShrubProb) tree else listOf()
             }
             else -> listOf()
         }
@@ -142,12 +149,12 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
                 // if there is no grass, grassMap[x] is an empty list
                 if (treeToSpawn[0] != 0) {
                     grassMap[plot1].let { if (it.isEmpty()) null else it.takeRand(xs.first + plot1, ys, 1234) }?.let {
-                        plantTree(xs.first + plot1, it, treeSpecies, 1, rng) // TODO use treeSize from the treeToSpawn
+                        plantTree(xs.first + plot1, it, treeSpecies, 1) // TODO use treeSize from the treeToSpawn
                     }
                 }
                 if (treeToSpawn[1] != 0) {
                     grassMap[plot2].let { if (it.isEmpty()) null else it.takeRand(xs.first + plot2, ys, 2345) }?.let {
-                        plantTree(xs.first + plot2, it, treeSpecies, 1, rng) // TODO use treeSize from the treeToSpawn
+                        plantTree(xs.first + plot2, it, treeSpecies, 1) // TODO use treeSize from the treeToSpawn
                     }
                 }
             }
@@ -158,7 +165,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
                 if (treeToSpawn[0] != 0) {
                     val treeSize = arrayOf(null, 0, 1, 2)[treeToSpawn[0]]
                     grassMap[plot1].let { if (it.isEmpty()) null else it.takeRand(xs.first + plot1, ys, 4567) }?.let {
-                        plantTree(xs.first + plot1, it, treeSpecies, treeSize!!, rng)
+                        plantTree(xs.first + plot1, it, treeSpecies, treeSize!!)
                     }
                 }
             }
@@ -193,7 +200,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
     /**
      * @param y where the grass/dirt tile is
      */
-    private fun plantTree(x: Int, y: Int, type: Int, size: Int, rng: HQRNG) {
+    private fun plantTree(x: Int, y: Int, type: Int, size: Int) {
         val trunk = "basegame:" + ((if (size <= 1) 64 else 72) + type)
         val foliage = "basegame:" + (112 + type)
 
@@ -212,7 +219,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
             }
 
             val stem = 1
-            val bulb1 = 3 + fudgeN(1, rng)
+            val bulb1 = 3 + fudgeN(x, y, 4095823)
 
             // trunk
             for (i in 0 until stem) {
@@ -244,10 +251,10 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
             }
 
             // roll for dice until we get a height that fits into the given terrain
-            val stem = 7 + fudgeN(2, rng)
-            val bulb1 = 4 + fudgeN(1, rng)
-            val bulb2 = 3 + fudgeN(1, rng)
-            val bulb3 = 2 + fudgeN(1, rng)
+            val stem = 7 + fudgeN(x, y, 7548291, 1530948)
+            val bulb1 = 4 + fudgeN(x, y, 345098)
+            val bulb2 = 3 + fudgeN(x, y, 6093481)
+            val bulb3 = 2 + fudgeN(x, y, 5413879)
             printdbg(this, "Planting tree at $x, $y; params: $stem, $bulb1, $bulb2, $bulb3")
 
             // trunk
@@ -292,11 +299,11 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
             }
 
             // roll for dice until we get a height that fits into the given terrain
-            val stem = 15 + fudgeN(3, rng)
-            val bulb1 = 5 + fudgeN(1, rng)
-            val bulb2 = 4 + fudgeN(1, rng)
-            val bulb3 = 3 + fudgeN(1, rng)
-            val bulb4 = 2 + fudgeN(1, rng)
+            val stem = 15 + fudgeN(x, y, 14509, 509348, 412098357)
+            val bulb1 = 5 + fudgeN(x, y, 1254)
+            val bulb2 = 4 + fudgeN(x, y, 98134)
+            val bulb3 = 3 + fudgeN(x, y, 123098)
+            val bulb4 = 2 + fudgeN(x, y, 8712)
 
             printdbg(this, "Planting tree at $x, $y; params: $stem, $bulb1, $bulb2, $bulb3")
 
@@ -417,7 +424,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
     /**
      * @return normally distributed integer, for `maxvar=1`, `[-1, 0, 1]`; for `maxvar=2`, `[-2, -1, 0, 1, 2]`, etc.
      */
-    private fun fudgeN(maxvar: Int, rng: HQRNG) = (0 until maxvar).sumOf { (rng.nextDouble() * 3).toInt() - 1 }
+    private fun fudgeN(x: Int, y: Int, vararg hs: Int) = hs.sumOf { (nextDouble(x, y, it) * 3).toInt() - 1 }
 
 }
 

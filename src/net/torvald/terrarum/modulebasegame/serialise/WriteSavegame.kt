@@ -201,10 +201,6 @@ object LoadSavegame {
                     newIngame.worldDisk.getFile(0x1_0000_0000L or layer.toLong().shl(24) or chunk)?.let { chunkFile ->
                         val (cx, cy) = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
 
-                        if (layer == 2) {
-                            printdbg(this, "Loading ore layer chunk ($cx, $cy) size: ${chunkFile.getSizePure()}")
-                        }
-
                         ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer]!!, cx, cy)
                         world.chunkFlags[cy][cx] = world.chunkFlags[cy][cx] or CHUNK_LOADED
                     }
