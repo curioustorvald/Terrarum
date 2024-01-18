@@ -62,8 +62,8 @@ class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCac
         for (x in xStart until xStart + CHUNK_W) {
             val st = (x.toDouble() / world.width) * TWO_PI
 
-            var dirtStoneTransition = 0
-            var stoneSlateTransition = 0
+            var dirtStoneTransition = -1
+            var stoneSlateTransition = -1
 
             for (y in yStart until yStart + CHUNK_H) {
                 val sx = sin(st) * soff + soff // plus sampleOffset to make only
@@ -74,11 +74,19 @@ class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCac
 
                 val terr = noiseValue[0].tiered(terragenTiers)
 
+
+                // disable the marker if relativeY=0 already has rock
+                if (y == yStart && terr == 2)
+                    dirtStoneTransition = -2
+                else if (y == yStart && terr == 3)
+                    stoneSlateTransition = -2
                 // mark off the position where the transition occurred
-                if (dirtStoneTransition == 0 && terr == 2)
-                    dirtStoneTransition = y
-                if (stoneSlateTransition == 0 && terr == 3)
-                    stoneSlateTransition = y
+                else {
+                    if (dirtStoneTransition == -1 && terr == 2)
+                        dirtStoneTransition = y
+                    if (stoneSlateTransition == -1 && terr == 3)
+                        stoneSlateTransition = y
+                }
 
                 val isMarble = noiseValue[1] > 0.5
 
@@ -100,11 +108,11 @@ class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCac
         %
         * - where the stone layer actually begins
          */
-            /*if (dirtStoneTransition > 0) {
+            /*if (dirtStoneTransition >= 0) {
                 for (pos in 0 until dirtStoneDitherSize * 2) {
                     val y = pos + dirtStoneTransition - (dirtStoneDitherSize * 2) + 1
                     if (y >= world.height) break
-                    val hash = XXHash32.hashGeoCoord(x, y).and(0x7FFFFFFF) / 2147483647.0
+                    val hash = XXHash32.hashGeoCoord(x, y).and(0xFFFFFF) / 16777216.0
 //            val fore = world.getTileFromTerrain(x, y)
 //            val back = world.getTileFromWall(x, y)
                     val newTile = if (pos < dirtStoneDitherSize)
@@ -125,11 +133,11 @@ class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCac
         # - stone-to-slate transition, height = stoneSlateDitherSize
         #
          */
-            /*if (stoneSlateTransition > 0) {
+            /*if (stoneSlateTransition >= 0) {
                 for (pos in 0 until stoneSlateDitherSize) {
                     val y = pos + stoneSlateTransition - stoneSlateDitherSize + 1
                     if (y >= world.height) break
-                    val hash = XXHash32.hashGeoCoord(x, y).and(0x7FFFFFFF) / 2147483647.0
+                    val hash = XXHash32.hashGeoCoord(x, y).and(0xFFFFFF) / 16777216.0
 //            val fore = world.getTileFromTerrain(x, y)
 //            val back = world.getTileFromWall(x, y)
                     val newTile = if (hash < pos.toDouble() / stoneSlateDitherSize) Block.STONE_SLATE else Block.STONE
