@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.sqrt
-import kotlin.math.tanh
 
 object SoftClp : TerrarumAudioFilter() {
     val downForce = arrayOf(1.0f, 1.0f)
@@ -36,18 +35,24 @@ object SoftClp : TerrarumAudioFilter() {
      */
     private fun clipfun0(x0: Double): Double {
 //        val p = 0.277777 // knee of around -1.94dB
-        val p = 0.44444 // knee of around -6.02dB
+        val p = 0.349 // knee of around -3.01dB
+//        val p = 0.44444 // knee of around -6.02dB
         val p1 = sqrt(1.0 - 2.0 * p)
 
         val x = x0 * (1.0 + p1) / 2.0
-
         val t = 0.5 * p1
+
+        val lim = 1.0 / (1.0 + p1)
+
+        if (x0 >= lim) return 0.5
+        if (x0 <= -lim) return -0.5
+
         val y0 = if (x < -t)
             (1.0 / p) * (x + 0.5).pow(2) - 0.5
         else if (x > t)
             -(1.0 / p) * (x - 0.5).pow(2) + 0.5
         else
-            x * 2.0 / (1.0 + p1)
+            x * 2.0 * lim
 
         return y0
     }
