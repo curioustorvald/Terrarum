@@ -8,13 +8,15 @@ import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import kotlin.math.cos
 import kotlin.math.sin
 
 /**
  * Created by minjaesong on 2023-11-04.
  */
-class Cavegen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, seed: Long, params: Any) : Gen(world, seed, params) {
+class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
 
     companion object {
         const val YHEIGHT_MAGIC = 2800.0 / 3.0
@@ -26,18 +28,7 @@ class Cavegen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, see
         loadscreen.progress.set(0L)
 
         Worldgen.threadExecutor.renew()
-        (0 until world.width).sliceEvenly(Worldgen.genSlices).mapIndexed { i, xs ->
-            Worldgen.threadExecutor.submit {
-                val localJoise = getGenerator(seed, params as TerragenParams)
-                for (x in xs) {
-                    val sampleTheta = (x.toDouble() / world.width) * TWO_PI
-                    val sampleOffset = world.width / 8.0
-                    draw(x, localJoise, sampleTheta, sampleOffset)
-                }
-                loadscreen.progress.addAndGet((xs.last - xs.first + 1).toLong())
-            }
-        }
-
+        submitJob(loadscreen)
         Worldgen.threadExecutor.join()
 
         App.printdbg(this, "Waking up Worldgen")
@@ -45,24 +36,30 @@ class Cavegen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, see
 
 
     //private fun draw(x: Int, y: Int, width: Int, height: Int, noiseValue: List<Double>, world: GameWorld) {
-    private fun draw(x: Int, noises: List<Joise>, st: Double, soff: Double) {
-        for (y in 0 until world.height) {
-            val sx = sin(st) * soff + soff // plus sampleOffset to make only
-            val sz = cos(st) * soff + soff // positive points are to be sampled
-            val sy = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
-            // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
-            val noiseValue = noises.map { it.get(sx, sy, sz) }
+    override fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double) {
+        for (x in xStart until xStart + CHUNK_W) {
+            val st = (x.toDouble() / world.width) * TWO_PI
 
-            val cave = if (noiseValue[0] < 0.5) 0 else 1
+            for (y in yStart until yStart + CHUNK_H) {
+                val sx = sin(st) * soff + soff // plus sampleOffset to make only
+                val sz = cos(st) * soff + soff // positive points are to be sampled
+                val sy = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+                // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
+                val noiseValue = noises.map { it.get(sx, sy, sz) }
 
-            if (cave == 0) {
-                world.setTileTerrain(x, y, Block.AIR, true)
+                val cave = if (noiseValue[0] < 0.5) 0 else 1
+
+                if (cave == 0) {
+                    world.setTileTerrain(x, y, Block.AIR, true)
+                }
             }
         }
     }
 
 
-    private fun getGenerator(seed: Long, params: TerragenParams): List<Joise> {
+    override fun getGenerator(seed: Long, params: Any?): List<Joise> {
+        val params = params as TerragenParams
+
         val caveMagic: Long = 0x00215741CDF // Urist McDF
         val cavePerturbMagic: Long = 0xA2410C // Armok
         val caveBlockageMagic: Long = 0xD15A57E5 // Disaster

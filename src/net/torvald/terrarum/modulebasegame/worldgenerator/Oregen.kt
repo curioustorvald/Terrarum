@@ -7,6 +7,9 @@ import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_DIVISOR
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_MAGIC
+import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -14,31 +17,20 @@ import kotlin.math.sqrt
 /**
  * Created by minjaesong on 2023-10-25.
  */
-class Oregen(world: GameWorld, private val caveAttenuateBiasScaledCache: ModuleCache, seed: Long, private val ores: List<OregenParams>) : Gen(world, seed) {
+class Oregen(world: GameWorld, isFinal: Boolean, private val caveAttenuateBiasScaledCache: ModuleCache, seed: Long, private val ores: List<OregenParams>) : Gen(world, isFinal, seed) {
     override fun getDone(loadscreen: LoadScreenBase) {
         loadscreen.stageValue += 1
         loadscreen.progress.set(0L)
 
         Worldgen.threadExecutor.renew()
-        (0 until world.width).sliceEvenly(Worldgen.genSlices).mapIndexed { i, xs ->
-            Worldgen.threadExecutor.submit {
-                val localJoise = getGenerator(seed)
-                for (x in xs) {
-                    val sampleTheta = (x.toDouble() / world.width) * TWO_PI
-                    val sampleOffset = world.width / 8.0
-                    draw(x, localJoise, sampleTheta, sampleOffset)
-                }
-                loadscreen.progress.addAndGet((xs.last - xs.first + 1).toLong())
-            }
-        }
-
+        submitJob(loadscreen)
         Worldgen.threadExecutor.join()
     }
 
     /**
      * @return List of noise instances, each instance refers to one of the spawnable ores
      */
-    private fun getGenerator(seed: Long): List<Joise> {
+    override fun getGenerator(seed: Long, any: Any?): List<Joise> {
         return ores.map {
             generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake it.tile, it.freq, it.power, it.scale, it.ratio)
         }
@@ -47,24 +39,29 @@ class Oregen(world: GameWorld, private val caveAttenuateBiasScaledCache: ModuleC
     /**
      * Indices of `noises` has one-to-one mapping to the `ores`
      */
-    private fun draw(x: Int, noises: List<Joise>, st: Double, soff: Double) {
-        for (y in 0 until world.height) {
-            val sx = sin(st) * soff + soff // plus sampleOffset to make only
-            val sz = cos(st) * soff + soff // positive points are to be sampled
-            val sy = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
-            // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
+    override fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double) {
+        for (x in xStart until xStart + CHUNK_W) {
+            val st = (x.toDouble() / world.width) * TWO_PI
 
-            // get the actual noise values
-            // the size of the two lists are guaranteed to be identical as they all derive from the same `ores`
-            val noiseValues = noises.map { it.get(sx, sy, sz) }
-            val oreTiles = ores.map { it.tile }
+            for (y in yStart until yStart + CHUNK_H) {
+                val sx = sin(st) * soff + soff // plus sampleOffset to make only
+                val sz = cos(st) * soff + soff // positive points are to be sampled
+                val sy = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+                // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
 
-            val tileToPut = noiseValues.zip(oreTiles).firstNotNullOfOrNull { (n, tile) -> if (n > 0.5) tile else null }
-            val backingTile = world.getTileFromTerrain(x, y)
+                // get the actual noise values
+                // the size of the two lists are guaranteed to be identical as they all derive from the same `ores`
+                val noiseValues = noises.map { it.get(sx, sy, sz) }
+                val oreTiles = ores.map { it.tile }
 
-            if (tileToPut != null && BlockCodex[backingTile].hasAllTagOf("ROCK", "OREBEARING")) {
-                // actually put the ore block
-                world.setTileOre(x, y, tileToPut, 0) // autotiling will be handled by the other worldgen process
+                val tileToPut =
+                    noiseValues.zip(oreTiles).firstNotNullOfOrNull { (n, tile) -> if (n > 0.5) tile else null }
+                val backingTile = world.getTileFromTerrain(x, y)
+
+                if (tileToPut != null && BlockCodex[backingTile].hasAllTagOf("ROCK", "OREBEARING")) {
+                    // actually put the ore block
+                    world.setTileOre(x, y, tileToPut, 0) // autotiling will be handled by the other worldgen process
+                }
             }
         }
     }

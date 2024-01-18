@@ -9,6 +9,9 @@ import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
@@ -16,7 +19,7 @@ import kotlin.math.sin
 /**
  * Created by minjaesong on 2019-07-23.
  */
-class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, seed: Long, params: Any) : Gen(world, seed, params) {
+class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCache: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
 
     companion object {
         const val YHEIGHT_MAGIC = 2800.0 / 3.0
@@ -31,18 +34,7 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
         loadscreen.progress.set(0L)
 
         Worldgen.threadExecutor.renew()
-        (0 until world.width).sliceEvenly(Worldgen.genSlices).mapIndexed { i, xs ->
-            Worldgen.threadExecutor.submit {
-                val localJoise = getGenerator(seed, params as TerragenParams)
-                for (x in xs) {
-                    val sampleTheta = (x.toDouble() / world.width) * TWO_PI
-                    val sampleOffset = world.width / 8.0
-                    draw(x, localJoise, sampleTheta, sampleOffset)
-                }
-                loadscreen.progress.addAndGet((xs.last - xs.first + 1).toLong())
-            }
-        }
-
+        submitJob(loadscreen)
         Worldgen.threadExecutor.join()
 
         printdbg(this, "Waking up Worldgen")
@@ -64,36 +56,40 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
     private val terragenTiers = listOf(.0, .5, 1.0, 2.5).map { it * terragenYscaling } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
 
     //private fun draw(x: Int, y: Int, width: Int, height: Int, noiseValue: List<Double>, world: GameWorld) {
-    private fun draw(x: Int, noises: List<Joise>, st: Double, soff: Double) {
-        var dirtStoneTransition = 0
-        var stoneSlateTransition = 0
+    override fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double) {
+        for (x in xStart until xStart + CHUNK_W) {
+            val st = (x.toDouble() / world.width) * TWO_PI
 
-        for (y in 0 until world.height) {
-            val sx = sin(st) * soff + soff // plus sampleOffset to make only
-            val sz = cos(st) * soff + soff // positive points are to be sampled
-            val sy = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
-            // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
-            val noiseValue = noises.map { it.get(sx, sy, sz) }
+            var dirtStoneTransition = 0
+            var stoneSlateTransition = 0
 
-            val terr = noiseValue[0].tiered(terragenTiers)
+            for (y in yStart until yStart + CHUNK_H) {
+                val sx = sin(st) * soff + soff // plus sampleOffset to make only
+                val sz = cos(st) * soff + soff // positive points are to be sampled
+                val sy = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+                // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
+                val noiseValue = noises.map { it.get(sx, sy, sz) }
 
-            // mark off the position where the transition occurred
-            if (dirtStoneTransition == 0 && terr == 2)
-                dirtStoneTransition = y
-            if (stoneSlateTransition == 0 && terr == 3)
-                stoneSlateTransition = y
+                val terr = noiseValue[0].tiered(terragenTiers)
 
-            val isMarble = noiseValue[1] > 0.5
+                // mark off the position where the transition occurred
+                if (dirtStoneTransition == 0 && terr == 2)
+                    dirtStoneTransition = y
+                if (stoneSlateTransition == 0 && terr == 3)
+                    stoneSlateTransition = y
 
-            val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
-            val terrBlock = if (isMarble) Block.STONE_MARBLE else wallBlock
+                val isMarble = noiseValue[1] > 0.5
 
-            world.setTileTerrain(x, y, terrBlock, true)
-            world.setTileWall(x, y, wallBlock, true)
-        }
+                val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
+                val terrBlock = if (isMarble) Block.STONE_MARBLE else wallBlock
 
-        // dither shits
-        /*
+                world.setTileTerrain(x, y, terrBlock, true)
+                world.setTileWall(x, y, wallBlock, true)
+            }
+
+
+            // dither shits
+            /*
         #
         # - dirt-to-cobble transition, height = dirtStoneDitherSize
         #
@@ -102,46 +98,55 @@ class Terragen(world: GameWorld, val highlandLowlandSelectCache: ModuleCache, se
         %
         * - where the stone layer actually begins
          */
-        for (pos in 0 until dirtStoneDitherSize * 2) {
-            val y = pos + dirtStoneTransition - (dirtStoneDitherSize * 2) + 1
-            if (y >= world.height) break
-            val hash = XXHash32.hashGeoCoord(x, y).and(0x7FFFFFFF) / 2147483647.0
+            if (dirtStoneTransition > 0) {
+                for (pos in 0 until dirtStoneDitherSize * 2) {
+                    val y = pos + dirtStoneTransition - (dirtStoneDitherSize * 2) + 1
+                    if (y >= world.height) break
+                    val hash = XXHash32.hashGeoCoord(x, y).and(0x7FFFFFFF) / 2147483647.0
 //            val fore = world.getTileFromTerrain(x, y)
 //            val back = world.getTileFromWall(x, y)
-            val newTile = if (pos < dirtStoneDitherSize)
-                if (hash < pos.toDouble() / dirtStoneDitherSize) Block.STONE_QUARRIED else Block.DIRT
-            else // don't +1 to pos.toDouble(); I've suffered
-                if (hash >= (pos.toDouble() - dirtStoneDitherSize) / dirtStoneDitherSize) Block.STONE_QUARRIED else Block.STONE
+                    val newTile = if (pos < dirtStoneDitherSize)
+                        if (hash < pos.toDouble() / dirtStoneDitherSize) Block.STONE_QUARRIED else Block.DIRT
+                    else // don't +1 to pos.toDouble(); I've suffered
+                        if (hash >= (pos.toDouble() - dirtStoneDitherSize) / dirtStoneDitherSize) Block.STONE_QUARRIED else Block.STONE
 
 //            if (fore != Block.AIR)
-                world.setTileTerrain(x, y, newTile, true)
+                    if (y in yStart until yStart + CHUNK_H) {
+                        world.setTileTerrain(x, y, newTile, true)
+                        world.setTileWall(x, y, newTile, true)
+                    }
+                }
+            }
 
-            world.setTileWall(x, y, newTile, true)
-        }
-
-        /*
+            /*
         #
         # - stone-to-slate transition, height = stoneSlateDitherSize
         #
          */
-        for (pos in 0 until stoneSlateDitherSize) {
-            val y = pos + stoneSlateTransition - stoneSlateDitherSize + 1
-            if (y >= world.height) break
-            val hash = XXHash32.hashGeoCoord(x, y).and(0x7FFFFFFF) / 2147483647.0
+            if (stoneSlateTransition > 0) {
+                for (pos in 0 until stoneSlateDitherSize) {
+                    val y = pos + stoneSlateTransition - stoneSlateDitherSize + 1
+                    if (y >= world.height) break
+                    val hash = XXHash32.hashGeoCoord(x, y).and(0x7FFFFFFF) / 2147483647.0
 //            val fore = world.getTileFromTerrain(x, y)
 //            val back = world.getTileFromWall(x, y)
-            val newTile = if (hash < pos.toDouble() / stoneSlateDitherSize) Block.STONE_SLATE else Block.STONE
+                    val newTile = if (hash < pos.toDouble() / stoneSlateDitherSize) Block.STONE_SLATE else Block.STONE
 
+                    if (y in yStart until yStart + CHUNK_H) {
 //            if (fore != Block.AIR)
-                world.setTileTerrain(x, y, newTile, true)
-
-            world.setTileWall(x, y, newTile, true)
+                        world.setTileTerrain(x, y, newTile, true)
+                        world.setTileWall(x, y, newTile, true)
+                    }
+                }
+            }
         }
     }
 
     private val thicknesses = listOf(0.016, 0.021, 0.029, 0.036, 0.036, 0.029, 0.021, 0.016)
 
-    private fun getGenerator(seed: Long, params: TerragenParams): List<Joise> {
+    override fun getGenerator(seed: Long, params: Any?): List<Joise> {
+        val params = params as TerragenParams
+
         // this noise tree WILL generate noise value greater than 1.0
         // they should be treated properly when you actually generate the world out of the noisemap
         // for the visualisation, no treatment will be done in this demo app.

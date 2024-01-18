@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.jme3.math.Vector2f
+import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.random.XXHash64
 import net.torvald.terrarum.*
@@ -10,7 +11,9 @@ import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import kotlin.math.roundToLong
 
 /**
@@ -25,7 +28,6 @@ object Worldgen {
         private set
 
     val threadExecutor = TerrarumIngame.worldgenThreadExecutor
-    var genSlices = -1
 
     private val threadLock = java.lang.Object()
 
@@ -60,14 +62,14 @@ object Worldgen {
             }
         }
         return listOf(
-            Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")),
-            Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, caveAttenuateBiasScaledCache, params.seed, oreRegistry), listOf("ORES")),
-            Work(Lang["MENU_IO_WORLDGEN_POSITIONING_ROCKS"], OregenAutotiling(world, params.seed, oreTilingModes), listOf("ORES")),
+            Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, false, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")),
+            Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, false, caveAttenuateBiasScaledCache, params.seed, oreRegistry), listOf("ORES")),
+            Work(Lang["MENU_IO_WORLDGEN_POSITIONING_ROCKS"], OregenAutotiling(world, false, params.seed, oreTilingModes), listOf("ORES")),
             // TODO generate rock veins
             // TODO generate gemstones
-            Work(Lang["MENU_IO_WORLDGEN_CARVING_EARTH"], Cavegen(world, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
-            Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Biomegen(world, params.seed, params.biomegenParams, biomeMap), listOf("BIOME")),
-            Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Treegen(world, params.seed, params.terragenParams, params.treegenParams, biomeMap), listOf("TREES")),
+            Work(Lang["MENU_IO_WORLDGEN_CARVING_EARTH"], Cavegen(world, false, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
+            Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Biomegen(world, false, params.seed, params.biomegenParams, biomeMap), listOf("BIOME")),
+            Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Treegen(world, true, params.seed, params.terragenParams, params.treegenParams, biomeMap), listOf("TREES")),
         ).filter(tagFilter)
     }
 
@@ -75,8 +77,6 @@ object Worldgen {
         highlandLowlandSelectCache = getHighlandLowlandSelectCache(params.terragenParams, params.seed)
         caveAttenuateBiasScaledCache = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
         biomeMap = HashMap()
-
-        genSlices = world.width / 9
 
 
         val jobs = getJobs()
@@ -111,7 +111,7 @@ object Worldgen {
      * @return starting chunk Y index, ending chunk Y index (inclusive)
      */
     fun getChunkGenStrip(world: GameWorld): Pair<Int, Int> {
-        val start = (0.00342f * world.height - 3.22f).floorToInt()
+        val start = (0.00342f * world.height - 3.22f).floorToInt().coerceAtLeast(0)
         return start to start + 6
     }
 
@@ -340,8 +340,32 @@ object Worldgen {
 
 }
 
-abstract class Gen(val world: GameWorld, val seed: Long, val params: Any? = null) {
+abstract class Gen(val world: GameWorld, val isFinal: Boolean, val seed: Long, val params: Any? = null) {
+
     open fun getDone(loadscreen: LoadScreenBase) { } // trying to use different name so that it won't be confused with Runnable or Callable
+    protected abstract fun getGenerator(seed: Long, params: Any?): List<Joise>
+    protected abstract fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double)
+
+    protected open fun getChunksRange(): List<Int> {
+        val (yStart, yEnd) = Worldgen.getChunkGenStrip(world)
+        return (0 until world.width / CHUNK_W).flatMap { cx ->
+            (LandUtil.chunkXYtoChunkNum(world, cx, yStart)..LandUtil.chunkXYtoChunkNum(world, cx, yEnd)).toList()
+        }
+    }
+
+    open fun submitJob(loadscreen: LoadScreenBase) {
+        getChunksRange().forEach { chunkNum ->
+            val (chunkX, chunkY) = LandUtil.chunkNumToChunkXY(world, chunkNum)
+            Worldgen.threadExecutor.submit {
+                val localJoise = getGenerator(seed, params)
+                val sampleOffset = world.width / 8.0
+                draw(chunkX * LandUtil.CHUNK_W, chunkY * CHUNK_H, localJoise, sampleOffset)
+                loadscreen.progress.addAndGet(1L)
+
+                world.chunkFlags[chunkY][chunkX] = if (isFinal) GameWorld.CHUNK_LOADED else GameWorld.CHUNK_GENERATING
+            }
+        }
+    }
 }
 
 data class WorldgenParams(

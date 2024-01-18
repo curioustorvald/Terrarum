@@ -10,13 +10,15 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import kotlin.math.cos
 import kotlin.math.sin
 
 /**
  * Created by minjaesong on 2019-09-02.
  */
-class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashMap<BlockAddress, Byte>) : Gen(world, seed, params) {
+class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val biomeMapOut: HashMap<BlockAddress, Byte>) : Gen(world, isFinal, seed, params) {
 
     private val YHEIGHT_MAGIC = 2800.0 / 3.0
     private val YHEIGHT_DIVISOR = 2.0 / 7.0
@@ -46,28 +48,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
 //        loadscreen.progress.set((loadscreen.progress.get() + 0x1_000000_000000L) and 0x7FFF_000000_000000L)
 
         Worldgen.threadExecutor.renew()
-        (0 until world.width).sliceEvenly(Worldgen.genSlices).map { xs ->
-            Worldgen.threadExecutor.submit {
-                val localJoise = getGenerator(seed, params as BiomegenParams)
-                for (x in xs) {
-                    for (y in 0 until world.height) {
-                        val sampleTheta = (x.toDouble() / world.width) * TWO_PI
-                        val sampleOffset = world.width / 8.0
-                        val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-                        val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                        val sampleY = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
-                        // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
-                        val noise = localJoise.map { it.get(sampleX, sampleY, sampleZ) }
-
-                        draw(x, y, noise, world)
-                    }
-                }
-
-
-                loadscreen.progress.addAndGet((xs.last - xs.first + 1).toLong())
-            }
-        }
-
+        submitJob(loadscreen)
         Worldgen.threadExecutor.join()
 
         App.printdbg(this, "Waking up Worldgen")
@@ -112,43 +93,53 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
 
     }
 
-    private fun draw(x: Int, y: Int, noiseValue: List<Double>, world: GameWorld) {
-        val control1 = noiseValue[0].coerceIn(0.0, 0.99999).times(slices).toInt().coerceAtMost(slices - 1)
-        val control2 = noiseValue[1].coerceIn(0.0, 0.99999).times(9).toInt().coerceAtMost(9 - 1)
-        val control3 = noiseValue[2].coerceIn(0.0, 0.99999).times(9).toInt().coerceAtMost(9 - 1)
-        val ba = LandUtil.getBlockAddr(world, x, y)
+    override fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double) {
+        for (x in xStart until xStart + CHUNK_W) {
+            val sampleTheta = (x.toDouble() / world.width) * TWO_PI
+            val sx = sin(sampleTheta) * soff + soff // plus sampleOffset to make only
+            val sz = cos(sampleTheta) * soff + soff // positive points are to be sampled
+            for (y in yStart until yStart + CHUNK_H) {
+                val sy = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
 
-        if (y > 0) {
-            val tileThis = world.getTileFromTerrain(x, y)
-            val wallThis = world.getTileFromWall(x, y)
-            val nearbyTerr = nearbyArr.map { world.getTileFromTerrain(x + it.first, y + it.second) }
-            val nearbyWall = nearbyArr.map { world.getTileFromWall(x + it.first, y + it.second) }
-            val exposedToAir = nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }
-            val hasNoFloor = (nearbyTerr[BT] == Block.AIR)
+                val control1 =
+                    noises[0].get(sx, sy, sz).coerceIn(0.0, 0.99999).times(slices).toInt().coerceAtMost(slices - 1)
+                val control2 = noises[1].get(sx, sy, sz).coerceIn(0.0, 0.99999).times(9).toInt().coerceAtMost(9 - 1)
+                val control3 = noises[2].get(sx, sy, sz).coerceIn(0.0, 0.99999).times(9).toInt().coerceAtMost(9 - 1)
+                val ba = LandUtil.getBlockAddr(world, x, y)
 
-            val grassRock = when (control1) {
-                0 -> { // woodlands
-                    if (tileThis == Block.DIRT && exposedToAir) {
-                        biomeMapOut[ba] = BIOME_KEY_WOODLANDS
-                        Block.GRASS to null
-                    }
-                    else null to null
-                }
-                1 -> { // sparse forest
-                    if (tileThis == Block.DIRT && exposedToAir) {
-                        biomeMapOut[ba] = BIOME_KEY_SPARSE_WOODS
-                        Block.GRASS to null
-                    }
-                    else null to null
-                }
-                2, 3 -> { // plains
-                    if (tileThis == Block.DIRT && exposedToAir) {
-                        biomeMapOut[ba] = BIOME_KEY_PLAINS
-                        Block.GRASS to null
-                    }
-                    else null to null
-                }
-                /*3 -> { // sands
+                if (y > 0) {
+                    val tileThis = world.getTileFromTerrain(x, y)
+                    val wallThis = world.getTileFromWall(x, y)
+                    val nearbyTerr = nearbyArr.map { world.getTileFromTerrain(x + it.first, y + it.second) }
+                    val nearbyWall = nearbyArr.map { world.getTileFromWall(x + it.first, y + it.second) }
+                    val exposedToAir = nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }
+                    val hasNoFloor = (nearbyTerr[BT] == Block.AIR)
+
+                    val grassRock = when (control1) {
+                        0 -> { // woodlands
+                            if (tileThis == Block.DIRT && exposedToAir) {
+                                biomeMapOut[ba] = BIOME_KEY_WOODLANDS
+                                Block.GRASS to null
+                            }
+                            else null to null
+                        }
+
+                        1 -> { // sparse forest
+                            if (tileThis == Block.DIRT && exposedToAir) {
+                                biomeMapOut[ba] = BIOME_KEY_SPARSE_WOODS
+                                Block.GRASS to null
+                            }
+                            else null to null
+                        }
+
+                        2, 3 -> { // plains
+                            if (tileThis == Block.DIRT && exposedToAir) {
+                                biomeMapOut[ba] = BIOME_KEY_PLAINS
+                                Block.GRASS to null
+                            }
+                            else null to null
+                        }
+                        /*3 -> { // sands
                     if (tileThis == Block.DIRT && (nearbyTerr[BT] == Block.STONE || nearbyTerr[BT] == Block.AIR)) {
                         world.setTileTerrain(x, y, Block.SANDSTONE, true)
                     }
@@ -156,67 +147,75 @@ class Biomegen(world: GameWorld, seed: Long, params: Any, val biomeMapOut: HashM
                         world.setTileTerrain(x, y, Block.SAND, true)
                     }
                 }*/
-                4 -> { // rockylands
-                    if (tileThis == Block.DIRT || tileThis == Block.STONE_QUARRIED) {
-                        if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_ROCKY
-                        Block.STONE to Block.STONE
-                    }
-                    else null to null
-                }
-                else -> null to null
-            }
-            val sablum = when (control2) {
-                0 -> {
-                    if (tileThis == Block.DIRT && hasNoFloor) {
-                        if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_GRAVELS
-                        Block.STONE_QUARRIED to null
-                    }
-                    else if (tileThis == Block.DIRT) {
-                        if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_GRAVELS
-                        Block.GRAVEL to null
-                    }
-                    else null to null
-                }
-                8 -> {
-                    if (tileThis == Block.DIRT && hasNoFloor) {
-                        if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_SANDY
-                        THISWORLD_SANDSTONE to null
-                    }
-                    else if (tileThis == Block.DIRT) {
-                        if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_SANDY
-                        THISWORLD_SAND to null
-                    }
-                    else null to null
-                }
-                else -> null to null
-            }
-            val lutum = when (control3) {
-                0 -> {
-                    if (tileThis == Block.DIRT || wallThis == Block.DIRT) {
-                        Block.CLAY to Block.CLAY
-                    }
-                    else null to null
-                }
-                else -> null to null
-            }
+                        4 -> { // rockylands
+                            if (tileThis == Block.DIRT || tileThis == Block.STONE_QUARRIED) {
+                                if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_ROCKY
+                                Block.STONE to Block.STONE
+                            }
+                            else null to null
+                        }
 
-            val outTile = if (grassRock.first == Block.STONE)
-                grassRock
-            else if (sablum.first != null)
-                sablum
-            else if (lutum.first != null)
-                lutum
-            else grassRock
+                        else -> null to null
+                    }
+                    val sablum = when (control2) {
+                        0 -> {
+                            if (tileThis == Block.DIRT && hasNoFloor) {
+                                if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_GRAVELS
+                                Block.STONE_QUARRIED to null
+                            }
+                            else if (tileThis == Block.DIRT) {
+                                if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_GRAVELS
+                                Block.GRAVEL to null
+                            }
+                            else null to null
+                        }
+
+                        8 -> {
+                            if (tileThis == Block.DIRT && hasNoFloor) {
+                                if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_SANDY
+                                THISWORLD_SANDSTONE to null
+                            }
+                            else if (tileThis == Block.DIRT) {
+                                if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_SANDY
+                                THISWORLD_SAND to null
+                            }
+                            else null to null
+                        }
+
+                        else -> null to null
+                    }
+                    val lutum = when (control3) {
+                        0 -> {
+                            if (tileThis == Block.DIRT || wallThis == Block.DIRT) {
+                                Block.CLAY to Block.CLAY
+                            }
+                            else null to null
+                        }
+
+                        else -> null to null
+                    }
+
+                    val outTile = if (grassRock.first == Block.STONE)
+                        grassRock
+                    else if (sablum.first != null)
+                        sablum
+                    else if (lutum.first != null)
+                        lutum
+                    else grassRock
 
 
-            if (outTile.first != null && tileThis != Block.AIR)
-                world.setTileTerrain(x, y, outTile.first!!, true)
-            if (outTile.second != null)
-                world.setTileWall(x, y, outTile.second!!, true)
+                    if (outTile.first != null && tileThis != Block.AIR)
+                        world.setTileTerrain(x, y, outTile.first!!, true)
+                    if (outTile.second != null)
+                        world.setTileWall(x, y, outTile.second!!, true)
+                }
+            }
         }
     }
 
-    private fun getGenerator(seed: Long, params: BiomegenParams): List<Joise> {
+    override fun getGenerator(seed: Long, params: Any?): List<Joise> {
+        val params = params as BiomegenParams
+
         return listOf(
             makeRandomSpotties("TERRA", params.featureSize1),
             makeRandomSpotties("SABLUM", params.featureSize2),

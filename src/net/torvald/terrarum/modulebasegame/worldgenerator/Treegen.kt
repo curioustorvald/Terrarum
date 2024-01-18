@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
+import com.sudoplay.joise.Joise
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
@@ -14,29 +15,37 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIO
 import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.BIOME_KEY_WOODLANDS
 import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_DIVISOR
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import net.torvald.terrarum.serialise.toUint
 import kotlin.math.absoluteValue
 
 /**
  * Created by minjaesong on 2023-11-10.
  */
-class Treegen(world: GameWorld, seed: Long, val terragenParams: TerragenParams, params: TreegenParams, val biomeMap: HashMap<BlockAddress, Byte>) : Gen(world, seed, params) {
+class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams: TerragenParams, params: TreegenParams, val biomeMap: HashMap<BlockAddress, Byte>) : Gen(world, isFinal, seed, params) {
 
     override fun getDone(loadscreen: LoadScreenBase) {
         loadscreen.stageValue += 1
         loadscreen.progress.set(0L)
 
         Worldgen.threadExecutor.renew()
-        (0 until world.width).sliceEvenly(Worldgen.genSlices).rearrange().mapIndexed { i, xs ->
-            Worldgen.threadExecutor.submit {
-                tryToPlant(xs, makeGrassMap(xs), HQRNG(seed shake xs.last.toLong()))
-                loadscreen.progress.addAndGet((xs.last - xs.first + 1).toLong())
-            }
-        }
-
+        submitJob(loadscreen)
         Worldgen.threadExecutor.join()
 
         App.printdbg(this, "Waking up Worldgen")
+    }
+
+
+    override fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double) {
+        for (i in 0 until 10) {
+            val xs = (xStart + 9*i) until (xStart + 9*i) + 9
+            tryToPlant(xs, makeGrassMap(xs), HQRNG(seed shake xs.last.toLong()))
+        }
+    }
+
+    override fun getGenerator(seed: Long, params: Any?): List<Joise> {
+        return emptyList()
     }
 
     private fun makeGrassMap(xs: IntProgression): Array<List<Int>> {
