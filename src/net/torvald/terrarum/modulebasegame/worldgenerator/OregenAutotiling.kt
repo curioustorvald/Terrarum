@@ -24,7 +24,7 @@ class OregenAutotiling(world: GameWorld, isFinal: Boolean, seed: Long, val tilin
 
     override fun getDone(loadscreen: LoadScreenBase?) {
         Worldgen.threadExecutor.renew()
-        submitJob(loadscreen)
+        submitJob(null)
         Worldgen.threadExecutor.join()
     }
 

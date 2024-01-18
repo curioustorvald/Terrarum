@@ -134,7 +134,7 @@ object Worldgen {
         val eqPow = 0.396 // use google sheet to get trend line equation
 
         val f = eqMult * (width.toDouble() * height).pow(eqPow)
-        return (1.2 * (testMachineBogoFlops.toDouble() / bogoflops) * f * (testMachineThreads.toDouble() / THREAD_COUNT)).roundToLong()
+        return (1.3 * (testMachineBogoFlops.toDouble() / bogoflops) * f * (testMachineThreads.toDouble() / THREAD_COUNT)).roundToLong()
     }
 
     /**
