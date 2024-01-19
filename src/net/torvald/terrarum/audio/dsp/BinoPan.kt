@@ -112,11 +112,13 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
         thru("L", -50f, inbuf[L], outLs, delayLineL) // 50 will become 59.036 on panningFieldMap
         thru("R", +50f, inbuf[R], outRs, delayLineR)
 
+        val vol = if (App.getConfigString("audio_speaker_setup") == "headphone") decibelsToFullscale(-1.2).toFloat() else 1f
+
         for (i in 0 until App.audioBufferSize) {
             val outL = (outLs[L][i] + outRs[L][i]) / 2f
             val outR = (outLs[R][i] + outRs[R][i]) / 2f
-            outbuf[L][i] = outL
-            outbuf[R][i] = outR
+            outbuf[L][i] = outL * vol
+            outbuf[R][i] = outR * vol
         }
 
         push(inbuf[L], delayLineL)

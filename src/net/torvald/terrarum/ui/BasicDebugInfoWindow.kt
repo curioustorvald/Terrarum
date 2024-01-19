@@ -455,7 +455,7 @@ class BasicDebugInfoWindow : UICanvas() {
         fun getSmoothingFactor(sampleCount: Int) = (1.0 - (256.0 / sampleCount))
         val PEAK_SMOOTHING_FACTOR = getSmoothingFactor(640)
         val FFT_SMOOTHING_FACTOR = getSmoothingFactor(2048)
-        val LAMP_SMOOTHING_FACTOR = getSmoothingFactor(3200)
+        val LAMP_SMOOTHING_FACTOR = getSmoothingFactor(640)
         val RMS_SMOOTHING_FACTOR = getSmoothingFactor(12000)
     }
 
@@ -526,12 +526,12 @@ class BasicDebugInfoWindow : UICanvas() {
         Toolkit.fillArea(batch, x + miniW / 2f, y.toFloat(), panw, 2f)
 
         // voltage lamp
+        batch.color = COL_METER_TROUGH
+        Toolkit.fillArea(batch, x, y + 2, miniW, 8)
         for (ch in 0..1) {
             val fs =
                 FastMath.interpolateLinear(LAMP_SMOOTHING_FACTOR, track.processor.maxSigLevel[ch], oldPeakDS[index][ch])
-            batch.color = COL_METER_TROUGH
             val intensity = fullscaleToDecibels(fs.coerceAtMost(1.0)).plus(dbLow).div(dbLow).coerceIn(0.0, 1.0).toFloat()
-            Toolkit.fillArea(batch, x, y + 2, miniW, 8)
             batch.color = if (fs > 1.0) LAMP_OVERRANGE else Color(0.1f, intensity, 0.1f, 1f)
             Toolkit.fillArea(batch, x + 2 + 13*ch, y + 4, 11, 4)
 
