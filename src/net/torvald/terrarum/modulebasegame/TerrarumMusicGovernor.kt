@@ -268,14 +268,13 @@ class TerrarumMusicGovernor : MusicGovernor() {
         musicBin = ArrayList(newMusicBin.toList())
     }
 
-    private val ambients: List<MusicContainer> =
-        ModMgr.getFilesFromEveryMod("audio/ambient/").flatMap { it.second.listFiles()?.toList() ?: emptyList() }.mapNotNull {
-            printdbg(this, "Ambient: ${it.absolutePath}")
+    private val ambients: HashMap<String, HashSet<MusicContainer>> =
+        HashMap(Terrarum.audioCodex.audio.filter { it.key.startsWith("ambient.") }.map { it.key to it.value.mapNotNull { fileHandle ->
             try {
                 MusicContainer(
-                    it.nameWithoutExtension.replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
-                    it,
-                    Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath)).also {
+                    fileHandle.nameWithoutExtension().replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
+                    fileHandle.file(),
+                    Gdx.audio.newMusic(fileHandle).also {
                         it.isLooping = true
                     }
                 ) { stopAmbient() }
@@ -284,7 +283,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
                 e.printStackTrace()
                 null
             }
-        }
+        }.toHashSet() }.toMap())
 
     private val musicStartHooks = ArrayList<(MusicContainer) -> Unit>()
     private val musicStopHooks = ArrayList<(MusicContainer) -> Unit>()
@@ -306,8 +305,12 @@ class TerrarumMusicGovernor : MusicGovernor() {
         songs.forEach {
             App.disposables.add(it.gdxMusic)
         }
-        ambients.forEach {
-            App.disposables.add(it.gdxMusic)
+        ambients.forEach { (k, v) ->
+            printdbg(this, "Ambients: $k -> $v")
+
+            v.forEach {
+                App.disposables.add(it.gdxMusic)
+            }
         }
     }
 
@@ -368,7 +371,8 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     private fun stopAmbient() {
-        App.audioMixer.ambientTrack.nextTrack = currentAmbientTrack
+        if (::currentAmbientTrack.isInitialized)
+            App.audioMixer.ambientTrack.nextTrack = currentAmbientTrack
     }
 
     private fun startAmbient(song: MusicContainer) {
@@ -419,8 +423,8 @@ class TerrarumMusicGovernor : MusicGovernor() {
                         in 3f..5f -> "autumn"
                         else -> "winter"
                     }
-                    val track = ambients.filter { it.name.lowercase().startsWith(seasonName) }.random()
 
+                    val track = ambients["ambient.season.$seasonName"]!!.random()
                     startAmbient(track)
                 }
             }

@@ -27,7 +27,6 @@ import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.csv.CSVFormat
@@ -764,19 +763,18 @@ object ModMgr {
 
         private fun loadAudio(basename: String, file: FileHandle) {
             if (file.isDirectory)
-                file.list().forEach { loadAudio("$basename.${it.nameWithoutExtension()}", it) }
+                file.list().forEach { loadAudio("$basename.${it.name()}", it) }
             else {
-                val id = basename
-                val materialID = file.nameWithoutExtension().substringBefore('_')
-                Terrarum.audioCodex.addToFootstepPool(materialID, file)
-                printdbg(this, "Registering music $id")
+                val id = basename.substringBeforeLast('.').substringBeforeLast('.')
+                Terrarum.audioCodex.addToAudioPool(id, file)
+                printdbg(this, "Registering audio $id ($file)")
             }
         }
 
         @JvmStatic operator fun invoke(module: String) {
             audioPath.forEach {
                 if (getGdxFile(module, it).let { it.exists() && it.isDirectory }) {
-                    getGdxFiles(module, it).forEach { file -> loadAudio("audio.${file.name()}", file) }
+                    getGdxFiles(module, it).forEach { file -> loadAudio("${it.substringAfter("audio/")}.${file.name()}", file) }
                 }
             }
         }

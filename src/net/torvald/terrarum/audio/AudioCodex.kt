@@ -5,24 +5,32 @@ import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.tryDispose
 
-typealias MaterialID = String
-
 /**
  * Created by minjaesong on 2023-12-02.
  */
 class AudioCodex {
 
-    @Transient val footsteps = HashMap<MaterialID, HashSet<FileHandle>>()
+    @Transient val audio = HashMap<String, HashSet<FileHandle>>()
 
     internal constructor()
 
-    fun addToFootstepPool(materialID: MaterialID, music: FileHandle) {
-        if (footsteps[materialID] == null) footsteps[materialID] = HashSet()
-        footsteps[materialID]!!.add(music)
+    /**
+     * The audio will be collected as one of many elements in the collection named `identifier`
+     *
+     * @param identifier identifier of the music, WITHOUT a serial number
+     */
+    fun addToAudioPool(identifier: String, music: FileHandle) {
+        if (audio[identifier] == null) audio[identifier] = HashSet()
+        audio[identifier]!!.add(music)
     }
 
-    fun getRandomFootstep(materialID: MaterialID): MusicContainer? {
-        val file = footsteps[materialID]?.random()
+    fun getRandomFootstep(materialID: String) = getRandomAudio("effects.steps.$materialID")
+
+    /**
+     * @param identifier
+     */
+    fun getRandomAudio(identifier: String): MusicContainer? {
+        val file = audio[identifier]?.random()
         return if (file != null) {
             MusicContainer(file.nameWithoutExtension(), file.file(), Gdx.audio.newMusic(file)) {
                 it.tryDispose()
