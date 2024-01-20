@@ -53,7 +53,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
     private val normalTex = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/normal.png")))
     private val smallTex = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/small.png")))
 
-    private val tex = arrayOf(/*smallTex, */normalTex, largeTex, hugeTex)
+    private val tex = arrayOf(smallTex, normalTex, largeTex, hugeTex)
 
     override var width = 480
     override var height = 480
@@ -72,18 +72,9 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     private val sizeSelector = UIItemInlineRadioButtons(this,
             drawX + radioX, drawY + sizeSelY, radioCellWidth,
-            if (App.IS_DEVELOPMENT_BUILD)
                 listOf(
                         { Lang["CONTEXT_DESCRIPTION_TINY"] },
-//                        { Lang["CONTEXT_DESCRIPTION_TINY"] }, // only available for World Portal
-                        { Lang["CONTEXT_DESCRIPTION_SMALL"] }, // ;p
-                        { Lang["CONTEXT_DESCRIPTION_BIG"] },
-                        { Lang["CONTEXT_DESCRIPTION_HUGE"] }
-                )
-            else
-                listOf(
-//                        { Lang["CONTEXT_DESCRIPTION_TINY"] }, // only available for World Portal
-                        { Lang["CONTEXT_DESCRIPTION_SMALL"] }, // ;p
+                        { Lang["CONTEXT_DESCRIPTION_SMALL"] },
                         { Lang["CONTEXT_DESCRIPTION_BIG"] },
                         { Lang["CONTEXT_DESCRIPTION_HUGE"] }
                 )
