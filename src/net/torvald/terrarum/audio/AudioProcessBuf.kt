@@ -113,8 +113,8 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
 
     private val finL = FloatArray(fetchSize + 2 * PADSIZE)
     private val finR = FloatArray(fetchSize + 2 * PADSIZE)
-    private val fmidL = FloatArray((fetchSize / q + 1.0).toInt())
-    private val fmidR = FloatArray((fetchSize / q + 1.0).toInt())
+    private val fmidL = FloatArray((fetchSize / q + 1.0).toInt() * 2)
+    private val fmidR = FloatArray((fetchSize / q + 1.0).toInt() * 2)
     private val foutL = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
     private val foutR = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
     private val readBuf = ByteArray(fetchSize * 4)

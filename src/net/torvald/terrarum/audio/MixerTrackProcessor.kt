@@ -2,16 +2,16 @@ package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
+import net.torvald.terrarum.audio.AudioMixer.Companion.SPEED_OF_SOUND_AIR
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.audio.dsp.BinoPan
 import net.torvald.terrarum.audio.dsp.Lowpass
 import net.torvald.terrarum.audio.dsp.NullFilter
-import net.torvald.terrarum.distBetweenActors
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.relativeXposition
-import net.torvald.terrarum.sqr
+import net.torvald.terrarum.gameactors.ActorWithBody.Companion.GAME_TO_SI_VELO
+import org.dyn4j.geometry.Vector2
 import kotlin.math.*
 
 /**
@@ -136,7 +136,19 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                             (SAMPLING_RATED*0.5) / (24.0 * (distFromActor / distFalloff).sqr() + 1.0)
                         )
 
-//                        printdbg("dist=$distFromActor\tvol=${fullscaleToDecibels(vol)}\tcutoff=${(track.filters[1] as Lowpass).cutoff}")
+                        val sourceVec = (track.trackingTarget as ActorWithBody).let { it.externalV + (it.controllerV ?: Vector2()) }
+                        val listenerVec = App.audioMixer.actorNowPlaying!!.let { it.externalV + (it.controllerV ?: Vector2()) }
+                        val distFromActorNext = distBetweenPoints(
+                            App.audioMixer.actorNowPlaying!!.centrePosVector + listenerVec,
+                            (track.trackingTarget as ActorWithBody).centrePosVector + sourceVec
+                        )
+                        val isApproaching = if (distFromActorNext <= distFromActor) 1.0 else -1.0
+                        val relativeSpeed = (sourceVec - listenerVec).magnitude * GAME_TO_SI_VELO * isApproaching
+                        val dopplerFactor = (SPEED_OF_SOUND_AIR + relativeSpeed) / SPEED_OF_SOUND_AIR // >1: speedup, <1: speeddown
+
+                        track.processor.streamBuf?.playbackSpeed = dopplerFactor.toFloat()
+
+//                        printdbg("dist=$distFromActor\tvol=${fullscaleToDecibels(vol)}\tcutoff=${(track.filters[1] as Lowpass).cutoff}\tdopplerFactor=$dopplerFactor")
                     }
                 }
                 else {

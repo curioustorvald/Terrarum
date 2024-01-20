@@ -2124,14 +2124,19 @@ open class ActorWithBody : Actor {
          */
         @Transient const val SI_TO_GAME_ACC = METER / (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME)
         /**
-         * [m / s] * SI_TO_GAME_VEL -> [px / InternalFrame]
+         * [m / s] * SI_TO_GAME_VEL0 -> [px / InternalFrame]
          */
-        @Transient const val SI_TO_GAME_VEL = METER / Terrarum.PHYS_TIME_FRAME
+        @Transient const val SI_TO_GAME_VELO = METER / Terrarum.PHYS_TIME_FRAME
 
         /**
          * [px / InternalFrame^2] * GAME_TO_SI_ACC -> [m / s^2]
          */
         @Transient const val GAME_TO_SI_ACC = (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME) / METER
+
+        /**
+         * [px / InternalFrame] * GAME_TO_SI_VELO -> [m / s]
+         */
+        @Transient const val GAME_TO_SI_VELO = Terrarum.PHYS_TIME_FRAME / METER
 
         @Transient const val PHYS_EPSILON_DIST = 1.0 / 4096.0
         @Transient const val PHYS_EPSILON_VELO = 1.0 / 65536.0

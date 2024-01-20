@@ -25,6 +25,7 @@ import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.ActorWithBody.Companion.METER
 import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.CraftingCodex
@@ -91,7 +92,7 @@ object Terrarum : Disposable {
     /**
      * To be used with physics simulator. This is a magic number.
      */
-    const val PHYS_TIME_FRAME: Double = 26.0 + (2.0 / 3.0)
+    const val PHYS_TIME_FRAME: Double = METER
     // 26.0 + (2.0 / 3.0) // lower value == faster gravity response (IT WON'T HOTSWAP!!)
     // protip: using METER, game unit and SI unit will have same number
 
@@ -973,11 +974,15 @@ inline fun Disposable.tryDispose() {
 }
 
 fun distBetweenActors(a: ActorWithBody, b: ActorWithBody): Double {
+    return distBetweenPoints(a.centrePosVector, b.centrePosVector)
+}
+
+fun distBetweenPoints(a: Vector2, b: Vector2): Double {
     val ww = INGAME.world.width * TILE_SIZED
-    val apos1 = a.centrePosVector
+    val apos1 = a
     val apos2 = Vector2(apos1.x + ww, apos1.y)
     val apos3 = Vector2(apos1.x - ww, apos1.y)
-    val bpos = b.centrePosVector
+    val bpos = b
     val dist = min(min(bpos.distanceSquared(apos1), bpos.distanceSquared(apos2)), bpos.distanceSquared(apos3))
     return dist.sqrt()
 }
