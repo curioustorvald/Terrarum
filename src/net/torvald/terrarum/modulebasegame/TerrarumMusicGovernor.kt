@@ -269,22 +269,22 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     private val ambients: List<MusicContainer> =
-        File(App.customAmbientDir).listFiles()?.mapNotNull {
+        ModMgr.getFilesFromEveryMod("audio/ambient/").flatMap { it.second.listFiles()?.toList() ?: emptyList() }.mapNotNull {
             printdbg(this, "Ambient: ${it.absolutePath}")
             try {
                 MusicContainer(
                     it.nameWithoutExtension.replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
                     it,
-                    Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath))
+                    Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath)).also {
+                        it.isLooping = true
+                    }
                 ) { stopAmbient() }
             }
             catch (e: GdxRuntimeException) {
                 e.printStackTrace()
                 null
             }
-        } ?: emptyList() // TODO test code
-
-    private var ambientsBin: ArrayList<Int> = ArrayList(ambients.indices.toList().shuffled())
+        }
 
     private val musicStartHooks = ArrayList<(MusicContainer) -> Unit>()
     private val musicStopHooks = ArrayList<(MusicContainer) -> Unit>()
@@ -367,30 +367,19 @@ class TerrarumMusicGovernor : MusicGovernor() {
         }
     }
 
-    // MixerTrackProcessor will call this function externally to make gapless playback work
-    fun pullNextAmbientTrack(): MusicContainer {
-        // prevent same song to play twice in row (for the most time)
-        if (ambientsBin.isEmpty()) {
-            ambientsBin = ArrayList(ambients.indices.toList().shuffled())
-        }
-        return ambients[ambientsBin.removeAt(0)]
-    }
-
     private fun stopAmbient() {
-        ambState = STATE_INTERMISSION
-        intermissionAkku = 0f
-        intermissionLength = 30f + 30f * Math.random().toFloat() // 30s-60s
-        ambFired = false
-        printdbg(this, "stopAmbient Intermission: $intermissionLength seconds")
+        App.audioMixer.ambientTrack.nextTrack = currentAmbientTrack
     }
 
     private fun startAmbient(song: MusicContainer) {
+        currentAmbientTrack = song
         App.audioMixer.startAmb(song)
         printdbg(this, "startAmbient Now playing: $song")
 //        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
         ambState = STATE_PLAYING
     }
 
+    private lateinit var currentAmbientTrack: MusicContainer
 
     override fun update(ingame: IngameInstance, delta: Float) {
         // start the song queueing if there is one to play
@@ -422,7 +411,17 @@ class TerrarumMusicGovernor : MusicGovernor() {
             STATE_FIREPLAY -> {
                 if (!ambFired) {
                     ambFired = true
-                    startAmbient(pullNextAmbientTrack())
+
+                    val season = ingame.world.worldTime.ecologicalSeason
+                    val seasonName = when (season) {
+                        in 0f..2f -> "autumn"
+                        in 2f..3f -> "summer"
+                        in 3f..5f -> "autumn"
+                        else -> "winter"
+                    }
+                    val track = ambients.filter { it.name.lowercase().startsWith(seasonName) }.random()
+
+                    startAmbient(track)
                 }
             }
             STATE_PLAYING -> {

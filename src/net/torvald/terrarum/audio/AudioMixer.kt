@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
 import net.torvald.terrarum.audio.dsp.*
@@ -205,8 +206,9 @@ class AudioMixer(val bufferSize: Int): Disposable {
 
         musicTrack.filters[1] = Vecto()
         musicTrack.filters[2] = Spectro()
-        ambientTrack.filters[1] = Vecto()
+        ambientTrack.filters[1] = Vecto(decibelsToFullscale(24.0).toFloat())
         ambientTrack.filters[2] = Spectro()
+        ambientTrack.filters[3] = Gain(1f)
         sfxSumBus.filters[1] = Vecto(0.7071f)
         sfxSumBus.filters[2] = Spectro()
 
@@ -232,7 +234,6 @@ class AudioMixer(val bufferSize: Int): Disposable {
         masterTrack.addSidechainInput(fadeBus, 1.0)
         masterTrack.addSidechainInput(guiTrack, 1.0)
 
-        musicTrack.filters[3] = Gain(0.5f)
 
         dynamicTracks.forEach {
             it.filters[0] = BinoPan(0f)
@@ -333,8 +334,8 @@ class AudioMixer(val bufferSize: Int): Disposable {
         // the real updates
         (Gdx.audio as? Lwjgl3Audio)?.update()
         masterTrack.volume = masterVolume
-        musicTrack.getFilter<Gain>().gain = musicVolume.toFloat()
-        ambientTrack.getFilter<Gain>().gain = ambientVolume.toFloat()
+        musicTrack.getFilter<Gain>().gain = musicVolume.toFloat() * 0.5f
+        ambientTrack.getFilter<Gain>().gain = ambientVolume.toFloat() * 2
         sfxSumBus.getFilter<Gain>().gain = sfxVolume.toFloat()
         guiTrack.getFilter<Gain>().gain = guiVolume.toFloat()
 
@@ -409,11 +410,16 @@ class AudioMixer(val bufferSize: Int): Disposable {
 
         if (!ambientTrack.isPlaying && ambientTrack.nextTrack != null) {
             ambientTrack.queueNext(null)
-            requestFadeIn(ambientTrack, DEFAULT_FADEOUT_LEN * 4, 1.0, 0.00001)
+            if (ambientStopped) {
+                requestFadeIn(ambientTrack, DEFAULT_FADEOUT_LEN * 4, 1.0, 0.00001)
+            }
             ambientTrack.volume = 1.0
             ambientTrack.play()
+            ambientStopped = false
         }
     }
+
+    private var ambientStopped = true
 
     fun startMusic(song: MusicContainer) {
         if (musicTrack.isPlaying) {
@@ -451,6 +457,9 @@ class AudioMixer(val bufferSize: Int): Disposable {
     }
 
     fun requestFadeIn(track: TerrarumAudioMixerTrack, length: Double, target: Double = 1.0, source: Double? = null, jobAfterFadeout: () -> Unit = {}) {
+        printdbg(this, "fadein called by")
+        printStackTrace(this)
+
         val req = fadeReqs[track]!!
         if (!req.fadeinFired) {
             req.fadeLength = length.coerceAtLeast(1.0/1024.0)
@@ -484,6 +493,7 @@ class AudioMixer(val bufferSize: Int): Disposable {
     }
 
     fun reset() {
+        ambientStopped = true
         dynamicTracks.forEach { it.stop() }
         tracks.filter { it.trackType == TrackType.STATIC_SOURCE }.forEach { it.stop() }
         tracks.forEach {

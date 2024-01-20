@@ -266,6 +266,11 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         App.bogoflops = maxOf(App.bogoflops, bogoflops)
 
 
+        App.audioMixer.ambientTrack.let {
+            it.stop()
+            it.currentTrack = null
+            it.nextTrack = null
+        }
         App.audioMixer.reset()
 
     }

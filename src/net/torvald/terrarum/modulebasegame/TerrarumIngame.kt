@@ -12,6 +12,7 @@ import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
 import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.audio.dsp.Gain
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.blockstats.TileSurvey
@@ -310,6 +311,16 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 val wallProp = BlockCodex[world.getTileFromWall(x, y)]
                 val prop = if (tileProp.isSolid && !tileProp.isActorBlock) tileProp else wallProp
                 MaterialCodex[prop.material].sondrefl
+            }
+        )
+
+        TileSurvey.submitProposal(
+            TileSurvey.SurveyProposal(
+                "basegame.Ingame.openness", 73, 73, 2, 4
+            ) { world, x, y ->
+                val tileProp = BlockCodex[world.getTileFromTerrain(x, y)]
+                val wallProp = BlockCodex[world.getTileFromWall(x, y)]
+                (!tileProp.isSolid && !wallProp.isSolid).toInt().toFloat()
             }
         )
     }
@@ -904,6 +915,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 App.audioMixer.convolveBusOpen.volume = (1.0 - ratio1).pow(0.75)
                 App.audioMixer.convolveBusCave.volume = 0.0
             }
+            val openness = (TileSurvey.getRatio("basegame.Ingame.openness") ?: 0.0).times(1.74).coerceIn(0.0, 1.0)
+            (App.audioMixer.ambientTrack.filters[3] as Gain).gain = openness.pow(2.0 / 3.0).toFloat()
+
+
 
             actorNowPlaying?.let { if (WORLD_UPDATE_TIMER % 4 == 1) updateWorldGenerator(actorNowPlaying!!) }
 
