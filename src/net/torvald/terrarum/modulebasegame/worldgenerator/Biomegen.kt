@@ -23,17 +23,10 @@ class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val 
     private val YHEIGHT_DIVISOR = 2.0 / 7.0
 
 
-    private lateinit var THISWORLD_SAND: ItemID
-    private lateinit var THISWORLD_SANDSTONE: ItemID
+    private val THISWORLD_SAND: ItemID
+    private val THISWORLD_SANDSTONE: ItemID
 
-
-    override fun getDone(loadscreen: LoadScreenBase?) {
-        loadscreen?.let {
-            it.stageValue += 1
-            it.progress.set(0L)
-        }
-
-
+    init {
         val SAND_RND = (seed shake "SANDYCOLOURS").ushr(7).xor(seed and 255L).and(255L).toInt()
         val SAND_BASE = when (SAND_RND) {
             255 -> 5 // green
@@ -44,7 +37,15 @@ class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val 
         }
         THISWORLD_SAND = "basegame:" + (Block.SAND.substringAfter(':').toInt() + SAND_BASE)
         THISWORLD_SANDSTONE = "basegame:" + (Block.SANDSTONE.substringAfter(':').toInt() + SAND_BASE)
+    }
 
+
+
+    override fun getDone(loadscreen: LoadScreenBase?) {
+        loadscreen?.let {
+            it.stageValue += 1
+            it.progress.set(0L)
+        }
 
 //        loadscreen.progress.set((loadscreen.progress.get() + 0x1_000000_000000L) and 0x7FFF_000000_000000L)
 
