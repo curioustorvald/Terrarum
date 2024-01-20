@@ -285,13 +285,15 @@ Sound from <https://www.freesound.org/people/klankbeeld>
 
 
 
-$BULLET Footstep sound recordings:
+$BULLET Foleys:
 
-    - GRSS_01..06.ogg
-    - GRVL_01..07.ogg
-    - ROCK_01..09.ogg
-    - SAND_01..04.ogg
-    - WOOD_01..03.ogg
+    - steps/GRSS.*.ogg
+    - steps/GRVL.*.ogg
+    - steps/ROCK.*.ogg
+    - steps/SAND.*.ogg
+    - steps/WOOD.*.ogg
+    - door/wooden_open.*.ogg
+    - door/wooden_close.*.ogg
 
 Copyright (C) 2020, 2021, 2022 Nox Sound
 Sound from <https://freesound.org/people/Nox_Sound>

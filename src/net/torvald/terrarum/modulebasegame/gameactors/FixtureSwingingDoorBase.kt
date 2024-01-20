@@ -35,6 +35,8 @@ open class FixtureSwingingDoorBase : FixtureBase {
     var doorOpenedHoldLength: Second = 0.25f
     var nameKey = "DOOR_BASE" // goes into the savegame
     var nameKeyReadFromLang = true // goes into the savegame
+    var audioIdForOpening = "effects.door.wooden_open"
+    var audioIdForClosing = "effects.door.wooden_close"
     /* END OF CUTOMISABLE PARAMETERS */
 
     private var tilewiseHitboxWidth = tw * 2 - twClosed
@@ -164,35 +166,38 @@ open class FixtureSwingingDoorBase : FixtureBase {
         shadeBoxList[0].light = Cvec(0)
     }
 
-    open protected fun closeDoor(doorHandler: Int) {
+    protected open fun closeDoor(doorHandler: Int) {
         if (doorState != 0) {
             (sprite!! as SheetSpriteAnimation).currentRow = 0
             doorState = 0
             placeActorBlocks()
             lastDoorHandler = doorHandler
             if (!isOpacityActuallyLuminosity) setOpacity()
+            Terrarum.audioCodex.getRandomAudio(audioIdForClosing)?.let { startAudio(it) }
         }
         doorCloseQueued = false
     }
 
-    open protected fun openToRight(doorHandler: Int) {
+    protected open fun openToRight(doorHandler: Int) {
         if (doorState != 1) {
             (sprite!! as SheetSpriteAnimation).currentRow = 1
             doorState = 1
             placeActorBlocks()
             lastDoorHandler = doorHandler
             if (!isOpacityActuallyLuminosity) unsetOpacity()
+            Terrarum.audioCodex.getRandomAudio(audioIdForOpening)?.let { startAudio(it) }
         }
         doorCloseQueued = false
     }
 
-    open protected fun openToLeft(doorHandler: Int) {
+    protected open fun openToLeft(doorHandler: Int) {
         if (doorState != -1) {
             (sprite!! as SheetSpriteAnimation).currentRow = 2
             doorState = -1
             placeActorBlocks()
             lastDoorHandler = doorHandler
             if (!isOpacityActuallyLuminosity) unsetOpacity()
+            Terrarum.audioCodex.getRandomAudio(audioIdForOpening)?.let { startAudio(it) }
         }
         doorCloseQueued = false
     }
