@@ -145,6 +145,33 @@ open class FixtureSwingingDoorBase : FixtureBase {
 
     override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawn(posX, posY, installersUUID, tilewiseHitboxWidth, tilewiseHitboxHeight)
 
+    override fun canSpawnHere0(posX: Int, posY: Int): Boolean {
+        val everyBlockboxPos = (posX until posX + blockBox.width).toList().cartesianProduct((posY until posY + blockBox.height).toList())
+
+        val xoffToFrame = (tilewiseHitboxWidth - twClosed) / 2
+        val everyDoorframePos = (posX + xoffToFrame until posX + blockBox.width - 1).toList().cartesianProduct((posY until posY + blockBox.height).toList())
+
+        // check for existing blocks (and fixtures)
+        var cannotSpawn = false
+        worldBlockPos = Point2i(posX, posY)
+
+        cannotSpawn = everyBlockboxPos.any { (x, y) -> !BlockCodex[world!!.getTileFromTerrain(x, y)].hasTag("INCONSEQUENTIAL") }
+
+        // check for walls, if spawnNeedsWall = true
+        if (spawnNeedsWall) {
+            cannotSpawn = cannotSpawn or everyDoorframePos.any { (x, y) -> !BlockCodex[world!!.getTileFromWall(x, y)].isSolid }
+        }
+
+        // check for floors, if spawnNeedsFloor == true
+        if (spawnNeedsFloor) {
+            val y = posY + blockBox.height
+            val xs = posX + xoffToFrame until posX + blockBox.width - xoffToFrame
+            cannotSpawn = cannotSpawn or xs.any { x -> !BlockCodex[world!!.getTileFromTerrain(x, y)].isSolid }
+        }
+
+        return !cannotSpawn
+    }
+
     override fun reload() {
         super.reload()
 

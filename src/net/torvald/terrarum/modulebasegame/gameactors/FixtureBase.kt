@@ -218,12 +218,6 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         }
     }
 
-    private fun <S, T> List<S>.cartesianProduct(other: List<T>) = this.flatMap { thisIt ->
-        other.map { otherIt ->
-            thisIt to otherIt
-        }
-    }
-
     val everyBlockboxPos: List<Pair<Int, Int>>?
         get() = worldBlockPos?.let { (posX, posY) ->
             (posX until posX + blockBox.width).toList().cartesianProduct((posY until posY + blockBox.height).toList())
@@ -254,7 +248,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         return canSpawnHere0(posX, posY)
     }
 
-    private fun canSpawnHere0(posX: Int, posY: Int): Boolean {
+    open fun canSpawnHere0(posX: Int, posY: Int): Boolean {
         val everyBlockboxPos = (posX until posX + blockBox.width).toList().cartesianProduct((posY until posY + blockBox.height).toList())
 
         // check for existing blocks (and fixtures)
