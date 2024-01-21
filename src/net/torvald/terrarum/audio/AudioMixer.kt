@@ -363,16 +363,16 @@ class AudioMixer(val bufferSize: Int): Disposable {
                     req.fadeoutFired = false
                     track.volume = req.fadeTarget
 
-                    // stop streaming if fadeBus is muted
+                    // stop streaming if the track or the fader track is muted
                     if (req.fadeTarget == 0.0 && (track == musicTrack || track == fadeBus)) {
                         musicTrack.stop()
                         musicTrack.currentTrack = null
                     }
-                    if (req.fadeTarget == 0.0 && track == ambientTrack1) {
+                    if (req.fadeTarget == 0.0 && (track == ambientTrack1 || track == fadeBus)) {
                         ambientTrack1.stop()
                         ambientTrack1.currentTrack = null
                     }
-                    if (req.fadeTarget == 0.0 && track == ambientTrack2) {
+                    if (req.fadeTarget == 0.0 && (track == ambientTrack2 || track == fadeBus)) {
                         ambientTrack2.stop()
                         ambientTrack2.currentTrack = null
                     }
