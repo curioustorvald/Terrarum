@@ -144,7 +144,8 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                         )
                         val isApproaching = if (distFromActorNext <= distFromActor) 1.0 else -1.0
                         val relativeSpeed = (sourceVec - listenerVec).magnitude * GAME_TO_SI_VELO * isApproaching
-                        val dopplerFactor = (SPEED_OF_SOUND_AIR + relativeSpeed) / SPEED_OF_SOUND_AIR // >1: speedup, <1: speeddown
+                        val soundSpeed = SPEED_OF_SOUND_AIR * 4f // using an arbitrary value for "gamification"
+                        val dopplerFactor = (soundSpeed + relativeSpeed) / soundSpeed // >1: speedup, <1: speeddown
 
                         track.processor.streamBuf?.playbackSpeed = dopplerFactor.toFloat()
 

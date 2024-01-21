@@ -6,6 +6,9 @@ import net.torvald.terrarum.audio.fullscaleToDecibels
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.FILTER_NAME_ACTIVE
 import kotlin.math.roundToInt
 
+/**
+ * Created by minjaesong on 2023-11-25.
+ */
 class Gain(var gain: Float): TerrarumAudioFilter() {
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         for (i in 0 until App.audioBufferSize) {

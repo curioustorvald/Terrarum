@@ -6,6 +6,9 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import kotlin.math.roundToInt
 
+/**
+ * Created by minjaesong on 2023-11-23.
+ */
 class Reverb(val delayMS: Float = 36f, var feedback: Float = 0.92f, var lowpass: Float = 1200f): TerrarumAudioFilter() {
 
     private val highpass = 80f

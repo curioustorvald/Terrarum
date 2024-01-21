@@ -2,9 +2,12 @@ package net.torvald.terrarum.audio.dsp
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
+/**
+ * Created by minjaesong on 2023-11-17.
+ */
 abstract class TerrarumAudioFilter {
     var bypass = false
-    protected abstract fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>)
+    abstract fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>)
     operator fun invoke(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         if (bypass) {
             outbuf.forEachIndexed { index, outTrack ->
@@ -16,6 +19,13 @@ abstract class TerrarumAudioFilter {
     abstract fun drawDebugView(batch: SpriteBatch, x: Int, y: Int)
     abstract val debugViewHeight: Int
     abstract fun copyParamsFrom(other: TerrarumAudioFilter)
+}
+
+/**
+ * Created by minjaesong on 2024-01-21.
+ */
+interface DspCompressor {
+    val downForce: Array<Float>
 }
 
 fun FloatArray.applyGain(gain: Float = 1f) = this.map { it * gain }.toFloatArray()

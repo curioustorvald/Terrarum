@@ -11,6 +11,9 @@ import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.STRIP_W
 import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.*
 
+/**
+ * Created by minjaesong on 2023-12-21.
+ */
 class Spectro(var gain: Float = 1f) : TerrarumAudioFilter() {
     private val FFTSIZE = 1024
     private val inBuf = Array(2) { FloatArray(FFTSIZE) }
@@ -99,7 +102,9 @@ class Spectro(var gain: Float = 1f) : TerrarumAudioFilter() {
     }
 }
 
-
+/**
+ * Created by minjaesong on 2023-11-20.
+ */
 class Vecto(var gain: Float = 1f) : TerrarumAudioFilter() {
     var backbufL = Array((6144f / App.audioBufferSize).roundToInt().coerceAtLeast(1)) {
         FloatArray(App.audioBufferSize)

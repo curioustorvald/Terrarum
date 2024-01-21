@@ -4,6 +4,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.FILTER_NAME_ACTIVE
 
+/**
+ * Created by minjaesong on 2023-11-18.
+ */
 object Buffer : TerrarumAudioFilter() {
     init {
         bypass = true

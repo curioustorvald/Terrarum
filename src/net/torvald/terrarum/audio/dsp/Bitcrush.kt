@@ -9,6 +9,9 @@ import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.toIntAndFrac
 import net.torvald.terrarum.ui.Toolkit
 
+/**
+ * Created by minjaesong on 2023-11-23.
+ */
 class Bitcrush(var steps: Int, var inputGain: Float = 1f): TerrarumAudioFilter() {
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         for (ch in outbuf.indices) {

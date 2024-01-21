@@ -2,6 +2,9 @@ package net.torvald.terrarum.audio.dsp
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
+/**
+ * Created by minjaesong on 2023-11-17.
+ */
 object NullFilter : TerrarumAudioFilter() {
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         outbuf.forEachIndexed { index, outTrack ->

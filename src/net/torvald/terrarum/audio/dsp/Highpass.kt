@@ -10,7 +10,9 @@ import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.COL_METER_GRAD2
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.FILTER_NAME_ACTIVE
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.STRIP_W
 import net.torvald.terrarum.ui.Toolkit
-
+/**
+ * Created by minjaesong on 2023-11-19.
+ */
 class Highpass(cutoff0: Float): TerrarumAudioFilter() {
 
     var cutoff = cutoff0.toDouble(); private set

@@ -11,6 +11,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.audio.AudioMixer.Companion.DEFAULT_FADEOUT_LEN
 import net.torvald.terrarum.audio.dsp.Convolv
+import net.torvald.terrarum.audio.dsp.LoFi
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.ItemID
@@ -39,6 +40,8 @@ class FixtureJukebox : Electric {
     @Transient var musicNowPlaying: MusicContainer? = null; private set
 
     @Transient private val backLamp: SheetSpriteAnimation
+
+    @Transient private val filterIndex = 2
 
     internal val discInventory = ArrayList<ItemID>()
 
@@ -114,7 +117,7 @@ class FixtureJukebox : Electric {
 
             App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
                 startAudio(musicNowPlaying!!) {
-                    it.filters[2] = Convolv(
+                    it.filters[filterIndex] = LoFi(
                         ModMgr.getFile(
                             "basegame",
                             "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin"
@@ -162,7 +165,7 @@ class FixtureJukebox : Electric {
     private fun unloadConvolver(music: MusicContainer?) {
         if (music != null) {
             musicTracks[music]?.let {
-                it.filters[2] = NullFilter
+                it.filters[filterIndex] = NullFilter
             }
         }
     }

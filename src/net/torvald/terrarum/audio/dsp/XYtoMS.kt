@@ -3,6 +3,9 @@ package net.torvald.terrarum.audio.dsp
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 
+/**
+ * Created by minjaesong on 2023-11-24.
+ */
 object XYtoMS: TerrarumAudioFilter() {
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         for (i in 0 until App.audioBufferSize) {
@@ -24,6 +27,9 @@ object XYtoMS: TerrarumAudioFilter() {
     }
 }
 
+/**
+ * Created by minjaesong on 2023-11-24.
+ */
 object MStoXY: TerrarumAudioFilter() {
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         for (i in 0 until App.audioBufferSize) {

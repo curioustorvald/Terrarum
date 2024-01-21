@@ -21,6 +21,8 @@ import kotlin.math.roundToInt
  * @param ir Binary file containing MONO IR (containing only two channels)
  * @param crossfeed The amount of channel crossfeeding to simulate the true stereo IR. Fullscale (0.0 - 1.0)
  * @param gain output gain. Fullscale (0.0 - 1.0)
+ *
+ * Created by minjaesong on 2023-11-25.
  */
 class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): TerrarumAudioFilter() {
 

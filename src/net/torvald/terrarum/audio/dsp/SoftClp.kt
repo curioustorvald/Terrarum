@@ -5,8 +5,11 @@ import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-object SoftClp : TerrarumAudioFilter() {
-    val downForce = arrayOf(1.0f, 1.0f)
+/**
+ * Created by minjaesong on 2023-11-20.
+ */
+object SoftClp : TerrarumAudioFilter(), DspCompressor {
+    override val downForce = arrayOf(1.0f, 1.0f)
 
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         downForce.fill(1.0f)

@@ -721,7 +721,7 @@ class BasicDebugInfoWindow : UICanvas() {
         }
 
         // comp marker
-        track.filters.filterIsInstance<SoftClp>().firstOrNull()?.let {
+        track.filters.filterIsInstance<DspCompressor>().firstOrNull()?.let {
             for (ch in 0..1) {
                 val downForceNow = it.downForce[ch] * 1.0
                 if (downForceNow != 0.0) {

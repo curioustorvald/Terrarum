@@ -22,6 +22,8 @@ import kotlin.math.tanh
  * @param pan -1 for far-left, 0 for centre, 1 for far-right
  * @param soundSpeed speed of the sound in meters per seconds
  * @param earDist distance between ears in meters. Maximum: 16.0
+ *
+ * Created by minjaesong on 2023-11-23.
  */
 class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAudioFilter() {
 
