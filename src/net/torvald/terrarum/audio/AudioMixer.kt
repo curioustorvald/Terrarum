@@ -201,7 +201,7 @@ class AudioMixer(val bufferSize: Int): Disposable {
     init {
         // initialise audio paths //
 
-        listOf(musicTrack, ambientTrack1, ambientTrack2, sfxSumBus, guiTrack).forEach {
+        listOf(musicTrack, ambientTrack1, ambientTrack2).forEach {
             it.filters[0] = Gain(1f)
         }
 
@@ -212,16 +212,15 @@ class AudioMixer(val bufferSize: Int): Disposable {
 
         musicTrack.filters[1] = Vecto()
         musicTrack.filters[2] = Spectro()
-        ambientTrack1.filters[1] = Vecto(decibelsToFullscale(32.0).toFloat())
+        ambientTrack1.filters[1] = Vecto(decibelsToFullscale(24.0).toFloat())
         ambientTrack1.filters[2] = Spectro()
-        ambientTrack2.filters[1] = Vecto(decibelsToFullscale(32.0).toFloat())
+        ambientTrack2.filters[1] = Vecto(decibelsToFullscale(24.0).toFloat())
         ambientTrack2.filters[2] = Spectro()
         sfxSumBus.filters[1] = Vecto(0.7071f)
         sfxSumBus.filters[2] = Spectro()
 
         ambSumBus.addSidechainInput(ambientTrack1, 1.0)
         ambSumBus.addSidechainInput(ambientTrack2, 1.0)
-        ambSumBus.filters[0] = Gain(1f) // controlled by the ambient volume config
         ambSumBus.filters[1] = Gain(1f) // controlled by the "openness" controller
 
         listOf(sumBus, convolveBusOpen, convolveBusCave).forEach {
@@ -347,9 +346,10 @@ class AudioMixer(val bufferSize: Int): Disposable {
         (Gdx.audio as? Lwjgl3Audio)?.update()
         masterTrack.volume = masterVolume
         musicTrack.getFilter<Gain>().gain = musicVolume.toFloat() * 0.5f
-        ambSumBus.getFilter<Gain>().gain = ambientVolume.toFloat() * 2
-        sfxSumBus.getFilter<Gain>().gain = sfxVolume.toFloat()
-        guiTrack.getFilter<Gain>().gain = guiVolume.toFloat()
+        ambientTrack1.getFilter<Gain>().gain = ambientVolume.toFloat() * 2
+        ambientTrack2.getFilter<Gain>().gain = ambientVolume.toFloat() * 2
+        sfxSumBus.volume = sfxVolume
+        guiTrack.volume = guiVolume
 
 
         // process fades

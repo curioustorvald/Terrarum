@@ -463,7 +463,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val stripGap = 1
     private val stripFilterHeight = 16
     private val stripFaderHeight = meterHeight + 20
-    private val numberOfFilters = 16
+    private val numberOfFilters = 14
     private val stripH = stripFaderHeight + stripFilterHeight * numberOfFilters + 16
 
     private val trackBack = listOf(COL_WELL, COL_WELL2)
