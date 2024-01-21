@@ -323,25 +323,22 @@ class TerrarumMusicGovernor : MusicGovernor() {
     protected var ambState = 0
     protected var ambFired = false
 
-    private fun stopMusic(song: MusicContainer?, callStopMusicHook: Boolean = true) {
-        if (intermissionLength < Float.POSITIVE_INFINITY) {
-            musicState = STATE_INTERMISSION
-            intermissionAkku = 0f
-            intermissionLength =
-                if (diskJockeyingMode == "intermittent") 30f + 30f * Math.random().toFloat() else 0f // 30s-60s
-            musicFired = false
-            if (callStopMusicHook && musicStopHooks.isNotEmpty()) musicStopHooks.forEach {
-                if (song != null) {
-                    it(song)
-                }
+    private fun stopMusic(song: MusicContainer?, callStopMusicHook: Boolean = true, customPauseLen: Float? = null) {
+        musicState = STATE_INTERMISSION
+        intermissionAkku = 0f
+        intermissionLength = customPauseLen ?:
+            if (diskJockeyingMode == "intermittent") 30f + 30f * Math.random().toFloat() else Float.POSITIVE_INFINITY // 30s-60s
+        musicFired = false
+        if (callStopMusicHook && musicStopHooks.isNotEmpty()) musicStopHooks.forEach {
+            if (song != null) {
+                it(song)
             }
-            printdbg(this, "StopMusic Intermission: $intermissionLength seconds")
         }
+//        printdbg(this, "StopMusic Intermission: $intermissionLength seconds")
     }
 
     fun stopMusic(callStopMusicHook: Boolean = true, pauseLen: Float = Float.POSITIVE_INFINITY) {
-        stopMusic(App.audioMixer.musicTrack.currentTrack, callStopMusicHook)
-        intermissionLength = pauseLen
+        stopMusic(App.audioMixer.musicTrack.currentTrack, callStopMusicHook, pauseLen)
 //        printdbg(this, "StopMusic Intermission2: $intermissionLength seconds")
     }
 

@@ -28,7 +28,7 @@ import org.dyn4j.geometry.Vector2
 /**
  * Created by minjaesong on 2024-01-11.
  */
-class FixtureJukebox : Electric {
+class FixtureJukebox : Electric, PlaysMusic {
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 2, 3),
@@ -83,7 +83,7 @@ class FixtureJukebox : Electric {
 
         // supress the normal background music playback
         if (musicIsPlaying && !flagDespawn) {
-            (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic()
+//            (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic()
         }
     }
 

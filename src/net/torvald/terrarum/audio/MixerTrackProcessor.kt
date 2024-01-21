@@ -282,12 +282,19 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
 
         // method 1.
         // https://www.desmos.com/calculator/uzbjw10lna
-        val K = 512.0
-        return K.pow(-sqrt(1.0+x.sqr())) * K
+//        val K = 512.0
+//        return K.pow(-sqrt(1.0+x.sqr())) * K
 
 
         // method 2.
         // https://www.desmos.com/calculator/3xsac66rsp
+
+
+        // method 3.
+        // comparison with method 1.
+        // https://www.desmos.com/calculator/rbteowef8v
+        val Q = 2.0
+        return 1.0 / cosh(Q * x).sqr()
     }
 
     private fun FloatArray.applyVolume(volume: Float) = FloatArray(this.size) { (this[it] * volume) }
