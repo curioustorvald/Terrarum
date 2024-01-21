@@ -15,6 +15,7 @@ import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioMixer
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import java.io.File
 import java.io.FileInputStream
@@ -371,8 +372,8 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     private fun stopAmbient() {
-        if (::currentAmbientTrack.isInitialized)
-            App.audioMixer.ambientTrack.nextTrack = currentAmbientTrack
+//        if (::currentAmbientTrack.isInitialized)
+//            App.audioMixer.ambientTrack.nextTrack = currentAmbientTrack
     }
 
     private fun startAmbient(song: MusicContainer) {

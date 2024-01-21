@@ -913,7 +913,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 App.audioMixer.convolveBusCave.volume = 0.0
             }
             val openness = (TileSurvey.getRatio("basegame.Ingame.openness") ?: 0.0).times(1.74).coerceIn(0.0, 1.0)
-            (App.audioMixer.ambientTrack.filters[3] as Gain).gain = openness.pow(2.0 / 3.0).toFloat()
+            (App.audioMixer.ambSumBus.filters[1] as Gain).gain = openness.pow(2.0 / 3.0).toFloat()
 
 
 
