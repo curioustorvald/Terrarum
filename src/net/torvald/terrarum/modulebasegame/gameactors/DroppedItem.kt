@@ -8,6 +8,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.ItemCodex
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.*
@@ -156,5 +157,12 @@ open class DroppedItem : ActorWithBody {
                 }
             }
         }
+    }
+
+    fun onItemPickup(actor: ActorWithBody) {
+        flagDespawn = true
+        (actor as Pocketed).inventory.add(itemID, itemCount)
+        Terrarum.ingame!!.sendItemPickupNoticelet(itemID, itemCount)
+        ItemCodex[itemID]!!.effectOnPickup(actor)
     }
 }

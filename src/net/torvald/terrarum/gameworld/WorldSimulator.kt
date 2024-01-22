@@ -149,9 +149,7 @@ object WorldSimulator {
                     val pickupDistSqr = w*w + h*h// TODO refer to the actorValue
 //                    println("${result.distance}\pickupDistSqr")
                     if (result.distance < pickupDistSqr) {
-                        droppedItem.flagDespawn = true
-                        (actor as Pocketed).inventory.add(droppedItem.itemID, droppedItem.itemCount)
-                        ItemCodex[droppedItem.itemID]!!.effectOnPickup(actor)
+                        droppedItem.onItemPickup(actor)
                         break
                     }
                 }

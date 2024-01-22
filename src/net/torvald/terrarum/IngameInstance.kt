@@ -17,6 +17,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
+import net.torvald.terrarum.modulebasegame.ui.Noticelet
 import net.torvald.terrarum.modulebasegame.ui.Notification
 import net.torvald.terrarum.modulebasegame.ui.UITooltip
 import net.torvald.terrarum.realestate.LandUtil
@@ -86,6 +87,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     /** For in-world text overlays? e.g. cursor on the ore block and tooltip will say "Malachite" or something */
     open var uiTooltip: UITooltip = UITooltip()
     open var notifier: Notification = Notification()
+    open var noticelet: Noticelet = Noticelet()
 
     val deltaTeeBenchmarks = CircularArray<Float>(App.getConfigInt("debug_deltat_benchmark_sample_sizes"), true)
 
@@ -97,6 +99,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
                 (Toolkit.drawWidth - notifier.width) / 2,
                 App.scr.height - notifier.height - App.scr.tvSafeGraphicsHeight
         )
+        noticelet.setPosition(0, 0)
 
         printdbg(this, "New ingame instance ${this.hashCode()}, called from")
         printStackTrace(this)
@@ -557,6 +560,10 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     }
 
     fun onConfigChange() {
+    }
+
+    fun sendItemPickupNoticelet(itemID: ItemID, itemCount: Long) {
+        noticelet.sendNotification(itemID, itemCount)
     }
 
     open val musicGovernor: MusicGovernor = MusicGovernor()

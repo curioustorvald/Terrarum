@@ -657,6 +657,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
         // these need to appear on top of any others
+        uiContainer.add(noticelet)
         uiContainer.add(notifier)
 
         App.setDebugTime("Ingame.UpdateCounter", 0)
@@ -1615,6 +1616,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 (Toolkit.drawWidth - notifier.width) / 2,
                 App.scr.height - notifier.height - App.scr.tvSafeGraphicsHeight
             )
+            noticelet.setPosition(0, 0)
             uiQuickBar.setPosition((drawWidth - uiQuickBar.width) / 2, App.scr.tvSafeGraphicsHeight)
 
             // inventory
