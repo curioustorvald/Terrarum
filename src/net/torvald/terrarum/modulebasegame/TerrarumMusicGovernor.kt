@@ -415,14 +415,16 @@ class TerrarumMusicGovernor : MusicGovernor() {
                     ambFired = true
 
                     val season = ingame.world.worldTime.ecologicalSeason
+                    val time = ingame.world.worldTime.todaySeconds // 0 until DAY_LENGTH (86400)
                     val seasonName = when (season) {
                         in 0f..2f -> "autumn"
                         in 2f..3f -> "summer"
                         in 3f..5f -> "autumn"
                         else -> "winter"
                     }
+                    val timeMode = "diurnal"
 
-                    val track = ambients["ambient.season.$seasonName"]!!.random()
+                    val track = ambients["ambient.season.${timeMode}_$seasonName"]!!.random()
                     startAmbient(track)
                 }
             }

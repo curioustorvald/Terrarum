@@ -273,14 +273,14 @@ limitations under the License.
 
 $BULLET Ambient sound recordings:
 
-    - ambient_forest_01.ogg
-    - ambient_meadow_01.ogg
-    - ambient_windy_01.ogg
-    - ambient_woods_01.ogg
-    - crickets_01.ogg
-    - crickets_02.ogg
+    - ambient/season/crepuscular_summer.*.ogg
+    - ambient/season/diurnal_autumn.*.ogg
+    - ambient/season/diurnal_spring.*.ogg
+    - ambient/season/diurnal_summer.*.ogg
+    - ambient/season/diurnal_winter.*.ogg
+    - ambient/season/nocturnal_summer.*.ogg
 
-Copyright (C) 2012, 2013, 2015, 2016, 2017 Klankbeeld
+Copyright (C) 2013, 2015, 2020, 2021 Klankbeeld
 Sound from <https://www.freesound.org/people/klankbeeld>
 
 
