@@ -12,7 +12,6 @@ import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
 import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
-import net.torvald.terrarum.audio.dsp.Gain
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.blockstats.TileSurvey
@@ -914,7 +913,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 App.audioMixer.convolveBusCave.volume = 0.0
             }
             val openness = (TileSurvey.getRatio("basegame.Ingame.openness") ?: 0.0).times(1.74).coerceIn(0.0, 1.0)
-            (App.audioMixer.ambSumBus.filters[1] as Gain).gain = openness.pow(2.0 / 3.0).toFloat()
+            App.audioMixer.amb1plus2.volume = openness.pow(2.0 / 3.0)
 
 
 

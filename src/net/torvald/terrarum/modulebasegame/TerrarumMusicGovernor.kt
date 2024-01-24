@@ -9,14 +9,15 @@ import com.badlogic.gdx.backends.lwjgl3.audio.Wav
 import com.badlogic.gdx.backends.lwjgl3.audio.Wav.WavInputStream
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jcraft.jorbis.VorbisFile
+import com.jme3.math.FastMath
 import javazoom.jl.decoder.Bitstream
 import net.torvald.reflection.extortField
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioMixer
-import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
+import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import java.io.File
 import java.io.FileInputStream
 import javax.sound.sampled.AudioSystem
@@ -278,7 +279,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
                     Gdx.audio.newMusic(fileHandle).also {
                         it.isLooping = true
                     }
-                ) { stopAmbient() }
+                ) {  }
             }
             catch (e: GdxRuntimeException) {
                 e.printStackTrace()
@@ -373,15 +374,34 @@ class TerrarumMusicGovernor : MusicGovernor() {
 //            App.audioMixer.ambientTrack.nextTrack = currentAmbientTrack
     }
 
-    private fun startAmbient(song: MusicContainer) {
-        currentAmbientTrack = song
-        App.audioMixer.startAmb(song)
-        printdbg(this, "startAmbient Now playing: $song")
-//        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
+    private fun startAmbient1(song: MusicContainer) {
+        App.audioMixer.startAmb1(song)
+        printdbg(this, "startAmbient1 Now playing: $song")
+        ambState = STATE_PLAYING
+    }
+    private fun startAmbient2(song: MusicContainer) {
+        App.audioMixer.startAmb2(song)
+        printdbg(this, "startAmbient2 Now playing: $song")
         ambState = STATE_PLAYING
     }
 
-    private lateinit var currentAmbientTrack: MusicContainer
+    private fun queueAmbientForce1(song: MusicContainer) {
+        App.audioMixer.ambientTrack1.let {
+            it.nextTrack = song
+            it.stop()
+        }
+        printdbg(this, "startAmbient1 Now playing: $song")
+        ambState = STATE_PLAYING
+    }
+    private fun queueAmbientForce2(song: MusicContainer) {
+        App.audioMixer.ambientTrack2.let {
+            it.nextTrack = song
+            it.stop()
+        }
+        printdbg(this, "startAmbient2 Now playing: $song")
+        ambState = STATE_PLAYING
+    }
+
 
     override fun update(ingame: IngameInstance, delta: Float) {
         // start the song queueing if there is one to play
@@ -409,35 +429,111 @@ class TerrarumMusicGovernor : MusicGovernor() {
             }
         }
 
+        val season = ingame.world.worldTime.ecologicalSeason
+        val isAM = (ingame.world.worldTime.todaySeconds < DAY_LENGTH / 2) // 0 until DAY_LENGTH (86400)
+        val solarElevDeg = ingame.world.worldTime.solarElevationDeg
+        val isSunUp = (solarElevDeg >= 0)
+        val seasonName = when (season) {
+            in 0f..2f -> "autumn"
+            in 2f..3f -> "summer"
+            in 3f..5f -> "autumn"
+            else -> "winter"
+        }
+
         when (ambState) {
             STATE_FIREPLAY -> {
                 if (!ambFired) {
                     ambFired = true
 
-                    val season = ingame.world.worldTime.ecologicalSeason
-                    val time = ingame.world.worldTime.todaySeconds // 0 until DAY_LENGTH (86400)
-                    val seasonName = when (season) {
-                        in 0f..2f -> "autumn"
-                        in 2f..3f -> "summer"
-                        in 3f..5f -> "autumn"
-                        else -> "winter"
-                    }
-                    val timeMode = "diurnal"
+                    // ambient track 1: diurnal/nocturnal
+                    // ambient track 2: crepuscular/matutinal
+                    val track1 = if (isSunUp)
+                        ambients["ambient.season.diurnal_$seasonName"]!!.random() // mad respect to Klankbeeld
+                    else
+                        ambients["ambient.season.nocturnal"]!!.random() // as it turns out ambient recordings of a wild place AT NIGHT is quite rare
 
-                    val track = ambients["ambient.season.${timeMode}_$seasonName"]!!.random()
-                    startAmbient(track)
+                    val track2 = if (isAM)
+                        ambients["ambient.season.matutinal"]!!.random()
+                    else
+                        ambients["ambient.season.crepuscular"]!!.random()
+
+                    startAmbient1(track1)
+                    startAmbient2(track2)
                 }
             }
             STATE_PLAYING -> {
-                // stopMusic() will be called when the music finishes; it's on the setOnCompletionListener
+                // mix ambient tracks
+
+                // queue up nocturnal
+                if (!isSunUp && oldWorldSolarElev >= 0)
+                    queueAmbientForce1(ambients["ambient.season.nocturnal"]!!.random()) // as it turns out ambient recordings of a wild place AT NIGHT is quite rare
+                // queue up diurnal
+                else if (isSunUp && oldWorldSolarElev < 0)
+                    queueAmbientForce1(ambients["ambient.season.diurnal_$seasonName"]!!.random()) // mad respect to Klankbeeld
+
+                // queue up crepuscular
+                if (!isAM && oldWorldTime < DAY_LENGTH / 2)
+                    queueAmbientForce2(ambients["ambient.season.crepuscular"]!!.random())
+                else if (isAM && oldWorldTime >= DAY_LENGTH / 2)
+                    queueAmbientForce2(ambients["ambient.season.matutinal"]!!.random())
+
+                // play around the fader
+                val track2vol = if (isAM)
+                    when (solarElevDeg) {
+                        in TRACK2_DAWN_ELEV_UP_MIN..TRACK2_DAWN_ELEV_UP_MAX ->
+                            FastMath.interpolateLinear(
+                                (solarElevDeg - TRACK2_DAWN_ELEV_UP_MIN) / (TRACK2_DAWN_ELEV_UP_MAX - TRACK2_DAWN_ELEV_UP_MIN),
+                                1.0, 0.0
+                            )
+                        in TRACK2_DAWN_ELEV_DN_MAX..TRACK2_DAWN_ELEV_DN_MIN ->
+                            FastMath.interpolateLinear(
+                                (solarElevDeg - TRACK2_DAWN_ELEV_DN_MIN) / (TRACK2_DAWN_ELEV_DN_MAX - TRACK2_DAWN_ELEV_DN_MIN),
+                                1.0, 0.0
+                            )
+                        in TRACK2_DAWN_ELEV_DN_MIN..TRACK2_DAWN_ELEV_UP_MIN -> 1.0
+                        else -> 0.0
+                    }
+                else 
+                    when (solarElevDeg) {
+                        in TRACK2_DUSK_ELEV_UP_MIN..TRACK2_DUSK_ELEV_UP_MAX ->
+                            FastMath.interpolateLinear(
+                                (solarElevDeg - TRACK2_DUSK_ELEV_UP_MIN) / (TRACK2_DUSK_ELEV_UP_MAX - TRACK2_DUSK_ELEV_UP_MIN),
+                                1.0, 0.0
+                            )
+                        in TRACK2_DUSK_ELEV_DN_MAX..TRACK2_DUSK_ELEV_DN_MIN ->
+                            FastMath.interpolateLinear(
+                                (solarElevDeg - TRACK2_DUSK_ELEV_DN_MIN) / (TRACK2_DUSK_ELEV_DN_MAX - TRACK2_DUSK_ELEV_DN_MIN),
+                                1.0, 0.0
+                            )
+                        in TRACK2_DUSK_ELEV_DN_MIN..TRACK2_DUSK_ELEV_UP_MIN -> 1.0
+                        else -> 0.0
+                    }
+                val track1vol = 1.0 - track2vol
+
+                App.audioMixer.ambientTrack1.volume = track1vol
+                App.audioMixer.ambientTrack2.volume = track2vol
             }
             STATE_INTERMISSION -> {
                 ambState = STATE_FIREPLAY
             }
         }
 
-
+        oldWorldSolarElev = solarElevDeg
+        oldWorldTime = ingame.world.worldTime.todaySeconds
     }
+
+    private var oldWorldSolarElev = Terrarum.ingame?.world?.worldTime?.solarElevationDeg ?: 0.0
+    private var oldWorldTime = Terrarum.ingame?.world?.worldTime?.todaySeconds ?: 0
+
+    private val TRACK2_DUSK_ELEV_UP_MAX = 15.0
+    private val TRACK2_DUSK_ELEV_UP_MIN = 0.1
+    private val TRACK2_DUSK_ELEV_DN_MIN = -0.1
+    private val TRACK2_DUSK_ELEV_DN_MAX = -15.0
+
+    private val TRACK2_DAWN_ELEV_UP_MAX = 20.0
+    private val TRACK2_DAWN_ELEV_UP_MIN = 5.0
+    private val TRACK2_DAWN_ELEV_DN_MIN = 5.0
+    private val TRACK2_DAWN_ELEV_DN_MAX = -10.0
 
     override fun dispose() {
         App.audioMixer.requestFadeOut(App.audioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits

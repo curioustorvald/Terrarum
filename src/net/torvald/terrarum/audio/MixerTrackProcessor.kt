@@ -74,17 +74,27 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                 track.currentTrack?.reset()
                 track.pullNextTrack()
 
-                val tmpBuf = ByteArray(buffer.size - bytesRead)
-                val newRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(tmpBuf)) ?: 0
+                bytesRead += read0(buffer, bytesRead)
+            }
+            // if isLooping=true, do gapless sampleRead but reads from itself
+            else if (track.currentTrack?.gdxMusic?.isLooping == true && bytesRead < buffer.size) {
+                track.currentTrack?.reset()
 
-                track.currentTrack?.let { it.samplesRead += newRead / 4 }
-                System.arraycopy(tmpBuf, 0, buffer, bytesRead, tmpBuf.size)
-
-                bytesRead += newRead
+                bytesRead += read0(buffer, bytesRead)
             }
 
             bytesRead
         }, { purgeStreamBuf() })
+    }
+
+    private fun read0(buffer: ByteArray, bytesRead: Int): Int {
+        val tmpBuf = ByteArray(buffer.size - bytesRead)
+        val newRead = track.currentTrack?.gdxMusic?.forceInvoke<Int>("read", arrayOf(tmpBuf)) ?: 0
+
+        track.currentTrack?.let { it.samplesRead += newRead / 4 }
+        System.arraycopy(tmpBuf, 0, buffer, bytesRead, tmpBuf.size)
+
+        return newRead
     }
 
     override fun run() {

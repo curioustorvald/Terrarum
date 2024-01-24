@@ -266,7 +266,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         App.bogoflops = maxOf(App.bogoflops, bogoflops)
 
 
-        listOf(App.audioMixer.ambientTrack1, App.audioMixer.ambientTrack2).forEach {
+        App.audioMixer.ambientTracks.forEach {
             it.stop()
             it.currentTrack = null
             it.nextTrack = null

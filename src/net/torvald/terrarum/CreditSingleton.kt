@@ -273,14 +273,15 @@ limitations under the License.
 
 $BULLET Foleys:
 
-    - ambient/season/crepuscular_summer.*.ogg
+    - ambient/season/crepuscular.*.ogg
     - ambient/season/diurnal_autumn.*.ogg
     - ambient/season/diurnal_spring.*.ogg
     - ambient/season/diurnal_summer.*.ogg
     - ambient/season/diurnal_winter.*.ogg
+    - ambient/season/matutinal.*.ogg
     - ambient/season/nocturnal_summer.*.ogg
 
-Copyright (C) 2013, 2015, 2020, 2021 Klankbeeld
+Copyright (C) 2011, 2013, 2015, 2020, 2021 Klankbeeld
 Sound from <https://www.freesound.org/people/klankbeeld>
 
     - effects/steps/GRSS.*.ogg
