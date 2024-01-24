@@ -104,15 +104,47 @@ object AxeCore {
                 ).let { tileBroken ->
                     // tile busted
                     if (tileBroken != null) {
-                        var upCtr = 1
+                        var upCtr = 0
                         var thisLeaf: ItemID? = null
+                        val tileThereL = INGAME.world.getTileFromTerrain(x-1, y - upCtr)
+                        val tileThereR = INGAME.world.getTileFromTerrain(x+1, y - upCtr)
+                        val propThereL = BlockCodex[tileThereL]
+                        val propThereR = BlockCodex[tileThereR]
+                        val treeTrunkXoff = if (propThereL.hasAllTag(listOf("TREELARGE", "TREETRUNK"))) -1
+                        else if (propThereR.hasAllTag(listOf("TREELARGE", "TREETRUNK"))) 1
+                        else 0
+
+                        if (treeTrunkXoff != 0) {
+                            val tileThere = INGAME.world.getTileFromTerrain(x + treeTrunkXoff, y - upCtr)
+                            val propThere = BlockCodex[tileThere]
+
+                            INGAME.world.setTileTerrain(x + treeTrunkXoff, y - upCtr, Block.AIR, false)
+                            PickaxeCore.dropItem(propThere.drop, x + treeTrunkXoff, y - upCtr)
+                            PickaxeCore.makeDust(tile, x + treeTrunkXoff, y - upCtr, 2 + Math.random().roundToInt())
+                        }
+
+                        upCtr = 1
                         while (true) {
                             val tileHere = INGAME.world.getTileFromTerrain(x, y - upCtr)
                             val propHere = BlockCodex[tileHere]
 
-                            if (propHere.hasTag("TREETRUNK")) {
+                            if (propHere.hasAllTag(listOf("TREELARGE", "TREETRUNK"))) {
                                 INGAME.world.setTileTerrain(x, y - upCtr, Block.AIR, false)
-                                PickaxeCore.dropItem(propHere.drop, x, y - upCtr) // todo use log item if applicable
+                                PickaxeCore.dropItem(propHere.drop, x, y - upCtr)
+                                PickaxeCore.makeDust(tile, x, y - upCtr, 2 + Math.random().roundToInt())
+
+                                if (treeTrunkXoff != 0) {
+                                    val tileThere = INGAME.world.getTileFromTerrain(x + treeTrunkXoff, y - upCtr)
+                                    val propThere = BlockCodex[tileThere]
+
+                                    INGAME.world.setTileTerrain(x + treeTrunkXoff, y - upCtr, Block.AIR, false)
+                                    PickaxeCore.dropItem(propThere.drop, x + treeTrunkXoff, y - upCtr)
+                                    PickaxeCore.makeDust(tile, x + treeTrunkXoff, y - upCtr, 2 + Math.random().roundToInt())
+                                }
+                            }
+                            else if (propHere.hasTag("TREETRUNK")) {
+                                INGAME.world.setTileTerrain(x, y - upCtr, Block.AIR, false)
+                                PickaxeCore.dropItem(propHere.drop, x, y - upCtr)
                                 PickaxeCore.makeDust(tile, x, y - upCtr, 2 + Math.random().roundToInt())
                             }
                             else if (propHere.hasTag("LEAVES")) {

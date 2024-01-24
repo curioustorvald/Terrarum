@@ -624,26 +624,28 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // batch-process uiAliases
         // NOTE: UIs that should pause the game (e.g. Inventory) must have relevant codes ON THEIR SIDE
         uiContainer.add(
-                // drawn first
-                //uiVitalPrimary,
-                //uiVitalSecondary,
-                //uiVitalItem,
+            // drawn first
+            //uiVitalPrimary,
+            //uiVitalSecondary,
+            //uiVitalItem,
+            noticelet,
 
-                uiBlur,
+            uiBlur,
 
-                uiPieMenu,
-                uiQuickBar,
-//                uiBasicInfo, // temporarily commenting out: wouldn't make sense for v 0.3 release
-                uiWatchTierOne,
-                getWearableDeviceUI,
-                UIScreenZoom(),
-                uiAutosaveNotifier,
-                uiInventoryPlayer,
-                getUIFixture,
-                uiTooltip,
-                consoleHandler,
-                uiCheatMotherfuckerNootNoot
-                // drawn last
+            uiPieMenu,
+            uiQuickBar,
+//            uiBasicInfo, // temporarily commenting out: wouldn't make sense for v 0.3 release
+            uiWatchTierOne,
+            getWearableDeviceUI,
+            UIScreenZoom(),
+            uiAutosaveNotifier,
+
+            uiInventoryPlayer,
+            getUIFixture,
+            uiTooltip,
+            consoleHandler,
+            uiCheatMotherfuckerNootNoot
+            // drawn last
         )
 
 
@@ -656,7 +658,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
         // these need to appear on top of any others
-        uiContainer.add(noticelet)
         uiContainer.add(notifier)
 
         App.setDebugTime("Ingame.UpdateCounter", 0)
