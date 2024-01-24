@@ -1,16 +1,15 @@
 package net.torvald.terrarum.audio.dsp
 
 import net.torvald.terrarum.ModMgr
-import java.io.File
 
 /**
  * Crackle and pops of the phonographs.
  *
  * Created by minjaesong on 2024-01-24.
  */
-class Phono(ir: File, crossfeed: Float, gain: Float) : LoFi(
-    ModMgr.getFile("basegame", "audio/effects/static/phono_pops.ogg"),
-    ir, crossfeed, gain
+class Phono(irModule: String, irPath: String, crossfeed: Float, gain: Float) : LoFi(
+    "basegame", "audio/effects/static/phono_pops.ogg",
+    irModule, irPath, crossfeed, gain
 )
 
 /**
@@ -18,9 +17,9 @@ class Phono(ir: File, crossfeed: Float, gain: Float) : LoFi(
  *
  * Created by minjaesong on 2024-01-24.
  */
-class Tape(ir: File, crossfeed: Float, gain: Float) : LoFi(
-    ModMgr.getFile("basegame", "audio/effects/static/tape_hiss.ogg"),
-    ir, crossfeed, gain
+class Tape(irModule: String, irPath: String, crossfeed: Float, gain: Float) : LoFi(
+    "basegame", "audio/effects/static/tape_hiss.ogg",
+    irModule, irPath, crossfeed, gain
 )
 
 /**
@@ -30,7 +29,7 @@ class Tape(ir: File, crossfeed: Float, gain: Float) : LoFi(
  *
  * Created by minjaesong on 2024-01-24.
  */
-class Holo(ir: File, crossfeed: Float, gain: Float) : LoFi(
-    ModMgr.getFile("basegame", "audio/effects/static/film_pops.ogg"),
-    ir, crossfeed, gain
+class Holo(irModule: String, irPath: String, crossfeed: Float, gain: Float) : LoFi(
+    "basegame", "audio/effects/static/film_pops.ogg",
+    irModule, irPath, crossfeed, gain
 )

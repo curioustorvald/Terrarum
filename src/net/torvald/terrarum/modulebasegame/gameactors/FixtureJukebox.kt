@@ -119,10 +119,9 @@ class FixtureJukebox : Electric, PlaysMusic {
             App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
                 startAudio(musicNowPlaying!!) {
                     it.filters[filterIndex] = Phono(
-                        ModMgr.getFile(
-                            "basegame",
-                            "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin"
-                        ), 0f, 5f / 16f
+                        "basegame",
+                        "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin",
+                        0f, 5f / 16f
                     )
                 }
             }

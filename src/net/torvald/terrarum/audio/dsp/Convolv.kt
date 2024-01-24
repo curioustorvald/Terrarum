@@ -24,7 +24,7 @@ import kotlin.math.roundToInt
  *
  * Created by minjaesong on 2023-11-25.
  */
-class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): TerrarumAudioFilter() {
+class Convolv(irModule: String, irPath: String, val crossfeed: Float, gain: Float = 1f / 256f): TerrarumAudioFilter() {
 
     private val gain: Float = gain / (1f + crossfeed)
 
@@ -35,39 +35,9 @@ class Convolv(ir: File, val crossfeed: Float, gain: Float = 1f / 256f): Terrarum
     var processingSpeed = 1f; private set
 
     init {
-        if (!ir.exists()) {
-            throw IllegalArgumentException("Impulse Response file '${ir.path}' does not exist.")
-        }
-
-        val sampleCount = (ir.length().toInt() / 8)//.coerceAtMost(65536)
-        fftLen = FastMath.nextPowerOfTwo(sampleCount)
-
-        println("IR '${ir.path}' Sample Count = $sampleCount; FFT Length = $fftLen")
-
-        val conv = Array(2) { FloatArray(fftLen) }
+        convFFT = AudioHelper.getIR(irModule, irPath)
+        fftLen = convFFT[0].size
         sumbuf = Array(2) { ComplexArray(FloatArray(fftLen * 2)) }
-
-        ir.inputStream().let {
-            for (i in 0 until sampleCount) {
-                val f1 = Float.fromBits(it.read().and(255) or
-                        it.read().and(255).shl(8) or
-                        it.read().and(255).shl(16) or
-                        it.read().and(255).shl(24))
-                val f2 = Float.fromBits(it.read().and(255) or
-                        it.read().and(255).shl(8) or
-                        it.read().and(255).shl(16) or
-                        it.read().and(255).shl(24))
-                conv[0][i] = f1
-                conv[1][i] = f2
-            }
-
-            it.close()
-        }
-
-        // fourier-transform the 'conv'
-        convFFT = Array(2) {
-            FFT.fft(conv[it])
-        }
     }
 
     private var realtime = (App.audioBufferSize / TerrarumAudioMixerTrack.SAMPLING_RATEF * 1000000000L)

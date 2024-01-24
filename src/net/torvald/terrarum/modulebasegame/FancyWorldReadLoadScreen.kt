@@ -17,19 +17,19 @@ import kotlin.math.sqrt
 open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidth: Int, private val worldheight: Int, override var preLoadJob: (LoadScreenBase) -> Unit) : LoadScreenBase() {
 
     init {
-        CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer01") {
+        CommonResourcePool.addToLoadingList("basegame.gui/loadscrlayer01") {
             Texture(ModMgr.getGdxFile("basegame", "gui/loadscr_layer01.png"))
         }
-        CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer02") {
+        CommonResourcePool.addToLoadingList("basegame.gui/loadscrlayer02") {
             Texture(ModMgr.getGdxFile("basegame", "gui/loadscr_layer02.png"))
         }
-        CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer03") {
+        CommonResourcePool.addToLoadingList("basegame.gui/loadscrlayer03") {
             Texture(ModMgr.getGdxFile("basegame", "gui/loadscr_layer03.png"))
         }
-        CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer04") {
+        CommonResourcePool.addToLoadingList("basegame.gui/loadscrlayer04") {
             Texture(ModMgr.getGdxFile("basegame", "gui/loadscr_layer04.png"))
         }
-        CommonResourcePool.addToLoadingList("basegame-gui-loadscrlayer05") {
+        CommonResourcePool.addToLoadingList("basegame.gui/loadscrlayer05") {
             Texture(ModMgr.getGdxFile("basegame", "gui/loadscr_layer05.png"))
         }
         CommonResourcePool.loadAll()
@@ -51,14 +51,14 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
     val xoff = (Math.random() * (1024-764)/2).toInt()
 
     val baseTileTex = arrayOf(
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer01"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer02"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer03"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer04"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer05"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer05"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer05"),
-        CommonResourcePool.getAsTexture("basegame-gui-loadscrlayer05"),
+        CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer01"),
+        CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer02"),
+        CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer03"),
+        CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer04"),
+        CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer05"),
+        CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer05"),
+        CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer05"),
+        CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer05"),
     )
 
     val drawWidth = Toolkit.drawWidth

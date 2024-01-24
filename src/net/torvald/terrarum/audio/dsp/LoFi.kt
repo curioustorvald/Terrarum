@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
+import net.torvald.terrarum.audio.AudioHelper
 import net.torvald.terrarum.audio.AudioProcessBuf.Companion.MP3_CHUNK_SIZE
 import net.torvald.terrarum.serialise.toUint
 import java.io.File
@@ -19,48 +20,17 @@ import kotlin.math.tanh
  *
  * Created by minjaesong on 2024-01-21.
  */
-open class LoFi(static: File, ir: File, val crossfeed: Float, gain: Float = 1f / 256f): TerrarumAudioFilter(), DspCompressor {
+open class LoFi(
+    staticModule: String, staticPath: String,
+    irModule: String, irPath: String,
+    val crossfeed: Float, gain: Float = 1f / 256f
+): TerrarumAudioFilter(), DspCompressor {
     override val downForce = arrayOf(1.0f, 1.0f)
 
-    internal val staticSample: List<FloatArray>
+    internal val staticSample = AudioHelper.getAudioInSamples(staticModule, staticPath)
     private var staticSamplePlayCursor = 0
 
-    init {
-        val music = Gdx.audio.newMusic(Gdx.files.absolute(static.absolutePath))
-        val readbuf = ByteArray(MP3_CHUNK_SIZE * 4)
-        val OUTBUF_BLOCK_SIZE_IN_BYTES = (48000 * 60) * 2 * 2
-        var outbuf = ByteArray(OUTBUF_BLOCK_SIZE_IN_BYTES)
-        var bytesRead = 0
-
-        fun expandOutbuf() {
-            val newOutBuf = ByteArray(outbuf.size + OUTBUF_BLOCK_SIZE_IN_BYTES)
-            System.arraycopy(outbuf, 0, newOutBuf, 0, outbuf.size)
-            outbuf = newOutBuf
-        }
-
-        while (true) {
-            val readSize = music.forceInvoke<Int>("read", arrayOf(readbuf))!!
-            if (readSize <= 0) break
-
-            // check if outbuf has room
-            if (bytesRead + readSize > outbuf.size) expandOutbuf()
-
-            // actually copy the bytes
-            System.arraycopy(readbuf, 0, outbuf, bytesRead, readSize)
-
-            bytesRead += readSize
-        }
-
-        // convert bytes to float samples
-        staticSample = listOf(FloatArray(bytesRead / 4), FloatArray(bytesRead / 4))
-        for (i in staticSample[0].indices) {
-            staticSample[0][i] = (outbuf[4*i+0].toUint() or outbuf[4*i+1].toUint().shl(8)).toShort() / 32767f
-            staticSample[1][i] = (outbuf[4*i+2].toUint() or outbuf[4*i+3].toUint().shl(8)).toShort() / 32767f
-        }
-
-    }
-
-    internal val convolver = Convolv(ir, crossfeed, gain)
+    internal val convolver = Convolv(irModule, irPath, crossfeed, gain)
 
     private val immAfterStaticMix = listOf(FloatArray(App.audioBufferSize), FloatArray(App.audioBufferSize))
     private val immAfterConvolv = listOf(FloatArray(App.audioBufferSize), FloatArray(App.audioBufferSize))
