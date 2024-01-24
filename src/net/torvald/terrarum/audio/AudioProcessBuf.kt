@@ -188,10 +188,12 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
 //        printdbg(this, "phase = $fPhaseL")
     }
 
-    fun getLR(volume: Double): Pair<FloatArray, FloatArray> {
+    fun getLR(): Pair<FloatArray, FloatArray> {
         // copy into the out
-        val outL = FloatArray(App.audioBufferSize) { (foutL[it] * volume).toFloat() }
-        val outR = FloatArray(App.audioBufferSize) { (foutR[it] * volume).toFloat() }
+        val outL = FloatArray(App.audioBufferSize)
+        val outR = FloatArray(App.audioBufferSize)
+        System.arraycopy(foutL, 0, outL, 0, App.audioBufferSize)
+        System.arraycopy(foutR, 0, outR, 0, App.audioBufferSize)
         // shift bytes in the fout
         System.arraycopy(foutL, App.audioBufferSize, foutL, 0, validSamplesInBuf - App.audioBufferSize)
         System.arraycopy(foutR, App.audioBufferSize, foutR, 0, validSamplesInBuf - App.audioBufferSize)

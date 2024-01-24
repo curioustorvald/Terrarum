@@ -184,8 +184,8 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                 // add all up
                 sidechains.forEach { (side, mix) ->
                     for (i in samplesL1.indices) {
-                        samplesL1[i] += side.processor.fout1[0][i] * (mix * track.volume).toFloat()
-                        samplesR1[i] += side.processor.fout1[1][i] * (mix * track.volume).toFloat()
+                        samplesL1[i] += side.processor.fout1[0][i] * mix.toFloat()
+                        samplesR1[i] += side.processor.fout1[1][i] * mix.toFloat()
                     }
                 }
             }
@@ -198,7 +198,7 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                 bufEmpty = true
             }
             else {
-                streamBuf!!.getLR(track.volume).let {
+                streamBuf!!.getLR().let {
                     samplesL1 = it.first
                     samplesR1 = it.second
                 }
@@ -221,6 +221,14 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                         if (index < filterStack.lastIndex) {
                             fout1 = listOf(FloatArray(buffertaille), FloatArray(buffertaille))
                         }
+                    }
+                }
+
+
+                // apply fader at post
+                fout1.forEach { ch ->
+                    ch.forEachIndexed { index, sample ->
+                        ch[index] = (sample * track.volume).toFloat()
                     }
                 }
 
