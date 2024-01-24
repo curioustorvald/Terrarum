@@ -13,6 +13,7 @@ import net.torvald.terrarum.audio.AudioMixer.Companion.DEFAULT_FADEOUT_LEN
 import net.torvald.terrarum.audio.dsp.Convolv
 import net.torvald.terrarum.audio.dsp.LoFi
 import net.torvald.terrarum.audio.dsp.NullFilter
+import net.torvald.terrarum.audio.dsp.Phono
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
@@ -117,7 +118,7 @@ class FixtureJukebox : Electric, PlaysMusic {
 
             App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
                 startAudio(musicNowPlaying!!) {
-                    it.filters[filterIndex] = LoFi(
+                    it.filters[filterIndex] = Phono(
                         ModMgr.getFile(
                             "basegame",
                             "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin"

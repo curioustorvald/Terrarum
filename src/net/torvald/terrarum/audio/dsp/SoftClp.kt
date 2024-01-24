@@ -6,6 +6,11 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 /**
+ * This filter compresses the input signal using a fixed artificial Voltage Transfer Characteristic curve,
+ * where the curve is linear on the intensity lower than -3dB, then up to +3.5dB the curve flattens
+ * (compression ratio steadily reaches infinity) gradually, using simple quadratic curve, then above
+ * +3.5dB the curve is completely flat and the compression ratio is infinity.
+ *
  * Created by minjaesong on 2023-11-20.
  */
 object SoftClp : TerrarumAudioFilter(), DspCompressor {
