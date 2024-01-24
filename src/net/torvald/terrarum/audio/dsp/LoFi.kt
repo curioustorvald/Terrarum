@@ -6,6 +6,7 @@ import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.AudioHelper
 import net.torvald.terrarum.audio.AudioProcessBuf.Companion.MP3_CHUNK_SIZE
+import net.torvald.terrarum.audio.decibelsToFullscale
 import net.torvald.terrarum.serialise.toUint
 import java.io.File
 import kotlin.math.absoluteValue
@@ -43,8 +44,8 @@ open class LoFi(
 
     private fun staticMixThru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         for (h in 0 until App.audioBufferSize) {
-            outbuf[0][h] = inbuf[0][h] + staticSample[0][staticSamplePlayCursor]
-            outbuf[1][h] = inbuf[1][h] + staticSample[1][staticSamplePlayCursor]
+            outbuf[0][h] = inbuf[0][h] + staticSample[0][staticSamplePlayCursor] * 2.512f // +8 dB
+            outbuf[1][h] = inbuf[1][h] + staticSample[1][staticSamplePlayCursor] * 2.512f // +8 dB
             staticSamplePlayCursor = (staticSamplePlayCursor + 1) % staticSample[0].size
         }
     }

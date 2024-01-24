@@ -30,6 +30,6 @@ class Tape(irModule: String, irPath: String, crossfeed: Float, gain: Float) : Lo
  * Created by minjaesong on 2024-01-24.
  */
 class Holo(irModule: String, irPath: String, crossfeed: Float, gain: Float) : LoFi(
-    "basegame", "audio/effects/static/film_pops.ogg",
+    "basegame", "audio/effects/static/film_pops_lowpass.ogg",
     irModule, irPath, crossfeed, gain
 )

@@ -14,6 +14,7 @@ import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.*
+import net.torvald.terrarum.audio.AudioMixer.Companion.DS_FLTIDX_PAN
 import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
@@ -519,7 +520,7 @@ class BasicDebugInfoWindow : UICanvas() {
         Toolkit.fillArea(batch, x, y, miniW, miniH)
 
         // pan
-        val panw = (track.filters[0] as BinoPan).pan * 0.5f * miniW
+        val panw = (track.filters[DS_FLTIDX_PAN] as BinoPan).pan * 0.5f * miniW
         batch.color = COL_METER_GRAD
         Toolkit.fillArea(batch, x.toFloat(), y.toFloat(), miniW.toFloat(), 2f)
         batch.color = COL_METER_GRAD2

@@ -32,6 +32,9 @@ class AudioMixer(val bufferSize: Int): Disposable {
         const val SPEED_OF_SOUND = 340f
 
         const val DEFAULT_FADEOUT_LEN = 1.8
+
+        internal const val DS_FLTIDX_PAN = 2
+        internal const val DS_FLTIDX_LOW = 3
     }
 
 
@@ -229,11 +232,11 @@ class AudioMixer(val bufferSize: Int): Disposable {
             it.addSidechainInput(sfxSumBus, 1.0)
         }
 
-        convolveBusOpen.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - PurgatoryChasm.bin"), decibelsToFullscale(-6.0).toFloat())
+        convolveBusOpen.filters[1] = Convolv("basegame", "audio/convolution/EchoThief - PurgatoryChasm.bin", decibelsToFullscale(-6.0).toFloat())
         convolveBusOpen.filters[2] = Gain(decibelsToFullscale(17.0).toFloat()) // don't make it too loud; it'll sound like a shit
         convolveBusOpen.volume = 0.5 // will be controlled by the other updater which surveys the world
 
-        convolveBusCave.filters[1] = Convolv(ModMgr.getFile("basegame", "audio/convolution/EchoThief - WaterplacePark-trimmed.bin"), decibelsToFullscale(-3.0).toFloat())
+        convolveBusCave.filters[1] = Convolv("basegame", "audio/convolution/EchoThief - WaterplacePark-trimmed.bin", decibelsToFullscale(-3.0).toFloat())
         convolveBusCave.filters[2] = Gain(decibelsToFullscale(16.0).toFloat())
         convolveBusCave.volume = 0.5 // will be controlled by the other updater which surveys the world
 
@@ -247,8 +250,8 @@ class AudioMixer(val bufferSize: Int): Disposable {
 
 
         dynamicTracks.forEach {
-            it.filters[0] = BinoPan(0f)
-            it.filters[1] = Lowpass(SAMPLING_RATE / 2f)
+            it.filters[DS_FLTIDX_PAN] = BinoPan(0f)
+            it.filters[DS_FLTIDX_LOW] = Lowpass(SAMPLING_RATE / 2f)
             sfxSumBus.addSidechainInput(it, 1.0)
         }
 

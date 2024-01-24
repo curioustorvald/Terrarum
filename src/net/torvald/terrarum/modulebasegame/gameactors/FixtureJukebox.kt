@@ -42,7 +42,7 @@ class FixtureJukebox : Electric, PlaysMusic {
 
     @Transient private val backLamp: SheetSpriteAnimation
 
-    @Transient private val filterIndex = 2
+    @Transient private val filterIndex = 0
 
     internal val discInventory = ArrayList<ItemID>()
 
