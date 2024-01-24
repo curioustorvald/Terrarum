@@ -73,6 +73,7 @@ basegame
     // Commit counts up to the Release 0.3.3: 3020
 
     val VERSION_SNAPSHOT = if (App.IS_DEVELOPMENT_BUILD) Snapshot(0) else null
+//    val VERSION_SNAPSHOT = ForcedSnapshot("24w04a")
 
     const val VERSION_TAG: String = ""
 

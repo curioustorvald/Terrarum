@@ -21,8 +21,10 @@ rm $DESTDIR/mods/basegame/blocks/*.txt
 rm $DESTDIR/mods/basegame/weathers/*.txt
 rm $DESTDIR/mods/basegame/weathers/*.md
 rm $DESTDIR/mods/basegame/weathers/*.kra
-rm -r $DESTDIR/mods/basegame/sounds
+rm -r $DESTDIR/mods/basegame/audio/music/
 rm -r $DESTDIR/mods/dwarventech
+rm -r $DESTDIR/mods/myawesomemod
+rm -r $DESTDIR/mods/musicplayer
 
 for s in .directory .DS_Store Thumbs.db thumbs.db; do
   rm $DESTDIR/$s
