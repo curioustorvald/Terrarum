@@ -271,7 +271,7 @@ limitations under the License.
 
 
 
-$BULLET Ambient sound recordings:
+$BULLET Foleys:
 
     - ambient/season/crepuscular_summer.*.ogg
     - ambient/season/diurnal_autumn.*.ogg
@@ -283,32 +283,46 @@ $BULLET Ambient sound recordings:
 Copyright (C) 2013, 2015, 2020, 2021 Klankbeeld
 Sound from <https://www.freesound.org/people/klankbeeld>
 
-
-
-$BULLET Foleys:
-
-    - steps/GRSS.*.ogg
-    - steps/GRVL.*.ogg
-    - steps/ROCK.*.ogg
-    - steps/SAND.*.ogg
-    - steps/WOOD.*.ogg
-    - door/wooden_open.*.ogg
-    - door/wooden_close.*.ogg
+    - effects/steps/GRSS.*.ogg
+    - effects/steps/GRVL.*.ogg
+    - effects/steps/ROCK.*.ogg
+    - effects/steps/SAND.*.ogg
+    - effects/steps/WOOD.*.ogg
+    - effects/door/wooden_open.*.ogg
+    - effects/door/wooden_close.*.ogg
 
 Copyright (C) 2020, 2021, 2022 Nox Sound
 Sound from <https://freesound.org/people/Nox_Sound>
 
+    - effects/static/phono_pops.ogg
+    
+Copyright (C) 2011 Veezay
+Sound from <https://freesound.org/people/veezay>
+
+    - effects/static/tape_hiss.ogg
+    
+Copyright (C) 2017 Stephen Holdaway
+Sound from <https://freesound.org/people/stecman>
+
+    - effects/static/tape_hiss.ogg
+    
+Copyright (C) 2015 Joe DeShon
+Sound from <https://freesound.org/people/joedeshon>
 
 
-$BULLET EchoThief Impulse Response Library
 
+$BULLET Impulse Responses:
+
+    - convolution/EchoThief - *.bin
+    
+EchoThief Impulse Response Library
 Copyright 2013-2023 Chris Warren <cwarren@sdsu.edu>
 
-
-
-$BULLET Soundwoofer $EMDASH Free Impulse Response Library
-
-Copyright 2018 Soundwoofer Team <https://soundwoofer.com/User/Index?uid=soundwoofer>
+    - convolution/Soundwoofer - *.bin
+    
+Soundwoofer Free Impulse Response Library
+Copyright 2018 Soundwoofer Team
+<https://soundwoofer.com/User/Index?uid=soundwoofer>
 """).split('\n')
 
 
