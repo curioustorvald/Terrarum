@@ -430,6 +430,7 @@ public class App implements ApplicationListener {
             int width = scr.getWindowW();
             int height = scr.getWindowH();
             boolean useFullscreen = getConfigBoolean("fullscreen");
+            float magn = (float) getConfigDouble("screenmagnifying");
 
             Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
             //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
@@ -441,15 +442,20 @@ public class App implements ApplicationListener {
             if (useFullscreen) {
                 // auto resize for fullscreen
                 var disp = Lwjgl3ApplicationConfiguration.getDisplayMode();
-                float magn = (float) getConfigDouble("screenmagnifying");
                 var newWidth = ((int)(disp.width / magn)) & 0x7FFFFFFE;
                 var newHeight = ((int)(disp.height / magn)) & 0x7FFFFFFE;
                 scr.setDimension(newWidth, newHeight, magn);
 
                 appConfig.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
+
             }
             else
                 appConfig.setWindowedMode(width, height);
+
+            // if filter is none AND magn is not (100% or 200%), set filter to hq2x
+            if (getConfigString("screenmagnifyingfilter").equals("none") && magn != 1f && magn != 2f) {
+                setConfig("screenmagnifyingfilter", "hq2x");
+            }
 
             appConfig.setTransparentFramebuffer(false);
             int fpsActive = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
