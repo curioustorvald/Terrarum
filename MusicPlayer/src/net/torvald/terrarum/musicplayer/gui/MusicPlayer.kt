@@ -346,8 +346,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                         // prev song
                         if (mode < MODE_SHOW_LIST) {
                             getPrevSongFromPlaylist()?.let { ingame.musicGovernor.unshiftPlaylist(it) }
-                            App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
-                                ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                            if (!shouldPlayerBeDisabled) {
+                                App.audioMixer.requestFadeOut(
+                                    App.audioMixer.musicTrack,
+                                    AudioMixer.DEFAULT_FADEOUT_LEN / 3f
+                                ) {
+                                    ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                                    iHitTheStopButton = false
+                                    stopRequested = false
+                                }
                             }
                         }
                         // prev page in the playlist
@@ -371,9 +378,12 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                                 App.audioMixer.musicTrack.nextTrack = null
                                 ingame.musicGovernor.stopMusic()
                                 thisMusic?.let { ingame.musicGovernor.queueMusicToPlayNext(it) }
+                                iHitTheStopButton = true
                             }
                             else if (!shouldPlayerBeDisabled) {
                                 ingame.musicGovernor.startMusic()
+                                iHitTheStopButton = false
+                                stopRequested = false
                             }
                         }
                     }
@@ -381,8 +391,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                     3 -> { // next
                         // next song
                         if (mode < MODE_SHOW_LIST) {
-                            App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
-                                ingame.musicGovernor.startMusic() // required for "intermittent" mode, does seemingly nothing on "continuous" mode
+                            if (!shouldPlayerBeDisabled) {
+                                App.audioMixer.requestFadeOut(
+                                    App.audioMixer.musicTrack,
+                                    AudioMixer.DEFAULT_FADEOUT_LEN / 3f
+                                ) {
+                                    ingame.musicGovernor.startMusic() // required for "intermittent" mode, does seemingly nothing on "continuous" mode
+                                    iHitTheStopButton = false
+                                    stopRequested = false
+                                }
                             }
                         }
                         // next page in the playlist
@@ -432,6 +449,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                         App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
                             if (!shouldPlayerBeDisabled) {
                                 ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                                iHitTheStopButton = false
+                                stopRequested = false
                             }
                         }
                     }
@@ -451,6 +470,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                             loadNewAlbum(albumsList[index])
                             if (!shouldPlayerBeDisabled) {
                                 ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                                iHitTheStopButton = false
+                                stopRequested = false
                             }
                             resetPlaylistScroll(App.audioMixer.musicTrack.nextTrack)
                         }
@@ -466,12 +487,15 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
 
 //        printdbg(this, "mode = $mode; req = $transitionRequest")
 
-        if (shouldPlayerBeDisabled) {
-            ingame.musicGovernor.stopMusic()
+        if (shouldPlayerBeDisabled || iHitTheStopButton) {
+            if (!stopRequested) {
+                stopRequested = true
+                ingame.musicGovernor.stopMusic()
+            }
         }
         else if (!jukeboxStopMonitorAlert && !App.audioMixer.musicTrack.isPlaying) {
             jukeboxStopMonitorAlert = true
-            ingame.musicGovernor.stopMusic(false, Math.random().toFloat() * 30f + 30f)
+            ingame.musicGovernor.stopMusic(false, ingame.musicGovernor.getRandomMusicInterval())
         }
         else if (App.audioMixer.musicTrack.isPlaying) {
             jukeboxStopMonitorAlert = false
@@ -479,6 +503,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     }
 
     private var jukeboxStopMonitorAlert = true
+    private var iHitTheStopButton = false
+    private var stopRequested = false
 
     private fun resetAlbumlistScroll() {
         val currentlyPlaying = albumsList.indexOfFirst { it.canonicalPath.replace('\\', '/') == ingame.musicGovernor.playlistSource }

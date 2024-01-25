@@ -324,11 +324,13 @@ class TerrarumMusicGovernor : MusicGovernor() {
     protected var ambState = 0
     protected var ambFired = false
 
+    fun getRandomMusicInterval() = 25f + Math.random().toFloat() * 10f
+
     private fun stopMusic(song: MusicContainer?, callStopMusicHook: Boolean = true, customPauseLen: Float? = null) {
         musicState = STATE_INTERMISSION
         intermissionAkku = 0f
         intermissionLength = customPauseLen ?:
-            if (diskJockeyingMode == "intermittent") 30f + 30f * Math.random().toFloat() else Float.POSITIVE_INFINITY // 30s-60s
+            if (diskJockeyingMode == "intermittent") getRandomMusicInterval() else Float.POSITIVE_INFINITY // 30s-60s
         musicFired = false
         if (callStopMusicHook && musicStopHooks.isNotEmpty()) musicStopHooks.forEach {
             if (song != null) {
@@ -340,7 +342,8 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
     fun stopMusic(callStopMusicHook: Boolean = true, pauseLen: Float = Float.POSITIVE_INFINITY) {
         stopMusic(App.audioMixer.musicTrack.currentTrack, callStopMusicHook, pauseLen)
-//        printdbg(this, "StopMusic Intermission2: $intermissionLength seconds")
+//        printdbg(this, "StopMusic Intermission2: $pauseLen seconds, called by:")
+//        printStackTrace(this)
     }
 
     fun startMusic() {
