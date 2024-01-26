@@ -434,7 +434,7 @@ internal object BlocksDrawer {
 
                 // hide tiles with super low lights, kinda like Minecraft's Orebfuscator
                 val lightAtXY = LightmapRenderer.getLight(x, y) ?: Cvec(0)
-                if (lightAtXY.fastLum() <= 1.5f / 255f) {
+                if (maxOf(lightAtXY.fastLum(), lightAtXY.a) <= 1.5f / 255f) {
                     tileNumber = 2 // black solid
                 }
 
