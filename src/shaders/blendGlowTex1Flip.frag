@@ -16,6 +16,10 @@ const vec2 boolean = vec2(0.0, 1.0);
 void main(void) {
     vec4 colorTex0 = texture(u_texture, v_texCoords); // lightmap (RGB) pre-mixed
     vec4 colorTex1 = texture(tex1, vec2(v_texCoords.x, 1.0 - v_texCoords.y)); // lightmap (A) pre-mixed
-//    fragColor = (max(colorTex0, colorTex1) * boolean.yyyx) + (colorTex0 * boolean.xxxy);
-    fragColor = fma(max(colorTex0, colorTex1), boolean.yyyx, colorTex0 * boolean.xxxy);
+//    if (colorTex0.a > colorTex1.a) {
+        fragColor = fma(max(colorTex0, colorTex1), boolean.yyyx, colorTex0 * boolean.xxxy);
+//    }
+//    else {
+//        fragColor = fma(max(colorTex0, colorTex1), boolean.yyyx, colorTex1 * boolean.xxxy);
+//    }
 }

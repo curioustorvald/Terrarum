@@ -14,6 +14,10 @@ import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.EntryID
 import net.torvald.terrarum.savegame.SimpleFileSystem
+import net.torvald.terrarum.savegame.VDFileID
+import net.torvald.terrarum.savegame.VDFileID.BODYPARTEMISSIVE_TO_ENTRY_MAP
+import net.torvald.terrarum.savegame.VDFileID.BODYPARTGLOW_TO_ENTRY_MAP
+import net.torvald.terrarum.savegame.VDFileID.BODYPART_TO_ENTRY_MAP
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.spriteassembler.ADPropertyObject
@@ -31,12 +35,19 @@ class AssembledSpriteAnimation(
     @Transient val adp: ADProperties,
     parentActor: ActorWithBody,
     @Transient val disk: SimpleFileSystem?, // specify if the resources for the animation is contained in the disk archive
-    @Transient val bodypartToFileMap: EntryID?, // which file in the disk contains bodypart-to-fileid mapping for this particular instance of sprite animation
     @Transient val isGlow: Boolean,
     @Transient val isEmissive: Boolean
 ) : SpriteAnimation(parentActor) {
 
-    constructor(adp: ADProperties, parentActor: ActorWithBody, isGlow: Boolean, isEmissive: Boolean) : this(adp, parentActor, null, null, isGlow, isEmissive)
+    constructor(adp: ADProperties, parentActor: ActorWithBody, isGlow: Boolean, isEmissive: Boolean) : this(adp, parentActor, null, isGlow, isEmissive)
+
+    @Transient val bodypartToFileMap = if (isEmissive)
+        BODYPARTEMISSIVE_TO_ENTRY_MAP
+    else if (isGlow)
+        BODYPARTGLOW_TO_ENTRY_MAP
+    else
+        BODYPART_TO_ENTRY_MAP
+
 
     var currentFrame = 0 // while this number is zero-based, the frame number on the ADP is one-based
         private set
@@ -69,13 +80,21 @@ class AssembledSpriteAnimation(
 
         val fileGetter = if (disk != null) {
             val bodypartMapping = Properties()
-            bodypartMapping.load(ByteArray64Reader(disk.getFile(bodypartToFileMap!!)!!.bytes, Common.CHARSET))
+            bodypartMapping.load(ByteArray64Reader(disk.getFile(bodypartToFileMap)!!.bytes, Common.CHARSET))
 
             AssembleSheetPixmap.getVirtualDiskFileGetter(bodypartMapping, disk)
         }
         else AssembleSheetPixmap.getAssetsDirFileGetter(adp)
 
-        adp.bodyparts.forEach { res[it] = getPartTexture(fileGetter, it) }
+        val fileGetterFallback = if (disk != null) {
+            val bodypartMapping = Properties()
+            bodypartMapping.load(ByteArray64Reader(disk.getFile(BODYPART_TO_ENTRY_MAP)!!.bytes, Common.CHARSET))
+
+            AssembleSheetPixmap.getVirtualDiskFileGetter(bodypartMapping, disk)
+        }
+        else AssembleSheetPixmap.getAssetsDirFileGetter(adp)
+
+        adp.bodyparts.forEach { res[it] = getPartTexture(fileGetter, fileGetterFallback, it) }
 
         val (mugPixmap, headSprite0) = if (disk != null)
             AssembleSheetPixmap.getMugshotFromVirtualDisk(disk, -1025L, adp)
@@ -225,10 +244,24 @@ class AssembledSpriteAnimation(
                 // TODO fill in with armours/etc
         )
 
-        private fun getPartTexture(getFile: (String) -> InputStream?, partName: String): TextureRegion? {
+        private fun getPartTexture(getFile: (String) -> InputStream?, getFileFallback: (String) -> InputStream?, partName: String): TextureRegion? {
             getFile(partName)?.let {
                 val bytes = it.readAllBytes()
                 return TextureRegion(Texture(Pixmap(bytes, 0, bytes.size)))
+            }
+            getFileFallback(partName)?.let {
+                val bytes = it.readAllBytes()
+
+                // filter the image so that it's either transparent or black
+                val pixmap = Pixmap(bytes, 0, bytes.size)
+                for (y in 0 until pixmap.height) {
+                    for (x in 0 until pixmap.width) {
+                        val c = pixmap.getPixel(x, y)
+                        pixmap.drawPixel(x, y, c and 0xFF)
+                    }
+                }
+
+                return TextureRegion(Texture(pixmap))
             }
             return null
         }

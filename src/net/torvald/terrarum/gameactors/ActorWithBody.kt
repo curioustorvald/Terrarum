@@ -1796,8 +1796,8 @@ open class ActorWithBody : Actor {
         if (isVisible) {
             blendNormalStraightAlpha(batch)
             if (spriteGlow != null)
-                drawSpriteInGoodPosition(frameDelta, spriteGlow!!, batch, 2)
-            else
+                drawSpriteInGoodPosition(frameDelta, spriteGlow!!, batch, 1)
+            else if (sprite != null)
                 drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 1, Color.BLACK)
         }
     }
@@ -1807,7 +1807,7 @@ open class ActorWithBody : Actor {
             blendNormalStraightAlpha(batch)
             if (spriteEmissive != null)
                 drawSpriteInGoodPosition(frameDelta, spriteEmissive!!, batch, 1)
-            else
+            else if (sprite != null)
                 drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 2, Color.BLACK)
         }
     }

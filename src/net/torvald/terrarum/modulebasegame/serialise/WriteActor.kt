@@ -179,7 +179,6 @@ object ReadActor {
                 actor.animDesc!!,
                 actor,
                 if (bodypartsFile != null) disk else null,
-                if (bodypartsFile != null) BODYPART_TO_ENTRY_MAP else null,
                 false, false
             )
 
@@ -189,7 +188,6 @@ object ReadActor {
                     actor.animDescGlow!!,
                     actor,
                     if (bodypartsFile != null) disk else null,
-                    if (bodypartsFile != null) BODYPARTGLOW_TO_ENTRY_MAP else null,
                     true, false
                 )
             }
@@ -200,7 +198,6 @@ object ReadActor {
                     actor.animDescEmissive!!,
                     actor,
                     if (bodypartsFile != null) disk else null,
-                    if (bodypartsFile != null) BODYPARTEMISSIVE_TO_ENTRY_MAP else null,
                     false, true
                 )
             }
@@ -223,50 +220,4 @@ object ReadActor {
         }
     }
 
-    private fun makeSprite(mode: Int, actor: IngamePlayer, disk: SimpleFileSystem, file: EntryFile?, bodypartsFile: EntryFile?) {
-        val animDesc = when (mode) {
-            0 -> actor.animDesc
-            1 -> actor.animDescGlow
-            2 -> actor.animDescEmissive
-            else -> throw IllegalArgumentException()
-        }
-
-        if (file != null) {
-            when (mode) {
-                0 -> { actor.animDesc = ADProperties(ByteArray64Reader(file.bytes, Common.CHARSET)) }
-                1 -> { actor.animDescGlow = ADProperties(ByteArray64Reader(file.bytes, Common.CHARSET)) }
-                2 -> { actor.animDescEmissive = ADProperties(ByteArray64Reader(file.bytes, Common.CHARSET)) }
-                else -> throw IllegalArgumentException()
-            }
-
-            when (mode) {
-                0 -> { actor.sprite = AssembledSpriteAnimation(
-                    actor.animDesc!!,
-                    actor,
-                    if (bodypartsFile != null) disk else null,
-                    if (bodypartsFile != null) BODYPART_TO_ENTRY_MAP else null,
-                    false, false
-                ) }
-                1 -> { actor.spriteGlow = AssembledSpriteAnimation(
-                    actor.animDescGlow!!,
-                    actor,
-                    if (bodypartsFile != null) disk else null,
-                    if (bodypartsFile != null) BODYPARTGLOW_TO_ENTRY_MAP else null,
-                    true, false
-                ) }
-                2 -> { actor.spriteEmissive = AssembledSpriteAnimation(
-                    actor.animDescEmissive!!,
-                    actor,
-                    if (bodypartsFile != null) disk else null,
-                    if (bodypartsFile != null) BODYPARTEMISSIVE_TO_ENTRY_MAP else null,
-                    false, true
-                ) }
-                else -> throw IllegalArgumentException()
-            }
-
-        }
-        else {
-
-        }
-    }
 }
