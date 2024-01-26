@@ -1793,16 +1793,22 @@ open class ActorWithBody : Actor {
     }
 
     open fun drawGlow(frameDelta: Float, batch: SpriteBatch) {
-        if (isVisible && spriteGlow != null) {
+        if (isVisible) {
             blendNormalStraightAlpha(batch)
-            drawSpriteInGoodPosition(frameDelta, spriteGlow!!, batch)
+            if (spriteGlow != null)
+                drawSpriteInGoodPosition(frameDelta, spriteGlow!!, batch, 2)
+            else
+                drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 1, Color.BLACK)
         }
     }
 
     open fun drawEmissive(frameDelta: Float, batch: SpriteBatch) {
-        if (isVisible && spriteEmissive != null) {
+        if (isVisible) {
             blendNormalStraightAlpha(batch)
-            drawSpriteInGoodPosition(frameDelta, spriteEmissive!!, batch)
+            if (spriteEmissive != null)
+                drawSpriteInGoodPosition(frameDelta, spriteEmissive!!, batch, 1)
+            else
+                drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 2, Color.BLACK)
         }
     }
 
@@ -1830,7 +1836,7 @@ open class ActorWithBody : Actor {
         }
     }
 
-    protected fun drawSpriteInGoodPosition(frameDelta: Float, sprite: SpriteAnimation, batch: SpriteBatch) {
+    protected fun drawSpriteInGoodPosition(frameDelta: Float, sprite: SpriteAnimation, batch: SpriteBatch, mode: Int = 0, forcedColourFilter: Color? = null) {
         if (world == null) return
 
         val offsetX = 0f
@@ -1840,7 +1846,7 @@ open class ActorWithBody : Actor {
         val posY = hitbox.startY.plus(PHYS_EPSILON_DIST).toFloat()
 
         drawBodyInGoodPosition(posX, posY) { x, y ->
-            sprite.render(frameDelta, batch, x + offsetX, y + offsetY, scale.toFloat())
+            sprite.render(frameDelta, batch, x + offsetX, y + offsetY, scale.toFloat(), mode, forcedColourFilter)
         }
     }
 

@@ -53,10 +53,13 @@ internal object BlocksDrawer {
     //val tilesWire: TextureRegionPack
     val tileItemTerrain: TextureRegionPack
     val tileItemTerrainGlow: TextureRegionPack
+    val tileItemTerrainEmissive: TextureRegionPack
     val tileItemWall: TextureRegionPack
     val tileItemWallGlow: TextureRegionPack
+    val tileItemWallEmissive: TextureRegionPack
     val tilesFluid: TextureRegionPack
     val tilesGlow: TextureRegionPack
+    val tilesEmissive: TextureRegionPack
 
     //val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
 
@@ -119,6 +122,7 @@ internal object BlocksDrawer {
         //tilesWire = TextureRegionPack(ModMgr.getGdxFile("basegame", "wires/wire.tga"), TILE_SIZE, TILE_SIZE)
         tilesFluid = TextureRegionPack(Texture(App.tileMaker.atlasFluid), TILE_SIZE, TILE_SIZE)
         tilesGlow = TextureRegionPack(Texture(App.tileMaker.atlasGlow), TILE_SIZE, TILE_SIZE)
+        tilesEmissive = TextureRegionPack(Texture(App.tileMaker.atlasEmissive), TILE_SIZE, TILE_SIZE)
 
 
         printdbg(this, "Making terrain and wall item textures...")
@@ -129,8 +133,10 @@ internal object BlocksDrawer {
 
         tileItemTerrain = TextureRegionPack(App.tileMaker.itemTerrainTexture, TILE_SIZE, TILE_SIZE)
         tileItemTerrainGlow = TextureRegionPack(App.tileMaker.itemTerrainTextureGlow, TILE_SIZE, TILE_SIZE)
+        tileItemTerrainEmissive = TextureRegionPack(App.tileMaker.itemTerrainTextureEmissive, TILE_SIZE, TILE_SIZE)
         tileItemWall = TextureRegionPack(App.tileMaker.itemWallTexture, TILE_SIZE, TILE_SIZE)
         tileItemWallGlow = TextureRegionPack(App.tileMaker.itemWallTextureGlow, TILE_SIZE, TILE_SIZE)
+        tileItemWallEmissive = TextureRegionPack(App.tileMaker.itemWallTextureEmissive, TILE_SIZE, TILE_SIZE)
 
 
 //        val texdata = tileItemTerrain.texture.textureData
@@ -217,28 +223,28 @@ internal object BlocksDrawer {
         }
     }
 
-    internal fun drawWall(projectionMatrix: Matrix4, drawGlow: Boolean, drawBlack: Boolean = false) {
+    internal fun drawWall(projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean = false) {
         gdxBlendNormalStraightAlpha()
-        renderUsingBuffer(WALL, projectionMatrix, drawGlow, drawBlack)
+        renderUsingBuffer(WALL, projectionMatrix, drawGlow, drawEmissive)
 
         gdxBlendMul()
-        renderUsingBuffer(OCCLUSION, projectionMatrix, false, drawBlack)
+        renderUsingBuffer(OCCLUSION, projectionMatrix, false, drawEmissive)
     }
 
-    internal fun drawTerrain(projectionMatrix: Matrix4, drawGlow: Boolean, drawBlack: Boolean = false) {
+    internal fun drawTerrain(projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean = false) {
         gdxBlendNormalStraightAlpha()
 
-        renderUsingBuffer(TERRAIN, projectionMatrix, drawGlow, drawBlack)
-        renderUsingBuffer(ORES, projectionMatrix, drawGlow, drawBlack)
-        renderUsingBuffer(FLUID, projectionMatrix, drawGlow, drawBlack)
+        renderUsingBuffer(TERRAIN, projectionMatrix, drawGlow, drawEmissive)
+        renderUsingBuffer(ORES, projectionMatrix, drawGlow, drawEmissive)
+        renderUsingBuffer(FLUID, projectionMatrix, drawGlow, drawEmissive)
     }
 
 
-    internal fun drawFront(projectionMatrix: Matrix4, drawBlack: Boolean = false) {
+    internal fun drawFront(projectionMatrix: Matrix4, drawEmissive: Boolean = false) {
         gdxBlendMul()
 
         // let's just not MUL on terrain, make it FLUID only...
-        renderUsingBuffer(FLUID, projectionMatrix, false, drawBlack)
+        renderUsingBuffer(FLUID, projectionMatrix, false, drawEmissive)
 
 
 
@@ -708,7 +714,7 @@ internal object BlocksDrawer {
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
     private val occlusionIntensity = 0.22222222f // too low value and dark-coloured walls won't darken enough
 
-    private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean, drawBlack: Boolean) {
+    private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
@@ -732,7 +738,7 @@ internal object BlocksDrawer {
             OCCLUSION -> occlusionBuffer
             else -> throw IllegalArgumentException()
         }
-        val vertexColour = if (drawBlack) Color.BLACK else when (mode) {
+        val vertexColour = when (mode) {
             TERRAIN, /*WIRE,*/ ORES, FLUID, OCCLUSION -> Color.WHITE
             WALL -> WALL_OVERLAY_COLOUR
             else -> throw IllegalArgumentException()
@@ -754,7 +760,12 @@ internal object BlocksDrawer {
         _tilesBufferAsTex = Texture(tilesBuffer)
         _tilesBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
-        if (drawGlow) {
+        if (drawEmissive) {
+            tilesEmissive.texture.bind(2)
+            _tilesBufferAsTex.bind(1) // trying 1 and 0...
+            tilesEmissive.texture.bind(0) // for some fuck reason, it must be bound as last
+        }
+        else if (drawGlow) {
             tilesGlow.texture.bind(2)
             _tilesBufferAsTex.bind(1) // trying 1 and 0...
             tilesGlow.texture.bind(0) // for some fuck reason, it must be bound as last
@@ -880,11 +891,13 @@ internal object BlocksDrawer {
 
         weatherTerrains.forEach { it.dispose() }
         tilesGlow.dispose()
-        //tilesWire.dispose()
+        tilesEmissive.dispose()
         tileItemTerrain.dispose()
         tileItemTerrainGlow.dispose()
+        tileItemTerrainEmissive.dispose()
         tileItemWall.dispose()
         tileItemWallGlow.dispose()
+        tileItemWallEmissive.dispose()
         tilesFluid.dispose()
         tilesBuffer.dispose()
         _tilesBufferAsTex.dispose()

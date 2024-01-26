@@ -137,6 +137,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      */
     @Transient open val itemImage: TextureRegion? = null
     @Transient open val itemImageGlow: TextureRegion? = null
+    @Transient open val itemImageEmissive: TextureRegion? = null
 
     /**
      * Apparent mass of the item. (basemass * scale^3)

@@ -10,9 +10,10 @@ import net.torvald.terrarum.gameactors.AVKey
 object PlayerBuilderTestSubject1 {
     operator fun invoke(): IngamePlayer {
         val p: IngamePlayer = IngamePlayer(
-                ModMgr.getGdxFile("basegame", "sprites/test_sprite.properties").path(),
-                ModMgr.getGdxFile("basegame", "sprites/test_sprite_glow.properties").path(),
-                -589141658L // random value thrown
+            ModMgr.getGdxFile("basegame", "sprites/test_sprite.properties").path(),
+            ModMgr.getGdxFile("basegame", "sprites/test_sprite_glow.properties").path(),
+            ModMgr.getGdxFile("basegame", "sprites/test_sprite_emsv.properties").path(),
+            0L // random value thrown
         )
         InjectCreatureRaw(p.actorValue, "basegame", "CreaturePlayer.json")
 
@@ -23,13 +24,11 @@ object PlayerBuilderTestSubject1 {
         p.actorValue[AVKey.NAME] = "Test Subject 1"
 
 
-        /*p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/npc_template_anim_prototype.tga"), 48, 52))
-        p.sprite!!.delays = floatArrayOf(2f, 1f/12f) // second value does nothing -- overridden by ActorHumanoid.updateSprite(float)
-        p.sprite!!.setRowsAndFrames(2, 4)*/
+        // TODO make null animation if animDesc is null
+        p.animDesc?.let { p.sprite = AssembledSpriteAnimation(it, p, false, false) }
+        p.animDescGlow?.let { p.spriteGlow = AssembledSpriteAnimation(it, p, true, false) }
+        p.animDescEmissive?.let { p.spriteEmissive = AssembledSpriteAnimation(it, p, true, true) }
 
-        p.animDesc?.let { p.sprite = AssembledSpriteAnimation(it, p, false) }
-        p.animDescGlow?.let { p.spriteGlow = AssembledSpriteAnimation(it, p, true) }
-        //p.reassembleSprite(p.sprite, p.spriteGlow, null)
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 21, 0)
 
         // ingame must teleport the player to the spawn point

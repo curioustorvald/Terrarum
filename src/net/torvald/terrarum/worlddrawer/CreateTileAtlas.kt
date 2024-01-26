@@ -11,13 +11,10 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.utils.HashArray
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.AtlasSource.*
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_47
-import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 /**
@@ -51,10 +48,13 @@ class CreateTileAtlas {
     lateinit var atlasHibernal: Pixmap
     lateinit var atlasFluid: Pixmap
     lateinit var atlasGlow: Pixmap // glowing won't be affected by the season... for now
+    lateinit var atlasEmissive: Pixmap // glowing won't be affected by the season... for now
     lateinit var itemTerrainTexture: Texture
     lateinit var itemTerrainTextureGlow: Texture
+    lateinit var itemTerrainTextureEmissive: Texture
     lateinit var itemWallTexture: Texture
     lateinit var itemWallTextureGlow: Texture
+    lateinit var itemWallTextureEmissive: Texture
     lateinit var terrainTileColourMap: HashMap<ItemID, Cvec>
     lateinit var tags: HashMap<ItemID, RenderTag> // TileID, RenderTag
         private set
@@ -76,8 +76,10 @@ class CreateTileAtlas {
 
     internal lateinit var itemTerrainPixmap: Pixmap
     internal lateinit var itemTerrainPixmapGlow: Pixmap
+    internal lateinit var itemTerrainPixmapEmissive: Pixmap
     internal lateinit var itemWallPixmap: Pixmap
     internal lateinit var itemWallPixmapGlow: Pixmap
+    internal lateinit var itemWallPixmapEmissive: Pixmap
 
     val atlas: Pixmap
         get() = atlasVernal
@@ -145,6 +147,7 @@ class CreateTileAtlas {
         atlasHibernal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
         atlasFluid = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
         atlasGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasEmissive = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
 
         // populate the atlantes with atlasInit
         // this just directly copies the image to the atlantes :p
@@ -203,7 +206,15 @@ class CreateTileAtlas {
                     val glowFile = Gdx.files.internal(
                         filehandle.path().dropLast(4) + "_glow.tga"
                     ) // assuming strict ".tga" file for now...
-                    fileToAtlantes(modname, filehandle, if (glowFile.exists()) glowFile else null, if (dirName == "blocks") null else dirName)
+                    val emissiveFile = Gdx.files.internal(
+                        filehandle.path().dropLast(4) + "_emsv.tga"
+                    ) // assuming strict ".tga" file for now...
+                    fileToAtlantes(
+                        modname, filehandle,
+                        if (glowFile.exists()) glowFile else null,
+                        if (emissiveFile.exists()) emissiveFile else null,
+                        if (dirName == "blocks") null else dirName
+                    )
                 }
                 catch (e: GdxRuntimeException) {
                     System.err.println("Couldn't load file $filehandle from $modname, skipping...")
@@ -240,8 +251,10 @@ class CreateTileAtlas {
 
         itemTerrainPixmap = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
         itemTerrainPixmapGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        itemTerrainPixmapEmissive = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
         itemWallPixmap = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
         itemWallPixmapGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        itemWallPixmapEmissive = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
         tags.toMap().forEach { id, tag ->
             val tilePosFromAtlas = tag.tileNumber + maskTypetoTileIDForItemImage(tag.maskType)
@@ -252,8 +265,10 @@ class CreateTileAtlas {
             val destY = (t / TILES_IN_X) * TILE_SIZE
             itemTerrainPixmap.drawPixmap(atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
             itemTerrainPixmapGlow.drawPixmap(atlasGlow, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+            itemTerrainPixmapEmissive.drawPixmap(atlasEmissive, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
             itemWallPixmap.drawPixmap(atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
             itemWallPixmapGlow.drawPixmap(atlasGlow, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+            itemWallPixmapEmissive.drawPixmap(atlasEmissive, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
         }
         // darken things for the wall
         for (y in 0 until itemWallPixmap.height) {
@@ -262,6 +277,8 @@ class CreateTileAtlas {
                 itemWallPixmap.drawPixel(x, y, c1)
                 val c2 = Color(itemWallPixmapGlow.getPixel(x, y)).mulAndAssign(WALL_OVERLAY_COLOUR).toRGBA()
                 itemWallPixmapGlow.drawPixel(x, y, c2)
+                val c3 = Color(itemWallPixmapEmissive.getPixel(x, y)).mulAndAssign(WALL_OVERLAY_COLOUR).toRGBA()
+                itemWallPixmapEmissive.drawPixel(x, y, c3)
             }
         }
 
@@ -295,8 +312,10 @@ class CreateTileAtlas {
 
         itemTerrainTexture = Texture(itemTerrainPixmap)
         itemTerrainTextureGlow = Texture(itemTerrainPixmapGlow)
+        itemTerrainTextureEmissive = Texture(itemTerrainPixmapEmissive)
         itemWallTexture = Texture(itemWallPixmap)
         itemWallTextureGlow = Texture(itemWallPixmapGlow)
+        itemWallTextureEmissive = Texture(itemWallPixmapEmissive)
 //        itemTerrainPixmap.dispose()
 //        itemWallPixmap.dispose()
 
@@ -314,10 +333,11 @@ class CreateTileAtlas {
 
     val nullTile = Pixmap(TILE_SIZE * 16, TILE_SIZE * 16, Pixmap.Format.RGBA8888)
 
-    private fun fileToAtlantes(modname: String, matte: FileHandle, glow: FileHandle?, mode: String?) {
-        val tilesPixmap = Pixmap(matte)
+    private fun fileToAtlantes(modname: String, diffuse: FileHandle, glow: FileHandle?, emissive: FileHandle?, mode: String?) {
+        val tilesPixmap = Pixmap(diffuse)
         val tilesGlowPixmap = if (glow != null) Pixmap(glow) else nullTile
-        val blockName = matte.nameWithoutExtension().split('-').last().toInt() // basically a filename
+        val tilesEmissivePixmap = if (emissive != null) Pixmap(emissive) else nullTile
+        val blockName = diffuse.nameWithoutExtension().split('-').last().toInt() // basically a filename
         val blockID = if (mode != null) "$mode@$modname:$blockName" else "$modname:$blockName"
 
 
@@ -325,37 +345,37 @@ class CreateTileAtlas {
         // predefined by the image dimension: 16x16 for (1,0)
         if (tilesPixmap.width == TILE_SIZE && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_NA)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_NA)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_NA)
         }
         // predefined by the image dimension: 64x16 for (2,3)
         else if (tilesPixmap.width == TILE_SIZE * 4 && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_WALL_STICKER, RenderTag.MASK_TORCH)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_TORCH)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_TORCH)
         }
         // predefined by the image dimension: 128x16 for (3,4)
         else if (tilesPixmap.width == TILE_SIZE * 8 && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_WALL_STICKER_CONNECT_SELF, RenderTag.MASK_PLATFORM)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_PLATFORM)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_PLATFORM)
         }
         // predefined by the image dimension: 256x16
         else if (tilesPixmap.width == TILE_SIZE * 16 && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_16)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_16)
         }
         // predefined by the image dimension: 256x64
         else if (tilesPixmap.width == TILE_SIZE * 16 && tilesPixmap.height == TILE_SIZE * 4) {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X4)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_16X4)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_16X4)
         }
         // predefined by the image dimension: 256x256
         else if (tilesPixmap.width == TILE_SIZE * 16 && tilesPixmap.height == TILE_SIZE * 16) {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X16)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.MASK_16X16)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_16X16)
         }
         // 112x112 or 224x224
         else {
             if (tilesPixmap.width != tilesPixmap.height && tilesPixmap.width % (7 * TILE_SIZE) >= 2) {
-                throw IllegalArgumentException("Unrecognized image dimension ${tilesPixmap.width}x${tilesPixmap.height} from $modname:${matte.name()}")
+                throw IllegalArgumentException("Unrecognized image dimension ${tilesPixmap.width}x${tilesPixmap.height} from $modname:${diffuse.name()}")
             }
             // figure out the tags
             var connectionType = 0
@@ -371,7 +391,7 @@ class CreateTileAtlas {
             }
 
             addTag(blockID, connectionType, maskType)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, maskType)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, maskType)
         }
 
         itemSheetNumbers[blockID] = itemSheetCursor
@@ -400,7 +420,7 @@ class CreateTileAtlas {
         printdbg(this, "tileName ${id} ->> tileNumber ${atlasCursor}")
     }
 
-    private fun drawToAtlantes(matte: Pixmap, glow: Pixmap, renderMask: Int) {
+    private fun drawToAtlantes(diffuse: Pixmap, glow: Pixmap, emissive: Pixmap, renderMask: Int) {
         val tilesCount = RenderTag.maskTypeToTileCount(renderMask)
         if (atlasCursor + tilesCount >= TOTAL_TILES) {
 //            throw Error("Too much tiles for $MAX_TEX_SIZE texture size: $atlasCursor")
@@ -408,30 +428,33 @@ class CreateTileAtlas {
             expandAtlantes()
         }
 
-        val sixSeasonal = matte.width == 21 * TILE_SIZE && matte.height == 14 * TILE_SIZE
-        val txOfPixmap = matte.width / TILE_SIZE
+        val sixSeasonal = diffuse.width == 21 * TILE_SIZE && diffuse.height == 14 * TILE_SIZE
+        val txOfPixmap = diffuse.width / TILE_SIZE
         val txOfPixmapGlow = glow.width / TILE_SIZE
+        val txOfPixmapEmissive = emissive.width / TILE_SIZE
         for (i in 0 until tilesCount) {
             //printdbg(this, "Rendering to atlas, tile# $atlasCursor, tilesCount = $tilesCount, seasonal = $seasonal")
 
             // different texture for different seasons (224x224)
             if (sixSeasonal) {
                 val i = if (renderMask == MASK_47) (if (i < 41) i else i + 1) else i // to compensate the discontinuity between 40th and 41st tile
-                _drawToAtlantes(matte, atlasCursor, i % 7     , i / 7, PREVERNAL)
-                _drawToAtlantes(matte, atlasCursor, i % 7 + 7 , i / 7, VERNAL)
-                _drawToAtlantes(matte, atlasCursor, i % 7 + 14, i / 7, AESTIVAL)
+                _drawToAtlantes(diffuse, atlasCursor, i % 7     , i / 7, PREVERNAL)
+                _drawToAtlantes(diffuse, atlasCursor, i % 7 + 7 , i / 7, VERNAL)
+                _drawToAtlantes(diffuse, atlasCursor, i % 7 + 14, i / 7, AESTIVAL)
 
-                _drawToAtlantes(matte, atlasCursor, i % 7 + 14, i / 7 + 7, SEROTINAL)
-                _drawToAtlantes(matte, atlasCursor, i % 7 + 7 , i / 7 + 7, AUTUMNAL)
-                _drawToAtlantes(matte, atlasCursor, i % 7     , i / 7 + 7, HIBERNAL)
+                _drawToAtlantes(diffuse, atlasCursor, i % 7 + 14, i / 7 + 7, SEROTINAL)
+                _drawToAtlantes(diffuse, atlasCursor, i % 7 + 7 , i / 7 + 7, AUTUMNAL)
+                _drawToAtlantes(diffuse, atlasCursor, i % 7     , i / 7 + 7, HIBERNAL)
 
                 _drawToAtlantes(glow, atlasCursor, i % 7, i / 7, GLOW)
+                _drawToAtlantes(emissive, atlasCursor, i % 7, i / 7, EMISSIVE)
                 atlasCursor += 1
             }
             else {
                 val i = if (renderMask == MASK_47) (if (i < 41) i else i + 1) else i // to compensate the discontinuity between 40th and 41st tile
-                _drawToAtlantes(matte, atlasCursor, i % txOfPixmap, i / txOfPixmap, SIX_SEASONS)
+                _drawToAtlantes(diffuse, atlasCursor, i % txOfPixmap, i / txOfPixmap, SIX_SEASONS)
                 _drawToAtlantes(glow, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, GLOW)
+                _drawToAtlantes(emissive, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, EMISSIVE)
                 atlasCursor += 1
             }
         }
@@ -466,6 +489,7 @@ class CreateTileAtlas {
                 HIBERNAL -> atlasHibernal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 FLUID -> atlasFluid.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 GLOW -> atlasGlow.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                EMISSIVE -> atlasEmissive.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 else -> throw IllegalArgumentException("Unknown draw source $source")
             }
         }
@@ -511,6 +535,7 @@ class CreateTileAtlas {
         atlasHibernal.dispose()
         atlasFluid.dispose()
         atlasGlow.dispose()
+        atlasEmissive.dispose()
         //itemTerrainTexture.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemTerrain (TextureRegionPack)'
         //itemTerrainTextureGlow.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemTerrain (TextureRegionPack)'
         //itemWallTexture.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemWall (TextureRegionPack)'
@@ -522,7 +547,7 @@ class CreateTileAtlas {
     }
 
     private enum class AtlasSource {
-        /*FOUR_SEASONS, SUMMER, AUTUMN, WINTER, SPRING,*/ FLUID, GLOW,
+        /*FOUR_SEASONS, SUMMER, AUTUMN, WINTER, SPRING,*/ FLUID, GLOW, EMISSIVE,
         SIX_SEASONS, PREVERNAL, VERNAL, AESTIVAL, SEROTINAL, AUTUMNAL, HIBERNAL,
     }
 
@@ -541,13 +566,13 @@ class CreateTileAtlas {
         TOTAL_TILES = TILES_IN_X * TILES_IN_X
 
 
-        val newAtlantes = Array(7) {
+        val newAtlantes = Array(8) {
             Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also {
                 it.blending = Pixmap.Blending.None
                 it.filter = Pixmap.Filter.NearestNeighbour
             }
         }
-        listOf(atlasPrevernal, atlasVernal, atlasAestival, atlasSerotinal, atlasAutumnal, atlasHibernal, atlasGlow).forEachIndexed { index, pixmap ->
+        listOf(atlasPrevernal, atlasVernal, atlasAestival, atlasSerotinal, atlasAutumnal, atlasHibernal, atlasGlow, atlasEmissive).forEachIndexed { index, pixmap ->
         /*
         How it works:
 
@@ -579,6 +604,7 @@ class CreateTileAtlas {
         atlasAutumnal = newAtlantes[4]
         atlasHibernal = newAtlantes[5]
         atlasGlow = newAtlantes[6]
+        atlasEmissive = newAtlantes[7]
 
 
         App.setConfig("atlastexsize", newTexSize)

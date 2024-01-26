@@ -135,6 +135,11 @@ class ItemCodex {
         return getItemImageGlow(item.originalID)
     }
 
+    fun getItemImageEmissive(item: GameItem?): TextureRegion? {
+        if (item == null) return null
+        return getItemImageEmissive(item.originalID)
+    }
+
     fun getItemImage(itemID: ItemID?): TextureRegion? {
         if (itemID == null) return null
 
@@ -187,6 +192,35 @@ class ItemCodex {
         else {
             val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID)
             return BlocksDrawer.tileItemTerrainGlow.get(
+                itemSheetNumber % App.tileMaker.TILES_IN_X,
+                itemSheetNumber / App.tileMaker.TILES_IN_X
+            )
+        }
+    }
+
+    fun getItemImageEmissive(itemID: ItemID?): TextureRegion? {
+        if (itemID == null) return null
+
+        if (itemID.isDynamic()) {
+            return getItemImageEmissive(dynamicToStaticID(itemID))
+        }
+        else if (itemID.isItem()) {
+            return itemCodex[itemID]?.itemImageEmissive
+        }
+        else if (itemID.isWire()) {
+            return itemCodex[itemID]?.itemImageEmissive
+        }
+        else if (itemID.isWall()) {
+            val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID.substring(5))
+            return BlocksDrawer.tileItemWallEmissive.get(
+                itemSheetNumber % App.tileMaker.TILES_IN_X,
+                itemSheetNumber / App.tileMaker.TILES_IN_X
+            )
+        }
+        // else: terrain
+        else {
+            val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID)
+            return BlocksDrawer.tileItemTerrainEmissive.get(
                 itemSheetNumber % App.tileMaker.TILES_IN_X,
                 itemSheetNumber / App.tileMaker.TILES_IN_X
             )

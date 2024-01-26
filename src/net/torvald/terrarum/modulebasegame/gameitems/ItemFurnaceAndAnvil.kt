@@ -14,6 +14,8 @@ class ItemFurnaceAndAnvil(originalID: ItemID) : FixtureItemBase(originalID, "net
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/metalworking_furnace_and_anvil.tga")
+    override val itemImageEmissive: TextureRegion
+        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/metalworking_furnace_and_anvil_emsv.tga")
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_FURNACE_AND_ANVIL"

@@ -14,6 +14,8 @@ class ItemJukebox(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/jukebox.tga")
+    override val itemImageEmissive: TextureRegion
+        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/jukebox_emsv.tga")
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_JUKEBOX"

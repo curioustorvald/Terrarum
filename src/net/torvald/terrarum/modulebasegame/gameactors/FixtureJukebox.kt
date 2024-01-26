@@ -53,11 +53,15 @@ class FixtureJukebox : Electric, PlaysMusic {
         (mainUI as UIJukebox).parent = this
 
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/jukebox.tga")
+        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/jukebox_emsv.tga")
 
         density = 1400.0
         setHitboxDimension(TILE_SIZE * 2, TILE_SIZE * 3, 0, 0)
 
         makeNewSprite(TextureRegionPack(itemImage.texture, TILE_SIZE * 2, TILE_SIZE * 3)).let {
+            it.setRowsAndFrames(1,1)
+        }
+        makeNewSpriteEmissive(TextureRegionPack(itemImage2.texture, TILE_SIZE * 2, TILE_SIZE * 3)).let {
             it.setRowsAndFrames(1,1)
         }
 
@@ -130,6 +134,7 @@ class FixtureJukebox : Electric, PlaysMusic {
     }
 
     @Transient private var lampDecay = 0f
+    @Transient private var lampIntensity = 0f
 
     /**
      * Try to stop the disc being played, and reset the background music cue
@@ -146,12 +151,24 @@ class FixtureJukebox : Electric, PlaysMusic {
         if (isVisible && musicNowPlaying != null) {
             val vol0 = (musicTracks[musicNowPlaying]?.processor?.maxSigLevel?.average() ?: 0.0).toFloat()
             val vol = FastMath.interpolateLinear(0.8f, vol0, lampDecay)
+            lampIntensity = vol.coerceIn(0f, 1f)
 
             blendScreen(batch)
-            backLamp.colourFilter = Color(0f, vol.coerceIn(0f, 1f), 0f, 1f)
+            backLamp.colourFilter = Color(0f, lampIntensity, 0f, 1f)
             drawSpriteInGoodPosition(frameDelta, backLamp, batch)
 
             lampDecay = vol
+        }
+    }
+
+    override fun drawEmissive(frameDelta: Float, batch: SpriteBatch) {
+        blendNormalStraightAlpha(batch)
+        super.drawEmissive(frameDelta, batch)
+
+        if (isVisible && musicNowPlaying != null) {
+            blendScreen(batch)
+            backLamp.colourFilter = Color(0f, lampIntensity / 2f, 0f, 1f)
+            drawSpriteInGoodPosition(frameDelta, backLamp, batch)
         }
     }
 

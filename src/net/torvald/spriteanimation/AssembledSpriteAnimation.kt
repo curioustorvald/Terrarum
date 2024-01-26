@@ -1,5 +1,6 @@
 package net.torvald.spriteanimation
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -31,10 +32,11 @@ class AssembledSpriteAnimation(
     parentActor: ActorWithBody,
     @Transient val disk: SimpleFileSystem?, // specify if the resources for the animation is contained in the disk archive
     @Transient val bodypartToFileMap: EntryID?, // which file in the disk contains bodypart-to-fileid mapping for this particular instance of sprite animation
-    @Transient val isGlow: Boolean
+    @Transient val isGlow: Boolean,
+    @Transient val isEmissive: Boolean
 ) : SpriteAnimation(parentActor) {
 
-    constructor(adp: ADProperties, parentActor: ActorWithBody, isGlow: Boolean) : this(adp, parentActor, null, null, isGlow)
+    constructor(adp: ADProperties, parentActor: ActorWithBody, isGlow: Boolean, isEmissive: Boolean) : this(adp, parentActor, null, null, isGlow, isEmissive)
 
     var currentFrame = 0 // while this number is zero-based, the frame number on the ADP is one-based
         private set
@@ -112,9 +114,23 @@ class AssembledSpriteAnimation(
         }
     }
 
-    private fun fetchItemImage(item: GameItem) = if (isGlow) ItemCodex.getItemImageGlow(item) else ItemCodex.getItemImage(item)
+    private fun fetchItemImage(item: GameItem) = if (isEmissive)
+        ItemCodex.getItemImageEmissive(item)
+    else if (isGlow)
+        ItemCodex.getItemImageGlow(item)
+    else
+        ItemCodex.getItemImage(item)
 
-    fun renderThisAnimation(batch: SpriteBatch, posX: Float, posY: Float, scale: Float, animName: String) {
+    private fun fetchItemImage(mode: Int, item: GameItem) = when (mode) {
+        0 -> ItemCodex.getItemImage(item)
+        1 -> ItemCodex.getItemImageGlow(item)
+        2 -> ItemCodex.getItemImageEmissive(item)
+        else -> throw IllegalArgumentException()
+    }
+
+    fun renderThisAnimation(batch: SpriteBatch, posX: Float, posY: Float, scale: Float, animName: String, mode: Int = 0) {
+        val oldBatchColour = batch.color.cpy()
+
         val animNameRoot = animName.substring(0, animName.indexOfLast { it == '_' }).ifBlank { return@renderThisAnimation }
         // quick fix for the temporary de-sync bug in which when the update-rate per frame is much greater than once, it attempts to load animation with blank name
 
@@ -138,8 +154,9 @@ class AssembledSpriteAnimation(
 
                 // draw held items/armours?
                 if (name in jointNameToEquipPos) {
+                    batch.color = if (mode > 0) Color.WHITE else oldBatchColour
                     ItemCodex[(parentActor as? Pocketed)?.inventory?.itemEquipped?.get(jointNameToEquipPos[name]!!)]?.let { item ->
-                        fetchItemImage(item)?.let { image ->
+                        fetchItemImage(mode, item)?.let { image ->
                             val drawPos = adp.origin + bodypartPos // imgCentre for held items are (0,0)
                             val w = image.regionWidth * scale
                             val h = image.regionHeight * scale
@@ -159,6 +176,7 @@ class AssembledSpriteAnimation(
                     }
                 }
                 else {
+                    batch.color = oldBatchColour
                     res[name]?.let { image ->
                         var imgCentre = bodypartOrigins[name]!!
                         if (flipVertical) imgCentre = imgCentre.invertY()
@@ -185,10 +203,15 @@ class AssembledSpriteAnimation(
         } ?: throw NullPointerException("Animation with name '$animNameRoot' is not found")
     }
 
-    override fun render(frameDelta: Float, batch: SpriteBatch, posX: Float, posY: Float, scale: Float) {
+    /**
+     * Held items will ignore forcedColourFilter if mode > 0
+     *
+     * @param mode specifies the mode for drawing the held item. 0=diffuse, 1=glow, 2=emissive
+     */
+    override fun render(frameDelta: Float, batch: SpriteBatch, posX: Float, posY: Float, scale: Float, mode: Int, forcedColourFilter: Color?) {
         if (parentActor.isVisible) {
-            batch.color = colourFilter
-            renderThisAnimation(batch, posX, posY, scale, "${currentAnimation}_${1+currentFrame}")
+            batch.color = forcedColourFilter ?: colourFilter
+            renderThisAnimation(batch, posX, posY, scale, "${currentAnimation}_${1+currentFrame}", mode)
         }
     }
 

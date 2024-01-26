@@ -45,9 +45,10 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite, NoSerialise {
 
     private constructor()
 
-    constructor(animDescPath: String, animDescPathGlow: String?, born: Long) : super(born) {
+    constructor(animDescPath: String, animDescPathGlow: String?, animDescPathEmissive: String?, born: Long) : super(born) {
         animDesc = ADProperties(Gdx.files.internal(animDescPath))
         if (animDescPathGlow != null) animDescGlow = ADProperties(Gdx.files.internal(animDescPathGlow))
+        if (animDescPathEmissive != null) animDescEmissive = ADProperties(Gdx.files.internal(animDescPathEmissive))
         actorValue[AVKey.__HISTORICAL_BORNTIME] = born
     }
 

@@ -51,25 +51,26 @@ object AssembleSheetPixmap {
     }
 
 
-    private fun drawAndGetCanvas(properties: ADProperties, fileGetter: (String) -> InputStream?, injectedItem: GameItem?): Pixmap {
+    private fun drawAndGetCanvas(properties: ADProperties, fileGetter: (String) -> InputStream?, injectedItem: GameItem?, layerMode: Int): Pixmap {
         val canvas = Pixmap(properties.cols * (properties.frameWidth), properties.rows * (properties.frameHeight), Pixmap.Format.RGBA8888)
         canvas.blending = Pixmap.Blending.SourceOver
 
         // actually draw
         properties.transforms.forEach { (t, _) ->
-            drawThisFrame(t, canvas, properties, fileGetter, injectedItem)
+            drawThisFrame(t, canvas, properties, fileGetter, injectedItem, layerMode)
         }
 
         return canvas
     }
 
-    fun fromAssetsDir(properties: ADProperties, injectedItem: GameItem?) = drawAndGetCanvas(properties, getAssetsDirFileGetter(properties), injectedItem)
+    fun fromAssetsDir(properties: ADProperties, injectedItem: GameItem?, layerMode: Int) =
+        drawAndGetCanvas(properties, getAssetsDirFileGetter(properties), injectedItem, layerMode)
 
-    fun fromVirtualDisk(disk: SimpleFileSystem, entrynum: Long, properties: ADProperties, injectedItem: GameItem?): Pixmap {
+    fun fromVirtualDisk(disk: SimpleFileSystem, entrynum: Long, properties: ADProperties, injectedItem: GameItem?, layerMode: Int): Pixmap {
         val bodypartMapping = Properties()
         bodypartMapping.load(ByteArray64Reader(disk.getFile(entrynum)!!.bytes, Common.CHARSET))
 
-        return drawAndGetCanvas(properties, getVirtualDiskFileGetter(bodypartMapping, disk), injectedItem)
+        return drawAndGetCanvas(properties, getVirtualDiskFileGetter(bodypartMapping, disk), injectedItem, layerMode)
     }
 
     fun getPartPixmap(getFile: (String) -> InputStream?, partName: String): Pixmap? {
@@ -133,10 +134,11 @@ object AssembleSheetPixmap {
     }
 
     fun drawThisFrame(frameName: String,
-                              canvas: Pixmap,
-                              properties: ADProperties,
-                              fileGetter: (String) -> InputStream?,
-                              injectedItem: GameItem?
+                      canvas: Pixmap,
+                      properties: ADProperties,
+                      fileGetter: (String) -> InputStream?,
+                      injectedItem: GameItem?,
+                      layerMode: Int
     ) {
         val theAnim = properties.getAnimByFrameName(frameName)
         val skeleton = theAnim.skeleton.joints.reversed()
@@ -163,18 +165,29 @@ object AssembleSheetPixmap {
 
 //        AppLoader.printdbg(this, "Frame to draw: $frameName (R$animRow C$animFrame)")
 
-        drawFrame(animRow, animFrame, canvas, properties, bodypartOrigins, bodypartImages, transformList, injectedItem)
+        drawFrame(animRow, animFrame, canvas, properties, bodypartOrigins, bodypartImages, transformList, injectedItem, layerMode)
 
         bodypartImages.values.forEach { it?.dispose() }
     }
 
+    private fun getItemImage(layerMode: Int, injectedItem: GameItem?): TextureRegion? {
+        return when (layerMode) {
+            0 -> ItemCodex.getItemImage(injectedItem)
+            1 -> ItemCodex.getItemImageGlow(injectedItem)
+            2 -> ItemCodex.getItemImageEmissive(injectedItem)
+            else -> throw IllegalArgumentException()
+        }
+    }
+
+
     fun drawFrame(row: Int, column: Int,
-                          canvas: Pixmap,
-                          props: ADProperties,
-                          bodypartOrigins: HashMap<String, ADPropertyObject.Vector2i>,
-                          bodypartImages: Map<String, Pixmap?>,
-                          transformList: List<Pair<String, ADPropertyObject.Vector2i>>,
-                          injectedItem: GameItem?
+                  canvas: Pixmap,
+                  props: ADProperties,
+                  bodypartOrigins: HashMap<String, ADPropertyObject.Vector2i>,
+                  bodypartImages: Map<String, Pixmap?>,
+                  transformList: List<Pair<String, ADPropertyObject.Vector2i>>,
+                  injectedItem: GameItem?,
+                  layerMode: Int
     ) {
         val tmpFrame = Pixmap(props.frameWidth, props.frameHeight, Pixmap.Format.RGBA8888)
 
@@ -182,7 +195,7 @@ object AssembleSheetPixmap {
             if (name == "HELD_ITEM" && injectedItem != null) {
 //                printdbg(this, "ID of the held item: ${injectedItem.originalID}")
 
-                ItemCodex.getItemImage(injectedItem)?.let { textureRegion ->
+                getItemImage(layerMode, injectedItem)?.let { textureRegion ->
 //                    printdbg(this, "and it did have a textureregion")
 
                     val texdata = textureRegion.texture.textureData
