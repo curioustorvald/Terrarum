@@ -33,6 +33,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, var despawnUponCollision
 
     open lateinit var body: TextureRegion // you might want to use SpriteAnimation
     open var glow: TextureRegion? = null
+    open var emissive: TextureRegion? = null
 
     val drawColour = Color(1f, 1f, 1f, 1f)
 
@@ -88,6 +89,15 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, var despawnUponCollision
             batch.color = drawColour
             drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
                 batch.draw(glow, x, y, hitbox.width.toFloat(), hitbox.height.toFloat())
+            }
+        }
+    }
+
+    open fun drawEmissive(frameDelta: Float, batch: SpriteBatch) {
+        if (!flagDespawn && emissive != null) {
+            batch.color = drawColour
+            drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
+                batch.draw(emissive, x, y, hitbox.width.toFloat(), hitbox.height.toFloat())
             }
         }
     }

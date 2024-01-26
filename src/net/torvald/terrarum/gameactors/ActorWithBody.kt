@@ -87,6 +87,7 @@ open class ActorWithBody : Actor {
 
     @Transient var sprite: SpriteAnimation? = null
     @Transient var spriteGlow: SpriteAnimation? = null
+    @Transient var spriteEmissive: SpriteAnimation? = null
 
     var drawMode = BlendMode.NORMAL
 
@@ -415,6 +416,13 @@ open class ActorWithBody : Actor {
         return spriteGlow as SheetSpriteAnimation
     }
 
+    fun makeNewSpriteEmissive(textureRegionPack: TextureRegionPack): SheetSpriteAnimation {
+        spriteEmissive = SheetSpriteAnimation(this).also {
+            it.setSpriteImage(textureRegionPack)
+        }
+        return spriteEmissive as SheetSpriteAnimation
+    }
+
     /**
      * ONLY FOR INITIAL SETUP
      *
@@ -523,6 +531,7 @@ open class ActorWithBody : Actor {
 
             if (sprite != null) sprite!!.update(delta)
             if (spriteGlow != null) spriteGlow!!.update(delta)
+            if (spriteEmissive != null) spriteEmissive!!.update(delta)
 
             // make NoClip work for player
             if (true) {//this == INGAME.actorNowPlaying) {
@@ -1790,6 +1799,13 @@ open class ActorWithBody : Actor {
         }
     }
 
+    open fun drawEmissive(frameDelta: Float, batch: SpriteBatch) {
+        if (isVisible && spriteEmissive != null) {
+            blendNormalStraightAlpha(batch)
+            drawSpriteInGoodPosition(frameDelta, spriteEmissive!!, batch)
+        }
+    }
+
     open fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         if (isVisible && sprite != null) {
             BlendMode.resolve(drawMode, batch)
@@ -2194,6 +2210,7 @@ open class ActorWithBody : Actor {
     override fun dispose() {
         App.disposables.add(sprite)
         App.disposables.add(spriteGlow)
+        App.disposables.add(spriteEmissive)
     }
 }
 

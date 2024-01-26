@@ -26,6 +26,7 @@ object PlayerBuilderWerebeastTest {
 
         p.animDesc?.let { p.sprite = AssembledSpriteAnimation(it, p, false) }
         p.animDescGlow?.let { p.spriteGlow = AssembledSpriteAnimation(it, p, true) }
+        p.animDescEmissive?.let { p.spriteEmissive = AssembledSpriteAnimation(it, p, true) }
         p.setHitboxDimension(22, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 30, 0)
 
         p.setPosition(3.0 * TILE_SIZE, 3.0 * TILE_SIZE)

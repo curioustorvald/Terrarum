@@ -35,7 +35,7 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
 
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/smelter_tall.tga")
-//        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/smelter_tall_illum.tga") // put this sprite to the hypothetical "SpriteIllum"
+        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/smelter_tall_emsv.tga")
 
         density = BlockCodex[Block.STONE].density.toDouble()
         setHitboxDimension(itemImage.texture.width, itemImage.texture.height, 0, 0)
@@ -43,9 +43,9 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
         makeNewSprite(TextureRegionPack(itemImage.texture, itemImage.texture.width, itemImage.texture.height)).let {
             it.setRowsAndFrames(1,1)
         }
-        /*makeNewSpriteGlow(TextureRegionPack(itemImage2.texture, itemImage.texture.width, itemImage.texture.height)).let {
+        makeNewSpriteEmissive(TextureRegionPack(itemImage2.texture, itemImage.texture.width, itemImage.texture.height)).let {
             it.setRowsAndFrames(1,1)
-        }*/
+        }
 
         actorValue[AVKey.BASEMASS] = 100.0
 

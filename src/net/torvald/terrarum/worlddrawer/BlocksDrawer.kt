@@ -217,28 +217,28 @@ internal object BlocksDrawer {
         }
     }
 
-    internal fun drawWall(projectionMatrix: Matrix4, drawGlow: Boolean) {
+    internal fun drawWall(projectionMatrix: Matrix4, drawGlow: Boolean, drawBlack: Boolean = false) {
         gdxBlendNormalStraightAlpha()
-        renderUsingBuffer(WALL, projectionMatrix, drawGlow)
+        renderUsingBuffer(WALL, projectionMatrix, drawGlow, drawBlack)
 
         gdxBlendMul()
-        renderUsingBuffer(OCCLUSION, projectionMatrix, false)
+        renderUsingBuffer(OCCLUSION, projectionMatrix, false, drawBlack)
     }
 
-    internal fun drawTerrain(projectionMatrix: Matrix4, drawGlow: Boolean) {
+    internal fun drawTerrain(projectionMatrix: Matrix4, drawGlow: Boolean, drawBlack: Boolean = false) {
         gdxBlendNormalStraightAlpha()
 
-        renderUsingBuffer(TERRAIN, projectionMatrix, drawGlow)
-        renderUsingBuffer(ORES, projectionMatrix, drawGlow)
-        renderUsingBuffer(FLUID, projectionMatrix, drawGlow)
+        renderUsingBuffer(TERRAIN, projectionMatrix, drawGlow, drawBlack)
+        renderUsingBuffer(ORES, projectionMatrix, drawGlow, drawBlack)
+        renderUsingBuffer(FLUID, projectionMatrix, drawGlow, drawBlack)
     }
 
 
-    internal fun drawFront(projectionMatrix: Matrix4) {
+    internal fun drawFront(projectionMatrix: Matrix4, drawBlack: Boolean = false) {
         gdxBlendMul()
 
         // let's just not MUL on terrain, make it FLUID only...
-        renderUsingBuffer(FLUID, projectionMatrix, false)
+        renderUsingBuffer(FLUID, projectionMatrix, false, drawBlack)
 
 
 
@@ -708,7 +708,7 @@ internal object BlocksDrawer {
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
     private val occlusionIntensity = 0.22222222f // too low value and dark-coloured walls won't darken enough
 
-    private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean) {
+    private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean, drawBlack: Boolean) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
@@ -732,7 +732,7 @@ internal object BlocksDrawer {
             OCCLUSION -> occlusionBuffer
             else -> throw IllegalArgumentException()
         }
-        val vertexColour = when (mode) {
+        val vertexColour = if (drawBlack) Color.BLACK else when (mode) {
             TERRAIN, /*WIRE,*/ ORES, FLUID, OCCLUSION -> Color.WHITE
             WALL -> WALL_OVERLAY_COLOUR
             else -> throw IllegalArgumentException()

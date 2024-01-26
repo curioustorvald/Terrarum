@@ -39,6 +39,8 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite, NoSerialise {
     @Transient override var animDesc: ADProperties? = null
     /** ADL for glow sprite. Optional. */
     @Transient override var animDescGlow: ADProperties? = null
+    /** ADL for glow sprite. Optional. */
+    @Transient override var animDescEmissive: ADProperties? = null
 
 
     private constructor()

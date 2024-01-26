@@ -312,8 +312,10 @@ object VDFileID {
     const val SPRITEDEF_GLOW = -3L
     const val LOADORDER = -4L
     const val PLAYER_SCREENSHOT = -5L
+    const val SPRITEDEF_EMISSIVE = -6L
     const val BODYPART_TO_ENTRY_MAP = -1025L
     const val BODYPARTGLOW_TO_ENTRY_MAP = -1026L
+    const val BODYPARTEMISSIVE_TO_ENTRY_MAP = -1027L
 }
 
 fun diskIDtoReadableFilename(id: EntryID, saveKind: Int?): String = when (id) {
@@ -345,6 +347,7 @@ fun diskIDtoReadableFilename(id: EntryID, saveKind: Int?): String = when (id) {
 //    -1024L -> "apocryphas.json.gz"
     VDFileID.BODYPART_TO_ENTRY_MAP -> "bodypart-to-entry.map"
     VDFileID.BODYPARTGLOW_TO_ENTRY_MAP -> "bodypartglow-to-entry.map"
+    VDFileID.BODYPARTEMISSIVE_TO_ENTRY_MAP -> "bodypartemissive-to-entry.map"
     in 1..65535 ->
         if (saveKind == PLAYER_DATA)
             "bodypart #$id.tga.gz"

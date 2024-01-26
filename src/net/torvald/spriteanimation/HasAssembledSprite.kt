@@ -18,6 +18,9 @@ interface HasAssembledSprite {
     /** ADL for glow sprite. Optional. */
     var animDescGlow: ADProperties?
 
+    /** ADL for glow sprite. Optional. */
+    var animDescEmissive: ADProperties?
+
     var spriteHeadTexture: TextureRegion?
 
     // FIXME sometimes the animmation is invisible (row and nFrames mismatch -- row is changed to 1 but it's drawing 3rd frame?)

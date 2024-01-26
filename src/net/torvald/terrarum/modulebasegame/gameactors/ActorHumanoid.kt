@@ -747,16 +747,19 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     open fun updateSprite(delta: Float) {
         sprite?.update(delta)
         spriteGlow?.update(delta)
+        spriteEmissive?.update(delta)
 
         if (walledBottom && controllerV?.x != 0.0) {
             //switch row
             if (this is HasAssembledSprite) {
                 (sprite as? AssembledSpriteAnimation)?.currentAnimation = "ANIM_RUN"
                 (spriteGlow as? AssembledSpriteAnimation)?.currentAnimation = "ANIM_RUN"
+                (spriteEmissive as? AssembledSpriteAnimation)?.currentAnimation = "ANIM_RUN"
             }
             else {
                 (sprite as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_WALK)
                 (spriteGlow as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_WALK)
+                (spriteEmissive as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_WALK)
             }
 
             // set anim frame delay
@@ -772,6 +775,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
                     (sprite as? AssembledSpriteAnimation)?.overrideDelay = finalDelay
                     (spriteGlow as? AssembledSpriteAnimation)?.overrideDelay = finalDelay
+                    (spriteEmissive as? AssembledSpriteAnimation)?.overrideDelay = finalDelay
                 }
                 catch (e: NullPointerException) {
                     println(animDesc!!.animations.keys.joinToString())
@@ -784,10 +788,12 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             if (walkHeading == LEFT) {
                 sprite?.flip(true, false)
                 spriteGlow?.flip(true, false)
+                spriteEmissive?.flip(true, false)
             }
             else {
                 sprite?.flip(false, false)
                 spriteGlow?.flip(false, false)
+                spriteEmissive?.flip(false, false)
             }
         }
         else {
@@ -795,12 +801,15 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             if (this is HasAssembledSprite) {
                 (sprite as? AssembledSpriteAnimation)?.currentAnimation = "ANIM_IDLE"
                 (spriteGlow as? AssembledSpriteAnimation)?.currentAnimation = "ANIM_IDLE"
+                (spriteEmissive as? AssembledSpriteAnimation)?.currentAnimation = "ANIM_IDLE"
                 (sprite as? AssembledSpriteAnimation)?.overrideDelay = 0f
                 (spriteGlow as? AssembledSpriteAnimation)?.overrideDelay = 0f
+                (spriteEmissive as? AssembledSpriteAnimation)?.overrideDelay = 0f
             }
             else {
                 (sprite as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_IDLE)
                 (spriteGlow as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_IDLE)
+                (spriteEmissive as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_IDLE)
             }
         }
     }

@@ -10,12 +10,14 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.savegame.VDFileID.BODYPARTEMISSIVE_TO_ENTRY_MAP
 import net.torvald.terrarum.savegame.VDFileID.BODYPARTGLOW_TO_ENTRY_MAP
 import net.torvald.terrarum.savegame.VDFileID.BODYPART_TO_ENTRY_MAP
 import net.torvald.terrarum.savegame.VDFileID.LOADORDER
 import net.torvald.terrarum.savegame.VDFileID.ROOT
 import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.savegame.VDFileID.SPRITEDEF
+import net.torvald.terrarum.savegame.VDFileID.SPRITEDEF_EMISSIVE
 import net.torvald.terrarum.savegame.VDFileID.SPRITEDEF_GLOW
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.spriteassembler.ADProperties
@@ -169,6 +171,7 @@ object ReadActor {
         if (actor is ActorWithBody && actor is IngamePlayer) {
             val animFile = disk.getFile(SPRITEDEF)
             val animFileGlow = disk.getFile(SPRITEDEF_GLOW)
+            val animFileEmissive = disk.getFile(SPRITEDEF_EMISSIVE)
             val bodypartsFile = disk.getFile(BODYPART_TO_ENTRY_MAP)
 
             actor.animDesc = ADProperties(ByteArray64Reader(animFile!!.bytes, Common.CHARSET))
@@ -189,6 +192,16 @@ object ReadActor {
                     true
                 )
             }
+            if (animFileEmissive != null) {
+                actor.animDescEmissive = ADProperties(ByteArray64Reader(animFileEmissive.bytes, Common.CHARSET))
+                actor.spriteEmissive = AssembledSpriteAnimation(
+                    actor.animDescEmissive!!,
+                    actor,
+                    if (bodypartsFile != null) disk else null,
+                    if (bodypartsFile != null) BODYPARTEMISSIVE_TO_ENTRY_MAP else null,
+                    true
+                )
+            }
 
             ItemCodex.loadFromSave(disk.getBackingFile(), actor.dynamicToStaticTable, actor.dynamicItemInventory)
 
@@ -202,6 +215,7 @@ object ReadActor {
         else if (actor is ActorWithBody && actor is HasAssembledSprite) {
             if (actor.animDesc != null) actor.sprite = AssembledSpriteAnimation(actor.animDesc!!, actor, false)
             if (actor.animDescGlow != null) actor.spriteGlow = AssembledSpriteAnimation(actor.animDescGlow!!, actor, true)
+            if (actor.animDescEmissive != null) actor.spriteEmissive = AssembledSpriteAnimation(actor.animDescEmissive!!, actor, true)
 
             //actor.reassembleSprite(actor.sprite, actor.spriteGlow, null)
         }

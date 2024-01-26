@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.Float16FrameBuffer
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -54,9 +55,11 @@ object IngameRenderer : Disposable {
 
     private lateinit var lightmapFbo: Float16FrameBuffer
     private lateinit var fboRGB: Float16FrameBuffer
+    private lateinit var fboRGB_lightMixed0: Float16FrameBuffer
     private lateinit var fboRGB_lightMixed: Float16FrameBuffer
     private lateinit var fboA: Float16FrameBuffer
     private lateinit var fboA_lightMixed: Float16FrameBuffer
+    private lateinit var fboEmissive: Float16FrameBuffer
     private lateinit var fboMixedOut: Float16FrameBuffer
     private lateinit var rgbTex: TextureRegion
     private lateinit var aTex: TextureRegion
@@ -85,6 +88,7 @@ object IngameRenderer : Disposable {
     val shaderKawaseUp: ShaderProgram
 
     val shaderBlendGlow: ShaderProgram
+    val shaderBlendGlowTex1Flip: ShaderProgram
     val shaderForActors: ShaderProgram
     val shaderDemultiply: ShaderProgram
 
@@ -127,6 +131,7 @@ object IngameRenderer : Disposable {
 
         shaderForActors = App.loadShaderFromClasspath("shaders/default.vert", "shaders/actors.frag")
         shaderBlendGlow = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/blendGlow.frag")
+        shaderBlendGlowTex1Flip = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/blendGlowTex1Flip.frag")
         shaderDemultiply = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/demultiply.frag")
 
 
@@ -459,6 +464,8 @@ object IngameRenderer : Disposable {
         particlesContainer: CircularArray<ParticleBase>?
     ) {
         fboRGB.inAction(null, null) { clearBuffer() }
+        fboEmissive.inAction(null, null) { clearBuffer() }
+        fboRGB_lightMixed0.inAction(null, null) { clearBuffer() }
         fboRGB_lightMixed.inAction(null, null) { clearBuffer() }
 
         fboRGB.inAction(camera, batch) {
@@ -503,7 +510,38 @@ object IngameRenderer : Disposable {
             }
         }
 
-        fboRGB_lightMixed.inAction(camera, batch) {
+        fboEmissive.inAction(camera, batch) {
+            batch.inUse {
+                batch.shader = shaderForActors
+                batch.color = Color.WHITE
+                moveCameraToWorldCoord()
+                actorsRenderBehind?.forEach { it.drawEmissive(frameDelta, batch) }
+                particlesContainer?.forEach { it.drawEmissive(frameDelta, batch) }
+            }
+
+            setCameraPosition(0f, 0f)
+            BlocksDrawer.drawTerrain(batch.projectionMatrix, false, true)
+
+            batch.shader = shaderForActors
+            batch.inUse {
+                batch.shader = shaderForActors
+                batch.color = Color.WHITE
+                /////////////////
+                // draw actors //
+                /////////////////
+                moveCameraToWorldCoord()
+                actorsRenderMiddle?.forEach { it.drawEmissive(frameDelta, batch) }
+                actorsRenderMidTop?.forEach { it.drawEmissive(frameDelta, batch) }
+                player?.drawEmissive(frameDelta, batch)
+                actorsRenderFront?.forEach { it.drawEmissive(frameDelta, batch) }
+                // --> Change of blend mode <-- introduced by children of ActorWithBody //
+            }
+
+            setCameraPosition(0f, 0f)
+            BlocksDrawer.drawFront(batch.projectionMatrix, true) // blue coloured filter of water, etc.
+        }
+
+        fboRGB_lightMixed0.inAction(camera, batch) {
 
             setCameraPosition(0f, 0f)
             val (xrem, yrem) = worldCamToRenderPos()
@@ -515,6 +553,7 @@ object IngameRenderer : Disposable {
 
             batch.inUse {
 
+                batch.color = Color.WHITE
                 blendNormalStraightAlpha(batch)
 
                 // draw world
@@ -542,19 +581,39 @@ object IngameRenderer : Disposable {
                     )
 //                }
 
-
-
-                // if right texture coord for lightTex and fboRGB are obtainable, you can try this:
-                /*
-                vec4 skyboxColour = ...
-                gl_FragCoord = alphablend skyboxColour with (fboRGB * lightTex)
-                 */
             }
 
 
-            // NOTE TO SELF: thㄴis works.
+
+            // NOTE TO SELF: this works.
         }
 
+
+        fboRGB_lightMixed.inActionF(camera, batch) {
+
+            setCameraPosition(0f, 0f)
+            val (xrem, yrem) = worldCamToRenderPos()
+
+            gdxEnableBlend()
+
+
+            fboEmissive.colorBufferTexture.bind(1)
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+
+
+            // draw emissive
+            batch.inUse {
+                batch.color = Color.WHITE
+                blendNormalStraightAlpha(batch)
+                batch.shader = shaderBlendGlowTex1Flip
+                shaderBlendGlowTex1Flip.setUniformi("tex1", 1)
+                shaderBlendGlowTex1Flip.setUniformi("tex1flip", 1)
+
+                batch.color = Color.WHITE
+                batch.draw(fboRGB_lightMixed0.colorBufferTexture, 0f, 0f)
+                batch.flush()
+            }
+        }
 
         blendNormalStraightAlpha(batch)
     }
@@ -819,9 +878,11 @@ object IngameRenderer : Disposable {
         }
         else {
             fboRGB.dispose()
+            fboRGB_lightMixed0.dispose()
             fboRGB_lightMixed.dispose()
             fboA.dispose()
             fboA_lightMixed.dispose()
+            fboEmissive.dispose()
             lightmapFbo.dispose()
 
             fboBlurHalf.dispose()
@@ -829,9 +890,11 @@ object IngameRenderer : Disposable {
         }
 
         fboRGB = Float16FrameBuffer(width, height, false)
+        fboRGB_lightMixed0 = Float16FrameBuffer(width, height, false)
         fboRGB_lightMixed = Float16FrameBuffer(width, height, false)
         fboA = Float16FrameBuffer(width, height, false)
         fboA_lightMixed = Float16FrameBuffer(width, height, false)
+        fboEmissive = Float16FrameBuffer(width, height, false)
         fboMixedOut = Float16FrameBuffer(width, height, false)
         lightmapFbo = Float16FrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
@@ -889,8 +952,10 @@ object IngameRenderer : Disposable {
 
         if (::fboRGB.isInitialized) fboRGB.tryDispose()
         if (::fboA.isInitialized) fboA.tryDispose()
+        if (::fboRGB_lightMixed0.isInitialized) fboRGB_lightMixed0.tryDispose()
         if (::fboRGB_lightMixed.isInitialized) fboRGB_lightMixed.tryDispose()
         if (::fboA_lightMixed.isInitialized) fboA_lightMixed.tryDispose()
+        if (::fboEmissive.isInitialized) fboEmissive.tryDispose()
         if (::fboMixedOut.isInitialized) fboMixedOut.tryDispose()
         if (::lightmapFbo.isInitialized) lightmapFbo.tryDispose()
 
@@ -914,6 +979,7 @@ object IngameRenderer : Disposable {
         shaderKawaseUp.dispose()
 
         shaderBlendGlow.dispose()
+        shaderBlendGlowTex1Flip.dispose()
         shaderForActors.dispose()
         shaderDemultiply.dispose()
 
