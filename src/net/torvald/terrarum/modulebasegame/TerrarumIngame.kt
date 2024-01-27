@@ -735,12 +735,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                                 (Toolkit.drawWidth - ui.width) / 4,
                                 (App.scr.height - ui.height) / 4 // what the fuck?
                         )
-                        if (fixture.mainUIopenFun == null) {
+//                        if (fixture.mainUIopenFun == null)
                             ui.setAsOpen()
-                        }
-                        else {
-                            fixture.mainUIopenFun!!.invoke(ui)
-                        }
+//                        else
+//                            fixture.mainUIopenFun!!.invoke(ui)
                     }
                 }
                 0L

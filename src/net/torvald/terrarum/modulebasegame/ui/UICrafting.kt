@@ -33,9 +33,6 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
     toggleButtonLiteral = if (full == null) "control_gamepad_start" else null
 ), HasInventory {
 
-    private val catBarx: UIItemCatBar?
-        get() = full?.catBar
-
     override var width = App.scr.width
     override var height = App.scr.height
 

@@ -12,6 +12,7 @@ import net.torvald.terrarum.gameparticles.ParticleVanishingSprite
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
+import net.torvald.terrarum.modulebasegame.ui.UICrafting
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -26,7 +27,8 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 3, 4), // temporary value, will be overwritten by spawn()
-        nameFun = { Lang["ITEM_SMELTER_SMALL"] }
+        nameFun = { Lang["ITEM_SMELTER_SMALL"] },
+        mainUI = UICrafting(null)
     ) {
         CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/bigger_smoke.tga"), 16, 16)
@@ -48,10 +50,6 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
         }
 
         actorValue[AVKey.BASEMASS] = 100.0
-
-        mainUIopenFun = { ui ->
-            (mainUI as? UIInventoryFull)?.openCrafting(mainUI!!.handler)
-        }
     }
 
     @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 2*TILE_SIZED, TILE_SIZED * 2, TILE_SIZED * 2), Cvec(0.5f, 0.18f, 0f, 0f)))
@@ -74,16 +72,7 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
     private var nextDelay = 0.25f
     private var spawnTimer = 0f
 
-    @Transient private var mainUIhookHackInstalled = false
     override fun update(delta: Float) {
-        // adding UI to the fixture as players may right-click on the workbenches instead of pressing a keyboard key
-        (INGAME as? TerrarumIngame)?.let { ingame ->
-            if (!mainUIhookHackInstalled && ingame.uiInventoryPlayerReady) {
-                mainUIhookHackInstalled = true
-                this.mainUI = ingame.uiInventoryPlayer // this field is initialised only after a full load so this hack is necessary
-            }
-        }
-
         super.update(delta)
 
 
