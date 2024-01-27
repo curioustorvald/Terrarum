@@ -14,6 +14,7 @@
   "BLOCK_DIRT": "흙",
   "BLOCK_GRASS": "잔디",
   "BLOCK_GRASSWALL": "잔디",
+  "BLOCK_CLAY": "점토",
 
   "BLOCK_PLANK_NORMAL": "나무 판자",
   "BLOCK_PLANK_EBONY": "흑단 판자",
