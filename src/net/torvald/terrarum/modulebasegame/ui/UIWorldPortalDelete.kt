@@ -66,7 +66,7 @@ class UIWorldPortalDelete(private val full: UIWorldPortal) : UICanvas() {
 
         // control hints
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, full.portalListingControlHelp, (Toolkit.drawWidth - width)/2 + 2, (full.yEnd - 20).toInt())
+        App.fontGame.draw(batch, full.portalListingControlHelp, (Toolkit.drawWidth - width)/2 + 2, (UIInventoryFull.yEnd - 20).toInt())
     }
 
     override fun dispose() {

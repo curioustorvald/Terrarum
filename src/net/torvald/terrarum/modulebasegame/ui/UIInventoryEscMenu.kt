@@ -195,18 +195,18 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val screenRenders = arrayOf(
         { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
-            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, UIInventoryFull.yEnd - 20)
             // text buttons
             gameMenuButtons.render(frameDelta, batch, camera)
         },
         { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
-            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, UIInventoryFull.yEnd - 20)
             keyboardSetupUI.render(frameDelta, batch, camera)
         },
         { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
-            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, UIInventoryFull.yEnd - 20)
             areYouSureMainMenuButtons.render(frameDelta, batch, camera)
         },
         { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
@@ -214,22 +214,22 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         },
         { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
-            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, UIInventoryFull.yEnd - 20)
             keyConfigUI.render(frameDelta, batch, camera)
         },
         { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
-            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, UIInventoryFull.yEnd - 20)
             languageUI.render(frameDelta, batch, camera)
         },
         { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
-            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, UIInventoryFull.yEnd - 20)
             shareUI.render(frameDelta, batch, camera)
         },
         { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
             // control hints
-            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, UIInventoryFull.yEnd - 20)
             audioUI.render(frameDelta, batch, camera)
         },
     )

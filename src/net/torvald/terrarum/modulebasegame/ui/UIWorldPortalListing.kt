@@ -459,7 +459,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
         // control hints
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, full.portalListingControlHelp, screencapX + 2, (full.yEnd - 20).toInt())
+        App.fontGame.draw(batch, full.portalListingControlHelp, screencapX + 2, (UIInventoryFull.yEnd - 20).toInt())
     }
 
     override fun hide() {

@@ -118,15 +118,15 @@ internal class UIInventoryCells(
         val controlHintXPos = full.offsetX - 34
         blendNormalStraightAlpha(batch)
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, full.listControlHelp, controlHintXPos, full.yEnd - 20)
+        App.fontGame.draw(batch, full.listControlHelp, controlHintXPos, UIInventoryFull.yEnd - 20)
 
 
         // encumbrance meter
         val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
         // encumbrance bar will go one row down if control help message is too long
-        val encumbBarXPos = full.xEnd - weightBarWidth
+        val encumbBarXPos = UIInventoryFull.xEnd - weightBarWidth
         val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
-        val encumbBarYPos = full.yEnd-20 + 3f +
+        val encumbBarYPos = UIInventoryFull.yEnd-20 + 3f +
                             if (App.fontGame.getWidth(full.listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
                                 App.fontGame.lineHeight
                             else 0f

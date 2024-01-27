@@ -28,10 +28,13 @@ import kotlin.math.min
  *
  * Created by minjaesong on 2022-03-10.
  */
-class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
+class UICrafting(val full: UIInventoryFull?) : UICanvas(
+    toggleKeyLiteral = if (full == null) "control_key_inventory" else null,
+    toggleButtonLiteral = if (full == null) "control_gamepad_start" else null
+), HasInventory {
 
-    private val catBar: UIItemCatBar
-        get() = full.catBar
+    private val catBarx: UIItemCatBar?
+        get() = full?.catBar
 
     override var width = App.scr.width
     override var height = App.scr.height
@@ -230,7 +233,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         // crafting list to the left
         itemListCraftable = UIItemCraftingCandidateGrid(
             this,
-            catBar,
             thisOffsetX,
             thisOffsetY,
             6, UIInventoryFull.CELLS_VRT - 2, // decrease the internal height so that craft/cancel button would fit in
@@ -457,48 +459,52 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         // control hints
         val controlHintXPos = thisOffsetX + 2f
         blendNormalStraightAlpha(batch)
-        App.fontGame.draw(batch, controlHelp, controlHintXPos, full.yEnd - 20)
+        App.fontGame.draw(batch, controlHelp, controlHintXPos, UIInventoryFull.yEnd - 20)
 
         
-
-        //draw player encumb
-        // encumbrance meter
-        val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
-        // encumbrance bar will go one row down if control help message is too long
-        val encumbBarXPos = thisXend - UIInventoryCells.weightBarWidth + 36
-        val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
-        val encumbBarYPos = full.yEnd-20 + 3f +
-                            if (App.fontGame.getWidth(full.listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
-                                App.fontGame.lineHeight
-                            else 0f
-        App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
-        // encumbrance bar background
-        blendNormalStraightAlpha(batch)
-        val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
-        val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
-        batch.color = encumbBack
-        Toolkit.fillArea(batch,
+        if (full != null) {
+            //draw player encumb
+            // encumbrance meter
+            val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
+            // encumbrance bar will go one row down if control help message is too long
+            val encumbBarXPos = thisXend - UIInventoryCells.weightBarWidth + 36
+            val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
+            val encumbBarYPos = UIInventoryFull.yEnd - 20 + 3f +
+                    if (App.fontGame.getWidth(full.listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
+                        App.fontGame.lineHeight
+                    else 0f
+            App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
+            // encumbrance bar background
+            blendNormalStraightAlpha(batch)
+            val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
+            val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
+            batch.color = encumbBack
+            Toolkit.fillArea(
+                batch,
                 encumbBarXPos, encumbBarYPos,
                 UIInventoryCells.weightBarWidth, UIInventoryFull.controlHelpHeight - 6f
-        )
-        // encumbrance bar
-        batch.color = encumbCol
-        Toolkit.fillArea(batch,
+            )
+            // encumbrance bar
+            batch.color = encumbCol
+            Toolkit.fillArea(
+                batch,
                 encumbBarXPos, encumbBarYPos,
                 if (full.actor.inventory.capacityMode == FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
                     1f
                 else // make sure 1px is always be seen
                     min(UIInventoryCells.weightBarWidth, max(1f, UIInventoryCells.weightBarWidth * encumbrancePerc)),
                 UIInventoryFull.controlHelpHeight - 6f
-        )
-        // debug text
-        batch.color = Color.LIGHT_GRAY
-        if (App.IS_DEVELOPMENT_BUILD) {
-            App.fontSmallNumbers.draw(batch,
+            )
+            // debug text
+            batch.color = Color.LIGHT_GRAY
+            if (App.IS_DEVELOPMENT_BUILD) {
+                App.fontSmallNumbers.draw(
+                    batch,
                     "${full.actor.inventory.capacity}/${full.actor.inventory.maxCapacity}",
                     encumbBarTextXPos,
                     encumbBarYPos + UIInventoryFull.controlHelpHeight - 4f
-            )
+                )
+            }
         }
 
 

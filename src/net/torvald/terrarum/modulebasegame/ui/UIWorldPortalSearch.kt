@@ -231,7 +231,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
 
         // control hints
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, full.portalListingControlHelp, 2 + (Toolkit.drawWidth - 560)/2 + 2, (full.yEnd - 20).toInt())
+        App.fontGame.draw(batch, full.portalListingControlHelp, 2 + (Toolkit.drawWidth - 560)/2 + 2, (UIInventoryFull.yEnd - 20).toInt())
 
         uiItems.forEach { it.render(frameDelta, batch, camera) }
 

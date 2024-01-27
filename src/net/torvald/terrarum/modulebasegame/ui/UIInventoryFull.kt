@@ -136,6 +136,11 @@ class UIInventoryFull(
             batch.draw(backdrop01.get(0, 4), 0f, hTopRem + 280f + hMid, w, hTopRem)
 
         }
+
+        internal var xEnd = (Toolkit.drawWidth + internalWidth).div(2).toFloat()
+            private set
+        internal var yEnd = -YPOS_CORRECTION + (App.scr.height + internalHeight).div(2).toFloat()
+            private set
     }
 
     //val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
@@ -342,10 +347,6 @@ class UIInventoryFull(
     //private val gradEndCol   = Color(0x000000_70)
     //private val gradHeight = 48f
 
-    internal var xEnd = (width + internalWidth).div(2).toFloat()
-        private set
-    internal var yEnd = -YPOS_CORRECTION + (App.scr.height + internalHeight).div(2).toFloat()
-        private set
 
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 

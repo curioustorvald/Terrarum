@@ -91,7 +91,7 @@ class UIWorldPortalShare(private val full: UIWorldPortal) : UICanvas() {
         App.fontUITitle.draw(batch, titlestr, drawX + (width - App.fontUITitle.getWidth(titlestr)).div(2).toFloat(), UIInventoryFull.INVENTORY_CELLS_OFFSET_Y() - 36f)
 
         // control hints
-        App.fontGame.draw(batch, full.portalListingControlHelp, (Toolkit.drawWidth - width)/2 + 2, (full.yEnd - 20).toInt())
+        App.fontGame.draw(batch, full.portalListingControlHelp, (Toolkit.drawWidth - width)/2 + 2, (UIInventoryFull.yEnd - 20).toInt())
 
         uiItems.forEach { it.render(frameDelta, batch, camera) }
 

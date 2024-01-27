@@ -14,7 +14,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
  * Created by minjaesong on 2022-06-28.
  */
 class UIItemCraftingCandidateGrid(
-    parentUI: UICrafting, catBar: UIItemCatBar,
+    parentUI: UICrafting,
     initialX: Int, initialY: Int,
     horizontalCells: Int, verticalCells: Int,
     drawScrollOnRightside: Boolean = false,
