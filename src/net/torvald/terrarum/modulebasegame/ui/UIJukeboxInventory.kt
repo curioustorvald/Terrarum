@@ -13,6 +13,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defau
 import net.torvald.terrarum.modulebasegame.ui.UIJukebox.Companion.SLOT_SIZE
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemInventoryElemWide
+import net.torvald.unicode.EMDASH
 
 
 private val songButtonColourTheme = defaultInventoryCellTheme.copy(
@@ -305,6 +306,10 @@ class UIItemJukeboxSonglist(
         if (title.isNotEmpty()) {
             blendNormalStraightAlpha(batch)
 
+            val nameSecondary = if (artist.isNotBlank() && album.isNotBlank())
+                "$artist $EMDASH $album"
+            else
+                "${artist.trim()}${album.trim()}"
 
             // if mouse is over, text lights up
             // highlight item name and count (blocks/walls) if the item is equipped
@@ -317,7 +322,7 @@ class UIItemJukeboxSonglist(
             Toolkit.drawTextCentered(batch, App.fontGame, title, width, posX, posY + textOffsetY)
             // draw artist
             batch.color = batch.color.cpy().mul(0.75f, 0.75f, 0.75f, 1f)
-            Toolkit.drawTextCentered(batch, App.fontGame, album, width, posX, posY + App.fontGame.lineHeight.toInt() - 2*textOffsetY)
+            Toolkit.drawTextCentered(batch, App.fontGame, nameSecondary, width, posX, posY + App.fontGame.lineHeight.toInt() - 2*textOffsetY)
         }
 
         // see IFs above?

@@ -50,7 +50,10 @@ open class MusicDiscPrototype(originalID: ItemID, module: String, path: String) 
         author = meta.author
         collection = meta.album
         name = meta.title
-        nameSecondary = "${meta.author} $EMDASH ${meta.album}"
+        nameSecondary = if (meta.author.isNotBlank() && meta.album.isNotBlank())
+            "${meta.author} $EMDASH ${meta.album}"
+        else
+            "${meta.author.trim()}${meta.album.trim()}"
     }
 
     @Transient override val itemImage: TextureRegion = generateSprite()
@@ -135,11 +138,9 @@ open class MusicDiscPrototype(originalID: ItemID, module: String, path: String) 
     }
 }
 
-class MusicDisc01(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/01 Thousands of Shards.ogg")
-class MusicDisc02(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/02 Glitter.ogg")
-class MusicDisc03(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/03 Digital Foliage.ogg")
-class MusicDisc04(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/04 HDMA.ogg")
-class MusicDisc05(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/05 Welded.ogg")
-class MusicDisc06(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/06 Cyllindrical.ogg")
-class MusicDisc07(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/07 Plastic Pop.ogg")
-class MusicDisc08(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/08 Gateway 509.ogg")
+class MusicDisc01(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/3_over_4.ogg")
+class MusicDisc02(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/fog.ogg")
+class MusicDisc03(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/geometry.ogg")
+class MusicDisc04(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/hdma.ogg")
+class MusicDisc05(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/lucid_dream.ogg")
+class MusicDisc06(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/railway.ogg")
