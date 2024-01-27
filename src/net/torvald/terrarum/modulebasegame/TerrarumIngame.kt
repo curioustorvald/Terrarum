@@ -1011,6 +1011,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             filterVisibleActors()
         }
 
+        if (uiInventoryPlayer == uiFixture) throw IllegalStateException("Do NOT use InventoryPlayer as a UIFixture, the engine cannot handle this situation XwX")
+
         uiContainer.forEach {
 
             // suppress inventory opening if fixture inventory is opened

@@ -713,7 +713,7 @@ fun printStackTrace(obj: Any, out: PrintStream = System.out) {
 }
 
 class UIContainer {
-    private val data = ArrayList<Any>()
+    internal val data = ArrayList<Any>()
     fun add(vararg things: Any) {
         things.forEach {
             if (it is UICanvas || it is Id_UICanvasNullable)
@@ -741,8 +741,28 @@ class UIContainer {
             else throw IllegalArgumentException("Unacceptable type ${it.javaClass.name}, instance of ${it.javaClass.superclass.name}")
         }
     }
+    fun iterator2() = object : Iterator<Pair<Int, UICanvas?>> {
+        private var cursor = 0
+
+        override fun hasNext() = cursor < data.size
+
+        override fun next(): Pair<Int, UICanvas?> {
+            val it = data[cursor]
+            // whatever the fucking reason when() does not work
+            if (it is UICanvas) {
+                cursor += 1
+                return (cursor - 1) to it
+            }
+            else if (it is Id_UICanvasNullable) {
+                cursor += 1
+                return (cursor - 1) to it.get()
+            }
+            else throw IllegalArgumentException("Unacceptable type ${it.javaClass.name}, instance of ${it.javaClass.superclass.name}")
+        }
+    }
 
     fun forEach(operation: (UICanvas?) -> Unit) = iterator().forEach(operation)
+    fun forEachIndexed(operation: (Pair<Int, UICanvas?>) -> Unit) = iterator2().forEach(operation)
     fun countVisible(): Int {
         var c = 0
         forEach { if (it?.isVisible == true) c += 1 }

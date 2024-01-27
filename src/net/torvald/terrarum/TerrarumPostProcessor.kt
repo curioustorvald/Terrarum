@@ -11,9 +11,11 @@ import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.savegame.toHex
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.weather.WeatherMixer
+import net.torvald.unsafe.UnsafeHelper
 
 /**
  * Must be called by the App Loader
@@ -150,7 +152,7 @@ object TerrarumPostProcessor : Disposable {
                         // print UIs under cursor
                         App.fontSmallNumbers.draw(it, "${ccY}UIs under mouse:", 2f, 15f)
                         Terrarum.ingame?.uiContainer?.UIsUnderMouse?.forEachIndexed { i, ui ->
-                            App.fontSmallNumbers.draw(it, "${ccY}-$ccG ${ui.javaClass.simpleName}", 2f, 28f + 13*i)
+                            App.fontSmallNumbers.draw(it, "${ccY}-$ccG ${ui.javaClass.simpleName} (0x${UnsafeHelper.addressOf(ui).toHex()})", 2f, 28f + 13*i)
                         }
                     }
                 }

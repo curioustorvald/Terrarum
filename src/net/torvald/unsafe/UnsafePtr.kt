@@ -58,6 +58,20 @@ internal object UnsafeHelper {
      * @return offset from the array's base memory address (aka pointer) that the actual data begins.
      */
     fun getArrayOffset(obj: Any) = unsafe.arrayBaseOffset(obj.javaClass).toLong()
+
+
+    fun addressOf(o: Any): Long {
+        val array = arrayOf(o)
+
+        val baseOffset = unsafe.arrayBaseOffset(Array<Any>::class.java).toLong()
+        val addressSize = unsafe.addressSize()
+        val objectAddress = when (addressSize) {
+            4 -> unsafe.getInt(array, baseOffset).toLong()
+            8 -> unsafe.getLong(array, baseOffset)
+            else -> throw Error("unsupported address size: $addressSize")
+        }
+        return (objectAddress)
+    }
 }
 
 /**
