@@ -1989,6 +1989,28 @@ open class ActorWithBody : Actor {
         return tilePosList.forEach(consumer)
     }
 
+    fun forEachOccupyingTilePosXY(hitbox: Hitbox, consumer: (Pair<Int, Int>) -> Unit) {
+        if (world == null) return
+
+
+        val newTilewiseHitbox = Hitbox.fromTwoPoints(
+            hitbox.startX.div(TILE_SIZE).floorToDouble(),
+            hitbox.startY.div(TILE_SIZE).floorToDouble(),
+            hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble(),
+            hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble(),
+            true
+        ) // NOT the same as intTilewiseHitbox !!
+
+        val tilePosList = ArrayList<Pair<Int, Int>>()
+        for (y in newTilewiseHitbox.startY.toInt()..newTilewiseHitbox.endY.toInt()) {
+            for (x in newTilewiseHitbox.startX.toInt()..newTilewiseHitbox.endX.toInt()) {
+                tilePosList.add(x to y)
+            }
+        }
+
+        return tilePosList.forEach(consumer)
+    }
+
     fun forEachFeetTileNum(consumer: (ItemID?) -> Unit) {
         if (world == null) return
 

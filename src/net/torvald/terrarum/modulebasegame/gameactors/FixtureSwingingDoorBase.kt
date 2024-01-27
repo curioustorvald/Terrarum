@@ -11,8 +11,10 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
+import kotlin.math.roundToInt
 
 /**
  * @param width of hitbox, in tiles, when the door is opened. Default to 2. Closed door always have width of 1. (this limits how big and thick the door can be)
@@ -144,6 +146,49 @@ open class FixtureSwingingDoorBase : FixtureBase {
     }
 
     override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawn(posX, posY, installersUUID, tilewiseHitboxWidth, tilewiseHitboxHeight)
+
+    override fun makeNoiseAndDust(posX: Int, posY: Int) {
+        val posYb = posY + blockBox.height - 1
+        val posXc = posX + blockBox.width / 2
+
+        // make some noise
+        var soundSource =
+            if (spawnNeedsWall) 1
+            else if (spawnNeedsFloor) 0
+            else 2
+        // 1: wall, 0: floor, 2: if wall is not solid, use wall; else, use floor
+        val wallTile = world!!.getTileFromWall(posXc, posYb)
+        val terrTile = world!!.getTileFromTerrain(posXc, posYb + 1)
+
+        if (soundSource == 2) {
+            soundSource = if (BlockCodex[wallTile].isSolid)
+                1
+            else
+                0
+        }
+
+        when (soundSource) {
+            1 -> PickaxeCore.makeNoise(this, wallTile)
+            0 -> PickaxeCore.makeNoise(this, terrTile)
+        }
+
+        // make some dust
+        if (soundSource == 0) {
+            val y = posY + blockBox.height
+            for (x in (posX + tw - twClosed) until (posX + tw - twClosed) + twClosed) {
+                val tile = world!!.getTileFromTerrain(x, y)
+                PickaxeCore.makeDust(tile, x, y - 1, 4 + (Math.random() + Math.random()).roundToInt())
+            }
+        }
+        else {
+            for (y in posY until posY + blockBox.height) {
+                for (x in (posX + tw - twClosed) until (posX + tw - twClosed) + twClosed) {
+                    val tile = world!!.getTileFromWall(x, y)
+                    PickaxeCore.makeDust(tile, x, y, 2 + (Math.random() + Math.random()).roundToInt())
+                }
+            }
+        }
+    }
 
     override fun canSpawnHere0(posX: Int, posY: Int): Boolean {
         val everyBlockboxPos = (posX until posX + blockBox.width).toList().cartesianProduct((posY until posY + blockBox.height).toList())
