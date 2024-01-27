@@ -115,7 +115,7 @@ class FixtureJukebox : Electric, PlaysMusic {
 
                 printdbg(this, "Stop music $title - $artist")
 
-                (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(pauseLen = (INGAME.musicGovernor as TerrarumMusicGovernor).getRandomMusicInterval())
+                (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, pauseLen = (INGAME.musicGovernor as TerrarumMusicGovernor).getRandomMusicInterval())
             }
 
             discCurrentlyPlaying = index
@@ -141,7 +141,7 @@ class FixtureJukebox : Electric, PlaysMusic {
      */
     fun stopGracefully() {
         stopDiscPlayback()
-        (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(pauseLen = (INGAME.musicGovernor as TerrarumMusicGovernor).getRandomMusicInterval())
+        (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, pauseLen = (INGAME.musicGovernor as TerrarumMusicGovernor).getRandomMusicInterval())
     }
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {

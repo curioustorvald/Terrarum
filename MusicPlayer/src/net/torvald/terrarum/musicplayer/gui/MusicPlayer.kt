@@ -351,7 +351,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                                     App.audioMixer.musicTrack,
                                     AudioMixer.DEFAULT_FADEOUT_LEN / 3f
                                 ) {
-                                    ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                                    ingame.musicGovernor.startMusic(this) // required for "intermittent" mode
                                     iHitTheStopButton = false
                                     stopRequested = false
                                 }
@@ -376,12 +376,12 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                                 val thisMusic = App.audioMixer.musicTrack.currentTrack
                                 App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
                                 App.audioMixer.musicTrack.nextTrack = null
-                                ingame.musicGovernor.stopMusic()
+                                ingame.musicGovernor.stopMusic(this)
                                 thisMusic?.let { ingame.musicGovernor.queueMusicToPlayNext(it) }
                                 iHitTheStopButton = true
                             }
                             else if (!shouldPlayerBeDisabled) {
-                                ingame.musicGovernor.startMusic()
+                                ingame.musicGovernor.startMusic(this)
                                 iHitTheStopButton = false
                                 stopRequested = false
                             }
@@ -396,7 +396,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                                     App.audioMixer.musicTrack,
                                     AudioMixer.DEFAULT_FADEOUT_LEN / 3f
                                 ) {
-                                    ingame.musicGovernor.startMusic() // required for "intermittent" mode, does seemingly nothing on "continuous" mode
+                                    ingame.musicGovernor.startMusic(this) // required for "intermittent" mode, does seemingly nothing on "continuous" mode
                                     iHitTheStopButton = false
                                     stopRequested = false
                                 }
@@ -448,7 +448,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                         // fade out
                         App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
                             if (!shouldPlayerBeDisabled) {
-                                ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                                ingame.musicGovernor.startMusic(this) // required for "intermittent" mode
                                 iHitTheStopButton = false
                                 stopRequested = false
                             }
@@ -469,7 +469,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                         App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
                             loadNewAlbum(albumsList[index])
                             if (!shouldPlayerBeDisabled) {
-                                ingame.musicGovernor.startMusic() // required for "intermittent" mode
+                                ingame.musicGovernor.startMusic(this) // required for "intermittent" mode
                                 iHitTheStopButton = false
                                 stopRequested = false
                             }
@@ -490,12 +490,12 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         if (shouldPlayerBeDisabled || iHitTheStopButton) {
             if (!stopRequested) {
                 stopRequested = true
-                ingame.musicGovernor.stopMusic()
+                ingame.musicGovernor.stopMusic(this)
             }
         }
-        else if (!jukeboxStopMonitorAlert && !App.audioMixer.musicTrack.isPlaying) {
+        else if (ingame.musicGovernor.playCaller is PlaysMusic && !jukeboxStopMonitorAlert && !App.audioMixer.musicTrack.isPlaying) {
             jukeboxStopMonitorAlert = true
-            ingame.musicGovernor.stopMusic(false, ingame.musicGovernor.getRandomMusicInterval())
+            ingame.musicGovernor.stopMusic(this, false, ingame.musicGovernor.getRandomMusicInterval())
         }
         else if (App.audioMixer.musicTrack.isPlaying) {
             jukeboxStopMonitorAlert = false

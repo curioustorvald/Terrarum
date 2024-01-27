@@ -183,7 +183,10 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
                     printdbg(this, "MusicTitle: ${muscon.name}")
 
-                    muscon.songFinishedHook =  { stopMusic(muscon) }
+                    muscon.songFinishedHook =  {
+                        if (it == App.audioMixer.musicTrack.currentTrack?.gdxMusic)
+                            stopMusic(this)
+                    }
                 }
             }
             catch (e: GdxRuntimeException) {
@@ -205,7 +208,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     fun queueDirectory(musicDir: String, shuffled: Boolean, diskJockeyingMode: String, fileToName: ((String) -> String)? = null) {
         if (musicState != STATE_INIT && musicState != STATE_INTERMISSION) {
             App.audioMixer.requestFadeOut(App.audioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
-            stopMusic(App.audioMixer.musicTrack.currentTrack)
+            stopMusic0(App.audioMixer.musicTrack.currentTrack)
         }
 
         songs.forEach { it.gdxMusic.tryDispose() }
@@ -326,11 +329,16 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
     fun getRandomMusicInterval() = 25f + Math.random().toFloat() * 10f
 
-    private fun stopMusic(song: MusicContainer?, callStopMusicHook: Boolean = true, customPauseLen: Float? = null) {
-        musicState = STATE_INTERMISSION
+    var stopCaller: Any? = null; private set
+    var playCaller: Any? = null; private set
+    var stopCallTime: Long? = null; private set
+
+    private fun stopMusic0(song: MusicContainer?, callStopMusicHook: Boolean = true, customPauseLen: Float? = null) {
+        musicState = if (customPauseLen == Float.POSITIVE_INFINITY) STATE_INIT else STATE_INTERMISSION
+//        printdbg(this, "stopMusic1 customLen=$customPauseLen, stateNow: $musicState, called by")
+//        printStackTrace(this)
         intermissionAkku = 0f
-        intermissionLength = customPauseLen ?:
-            if (diskJockeyingMode == "intermittent") getRandomMusicInterval() else Float.POSITIVE_INFINITY // 30s-60s
+        intermissionLength = customPauseLen ?: getRandomMusicInterval()
         musicFired = false
         if (callStopMusicHook && musicStopHooks.isNotEmpty()) musicStopHooks.forEach {
             if (song != null) {
@@ -340,19 +348,42 @@ class TerrarumMusicGovernor : MusicGovernor() {
 //        printdbg(this, "StopMusic Intermission: $intermissionLength seconds")
     }
 
-    fun stopMusic(callStopMusicHook: Boolean = true, pauseLen: Float = Float.POSITIVE_INFINITY) {
-        stopMusic(App.audioMixer.musicTrack.currentTrack, callStopMusicHook, pauseLen)
-//        printdbg(this, "StopMusic Intermission2: $pauseLen seconds, called by:")
+    fun stopMusic(caller: Any?, callStopMusicHook: Boolean = true, pauseLen: Float = Float.POSITIVE_INFINITY) {
+        val timeNow = System.currentTimeMillis()
+        val trackThis = App.audioMixer.musicTrack.currentTrack
+
+        if (caller is TerrarumMusicGovernor) {
+            if (stopCaller == null) {
+//                printdbg(this, "Caller: this, prev caller: $stopCaller, len: $pauseLen, obliging stop request")
+                stopMusic0(trackThis, callStopMusicHook, pauseLen)
+            }
+            else {
+//                printdbg(this, "Caller: this, prev caller: $stopCaller, len: $pauseLen, ignoring stop request")
+            }
+        }
+        else {
+//            printdbg(this, "Caller: $caller, prev caller: <doesn't matter>, len: $pauseLen, obliging stop request")
+            stopMusic0(trackThis, callStopMusicHook, pauseLen)
+        }
+
+        stopCaller = caller?.javaClass?.canonicalName
+        stopCallTime = System.currentTimeMillis()
+
 //        printStackTrace(this)
     }
 
-    fun startMusic() {
-        startMusic(pullNextMusicTrack())
+    fun startMusic(caller: Any?) {
+        playCaller = caller
+        startMusic0(pullNextMusicTrack())
     }
 
-    private fun startMusic(song: MusicContainer) {
+    private fun startMusic0(song: MusicContainer) {
+        stopCaller = null
+        stopCallTime = null
+
         App.audioMixer.startMusic(song)
-        printdbg(this, "startMusic Now playing: ${song.name}")
+//        printdbg(this, "startMusic Now playing: ${song.name}, called by:")
+//        printStackTrace(this)
 //        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
         if (musicStartHooks.isNotEmpty()) musicStartHooks.forEach { it(song) }
         musicState = STATE_PLAYING
@@ -405,18 +436,30 @@ class TerrarumMusicGovernor : MusicGovernor() {
         ambState = STATE_PLAYING
     }
 
+    var firstTime = true
 
     override fun update(ingame: IngameInstance, delta: Float) {
+        val timeNow = System.currentTimeMillis()
+        val callerRecordExpired = (timeNow - (stopCallTime ?: 0L) > 1000)
+
+        if (callerRecordExpired && stopCaller != null) {
+            stopCaller = null
+            stopCallTime = null
+        }
+
         // start the song queueing if there is one to play
-        if (songs.isNotEmpty() && musicState == 0) musicState = STATE_INTERMISSION
-        if (ambients.isNotEmpty() && ambState == 0) ambState = STATE_INTERMISSION
+        if (firstTime) {
+            firstTime = false
+            if (songs.isNotEmpty()) musicState = STATE_INTERMISSION
+            if (ambients.isNotEmpty()) ambState = STATE_INTERMISSION
+        }
 
 
         when (musicState) {
             STATE_FIREPLAY -> {
                 if (!musicFired) {
                     musicFired = true
-                    startMusic(pullNextMusicTrack())
+                    startMusic0(pullNextMusicTrack())
                 }
             }
             STATE_PLAYING -> {
@@ -540,7 +583,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
     override fun dispose() {
         App.audioMixer.requestFadeOut(App.audioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
-        stopMusic(App.audioMixer.musicTrack.currentTrack)
+        stopMusic0(App.audioMixer.musicTrack.currentTrack)
         stopAmbient()
     }
 }

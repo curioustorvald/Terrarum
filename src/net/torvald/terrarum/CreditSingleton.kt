@@ -279,7 +279,7 @@ $BULLET Foleys:
     - ambient/season/diurnal_summer.*.ogg
     - ambient/season/diurnal_winter.*.ogg
     - ambient/season/matutinal.*.ogg
-    - ambient/season/nocturnal_summer.*.ogg
+    - ambient/season/nocturnal.*.ogg
 
 Copyright (C) 2011, 2013, 2015, 2020, 2021 Klankbeeld
 Sound from <https://www.freesound.org/people/klankbeeld>
@@ -305,7 +305,7 @@ Sound from <https://freesound.org/people/veezay>
 Copyright (C) 2017 Stephen Holdaway
 Sound from <https://freesound.org/people/stecman>
 
-    - effects/static/tape_hiss.ogg
+    - effects/static/film_pops_lowpass.ogg
     
 Copyright (C) 2015 Joe DeShon
 Sound from <https://freesound.org/people/joedeshon>
