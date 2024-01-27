@@ -6,8 +6,11 @@ import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.savegame.diskIDtoReadableFilename
 import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.utils.JsonFetcher
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.PrintStream
+import java.io.StringReader
 import java.nio.charset.Charset
 import java.util.*
 import java.util.logging.Level
@@ -267,6 +270,27 @@ class SavegameCracker(
     fun save(args: List<String>) {
         letdisk {
             VDUtil.dumpToRealMachine(it, file!!)
+        }
+    }
+
+    @Command("Retrieves all UUIDs found (player UUID, current world UUID, etc.")
+    fun uuid(args: List<String>) {
+        letdisk {
+            val jsonFile = it.getFile(-1) ?: throw FileNotFoundException("savegameinfo.json (entry ID -1) not found")
+            val jsonStr = jsonFile.bytes.toByteArray().toString(Common.CHARSET)
+            val json = JsonFetcher.readFromJsonString(StringReader(jsonStr))
+            var playerUUID = ""
+            var worldCurrentlyPlaying = ""
+            var worldIndex = ""
+            JsonFetcher.forEachSiblings(json) { name, value ->
+                if (name == "uuid") playerUUID = value.asString()
+                if (name == "worldCurrentlyPlaying") worldCurrentlyPlaying = value.asString()
+                if (name == "worldIndex") worldIndex = value.asString()
+            }
+
+            if (playerUUID.isNotBlank()) println("${ccNoun}Player UUID: $ccNoun2$playerUUID")
+            if (worldCurrentlyPlaying.isNotBlank()) println("${ccNoun}worldCurrentlyPlaying: $ccNoun2$worldCurrentlyPlaying")
+            if (worldIndex.isNotBlank()) println("${ccNoun}World UUID: $ccNoun2$worldIndex")
         }
     }
 }
