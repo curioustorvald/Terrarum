@@ -2068,7 +2068,7 @@ open class ActorWithBody : Actor {
 
     private fun makeDust(collisionDamage: Double, vecSum: Vector2) {
         val particleCount = (collisionDamage / 24.0).pow(0.75)
-        val trueParticleCount = particleCount.toInt() + (Math.random() < (particleCount % 1.0)).toInt()
+        val trueParticleCount = particleCount.ditherToInt()
 
         val feetTiles = getFeetTiles()
 

@@ -348,8 +348,6 @@ internal object TerragenTest : NoiseMaker {
     private val terragenYscaling = (NOISEBOX_HEIGHT / 2400.0).pow(0.75)
     private val terragenTiers = listOf(.0, .5, 1.0, 2.5).map { it * terragenYscaling } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
 
-    private fun Double.dither() = Math.random() < this
-
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val terr = noiseValue[0].tiered(terragenTiers)
         val cave = if (noiseValue[1] < 0.5) 0 else 1

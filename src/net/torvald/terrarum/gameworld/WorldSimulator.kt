@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameworld
 import com.badlogic.gdx.utils.Queue
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
@@ -13,9 +14,13 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.*
+import net.torvald.terrarum.modulebasegame.gameitems.AxeCore
+import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import org.dyn4j.geometry.Vector2
+import kotlin.math.cosh
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 /**
  * Created by minjaesong on 2016-08-03.
@@ -94,6 +99,8 @@ object WorldSimulator {
             // TODO update logic
         }
         App.measureDebugTime("WorldSimulator.collisionDroppedItem") { collideDroppedItems() }
+        App.measureDebugTime("WorldSimulator.dropTreeLeaves") { dropTreeLeaves() }
+
 
         //printdbg(this, "============================")
     }
@@ -112,8 +119,17 @@ object WorldSimulator {
         }
     }
 
+    private fun sech2(x: Float) = 1f / cosh(x).sqr()
+
     fun growOrKillGrass() {
-        repeat(2 * world.worldTime.timeDelta) { // TODO: season-dependent growth rate
+        // season-dependent growth rate
+        // https://www.desmos.com/calculator/ivxyxuj0bm
+        val baseCount = 2 * world.worldTime.timeDelta
+        val season = world.worldTime.ecologicalSeason.coerceIn(0f, 5f) // 1->1.0,  2.5->3.0, 4->1.0
+        val seasonalMult = 1f + sech2((season - 2.5f)) * 2f
+        val repeatCount = (baseCount * seasonalMult).ditherToInt()
+
+        repeat(repeatCount) {
             val rx = rng.nextInt(updateXFrom, updateXTo + 1)
             val ry = rng.nextInt(updateYFrom, updateYTo + 1)
             val tile = world.getTileFromTerrain(rx, ry)
@@ -130,6 +146,23 @@ object WorldSimulator {
                 val nearby = getNearbyTiles8(rx, ry)
                 if (nearby.all { BlockCodex[it].isSolid }) {
                     world.setTileTerrain(rx, ry, Block.DIRT, false)
+                }
+            }
+        }
+    }
+
+    fun dropTreeLeaves() {
+        repeat(26 * world.worldTime.timeDelta) {
+            val rx = rng.nextInt(updateXFrom, updateXTo + 1)
+            val ry = rng.nextInt(updateYFrom, updateYTo + 1)
+            val tile = world.getTileFromTerrain(rx, ry)
+            // if the dirt tile has a grass and an air tile nearby, put grass to it
+            if (BlockCodex[tile].hasAllTagOf("TREE", "LEAVES")) {
+                val nearby8 = getNearbyTiles8(rx, ry)
+                val nearbyCount = nearby8.count { BlockCodex[it].hasTag("TREE") }
+
+                if (nearbyCount <= 1) {
+                    AxeCore.removeLeaf(rx, ry)
                 }
             }
         }

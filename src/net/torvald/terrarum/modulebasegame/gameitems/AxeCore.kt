@@ -82,7 +82,7 @@ object AxeCore {
                 ).let { tileBroken ->
                     // tile busted
                     if (tileBroken != null) {
-                        removeLeaf(x, y, tileBroken.substringAfter(':').toInt() - 112)
+                        removeLeaf(x, y)
                         PickaxeCore.makeDust(tile, x, y, 9)
                     }
                     // tile not busted
@@ -110,8 +110,8 @@ object AxeCore {
                         val tileThereR = INGAME.world.getTileFromTerrain(x+1, y - upCtr)
                         val propThereL = BlockCodex[tileThereL]
                         val propThereR = BlockCodex[tileThereR]
-                        val treeTrunkXoff = if (propThereL.hasAllTag(listOf("TREELARGE", "TREETRUNK"))) -1
-                        else if (propThereR.hasAllTag(listOf("TREELARGE", "TREETRUNK"))) 1
+                        val treeTrunkXoff = if (propThereL.hasAllTagOf("TREELARGE", "TREETRUNK")) -1
+                        else if (propThereR.hasAllTagOf("TREELARGE", "TREETRUNK")) 1
                         else 0
 
                         if (treeTrunkXoff != 0) {
@@ -128,7 +128,7 @@ object AxeCore {
                             val tileHere = INGAME.world.getTileFromTerrain(x, y - upCtr)
                             val propHere = BlockCodex[tileHere]
 
-                            if (propHere.hasAllTag(listOf("TREELARGE", "TREETRUNK"))) {
+                            if (propHere.hasAllTagOf("TREELARGE", "TREETRUNK")) {
                                 INGAME.world.setTileTerrain(x, y - upCtr, Block.AIR, false)
                                 PickaxeCore.dropItem(propHere.drop, x, y - upCtr)
                                 PickaxeCore.makeDust(tile, x, y - upCtr, 2 + Math.random().roundToInt())
@@ -154,20 +154,20 @@ object AxeCore {
                                 for (l in -1 downTo -branchSize) {
                                     val tileBranch = INGAME.world.getTileFromTerrain(x + l, y - upCtr)
                                     if (tileBranch == thisLeaf)
-                                        removeLeaf(x + l, y - upCtr, thisLeaf.substringAfter(':').toInt() - 112)
+                                        removeLeaf(x + l, y - upCtr)
                                     else break
                                 }
                                 // scan horizontally right
                                 for (l in 1 .. branchSize) {
                                     val tileBranch = INGAME.world.getTileFromTerrain(x + l, y - upCtr)
                                     if (tileBranch == thisLeaf)
-                                        removeLeaf(x + l, y - upCtr, thisLeaf.substringAfter(':').toInt() - 112)
+                                        removeLeaf(x + l, y - upCtr)
                                     else break
                                 }
                                 // deal with the current tile
                                 val tileBranch = INGAME.world.getTileFromTerrain(x, y - upCtr)
                                 if (tileBranch == thisLeaf)
-                                    removeLeaf(x, y - upCtr, thisLeaf.substringAfter(':').toInt() - 112)
+                                    removeLeaf(x, y - upCtr)
                                 else break
                             }
                             else {
@@ -200,8 +200,9 @@ object AxeCore {
         usageStatus
     }
 
-    private fun removeLeaf(x: Int, y: Int, species: Int) {
+    fun removeLeaf(x: Int, y: Int) {
         val tileBack = INGAME.world.getTileFromTerrain(x, y)
+        val species = tileBack.substringAfter(":").toInt() - 112
         INGAME.world.setTileTerrain(x, y, Block.AIR, false)
         // drop items
         when (Math.random()) {

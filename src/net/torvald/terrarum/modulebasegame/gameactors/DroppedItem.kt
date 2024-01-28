@@ -125,9 +125,11 @@ open class DroppedItem : ActorWithBody {
     }
 
     private fun getLum(itemID: ItemID): Cvec {
-        return if (itemID.isBlock() || itemID.isWall()) {
-            BlockCodex[itemID.substringAfter('@')].getLumCol(randKey1, randKey2)
+        return if (itemID.isBlock()) {
+            BlockCodex[itemID].getLumCol(randKey1, randKey2)
         }
+        else if (itemID.isWall())
+            BlockCodex[itemID.substringAfter('@')].getLumCol(randKey1, randKey2)
         else {
             Cvec(
                 ItemCodex[itemID]?.itemProperties?.getAsFloat(AVKey.LUMR) ?: 0f,
