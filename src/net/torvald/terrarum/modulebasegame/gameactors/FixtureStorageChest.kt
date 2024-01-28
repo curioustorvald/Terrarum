@@ -5,6 +5,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_COUNT
+import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -24,9 +25,11 @@ internal class FixtureStorageChest : FixtureBase {
         (mainUI as UIStorageChest).chestInventory = this.inventory!!
         (mainUI as UIStorageChest).chestNameFun = this.nameFun
 
-        setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 1)
+        val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/storage_chest.tga")
 
-        makeNewSprite(TextureRegionPack(CommonResourcePool.getAsTextureRegion("itemplaceholder_16").texture, 16, 16)).let {
+        setHitboxDimension(TILE_SIZE, TILE_SIZE, 1, 0)
+
+        makeNewSprite(TextureRegionPack(itemImage.texture, 18, 18)).let {
             it.setRowsAndFrames(1,1)
         }
 

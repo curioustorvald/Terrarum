@@ -17,7 +17,7 @@ class ItemStorageChest(originalID: ItemID) : FixtureItemBase(originalID, "net.to
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_48")
+        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/storage_chest.tga")
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_STORAGE_CHEST"
 
