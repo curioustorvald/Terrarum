@@ -88,7 +88,7 @@ class FixtureJukebox : Electric, PlaysMusic {
 
         // supress the normal background music playback
         if (musicIsPlaying && !flagDespawn) {
-            (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, false)
+            (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, true)
         }
     }
 
