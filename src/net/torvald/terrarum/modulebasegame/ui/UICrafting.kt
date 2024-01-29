@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
-import net.torvald.terrarum.ui.UIItemCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -20,8 +19,6 @@ import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemCatBar.Companion.FILTER_CAT_ALL
 import net.torvald.unicode.getKeycapPC
 import kotlin.math.ceil
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * This UI has inventory, but it's just there to display all craftable items and should not be serialised.
@@ -461,47 +458,9 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         
         if (full != null) {
             //draw player encumb
-            // encumbrance meter
-            val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
-            // encumbrance bar will go one row down if control help message is too long
             val encumbBarXPos = thisXend - UIInventoryCells.weightBarWidth + 36
-            val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
-            val encumbBarYPos = UIInventoryFull.yEnd - 20 + 3f +
-                    if (App.fontGame.getWidth(full.listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
-                        App.fontGame.lineHeight
-                    else 0f
-            App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
-            // encumbrance bar background
-            blendNormalStraightAlpha(batch)
-            val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
-            val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
-            batch.color = encumbBack
-            Toolkit.fillArea(
-                batch,
-                encumbBarXPos, encumbBarYPos,
-                UIInventoryCells.weightBarWidth, UIInventoryFull.controlHelpHeight - 6f
-            )
-            // encumbrance bar
-            batch.color = encumbCol
-            Toolkit.fillArea(
-                batch,
-                encumbBarXPos, encumbBarYPos,
-                if (full.actor.inventory.capacityMode == FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
-                    1f
-                else // make sure 1px is always be seen
-                    min(UIInventoryCells.weightBarWidth, max(1f, UIInventoryCells.weightBarWidth * encumbrancePerc)),
-                UIInventoryFull.controlHelpHeight - 6f
-            )
-            // debug text
-            batch.color = Color.LIGHT_GRAY
-            if (App.IS_DEVELOPMENT_BUILD) {
-                App.fontSmallNumbers.draw(
-                    batch,
-                    "${full.actor.inventory.capacity}/${full.actor.inventory.maxCapacity}",
-                    encumbBarTextXPos,
-                    encumbBarYPos + UIInventoryFull.controlHelpHeight - 4f
-                )
-            }
+            val encumbBarYPos = UIInventoryFull.yEnd - 20 + 3f
+            UIInventoryCells.drawEncumbranceBar(batch, encumbBarXPos, encumbBarYPos, encumbrancePerc, full.actor.inventory)
         }
 
 

@@ -213,36 +213,11 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
         blendNormalStraightAlpha(batch)
 
         // encumbrance meter
-        val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
         val chestName = chestNameFun()
         val playerName = INGAME.actorNowPlaying!!.actorValue.getAsString(AVKey.NAME).orEmpty().let { it.ifBlank { Lang["GAME_INVENTORY"] } }
         val encumbBarXPos = itemListPlayer.posX + itemListPlayer.width - UIInventoryCells.weightBarWidth + 36
-        val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
         val yEnd = -UIInventoryFull.YPOS_CORRECTION + (App.scr.height + UIInventoryFull.internalHeight).div(2).toFloat() // directly copied from UIInventoryFull.yEnd
         val encumbBarYPos = yEnd - 20 + 3 // dunno why but extra 3 px is needed
-        val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
-        val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
-
-        // encumbrance bar background
-        batch.color = encumbBack
-        Toolkit.fillArea(
-            batch,
-            encumbBarXPos,
-            encumbBarYPos,
-            UIInventoryCells.weightBarWidth,
-            UIInventoryFull.controlHelpHeight - 6f
-        )
-        // encumbrance bar
-        batch.color = encumbCol
-        Toolkit.fillArea(
-            batch,
-            encumbBarXPos, encumbBarYPos,
-            if (getPlayerInventory().capacityMode == FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
-                1f
-            else // make sure 1px is always be seen
-                min(UIInventoryCells.weightBarWidth, max(1f, UIInventoryCells.weightBarWidth * encumbrancePerc)),
-            UIInventoryFull.controlHelpHeight - 6f
-        )
 
         // chest name text
         batch.color = Color.WHITE
@@ -252,9 +227,7 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
         // control hint
         App.fontGame.draw(batch, controlHelp, thisOffsetX - 34f, encumbBarYPos - 3)
 
-        // encumb text
-        batch.color = Color.WHITE
-        App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
+        UIInventoryCells.drawEncumbranceBar(batch, encumbBarXPos, encumbBarYPos, encumbrancePerc, getPlayerInventory())
     }
 
     override fun doOpening(delta: Float) {
