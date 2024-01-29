@@ -27,7 +27,7 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
     var fuelCaloriesNow = 0f
     var fuelCaloriesMax: Float? = null
     var temperature = 0f // 0f..1f
-    var progress = 0f
+    var progress = 0f // 0f..1f
 
     var oreItem: InventoryPair? = null
     var fireboxItem: InventoryPair? = null

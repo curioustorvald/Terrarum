@@ -30,7 +30,6 @@ fun Color.darkerLuv(scale: Float): Color {
     return luv.toColor()
 }
 
-/** Tend to have more vivid (or saturated) colour */
 fun cieluv_getGradient(scale: Float, fromCol: Color, toCol: Color): Color {
     val from = fromCol.toLuv()
     val to = toCol.toLuv()
@@ -39,7 +38,7 @@ fun cieluv_getGradient(scale: Float, fromCol: Color, toCol: Color): Color {
     val newV = FastMath.interpolateLinear(scale, from.v, to.v)
     val newAlpha = FastMath.interpolateLinear(scale, from.alpha, to.alpha)
 
-    return CIELab(newL, newU, newV, newAlpha).toColor()
+    return CIELuv(newL, newU, newV, newAlpha).toColor()
 }
 
 /**

@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.colourutil.cieluv_getGradient
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
@@ -88,14 +89,17 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     private val backdropX = (leftPanelX + (leftPanelWidth - smelterBackdrop.regionWidth * backdropZoom) / 2).toFloat()
     private val backdropY = (leftPanelY + (leftPanelHeight - smelterBackdrop.regionHeight * backdropZoom) / 2).toFloat()
 
-    private val oreX = backdropX + 12 * backdropZoom + 3
+    private val oreX = backdropX + 12 * backdropZoom + 6
     private val oreY = backdropY + 23 * backdropZoom + 3
 
-    private val fireboxX = backdropX + 12 * backdropZoom + 3
+    private val fireboxX = backdropX + 12 * backdropZoom + 6
     private val fireboxY = backdropY + 39 * backdropZoom + 3
 
     private val productX = backdropX + 37 * backdropZoom + 3
     private val productY = backdropY + 39 * backdropZoom + 3
+
+    private val thermoX = (backdropX + 28 * backdropZoom + 1).toInt()
+    private val thermoY = (backdropY + 39 * backdropZoom + 3).toInt()
 
     /*
     Click on the button when item is there:
@@ -182,7 +186,6 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     private val productItemslot: UIItemInventoryElemSimple = UIItemInventoryElemSimple(
         this, productX.toInt(), productY.toInt(),
         emptyCellIcon = smelterCellIcons.get(1, 0),
-        updateOnNull = true,
         keyDownFun = { _, _, _, _, _ -> },
         touchDownFun = { _, _, button, _, self ->
             if (smelter.productItem != null) {
@@ -295,7 +298,9 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
         uiItems.forEach { it.render(frameDelta, batch, camera) }
 
-
+        drawProgressGauge(batch, oreItemSlot.posX, oreItemSlot.posY, smelter.progress)
+        drawProgressGauge(batch, fireboxItemSlot.posX, fireboxItemSlot.posY, smelter.fuelCaloriesNow / (smelter.fuelCaloriesMax ?: Float.POSITIVE_INFINITY))
+        drawThermoGauge(batch, thermoX, thermoY, smelter.temperature)
 
 
         // control hints
@@ -316,10 +321,80 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         blendNormalStraightAlpha(batch)
     }
 
-    override fun dispose() {
+    private val colProgress = Color(0xbbbbbbff.toInt())
+    private val colTemp1 = Color(0x99000bff.toInt())
+    private val colTemp2 = Color(0xffe200ff.toInt())
+
+
+
+    /**
+     * @param x x-position of the inventory cell that will have the gauge
+     * @param y y-position of the inventory cell that will have the gauge
+     */
+    private fun drawProgressGauge(batch: SpriteBatch, x: Int, y: Int, percentage: Float) {
+        batch.color = Toolkit.Theme.COL_CELL_FILL
+        Toolkit.fillArea(batch, x - 7, y, 6, UIItemInventoryElemSimple.height)
+
+        batch.color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER
+        Toolkit.drawStraightLine(batch, x - 7, y - 1, x - 1, 1, false)
+        Toolkit.drawStraightLine(batch, x - 7, y + UIItemInventoryElemSimple.height, x - 1, 1, false)
+        Toolkit.drawStraightLine(batch, x - 8, y, y + UIItemInventoryElemSimple.height, 1, true)
+
+        batch.color = colProgress
+        Toolkit.fillArea(batch, x - 7, y + UIItemInventoryElemSimple.height, 6, -(percentage * UIItemInventoryElemSimple.height).roundToInt())
+    }
+
+    private fun drawThermoGauge(batch: SpriteBatch, x: Int, y: Int, percentage: Float) {
+        batch.color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER
+        Toolkit.drawStraightLine(batch, x, y - 1, x + 4, 1, false)
+        Toolkit.drawStraightLine(batch, x, y + UIItemInventoryElemSimple.height + 7, x + 4, 1, false)
+
+        Toolkit.drawStraightLine(batch, x - 1, y, y + UIItemInventoryElemSimple.height, 1, true)
+        Toolkit.drawStraightLine(batch, x + 4, y, y + UIItemInventoryElemSimple.height, 1, true)
+        Toolkit.drawStraightLine(batch, x - 1, y + UIItemInventoryElemSimple.height + 6, y + UIItemInventoryElemSimple.height + 7, 1, true)
+        Toolkit.drawStraightLine(batch, x + 4, y + UIItemInventoryElemSimple.height + 6, y + UIItemInventoryElemSimple.height + 7, 1, true)
+
+        Toolkit.drawStraightLine(batch, x - 2, y + UIItemInventoryElemSimple.height, y + UIItemInventoryElemSimple.height + 1, 1, true)
+        Toolkit.drawStraightLine(batch, x + 5, y + UIItemInventoryElemSimple.height, y + UIItemInventoryElemSimple.height + 1, 1, true)
+        Toolkit.drawStraightLine(batch, x - 2, y + UIItemInventoryElemSimple.height + 5, y + UIItemInventoryElemSimple.height + 6, 1, true)
+        Toolkit.drawStraightLine(batch, x + 5, y + UIItemInventoryElemSimple.height + 5, y + UIItemInventoryElemSimple.height + 6, 1, true)
+
+        Toolkit.drawStraightLine(batch, x - 3, y + UIItemInventoryElemSimple.height + 1, y + UIItemInventoryElemSimple.height + 5, 1, true)
+        Toolkit.drawStraightLine(batch, x + 6, y + UIItemInventoryElemSimple.height + 1, y + UIItemInventoryElemSimple.height + 5, 1, true)
+
+
+        batch.color = cieluv_getGradient(percentage, colTemp1, colTemp2)
+        Toolkit.fillArea(batch, x, y + UIItemInventoryElemSimple.height, 4, -(percentage * UIItemInventoryElemSimple.height).roundToInt())
+
+        Toolkit.fillArea(batch, x, y + UIItemInventoryElemSimple.height, 4, 6)
+        Toolkit.fillArea(batch, x - 1, y + UIItemInventoryElemSimple.height + 1, 6, 4)
     }
 
 
 
+    override fun doOpening(delta: Float) {
+        super.doOpening(delta)
+        INGAME.disablePlayerControl()
+        INGAME.setTooltipMessage(null)
+    }
+
+    override fun doClosing(delta: Float) {
+        super.doClosing(delta)
+        INGAME.resumePlayerControl()
+        INGAME.setTooltipMessage(null)
+    }
+
+    override fun endOpening(delta: Float) {
+        super.endOpening(delta)
+    }
+
+    override fun endClosing(delta: Float) {
+        super.endClosing(delta)
+        UIItemInventoryItemGrid.tooltipShowing.clear()
+        INGAME.setTooltipMessage(null) // required!
+    }
+
+    override fun dispose() {
+    }
 
 }

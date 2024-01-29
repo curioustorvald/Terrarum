@@ -48,7 +48,7 @@ internal class UIInventoryCells(
             // encumbrance bar background
             blendNormalStraightAlpha(batch)
             val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
-            val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
+            val encumbBack = Toolkit.Theme.COL_CELL_FILL
             batch.color = encumbBack
             Toolkit.fillArea(
                 batch,
