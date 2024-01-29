@@ -56,8 +56,6 @@ open class UIItemInventoryItemGrid(
 
     var numberMultiplier = 1L
 
-    private val hash = System.nanoTime()
-
     override val width  = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
     override val height = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
 
@@ -179,9 +177,6 @@ open class UIItemInventoryItemGrid(
             }
         }
 
-        // COMMON variables because more than one instance of this can be up on the screen
-        // This variable must be emptied out when the parent UI hides/closes
-        val tooltipShowing = HashMap<Long, Boolean>() // Long: `hash` field on UIItemInventoryItemGrid
     }
 
     protected val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
@@ -317,39 +312,9 @@ open class UIItemInventoryItemGrid(
     override fun update(delta: Float) {
         super.update(delta)
 
-
-        tooltipShowing[hash] = false
-
-//        printdbg(this, tooltipShowing.entries)
-
         items.forEach {
             it.update(delta)
-
-
-            // set tooltip accordingly
-            if ((App.IS_DEVELOPMENT_BUILD || isCompactMode) && tooltipShowing[hash] != true && it.item != null && it.mouseUp) {
-//                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
-
-                val grey = App.fontGame.toColorCode(11, 11, 11)
-                val itemIDstr = "\n$grey(${it.item?.originalID}${if (it.item?.originalID == it.item?.dynamicID) "" else "/${it.item?.dynamicID}"})"
-                val nameStr = if (it.item?.nameSecondary?.isNotBlank() == true) "${it.item?.name}\n$grey${it.item?.nameSecondary}" else "${it.item?.name}"
-
-                INGAME.setTooltipMessage(
-                    if (App.IS_DEVELOPMENT_BUILD)
-                        nameStr + itemIDstr
-                    else
-                        nameStr
-                )
-
-                tooltipShowing[hash] = true
-//                printdbg(this, tooltipShowing.entries)
-            }
         }
-
-        if (tooltipShowing.values.all { !it }) {
-            INGAME.setTooltipMessage(null)
-        }
-
 
         if (!hideSidebar) {
             navRemoCon.update(delta)
@@ -585,11 +550,6 @@ open class UIItemInventoryItemGrid(
     }
 
     override fun dispose() {
-        tooltipShowing.remove(hash)
-    }
-
-    override fun hide() {
-        tooltipShowing.remove(hash)
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

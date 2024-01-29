@@ -14,6 +14,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.CraftingStation
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 import net.torvald.terrarum.modulebasegame.ui.UITemplateHalfInventory.Companion.INVENTORY_NAME_TEXT_GAP
 import net.torvald.terrarum.ui.*
@@ -402,7 +403,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
 
         openingClickLatched = Terrarum.mouseDown
 
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
 
         resetUI()
@@ -476,14 +477,14 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
 
     override fun endOpening(delta: Float) {
         super.endOpening(delta)
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
         resetUI()
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 

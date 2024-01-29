@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.unicode.getKeycapPC
 import kotlin.math.max
@@ -144,7 +145,7 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
 
         openingClickLatched = Terrarum.mouseDown
 
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }
 
@@ -244,7 +245,7 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
     }
 
     override fun endClosing(delta: Float) {
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 

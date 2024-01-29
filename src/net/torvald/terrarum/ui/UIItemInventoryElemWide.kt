@@ -5,12 +5,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.ui.InventoryCellColourTheme
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import kotlin.math.roundToInt
 
 /***
@@ -64,9 +66,6 @@ class UIItemInventoryElemWide(
 
 
     override fun update(delta: Float) {
-        if (item != null) {
-
-        }
     }
 
     private var highlightToMainCol = false
@@ -159,13 +158,39 @@ class UIItemInventoryElemWide(
                 App.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW.toFloat(), posY + textOffsetY)
             }
 
+
+            // set tooltip accordingly
+            if (IS_DEVELOPMENT_BUILD && tooltipShowing[hash] != true && item != null && mouseUp) {
+//                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
+
+                val grey = App.fontGame.toColorCode(11, 11, 11)
+                val itemIDstr = "\n$grey(${item?.originalID}${if (item?.originalID == item?.dynamicID) "" else "/${item?.dynamicID}"})"
+                val nameStr = if (item?.nameSecondary?.isNotBlank() == true) "${item?.name}\n$grey${item?.nameSecondary}" else "${item?.name}"
+
+                INGAME.setTooltipMessage(
+                    if (App.IS_DEVELOPMENT_BUILD)
+                        nameStr + itemIDstr
+                    else
+                        nameStr
+                )
+
+                tooltipShowing[hash] = true
+//                printdbg(this, tooltipShowing.entries)
+            }
+            else if (item == null || !mouseUp) {
+                tooltipShowing[hash] = false
+            }
         }
 
         // see IFs above?
         batch.color = Color.WHITE
-
     }
 
     override fun dispose() {
+        tooltipShowing.remove(hash)
+    }
+
+    override fun hide() {
+        tooltipShowing.remove(hash)
     }
 }

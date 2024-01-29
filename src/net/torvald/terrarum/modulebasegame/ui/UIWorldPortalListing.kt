@@ -13,6 +13,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureWorldPortal
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.getCellCountVertically
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import net.torvald.terrarum.savegame.*
@@ -524,7 +525,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 

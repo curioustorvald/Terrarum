@@ -8,6 +8,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureJukebox
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.getKeycapPC
@@ -78,7 +79,7 @@ class UIJukebox : UICanvas(
     override fun show() {
         openingClickLatched = Terrarum.mouseDown
         transitionPanel.show()
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }
 
@@ -131,7 +132,7 @@ class UIJukebox : UICanvas(
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 

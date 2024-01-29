@@ -8,6 +8,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.MONTH_LENGTH
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.unicode.getKeycapPC
@@ -368,13 +369,13 @@ class UIWallCalendar : UICanvas(
 
     override fun endOpening(delta: Float) {
         super.endOpening(delta)
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 

@@ -18,6 +18,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
 import net.torvald.terrarum.modulebasegame.serialise.WriteSavegame
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.serialise.WriteConfig
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -281,7 +282,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     )
 
     override fun show() {
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
         toInitScreen()
     }
@@ -355,7 +356,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
         screen = 0
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }
 

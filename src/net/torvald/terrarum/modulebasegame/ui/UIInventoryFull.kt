@@ -10,6 +10,7 @@ import net.torvald.terrarum.audio.decibelsToFullscale
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.*
@@ -321,7 +322,7 @@ class UIInventoryFull(
 
     override fun show() {
         transitionPanel.show()
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }
 
@@ -413,7 +414,7 @@ class UIInventoryFull(
         INGAME.setTooltipMessage(null) // required!
 //        MinimapComposer.revalidateAll()
 
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
 
 //        printdbg(this, "Clearing out tooltipShowing")
     }

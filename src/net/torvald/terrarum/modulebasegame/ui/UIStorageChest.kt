@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.getWidthOfCells
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.unicode.getKeycapPC
 import kotlin.math.max
@@ -155,7 +156,7 @@ internal class UIStorageChest : UICanvas(
 
         openingClickLatched = Terrarum.mouseDown
 
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }
 
@@ -254,7 +255,7 @@ internal class UIStorageChest : UICanvas(
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 

@@ -4,16 +4,14 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.App
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.blendNormalStraightAlpha
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.ui.InventoryCellColourTheme
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defaultInventoryCellTheme
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
-import net.torvald.terrarum.mul
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import kotlin.math.roundToInt
 
 /**
@@ -59,7 +57,6 @@ class UIItemInventoryElemSimple(
     private val emptyCellIconOffsetY = (this.height - (emptyCellIcon?.regionHeight ?: 0)).div(2).toFloat()
 
     override fun update(delta: Float) {
-
     }
 
     private var highlightToMainCol = false
@@ -129,6 +126,29 @@ class UIItemInventoryElemSimple(
                 )
             }
 
+
+            // set tooltip accordingly
+            if (tooltipShowing[hash] != true && item != null && mouseUp) {
+//                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
+
+                val grey = App.fontGame.toColorCode(11, 11, 11)
+                val itemIDstr = "\n$grey(${item?.originalID}${if (item?.originalID == item?.dynamicID) "" else "/${item?.dynamicID}"})"
+                val nameStr = if (item?.nameSecondary?.isNotBlank() == true) "${item?.name}\n$grey${item?.nameSecondary}" else "${item?.name}"
+
+                INGAME.setTooltipMessage(
+                    if (App.IS_DEVELOPMENT_BUILD)
+                        nameStr + itemIDstr
+                    else
+                        nameStr
+                )
+
+                tooltipShowing[hash] = true
+//                printdbg(this, tooltipShowing.entries)
+            }
+            else if (item == null || !mouseUp) {
+                tooltipShowing[hash] = false
+            }
+
         }
         else {
 
@@ -146,5 +166,10 @@ class UIItemInventoryElemSimple(
     }
 
     override fun dispose() {
+        tooltipShowing.remove(hash)
+    }
+
+    override fun hide() {
+        tooltipShowing.remove(hash)
     }
 }

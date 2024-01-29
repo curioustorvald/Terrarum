@@ -11,6 +11,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureSmelterBasic
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemCatBar.Companion.FILTER_CAT_ALL
 import net.torvald.terrarum.ui.UIItemInventoryElemWide.Companion.UNIQUE_ITEM_HAS_NO_AMOUNT
@@ -98,7 +99,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     private val productX = backdropX + 37 * backdropZoom + 3
     private val productY = backdropY + 39 * backdropZoom + 3
 
-    private val thermoX = (backdropX + 28 * backdropZoom + 1).toInt()
+    private val thermoX = (backdropX + 24 * backdropZoom + 1).toInt()
     private val thermoY = (backdropY + 39 * backdropZoom + 3).toInt()
 
     /*
@@ -253,7 +254,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         playerThings.setGetInventoryFun { INGAME.actorNowPlaying!!.inventory }
         itemListUpdate()
 
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }
 
@@ -390,7 +391,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 

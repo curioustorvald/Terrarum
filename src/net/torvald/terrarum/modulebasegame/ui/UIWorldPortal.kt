@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.YPOS_COR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.drawBackground
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.serialise.toAscii85
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -190,14 +191,14 @@ class UIWorldPortal : UICanvas(
     override fun endOpening(delta: Float) {
         super.endOpening(delta)
         transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f)  }
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
         transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
-        UIItemInventoryItemGrid.tooltipShowing.clear()
+        tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 }

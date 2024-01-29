@@ -416,10 +416,12 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     open fun setTooltipMessage(message: String?) {
         if (message == null) {
             uiTooltip.setAsClose()
+//            printdbg(this, "Tooltip close!")
         }
         else {
             if (uiTooltip.isClosed || uiTooltip.isClosing) {
                 uiTooltip.setAsOpen()
+//                printdbg(this, "Tooltip open!")
             }
             uiTooltip.message = message
 

@@ -5,8 +5,11 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINotControllable
@@ -21,7 +24,7 @@ class UITooltip : UICanvas() {
         handler.allowESCtoClose = false
     }
 
-    override var openCloseTime: Second = 0f
+    override var openCloseTime: Second = OPENCLOSE_GENERIC * 0.72f
 
     private val tooltipBackCol = Color.WHITE
     private val tooltipForeCol = Color(0xfafafaff.toInt())
@@ -47,6 +50,7 @@ class UITooltip : UICanvas() {
     override var height: Int
         get() = 36 * 2 + font.lineHeight.toInt()
         set(value) { throw Error("You are not supposed to set the height of the tooltip manually.") }
+
 
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val mouseXoff = 28f
@@ -80,20 +84,29 @@ class UITooltip : UICanvas() {
         }
     }
 
+//    private var lastOpenSignalTime = 0L
+//    private var debounceTime = 100*1000000L // miliseconds
+
+    override fun setAsOpen() {
+        handler.setAsOpen()
+//        lastOpenSignalTime = System.nanoTime()
+//        printdbg(this, "start open")
+    }
+
+    override fun setAsClose() {
+//        printdbg(this, "Close called, time since last open: ${System.nanoTime() - lastOpenSignalTime}")
+//        if (System.nanoTime() - lastOpenSignalTime >= debounceTime) {
+//            printdbg(this, "start close")
+            handler.setAsClose()
+//        }
+    }
+
     override fun updateUI(delta: Float) {
         setPosition(Terrarum.mouseScreenX, Terrarum.mouseScreenY)
-    }
 
-    override fun doOpening(delta: Float) {
-    }
-
-    override fun doClosing(delta: Float) {
-    }
-
-    override fun endOpening(delta: Float) {
-    }
-
-    override fun endClosing(delta: Float) {
+        if (tooltipShowing.values.all { !it }) {
+            INGAME.setTooltipMessage(null)
+        }
     }
 
     override fun dispose() {

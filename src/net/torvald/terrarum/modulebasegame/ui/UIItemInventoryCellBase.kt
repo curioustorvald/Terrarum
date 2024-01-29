@@ -32,10 +32,13 @@ abstract class UIItemInventoryCellBase(
     var touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
     open var extraInfo: Any?,
     open protected val highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
-    var colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme
+    var colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme,
+    var showTooltip: Boolean = true,
 ) : UIItem(parentUI, initialX, initialY) {
     abstract override fun update(delta: Float)
     abstract override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera)
+
+    protected val hash = System.nanoTime()
 
     /** Custom highlight rule to highlight tihs button to primary accent colour (blue by default).
      * Set to `null` to use default rule:
@@ -110,6 +113,8 @@ object UIItemInventoryCellCommonRes {
         Color.WHITE,
         Toolkit.Theme.COL_CELL_FILL
     )
+
+    val tooltipShowing = HashMap<Long, Boolean>() // Long: `hash` field on UIItemInventoryItemGrid
 }
 
 data class InventoryCellColourTheme(
