@@ -124,7 +124,7 @@ object LoadSavegame {
 
     operator fun invoke(diskPair: DiskPair) = invoke(diskPair.player, diskPair.world)
 
-    private val getGenver = Regex("""(?<="genver":)[0-9]+""")
+    private val getGenver = Regex("""(?<="genver" ?: ?)[0-9]+""")
 
     /**
      * @param playerDisk DiskSkimmer representing the Player.
