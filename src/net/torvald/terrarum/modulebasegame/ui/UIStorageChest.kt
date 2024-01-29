@@ -95,7 +95,7 @@ internal class UIStorageChest : UICanvas(
         catBar.selectionChangeListener = { old, new -> itemListUpdate() }
 
 
-        itemListChest = UITemplateHalfInventory(this, true) { getFixtureInventory() }.also {
+        itemListChest = UITemplateHalfInventory(this, true, { getFixtureInventory() }, { chestNameFun() }).also {
             it.itemListKeyDownFun = { _, _, _, _, _ -> Unit }
             it.itemListTouchDownFun = { gameItem, amount, button, _, _ ->
                 if (button == App.getConfigInt("config_mouseprimary")) {
@@ -210,18 +210,11 @@ internal class UIStorageChest : UICanvas(
         blendNormalStraightAlpha(batch)
 
         // encumbrance meter
-        val chestName = chestNameFun()
-        val playerName = INGAME.actorNowPlaying!!.actorValue.getAsString(AVKey.NAME).orEmpty().let { it.ifBlank { Lang["GAME_INVENTORY"] } }
         val encumbBarXPos = itemListPlayer.posX + itemListPlayer.width - UIInventoryCells.weightBarWidth + 36
         val yEnd = -UIInventoryFull.YPOS_CORRECTION + (App.scr.height + UIInventoryFull.internalHeight).div(2).toFloat() // directly copied from UIInventoryFull.yEnd
         val encumbBarYPos = yEnd - 20 + 3 // dunno why but extra 3 px is needed
 
         UIInventoryCells.drawEncumbranceBar(batch, encumbBarXPos, encumbBarYPos, encumbrancePerc, getPlayerInventory())
-
-        // chest name text
-        batch.color = Color.WHITE
-        App.fontGame.draw(batch, chestName, thisOffsetX + (cellsWidth - App.fontGame.getWidth(chestName)) / 2, thisOffsetY - 30)
-        App.fontGame.draw(batch, playerName, thisOffsetX2 + (cellsWidth - App.fontGame.getWidth(playerName)) / 2, thisOffsetY - 30)
 
         // control hint
         App.fontGame.draw(batch, controlHelp, thisOffsetX - 34f, encumbBarYPos - 3)

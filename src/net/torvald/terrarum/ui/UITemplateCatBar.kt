@@ -1,5 +1,7 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
@@ -34,4 +36,8 @@ class UITemplateCatBar(
     override fun getUIitems(): List<UIItem> {
         return listOf(catBar)
     }
+
+    override fun update(delta: Float) = catBar.update(delta)
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) = catBar.render(frameDelta, batch, camera)
+    override fun dispose() = catBar.dispose()
 }

@@ -44,19 +44,19 @@ class UIItemInventoryEquippedView(
 
     private val equipPosIcon = CommonResourcePool.getAsTextureRegionPack("inventory_category")
     private val cellToIcon = intArrayOf(0,1,2,3,4,5,6,7,6,7,6,7)
-    private val equipPosIconCol = Color(0xdddddd7f.toInt())
 
     private val itemGrid = Array<UIItemInventoryCellBase>(2 * 6) {
         UIItemInventoryElemSimple(
-                parentUI = parentUI,
-                initialX = this.posX + (UIItemInventoryElemSimple.height + listGap) * ((it + 4) % 2),
-                initialY = this.posY + (UIItemInventoryElemSimple.height + listGap) * ((it + 4) / 2),
-                item = null,
-                amount = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
-                itemImage = null,
-                drawBackOnNull = true,
-                keyDownFun = createInvCellGenericKeyDownFun(),
-                touchDownFun = createInvCellGenericTouchDownFun(inventoryListRebuildFun) // to "unselect" the equipped item and main item grid would "untick" accordingly
+            parentUI = parentUI,
+            initialX = this.posX + (UIItemInventoryElemSimple.height + listGap) * ((it + 4) % 2),
+            initialY = this.posY + (UIItemInventoryElemSimple.height + listGap) * ((it + 4) / 2),
+            item = null,
+            amount = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
+            itemImage = null,
+            drawBackOnNull = true,
+            keyDownFun = createInvCellGenericKeyDownFun(),
+            touchDownFun = createInvCellGenericTouchDownFun(inventoryListRebuildFun), // to "unselect" the equipped item and main item grid would "untick" accordingly
+            emptyCellIcon = equipPosIcon.get(cellToIcon[it], 1)
         )
     }
 
@@ -107,10 +107,6 @@ class UIItemInventoryEquippedView(
         // slot image on each cells
         itemGrid.forEachIndexed { index, cell ->
             cell.render(frameDelta, batch, camera)
-            if (cell.item == null) {
-                batch.color = equipPosIconCol
-                batch.draw(equipPosIcon.get(cellToIcon[index], 1), 15f + cell.posX, 15f + cell.posY)
-            }
         }
 
 

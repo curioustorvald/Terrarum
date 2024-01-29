@@ -55,5 +55,11 @@
     "ingredients": [
       [1, 6, "basegame:51"]
     ]
+  },
+  "item@basegame:6": { /* storage chest */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 20, "$WOOD"] /* 1 chest = 20 wood */
+    ]
   }
 }

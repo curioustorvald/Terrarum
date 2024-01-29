@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.UICrafting
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
+import net.torvald.terrarum.modulebasegame.ui.UISmelterBasic
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -28,7 +29,7 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 3, 4), // temporary value, will be overwritten by spawn()
         nameFun = { Lang["ITEM_SMELTER_SMALL"] },
-        mainUI = UICrafting(null)
+        mainUI = UISmelterBasic()
     ) {
         CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/bigger_smoke.tga"), 16, 16)

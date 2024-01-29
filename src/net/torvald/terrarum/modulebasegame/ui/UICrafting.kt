@@ -15,6 +15,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.CraftingStation
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
+import net.torvald.terrarum.modulebasegame.ui.UITemplateHalfInventory.Companion.INVENTORY_NAME_TEXT_GAP
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemCatBar.Companion.FILTER_CAT_ALL
 import net.torvald.unicode.getKeycapPC
@@ -30,7 +31,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
     toggleButtonLiteral = if (full == null) "control_gamepad_start" else null
 ), HasInventory {
 
-    override var width = App.scr.width
+    override var width = Toolkit.drawWidth
     override var height = App.scr.height
 
     private val playerThings = UITemplateHalfInventory(this, false).also {
@@ -82,7 +83,6 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
 
     override fun getNegotiator() = negotiator
     override fun getFixtureInventory(): FixtureInventory = craftables
-
     override fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
 
     private val halfSlotOffset = (UIItemInventoryElemSimple.height + listGap) / 2
@@ -93,7 +93,6 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
     private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
     private val cellsWidth = (listGap + UIItemInventoryElemWide.height) * 6 - listGap
 
-    private val TEXT_GAP = 26
     private val LAST_LINE_IN_GRID = ((UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 2)) + 22//359 // TEMPORARY VALUE!
 
     private var recipeClicked: CraftingCodex.CraftingRecipe? = null
@@ -443,11 +442,9 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         // text label for two inventory grids
         val craftingLabel = Lang["GAME_CRAFTING"]
         val ingredientsLabel = Lang["GAME_INVENTORY_INGREDIENTS"]
-        val playerName = INGAME.actorNowPlaying!!.actorValue.getAsString(AVKey.NAME).orEmpty().let { it.ifBlank { Lang["GAME_INVENTORY"] } }
 
-        App.fontGame.draw(batch, craftingLabel, thisOffsetX + (cellsWidth - App.fontGame.getWidth(craftingLabel)) / 2, thisOffsetY - TEXT_GAP)
-        App.fontGame.draw(batch, ingredientsLabel, thisOffsetX + (cellsWidth - App.fontGame.getWidth(ingredientsLabel)) / 2, thisOffsetY + LAST_LINE_IN_GRID - TEXT_GAP)
-        App.fontGame.draw(batch, playerName, thisOffsetX2 + (cellsWidth - App.fontGame.getWidth(playerName)) / 2, thisOffsetY - TEXT_GAP)
+        App.fontGame.draw(batch, craftingLabel, thisOffsetX + (cellsWidth - App.fontGame.getWidth(craftingLabel)) / 2, thisOffsetY - INVENTORY_NAME_TEXT_GAP)
+        App.fontGame.draw(batch, ingredientsLabel, thisOffsetX + (cellsWidth - App.fontGame.getWidth(ingredientsLabel)) / 2, thisOffsetY + LAST_LINE_IN_GRID - INVENTORY_NAME_TEXT_GAP)
 
 
         // control hints
@@ -456,11 +453,11 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         App.fontGame.draw(batch, controlHelp, controlHintXPos, UIInventoryFull.yEnd - 20)
 
         
-        if (full != null) {
+        if (INGAME.actorNowPlaying != null) {
             //draw player encumb
             val encumbBarXPos = thisXend - UIInventoryCells.weightBarWidth + 36
             val encumbBarYPos = UIInventoryFull.yEnd - 20 + 3f
-            UIInventoryCells.drawEncumbranceBar(batch, encumbBarXPos, encumbBarYPos, encumbrancePerc, full.actor.inventory)
+            UIInventoryCells.drawEncumbranceBar(batch, encumbBarXPos, encumbBarYPos, encumbrancePerc, INGAME.actorNowPlaying!!.inventory)
         }
 
 

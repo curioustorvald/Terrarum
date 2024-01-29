@@ -97,7 +97,7 @@ abstract class UICanvas(
     open var openCloseTime: Second = OPENCLOSE_GENERIC
 
 
-    protected val uiItems = ArrayList<UIItem>()
+    protected val uiItems = ArrayList<UIItemisable>()
 
 
     val relativeMouseX: Int
@@ -189,11 +189,8 @@ abstract class UICanvas(
 
     abstract override fun dispose()
 
-    fun addUIitem(uiItem: UIItem) {
+    fun addUIitem(uiItem: UIItemisable) {
         if (!uiItems.contains(uiItem)) uiItems.add(uiItem)
-    }
-    fun addUIitem(template: UITemplate) {
-        template.getUIitems().forEach { addUIitem(it) }
     }
 
     fun mouseInScreen(x: Int, y: Int) = x in 0 until App.scr.windowW && y in 0 until App.scr.windowH

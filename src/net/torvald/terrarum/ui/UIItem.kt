@@ -52,7 +52,7 @@ import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
  *
  * Created by minjaesong on 2015-12-31.
  */
-abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: Int): Disposable { // do not replace parentUI to UIHandler!
+abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: Int): UIItemisable() { // do not replace parentUI to UIHandler!
 
     // X/Y Position relative to the containing canvas
     var posX: Int = initialX
@@ -145,11 +145,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open var isActive = true
 
 
-    open fun show() {}
-    open fun hide() {}
-
-
-    open fun update(delta: Float) {
+    override fun update(delta: Float) {
         if (parentUI.isVisible) {
             if (isActive) {
                 updateListener.invoke(delta)
@@ -177,7 +173,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     /**
      * In this time, you do write like: ```draw(posX + 4, posY + 32)```, unlike UICanvas, because posX/posY comes from the parent UI.
      */
-    open fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         if (parentUI.isVisible) {
 //            if (isActive) {
                 mouseOverCall?.render(frameDelta, batch, camera)
@@ -190,7 +186,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     }
 
     // keyboard controlled
-    open fun keyDown(keycode: Int): Boolean {
+    override fun keyDown(keycode: Int): Boolean {
         if (parentUI.isVisible && isEnabled) {
             keyDownListener.invoke(keycode)
             return true
@@ -198,7 +194,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
         return false
     }
-    open fun keyUp(keycode: Int): Boolean {
+    override fun keyUp(keycode: Int): Boolean {
         if (parentUI.isVisible && isEnabled) {
             keyUpListener.invoke(keycode)
             return true
@@ -206,7 +202,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
         return false
     }
-    open fun keyTyped(character: Char): Boolean  {
+    override fun keyTyped(character: Char): Boolean  {
         if (parentUI.isVisible && isEnabled) {
             keyTypedListener.invoke(character)
             return true
@@ -216,7 +212,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     }
 
     // mouse controlled
-    open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         if (parentUI.isVisible && isEnabled) {
             touchDraggedListener.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer)
             return true
@@ -224,7 +220,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
         return false
     }
-    open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         var actionDone = false
 
         if (parentUI.isVisible && isEnabled) {
@@ -241,7 +237,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
         return actionDone
     }
-    open fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         clickOnceListenerFired = false
 
         if (parentUI.isVisible && mouseUp) {
@@ -251,7 +247,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
         return false
     }
-    open fun scrolled(amountX: Float, amountY: Float): Boolean {
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
         if (parentUI.isVisible && mouseUp && isEnabled) {
             scrolledListener.invoke(amountX, amountY)
             return true
@@ -259,9 +255,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
         return false
     }
-    open fun inputStrobed(e: TerrarumKeyboardEvent) {
 
-    }
 
     abstract override fun dispose()
 

@@ -35,6 +35,8 @@ class UIItemInventoryElemSimple(
     highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
     colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme,
     var showItemCount: Boolean = true,
+    var emptyCellIcon: TextureRegion? = null, // icon to draw when the cell is empty
+    var emptyCellIconColour: Color = Color(0xdddddd7f.toInt()),
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo, highlightEquippedItem, colourTheme) {
     
     companion object {
@@ -51,6 +53,9 @@ class UIItemInventoryElemSimple(
         get() = (this.height - itemImageOrDefault.regionHeight).div(2).toFloat() // to snap to the pixel grid
     private val imgOffsetX: Float
         get() = (this.height - itemImageOrDefault.regionWidth).div(2).toFloat() // to snap to the pixel grid
+
+    private val emptyCellIconOffsetX = (this.height - (emptyCellIcon?.regionWidth ?: 0)).div(2).toFloat()
+    private val emptyCellIconOffsetY = (this.height - (emptyCellIcon?.regionHeight ?: 0)).div(2).toFloat()
 
     override fun update(delta: Float) {
 
@@ -121,6 +126,15 @@ class UIItemInventoryElemSimple(
                         posX + (width - App.fontSmallNumbers.getWidth(amountString)).toFloat(),
                         posY + (height - App.fontSmallNumbers.H).toFloat()
                 )
+            }
+
+        }
+        else {
+
+            // empty cell image
+            emptyCellIcon?.let {
+                batch.color = emptyCellIconColour
+                batch.draw(it, posX + emptyCellIconOffsetX, posY + emptyCellIconOffsetY)
             }
 
         }

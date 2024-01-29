@@ -4,13 +4,13 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defaultInventoryCellTheme
 import net.torvald.terrarum.modulebasegame.ui.UIJukebox.Companion.SLOT_SIZE
+import net.torvald.terrarum.modulebasegame.ui.UITemplateHalfInventory.Companion.INVENTORY_NAME_TEXT_GAP
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemInventoryElemWide
 import net.torvald.unicode.EMDASH
@@ -117,13 +117,8 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
         uiItems.forEach { it.render(frameDelta, batch, camera) }
 
         // chest name text
-        val chestName = Lang["ITEM_JUKEBOX"]
-        val playerName = INGAME.actorNowPlaying!!.actorValue.getAsString(AVKey.NAME).orEmpty().let { it.ifBlank { Lang["GAME_INVENTORY"] } }
-
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, chestName, thisOffsetX + (cellsWidth - App.fontGame.getWidth(chestName)) / 2, thisOffsetY - 30)
-        App.fontGame.draw(batch, playerName, thisOffsetX2 + (cellsWidth - App.fontGame.getWidth(playerName)) / 2, thisOffsetY - 30)
-
+        Toolkit.drawTextCentered(batch, App.fontGame, Lang["ITEM_JUKEBOX"], cellsWidth, thisOffsetX, thisOffsetY - INVENTORY_NAME_TEXT_GAP)
     }
 
     override fun dispose() {

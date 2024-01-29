@@ -1,10 +1,13 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
@@ -22,8 +25,13 @@ import net.torvald.terrarum.ui.*
 class UITemplateHalfInventory(
     parent: UICanvas,
     drawOnLeft: Boolean,
-    getInventoryFun: () -> FixtureInventory = { INGAME.actorNowPlaying!!.inventory }
+    getInventoryFun: () -> FixtureInventory = { INGAME.actorNowPlaying!!.inventory },
+    val inventoryNameFun: () -> String = { INGAME.actorNowPlaying!!.actorValue.getAsString(AVKey.NAME).orEmpty().let { it.ifBlank { Lang["GAME_INVENTORY"] } } }
 ) : UITemplate(parent) {
+
+    companion object {
+        const val INVENTORY_NAME_TEXT_GAP = 28
+    }
 
     val itemList: UIItemInventoryItemGrid
 
@@ -78,8 +86,13 @@ class UITemplateHalfInventory(
         itemList.getInventory = getter
     }
 
-    inline fun update(delta: Float) = itemList.update(delta)
-    inline fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) = itemList.render(frameDelta, batch, camera)
+    override fun update(delta: Float) = itemList.update(delta)
+    override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        itemList.render(frameDelta, batch, camera)
+
+        batch.color = Color.WHITE
+        Toolkit.drawTextCentered(batch, App.fontGame, inventoryNameFun(), width, posX, thisOffsetY - INVENTORY_NAME_TEXT_GAP)
+    }
 
     var posX: Int
         get() = itemList.posX
@@ -94,5 +107,8 @@ class UITemplateHalfInventory(
 
     override fun getUIitems(): List<UIItem> {
         return listOf(itemList)
+    }
+
+    override fun dispose() {
     }
 }
