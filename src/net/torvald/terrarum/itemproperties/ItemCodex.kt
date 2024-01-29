@@ -32,6 +32,7 @@ class ItemCodex {
      * Will return corresponding Actor if ID >= ACTORID_MIN
      */
     @Transient val itemCodex = ItemTable()
+    @Transient var tags = HashMap<String, HashSet<String>>()
     val dynamicItemInventory = ItemTable()
     val dynamicToStaticTable = ItemRemapTable()
 
@@ -229,4 +230,15 @@ class ItemCodex {
 
     fun hasItem(itemID: ItemID): Boolean = dynamicItemInventory.containsKey(itemID)
     fun isEmpty(): Boolean = itemCodex.isEmpty()
+
+    fun hasTag(itemID: ItemID, s: String) = tags[itemID]?.contains(s) == true
+    fun hasAnyTagOf(itemID: ItemID, vararg s: String) = s.any { hasTag(itemID, it) }
+    fun hasAnyTag(itemID: ItemID, s: Collection<String>) = s.any { hasTag(itemID, it) }
+    fun hasAnyTag(itemID: ItemID, s: Array<String>) = s.any { hasTag(itemID, it) }
+    fun hasAllTagOf(itemID: ItemID, vararg s: String) = s.all { hasTag(itemID, it) }
+    fun hasAllTag(itemID: ItemID, s: Collection<String>) = s.all { hasTag(itemID, it) }
+    fun hasAllTag(itemID: ItemID, s: Array<String>) = s.all { hasTag(itemID, it) }
+    fun hasNoTagOf(itemID: ItemID, vararg s: String) = s.none { hasTag(itemID, it) }
+    fun hasNoTag(itemID: ItemID, s: Collection<String>) = s.none { hasTag(itemID, it) }
+    fun hasNoTag(itemID: ItemID, s: Array<String>) = s.none { hasTag(itemID, it) }
 }

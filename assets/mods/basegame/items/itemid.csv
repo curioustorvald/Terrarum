@@ -1,82 +1,82 @@
-id;classname
-1;net.torvald.terrarum.modulebasegame.gameitems.PickaxeCopper
-2;net.torvald.terrarum.modulebasegame.gameitems.PickaxeIron
-3;net.torvald.terrarum.modulebasegame.gameitems.PickaxeSteel
-4;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerIron
-5;net.torvald.terrarum.modulebasegame.gameitems.ItemTikiTorch
-6;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChest
-7;net.torvald.terrarum.modulebasegame.gameitems.WireGraphDebugger
-8;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalEmitter
-9;net.torvald.terrarum.modulebasegame.gameitems.WireCutterAll
-10;net.torvald.terrarum.modulebasegame.gameitems.ItemTypewriter
-11;net.torvald.terrarum.modulebasegame.gameitems.ItemWallCalendar
-12;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerCopper
-13;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerSteel
-14;net.torvald.terrarum.modulebasegame.gameitems.PickaxeWood
-15;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerWood
-16;net.torvald.terrarum.modulebasegame.gameitems.ItemWorkbench
-17;net.torvald.terrarum.modulebasegame.gameitems.ItemSmelterBasic
-18;net.torvald.terrarum.modulebasegame.gameitems.OreStick
-19;net.torvald.terrarum.modulebasegame.gameitems.AxeCopper
-20;net.torvald.terrarum.modulebasegame.gameitems.AxeIron
-21;net.torvald.terrarum.modulebasegame.gameitems.AxeSteel
-#22;net.torvald.terrarum.modulebasegame.gameitems.AxeWood
-23;net.torvald.terrarum.modulebasegame.gameitems.PickaxeStone
-24;net.torvald.terrarum.modulebasegame.gameitems.AxeStone
-25;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBall
-26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel
-27;net.torvald.terrarum.modulebasegame.gameitems.ItemFurnaceAndAnvil
-28;net.torvald.terrarum.modulebasegame.gameitems.ItemJukebox
+id;classname;tags
+1;net.torvald.terrarum.modulebasegame.gameitems.PickaxeCopper;TOOL,PICK
+2;net.torvald.terrarum.modulebasegame.gameitems.PickaxeIron;TOOL,PICK
+3;net.torvald.terrarum.modulebasegame.gameitems.PickaxeSteel;TOOL,PICK
+4;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerIron;TOOL,HAMMER
+5;net.torvald.terrarum.modulebasegame.gameitems.ItemTikiTorch;FIXTURE,LIGHT
+6;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChest;FIXTURE,STORAGE
+7;net.torvald.terrarum.modulebasegame.gameitems.WireGraphDebugger;TOOL,WIRE
+8;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalEmitter;FIXTURE
+9;net.torvald.terrarum.modulebasegame.gameitems.WireCutterAll;TOOL,WIRE
+10;net.torvald.terrarum.modulebasegame.gameitems.ItemTypewriter;FIXTURE,PRINTING
+11;net.torvald.terrarum.modulebasegame.gameitems.ItemWallCalendar;FIXTURE
+12;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerCopper;TOOL,HAMMER
+13;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerSteel;TOOL,HAMMER
+14;net.torvald.terrarum.modulebasegame.gameitems.PickaxeWood;TOOL,PICK
+15;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerWood;TOOL,HAMMER
+16;net.torvald.terrarum.modulebasegame.gameitems.ItemWorkbench;FIXTURE,CRAFTING
+17;net.torvald.terrarum.modulebasegame.gameitems.ItemSmelterBasic;FIXTURE,STATION
+18;net.torvald.terrarum.modulebasegame.gameitems.OreStick;BURNABLE
+19;net.torvald.terrarum.modulebasegame.gameitems.AxeCopper;TOOL,AXE
+20;net.torvald.terrarum.modulebasegame.gameitems.AxeIron;TOOL,AXE
+21;net.torvald.terrarum.modulebasegame.gameitems.AxeSteel;TOOL,AXE
+#22;net.torvald.terrarum.modulebasegame.gameitems.AxeWood;TOOL,AXE
+23;net.torvald.terrarum.modulebasegame.gameitems.PickaxeStone;TOOL,PICK
+24;net.torvald.terrarum.modulebasegame.gameitems.AxeStone;TOOL,AXE
+25;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBall;
+27;net.torvald.terrarum.modulebasegame.gameitems.ItemFurnaceAndAnvil;FIXTURE,CRAFTING
+28;net.torvald.terrarum.modulebasegame.gameitems.ItemJukebox;FIXTURE,MUSIC
 
 # ingots
-112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper
-113;net.torvald.terrarum.modulebasegame.gameitems.IngotIron
-114;net.torvald.terrarum.modulebasegame.gameitems.ItemCoalCoke
-115;net.torvald.terrarum.modulebasegame.gameitems.IngotZinc
-116;net.torvald.terrarum.modulebasegame.gameitems.IngotTin
-117;net.torvald.terrarum.modulebasegame.gameitems.IngotGold
-118;net.torvald.terrarum.modulebasegame.gameitems.IngotSilver
-119;net.torvald.terrarum.modulebasegame.gameitems.IngotLead
+26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT
+112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper;INGOT
+113;net.torvald.terrarum.modulebasegame.gameitems.IngotIron;INGOT
+114;net.torvald.terrarum.modulebasegame.gameitems.ItemCoalCoke;INGOT,BURNABLE
+115;net.torvald.terrarum.modulebasegame.gameitems.IngotZinc;INGOT
+116;net.torvald.terrarum.modulebasegame.gameitems.IngotTin;INGOT
+117;net.torvald.terrarum.modulebasegame.gameitems.IngotGold;INGOT
+118;net.torvald.terrarum.modulebasegame.gameitems.IngotSilver;INGOT
+119;net.torvald.terrarum.modulebasegame.gameitems.IngotLead;INGOT
 
 # ores
-128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper
-129;net.torvald.terrarum.modulebasegame.gameitems.OreIron
-130;net.torvald.terrarum.modulebasegame.gameitems.OreCoal
-131;net.torvald.terrarum.modulebasegame.gameitems.OreZinc
-132;net.torvald.terrarum.modulebasegame.gameitems.OreTin
-133;net.torvald.terrarum.modulebasegame.gameitems.OreGold
-134;net.torvald.terrarum.modulebasegame.gameitems.OreSilver
-135;net.torvald.terrarum.modulebasegame.gameitems.OreLead
+128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper;SMELTABLE
+129;net.torvald.terrarum.modulebasegame.gameitems.OreIron;SMELTABLE
+130;net.torvald.terrarum.modulebasegame.gameitems.OreCoal;SMELTABLE,BURNABLE
+131;net.torvald.terrarum.modulebasegame.gameitems.OreZinc;SMELTABLE
+132;net.torvald.terrarum.modulebasegame.gameitems.OreTin;SMELTABLE
+133;net.torvald.terrarum.modulebasegame.gameitems.OreGold;SMELTABLE
+134;net.torvald.terrarum.modulebasegame.gameitems.OreSilver;SMELTABLE
+135;net.torvald.terrarum.modulebasegame.gameitems.OreLead;SMELTABLE
 
 
 # gemstones
 #144; gems
 
 # tree seeds by tree species
-160;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedOak
-161;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedEbony
-162;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedBirch
-163;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedRosewood
+160;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedOak;SEEDLING
+161;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedEbony;SEEDLING
+162;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedBirch;SEEDLING
+163;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedRosewood;SEEDLING
 
 # tree logs
-168;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsOak
-169;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsEbony
-170;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsBirch
-171;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsRosewood
+168;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsOak;
+169;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsEbony;
+170;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsBirch;
+171;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsRosewood;
 
 
-256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak
-257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony
-258;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorBirch
-259;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorRosewood
+256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak;FIXTURE
+257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony;FIXTURE
+258;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorBirch;FIXTURE
+259;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorRosewood;FIXTURE
 
-320;net.torvald.terrarum.modulebasegame.gameitems.ItemWorldPortal
+320;net.torvald.terrarum.modulebasegame.gameitems.ItemWorldPortal;FIXTURE,STATION
 
-65536;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc01
-65537;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc02
-65538;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc03
-65539;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc04
-65540;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc05
-65541;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc06
+65536;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc01;MUSIC
+65537;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc02;MUSIC
+65538;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc03;MUSIC
+65539;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc04;MUSIC
+65540;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc05;MUSIC
+65541;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc06;MUSIC
 
-999999;net.torvald.terrarum.modulebasegame.gameitems.ItemTapestry
+999999;net.torvald.terrarum.modulebasegame.gameitems.ItemTapestry;FIXTURE

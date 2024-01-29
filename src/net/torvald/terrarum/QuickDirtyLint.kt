@@ -78,6 +78,7 @@ fun main() {
         "Lkotlin/ranges/IntRange",
         "Lorg/dyn4j/geometry/Vector2",
         "Lcom/badlogic/gdx/graphics/Color",
+        "Lnet/torvald/terrarum/modulebasegame/gameactors/InventoryPair",
         // subclasses
         "Lnet/torvald/terrarum/gameactors/BlockMarkerActor",
         "Lnet/torvald/terrarum/gameactors/Actor",

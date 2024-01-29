@@ -111,7 +111,7 @@ class BlockProp {
     @Transient var rngBase1 = Math.random().toFloat() // flicker P0, etc
     @Transient var rngBase2 = Math.random().toFloat() // flicker P1, etc
 
-    var tags = HashSet<String>()
+    @Transient var tags = HashSet<String>()
 
     /**
      * Mainly intended to be used by third-party modules

@@ -180,7 +180,7 @@ class BlockCodex {
     private fun setProp(modname: String, key: Int, record: CSVRecord) {
         val prop = BlockProp()
         prop.nameKey = record.get("name")
-        prop.tags = record.get("tags").split(',').map { it.trim() }.toHashSet()
+        prop.tags = record.get("tags").split(',').map { it.trim().toUpperCase() }.toHashSet()
 
         prop.id = "$modname:$key"
         prop.numericID = key

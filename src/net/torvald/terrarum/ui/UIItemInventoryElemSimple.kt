@@ -37,6 +37,7 @@ class UIItemInventoryElemSimple(
     var showItemCount: Boolean = true,
     var emptyCellIcon: TextureRegion? = null, // icon to draw when the cell is empty
     var emptyCellIconColour: Color = Color(0xdddddd7f.toInt()),
+    val updateOnNull: Boolean = false,
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo, highlightEquippedItem, colourTheme) {
     
     companion object {
@@ -78,7 +79,7 @@ class UIItemInventoryElemSimple(
         // cell border
         batch.color = if (highlightToMainCol) colourTheme.cellHighlightMainCol
                 else if (highlightToSubCol) colourTheme.cellHighlightSubCol
-                else if (mouseUp && item != null) colourTheme.cellHighlightMouseUpCol
+                else if (mouseUp && (item != null || updateOnNull)) colourTheme.cellHighlightMouseUpCol
                 else colourTheme.cellHighlightNormalCol
         Toolkit.drawBoxBorder(batch, posX, posY, width, height)
 

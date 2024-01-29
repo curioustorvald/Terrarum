@@ -66,23 +66,23 @@ class UITemplateHalfInventory(
 
     }
 
-    inline fun rebuild(category: Array<String>) {
+    fun rebuild(category: Array<String>) {
         itemList.rebuild(category)
     }
 
-    inline fun rebuild(noinline predicate: (InventoryPair) -> Boolean) {
+    fun rebuild(predicate: (InventoryPair) -> Boolean) {
         itemList.rebuild(predicate)
     }
 
-    inline fun rebuild(noinline predicate: (InventoryPair) -> Boolean, appendix: ItemID) {
+    fun rebuild(predicate: (InventoryPair) -> Boolean, appendix: ItemID) {
         itemList.rebuild(predicate, appendix)
     }
 
-    inline fun removeFromForceHighlightList(items: List<ItemID>) {
+    fun removeFromForceHighlightList(items: List<ItemID>) {
         itemList.removeFromForceHighlightList(items)
     }
 
-    inline fun setGetInventoryFun(noinline getter: () -> ActorInventory) {
+    fun setGetInventoryFun(getter: () -> ActorInventory) {
         itemList.getInventory = getter
     }
 

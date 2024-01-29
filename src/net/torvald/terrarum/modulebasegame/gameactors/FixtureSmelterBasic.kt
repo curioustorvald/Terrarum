@@ -24,12 +24,23 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
+    var fuelCaloriesNow = 0f
+    var fuelCaloriesMax: Float? = null
+    var temperature = 0f // 0f..1f
+    var progress = 0f
+
+    var oreItem: InventoryPair? = null
+    var fireboxItem: InventoryPair? = null
+    var productItem: InventoryPair? = null
+
+    override val canBeDespawned: Boolean
+        get() = oreItem == null && fireboxItem == null && productItem == null
+
     @Transient override val tags = listOf("basicsmelter")
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 3, 4), // temporary value, will be overwritten by spawn()
         nameFun = { Lang["ITEM_SMELTER_SMALL"] },
-        mainUI = UISmelterBasic()
     ) {
         CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/bigger_smoke.tga"), 16, 16)
@@ -51,6 +62,8 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
         }
 
         actorValue[AVKey.BASEMASS] = 100.0
+
+        this.mainUI = UISmelterBasic(this)
     }
 
     @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 2*TILE_SIZED, TILE_SIZED * 2, TILE_SIZED * 2), Cvec(0.5f, 0.18f, 0f, 0f)))

@@ -98,7 +98,14 @@ internal class UIStorageChest : UICanvas(
         itemListChest = UITemplateHalfInventory(this, true, { getFixtureInventory() }, { chestNameFun() }).also {
             it.itemListKeyDownFun = { _, _, _, _, _ -> Unit }
             it.itemListTouchDownFun = { gameItem, amount, button, _, _ ->
-                if (button == App.getConfigInt("config_mouseprimary")) {
+                val amount = if (button == App.getConfigInt("config_mouseprimary"))
+                    amount
+                else if (button == App.getConfigInt("config_mousesecondary"))
+                    1
+                else
+                    null
+
+                if (amount != null) {
                     if (gameItem != null) {
                         negotiator.refund(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
                     }
@@ -114,7 +121,14 @@ internal class UIStorageChest : UICanvas(
         itemListPlayer = UITemplateHalfInventory(this, false).also {
             it.itemListKeyDownFun = { _, _, _, _, _ -> Unit }
             it.itemListTouchDownFun = { gameItem, amount, button, _, _ ->
-                if (button == App.getConfigInt("config_mouseprimary")) {
+                val amount = if (button == App.getConfigInt("config_mouseprimary"))
+                    amount
+                else if (button == App.getConfigInt("config_mousesecondary"))
+                    1
+                else
+                    null
+
+                if (amount != null) {
                     if (gameItem != null) {
                         negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
                     }

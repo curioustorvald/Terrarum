@@ -659,6 +659,7 @@ object ModMgr {
                 val className: String = it["classname"].toString()
                 val internalID: Int = it["id"].toInt()
                 val itemName: String = "item@$module:$internalID"
+                val tags = it["tags"].split(',').map { it.trim().toUpperCase() }.toHashSet()
 
                 printdbg(this, "Reading item  ${itemName} <<- internal #$internalID with className $className")
 
@@ -668,12 +669,14 @@ object ModMgr {
                         val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
                         val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
                         ItemCodex[itemName] = loadedClassInstance as GameItem
+                        ItemCodex.tags[itemName] = tags
                     }
                     else {
                         val loadedClass = it.loadClass(className)
                         val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
                         val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
                         ItemCodex[itemName] = loadedClassInstance as GameItem
+                        ItemCodex.tags[itemName] = tags
                     }
                 }
             }
