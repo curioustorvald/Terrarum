@@ -96,6 +96,7 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
             drawScrollOnRightside = false,
             drawWallet = false,
             keyDownFun = { _, _, _, _, _ -> Unit },
+            wheelFun = { _, _, _, _, _, _ -> },
             touchDownFun = { gameItem, amount, button, _, _ ->
                 if (button == App.getConfigInt("config_mouseprimary")) {
                     if (gameItem != null) {
@@ -118,6 +119,7 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
             drawScrollOnRightside = true,
             drawWallet = false,
             keyDownFun = { _, _, _, _, _ -> Unit },
+            wheelFun = { _, _, _, _, _, _ -> },
             touchDownFun = { gameItem, amount, button, _, _ ->
                 if (button == App.getConfigInt("config_mouseprimary")) {
                     if (gameItem != null) {

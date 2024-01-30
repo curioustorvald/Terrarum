@@ -40,11 +40,11 @@ class ActorInventory() : FixtureInventory() {
     val quickSlot = Array<ItemID?>(UIQuickslotBar.SLOT_COUNT) { null } // 0: Slot 1, 9: Slot 10
 
 
-    override fun remove(itemID: ItemID, count: Long) = remove(ItemCodex[itemID]!!, count)
+    override fun remove(itemID: ItemID, count: Long): Long = remove(ItemCodex[itemID]!!, count)
     /** Will check existence of the item using its Dynamic ID; careful with command order!
      *      e.g. re-assign after this operation */
-    override fun remove(item: GameItem, count: Long) {
-        super.remove(item, count) { existingItem ->
+    override fun remove(item: GameItem, count: Long): Long {
+        return super.remove(item, count) { existingItem ->
             // unequip, if applicable
             actor.unequipItem(existingItem.itm)
             // also unequip on the quickslot

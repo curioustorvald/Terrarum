@@ -121,92 +121,93 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
 
         // ingredient list
         itemListIngredients =  UIItemInventoryItemGrid(
-                this,
-                { ingredients },
-                thisOffsetX,
-                thisOffsetY + LAST_LINE_IN_GRID,
-                6, 1,
-                drawScrollOnRightside = false,
-                drawWallet = false,
-                hideSidebar = true,
-                colourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme.copy(
-                        cellHighlightSubCol = Toolkit.Theme.COL_INACTIVE
-                ),
-                keyDownFun = { _, _, _, _, _ -> },
-                touchDownFun = { gameItem, amount, _, _, _ -> gameItem?.let { gameItem ->
-                    // if the item is craftable one, load its recipe instead
-                    CraftingRecipeCodex.getRecipesFor(gameItem.originalID)?.let { recipes ->
-                        // select most viable recipe (completely greedy search)
-                        val player = getPlayerInventory()
-                        // list of [Score, Ingredients, Recipe]
-                        recipes.map { recipe ->
-                            // list of (Item, How many player has, How many the recipe requires)
-                            val items = recipeToIngredientRecord(player, recipe, nearbyCraftingStations)
+            this,
+            { ingredients },
+            thisOffsetX,
+            thisOffsetY + LAST_LINE_IN_GRID,
+            6, 1,
+            drawScrollOnRightside = false,
+            drawWallet = false,
+            hideSidebar = true,
+            colourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme.copy(
+                    cellHighlightSubCol = Toolkit.Theme.COL_INACTIVE
+            ),
+            keyDownFun = { _, _, _, _, _ -> },
+            wheelFun = { _, _, _, _, _, _ -> },
+            touchDownFun = { gameItem, amount, _, _, _ -> gameItem?.let { gameItem ->
+                // if the item is craftable one, load its recipe instead
+                CraftingRecipeCodex.getRecipesFor(gameItem.originalID)?.let { recipes ->
+                    // select most viable recipe (completely greedy search)
+                    val player = getPlayerInventory()
+                    // list of [Score, Ingredients, Recipe]
+                    recipes.map { recipe ->
+                        // list of (Item, How many player has, How many the recipe requires)
+                        val items = recipeToIngredientRecord(player, recipe, nearbyCraftingStations)
 
-                            val score = items.fold(1L) { acc, item ->
-                                (item.howManyPlayerHas).times(16L) + 1L
-                            }
-
-                            listOf(score, items, recipe)
-                        }.maxByOrNull { it[0] as Long }?.let { (_, items, recipe) ->
-                            val items = items as List<List<*>>
-                            val recipe = recipe as CraftingCodex.CraftingRecipe
-
-                            // change selected recipe to mostViableRecipe then update the UIs accordingly
-                            // FIXME recipe highlighting will not change correctly!
-                            val selectedItems = ArrayList<ItemID>()
-
-                            // auto-dial the spinner so that player would just have to click the Craft! button (for the most time, that is)
-                            val howManyRequired = craftMult * amount
-                            val howManyPlayerHas = player.searchByID(gameItem.dynamicID)?.qty ?: 0
-                            val howManyPlayerMightNeed = ceil((howManyRequired - howManyPlayerHas).toDouble() / recipe.moq).toLong()
-                            resetSpinner(howManyPlayerMightNeed.coerceIn(1L, App.getConfigInt("basegame:gameplay_max_crafting").toLong()))
-
-                            ingredients.clear()
-                            recipeClicked = recipe
-
-                            items.forEach {
-                                val itm = it[0] as ItemID
-                                val qty = it[2] as Long
-
-                                selectedItems.add(itm)
-                                ingredients.add(itm, qty)
-                            }
-
-                            _getItemListPlayer().let {
-                                it.removeFromForceHighlightList(oldSelectedItems)
-                                filterPlayerListUsing(recipeClicked)
-                                it.addToForceHighlightList(selectedItems)
-                                it.rebuild(FILTER_CAT_ALL)
-                            }
-                            _getItemListIngredients().rebuild(FILTER_CAT_ALL)
-
-                            // highlighting CraftingCandidateButton by searching for the buttons that has the recipe
-                            _getItemListCraftables().let {
-                                // turn the highlights off
-                                it.items.forEach { it.forceHighlighted = false }
-
-                                // search for the recipe
-                                // also need to find what "page" the recipe might be in
-                                // use it.isCompactMode to find out the current mode
-                                var ord = 0
-                                while (ord < it.craftingRecipes.indices.last) {
-                                    if (recipeClicked == it.craftingRecipes[ord]) break
-                                    ord += 1
-                                }
-                                val itemSize = it.items.size
-
-                                it.itemPage = ord / itemSize
-                                it.items[ord % itemSize].forceHighlighted = true
-                            }
-
-                            oldSelectedItems.clear()
-                            oldSelectedItems.addAll(selectedItems)
-
-                            refreshCraftButtonStatus()
+                        val score = items.fold(1L) { acc, item ->
+                            (item.howManyPlayerHas).times(16L) + 1L
                         }
+
+                        listOf(score, items, recipe)
+                    }.maxByOrNull { it[0] as Long }?.let { (_, items, recipe) ->
+                        val items = items as List<List<*>>
+                        val recipe = recipe as CraftingCodex.CraftingRecipe
+
+                        // change selected recipe to mostViableRecipe then update the UIs accordingly
+                        // FIXME recipe highlighting will not change correctly!
+                        val selectedItems = ArrayList<ItemID>()
+
+                        // auto-dial the spinner so that player would just have to click the Craft! button (for the most time, that is)
+                        val howManyRequired = craftMult * amount
+                        val howManyPlayerHas = player.searchByID(gameItem.dynamicID)?.qty ?: 0
+                        val howManyPlayerMightNeed = ceil((howManyRequired - howManyPlayerHas).toDouble() / recipe.moq).toLong()
+                        resetSpinner(howManyPlayerMightNeed.coerceIn(1L, App.getConfigInt("basegame:gameplay_max_crafting").toLong()))
+
+                        ingredients.clear()
+                        recipeClicked = recipe
+
+                        items.forEach {
+                            val itm = it[0] as ItemID
+                            val qty = it[2] as Long
+
+                            selectedItems.add(itm)
+                            ingredients.add(itm, qty)
+                        }
+
+                        _getItemListPlayer().let {
+                            it.removeFromForceHighlightList(oldSelectedItems)
+                            filterPlayerListUsing(recipeClicked)
+                            it.addToForceHighlightList(selectedItems)
+                            it.rebuild(FILTER_CAT_ALL)
+                        }
+                        _getItemListIngredients().rebuild(FILTER_CAT_ALL)
+
+                        // highlighting CraftingCandidateButton by searching for the buttons that has the recipe
+                        _getItemListCraftables().let {
+                            // turn the highlights off
+                            it.items.forEach { it.forceHighlighted = false }
+
+                            // search for the recipe
+                            // also need to find what "page" the recipe might be in
+                            // use it.isCompactMode to find out the current mode
+                            var ord = 0
+                            while (ord < it.craftingRecipes.indices.last) {
+                                if (recipeClicked == it.craftingRecipes[ord]) break
+                                ord += 1
+                            }
+                            val itemSize = it.items.size
+
+                            it.itemPage = ord / itemSize
+                            it.items[ord % itemSize].forceHighlighted = true
+                        }
+
+                        oldSelectedItems.clear()
+                        oldSelectedItems.addAll(selectedItems)
+
+                        refreshCraftButtonStatus()
                     }
-                } }
+                }
+            } }
         )
 
         // make sure grid buttons for ingredients do nothing (even if they are hidden!)

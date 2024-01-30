@@ -56,7 +56,8 @@ class UIItemInventoryEquippedView(
             drawBackOnNull = true,
             keyDownFun = createInvCellGenericKeyDownFun(),
             touchDownFun = createInvCellGenericTouchDownFun(inventoryListRebuildFun), // to "unselect" the equipped item and main item grid would "untick" accordingly
-            emptyCellIcon = equipPosIcon.get(cellToIcon[it], 1)
+            wheelFun = { _, _, _, _, _, _ -> },
+            emptyCellIcon = equipPosIcon.get(cellToIcon[it], 1),
         )
     }
 

@@ -48,6 +48,7 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
             showItemCount = false,
             keyDownFun = { _, _, _, _, _ -> Unit },
             touchDownFun = { _, _, _, _, _ -> Unit },
+            wheelFun = { _, _, _, _, _, _ -> },
         )
     }.toTypedArray()
 

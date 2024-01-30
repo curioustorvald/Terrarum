@@ -206,25 +206,28 @@ internal class UIStorageChest : UICanvas(
     private val cellsWidth = (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 6 - UIItemInventoryItemGrid.listGap
 
     private val SP = "\u3000"
+    private val ML = getMouseButton(App.getConfigInt("config_mouseprimary"))
+    private val MR = getMouseButton(App.getConfigInt("config_mousesecondary"))
+    private val MW = getMouseButton(2)
     private val controlHelpLeft: String
         get() = if (App.environment == RunningEnvironment.PC)
             "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
-                    "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_TAKE_ALL_CONT"]}$SP" +
-                    "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_TAKE_ONE_CONT"]}"
+            "$ML ${Lang["GAME_ACTION_TAKE_ALL_CONT"]}$SP" +
+            "$MW$MR ${Lang["GAME_ACTION_TAKE_ONE_CONT"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}"
 
     private val controlHelpRight: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL_CONT"]}$SP" +
-            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE_CONT"]}"
+            "$ML ${Lang["GAME_ACTION_PUT_ALL_CONT"]}$SP" +
+            "$MW$MR ${Lang["GAME_ACTION_PUT_ONE_CONT"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}"
 
     private val controlHelpRightTwoRows: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL"]}$SP" +
-                    "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE"]}"
+            "$ML ${Lang["GAME_ACTION_PUT_ALL"]}$SP" +
+                    "$MW$MR ${Lang["GAME_ACTION_PUT_ONE"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}"
 

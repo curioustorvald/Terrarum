@@ -29,6 +29,7 @@ class UIItemInventoryElemSimple(
     val drawBackOnNull: Boolean = true,
     keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
     touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
+    wheelFun: (GameItem?, Long, Float, Float, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, scroll x, scroll y, extra info, self
     extraInfo: Any? = null,
     highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
     colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme,
@@ -36,7 +37,7 @@ class UIItemInventoryElemSimple(
     var emptyCellIcon: TextureRegion? = null, // icon to draw when the cell is empty
     var emptyCellIconColour: Color = Color(0xdddddd7f.toInt()),
     val updateOnNull: Boolean = false,
-) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo, highlightEquippedItem, colourTheme) {
+) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, wheelFun, extraInfo, highlightEquippedItem, colourTheme) {
     
     companion object {
         val height = UIItemInventoryElemWide.height

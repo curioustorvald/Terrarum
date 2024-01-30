@@ -87,13 +87,14 @@ internal class UIInventoryCells(
 
     internal val itemList: UIItemInventoryItemGrid =
             UIItemInventoryItemGrid(
-                    full,
-                    { full.actor.inventory },
-                    INVENTORY_CELLS_OFFSET_X(),
-                    INVENTORY_CELLS_OFFSET_Y(),
-                    CELLS_HOR, CELLS_VRT,
-                    keyDownFun = createInvCellGenericKeyDownFun(),
-                    touchDownFun = createInvCellGenericTouchDownFun { rebuildList() }
+                full,
+                { full.actor.inventory },
+                INVENTORY_CELLS_OFFSET_X(),
+                INVENTORY_CELLS_OFFSET_Y(),
+                CELLS_HOR, CELLS_VRT,
+                keyDownFun = createInvCellGenericKeyDownFun(),
+                touchDownFun = createInvCellGenericTouchDownFun { rebuildList() },
+                wheelFun = { _, _, _, _, _, _ -> },
             )
 
 

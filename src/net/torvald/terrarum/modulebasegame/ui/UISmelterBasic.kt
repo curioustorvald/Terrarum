@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.colourutil.cieluv_getGradient
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureSmelterBasic
@@ -19,7 +19,6 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.getKeycapPC
 import net.torvald.unicode.getMouseButton
 import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 
 /**
  * Created by minjaesong on 2024-01-29.
@@ -67,6 +66,67 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
             }
 
             itemListUpdateKeepCurrentFilter()
+        }
+        it.itemListWheelFun = { gameItem, _, _, scrollY, _, _ ->
+            val scrollY = -scrollY
+            if (gameItem != null) {
+                val playerInventory = getPlayerInventory()
+                val addCount1 = scrollY.toLong()
+
+                if (clickedOn == 1 && (smelter.oreItem == null || smelter.oreItem!!.itm == gameItem.dynamicID)) {
+                    val itemToUse = smelter.oreItem?.itm ?: gameItem.dynamicID
+
+                    val addCount2 = scrollY.toLong().coerceIn(
+                        -(playerInventory.searchByID(itemToUse)?.qty ?: 0L),
+                        smelter.oreItem?.qty ?: 0L,
+                    )
+
+                    // add to the inventory slot
+                    if (smelter.oreItem != null && addCount1 >= 1L) {
+                        getPlayerInventory().add(smelter.oreItem!!.itm, addCount2)
+                        smelter.oreItem!!.qty -= addCount2
+                    }
+                    // remove from the inventory slot
+                    else if (addCount1 <= -1L) {
+                        playerInventory.remove(itemToUse, -addCount2)
+                        if (smelter.oreItem == null)
+                            smelter.oreItem = InventoryPair(itemToUse, -addCount2)
+                        else
+                            smelter.oreItem!!.qty -= addCount2
+                    }
+                    if (smelter.oreItem != null && smelter.oreItem!!.qty == 0L) smelter.oreItem = null
+                    else if (smelter.oreItem != null && smelter.oreItem!!.qty < 0L) throw Error("Item removal count is larger than what was on the slot")
+                    itemListUpdateKeepCurrentFilter()
+                }
+                else if (clickedOn == 2 && (smelter.fireboxItem == null || smelter.fireboxItem!!.itm == gameItem.dynamicID)) {
+                    val itemToUse = smelter.fireboxItem?.itm ?: gameItem.dynamicID
+
+                    val addCount2 = scrollY.toLong().coerceIn(
+                        -(playerInventory.searchByID(itemToUse)?.qty ?: 0L),
+                        smelter.fireboxItem?.qty ?: 0L,
+                    )
+
+                    // add to the inventory slot
+                    if (smelter.fireboxItem != null && addCount1 >= 1L) {
+                        getPlayerInventory().add(smelter.fireboxItem!!.itm, addCount2)
+                        smelter.fireboxItem!!.qty -= addCount2
+                    }
+                    // remove from the inventory slot
+                    else if (addCount1 <= -1L) {
+                        playerInventory.remove(itemToUse, -addCount2)
+                        if (smelter.fireboxItem == null)
+                            smelter.fireboxItem = InventoryPair(itemToUse, -addCount2)
+                        else
+                            smelter.fireboxItem!!.qty -= addCount2
+                    }
+                    if (smelter.fireboxItem != null && smelter.fireboxItem!!.qty == 0L) smelter.fireboxItem = null
+                    else if (smelter.fireboxItem != null && smelter.fireboxItem!!.qty < 0L) throw Error("Item removal count is larger than what was on the slot")
+                    itemListUpdateKeepCurrentFilter()
+                }
+                else {
+                    itemListUpdateKeepCurrentFilter()
+                }
+            }
         }
     }
 
@@ -157,6 +217,33 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
             else {
                 itemListUpdateKeepCurrentFilter()
             }
+        },
+        wheelFun = { _, _, _, scrollY, _, _ ->
+            val scrollY = -scrollY
+            if (clickedOn == 1 && smelter.oreItem != null) {
+                val playerInventory = getPlayerInventory()
+                val removeCount1 = scrollY.toLong()
+                val removeCount2 = scrollY.toLong().coerceIn(
+                    -smelter.oreItem!!.qty,
+                    playerInventory.searchByID(smelter.oreItem!!.itm)?.qty ?: 0L,
+                )
+
+                // add to the slot
+                if (removeCount1 >= 1L) {
+                    playerInventory.remove(smelter.oreItem!!.itm, removeCount2)
+                    smelter.oreItem!!.qty += removeCount2
+                }
+                // remove from the slot
+                else if (removeCount1 <= -1L) {
+                    getPlayerInventory().add(smelter.oreItem!!.itm, -removeCount2)
+                    smelter.oreItem!!.qty += removeCount2
+                }
+                if (smelter.oreItem!!.qty == 0L) smelter.oreItem = null
+                itemListUpdateKeepCurrentFilter()
+            }
+            else {
+                itemListUpdateKeepCurrentFilter()
+            }
         }
     )
     private val fireboxItemSlot: UIItemInventoryElemSimple = UIItemInventoryElemSimple(
@@ -189,6 +276,33 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
             else {
                 itemListUpdateKeepCurrentFilter()
             }
+        },
+        wheelFun = { _, _, _, scrollY, _, _ ->
+            val scrollY = -scrollY
+            if (clickedOn == 2 && smelter.fireboxItem != null) {
+                val playerInventory = getPlayerInventory()
+                val removeCount1 = scrollY.toLong()
+                val removeCount2 = scrollY.toLong().coerceIn(
+                    -smelter.fireboxItem!!.qty,
+                    playerInventory.searchByID(smelter.fireboxItem!!.itm)?.qty ?: 0L,
+                )
+
+                // add to the slot
+                if (removeCount1 >= 1L) {
+                    playerInventory.remove(smelter.fireboxItem!!.itm, removeCount2)
+                    smelter.fireboxItem!!.qty += removeCount2
+                }
+                // remove from the slot
+                else if (removeCount1 <= -1L) {
+                    getPlayerInventory().add(smelter.fireboxItem!!.itm, -removeCount2)
+                    smelter.fireboxItem!!.qty += removeCount2
+                }
+                if (smelter.fireboxItem!!.qty == 0L) smelter.fireboxItem = null
+                itemListUpdateKeepCurrentFilter()
+            }
+            else {
+                itemListUpdateKeepCurrentFilter()
+            }
         }
     )
     private val productItemslot: UIItemInventoryElemSimple = UIItemInventoryElemSimple(
@@ -216,6 +330,27 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                     smelter.productItem!!.qty -= removeCount
                     if (smelter.productItem!!.qty == 0L) smelter.productItem = null
                 }
+                itemListUpdateKeepCurrentFilter()
+            }
+        },
+        wheelFun = { _, _, _, scrollY, _, _ ->
+            val scrollY = -scrollY
+            if (smelter.productItem != null) {
+                val removeCount1 = scrollY.toLong()
+                val removeCount2 = scrollY.toLong().coerceIn(
+                    -smelter.productItem!!.qty,
+                    0L,
+                )
+
+                // remove from the slot
+                if (removeCount1 <= -1L) {
+                    getPlayerInventory().add(smelter.productItem!!.itm, -removeCount2)
+                    smelter.productItem!!.qty += removeCount2
+                }
+                if (smelter.productItem!!.qty == 0L) smelter.productItem = null
+                itemListUpdateKeepCurrentFilter()
+            }
+            else {
                 itemListUpdateKeepCurrentFilter()
             }
         }
@@ -309,25 +444,28 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     }
 
     private val SP = "\u3000"
+    private val ML = getMouseButton(App.getConfigInt("config_mouseprimary"))
+    private val MR = getMouseButton(App.getConfigInt("config_mousesecondary"))
+    private val MW = getMouseButton(2)
     private val controlHelpForSmelter = listOf(
         // no slot selected
         { if (App.environment == RunningEnvironment.PC)
             "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
-            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_SELECT_SLOT"]}"
+            "$ML ${Lang["GAME_ACTION_SELECT_SLOT"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" },
         // ore slot
         { if (App.environment == RunningEnvironment.PC)
             "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
-            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_TAKE_ALL_CONT"]}$SP" +
-            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_TAKE_ONE_CONT"]}"
+            "$ML ${Lang["GAME_ACTION_TAKE_ALL_CONT"]}$SP" +
+            "$MW$MR ${Lang["GAME_ACTION_TAKE_ONE_CONT"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" },
         // firebox slot
         { if (App.environment == RunningEnvironment.PC)
             "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
-            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_TAKE_ALL_CONT"]}$SP" +
-            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_TAKE_ONE_CONT"]}"
+            "$ML ${Lang["GAME_ACTION_TAKE_ALL_CONT"]}$SP" +
+            "$MW$MR ${Lang["GAME_ACTION_TAKE_ONE_CONT"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" }
     )
@@ -337,14 +475,14 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         { "" },
         // ore slot
         { if (App.environment == RunningEnvironment.PC)
-            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL_CONT"]}$SP" +
-            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE_CONT"]}"
+            "$ML ${Lang["GAME_ACTION_PUT_ALL_CONT"]}$SP" +
+            "$MW$MR ${Lang["GAME_ACTION_PUT_ONE_CONT"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" },
         // firebox slot
         { if (App.environment == RunningEnvironment.PC)
-            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL_CONT"]}$SP" +
-            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE_CONT"]}"
+            "$ML ${Lang["GAME_ACTION_PUT_ALL_CONT"]}$SP" +
+            "$MW$MR ${Lang["GAME_ACTION_PUT_ONE_CONT"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" }
     )
@@ -354,14 +492,14 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         { "" },
         // ore slot
         { if (App.environment == RunningEnvironment.PC)
-            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL"]}$SP" +
-            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE"]}"
+            "$ML ${Lang["GAME_ACTION_PUT_ALL"]}$SP" +
+            "$MW$MR ${Lang["GAME_ACTION_PUT_ONE"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" },
         // firebox slot
         { if (App.environment == RunningEnvironment.PC)
-            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL"]}$SP" +
-                    "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE"]}"
+            "$ML ${Lang["GAME_ACTION_PUT_ALL"]}$SP" +
+            "$MW$MR ${Lang["GAME_ACTION_PUT_ONE"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" }
     )

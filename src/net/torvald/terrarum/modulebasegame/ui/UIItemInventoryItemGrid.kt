@@ -45,6 +45,7 @@ open class UIItemInventoryItemGrid(
     val hideSidebar: Boolean = false,
     keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
     touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
+    wheelFun: (GameItem?, Long, Float, Float, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, scroll x, scroll y, extra info, self
     protected val useHighlightingManager: Boolean = true, // only used by UIItemCraftingCandidateGrid which addresses buttons directly to set highlighting
     open protected val highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
     private val colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme
@@ -183,13 +184,14 @@ open class UIItemInventoryItemGrid(
 
     protected val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
         UIItemInventoryElemSimple(
-                parentUI = inventoryUI,
-                initialX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % horizontalCells),
-                initialY = this.posY + (UIItemInventoryElemSimple.height + listGap) * (it / horizontalCells),
-                keyDownFun = keyDownFun,
-                touchDownFun = touchDownFun,
-                highlightEquippedItem = highlightEquippedItem,
-                colourTheme = colourTheme
+            parentUI = inventoryUI,
+            initialX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % horizontalCells),
+            initialY = this.posY + (UIItemInventoryElemSimple.height + listGap) * (it / horizontalCells),
+            keyDownFun = keyDownFun,
+            touchDownFun = touchDownFun,
+            wheelFun = wheelFun,
+            highlightEquippedItem = highlightEquippedItem,
+            colourTheme = colourTheme
         )
     }
     // automatically determine how much columns are needed. Minimum Width = 5 grids
@@ -198,14 +200,15 @@ open class UIItemInventoryItemGrid(
     private val largeListWidth = ((listGap + actualItemCellWidth) / itemListColumnCount) - (itemListColumnCount - 1).coerceAtLeast(1) * listGap
     protected val itemList = Array<UIItemInventoryCellBase>(verticalCells * itemListColumnCount) {
         UIItemInventoryElemWide(
-                parentUI = inventoryUI,
-                initialX = this.posX + (largeListWidth + listGap) * (it % itemListColumnCount),
-                initialY = this.posY + (UIItemInventoryElemWide.height + listGap) * (it / itemListColumnCount),
-                width = largeListWidth,
-                keyDownFun = keyDownFun,
-                touchDownFun = touchDownFun,
-                highlightEquippedItem = highlightEquippedItem,
-                colourTheme = colourTheme
+            parentUI = inventoryUI,
+            initialX = this.posX + (largeListWidth + listGap) * (it % itemListColumnCount),
+            initialY = this.posY + (UIItemInventoryElemWide.height + listGap) * (it / itemListColumnCount),
+            width = largeListWidth,
+            keyDownFun = keyDownFun,
+            touchDownFun = touchDownFun,
+            wheelFun = wheelFun,
+            highlightEquippedItem = highlightEquippedItem,
+            colourTheme = colourTheme
         )
     }
 
@@ -598,6 +601,8 @@ open class UIItemInventoryItemGrid(
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         super.scrolled(amountX, amountY)
+
+        items.forEach { if (it.mouseUp) it.scrolled(amountX, amountY) }
 
         // scroll the item list (for now)
         if (mouseUp) {

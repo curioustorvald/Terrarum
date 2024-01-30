@@ -136,19 +136,23 @@ open class FixtureInventory() {
     open fun remove(itemID: ItemID, count: Long, unequipFun: (InventoryPair) -> Unit) =
             remove(ItemCodex[itemID]!!, count, unequipFun)
     /** Will check existence of the item using its Dynamic ID; careful with command order!
-     *      e.g. re-assign after this operation */
-    open fun remove(item: GameItem, count: Long = 1, unequipFun: (InventoryPair) -> Unit) {
+     *      e.g. re-assign after this operation
+     *
+     * @return the actual amount of item that has been removed
+     **/
+    open fun remove(item: GameItem, count: Long = 1, unequipFun: (InventoryPair) -> Unit): Long {
 
 //        printdbg(this, "remove $item, $count")
 
         if (count == 0L)
 //            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is zero.")
-            return
+            return 0L
         if (count < 0L)
             throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is negative number. If you intended adding items, use add()" +
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
 
 
+        var delta = 0L
 
         val existingItem = searchByID(item.dynamicID)
         if (existingItem != null) { // if the item already exists
@@ -158,10 +162,12 @@ open class FixtureInventory() {
                 throw InventoryFailedTransactionError("[${this.javaClass.canonicalName}] Tried to remove $count of $item, but the inventory only contains ${existingItem.qty} of them.")
             }
             else*/ if (newCount > 0) {
+                delta = count
                 // decrement count
                 existingItem.qty = newCount
             }
             else {
+                delta = existingItem.qty
                 // unequip must be done before the entry removal
                 unequipFun(existingItem)
                 // depleted item; remove entry from inventory
@@ -170,11 +176,14 @@ open class FixtureInventory() {
         }
         else {
 //            throw InventoryFailedTransactionError("[${this.javaClass.canonicalName}] Tried to remove $item, but the inventory does not have it.")
+            return 0L
         }
 
-        itemList.sumOf { ItemCodex[it.itm]!!.mass * it.qty }
+//        itemList.sumOf { ItemCodex[it.itm]!!.mass * it.qty } // ???
 
         updateEncumbrance()
+
+        return delta
     }
 
     open fun clear(): List<InventoryPair> {

@@ -46,6 +46,9 @@ class UITemplateHalfInventory(
     internal var itemListTouchDownFun = { gameItem: GameItem?, amount: Long, mouseButton: Int, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
         /* crickets */
     }
+    internal var itemListWheelFun = { gameItem: GameItem?, amount: Long, scrollX: Float, scrollY: Float, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
+        /* crickets */
+    }
 
     init {
         itemList = UIItemInventoryItemGrid(
@@ -58,7 +61,8 @@ class UITemplateHalfInventory(
             drawWallet = false,
             highlightEquippedItem = false,
             keyDownFun = { a, b, c, d, e -> itemListKeyDownFun(a, b, c, d, e) },
-            touchDownFun = {  a, b, c, d, e -> itemListTouchDownFun.invoke(a, b, c, d, e) }
+            touchDownFun = {  a, b, c, d, e -> itemListTouchDownFun.invoke(a, b, c, d, e) },
+            wheelFun = { a, b, c, d, e, f -> itemListWheelFun.invoke(a, b, c, d, e, f)}
         )
         // make grid mode buttons work together
 //        itemListPlayer.gridModeButtons[0].clickOnceListener = { _,_ -> setCompact(false) }

@@ -30,6 +30,7 @@ abstract class UIItemInventoryCellBase(
     open var equippedSlot: Int? = null,
     var keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
     var touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
+    var wheelFun: (GameItem?, Long, Float, Float, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, scroll x, scroll y, extra info, self
     open var extraInfo: Any?,
     open protected val highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
     var colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme,
@@ -67,6 +68,14 @@ abstract class UIItemInventoryCellBase(
         if (mouseUp) {
             touchDownFun(item, amount, button, extraInfo, this)
             super.touchDown(screenX, screenY, pointer, button)
+        }
+        return true
+    }
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        if (mouseUp) {
+            wheelFun(item, amount, amountX, amountY, extraInfo, this)
+            super.scrolled(amountX, amountY)
         }
         return true
     }
