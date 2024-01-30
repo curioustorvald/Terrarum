@@ -22,6 +22,7 @@ class UITooltip : UICanvas() {
 
     init {
         handler.allowESCtoClose = false
+        handler.alwaysUpdate = true
     }
 
     override var openCloseTime: Second = OPENCLOSE_GENERIC * 0.72f
@@ -104,7 +105,7 @@ class UITooltip : UICanvas() {
     override fun updateUI(delta: Float) {
         setPosition(Terrarum.mouseScreenX, Terrarum.mouseScreenY)
 
-        if (tooltipShowing.values.all { !it }) {
+        if (isVisible && tooltipShowing.values.all { !it }) {
             INGAME.setTooltipMessage(null)
         }
     }
