@@ -71,6 +71,13 @@ fun getKeycapPC(c: Char) = when (c.uppercaseChar()) {
     else -> throw IllegalArgumentException("Not in range: ${c.code - 32}")
 }
 fun getKeycapPC(keycode: Int) = getKeycapPC(com.badlogic.gdx.Input.Keys.toString(keycode)[0])
+fun getMouseButton(button: Int) = when (button) {
+    0 -> KEYCAP_LEFT_MOUSE
+    1 -> KEYCAP_RIGHT_MOUSE
+    2 -> KEYCAP_WHEEL
+    else -> throw IllegalArgumentException("Unknown mouse button: $button")
+}
+
 fun getKeycapConsole(c: Char) = when (c.uppercaseChar()) {
     in ' '..'_' -> (0xE040 + c.code - 32).toChar()
     else -> throw IllegalArgumentException("Not in range: ${c.code - 32}")

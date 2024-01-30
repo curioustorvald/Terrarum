@@ -14,11 +14,12 @@
   "MENU_LABEL_USE_CODE": "Use Code",
   "MENU_MODE_BUILDINGMAKER": "POI Editor",
   "MENU_MONITOR_CALI_TITLE": "Check Monitor",
-  "MENU_OPTIONS_SHOW_ORES_TOOLTIP_WHEN_MINING": "Show Ores Tooltip When Mining",
-  "MENU_OPTIONS_MAX_CRAFTING": "Max Number of Items For Crafting",
+  "MENU_OPTIONS_SHOW_ORES_TOOLTIP_WHEN_MINING": "Show Ore Tooltip When Mining",
+  "MENU_OPTIONS_MAX_CRAFTING": "Max Number of Items for Crafting",
   "MENU_UPDATE_UPDATE_AVAILABLE": "Update Available!",
   "GAME_ACTION_GRAPPLE": "Grapple",
   "GAME_ACTION_QUICKSEL": "Quick Select",
+  "GAME_ACTION_SELECT_SLOT": "Select Slot",
   "GAME_ACTION_TELEPORT": "Teleport",
   "GAME_CRAFTABLE_ITEMS": "Craftable Items",
   "GAME_CRAFTING": "Crafting",
@@ -27,7 +28,5 @@
   "GAME_INVENTORY_INGREDIENTS": "Ingredients",
   "GAME_INVENTORY_POTIONS": "Potions",
   "GAME_INVENTORY_REGISTER": "Register",
-  "GAME_INVENTORY_WALLS": "Walls",
-
-  "GAME_INVENTORY_DROP": "Toss" /* overwrites Polyglot; please don't include this line for translation */
+  "GAME_INVENTORY_WALLS": "Walls"
 }

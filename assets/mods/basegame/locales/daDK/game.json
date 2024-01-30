@@ -4,5 +4,6 @@
   "CONTEXT_WORLD_COUNT": "Verdener: ",
   "CONTEXT_ITEM_MAP": "Kort",
   "MENU_LABEL_MENU": "Menu",
-  "GAME_INVENTORY_REGISTER": "Registrer"
+  "GAME_INVENTORY_REGISTER": "Registrer",
+  "GAME_ACTION_SELECT_SLOT": "Vælg Slot"
 }

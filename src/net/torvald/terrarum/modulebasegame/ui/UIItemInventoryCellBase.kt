@@ -114,6 +114,10 @@ object UIItemInventoryCellCommonRes {
         Toolkit.Theme.COL_CELL_FILL
     )
 
+    /**
+     * Special hash values:
+     * - 10001: Encumbrance bar
+     */
     val tooltipShowing = HashMap<Long, Boolean>() // Long: `hash` field on UIItemInventoryItemGrid
 }
 

@@ -17,6 +17,7 @@ import net.torvald.terrarum.ui.UIItemCatBar.Companion.FILTER_CAT_ALL
 import net.torvald.terrarum.ui.UIItemInventoryElemWide.Companion.UNIQUE_ITEM_HAS_NO_AMOUNT
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.getKeycapPC
+import net.torvald.unicode.getMouseButton
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
@@ -189,6 +190,13 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         emptyCellIcon = smelterCellIcons.get(1, 0),
         keyDownFun = { _, _, _, _, _ -> },
         touchDownFun = { _, _, button, _, self ->
+            if (clickedOn != 0) {
+                clickedOn = 0
+                oreItemSlot.forceHighlighted = false
+                fireboxItemSlot.forceHighlighted = false
+                itemListUpdate()
+            }
+
             if (smelter.productItem != null) {
                 val removeCount = if (button == App.getConfigInt("config_mouseprimary"))
                     smelter.productItem!!.qty
@@ -287,11 +295,46 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         return true
     }
 
-    private val controlHelp: String
-        get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
+    private val SP = "\u3000"
+    private val controlHelpForSmelter = listOf(
+        // no slot selected
+        { if (App.environment == RunningEnvironment.PC)
+            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_SELECT_SLOT"]}"
         else
-            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}"
+            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" },
+        // ore slot
+        { if (App.environment == RunningEnvironment.PC)
+            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_TAKE_ALL_CONT"]}$SP" +
+            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_TAKE_ONE_CONT"]}"
+        else
+            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" },
+        // firebox slot
+        { if (App.environment == RunningEnvironment.PC)
+            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_TAKE_ALL_CONT"]}$SP" +
+            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_TAKE_ONE_CONT"]}"
+        else
+            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" }
+    )
+
+    private val controlHelpForInventory = listOf(
+        // no slot selected
+        { "" },
+        // ore slot
+        { if (App.environment == RunningEnvironment.PC)
+            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL_CONT"]}$SP" +
+            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE_CONT"]}"
+        else
+            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" },
+        // firebox slot
+        { if (App.environment == RunningEnvironment.PC)
+            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL_CONT"]}$SP" +
+            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE_CONT"]}"
+        else
+            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" }
+    )
 
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = backdropColour
@@ -307,14 +350,30 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         // control hints
         batch.color = Color.WHITE
         val controlHintXPos = leftPanelX + 2f
+        val controlHintXPos2 = playerThings.posX + 2f
         blendNormalStraightAlpha(batch)
-        App.fontGame.draw(batch, controlHelp, controlHintXPos, UIInventoryFull.yEnd - 20)
+        App.fontGame.draw(batch, controlHelpForSmelter[clickedOn](), controlHintXPos, UIInventoryFull.yEnd - 20)
+
+        // deal with the text that is too long
+        val encumbBarXPos = playerThings.posX + playerThings.width - UIInventoryCells.weightBarWidth + 36
+        val encumbBarYPos = UIInventoryFull.yEnd - 20 + 3f
+
+        val tr = controlHelpForInventory[clickedOn]()
+        val trLen = App.fontGame.getWidth(tr)
+        val encumbTextX = encumbBarXPos - 6 - App.fontGame.getWidth(Lang["GAME_INVENTORY_ENCUMBRANCE"])
+        if (controlHintXPos2 + trLen + 4 >= encumbTextX) {
+            tr.split(SP).forEachIndexed { index, s ->
+                App.fontGame.draw(batch, s, controlHintXPos2, UIInventoryFull.yEnd - 20 + 20 * index)
+            }
+        }
+        else {
+            App.fontGame.draw(batch, controlHelpForInventory[clickedOn](), controlHintXPos2, UIInventoryFull.yEnd - 20)
+        }
+
 
 
         if (INGAME.actorNowPlaying != null) {
             //draw player encumb
-            val encumbBarXPos = playerThings.posX + playerThings.width - UIInventoryCells.weightBarWidth + 36
-            val encumbBarYPos = UIInventoryFull.yEnd - 20 + 3f
             UIInventoryCells.drawEncumbranceBar(batch, encumbBarXPos, encumbBarYPos, encumbrancePerc, INGAME.actorNowPlaying!!.inventory)
         }
 

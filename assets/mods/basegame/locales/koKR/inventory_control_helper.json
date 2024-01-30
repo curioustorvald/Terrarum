@@ -1,0 +1,11 @@
+{
+  "GAME_ACTION_PUT_ALL": "모두 넣기",
+  "GAME_ACTION_PUT_ONE": "하나 넣기",
+  "GAME_ACTION_TAKE_ALL": "모두 가져가기",
+  "GAME_ACTION_TAKE_ONE": "하나 가져가기",
+
+  "GAME_ACTION_PUT_ALL_CONT": "모두",
+  "GAME_ACTION_PUT_ONE_CONT": "하나 넣기",
+  "GAME_ACTION_TAKE_ALL_CONT": "모두",
+  "GAME_ACTION_TAKE_ONE_CONT": "하나 가져가기"
+}

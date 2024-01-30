@@ -67,15 +67,14 @@ internal class UIInventoryCells(
                     min(UIInventoryCells.weightBarWidth, max(1f, UIInventoryCells.weightBarWidth * encumbrancePerc)),
                 UIInventoryFull.controlHelpHeight - 6f
             )
-            // debug text
-            batch.color = Color.LIGHT_GRAY
-            if (App.IS_DEVELOPMENT_BUILD) {
-                App.fontSmallNumbers.draw(
-                    batch,
-                    "${actorInventory.capacity}/${actorInventory.maxCapacity}",
-                    encumbBarTextXPos,
-                    encumbBarYPos + UIInventoryFull.controlHelpHeight - 4f
-                )
+
+            // tooltip
+            if (Terrarum.mouseScreenX.toFloat() in encumbBarXPos..encumbBarXPos+UIInventoryCells.weightBarWidth && Terrarum.mouseScreenY.toFloat() in encumbBarYPos..encumbBarYPos+UIInventoryFull.controlHelpHeight - 6f) {
+                INGAME.setTooltipMessage("${actorInventory.capacity}/${actorInventory.maxCapacity}")
+                tooltipShowing[10001] = true
+            }
+            else {
+                tooltipShowing[10001] = false
             }
         }
     }

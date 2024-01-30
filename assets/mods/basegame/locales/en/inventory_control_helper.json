@@ -1,0 +1,11 @@
+{
+  "GAME_ACTION_PUT_ALL": "Put All",
+  "GAME_ACTION_PUT_ONE": "Put One",
+  "GAME_ACTION_TAKE_ALL": "Take All",
+  "GAME_ACTION_TAKE_ONE": "Take One",
+
+  "GAME_ACTION_PUT_ALL_CONT": "Put All",
+  "GAME_ACTION_PUT_ONE_CONT": "One",
+  "GAME_ACTION_TAKE_ALL_CONT": "Take All",
+  "GAME_ACTION_TAKE_ONE_CONT": "One"
+}

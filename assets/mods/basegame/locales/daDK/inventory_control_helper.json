@@ -1,0 +1,11 @@
+{
+  "GAME_ACTION_PUT_ALL": "Sæt Hele",
+  "GAME_ACTION_PUT_ONE": "Sæt En",
+  "GAME_ACTION_TAKE_ALL": "Tag Hele",
+  "GAME_ACTION_TAKE_ONE": "Tag En",
+
+  "GAME_ACTION_PUT_ALL_CONT": "Sæt Hele",
+  "GAME_ACTION_PUT_ONE_CONT": "En",
+  "GAME_ACTION_TAKE_ALL_CONT": "Tag Hele",
+  "GAME_ACTION_TAKE_ONE_CONT": "En"
+}

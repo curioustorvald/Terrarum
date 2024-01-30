@@ -1,0 +1,11 @@
+{
+  "GAME_ACTION_PUT_ALL": "全て入れる",
+  "GAME_ACTION_PUT_ONE": "一つ入れる",
+  "GAME_ACTION_TAKE_ALL": "全て取る",
+  "GAME_ACTION_TAKE_ONE": "一つ取る",
+
+  "GAME_ACTION_PUT_ALL_CONT": "全て",
+  "GAME_ACTION_PUT_ONE_CONT": "一つ入れる",
+  "GAME_ACTION_TAKE_ALL_CONT": "全て",
+  "GAME_ACTION_TAKE_ONE_CONT": "一つ取る"
+}

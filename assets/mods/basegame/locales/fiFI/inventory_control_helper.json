@@ -1,0 +1,11 @@
+{
+  "GAME_ACTION_PUT_ALL": "Laita Kaikki",
+  "GAME_ACTION_PUT_ONE": "Laita Yksi",
+  "GAME_ACTION_TAKE_ALL": "Ota Kaikki",
+  "GAME_ACTION_TAKE_ONE": "Ota Yksi",
+
+  "GAME_ACTION_PUT_ALL_CONT": "Laita Kaikki",
+  "GAME_ACTION_PUT_ONE_CONT": "Yksi",
+  "GAME_ACTION_TAKE_ALL_CONT": "Ota Kaikki",
+  "GAME_ACTION_TAKE_ONE_CONT": "Yksi"
+}
