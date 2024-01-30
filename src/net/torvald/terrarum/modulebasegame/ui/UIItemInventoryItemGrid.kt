@@ -29,6 +29,8 @@ import kotlin.math.floor
  * Number of grids: 10x7
  * Number of lists: 2x7
  *
+ * `mouseUp()` will be false if the mouse is on the mode/scroll/etc bar, use `navRemoCon.mouseUp()` for that.
+ *
  * Created by minjaesong on 2017-10-21.
  */
 open class UIItemInventoryItemGrid(
@@ -209,11 +211,17 @@ open class UIItemInventoryItemGrid(
 
     var items: Array<UIItemInventoryCellBase> = itemList
 
+    /**
+     * @param mode 0 if mode has changed to non-compact mode, 1 if compact
+     */
+    var setListModeCallback = { mode: Int ->}
+
     open var isCompactMode = false // this is INIT code
         set(value) {
             field = value
             items = if (value) itemGrid else itemList
             rebuild(currentFilter, currentAppendix)
+            setListModeCallback(value.toInt())
         }
 
     private val iconPosX = if (drawScrollOnRightside)

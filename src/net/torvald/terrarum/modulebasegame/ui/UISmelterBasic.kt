@@ -72,6 +72,8 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
     fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
 
+    private var listModeButtonPushed = false
+
     init {
         CommonResourcePool.addToLoadingList("basegame_gui_smelter_icons") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/smelter_icons.tga"), 20, 20)
@@ -289,8 +291,15 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         super.touchDown(screenX, screenY, pointer, button)
 
-        if (!oreItemSlot.mouseUp && !fireboxItemSlot.mouseUp && !productItemslot.mouseUp && !playerThings.itemList.mouseUp) {
+        if (!oreItemSlot.mouseUp &&
+            !fireboxItemSlot.mouseUp &&
+            !productItemslot.mouseUp &&
+            !playerThings.itemList.mouseUp &&
+            !playerThings.itemList.navRemoCon.mouseUp
+        ) {
+
             clickedOn = 0
+
             oreItemSlot.forceHighlighted = false
             fireboxItemSlot.forceHighlighted = false
             itemListUpdate()

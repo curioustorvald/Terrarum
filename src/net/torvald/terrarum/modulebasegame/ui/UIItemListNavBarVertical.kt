@@ -25,6 +25,10 @@ class UIItemListNavBarVertical(
 
     override val width = UIItemListNavBarVertical.WIDTH
 
+    override val mouseUp: Boolean
+        get() = itemRelativeMouseX - 8 in 0 until width &&
+                itemRelativeMouseY + 8 in 0 until height
+
     companion object {
         const val WIDTH = 28
         const val LIST_TO_CONTROL_GAP = 12
@@ -128,6 +132,7 @@ class UIItemListNavBarVertical(
         batch.color = Toolkit.Theme.COL_CELL_FILL
         Toolkit.fillArea(batch, iconPosX - 4, getIconPosY(0) - 8, width, height)
         // cell border
+//        batch.color = if (mouseUp) colourTheme.cellHighlightMouseUpCol else colourTheme.cellHighlightNormalCol // just to test the mouseUp
         batch.color = colourTheme.cellHighlightNormalCol
         Toolkit.drawBoxBorder(batch, iconPosX - 4, getIconPosY(0) - 8, width, height)
 
