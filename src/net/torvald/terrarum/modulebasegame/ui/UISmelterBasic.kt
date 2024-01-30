@@ -44,21 +44,25 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
             // oreslot
             if (amount != null && gameItem != null) {
                 if (clickedOn == 1) {
-                    getPlayerInventory().remove(gameItem.dynamicID, amount)
-
-                    if (smelter.oreItem == null)
+                    if (smelter.oreItem == null) {
+                        getPlayerInventory().remove(gameItem.dynamicID, amount)
                         smelter.oreItem = InventoryPair(gameItem.dynamicID, amount)
-                    else
+                    }
+                    else if (smelter.oreItem!!.itm == gameItem.dynamicID) {
+                        getPlayerInventory().remove(gameItem.dynamicID, amount)
                         smelter.oreItem!!.qty += amount
+                    }
                 }
                 // firebox
                 else if (clickedOn == 2) {
-                    getPlayerInventory().remove(gameItem.dynamicID, amount)
-
-                    if (smelter.fireboxItem == null)
+                    if (smelter.fireboxItem == null) {
+                        getPlayerInventory().remove(gameItem.dynamicID, amount)
                         smelter.fireboxItem = InventoryPair(gameItem.dynamicID, amount)
-                    else
+                    }
+                    else if (smelter.fireboxItem!!.itm == gameItem.dynamicID) {
+                        getPlayerInventory().remove(gameItem.dynamicID, amount)
                         smelter.fireboxItem!!.qty += amount
+                    }
                 }
             }
 

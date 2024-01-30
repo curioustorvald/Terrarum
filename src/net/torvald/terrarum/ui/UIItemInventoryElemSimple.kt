@@ -145,10 +145,6 @@ class UIItemInventoryElemSimple(
                 tooltipShowing[hash] = true
 //                printdbg(this, tooltipShowing.entries)
             }
-            else if (item == null || !mouseUp) {
-                tooltipShowing[hash] = false
-            }
-
         }
         else {
 
@@ -158,6 +154,10 @@ class UIItemInventoryElemSimple(
                 batch.draw(it, posX + emptyCellIconOffsetX, posY + emptyCellIconOffsetY)
             }
 
+        }
+
+        if (item == null || !mouseUp) {
+            tooltipShowing[hash] = false
         }
 
         // see IFs above?

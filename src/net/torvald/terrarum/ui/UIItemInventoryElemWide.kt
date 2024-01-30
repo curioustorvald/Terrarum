@@ -177,9 +177,10 @@ class UIItemInventoryElemWide(
                 tooltipShowing[hash] = true
 //                printdbg(this, tooltipShowing.entries)
             }
-            else if (item == null || !mouseUp) {
-                tooltipShowing[hash] = false
-            }
+        }
+
+        if (item == null || !mouseUp) {
+            tooltipShowing[hash] = false
         }
 
         // see IFs above?
