@@ -114,6 +114,23 @@ internal class UIStorageChest : UICanvas(
                     itemListUpdate()
                 }
             }
+            it.itemListWheelFun = { gameItem, amount, _, scrollY, _, _ ->
+                if (gameItem != null) {
+                    val amount = scrollY.toLong().coerceIn(
+                        -(getPlayerInventory().searchByID(gameItem.dynamicID)?.qty ?: 0L),
+                        amount
+                    )
+
+                    // remove from the chest
+                    if (amount >= 1f)
+                        negotiator.refund(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
+                    // add to the chest
+                    else if (amount <= -1f)
+                        negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, -amount)
+
+                    itemListUpdate()
+                }
+            }
         }
         // make grid mode buttons work together
         itemListChest.itemList.navRemoCon.listButtonListener = { _,_ -> setCompact(false) }
@@ -134,6 +151,23 @@ internal class UIStorageChest : UICanvas(
                     if (gameItem != null) {
                         negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
                     }
+                    itemListUpdate()
+                }
+            }
+            it.itemListWheelFun = { gameItem, amount, _, scrollY, _, _ ->
+                if (gameItem != null) {
+                    val amount = scrollY.toLong().coerceIn(
+                        -(getFixtureInventory().searchByID(gameItem.dynamicID)?.qty ?: 0L),
+                        amount
+                    )
+
+                    // remove from the player
+                    if (amount >= 1f)
+                        negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
+                    // add to the player
+                    else if (amount <= -1f)
+                        negotiator.refund(getFixtureInventory(), getPlayerInventory(), gameItem, -amount)
+
                     itemListUpdate()
                 }
             }
