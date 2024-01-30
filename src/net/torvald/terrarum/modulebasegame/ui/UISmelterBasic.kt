@@ -336,6 +336,24 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" }
     )
 
+    private val controlHelpForInventoryTwoRows = listOf(
+        // no slot selected
+        { "" },
+        // ore slot
+        { if (App.environment == RunningEnvironment.PC)
+            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL"]}$SP" +
+            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE"]}"
+        else
+            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" },
+        // firebox slot
+        { if (App.environment == RunningEnvironment.PC)
+            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL"]}$SP" +
+                    "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE"]}"
+        else
+            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" }
+    )
+
+
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = backdropColour
         batch.draw(smelterBackdrop, backdropX, backdropY, smelterBackdrop.regionWidth * 6f, smelterBackdrop.regionHeight * 6f)
@@ -362,7 +380,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         val trLen = App.fontGame.getWidth(tr)
         val encumbTextX = encumbBarXPos - 6 - App.fontGame.getWidth(Lang["GAME_INVENTORY_ENCUMBRANCE"])
         if (controlHintXPos2 + trLen + 4 >= encumbTextX) {
-            tr.split(SP).forEachIndexed { index, s ->
+            controlHelpForInventoryTwoRows[clickedOn]().split(SP).forEachIndexed { index, s ->
                 App.fontGame.draw(batch, s, controlHintXPos2, UIInventoryFull.yEnd - 20 + 20 * index)
             }
         }

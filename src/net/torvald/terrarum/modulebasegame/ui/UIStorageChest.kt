@@ -12,6 +12,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.getWidth
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.unicode.getKeycapPC
+import net.torvald.unicode.getMouseButton
 import kotlin.math.max
 import kotlin.math.min
 
@@ -204,11 +205,28 @@ internal class UIStorageChest : UICanvas(
     private val thisOffsetY = UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
     private val cellsWidth = (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 6 - UIItemInventoryItemGrid.listGap
 
-    private val controlHelp: String
+    private val SP = "\u3000"
+    private val controlHelpLeft: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
+            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+                    "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_TAKE_ALL_CONT"]}$SP" +
+                    "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_TAKE_ONE_CONT"]}"
         else
-            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]} "
+            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}"
+
+    private val controlHelpRight: String
+        get() = if (App.environment == RunningEnvironment.PC)
+            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL_CONT"]}$SP" +
+            "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE_CONT"]}"
+        else
+            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}"
+
+    private val controlHelpRightTwoRows: String
+        get() = if (App.environment == RunningEnvironment.PC)
+            "${getMouseButton(App.getConfigInt("config_mouseprimary"))} ${Lang["GAME_ACTION_PUT_ALL"]}$SP" +
+                    "${getMouseButton(App.getConfigInt("config_mousesecondary"))} ${Lang["GAME_ACTION_PUT_ONE"]}"
+        else
+            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}"
 
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // background fill
@@ -232,8 +250,22 @@ internal class UIStorageChest : UICanvas(
         UIInventoryCells.drawEncumbranceBar(batch, encumbBarXPos, encumbBarYPos, encumbrancePerc, getPlayerInventory())
 
         // control hint
-        App.fontGame.draw(batch, controlHelp, thisOffsetX - 34f, encumbBarYPos - 3)
+        val controlHintXPos = itemListChest.posX + 2f
+        val controlHintXPos2 = itemListPlayer.posX + 2f
+        val trLen = App.fontGame.getWidth(controlHelpRight)
+        val encumbTextX = encumbBarXPos - 6 - App.fontGame.getWidth(Lang["GAME_INVENTORY_ENCUMBRANCE"])
 
+        batch.color = Color.WHITE
+        App.fontGame.draw(batch, controlHelpLeft, controlHintXPos, UIInventoryFull.yEnd - 20)
+
+        if (controlHintXPos2 + trLen + 4 >= encumbTextX) {
+            controlHelpRightTwoRows.split(SP).forEachIndexed { index, s ->
+                App.fontGame.draw(batch, s, controlHintXPos2, UIInventoryFull.yEnd - 20 + 20 * index)
+            }
+        }
+        else {
+            App.fontGame.draw(batch, controlHelpRight, controlHintXPos2, UIInventoryFull.yEnd - 20)
+        }
 
     }
 
