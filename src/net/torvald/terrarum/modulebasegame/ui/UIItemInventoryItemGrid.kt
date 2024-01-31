@@ -603,11 +603,13 @@ open class UIItemInventoryItemGrid(
         super.scrolled(amountX, amountY)
 
         items.forEach { if (it.mouseUp) it.scrolled(amountX, amountY) }
+        navRemoCon.scrolled(amountX, amountY)
 
         // scroll the item list (for now)
-        if (mouseUp) {
-            scrollItemPage(amountY.toInt())
-        }
+        // commented out -- this clashes with the wheelFun
+//        if (mouseUp) {
+//            scrollItemPage(amountY.toInt())
+//        }
 
         return true
     }

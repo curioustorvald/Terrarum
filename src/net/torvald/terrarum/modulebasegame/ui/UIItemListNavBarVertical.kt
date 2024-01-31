@@ -177,6 +177,19 @@ class UIItemListNavBarVertical(
         return super.touchDown(screenX, screenY, pointer, button)
     }
 
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        if (mouseUp && amountY > 0f) {
+            scrollDownListener.invoke(this, scrollDownButton)
+            return true
+        }
+        else if (mouseUp && amountY < 0f) {
+            scrollUpListener.invoke(this, scrollUpButton)
+            return true
+        }
+
+        return false
+    }
+
     override fun dispose() {
     }
 
