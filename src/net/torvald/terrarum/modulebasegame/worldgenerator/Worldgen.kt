@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.jme3.math.Vector2f
+import com.jme3.math.Vector3f
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.random.XXHash64
@@ -152,7 +153,7 @@ object Worldgen {
 
     private fun tryForSpawnPoint(world: GameWorld): Point2i {
         val yInit = getChunkGenStrip(world).first
-        val tallies = ArrayList<Pair<Point2i, Vector2f>>() // xypos, score (0..1+)
+        val tallies = ArrayList<Pair<Point2i, Vector3f>>() // xypos, score (0..1+)
         var tries = 0
         var found = false
         while (tries < 99) {
@@ -176,7 +177,7 @@ object Worldgen {
 
             var rocks = 0
             var trees = 0
-
+            var flatness = 0
             // make survey
             for (sx in -80..80) {
                 for (sy in -30..30) {
@@ -191,15 +192,27 @@ object Worldgen {
                     }
                 }
             }
+
+            for (sx in -2..2) {
+                val x = posX + sx
+                val y = posY
+                val yUp = posY - 1
+                val tile = BlockCodex[world.getTileFromTerrain(x, y)]
+                val tileUp = BlockCodex[world.getTileFromTerrain(x, yUp)]
+                if (tile.isSolid && !tileUp.isSolid)
+                    flatness += 1
+            }
+
             val rockScore = rocks / rockScoreMin.toFloat()
             val treeScore = trees / treeScoreMin.toFloat()
-            val score = Vector2f(rockScore, treeScore)
+            val flatScore = flatness / 5f
+            val score = Vector3f(rockScore, treeScore, flatScore)
 
             tallies.add(Point2i(posX, posY) to score)
 
-            printdbg(this, "...Survey says: $rocks/$rockScoreMin rocks, $trees/$treeScoreMin trees")
+            printdbg(this, "...Survey says: $rocks/$rockScoreMin rocks, $trees/$treeScoreMin trees, flatness $flatScore")
 
-            if (score.x >= 1f && score.y >= 1f) {
+            if (score.x >= 1f && score.y >= 1f && flatScore >= 1f) {
                 found = true
                 break
             }
