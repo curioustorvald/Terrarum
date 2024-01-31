@@ -181,7 +181,7 @@ object LoadSavegame {
 
 
             val actors = world.actors.distinct()
-            val worldParam = TerrarumIngame.Codices(newIngame.worldDisk, world, actors, player, worldGenver, playerGenver)
+            val worldParam = TerrarumIngame.Codices(newIngame.worldDisk, world, actors, player, worldGenver, playerGenver) {}
 
 
             newIngame.gameLoadInfoPayload = worldParam

@@ -322,16 +322,18 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
     data class NewGameParams(
-            val player: IngamePlayer,
-            val newWorldParams: NewWorldParameters
+        val player: IngamePlayer,
+        val newWorldParams: NewWorldParameters,
+        val callbackAfterLoad: (TerrarumIngame) -> Unit
+
     )
 
     data class NewWorldParameters(
-            val width: Int,
-            val height: Int,
-            val worldGenSeed: Long,
-            val savegameName: String
-            // other worldgen options
+        val width: Int,
+        val height: Int,
+        val worldGenSeed: Long,
+        val savegameName: String
+        // other worldgen options
     ) {
         init {
             if (width % LandUtil.CHUNK_W != 0 || height % LandUtil.CHUNK_H != 0) {
@@ -353,10 +355,11 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val actors: List<ActorID>,
         val player: IngamePlayer,
         val worldGenver: Long,
-        val playerGenver: Long
+        val playerGenver: Long,
+        val callbackAfterLoad: (TerrarumIngame) -> Unit
     )
 
-
+    private var loadCallback: ((TerrarumIngame) -> Unit)? = null
 
     /**
      * Init instance by loading saved world
@@ -378,6 +381,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             // feed info to the worldgen
             Worldgen.attachMap(world, WorldgenParams(world.generatorSeed))
         }
+
+        loadCallback = codices.callbackAfterLoad
     }
 
     /** Load rest of the game with GL context */
@@ -547,6 +552,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
         KeyToggler.forceSet(Input.Keys.Q, false)
+
+        loadCallback = newGameParams.callbackAfterLoad
     }
 
     val ingameController = IngameController(this)
@@ -666,6 +673,16 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         KeyToggler.forceSet(Input.Keys.F2, false)
 
+
+        if (loadCallback != null) {
+            try {
+                loadCallback!!(this)
+            }
+            catch (e: Throwable) {
+                e.printStackTrace()
+            }
+            loadCallback = null
+        }
     }// END enter
 
 

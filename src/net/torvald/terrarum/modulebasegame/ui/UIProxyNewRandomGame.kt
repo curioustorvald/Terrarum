@@ -42,7 +42,7 @@ class UIProxyNewRandomGame(val remoCon: UIRemoCon) : UICanvas() {
 //                PlayerBuilderTestSubject1(),
                 PlayerBuilderWerebeastTest(),
                 TerrarumIngame.NewWorldParameters(2880, 1350, HQRNG().nextLong(), RandomWordsName(4))
-        )
+        ) {}
 //        val worldParam = TerrarumIngame.NewWorldParameters(2880, 1350, 0x51621D)
 
 //        val worldParam = TerrarumIngame.NewWorldParameters(6030, 1800, HQRNG().nextLong()) // small

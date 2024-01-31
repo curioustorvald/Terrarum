@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.FancyWorldgenLoadScreen
@@ -18,6 +19,10 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  * Created by minjaesong on 2023-05-28.
  */
 class FixtureWorldPortal : Electric {
+
+    companion object {
+        const val ITEMID = "item@basegame:320"
+    }
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 5, 2),
@@ -85,7 +90,29 @@ class FixtureWorldPortal : Electric {
                     printdbg(this, "generate for teleportation! Size=${wx}x${wy}, Name=$name, Seed=$seed")
 
                     val ingame = TerrarumIngame(App.batch)
-                    val worldParam = TerrarumIngame.NewGameParams(player, it.worldLoadParam)
+                    val worldParam = TerrarumIngame.NewGameParams(player, it.worldLoadParam) { ingame ->
+                        val world = ingame.world
+
+                        // flatten terrain
+                        for (x in world.spawnX - 2..world.spawnX + 2) {
+                            // clear ceiling
+                            for (y in world.spawnY - 2..world.spawnY - 1) {
+                                world.setTileTerrain(x, y, Block.AIR, true)
+                            }
+                            // fill bottom
+                            for (y in world.spawnY..world.spawnY + 2) {
+                                if (!BlockCodex[world.getTileFromTerrain(x, y)].isSolid) {
+                                    world.setTileTerrain(x, y, Block.DIRT, true)
+                                }
+                            }
+                        }
+
+                        // spawn a world portal
+                        printdbg(this, "Portal new world callback; spawning portal at ${world.spawnX}, ${world.spawnY - 1}")
+                        FixtureWorldPortal().spawn(world.spawnX, world.spawnY - 1, player.uuid)
+                        printdbg(this, "Spawn complete")
+
+                    }
                     ingame.gameLoadInfoPayload = worldParam
                     ingame.gameLoadMode = TerrarumIngame.GameLoadMode.CREATE_NEW
 

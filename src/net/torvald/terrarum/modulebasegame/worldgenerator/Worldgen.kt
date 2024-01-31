@@ -7,6 +7,7 @@ import com.sudoplay.joise.module.*
 import net.torvald.random.XXHash64
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
@@ -198,8 +199,8 @@ object Worldgen {
                 val y = posY
                 val yUp = posY - 1
                 val tile = BlockCodex[world.getTileFromTerrain(x, y)]
-                val tileUp = BlockCodex[world.getTileFromTerrain(x, yUp)]
-                if (tile.isSolid && !tileUp.isSolid)
+                val tileUp = world.getTileFromTerrain(x, yUp)
+                if (tile.isSolid && tileUp == Block.AIR)
                     flatness += 1
             }
 

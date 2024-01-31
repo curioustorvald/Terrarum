@@ -183,7 +183,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
                     player, TerrarumIngame.NewWorldParameters(
                         wx, wy, seed, nameInput.getTextOrPlaceholder()
                     )
-                )
+                ) {}
                 ingame.gameLoadInfoPayload = worldParam
                 ingame.gameLoadMode = TerrarumIngame.GameLoadMode.CREATE_NEW
 
