@@ -256,7 +256,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                 clickedOn = 2
                 self.forceHighlighted = true
                 oreItemSlot.forceHighlighted = false
-                itemListUpdate { ItemCodex.hasTag(it.itm, "BURNABLE") }
+                itemListUpdate { ItemCodex.hasTag(it.itm, "COMBUSTIBLE") }
             }
             else if (smelter.fireboxItem != null) {
                 val removeCount = if (button == App.getConfigInt("config_mouseprimary"))
@@ -512,7 +512,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         uiItems.forEach { it.render(frameDelta, batch, camera) }
 
         drawProgressGauge(batch, oreItemSlot.posX, oreItemSlot.posY, smelter.progress)
-        drawProgressGauge(batch, fireboxItemSlot.posX, fireboxItemSlot.posY, smelter.fuelCaloriesNow / (smelter.fuelCaloriesMax ?: Float.POSITIVE_INFINITY))
+        drawProgressGauge(batch, fireboxItemSlot.posX, fireboxItemSlot.posY, (smelter.fuelCaloriesNow / (smelter.fuelCaloriesMax ?: Double.POSITIVE_INFINITY)).toFloat())
         drawThermoGauge(batch, thermoX, thermoY, smelter.temperature)
 
 

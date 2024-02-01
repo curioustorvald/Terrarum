@@ -28,6 +28,22 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
 
     constructor() : this("-uninitialised-")
 
+    /**
+     * For items with COMBUSTIBLE tag only
+     *
+     * If it burns for 80 seconds in the furnace, the calories value would be 80*60=4800, assuming tickrate of 60.
+     * Assuming one item weighs 10 kilograms, 1 game-calories is about 5 watt-hours.
+     */
+    open var calories = 0.0
+
+    /**
+     * For items with COMBUSTIBLE tag only
+     *
+     * Lower=more smoky. How likely it would produce smokes when burned on a furnace. Smokiness = 0.25 means the furnace would
+     * emit smoke particle every 0.25 seconds.
+     */
+    open var smokiness = Float.POSITIVE_INFINITY
+
     open var dynamicID: ItemID = originalID
     /**
      * if the ID is a Actor range, it's an actor contained in a pocket.

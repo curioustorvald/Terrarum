@@ -38,8 +38,6 @@ class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCac
         Worldgen.threadExecutor.renew()
         submitJob(loadscreen)
         Worldgen.threadExecutor.join()
-
-        printdbg(this, "Waking up Worldgen")
     }
 
 

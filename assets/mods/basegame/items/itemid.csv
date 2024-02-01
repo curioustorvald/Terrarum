@@ -16,7 +16,7 @@ id;classname;tags
 15;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerWood;TOOL,HAMMER
 16;net.torvald.terrarum.modulebasegame.gameitems.ItemWorkbench;FIXTURE,CRAFTING
 17;net.torvald.terrarum.modulebasegame.gameitems.ItemSmelterBasic;FIXTURE,STATION
-18;net.torvald.terrarum.modulebasegame.gameitems.OreStick;BURNABLE
+18;net.torvald.terrarum.modulebasegame.gameitems.OreStick;COMBUSTIBLE
 19;net.torvald.terrarum.modulebasegame.gameitems.AxeCopper;TOOL,AXE
 20;net.torvald.terrarum.modulebasegame.gameitems.AxeIron;TOOL,AXE
 21;net.torvald.terrarum.modulebasegame.gameitems.AxeSteel;TOOL,AXE
@@ -31,7 +31,7 @@ id;classname;tags
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT
 112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper;INGOT
 113;net.torvald.terrarum.modulebasegame.gameitems.IngotIron;INGOT
-114;net.torvald.terrarum.modulebasegame.gameitems.ItemCoalCoke;INGOT,BURNABLE
+114;net.torvald.terrarum.modulebasegame.gameitems.ItemCoalCoke;INGOT,COMBUSTIBLE
 115;net.torvald.terrarum.modulebasegame.gameitems.IngotZinc;INGOT
 116;net.torvald.terrarum.modulebasegame.gameitems.IngotTin;INGOT
 117;net.torvald.terrarum.modulebasegame.gameitems.IngotGold;INGOT
@@ -41,7 +41,7 @@ id;classname;tags
 # ores
 128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper;SMELTABLE
 129;net.torvald.terrarum.modulebasegame.gameitems.OreIron;SMELTABLE
-130;net.torvald.terrarum.modulebasegame.gameitems.OreCoal;SMELTABLE,BURNABLE
+130;net.torvald.terrarum.modulebasegame.gameitems.OreCoal;SMELTABLE,COMBUSTIBLE
 131;net.torvald.terrarum.modulebasegame.gameitems.OreZinc;SMELTABLE
 132;net.torvald.terrarum.modulebasegame.gameitems.OreTin;SMELTABLE
 133;net.torvald.terrarum.modulebasegame.gameitems.OreGold;SMELTABLE
@@ -59,10 +59,10 @@ id;classname;tags
 163;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedRosewood;SEEDLING
 
 # tree logs
-168;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsOak;
-169;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsEbony;
-170;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsBirch;
-171;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsRosewood;
+168;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsOak;COMBUSTIBLE
+169;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsEbony;COMBUSTIBLE
+170;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsBirch;COMBUSTIBLE
+171;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsRosewood;COMBUSTIBLE
 
 
 256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak;FIXTURE

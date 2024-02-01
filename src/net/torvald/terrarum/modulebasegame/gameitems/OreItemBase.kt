@@ -33,6 +33,8 @@ open class OreItemBase(originalID: ItemID) : GameItem(originalID) {
 class ItemLogsOak(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_LOGS_OAK"
     override val materialId = "WOOD"
+    override var calories = 1920.0
+    override var smokiness = 0.2f
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,10)
 
@@ -44,6 +46,8 @@ class ItemLogsOak(originalID: ItemID) : OreItemBase(originalID) {
 class ItemLogsEbony(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_LOGS_EBONY"
     override val materialId = "WOOD"
+    override var calories = 1920.0
+    override var smokiness = 0.2f
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,10)
 
@@ -55,6 +59,8 @@ class ItemLogsEbony(originalID: ItemID) : OreItemBase(originalID) {
 class ItemLogsBirch(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_LOGS_BIRCH"
     override val materialId = "WOOD"
+    override var calories = 1920.0
+    override var smokiness = 0.2f
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,10)
 
@@ -66,6 +72,8 @@ class ItemLogsBirch(originalID: ItemID) : OreItemBase(originalID) {
 class ItemLogsRosewood(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_LOGS_ROSEWOOD"
     override val materialId = "WOOD"
+    override var calories = 1920.0
+    override var smokiness = 0.2f
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,10)
 
@@ -107,6 +115,8 @@ class ItemSeedRosewood(originalID: ItemID) : OreItemBase(originalID) {
 class OreStick(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_WOOD_STICK"
     override val materialId = "WOOD"
+    override var calories = 600.0
+    override var smokiness = 0.2f
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,6)
 }
@@ -122,6 +132,8 @@ class OreIron(originalID: ItemID) : OreItemBase(originalID) {
 }
 class OreCoal(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_COAL"
+    override var calories = 4800.0
+    override var smokiness = 0.3f
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,6)
 }
@@ -155,6 +167,8 @@ class OreLead(originalID: ItemID) : OreItemBase(originalID) {
 
 class ItemCoalCoke(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_COAL_COKE"
+    override var calories = 4800.0
+    override var smokiness = 0.4f
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,6)
 }

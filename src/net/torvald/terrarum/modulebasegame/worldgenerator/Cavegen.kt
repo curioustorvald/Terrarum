@@ -30,8 +30,6 @@ class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache
         Worldgen.threadExecutor.renew()
         submitJob(loadscreen)
         Worldgen.threadExecutor.join()
-
-        App.printdbg(this, "Waking up Worldgen")
     }
 
 

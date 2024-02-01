@@ -52,8 +52,6 @@ class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val 
         Worldgen.threadExecutor.renew()
         submitJob(loadscreen)
         Worldgen.threadExecutor.join()
-
-        App.printdbg(this, "Waking up Worldgen")
     }
 
     companion object {

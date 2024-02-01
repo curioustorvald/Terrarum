@@ -28,8 +28,6 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
         Worldgen.threadExecutor.renew()
         submitJob(loadscreen)
         Worldgen.threadExecutor.join()
-
-        App.printdbg(this, "Waking up Worldgen")
     }
 
 
@@ -214,7 +212,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
             val chkP1 = (2..heightSum).any { BlockCodex[world.getTileFromTerrain(x, y - it)].isSolid }
 
             if (chkM1 || chk0 || chkP1) {
-                printdbg(this, "Ceiling not tall enough at $x, $y, aborting")
+//                printdbg(this, "Ceiling not tall enough at $x, $y, aborting")
                 return
             }
 
@@ -246,7 +244,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
             val chkP1 = (2..heightSum).any { BlockCodex[world.getTileFromTerrain(x, y - it)].isSolid }
 
             if (chkM1 || chk0 || chkP1) {
-                printdbg(this, "Ceiling not tall enough at $x, $y, aborting")
+//                printdbg(this, "Ceiling not tall enough at $x, $y, aborting")
                 return
             }
 
@@ -255,7 +253,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
             val bulb1 = 4 + fudgeN(x, y, 345098)
             val bulb2 = 3 + fudgeN(x, y, 6093481)
             val bulb3 = 2 + fudgeN(x, y, 5413879)
-            printdbg(this, "Planting tree at $x, $y; params: $stem, $bulb1, $bulb2, $bulb3")
+//            printdbg(this, "Planting tree at $x, $y; params: $stem, $bulb1, $bulb2, $bulb3")
 
             // trunk
             for (i in 0 until stem) {
@@ -294,7 +292,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
             val chkP2 = (2..heightSum).any { BlockCodex[world.getTileFromTerrain(x, y - it)].isSolid }
 
             if (chkM1 || chk0 || chkP1 || chkP2) {
-                printdbg(this, "Ceiling not tall enough at $x, $y, aborting")
+//                printdbg(this, "Ceiling not tall enough at $x, $y, aborting")
                 return
             }
 
@@ -304,8 +302,7 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
             val bulb2 = 4 + fudgeN(x, y, 98134)
             val bulb3 = 3 + fudgeN(x, y, 123098)
             val bulb4 = 2 + fudgeN(x, y, 8712)
-
-            printdbg(this, "Planting tree at $x, $y; params: $stem, $bulb1, $bulb2, $bulb3")
+//            printdbg(this, "Planting tree at $x, $y; params: $stem, $bulb1, $bulb2, $bulb3, $bulb4")
 
             // soiling
             val tl1 = world.getTileFromTerrain(x - 1, y)
