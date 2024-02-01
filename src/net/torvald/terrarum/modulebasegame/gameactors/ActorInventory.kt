@@ -25,6 +25,18 @@ class ActorInventory() : FixtureInventory() {
         this.capacityMode = capacityMode
     }
 
+    override var maxCapacity: Long = 0
+        get() = when (capacityMode) {
+            CAPACITY_MODE_COUNT -> field
+            CAPACITY_MODE_WEIGHT -> actor.actorValue.getAsInt(AVKey.ENCUMBRANCE)?.toLong() ?: field
+            CAPACITY_MODE_NO_ENCUMBER -> 0x7FFFFFFFFFFFFFFFL
+            else -> throw IllegalArgumentException()
+        }
+        set(value) {
+            if (capacityMode == CAPACITY_MODE_COUNT)
+                field = value
+        }
+
     /**
      * List of all equipped items (tools, armours, rings, necklaces, etc.)
      *

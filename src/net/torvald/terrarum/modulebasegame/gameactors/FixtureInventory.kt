@@ -18,8 +18,8 @@ import java.math.BigInteger
 
 open class FixtureInventory() {
 
-    var maxCapacity = 100L
-    var capacityMode = CAPACITY_MODE_COUNT
+    open var maxCapacity = 100L
+    open var capacityMode = CAPACITY_MODE_COUNT
 
     constructor(maxCapacity: Long, capacityMode: Int) : this() {
         this.maxCapacity = maxCapacity

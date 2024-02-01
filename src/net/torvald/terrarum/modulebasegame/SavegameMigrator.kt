@@ -163,7 +163,7 @@ internal object SavegameMigrator {
     }
 
 
-    @AppliedVersion("0.3.99999")
+    @AppliedVersion("0.4.0")
     fun updatePlayerEncumbrance(actor: Actor) {
         if (actor is IngamePlayer && actor.actorValue.getAsInt("encumbrance") == 1000) {
             actor.actorValue.set("encumbrance", 50000)
