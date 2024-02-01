@@ -246,7 +246,7 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
             (productItem == null || oreItemProp.smeltingProduct == productItem!!.itm)
         ) {
 
-            progress += temperature * 5f // debug speedup
+            progress += temperature
 
             if (progress >= CALORIES_PER_ROASTING) {
                 val smeltingProduct = oreItemProp.smeltingProduct!!
