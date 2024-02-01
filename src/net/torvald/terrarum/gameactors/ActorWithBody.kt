@@ -1806,7 +1806,7 @@ open class ActorWithBody : Actor {
         if (isVisible) {
             blendNormalStraightAlpha(batch)
             if (spriteEmissive != null)
-                drawSpriteInGoodPosition(frameDelta, spriteEmissive!!, batch, 1)
+                drawSpriteInGoodPosition(frameDelta, spriteEmissive!!, batch, 2)
             else if (sprite != null)
                 drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 2, Color.BLACK)
         }
@@ -2221,8 +2221,8 @@ open class ActorWithBody : Actor {
             return if (Math.abs(x) > ceil) ceil else x
         }
 
-        @Transient private val HITBOX_COLOURS0 = Color(0xFF00FF88.toInt())
-        @Transient private val HITBOX_COLOURS1 = Color(0xFFFF0088.toInt())
+        @Transient internal val HITBOX_COLOURS0 = Color(0xFF00FF88.toInt())
+        @Transient internal val HITBOX_COLOURS1 = Color(0xFFFF0088.toInt())
 
 
         fun isCloseEnough(a: Double, b: Double) = ((a / b).let { if (it.isNaN()) 0.0 else it } - 1).absoluteValue < PHYS_EPSILON_DIST

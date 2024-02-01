@@ -1,5 +1,8 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.spriteanimation.SheetSpriteAnimation
@@ -9,6 +12,8 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Lightbox
+import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleVanishingSprite
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -39,6 +44,16 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
     @Transient override val tags = listOf("basicsmelter")
 
+    init {
+        CommonResourcePool.addToLoadingList("basegame/sprites/fixtures/smelter_tall.tga") {
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/smelter_tall.tga"), 48, 64)
+        }
+        CommonResourcePool.addToLoadingList("basegame/sprites/fixtures/smelter_tall_emsv.tga") {
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/smelter_tall_emsv.tga"), 48, 64)
+        }
+        CommonResourcePool.loadAll()
+    }
+
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 3, 4), // temporary value, will be overwritten by spawn()
         nameFun = { Lang["ITEM_SMELTER_SMALL"] },
@@ -49,16 +64,14 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
         CommonResourcePool.loadAll()
 
 
-        val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/smelter_tall.tga")
-        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/smelter_tall_emsv.tga")
 
         density = BlockCodex[Block.STONE].density.toDouble()
-        setHitboxDimension(itemImage.texture.width, itemImage.texture.height, 0, 0)
+        setHitboxDimension(48, 64, 0, 0)
 
-        makeNewSprite(TextureRegionPack(itemImage.texture, itemImage.texture.width, itemImage.texture.height)).let {
+        makeNewSprite(CommonResourcePool.getAsTextureRegionPack("basegame/sprites/fixtures/smelter_tall.tga")).let {
             it.setRowsAndFrames(1,1)
         }
-        makeNewSpriteEmissive(TextureRegionPack(itemImage2.texture, itemImage.texture.width, itemImage.texture.height)).let {
+        makeNewSpriteEmissive(CommonResourcePool.getAsTextureRegionPack("basegame/sprites/fixtures/smelter_tall_emsv.tga")).let {
             it.setRowsAndFrames(1,1)
         }
 
@@ -88,12 +101,101 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
     private var nextDelay = 0.25f // use smokiness value of the item
     private var spawnTimer = 0f
 
-    @Transient private val FUEL_CONSUMPTION = 1f
+    companion object {
+        @Transient val FUEL_CONSUMPTION = 1f
+        @Transient val CALORIES_PER_ROASTING = 10 * 60 // 10 seconds @ 60 ticks per second
+    }
 
     @Transient private val RNG = HQRNG()
 
+    fun changeFireboxItemCount(delta: Long) {
+        fireboxItem!!.qty += delta
+        if (fireboxItem!!.qty <= 0L) {
+            fireboxItem = null
+        }
+    }
+
+    fun changeOreItemCount(delta: Long) {
+        oreItem!!.qty += delta
+        if (oreItem!!.qty <= 0L) {
+            oreItem = null
+        }
+    }
+
+    fun changeProductItemCount(delta: Long) {
+        productItem!!.qty += delta
+        if (productItem!!.qty <= 0L) {
+            productItem = null
+        }
+    }
+
+    override fun drawEmissive(frameDelta: Float, batch: SpriteBatch) {
+        if (isVisible && spriteEmissive != null) {
+            BlendMode.resolve(drawMode, batch)
+
+            (spriteEmissive as SheetSpriteAnimation).currentFrame = 1 // unlit
+            drawSpriteInGoodPosition(frameDelta, spriteEmissive!!, batch, 2, Color.WHITE)
+
+            (spriteEmissive as SheetSpriteAnimation).currentFrame = 0 // lit
+            val r = 1f - (temperature - 1f).sqr()
+            val g = (2f * temperature - 1f).coerceIn(0f, 1f)
+            drawSpriteInGoodPosition(frameDelta, spriteEmissive!!, batch, 2, Color(r, g, g, 1f))
+        }
+
+        // debug display of hIntTilewiseHitbox
+        if (KeyToggler.isOn(Input.Keys.F9)) {
+            val blockMark = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
+
+            for (y in 0..intTilewiseHitbox.height.toInt() + 1) {
+                batch.color = if (y == intTilewiseHitbox.height.toInt() + 1) HITBOX_COLOURS1 else HITBOX_COLOURS0
+                for (x in 0..intTilewiseHitbox.width.toInt()) {
+                    batch.draw(blockMark,
+                        (intTilewiseHitbox.startX.toFloat() + x) * TerrarumAppConfiguration.TILE_SIZEF,
+                        (intTilewiseHitbox.startY.toFloat() + y) * TerrarumAppConfiguration.TILE_SIZEF
+                    )
+                }
+            }
+
+            batch.color = Color.WHITE
+        }
+    }
+
+    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
+        if (isVisible && sprite != null) {
+            BlendMode.resolve(drawMode, batch)
+
+            (sprite as SheetSpriteAnimation).currentFrame = 1 // unlit
+            drawSpriteInGoodPosition(frameDelta, sprite!!, batch, forcedColourFilter = Color.WHITE)
+
+            (sprite as SheetSpriteAnimation).currentFrame = 2 // lit overlay
+            val r = 1f - (temperature - 1f).sqr()
+            val g = (2f * temperature - 1f).coerceIn(0f, 1f)
+            drawSpriteInGoodPosition(frameDelta, sprite!!, batch, forcedColourFilter = Color(1f, g, g, r))
+        }
+
+        // debug display of hIntTilewiseHitbox
+        if (KeyToggler.isOn(Input.Keys.F9)) {
+            val blockMark = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
+
+            for (y in 0..intTilewiseHitbox.height.toInt() + 1) {
+                batch.color = if (y == intTilewiseHitbox.height.toInt() + 1) HITBOX_COLOURS1 else HITBOX_COLOURS0
+                for (x in 0..intTilewiseHitbox.width.toInt()) {
+                    batch.draw(blockMark,
+                        (intTilewiseHitbox.startX.toFloat() + x) * TerrarumAppConfiguration.TILE_SIZEF,
+                        (intTilewiseHitbox.startY.toFloat() + y) * TerrarumAppConfiguration.TILE_SIZEF
+                    )
+                }
+            }
+
+            batch.color = Color.WHITE
+        }
+    }
+
     override fun update(delta: Float) {
         super.update(delta)
+
+        val oreItemProp = ItemCodex[oreItem?.itm]
+        val fuelItemProp = ItemCodex[fireboxItem?.itm]
 
         // consume fuel
         if (fuelCaloriesNow > 0f) {
@@ -103,16 +205,13 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
             temperature += 1f /2048f
         }
         // take fuel from the item slot
-        else if (fuelCaloriesNow <= 0f && fireboxItem != null && fireboxItem!!.qty > 0L) {
-            fuelCaloriesNow = ItemCodex[fireboxItem!!.itm]!!.calories
-            fuelCaloriesMax = ItemCodex[fireboxItem!!.itm]!!.calories
-            nextDelayBase = ItemCodex[fireboxItem!!.itm]!!.smokiness
+        else if (fuelCaloriesNow <= 0f && fuelItemProp?.calories != null && fireboxItem!!.qty > 0L) {
+            fuelCaloriesNow = fuelItemProp.calories
+            fuelCaloriesMax = fuelItemProp.calories
+            nextDelayBase = fuelItemProp.smokiness
             nextDelay = (nextDelayBase * (1.0 + RNG.nextTriangularBal() * 0.1)).toFloat()
 
-            fireboxItem!!.qty -= 1L
-            if (fireboxItem!!.qty == 0L) {
-                fireboxItem = null
-            }
+            changeFireboxItemCount(-1)
         }
         // no item on the slot
         else if (fuelCaloriesNow <= 0f && fireboxItem == null) {
@@ -138,6 +237,32 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
             nextDelay = (nextDelayBase * (1.0 + RNG.nextTriangularBal() * 0.1)).toFloat()
 
             (sprite as? SheetSpriteAnimation)?.delays?.set(0, Math.random().toFloat() * 0.4f + 0.1f)
+        }
+
+        // roast items
+        if (oreItem != null &&
+            fuelCaloriesNow > 0f &&
+            oreItemProp?.smeltingProduct != null &&
+            (productItem == null || oreItemProp.smeltingProduct == productItem!!.itm)
+        ) {
+
+            progress += temperature * 5f // debug speedup
+
+            if (progress >= CALORIES_PER_ROASTING) {
+                val smeltingProduct = oreItemProp.smeltingProduct!!
+                if (productItem == null)
+                    productItem = InventoryPair(smeltingProduct, 1L)
+                else
+                    changeProductItemCount(1)
+
+                // take the ore item
+                changeOreItemCount(-1)
+
+                progress = 0f
+            }
+        }
+        else if (oreItem == null) {
+            progress = 0f
         }
 
 

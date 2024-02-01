@@ -49,7 +49,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                     }
                     else if (smelter.oreItem!!.itm == gameItem.dynamicID) {
                         getPlayerInventory().remove(gameItem.dynamicID, amount)
-                        smelter.oreItem!!.qty += amount
+                        smelter.changeOreItemCount(amount)
                     }
                 }
                 // firebox
@@ -60,7 +60,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                     }
                     else if (smelter.fireboxItem!!.itm == gameItem.dynamicID) {
                         getPlayerInventory().remove(gameItem.dynamicID, amount)
-                        smelter.fireboxItem!!.qty += amount
+                        smelter.changeFireboxItemCount(amount)
                     }
                 }
             }
@@ -84,7 +84,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                     // add to the inventory slot
                     if (smelter.oreItem != null && addCount1 >= 1L) {
                         getPlayerInventory().add(smelter.oreItem!!.itm, addCount2)
-                        smelter.oreItem!!.qty -= addCount2
+                        smelter.changeOreItemCount(-addCount2)
                     }
                     // remove from the inventory slot
                     else if (addCount1 <= -1L) {
@@ -92,7 +92,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                         if (smelter.oreItem == null)
                             smelter.oreItem = InventoryPair(itemToUse, -addCount2)
                         else
-                            smelter.oreItem!!.qty -= addCount2
+                            smelter.changeOreItemCount(-addCount2)
                     }
                     if (smelter.oreItem != null && smelter.oreItem!!.qty == 0L) smelter.oreItem = null
                     else if (smelter.oreItem != null && smelter.oreItem!!.qty < 0L) throw Error("Item removal count is larger than what was on the slot")
@@ -109,7 +109,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                     // add to the inventory slot
                     if (smelter.fireboxItem != null && addCount1 >= 1L) {
                         getPlayerInventory().add(smelter.fireboxItem!!.itm, addCount2)
-                        smelter.fireboxItem!!.qty -= addCount2
+                        smelter.changeFireboxItemCount(-addCount2)
                     }
                     // remove from the inventory slot
                     else if (addCount1 <= -1L) {
@@ -117,7 +117,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                         if (smelter.fireboxItem == null)
                             smelter.fireboxItem = InventoryPair(itemToUse, -addCount2)
                         else
-                            smelter.fireboxItem!!.qty -= addCount2
+                            smelter.changeFireboxItemCount(-addCount2)
                     }
                     if (smelter.fireboxItem != null && smelter.fireboxItem!!.qty == 0L) smelter.fireboxItem = null
                     else if (smelter.fireboxItem != null && smelter.fireboxItem!!.qty < 0L) throw Error("Item removal count is larger than what was on the slot")
@@ -143,8 +143,8 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
     private val smelterCellIcons = CommonResourcePool.getAsTextureRegionPack("basegame_gui_smelter_icons")
 
-    private var smelterBackdrop =
-        FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/smelter_tall.tga")
+    private var smelterBackdrops =
+        CommonResourcePool.getAsTextureRegionPack("basegame/sprites/fixtures/smelter_tall.tga")
 
 
     private val leftPanelWidth = playerThings.width
@@ -154,8 +154,8 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
     private val backdropColour = Color(0x999999_c8.toInt())
     private val backdropZoom = 6
-    private val backdropX = (leftPanelX + (leftPanelWidth - smelterBackdrop.regionWidth * backdropZoom) / 2).toFloat()
-    private val backdropY = (leftPanelY + (leftPanelHeight - smelterBackdrop.regionHeight * backdropZoom) / 2).toFloat()
+    private val backdropX = (leftPanelX + (leftPanelWidth - smelterBackdrops.tileW * backdropZoom) / 2).toFloat()
+    private val backdropY = (leftPanelY + (leftPanelHeight - smelterBackdrops.tileH * backdropZoom) / 2).toFloat()
 
     private val oreX = backdropX + 12 * backdropZoom + 6
     private val oreY = backdropY + 23 * backdropZoom + 3
@@ -209,8 +209,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
                 if (removeCount != null) {
                     getPlayerInventory().add(smelter.oreItem!!.itm, removeCount)
-                    smelter.oreItem!!.qty -= removeCount
-                    if (smelter.oreItem!!.qty == 0L) smelter.oreItem = null
+                    smelter.changeOreItemCount(-removeCount)
                 }
                 itemListUpdateKeepCurrentFilter()
             }
@@ -231,12 +230,12 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                 // add to the slot
                 if (removeCount1 >= 1L) {
                     playerInventory.remove(smelter.oreItem!!.itm, removeCount2)
-                    smelter.oreItem!!.qty += removeCount2
+                    smelter.changeOreItemCount(removeCount2)
                 }
                 // remove from the slot
                 else if (removeCount1 <= -1L) {
                     getPlayerInventory().add(smelter.oreItem!!.itm, -removeCount2)
-                    smelter.oreItem!!.qty += removeCount2
+                    smelter.changeOreItemCount(removeCount2)
                 }
                 if (smelter.oreItem!!.qty == 0L) smelter.oreItem = null
                 itemListUpdateKeepCurrentFilter()
@@ -268,8 +267,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
                 if (removeCount != null) {
                     getPlayerInventory().add(smelter.fireboxItem!!.itm, removeCount)
-                    smelter.fireboxItem!!.qty -= removeCount
-                    if (smelter.fireboxItem!!.qty == 0L) smelter.fireboxItem = null
+                    smelter.changeFireboxItemCount(-removeCount)
                 }
                 itemListUpdateKeepCurrentFilter()
             }
@@ -290,12 +288,12 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                 // add to the slot
                 if (removeCount1 >= 1L) {
                     playerInventory.remove(smelter.fireboxItem!!.itm, removeCount2)
-                    smelter.fireboxItem!!.qty += removeCount2
+                    smelter.changeFireboxItemCount(removeCount2)
                 }
                 // remove from the slot
                 else if (removeCount1 <= -1L) {
                     getPlayerInventory().add(smelter.fireboxItem!!.itm, -removeCount2)
-                    smelter.fireboxItem!!.qty += removeCount2
+                    smelter.changeFireboxItemCount(removeCount2)
                 }
                 if (smelter.fireboxItem!!.qty == 0L) smelter.fireboxItem = null
                 itemListUpdateKeepCurrentFilter()
@@ -327,8 +325,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
                 if (removeCount != null) {
                     getPlayerInventory().add(smelter.productItem!!.itm, removeCount)
-                    smelter.productItem!!.qty -= removeCount
-                    if (smelter.productItem!!.qty == 0L) smelter.productItem = null
+                    smelter.changeProductItemCount(-removeCount)
                 }
                 itemListUpdateKeepCurrentFilter()
             }
@@ -345,7 +342,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                 // remove from the slot
                 if (removeCount1 <= -1L) {
                     getPlayerInventory().add(smelter.productItem!!.itm, -removeCount2)
-                    smelter.productItem!!.qty += removeCount2
+                    smelter.changeProductItemCount(removeCount2)
                 }
                 if (smelter.productItem!!.qty == 0L) smelter.productItem = null
                 itemListUpdateKeepCurrentFilter()
@@ -507,11 +504,13 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = backdropColour
-        batch.draw(smelterBackdrop, backdropX, backdropY, smelterBackdrop.regionWidth * 6f, smelterBackdrop.regionHeight * 6f)
+//        batch.draw(smelterBackdrops.get(1,0), backdropX, backdropY, smelterBackdrops.tileW * 6f, smelterBackdrops.tileH * 6f)
+//        batch.color = backdropColour mul Color(1f, 1f, 1f, smelter.temperature)
+        batch.draw(smelterBackdrops.get(0,0), backdropX, backdropY, smelterBackdrops.tileW * 6f, smelterBackdrops.tileH * 6f)
 
         uiItems.forEach { it.render(frameDelta, batch, camera) }
 
-        drawProgressGauge(batch, oreItemSlot.posX, oreItemSlot.posY, smelter.progress)
+        drawProgressGauge(batch, oreItemSlot.posX, oreItemSlot.posY, smelter.progress.toFloat() / FixtureSmelterBasic.CALORIES_PER_ROASTING)
         drawProgressGauge(batch, fireboxItemSlot.posX, fireboxItemSlot.posY, (smelter.fuelCaloriesNow / (smelter.fuelCaloriesMax ?: Double.POSITIVE_INFINITY)).toFloat())
         drawThermoGauge(batch, thermoX, thermoY, smelter.temperature)
 
@@ -561,6 +560,8 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
      * @param y y-position of the inventory cell that will have the gauge
      */
     private fun drawProgressGauge(batch: SpriteBatch, x: Int, y: Int, percentage: Float) {
+        val percentage = percentage.coerceIn(0f, 1f)
+
         batch.color = Toolkit.Theme.COL_CELL_FILL
         Toolkit.fillArea(batch, x - 7, y, 6, UIItemInventoryElemSimple.height)
 
@@ -574,6 +575,8 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     }
 
     private fun drawThermoGauge(batch: SpriteBatch, x: Int, y: Int, percentage: Float) {
+        val percentage = percentage.coerceIn(0f, 1f)
+
         batch.color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER
         Toolkit.drawStraightLine(batch, x, y - 1, x + 4, 1, false)
         Toolkit.drawStraightLine(batch, x, y + UIItemInventoryElemSimple.height + 7, x + 4, 1, false)
