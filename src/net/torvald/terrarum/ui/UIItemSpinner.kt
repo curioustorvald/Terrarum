@@ -83,7 +83,7 @@ class UIItemSpinner(
         fboUpdateLatch = true
     }
 
-    private fun changeValueBy(diff: Int) {
+    fun changeValueBy(diff: Int) {
         currentIndex = (currentIndex + diff).coerceIn(values.indices)
         value = values[currentIndex]
     }

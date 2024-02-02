@@ -155,14 +155,9 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
                         val recipe = recipe as CraftingCodex.CraftingRecipe
 
                         // change selected recipe to mostViableRecipe then update the UIs accordingly
-                        // FIXME recipe highlighting will not change correctly!
                         val selectedItems = ArrayList<ItemID>()
 
-                        // auto-dial the spinner so that player would just have to click the Craft! button (for the most time, that is)
-                        val howManyRequired = craftMult * amount
-                        val howManyPlayerHas = player.searchByID(gameItem.dynamicID)?.qty ?: 0
-                        val howManyPlayerMightNeed = ceil((howManyRequired - howManyPlayerHas).toDouble() / recipe.moq).toLong()
-                        resetSpinner(howManyPlayerMightNeed.coerceIn(1L, App.getConfigInt("basegame:gameplay_max_crafting").toLong()))
+                        resetSpinner()
 
                         ingredients.clear()
                         recipeClicked = recipe
@@ -372,10 +367,10 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         refreshCraftButtonStatus()
     }
 
-    private fun resetSpinner(value: Long = 1L) {
+    private fun resetSpinner() {
         spinnerCraftCount.resetToSmallest()
-        itemListIngredients.numberMultiplier = value
-        itemListCraftable.numberMultiplier = value
+        itemListIngredients.numberMultiplier = 1L
+        itemListCraftable.numberMultiplier = 1L
     }
 
     private var openingClickLatched = false

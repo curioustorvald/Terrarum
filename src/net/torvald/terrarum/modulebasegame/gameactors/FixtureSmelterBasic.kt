@@ -13,13 +13,9 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleVanishingSprite
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
-import net.torvald.terrarum.modulebasegame.ui.UICrafting
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UISmelterBasic
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -79,6 +75,8 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
         this.mainUI = UISmelterBasic(this)
     }
+
+    @Transient val light = Cvec(0.5f, 0.18f, 0f, 0f)
 
     @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 2*TILE_SIZED, TILE_SIZED * 2, TILE_SIZED * 2), Cvec(0.5f, 0.18f, 0f, 0f)))
 
@@ -265,8 +263,15 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
             progress = 0f
         }
 
+        // update lightbox
+        lightBoxList.forEach {
+            it.light = light.cpy().mul(temperature)
+        }
 
-        spawnTimer += delta
+        if (temperature > 0.001f)
+            spawnTimer += delta
+        else
+            spawnTimer = 0f
     }
 
 }
