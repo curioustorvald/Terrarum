@@ -76,8 +76,8 @@ class UIItemInventoryElemSimple(
         }
         // cell border
         batch.color = if (highlightToMainCol) colourTheme.cellHighlightMainCol
-                else if (highlightToSubCol) colourTheme.cellHighlightSubCol
                 else if (mouseUp && (item != null || updateOnNull)) colourTheme.cellHighlightMouseUpCol
+                else if (highlightToSubCol) colourTheme.cellHighlightSubCol
                 else colourTheme.cellHighlightNormalCol
         Toolkit.drawBoxBorder(batch, posX, posY, width, height)
 

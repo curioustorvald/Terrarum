@@ -120,7 +120,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         val buttonWidth = (UIItemInventoryElemWide.height + listGap) * 3 - listGap - 2
 
         // ingredient list
-        itemListIngredients =  UIItemInventoryItemGrid(
+        itemListIngredients = UIItemInventoryItemGrid(
             this,
             { ingredients },
             thisOffsetX,
@@ -135,7 +135,8 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
             keyDownFun = { _, _, _, _, _ -> },
             wheelFun = { _, _, _, _, _, _ -> },
             touchDownFun = { gameItem, amount, _, _, _ -> gameItem?.let { gameItem ->
-                // if the item is craftable one, load its recipe instead
+                // if the clicked item is craftable one, present its recipe to the player //
+
                 CraftingRecipeCodex.getRecipesFor(gameItem.originalID)?.let { recipes ->
                     // select most viable recipe (completely greedy search)
                     val player = getPlayerInventory()
@@ -150,7 +151,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
 
                         listOf(score, items, recipe)
                     }.maxByOrNull { it[0] as Long }?.let { (_, items, recipe) ->
-                        val items = items as List<List<*>>
+                        val items = items as List<RecipeIngredientRecord>
                         val recipe = recipe as CraftingCodex.CraftingRecipe
 
                         // change selected recipe to mostViableRecipe then update the UIs accordingly
@@ -167,8 +168,8 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
                         recipeClicked = recipe
 
                         items.forEach {
-                            val itm = it[0] as ItemID
-                            val qty = it[2] as Long
+                            val itm = it.selectedItem
+                            val qty = it.howManyRecipeWants
 
                             selectedItems.add(itm)
                             ingredients.add(itm, qty)
@@ -176,30 +177,14 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
 
                         _getItemListPlayer().let {
                             it.removeFromForceHighlightList(oldSelectedItems)
-                            filterPlayerListUsing(recipeClicked)
+                            //filterPlayerListUsing(recipeClicked) // ???
                             it.addToForceHighlightList(selectedItems)
-                            it.rebuild(FILTER_CAT_ALL)
+                            filterPlayerListUsing(recipeClicked)
                         }
+
                         _getItemListIngredients().rebuild(FILTER_CAT_ALL)
 
-                        // highlighting CraftingCandidateButton by searching for the buttons that has the recipe
-                        _getItemListCraftables().let {
-                            // turn the highlights off
-                            it.items.forEach { it.forceHighlighted = false }
-
-                            // search for the recipe
-                            // also need to find what "page" the recipe might be in
-                            // use it.isCompactMode to find out the current mode
-                            var ord = 0
-                            while (ord < it.craftingRecipes.indices.last) {
-                                if (recipeClicked == it.craftingRecipes[ord]) break
-                                ord += 1
-                            }
-                            val itemSize = it.items.size
-
-                            it.itemPage = ord / itemSize
-                            it.items[ord % itemSize].forceHighlighted = true
-                        }
+                        _getItemListCraftables().highlightRecipe(recipeClicked, true)
 
                         oldSelectedItems.clear()
                         oldSelectedItems.addAll(selectedItems)

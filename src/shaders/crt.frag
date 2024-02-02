@@ -40,6 +40,6 @@ void main(void) {
         out_color = out_color * scanline_darkening;
     }
 
-    fragColor = vec4(out_color, 1);
+    fragColor = vec4(out_color, color.a);
     //fragColor = texture(u_texture, v_texCoords);
 }

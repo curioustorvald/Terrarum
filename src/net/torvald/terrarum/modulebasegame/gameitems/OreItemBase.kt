@@ -35,6 +35,7 @@ class ItemLogsOak(originalID: ItemID) : OreItemBase(originalID) {
     override val materialId = "WOOD"
     override var calories = 1920.0
     override var smokiness = 0.2f
+    override var smeltingProduct: ItemID? = "item@basegame:29"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,10)
 
@@ -48,6 +49,7 @@ class ItemLogsEbony(originalID: ItemID) : OreItemBase(originalID) {
     override val materialId = "WOOD"
     override var calories = 1920.0
     override var smokiness = 0.2f
+    override var smeltingProduct: ItemID? = "item@basegame:29"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,10)
 
@@ -61,6 +63,7 @@ class ItemLogsBirch(originalID: ItemID) : OreItemBase(originalID) {
     override val materialId = "WOOD"
     override var calories = 1920.0
     override var smokiness = 0.2f
+    override var smeltingProduct: ItemID? = "item@basegame:29"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,10)
 
@@ -74,6 +77,7 @@ class ItemLogsRosewood(originalID: ItemID) : OreItemBase(originalID) {
     override val materialId = "WOOD"
     override var calories = 1920.0
     override var smokiness = 0.2f
+    override var smeltingProduct: ItemID? = "item@basegame:29"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,10)
 
@@ -179,6 +183,13 @@ class ItemCoalCoke(originalID: ItemID) : OreItemBase(originalID) {
     override var smokiness = 0.4f
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,6)
+}
+class ItemCharcoal(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_CHARCOAL"
+    override var calories = 4800.0
+    override var smokiness = 0.3f
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(12,6)
 }
 class IngotCopper(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_INGOT_COPPER"

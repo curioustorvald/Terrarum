@@ -40,14 +40,34 @@ class UIItemCraftingCandidateGrid(
 
     private var highlightedRecipe: CraftingCodex.CraftingRecipe? = null
 
-    fun highlightRecipe(recipe: CraftingCodex.CraftingRecipe?) {
+    fun highlightRecipe(recipe: CraftingCodex.CraftingRecipe?, changePage: Boolean = false) {
         items.forEach { it.forceHighlighted = false }
 
         highlightedRecipe = recipe
 
-        recipe?.let {
-            items.find { it.extraInfo == recipe }?.let { buttonFound ->
-                buttonFound.forceHighlighted = true
+        // search for the recipe
+        // also need to find what "page" the recipe might be in
+        // use it.isCompactMode to find out the current mode
+        var ord = 0
+        var found = false
+        while (ord < craftingRecipes.indices.last) {
+            if (recipe == craftingRecipes[ord]) {
+                found = true
+                break
+            }
+            ord += 1
+        }
+        val itemSize = items.size
+        val newPage = ord / itemSize
+
+        if (found) {
+            if (changePage) {
+                itemPage = newPage
+                items[ord % itemSize].forceHighlighted = true
+            }
+            // if we are on the same page, highlight the cell; otherwise, do nothing
+            else if (itemPage == newPage) {
+                items[ord % itemSize].forceHighlighted = true
             }
         }
     }
