@@ -86,10 +86,12 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
         val thre = this - ibase
         return if (nextDouble(x, y, h) < 1.0 - thre) ibase else ibase + 1
     }
-    
+
+    private val speciesSlot = arrayOf(0,0,0,0,0,0,0,0,2,2,2,2,1,1,3,3)
 
     private fun tryToPlant(xs: IntProgression, ys: Int, grassMap: Array<List<Int>>) {
-        val treeSpecies = 0
+        val speciesIndex = nextDouble(xs.first, ys, 594188903 xor world.generatorSeed.toInt()).times(speciesSlot.size).toInt()
+        val treeSpecies = speciesSlot[speciesIndex]
 
 
         // single "slice" is guaranteed to be 9 blocks wide
@@ -155,7 +157,10 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
                 if (treeToSpawn[0] != 0) {
                     val treeSize = arrayOf(null, 0, 1, 2)[treeToSpawn[0]]
                     grassMap[plot1].let { if (it.isEmpty()) null else it.takeRand(xs.first + plot1, ys, 4567) }?.let {
-                        plantTree(world, xs.first + plot1, it, treeSpecies, treeSize!!)
+                        if (treeSize == 0) // shrubs are always oak
+                            plantTree(world, xs.first + plot1, it, 0, treeSize!!)
+                        else
+                            plantTree(world, xs.first + plot1, it, treeSpecies, treeSize!!)
                     }
                 }
             }
