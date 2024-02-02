@@ -89,33 +89,6 @@ class ItemLogsRosewood(originalID: ItemID) : OreItemBase(originalID) {
 
 
 
-class ItemSeedOak(originalID: ItemID) : OreItemBase(originalID) {
-    override var originalName = "ITEM_SEED_OAK"
-    override val materialId = "OOZE"
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,11)
-}
-class ItemSeedEbony(originalID: ItemID) : OreItemBase(originalID) {
-    override var originalName = "ITEM_SEED_EBONY"
-    override val materialId = "OOZE"
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,11)
-}
-class ItemSeedBirch(originalID: ItemID) : OreItemBase(originalID) {
-    override var originalName = "ITEM_SEED_BIRCH"
-    override val materialId = "OOZE"
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,11)
-}
-class ItemSeedRosewood(originalID: ItemID) : OreItemBase(originalID) {
-    override var originalName = "ITEM_SEED_ROSEWOOD"
-    override val materialId = "OOZE"
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,11)
-}
-
-
-
 class OreStick(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_WOOD_STICK"
     override val materialId = "WOOD"

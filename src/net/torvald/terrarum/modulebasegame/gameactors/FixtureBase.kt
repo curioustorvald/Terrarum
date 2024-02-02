@@ -245,6 +245,13 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         }
     }
 
+    /**
+     * Condition for (if the tile is solid) is always implied regardless of this function. See [canSpawnHere0]
+     */
+    open fun canSpawnOnThisFloor(itemID: ItemID): Boolean {
+        return true
+    }
+
     fun canSpawnHere(posX0: Int, posY0: Int): Boolean {
         val posX = (posX0 - blockBox.width.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
         val posY = posY0 - blockBox.height + 1
@@ -269,7 +276,11 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         if (spawnNeedsFloor) {
             val y = posY + blockBox.height
             val xs = posX until posX + blockBox.width
-            cannotSpawn = cannotSpawn or xs.any { x -> !BlockCodex[world!!.getTileFromTerrain(x, y)].isSolid }
+            cannotSpawn = cannotSpawn or xs.any { x ->
+                world!!.getTileFromTerrain(x, y).let {
+                    !BlockCodex[it].isSolid || !canSpawnOnThisFloor(it)
+                }
+            }
         }
 
         return !cannotSpawn
@@ -297,7 +308,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         val posY = posY0 - blockBox.height + 1
 
         if (!canSpawnHere(posX0, posY0)) {
-            printdbg(this, "cannot spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
+            printdbg(this, "cannot spawn fixture1 ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
+            printStackTrace(this)
             return false
         }
         printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
@@ -313,6 +325,12 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
                 posY * TILE_SIZED,
                 blockBox.width * TILE_SIZED,
                 blockBox.height * TILE_SIZED
+        )
+        this.intTilewiseHitbox.setFromWidthHeight(
+            posX.toDouble(),
+            posY.toDouble(),
+            blockBox.width.toDouble(),
+            blockBox.height.toDouble()
         )
 
         // actually add this actor into the world
@@ -399,10 +417,16 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
                 blockBox.width * TILE_SIZED,
                 blockBox.height * TILE_SIZED
         )
+        this.intTilewiseHitbox.setFromWidthHeight(
+            posX.toDouble(),
+            posY.toDouble(),
+            blockBox.width.toDouble(),
+            blockBox.height.toDouble()
+        )
 
         // check for existing blocks (and fixtures)
         if (!canSpawnHere0(posX, posY)) {
-            printdbg(this, "cannot spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
+            printdbg(this, "cannot spawn fixture2 ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
             return false
         }
         printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
@@ -471,21 +495,10 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
     protected var dropItem = false
 
+    /**
+     * This function MUST BE super-called for make despawn call to work at all.
+     */
     override fun update(delta: Float) {
-        // FIXME retrieving fixture by mining relied on a quirk that mining a actorblock would also drop the fixture.
-        // FIXME since that particular method of operation causes so much problems, it is required to implement the
-        // FIXME said feature "correctly"
-        /*if (!flagDespawn && worldBlockPos != null) {
-            // removal-by-player because player is removing the filler block by pick
-            // no-flagDespawn check is there to prevent item dropping when externally despawned
-            // (e.g. picked the fixture up in which case the fixture must not drop itself to the world; it must go into the actor's inventory)
-            forEachBlockbox { x, y, _, _ ->
-                if (!BlockCodex[world!!.getTileFromTerrain(x, y)].isActorBlock) {
-                    flagDespawn = true
-                    dropItem = true
-                }
-            }
-        }*/
         if (!canBeDespawned) flagDespawn = false // actively deny despawning request if cannot be despawned
         if (canBeDespawned && flagDespawn) despawn()
         if (canBeDespawned && dropItem) dropSelfAsAnItem()
