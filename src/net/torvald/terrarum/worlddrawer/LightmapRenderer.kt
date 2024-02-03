@@ -876,10 +876,8 @@ object LightmapRenderer {
 
         printdbg(this, "Resize event")
     }
-
-//    private const val clip_p = 0.277777f // knee of around -1.94dB
-    private const val clip_p = 0.349f // knee of around -3.01dB
-//    private const val clip_p = 0.44444f // knee of around -6.02dB
+    
+    private const val clip_p = 0.44444f // knee of around -6.02dB
     private val clip_p1 = sqrt(1.0f - 2.0f * clip_p)
     private val clip_lim = 1.0f / (1.0f + clip_p1)
     /**
