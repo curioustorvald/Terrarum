@@ -8,6 +8,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.InventoryCellColourTheme
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
@@ -161,19 +162,18 @@ class UIItemInventoryElemWide(
 
 
             // set tooltip accordingly
-            if (IS_DEVELOPMENT_BUILD && tooltipShowing[hash] != true && item != null && mouseUp) {
+            if (tooltipShowing[hash] != true && item != null && mouseUp) {
 //                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
 
                 val grey = App.fontGame.toColorCode(11, 11, 11)
                 val itemIDstr = "\n$grey(${item?.originalID}${if (item?.originalID == item?.dynamicID) "" else "/${item?.dynamicID}"})"
-                val nameStr = if (item?.nameSecondary?.isNotBlank() == true) "${item?.name}\n$grey${item?.nameSecondary}" else "${item?.name}"
+                val nameStr0 = if (item?.nameSecondary?.isNotBlank() == true) "${item?.name}\n$grey${item?.nameSecondary}" else "${item?.name}"
+                val nameStr = if (App.IS_DEVELOPMENT_BUILD) nameStr0 + itemIDstr else nameStr0
+                val descStr = Lang.getOrNull("TOOLTIP_${item?.originalID}")?.replace("\n","\n$grey")
 
-                INGAME.setTooltipMessage(
-                    if (App.IS_DEVELOPMENT_BUILD)
-                        nameStr + itemIDstr
-                    else
-                        nameStr
-                )
+                val finalStr = if (descStr != null) "$nameStr\n$grey$descStr" else nameStr
+
+                INGAME.setTooltipMessage(finalStr)
 
                 tooltipShowing[hash] = true
 //                printdbg(this, tooltipShowing.entries)

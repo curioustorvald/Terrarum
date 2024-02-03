@@ -1,0 +1,45 @@
+{
+  "TOOLTIP_basegame:256": "Provides stable light",
+  "TOOLTIP_basegame:257": "Provides a light equal to the sun", /* it literally does -- provides the sunlight of the exact hour (emits "moonlight" at night time) */
+  "TOOLTIP_basegame:258": "Provides a light equal to the sun at noon",
+
+  "TOOLTIP_wire@basegame:8192": "Carries signals",
+  "TOOLTIP_wire@basegame:8193": "Carries signals",
+  "TOOLTIP_wire@basegame:8194": "Carries signals",
+  "TOOLTIP_wire@basegame:8196": "Carries power",
+  "TOOLTIP_wire@basegame:8197": "Carries power",
+  "TOOLTIP_wire@basegame:8198": "Carries information",
+
+  "TOOLTIP_item@basegame:1": "Breaks rocks",
+  "TOOLTIP_item@basegame:2": "Breaks rocks",
+  "TOOLTIP_item@basegame:3": "Breaks rocks",
+  "TOOLTIP_item@basegame:4": "Breaks down walls",
+  "TOOLTIP_item@basegame:5": "Provides light but fancier",
+  "TOOLTIP_item@basegame:6": "“I am sworn to keep your burdens.”", /* skyrim/lydia reference */
+  "TOOLTIP_item@basegame:8": "Emits a signal",
+  "TOOLTIP_item@basegame:9": "An electricians’ best friend",
+  "TOOLTIP_item@basegame:10": "“Who needs a Book and Quill when you’ve got this?”", /* a jab on the Minecraft item Book and Quill */
+  "TOOLTIP_item@basegame:11": "Tells what day it is",
+  "TOOLTIP_item@basegame:12": "Breaks down walls",
+  "TOOLTIP_item@basegame:13": "Breaks down walls",
+  "TOOLTIP_item@basegame:14": "Breaks rocks, just barely",
+  "TOOLTIP_item@basegame:15": "Breaks down walls",
+  "TOOLTIP_item@basegame:16": "The most essential crafting table",
+  "TOOLTIP_item@basegame:17": "“Burn a rock and a metal drools out? What madness is this?”",
+  "TOOLTIP_item@basegame:18": "It’s just a stick",
+  "TOOLTIP_item@basegame:19": "Cuts trees",
+  "TOOLTIP_item@basegame:20": "Cuts trees",
+  "TOOLTIP_item@basegame:21": "Cuts trees",
+  "TOOLTIP_item@basegame:22": "Cuts trees, just barely",
+  "TOOLTIP_item@basegame:23": "Cuts trees",
+  "TOOLTIP_item@basegame:24": "Breaks rocks",
+  "TOOLTIP_item@basegame:25": "Finer grains of dirts that gets stronger when burned",
+  /* 26 is Steel Ingot */
+  "TOOLTIP_item@basegame:27": "Every blacksmith gotta start from somewhere",
+  "TOOLTIP_item@basegame:28": "A music vending machine (free to play)",
+  "TOOLTIP_item@basegame:29": "A coal lookalike that burns just as well and is renewable",
+
+  "TOOLTIP_item@basegame:114": "A precious fuel for the steel production",
+
+  "TOOLTIP_item@basegame:320": "Travel multiverse!\nWarning: a pair is needed for the return trip"
+}

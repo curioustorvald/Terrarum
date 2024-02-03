@@ -1,0 +1,45 @@
+{
+  "TOOLTIP_basegame:256": "흔들리지 않는 빛을 냅니다",
+  "TOOLTIP_basegame:257": "태양과 같은 빛을 냅니다", /* it literally does -- provides the sunlight of the exact hour (emits "moonlight" at night time) */
+  "TOOLTIP_basegame:258": "한낮의 태양과 같은 빛을 냅니다",
+
+  "TOOLTIP_wire@basegame:8192": "신호를 전달합니다",
+  "TOOLTIP_wire@basegame:8193": "신호를 전달합니다",
+  "TOOLTIP_wire@basegame:8194": "신호를 전달합니다",
+  "TOOLTIP_wire@basegame:8196": "전력을 전달합니다",
+  "TOOLTIP_wire@basegame:8197": "전력을 전달합니다",
+  "TOOLTIP_wire@basegame:8198": "정보를 전달합니다",
+
+  "TOOLTIP_item@basegame:1": "돌을 부숩니다",
+  "TOOLTIP_item@basegame:2": "돌을 부숩니다",
+  "TOOLTIP_item@basegame:3": "돌을 부숩니다",
+  "TOOLTIP_item@basegame:4": "벽을 부숩니다",
+  "TOOLTIP_item@basegame:5": "빛을 더 이쁘게 냅니다",
+  "TOOLTIP_item@basegame:6": "“짐을 맡아두기로 한 몸이니까요.”", /* skyrim/lydia reference */
+  "TOOLTIP_item@basegame:8": "신호를 만들어냅니다",
+  "TOOLTIP_item@basegame:9": "전기공의 친한 친구",
+  "TOOLTIP_item@basegame:10": "“이게 있는데 책과 깃펜이 왜 필요하죠?”", /* a jab on the Minecraft item Book and Quill */
+  "TOOLTIP_item@basegame:11": "오늘이 무슨 날인지 알려줍니다",
+  "TOOLTIP_item@basegame:12": "벽을 부숩니다",
+  "TOOLTIP_item@basegame:13": "벽을 부숩니다",
+  "TOOLTIP_item@basegame:14": "돌을 간신히 부숩니다",
+  "TOOLTIP_item@basegame:15": "벽을 부숩니다",
+  "TOOLTIP_item@basegame:16": "가장 필수적인 조합대",
+  "TOOLTIP_item@basegame:17": "“돌을 태우면 쇠가 녹아서 떨어진다고? 이 뭔 개소리야?”", /* 태왕사신기 */
+  "TOOLTIP_item@basegame:18": "그냥 막대기예요",
+  "TOOLTIP_item@basegame:19": "나무를 자릅니다",
+  "TOOLTIP_item@basegame:20": "나무를 자릅니다",
+  "TOOLTIP_item@basegame:21": "나무를 자릅니다",
+  "TOOLTIP_item@basegame:22": "나무를 간신히 자릅니다",
+  "TOOLTIP_item@basegame:23": "나무를 자릅니다",
+  "TOOLTIP_item@basegame:24": "돌을 부숩니다",
+  "TOOLTIP_item@basegame:25": "태우면 더 단단해지는 고운 흙입니다",
+  /* 26 is Steel Ingot */
+  "TOOLTIP_item@basegame:27": "모든 대장장이는 초보 시절이 있는 법이죠",
+  "TOOLTIP_item@basegame:28": "음악 자판기입이다 (무료 플레이)",
+  "TOOLTIP_item@basegame:29": "석탄과 비슷하고 똑같이 잘 타지만 재생 가능합니다",
+
+  "TOOLTIP_item@basegame:114": "강철 생산의 소중한 연료입니다",
+
+  "TOOLTIP_item@basegame:320": "멀티버스를 여행하세요!\n경고: 2개를 만들어야 왕복이 가능합니다"
+}

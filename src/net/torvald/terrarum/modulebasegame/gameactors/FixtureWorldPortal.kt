@@ -91,7 +91,8 @@ class FixtureWorldPortal : Electric {
 
                     val ingame = TerrarumIngame(App.batch)
                     val worldParam = TerrarumIngame.NewGameParams(player, it.worldLoadParam) { ingame ->
-                        val world = ingame.world
+                        // I SCRAP THIS IDEA: it makes the game way too easy
+                        /*val world = ingame.world
 
                         // flatten terrain
                         for (x in world.spawnX - 2..world.spawnX + 2) {
@@ -111,7 +112,7 @@ class FixtureWorldPortal : Electric {
                         printdbg(this, "Portal new world callback; spawning portal at ${world.spawnX}, ${world.spawnY - 1}")
                         FixtureWorldPortal().spawn(world.spawnX, world.spawnY - 1, player.uuid)
                         printdbg(this, "Spawn complete")
-
+                        */
                     }
                     ingame.gameLoadInfoPayload = worldParam
                     ingame.gameLoadMode = TerrarumIngame.GameLoadMode.CREATE_NEW

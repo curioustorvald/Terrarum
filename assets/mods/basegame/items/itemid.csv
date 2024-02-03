@@ -24,6 +24,7 @@ id;classname;tags
 23;net.torvald.terrarum.modulebasegame.gameitems.PickaxeStone;TOOL,PICK
 24;net.torvald.terrarum.modulebasegame.gameitems.AxeStone;TOOL,AXE
 25;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBall;
+
 27;net.torvald.terrarum.modulebasegame.gameitems.ItemFurnaceAndAnvil;FIXTURE,CRAFTING
 28;net.torvald.terrarum.modulebasegame.gameitems.ItemJukebox;FIXTURE,MUSIC
 29;net.torvald.terrarum.modulebasegame.gameitems.ItemCharcoal;COMBUSTIBLE

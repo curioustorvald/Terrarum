@@ -124,7 +124,9 @@ object Lang {
     private val bindOp = ">>="
 
     fun getOrNull(key: String?, capitalise: Boolean = true) =
-        if (key == null) null else get(key, capitalise)
+        if (key == null) null else get(key, capitalise).let {
+            if (it.startsWith("$")) null else it
+        }
 
     /**
      * Syntax example:
