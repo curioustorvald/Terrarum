@@ -126,6 +126,7 @@ object UIItemInventoryCellCommonRes {
     /**
      * Special hash values:
      * - 10001: Encumbrance bar
+     * - 10002: Pickaxe
      */
     val tooltipShowing = HashMap<Long, Boolean>() // Long: `hash` field on UIItemInventoryItemGrid
 }

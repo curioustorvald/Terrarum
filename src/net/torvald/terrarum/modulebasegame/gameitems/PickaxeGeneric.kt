@@ -18,6 +18,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.TOOL_DURABILITY_BASE
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag
 import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
@@ -26,6 +27,8 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2019-03-10.
  */
 object PickaxeCore {
+    private val hash = 10002L
+
     /**
      * @param mx centre position of the digging
      * @param my centre position of the digging
@@ -199,13 +202,14 @@ object PickaxeCore {
                         Lang[ItemCodex[itemForOre]!!.originalName]
                     else "???"
                     INGAME.setTooltipMessage(tileName)
+                    tooltipShowing[hash] = true
                     tooltipSet = true
                 }
 
                 true // just a placeholder
             }
 
-            if (!tooltipSet) INGAME.setTooltipMessage(null)
+            if (!tooltipSet) tooltipShowing[hash] = false
         }
     }
 }
