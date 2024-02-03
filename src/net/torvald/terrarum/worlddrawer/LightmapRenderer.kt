@@ -17,9 +17,7 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
 import java.util.*
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
+import kotlin.math.*
 
 /**
  * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
@@ -133,7 +131,6 @@ object LightmapRenderer {
     }
 
     init {
-        LightmapHDRMap.invoke()
         printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
     }
 
@@ -730,18 +727,18 @@ object LightmapRenderer {
                         /*lightBuffer.drawPixel(
                             x - this_x_start,
                             lightBuffer.height - 1 - y + this_y_start, // flip Y
-                                (max(red,grnw,bluw,uvlwr) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
-                                        (max(redw,grn,bluw,uvlwg) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
-                                        (max(redw,grnw,blu,uvlwb) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
-                                        (max(bluwv,uvl) * solidMultMagic).hdnorm().times(255f).roundToInt()
+                                (max(red,grnw,bluw,uvlwr) * solidMultMagic).tonemap().times(255f).roundToInt().shl(24) or
+                                        (max(redw,grn,bluw,uvlwg) * solidMultMagic).tonemap().times(255f).roundToInt().shl(16) or
+                                        (max(redw,grnw,blu,uvlwb) * solidMultMagic).tonemap().times(255f).roundToInt().shl(8) or
+                                        (max(bluwv,uvl) * solidMultMagic).tonemap().times(255f).roundToInt()
                         )*/
                             lightBuffer.drawPixel(
                                 x - this_x_start,
                                 lightBuffer.height - 1 - y + this_y_start, // flip Y
-                                (red * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
-                                        (grn * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
-                                        (blu * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
-                                        (uvl * solidMultMagic).hdnorm().times(255f).roundToInt()
+                                (red * solidMultMagic).tonemap().times(255f).roundToInt().shl(24) or
+                                        (grn * solidMultMagic).tonemap().times(255f).roundToInt().shl(16) or
+                                        (blu * solidMultMagic).tonemap().times(255f).roundToInt().shl(8) or
+                                        (uvl * solidMultMagic).tonemap().times(255f).roundToInt()
                             )
                     }
                 }
@@ -764,7 +761,6 @@ object LightmapRenderer {
     }
 
     fun dispose() {
-        LightmapHDRMap.dispose()
         _lightBufferAsTex.dispose()
         lightBuffer.dispose()
 
@@ -846,26 +842,6 @@ object LightmapRenderer {
     fun Int.even(): Boolean = this and 1 == 0
     fun Int.odd(): Boolean = this and 1 == 1
 
-    // TODO: float LUT lookup using linear interpolation
-
-    // input: 0..1 for int 0..1023
-    fun hdr(intensity: Float): Float {
-        val intervalStart = (intensity / 4f * LightmapHDRMap.size).floorToInt()
-        val intervalEnd = (intensity / 4f * LightmapHDRMap.size).floorToInt() + 1
-
-        if (intervalStart == intervalEnd) return LightmapHDRMap[intervalStart]
-
-        val intervalPos = (intensity / 4f * LightmapHDRMap.size) - (intensity / 4f * LightmapHDRMap.size).toInt()
-
-        val ret = interpolateLinear(
-                intervalPos,
-                LightmapHDRMap[intervalStart],
-                LightmapHDRMap[intervalEnd]
-        )
-
-        return ret
-    }
-
     private var _init = false
 
     fun resize(screenW: Int, screenH: Int) {
@@ -901,16 +877,33 @@ object LightmapRenderer {
         printdbg(this, "Resize event")
     }
 
+//    private const val clip_p = 0.277777f // knee of around -1.94dB
+    private const val clip_p = 0.349f // knee of around -3.01dB
+//    private const val clip_p = 0.44444f // knee of around -6.02dB
+    private val clip_p1 = sqrt(1.0f - 2.0f * clip_p)
+    private val clip_lim = 1.0f / (1.0f + clip_p1)
+    /**
+     * https://www.desmos.com/calculator/syqd1byzzl
+     * @param x0 -0.5..0.5 ish
+     * @return -0.5..0.5
+     */
+    private fun clipfun0(x0: Float): Float {
+        val x = x0 * (1.0f + clip_p1) / 2.0f
+        val t = 0.5f * clip_p1
 
-    /** To eliminated visible edge on the gradient when 255/1023 is exceeded */
-    fun Color.normaliseToHDR() = Color(
-            hdr(this.r.coerceIn(0f, 1f)),
-            hdr(this.g.coerceIn(0f, 1f)),
-            hdr(this.b.coerceIn(0f, 1f)),
-            hdr(this.a.coerceIn(0f, 1f))
-    )
+        if (x0.absoluteValue >= clip_lim) return 0.5f * sign(x0)
 
-    inline fun Float.hdnorm() = hdr(this.coerceIn(0f, 1f))
+        val y0 = if (x < -t)
+             (x*x + x + 0.25f) / clip_p - 0.5f
+        else if (x > t)
+            -(x*x - x + 0.25f) / clip_p + 0.5f
+        else
+            x * 2.0f * clip_lim
+
+        return y0
+    }
+    
+    fun Float.tonemap() = clipfun0(this / 2f) * 2f
 
     private fun Cvec.nonZero() = this.r.abs() > epsilon ||
                                  this.g.abs() > epsilon ||

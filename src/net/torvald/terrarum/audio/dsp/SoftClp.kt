@@ -3,6 +3,7 @@ package net.torvald.terrarum.audio.dsp
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import kotlin.math.absoluteValue
 import kotlin.math.pow
+import kotlin.math.sign
 import kotlin.math.sqrt
 
 /**
@@ -36,31 +37,29 @@ object SoftClp : TerrarumAudioFilter(), DspCompressor {
         }
     }
 
+//    private const val clip_p = 0.277777f // knee of around -1.94dB
+    private const val clip_p = 0.349f // knee of around -3.01dB
+//    private const val clip_p = 0.44444f // knee of around -6.02dB
+    private val clip_p1 = sqrt(1.0f - 2.0f * clip_p)
+    private val clip_lim = 1.0f / (1.0f + clip_p1)
+
     /**
      * https://www.desmos.com/calculator/syqd1byzzl
      * @param x0 -0.5..0.5 ish
      * @return -0.5..0.5
      */
     private fun clipfun0(x0: Double): Double {
-//        val p = 0.277777 // knee of around -1.94dB
-        val p = 0.349 // knee of around -3.01dB
-//        val p = 0.44444 // knee of around -6.02dB
-        val p1 = sqrt(1.0 - 2.0 * p)
+        val x = x0 * (1.0f + clip_p1) / 2.0f
+        val t = 0.5f * clip_p1
 
-        val x = x0 * (1.0 + p1) / 2.0
-        val t = 0.5 * p1
-
-        val lim = 1.0 / (1.0 + p1)
-
-        if (x0 >= lim) return 0.5
-        if (x0 <= -lim) return -0.5
+        if (x0.absoluteValue >= clip_lim) return 0.5f * sign(x0)
 
         val y0 = if (x < -t)
-            (1.0 / p) * (x + 0.5).pow(2) - 0.5
+            (x*x + x + 0.25f) / clip_p - 0.5f
         else if (x > t)
-            -(1.0 / p) * (x - 0.5).pow(2) + 0.5
+            -(x*x - x + 0.25f) / clip_p + 0.5f
         else
-            x * 2.0 * lim
+            x * 2.0f * clip_lim
 
         return y0
     }
