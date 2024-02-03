@@ -33,7 +33,7 @@ open class DroppedItem : ActorWithBody {
 
     var itemCount = 1L
 
-    protected constructor()
+    protected constructor() : super(RenderOrder.OVERLAY, PhysProperties.PHYSICS_OBJECT)
 
     private var timeSinceSpawned = 0f
 
@@ -51,7 +51,7 @@ open class DroppedItem : ActorWithBody {
      * @param topLeftX world-wise coord
      * @param topLeftY world-wise coord
      */
-    constructor(itemID: ItemID, centreX: Double, bottomY: Double, spawnVelo: Vector2? = null) : super(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
+    constructor(itemID: ItemID, centreX: Double, bottomY: Double, spawnVelo: Vector2? = null) : super(RenderOrder.OVERLAY, PhysProperties.PHYSICS_OBJECT) {
         this.itemID = itemID
 
         if (itemID.isActor())
@@ -141,6 +141,8 @@ open class DroppedItem : ActorWithBody {
     }
 
     override fun update(delta: Float) {
+        renderOrder = RenderOrder.OVERLAY // for some reason the "overlaying" won't work without this
+
         if (this.itemID.isBlock() || this.itemID.isItem()) {
             this.lightBoxList[0].light = getLum(this.itemID)
         }
