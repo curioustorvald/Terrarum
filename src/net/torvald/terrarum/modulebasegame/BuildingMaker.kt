@@ -306,6 +306,8 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     var mousePrimaryJustDown = false; private set
 
     override fun render(updateRate: Float) {
+        IngameRenderer.setRenderedWorld(gameWorld)
+
         super.render(updateRate)
 
 

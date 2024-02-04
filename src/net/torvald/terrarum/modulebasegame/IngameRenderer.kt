@@ -180,27 +180,27 @@ object IngameRenderer : Disposable {
      * - When the game make transition to the new world (advancing to the next level/entering or exiting the room)
      */
     fun setRenderedWorld(world: GameWorld) {
-        printdbg(this, "Set new RenderedWorld (UUID=${world.worldIndex}) at time ${System.currentTimeMillis()}, called by:")
-        printStackTrace(this)
+//        printdbg(this, "Set new RenderedWorld (UUID=${world.worldIndex}) at time ${System.currentTimeMillis()} (disposed: ${world.disposed}), called by:")
+//        printStackTrace(this)
 
         try {
+
+            // change worlds from internal methods
+            this.world = world
+            LightmapRenderer.internalSetWorld(world)
+            BlocksDrawer.world = world
+            FeaturesDrawer.world = world
+
             if (this.world != world) {
 //                    printdbg(this, "World change detected -- " +
 //                                   "old world: ${this.world.hashCode()}, " +
 //                                   "new world: ${world.hashCode()}")
-
-                // change worlds from internal methods
-                this.world = world
-                LightmapRenderer.internalSetWorld(world)
-                BlocksDrawer.world = world
-                FeaturesDrawer.world = world
-
                 newWorldLoadedLatch = true
             }
         }
-        catch (e: UninitializedPropertyAccessException) {
+        catch (e: Throwable) {
+            e.printStackTrace()
             // new init, do nothing
-            this.world = world
         }
     }
 

@@ -3,7 +3,6 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
-import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.UICanvas
 
@@ -48,7 +47,7 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             if (it != oldBufferSize) {
                 oldBufferSize = it
 
-                App.renewAudioProcessor(it)
+                App.reloadAudioProcessor(it)
             }
         }
     }

@@ -810,6 +810,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
             gameFullyLoaded = true
         }
+        else {
+            IngameRenderer.setRenderedWorld(world) // this doesn't slow down the game and prevents world-changing related bugs
+        }
 
         super.render(updateRate)
 

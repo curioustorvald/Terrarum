@@ -309,6 +309,8 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private var introUncoverDeltaCounter = 0f
 
     override fun render(updateRate: Float) {
+        IngameRenderer.setRenderedWorld(demoWorld)
+
         super.render(updateRate)
         // async update and render
         gameUpdateGovernor.update(Gdx.graphics.deltaTime, App.UPDATE_RATE, updateScreen, renderScreen)

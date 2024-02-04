@@ -1246,7 +1246,7 @@ public class App implements ApplicationListener {
         printdbg(this, "PostInit done; took "+tms+" seconds");
     }
 
-    public static void renewAudioProcessor(int bufferSize) {
+    public static void reloadAudioProcessor(int bufferSize) {
         // copy music tracks
         var dynaicTracks = audioMixer.getDynamicTracks();
         var staticTracks = audioMixer.getTracks();
@@ -1280,6 +1280,7 @@ public class App implements ApplicationListener {
                 e.printStackTrace();
             }
         }*/
+
     }
 
 
