@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
 import com.github.strikerx3.jxinput.XInputDevice;
+import kotlin.jvm.functions.Function0;
 import kotlin.text.Charsets;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.audio.AudioMixer;
@@ -1063,9 +1064,10 @@ public class App implements ApplicationListener {
 
     /**
      * Make sure to call App.audioMixerRenewHooks.remove(Object) whenever the class gets disposed of
+     * <p>
      * Key: the class that calls the hook, value: the actual operation (function)
      */
-    //public static HashMap<Object, Function0> audioMixerRenewHooks = new HashMap<>();
+    public static HashMap<Object, Function0> audioMixerReloadHooks = new HashMap<>();
 
     /**
      * Init stuffs which needs GL context
@@ -1248,8 +1250,8 @@ public class App implements ApplicationListener {
 
     public static void reloadAudioProcessor(int bufferSize) {
         // copy music tracks
-        var dynaicTracks = audioMixer.getDynamicTracks();
-        var staticTracks = audioMixer.getTracks();
+        var oldDynamicTracks = audioMixer.getDynamicTracks();
+        var oldStaticTracks = audioMixer.getTracks();
 
         audioManagerThread.interrupt();
         audioMixer.dispose();
@@ -1260,11 +1262,32 @@ public class App implements ApplicationListener {
         // paste music tracks
         for (int i = 0; i < audioMixer.getDynamicTracks().length; i++) {
             var track = audioMixer.getDynamicTracks()[i];
-            dynaicTracks[i].copyStatusFrom(track);
+            oldDynamicTracks[i].copyStatusTo(track);
+
+            var ingame = Terrarum.INSTANCE.getIngame();
+            if (ingame != null) {
+                // update track references for the actors
+                for (var actor : ingame.getActorContainerActive()) {
+                    var tracks = actor.getMusicTracks();
+                    for (var trackMusic : tracks.keySet()) {
+                        if (tracks.get(trackMusic).equals(oldDynamicTracks[i])) {
+                            tracks.put(trackMusic, track);
+                        }
+                    }
+                }
+                for (var actor : ingame.getActorContainerInactive()) {
+                    var tracks = actor.getMusicTracks();
+                    for (var trackMusic : tracks.keySet()) {
+                        if (tracks.get(trackMusic).equals(oldDynamicTracks[i])) {
+                            tracks.put(trackMusic, track);
+                        }
+                    }
+                }
+            }
         }
         for (int i = 0; i < audioMixer.getTracks().length; i++) {
             var track = audioMixer.getTracks()[i];
-            staticTracks[i].copyStatusFrom(track);
+            oldStaticTracks[i].copyStatusTo(track);
         }
 
         audioManagerThread = new Thread(new AudioManagerRunnable(audioMixer), "TerrarumAudioManager");
@@ -1272,14 +1295,14 @@ public class App implements ApplicationListener {
         audioManagerThread.start();
 
 
-        /*for (var it : audioMixerRenewHooks.values()) {
+        for (var it : audioMixerReloadHooks.values()) {
             try {
                 it.invoke();
             }
             catch (Throwable e) {
                 e.printStackTrace();
             }
-        }*/
+        }
 
     }
 

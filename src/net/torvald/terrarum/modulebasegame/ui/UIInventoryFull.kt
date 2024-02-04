@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.audio.decibelsToFullscale
+import net.torvald.terrarum.audio.dsp.Lowpass
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
@@ -393,19 +395,29 @@ class UIInventoryFull(
         App.audioMixer.requestFadeOut(App.audioMixer.fadeBus, 0.25, decibelsToFullscale(-3.0))
     }
 
+    private var shouldIFadeIn: Boolean? = null
+
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
         transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.resume()
         INGAME.setTooltipMessage(null)
 
-        App.audioMixer.requestLowpassOut(0.25)
-        App.audioMixer.requestFadeIn(App.audioMixer.fadeBus, 0.25, 1.0)
+        if (shouldIFadeIn == null) {
+            shouldIFadeIn = (App.audioMixer.fadeBus.getFilter<Lowpass>().cutoff < SAMPLING_RATE / 2)
+        }
+
+        if (shouldIFadeIn == true) {
+            App.audioMixer.requestLowpassOut(0.25)
+            App.audioMixer.requestFadeIn(App.audioMixer.fadeBus, 0.25, 1.0)
+        }
     }
 
     override fun endOpening(delta: Float) {
         super.endOpening(delta)
         transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f)  }
+
+        shouldIFadeIn = null
     }
 
     override fun endClosing(delta: Float) {
@@ -417,6 +429,8 @@ class UIInventoryFull(
         tooltipShowing.clear()
 
 //        printdbg(this, "Clearing out tooltipShowing")
+
+        shouldIFadeIn = null
     }
 
 

@@ -3,6 +3,9 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
+import net.torvald.terrarum.audio.dsp.Lowpass
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.UICanvas
 
@@ -53,10 +56,17 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     }
 
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        // undo sound fadeout/muting when this panel is opened
+        if (handler.openCloseCounter == 0f && App.audioMixer.fadeBus.getFilter<Lowpass>().cutoff < SAMPLING_RATE / 2) {
+            App.audioMixer.requestLowpassOut(0.25)
+            App.audioMixer.requestFadeIn(App.audioMixer.fadeBus, 0.25, 1.0)
+        }
+
         ControlPanelCommon.render("basegame.soundcontrolpanel", width, batch)
         uiItems.forEach { it.render(frameDelta, batch, camera) }
     }
 
     override fun dispose() {
     }
+
 }

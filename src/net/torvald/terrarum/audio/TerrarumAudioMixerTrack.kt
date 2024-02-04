@@ -65,7 +65,7 @@ class TerrarumAudioMixerTrack(
     var playStartedTime = 0L; internal set
 
 
-    fun copyStatusFrom(other: TerrarumAudioMixerTrack) {
+    fun copyStatusTo(other: TerrarumAudioMixerTrack) {
         other.pullNextTrack = this.pullNextTrack
         other.currentTrack = this.currentTrack
         other.nextTrack = this.nextTrack

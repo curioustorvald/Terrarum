@@ -12,6 +12,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.AudioMixer.Companion.DEFAULT_FADEOUT_LEN
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.dsp.Convolv
 import net.torvald.terrarum.audio.dsp.LoFi
 import net.torvald.terrarum.audio.dsp.NullFilter
@@ -90,7 +91,9 @@ class FixtureJukebox : Electric, PlaysMusic {
         }
 
 
-//        App.audioMixerRenewHooks[this] = { stopGracefully() }
+        App.audioMixerReloadHooks[this] = {
+            loadConvolver(musicTracks[musicNowPlaying])
+        }
     }
 
     @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 0.0, TILE_SIZED * 2, TILE_SIZED * 3), Cvec(0.44f, 0.41f, 0.40f, 0.2f)))
@@ -141,13 +144,7 @@ class FixtureJukebox : Electric, PlaysMusic {
             discCurrentlyPlaying = index
 
             App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
-                startAudio(musicNowPlaying!!) {
-                    it.filters[filterIndex] = Phono(
-                        "basegame",
-                        "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin",
-                        0f, 5f / 16f
-                    )
-                }
+                startAudio(musicNowPlaying!!) { loadConvolver(it) }
             }
 
 
@@ -167,6 +164,7 @@ class FixtureJukebox : Electric, PlaysMusic {
     fun stopGracefully() {
         stopDiscPlayback()
         (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, pauseLen = (INGAME.musicGovernor as TerrarumMusicGovernor).getRandomMusicInterval())
+
     }
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
@@ -214,6 +212,14 @@ class FixtureJukebox : Electric, PlaysMusic {
         playMech.currentFrame = 0
     }
 
+    private fun loadConvolver(it: TerrarumAudioMixerTrack?) {
+        it?.filters?.set(filterIndex, Phono(
+            "basegame",
+            "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin",
+            0f, 5f / 16f
+        ))
+    }
+
     private fun unloadConvolver(music: MusicContainer?) {
         if (music != null) {
             musicTracks[music]?.let {
@@ -232,7 +238,7 @@ class FixtureJukebox : Electric, PlaysMusic {
     }
 
     override fun dispose() {
-//        App.audioMixerRenewHooks.remove(this)
+        App.audioMixerReloadHooks.remove(this)
         super.dispose()
 //        testMusic.gdxMusic.dispose()
 
