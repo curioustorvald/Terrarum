@@ -5,16 +5,20 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.AudioMixer.Companion.DEFAULT_FADEOUT_LEN
 import net.torvald.terrarum.audio.dsp.Convolv
 import net.torvald.terrarum.audio.dsp.LoFi
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.audio.dsp.Phono
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.Hitbox
+import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.MusicContainer
@@ -41,6 +45,7 @@ class FixtureJukebox : Electric, PlaysMusic {
     @Transient var musicNowPlaying: MusicContainer? = null; private set
 
     @Transient private val backLamp: SheetSpriteAnimation
+    @Transient private val playMech: SheetSpriteAnimation
 
     @Transient private val filterIndex = 0
 
@@ -59,7 +64,7 @@ class FixtureJukebox : Electric, PlaysMusic {
         setHitboxDimension(TILE_SIZE * 2, TILE_SIZE * 3, 0, 0)
 
         makeNewSprite(TextureRegionPack(itemImage.texture, TILE_SIZE * 2, TILE_SIZE * 3)).let {
-            it.setRowsAndFrames(1,1)
+            it.setRowsAndFrames(3,5)
         }
         makeNewSpriteEmissive(TextureRegionPack(itemImage2.texture, TILE_SIZE * 2, TILE_SIZE * 3)).let {
             it.setRowsAndFrames(1,1)
@@ -70,15 +75,25 @@ class FixtureJukebox : Electric, PlaysMusic {
         setWireSinkAt(0, 2, "appliance_power")
         setWireConsumptionAt(0, 2, Vector2(350.0, 0.0))
 
-        val backLampTex = Texture(ModMgr.getGdxFile("basegame", "sprites/fixtures/jukebox_innerlamp.tga"))
         backLamp = SheetSpriteAnimation(this).also {
-            it.setSpriteImage(TextureRegionPack(backLampTex, TILE_SIZE * 2, TILE_SIZE * 3))
-            it.setRowsAndFrames(1, 1)
+            it.setSpriteImage(TextureRegionPack(itemImage.texture, TILE_SIZE * 2, TILE_SIZE * 3))
+            it.setRowsAndFrames(3,5)
+            it.currentRow = 1
+            it.currentFrame = 0
+        }
+
+        playMech = SheetSpriteAnimation(this).also {
+            it.setSpriteImage(TextureRegionPack(itemImage.texture, TILE_SIZE * 2, TILE_SIZE * 3))
+            it.setRowsAndFrames(3,5)
+            it.currentRow = 2
+            it.currentFrame = 0
         }
 
 
 //        App.audioMixerRenewHooks[this] = { stopGracefully() }
     }
+
+    @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 0.0, TILE_SIZED * 2, TILE_SIZED * 3), Cvec(0.44f, 0.41f, 0.40f, 0.2f)))
 
     override val canBeDespawned: Boolean
         get() = discInventory.isEmpty()
@@ -115,7 +130,12 @@ class FixtureJukebox : Electric, PlaysMusic {
 
                 printdbg(this, "Stop music $title - $artist")
 
+                // can't call stopDiscPlayback() because of the recursion
+
                 (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, pauseLen = (INGAME.musicGovernor as TerrarumMusicGovernor).getRandomMusicInterval())
+
+                backLamp.currentFrame = 0
+                playMech.currentFrame = 0
             }
 
             discCurrentlyPlaying = index
@@ -129,11 +149,16 @@ class FixtureJukebox : Electric, PlaysMusic {
                     )
                 }
             }
+
+
+            backLamp.currentFrame = 1 + (index / 2)
+            playMech.currentFrame = 1 + (index / 2)
         }
 
     }
 
     @Transient private var lampDecay = 0f
+    @Transient private var vol = 0f
     @Transient private var lampIntensity = 0f
 
     /**
@@ -150,15 +175,22 @@ class FixtureJukebox : Electric, PlaysMusic {
 
         if (isVisible && musicNowPlaying != null) {
             val vol0 = (musicTracks[musicNowPlaying]?.processor?.maxSigLevel?.average() ?: 0.0).toFloat()
-            val vol = FastMath.interpolateLinear(0.8f, vol0, lampDecay)
-            lampIntensity = vol.coerceIn(0f, 1f)
-
-            blendScreen(batch)
-            backLamp.colourFilter = Color(0f, lampIntensity, 0f, 1f)
-            drawSpriteInGoodPosition(frameDelta, backLamp, batch)
-
-            lampDecay = vol
+            vol = FastMath.interpolateLinear(0.8f, vol0, lampDecay)
         }
+        else {
+            vol = 0f
+        }
+
+        lampIntensity = vol.coerceIn(0f, 1f)
+
+        blendScreen(batch)
+        backLamp.colourFilter = Color(0f, lampIntensity, 0f, 1f)
+        drawSpriteInGoodPosition(frameDelta, backLamp, batch)
+
+        blendNormalStraightAlpha(batch)
+        drawSpriteInGoodPosition(frameDelta, playMech, batch)
+
+        lampDecay = vol
     }
 
     override fun drawEmissive(frameDelta: Float, batch: SpriteBatch) {
@@ -177,6 +209,9 @@ class FixtureJukebox : Electric, PlaysMusic {
             stopAudio(it)
             unloadConvolver(it)
         }
+
+        backLamp.currentFrame = 0
+        playMech.currentFrame = 0
     }
 
     private fun unloadConvolver(music: MusicContainer?) {
@@ -200,5 +235,7 @@ class FixtureJukebox : Electric, PlaysMusic {
 //        App.audioMixerRenewHooks.remove(this)
         super.dispose()
 //        testMusic.gdxMusic.dispose()
+
+        // no need to dispose of backlamp and playmech: they share the same texture with the main sprite
     }
 }
