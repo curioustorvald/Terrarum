@@ -114,7 +114,7 @@ class AudioMixer(val bufferSize: Int): Disposable {
         get() = tracks[11]
 
     val ambientTracks = arrayOf(
-        ambientTrack1, ambientTrack2
+        ambientTrack1, ambientTrack2, ambientTrack3, ambientTrack4
     )
 
     var processing = false
@@ -214,7 +214,7 @@ class AudioMixer(val bufferSize: Int): Disposable {
     init {
         // initialise audio paths //
 
-        listOf(musicTrack, ambientTrack1, ambientTrack2).forEach {
+        listOf(musicTrack, ambientTrack1, ambientTrack2, ambientTrack3, ambientTrack4).forEach {
             it.filters[0] = Gain(1f)
         }
 
@@ -228,8 +228,11 @@ class AudioMixer(val bufferSize: Int): Disposable {
         ambientTracks.forEach {
             it.filters[1] = Vecto(decibelsToFullscale(24.0).toFloat())
             it.filters[2] = Spectro()
-            amb1plus2.addSidechainInput(it, 1.0)
         }
+
+        amb1plus2.addSidechainInput(ambientTrack1, 1.0)
+        amb1plus2.addSidechainInput(ambientTrack2, 1.0)
+
         sfxSumBus.filters[1] = Vecto(0.7071f)
         sfxSumBus.filters[2] = Spectro()
 

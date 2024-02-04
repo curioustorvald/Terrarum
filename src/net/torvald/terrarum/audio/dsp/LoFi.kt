@@ -51,6 +51,8 @@ open class LoFi(
     }
 
     private fun saturatorThru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
+        downForce.fill(1.0f)
+
         for (ch in inbuf.indices) {
             for (i in inbuf[ch].indices) {
                 val u = inbuf[ch][i]
@@ -74,9 +76,10 @@ open class LoFi(
     }
 
     override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
+        convolver.drawDebugView(batch, x, y)
     }
 
-    override val debugViewHeight = 0
+    override val debugViewHeight = 16
 
     override fun copyParamsFrom(other: TerrarumAudioFilter) {
         this.convolver.copyParamsFrom((other as LoFi).convolver)

@@ -77,11 +77,13 @@ class BasicDebugInfoWindow : UICanvas() {
     private val KEY_TIMERS = Input.Keys.T // + CONTROL_LEFT
     private val KEY_WEATHERS = Input.Keys.W // + CONTROL_LEFT
     private val KEY_AUDIOMIXER = Input.Keys.M // + CONTROL_LEFT
+    private val KEY_AUDIOMIXER2 = Input.Keys.N // + CONTROL_LEFT
     private val KEY_CHUNKS = Input.Keys.C // + CONTROL_LEFT
 
     private var showTimers = false
     private var showWeatherInfo = false
     private var showAudioMixer = false
+    private var showAudioMixer2 = false
     private var showChunks = false
 
     override fun show() {
@@ -139,15 +141,45 @@ class BasicDebugInfoWindow : UICanvas() {
         // toggle show-something
         showTimers = showTimers xor (Gdx.input.isKeyJustPressed(KEY_TIMERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
         showWeatherInfo = showWeatherInfo xor (Gdx.input.isKeyJustPressed(KEY_WEATHERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
-        showAudioMixer = showAudioMixer xor (Gdx.input.isKeyJustPressed(KEY_AUDIOMIXER) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
+        val _showAudioMixer = showAudioMixer xor (Gdx.input.isKeyJustPressed(KEY_AUDIOMIXER) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
+        val _showAudioMixer2 = showAudioMixer2 xor (Gdx.input.isKeyJustPressed(KEY_AUDIOMIXER2) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
         showChunks = showChunks xor (Gdx.input.isKeyJustPressed(KEY_CHUNKS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
 
-        App.audioMixer.masterTrack.filters[2].bypass = !showAudioMixer
+        if (showAudioMixer && _showAudioMixer2) {
+            showAudioMixer2 = true
+            showAudioMixer = false
+        }
+        else if (showAudioMixer2 && _showAudioMixer) {
+            showAudioMixer = true
+            showAudioMixer2 = false
+        }
+        else if (_showAudioMixer2 != _showAudioMixer) {
+            showAudioMixer = _showAudioMixer
+            showAudioMixer2 = _showAudioMixer2
+        }
+        else if (!_showAudioMixer && !_showAudioMixer2) {
+            showAudioMixer = false
+            showAudioMixer2 = false
+        }
+
+        val bypassScopes = (!showAudioMixer && !showAudioMixer2)
+
+        App.audioMixer.musicTrack.filters[1].bypass = bypassScopes
+        App.audioMixer.musicTrack.filters[2].bypass = bypassScopes
+        App.audioMixer.ambientTracks.forEach {
+            it.filters[1].bypass = bypassScopes
+            it.filters[2].bypass = bypassScopes
+        }
+        App.audioMixer.sfxSumBus.filters[1].bypass = bypassScopes
+        App.audioMixer.sfxSumBus.filters[2].bypass = bypassScopes
+        App.audioMixer.masterTrack.filters[2].bypass = bypassScopes
+        App.audioMixer.masterTrack.filters[3].bypass = bypassScopes
 
         drawMain(batch)
         if (showTimers) drawTimers(batch)
         if (showWeatherInfo) drawWeatherInfo(batch)
         if (showAudioMixer) drawAudioMixer(batch)
+        if (showAudioMixer2) drawAudioMixer2(batch)
         if (showChunks) drawChunks(batch)
     }
 
@@ -474,11 +506,11 @@ class BasicDebugInfoWindow : UICanvas() {
     private val clippingHoldTime = 60000L * 3 // 3 mins
 
     private fun drawAudioMixer(batch: SpriteBatch) {
+        val strips = App.audioMixer.tracks + App.audioMixer.masterTrack
 
-        val x = App.scr.width - 186 - (App.audioMixer.tracks.size + 1) * (STRIP_W + stripGap)
+        val x = App.scr.width - 186 - strips.size * (STRIP_W + stripGap)
         val y = App.scr.height - 38 - stripH
 
-        val strips = App.audioMixer.tracks + App.audioMixer.masterTrack
 
 //        batch.color = COL_MIXER_BACK
 //        Toolkit.fillArea(batch, x - stripGap, y - stripGap, strips.size * (stripW + stripGap) + stripGap, stripH + 2*stripGap)
@@ -499,6 +531,28 @@ class BasicDebugInfoWindow : UICanvas() {
             val px = x - (miniW + 5) * (1 + (index / 13))
             val py = y + (miniH + stripGap) * (index % 13)
             drawDynamicSource(batch, px, py, track, index)
+        }
+    }
+
+    private fun drawAudioMixer2(batch: SpriteBatch) {
+        val strips = App.audioMixer.dynamicTracks.filter { it.isPlaying }.sortedBy { it.playStartedTime }.reversed() +
+                App.audioMixer.sfxSumBus + App.audioMixer.masterTrack
+
+        val x = App.scr.width - 186 - strips.size * (STRIP_W + stripGap)
+        val y = App.scr.height - 38 - stripH
+
+
+//        batch.color = COL_MIXER_BACK
+//        Toolkit.fillArea(batch, x - stripGap, y - stripGap, strips.size * (stripW + stripGap) + stripGap, stripH + 2*stripGap)
+
+        strips.forEachIndexed { index, track ->
+            // get clipping status
+            track.processor.hasClipping.forEachIndexed { channel, b ->
+                if (b) mixerLastTimeHadClipping[index][channel] = System.currentTimeMillis()
+            }
+
+            // draw
+            drawStrip(batch, x + index * (STRIP_W + stripGap), y, track, index)
         }
     }
 

@@ -140,7 +140,7 @@ class BinoPan(var pan: Float, var earDist: Float = EARDIST_DEFAULT): TerrarumAud
         else "R${pan.absoluteValue.times(100).toIntAndFrac(3,1)}"
         App.fontSmallNumbers.draw(batch, panLabel, x+3f, y+1f)
 
-        App.fontSmallNumbers.draw(batch, "AS:${AudioMixer.SPEED_OF_SOUND.roundToInt()}", x+3f, y+17f)
+        App.fontSmallNumbers.draw(batch, "H:${earDist.toIntAndFrac(1,3)}", x+3f, y+17f)
     }
 
     override val debugViewHeight = 32
