@@ -32,7 +32,7 @@ class ItemCodex {
      * Will return corresponding Actor if ID >= ACTORID_MIN
      */
     @Transient val itemCodex = ItemTable()
-    @Transient var tags = HashMap<String, HashSet<String>>()
+//    @Transient var tags = HashMap<String, HashSet<String>>()
     val dynamicItemInventory = ItemTable()
     val dynamicToStaticTable = ItemRemapTable()
 
@@ -94,9 +94,18 @@ class ItemCodex {
 
     /**
      * Returns the item in the Codex. If the item is static, its clone will be returned (you are free to modify the returned item).
-     * However, if the item is dynamic, the item itself will be returned. Modifying the item will affect the game.
+     * However, if the item is dynamic, the item itself will be returned.
+     *
+     * The returned object is a clone of the original object. Modifying fields will NOT affect the game.
      */
     operator fun get(code: ItemID?): GameItem? {
+        return get0(code)?.clone()
+    }
+
+    /**
+     * Same as `get` but the object is mutable.
+     */
+    fun get0(code: ItemID?): GameItem? {
         if (code == null) return null
 
         if (code.startsWith("$PREFIX_DYNAMICITEM:"))
@@ -109,7 +118,7 @@ class ItemCodex {
             //throw IllegalArgumentException("Attempted to get item data of actor that cannot be an item. ($a)")
         }
         else // generic item
-            return itemCodex[code]?.clone() // from CSV
+            return itemCodex[code] // from CSV
     }
 
     fun dynamicToStaticID(dynamicID: ItemID) = dynamicToStaticTable[dynamicID]!!
@@ -231,7 +240,7 @@ class ItemCodex {
     fun hasItem(itemID: ItemID): Boolean = dynamicItemInventory.containsKey(itemID)
     fun isEmpty(): Boolean = itemCodex.isEmpty()
 
-    fun hasTag(itemID: ItemID, s: String) = tags[itemID]?.contains(s) == true
+    fun hasTag(itemID: ItemID, s: String) = get(itemID)?.tags?.contains(s) == true
     fun hasAnyTagOf(itemID: ItemID, vararg s: String) = s.any { hasTag(itemID, it) }
     fun hasAnyTag(itemID: ItemID, s: Collection<String>) = s.any { hasTag(itemID, it) }
     fun hasAnyTag(itemID: ItemID, s: Array<String>) = s.any { hasTag(itemID, it) }

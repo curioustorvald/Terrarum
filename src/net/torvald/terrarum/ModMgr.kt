@@ -669,14 +669,14 @@ object ModMgr {
                         val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
                         val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
                         ItemCodex[itemName] = loadedClassInstance as GameItem
-                        ItemCodex.tags[itemName] = tags
+                        ItemCodex[itemName]!!.tags.addAll(tags)
                     }
                     else {
                         val loadedClass = it.loadClass(className)
                         val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
                         val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
                         ItemCodex[itemName] = loadedClassInstance as GameItem
-                        ItemCodex.tags[itemName] = tags
+                        ItemCodex[itemName]!!.tags.addAll(tags)
                     }
                 }
             }

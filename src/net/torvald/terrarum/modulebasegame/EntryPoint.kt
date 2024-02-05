@@ -1,16 +1,8 @@
 package net.torvald.terrarum.modulebasegame
 
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.blockproperties.BlockProp
-import net.torvald.terrarum.blockproperties.OreProp
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameitems.GameItem
-import net.torvald.terrarum.itemproperties.CraftingCodex
-import net.torvald.terrarum.modulebasegame.gameitems.BlockBase
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * The entry point for the module "Basegame"
@@ -54,6 +46,12 @@ class EntryPoint : ModuleEntryPoint() {
                     println(it)
                 }
             }
+        }
+
+        // add smelting recipe for sands
+        BlockCodex.filter { it.hasTag("SAND") }.forEach { (itemID, _) ->
+            ItemCodex.get0(itemID)!!.tags.add("SMELTABLE")
+            ItemCodex.get0(itemID)!!.smeltingProduct = "basegame:148"
         }
 
         println("\n[Basegame.EntryPoint] Welcome back!")

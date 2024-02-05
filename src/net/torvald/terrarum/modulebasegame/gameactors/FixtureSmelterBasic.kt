@@ -7,6 +7,7 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey

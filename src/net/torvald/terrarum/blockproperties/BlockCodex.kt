@@ -177,6 +177,8 @@ class BlockCodex {
         return blockProps[blockID]
     }
 
+    fun filter(predicate: (BlockProp) -> Boolean) = blockProps.entries.filter { (_, prop) -> predicate(prop) }
+
     private fun setProp(modname: String, key: Int, record: CSVRecord) {
         val prop = BlockProp()
         prop.nameKey = record.get("name")
