@@ -60,12 +60,16 @@ class Noticelet : UICanvas() {
         toDelete.clear()
 
         if (Terrarum.mouseScreenX.toFloat() in Toolkit.drawWidthf * 0.25f..Toolkit.drawWidthf * 0.75f) {
-            ypos = if (Terrarum.mouseScreenY < App.scr.halfhf) 1f else -1f
+            if (ypos == -1f && Terrarum.mouseScreenY < App.scr.halfhf - awayFromCentre)
+                ypos = 1f
+            else if (ypos == 1f && Terrarum.mouseScreenY > App.scr.halfhf + awayFromCentre)
+                ypos = -1f
         }
     }
 
     private val h = 24f
     private val gap = 8f
+    private val awayFromCentre = 120f
 
     private val toDelete = ArrayList<Notice>()
 
@@ -73,7 +77,7 @@ class Noticelet : UICanvas() {
 
     override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val px = Toolkit.drawWidthf
-        val py = App.scr.halfhf + 120f * ypos - (if (ypos < 0) h else 0f)
+        val py = App.scr.halfhf + awayFromCentre * ypos - (if (ypos < 0) h else 0f)
 
         messageQueue.forEachIndexed { index, notice ->
             drawNoticelet(batch, px,  py + (h + gap) * index * ypos, notice)
