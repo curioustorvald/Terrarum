@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.gameitems.ItemID
 
 /**
@@ -13,9 +14,7 @@ class ItemJukebox(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/jukebox.tga")
-    override val itemImageEmissive: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/jukebox_emsv.tga")
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(6,3)
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_JUKEBOX"
