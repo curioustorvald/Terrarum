@@ -451,14 +451,12 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     /** force disable despawn when inventory is not empty */
-    open val canBeDespawned: Boolean get() = inventory?.isEmpty() ?: true
-
-    @Transient open var despawnHook: (FixtureBase) -> Unit = {}
+    override val canBeDespawned: Boolean get() = inventory?.isEmpty() ?: true
 
     /**
      * Removes this instance of the fixture from the world
      */
-    open fun despawn() {
+    override fun despawn() {
 
         if (canBeDespawned) {
             printdbg(this, "despawn at T${INGAME.WORLD_UPDATE_TIMER}: ${nameFun()}")
@@ -493,16 +491,10 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         INGAME.queueActorAddition(DroppedItem(drop, hitbox.startX, hitbox.startY - 1.0))
     }
 
-    protected var dropItem = false
-
     /**
      * This function MUST BE super-called for make despawn call to work at all.
      */
     override fun update(delta: Float) {
-        if (!canBeDespawned) flagDespawn = false // actively deny despawning request if cannot be despawned
-        if (canBeDespawned && flagDespawn) despawn()
-        if (canBeDespawned && dropItem) dropSelfAsAnItem()
-        // actual actor removal is performed by the TerrarumIngame.killOrKnockdownActors
         super.update(delta)
     }
 
@@ -514,8 +506,10 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
             actorBlockFillingFunction()
         }
         if (!canBeDespawned) flagDespawn = false
-        if (canBeDespawned && flagDespawn) despawn()
-        if (canBeDespawned && dropItem) dropSelfAsAnItem()
+        if (canBeDespawned && flagDespawn) {
+            despawn()
+            despawned = true
+        }
         // actual actor removal is performed by the TerrarumIngame.killOrKnockdownActors
         super.update(delta)
     }

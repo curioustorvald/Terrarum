@@ -9,6 +9,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.terrarum.modulebasegame.worldgenerator.Treegen
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -72,6 +73,16 @@ open class SaplingBase(val species: Int) : Cultivable(72000) {
         // these have to run every frame to make the sprite static
         (sprite as SheetSpriteAnimation).currentRow = species
         (sprite as SheetSpriteAnimation).currentFrame = variant
+
+        // check for soil
+        val groundTile = INGAME.world.getTileFromTerrain(intTilewiseHitbox.startX.toInt(), intTilewiseHitbox.endY.toInt() + 1)
+        if (BlockCodex[groundTile].hasNoTagOf("CULTIVABLE")) {
+            despawnHook = {
+                printdbg(this, "Sapling despawn!")
+                PickaxeCore.dropItem("item@basegame:${160 + species}", intTilewiseHitbox.canonicalX.toInt(), intTilewiseHitbox.canonicalY.toInt())
+            }
+            flagDespawn()
+        }
 
         if (!flagDespawn) {
             tickGrowthCounter()

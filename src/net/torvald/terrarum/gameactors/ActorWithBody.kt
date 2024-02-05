@@ -518,6 +518,7 @@ open class ActorWithBody : Actor {
     }
 
     override fun update(delta: Float) {
+        super.update(delta)
 
         // re-scale hitbox
         // it's just much better to poll them than use perfectly-timed setter because latter simply cannot exist

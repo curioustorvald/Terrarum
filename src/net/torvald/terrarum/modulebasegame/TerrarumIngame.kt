@@ -1298,7 +1298,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             val actor = actorContainerActive[i]
             val actorIndex = i
             // kill actors flagged to despawn
-            if (actor.flagDespawn) {
+            if (actor.despawned) {
                 queueActorRemoval(actor)
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1

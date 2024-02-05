@@ -94,6 +94,10 @@ class FixtureJukebox : Electric, PlaysMusic {
         App.audioMixerReloadHooks[this] = {
             loadConvolver(musicTracks[musicNowPlaying])
         }
+
+        despawnHook = {
+            stopGracefully()
+        }
     }
 
     @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 0.0, TILE_SIZED * 2, TILE_SIZED * 3), Cvec(0.44f, 0.41f, 0.40f, 0.2f)))
@@ -227,8 +231,6 @@ class FixtureJukebox : Electric, PlaysMusic {
             }
         }
     }
-
-    @Transient override var despawnHook: (FixtureBase) -> Unit = { stopGracefully() }
 
     override fun reload() {
         super.reload()

@@ -51,10 +51,19 @@ abstract class Actor : Comparable<Actor>, Runnable {
         OVERLAY // screen overlay, not affected by lightmap
     }
 
-    abstract fun update(delta: Float)
+    open fun update(delta: Float) {
+        if (!canBeDespawned) flagDespawn = false // actively deny despawning request if cannot be despawned
+        if (canBeDespawned && flagDespawn) {
+            despawn()
+            despawned = true
+        }
+    }
 
     var actorValue = ActorValue(this)
     @Volatile var flagDespawn = false
+    @Transient var despawnHook: (Actor) -> Unit = {}
+    @Transient open val canBeDespawned = true
+    @Volatile internal var despawned = false
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
@@ -81,6 +90,12 @@ abstract class Actor : Comparable<Actor>, Runnable {
             inventory.actor = this
         if (this is ActorHumanoid && vehicleRidingActorID != null) {
             vehicleRiding = INGAME.getActorByID(vehicleRidingActorID!!) as Controllable
+        }
+    }
+
+    open fun despawn() {
+        if (canBeDespawned) {
+            despawnHook(this)
         }
     }
 
