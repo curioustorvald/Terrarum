@@ -55,7 +55,7 @@ class ADProperties {
     internal lateinit var skeletons: HashMap<String, Skeleton>; private set
     /** properties that defines position of joint of the bodypart */
     internal val bodypartJoints = HashMap<String, ADPropertyObject.Vector2i>()
-    /** properties that are recognised as animations (ANIM_RUN, ANIM)IDLE) */
+    /** properties that are recognised as animations (ANIM_RUN, ANIM_IDLE) */
     internal lateinit var animations: HashMap<String, Animation>; private set
     /** an "animation frame" property (ANIM_RUN_1, ANIM_RUN_2) */
     internal lateinit var transforms: HashMap<String, List<Transform>>; private set

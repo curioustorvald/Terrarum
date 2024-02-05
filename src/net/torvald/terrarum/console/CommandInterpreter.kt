@@ -61,6 +61,7 @@ internal object CommandInterpreter {
                     System.err.print("[CommandInterpreter] ")
                     e.printStackTrace()
                     EchoError(Lang["ERROR_GENERIC_TEXT"])
+                    EchoError(e.localizedMessage)
                 }
             }
             catch (e: NullPointerException) {

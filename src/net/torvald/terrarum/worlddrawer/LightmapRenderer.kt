@@ -6,16 +6,25 @@ import com.badlogic.gdx.graphics.Texture
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.gdx.graphics.UnsafeCvecArray
+import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.*
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.Hitbox
+import net.torvald.terrarum.gameactors.Lightbox
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.isBlock
+import net.torvald.terrarum.gameitems.isWall
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
+import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.spriteassembler.ADPropertyObject
 import java.util.*
 import kotlin.math.*
 
@@ -356,10 +365,52 @@ object LightmapRenderer {
         actorContainer.forEach {
             val lightBoxCopy = it.lightBoxList.subList(0, it.lightBoxList.size) // make copy to prevent ConcurrentModificationException
             val shadeBoxCopy = it.shadeBoxList.subList(0, it.shadeBoxList.size) // make copy to prevent ConcurrentModificationException
-            val scale = it.scale
+
+            // add lightbox for held item
+            val heldItemLightBox = if (it.sprite is AssembledSpriteAnimation && it is Pocketed) {
+                val sprite = it.sprite as AssembledSpriteAnimation
+                val adp = sprite.adp
+                val currentAnimNameRoot = sprite.currentAnimation
+                val currentAnimNameFull = "${sprite.currentAnimation}_${1 + sprite.currentFrame}"
+                val anim = adp.animations[currentAnimNameRoot]!!
+                val HELD_ITEM = "HELD_ITEM"
+                val transform = adp.getTransform(currentAnimNameFull)
+                val skeleton = anim.skeleton
+
+                val heldItemTransform = transform.firstOrNull { it.joint.name == HELD_ITEM }?.translate ?: ADPropertyObject.Vector2i(0, 0)
+                val heldItemJoint = skeleton.joints.firstOrNull { it.name == HELD_ITEM }
+
+                if (heldItemJoint != null) {
+                    val relativeHeldItemTopLeftPos =
+                        adp.origin + (heldItemJoint.position + heldItemTransform).invertY() + ADPropertyObject.Vector2i(1,0)
+
+                    val tx = -(it.hitboxTranslateX).toDouble()
+                    val ty = if (sprite.flipVertical) (it.hitboxTranslateY).toDouble() else -(it.hitboxTranslateY - it.baseHitboxH).toDouble()
+
+                    val heldItem = it.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
+
+                    val light = if (heldItem != null && (heldItem.isBlock() || heldItem.isWall()))
+                            BlockCodex[heldItem].getLumCol(0, 0)
+                        else
+                            Cvec(0)
+
+
+                    Lightbox(Hitbox(
+                        relativeHeldItemTopLeftPos.x + tx,
+                        relativeHeldItemTopLeftPos.y + ty - TILE_SIZED,
+                        TILE_SIZED, TILE_SIZED
+                    ), light)
+                }
+                else
+                    Lightbox(Hitbox(0.0, 0.0, 1.0, 1.0), Cvec(0))
+            }
+            else
+                Lightbox(Hitbox(0.0, 0.0, 1.0, 1.0), Cvec(0))
+
 
             // put lanterns to the area the lightBox is occupying
-            lightBoxCopy.forEach { (box, colour) ->
+            val scale = it.scale
+            (lightBoxCopy + heldItemLightBox).forEach { (box, colour) ->
                 val boxX = it.hitbox.startX + (box.startX * scale)
                 val boxY = it.hitbox.startY + (box.startY * scale)
                 val boxW = box.width * scale

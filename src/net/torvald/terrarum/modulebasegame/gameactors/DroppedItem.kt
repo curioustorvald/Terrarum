@@ -42,9 +42,9 @@ open class DroppedItem : ActorWithBody {
     private val randKey1 = (Math.random() * 256).toInt()
     private val randKey2 = (Math.random() * 256).toInt()
 
-    override var lightBoxList = arrayListOf(Lightbox(this.hitbox.clone().setPosition(0.0, 0.0), Cvec(0)))
+    override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 0.0, TILE_SIZED, TILE_SIZED), Cvec(0)))
         // the Cvec will be calculated dynamically on Update
-    override var shadeBoxList = arrayListOf(Lightbox(this.hitbox.clone().setPosition(0.0, 0.0), Cvec(0)))
+    override var shadeBoxList = arrayListOf(Lightbox(Hitbox(0.0, 0.0, TILE_SIZED, TILE_SIZED), Cvec(0)))
         // the Cvec will be calculated dynamically on Update
 
     /**

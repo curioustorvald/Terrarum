@@ -153,10 +153,10 @@ class AssembledSpriteAnimation(
         val animNameRoot = animName.substring(0, animName.indexOfLast { it == '_' }).ifBlank { return@renderThisAnimation }
         // quick fix for the temporary de-sync bug in which when the update-rate per frame is much greater than once, it attempts to load animation with blank name
 
-        val tx = (parentActor.hitboxTranslateX) * scale
+        val tx = -(parentActor.hitboxTranslateX) * scale
         val txFlp = -(parentActor.hitboxTranslateX) * scale
         // flipping will not be symmetrical if baseHitboxWidth is odd number
-        val ty = (parentActor.hitboxTranslateY - parentActor.baseHitboxH) * scale
+        val ty = -(parentActor.hitboxTranslateY - parentActor.baseHitboxH) * scale
         val tyFlp = (parentActor.hitboxTranslateY) * scale
 
 
@@ -186,11 +186,11 @@ class AssembledSpriteAnimation(
                             if (flipHorizontal && flipVertical)
                                 batch.draw(image, fposX + txFlp, fposY + tyFlp, -w, -h)
                             else if (flipHorizontal && !flipVertical)
-                                batch.draw(image, fposX + txFlp, fposY - ty, -w, h)
+                                batch.draw(image, fposX + txFlp, fposY + ty, -w, h)
                             else if (!flipHorizontal && flipVertical)
-                                batch.draw(image, fposX - tx, fposY + tyFlp, w, -h)
+                                batch.draw(image, fposX + tx, fposY + tyFlp, w, -h)
                             else
-                                batch.draw(image, fposX - tx, fposY - ty, w, h)
+                                batch.draw(image, fposX + tx, fposY + ty, w, h)
                         }
                     }
                 }
@@ -210,11 +210,11 @@ class AssembledSpriteAnimation(
                         if (flipHorizontal && flipVertical)
                             batch.draw(image, fposX + txFlp, fposY + tyFlp, -w, -h)
                         else if (flipHorizontal && !flipVertical)
-                            batch.draw(image, fposX + txFlp, fposY - ty, -w, h)
+                            batch.draw(image, fposX + txFlp, fposY + ty, -w, h)
                         else if (!flipHorizontal && flipVertical)
-                            batch.draw(image, fposX - tx, fposY + tyFlp, w, -h)
+                            batch.draw(image, fposX + tx, fposY + tyFlp, w, -h)
                         else
-                            batch.draw(image, fposX - tx, fposY - ty, w, h)
+                            batch.draw(image, fposX + tx, fposY + ty, w, h)
 
                     }
                 }
