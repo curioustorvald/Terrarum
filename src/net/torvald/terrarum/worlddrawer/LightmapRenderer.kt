@@ -389,7 +389,7 @@ object LightmapRenderer {
 
                     val heldItem = it.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
-                    val light = if (heldItem != null && (heldItem.isBlock() || heldItem.isWall()))
+                    val light = if (heldItem != null && (heldItem.isBlock()))
                             BlockCodex[heldItem].getLumCol(0, 0)
                         else
                             Cvec(0)
