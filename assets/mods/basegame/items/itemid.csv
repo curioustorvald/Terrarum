@@ -82,6 +82,9 @@ id;classname;tags
 32772;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc04;MUSIC
 32773;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc05;MUSIC
 32774;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc06;MUSIC
+32775;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc07;MUSIC
+32776;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc08;MUSIC
+32777;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc09;MUSIC
 
 # data storage (tapestries; 256)
 #33023;net.torvald.terrarum.modulebasegame.gameitems.ItemTapestry;FIXTURE

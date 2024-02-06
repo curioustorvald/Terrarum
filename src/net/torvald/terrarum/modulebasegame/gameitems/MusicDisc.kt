@@ -144,3 +144,6 @@ class MusicDisc03(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame
 class MusicDisc04(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/hdma.ogg")
 class MusicDisc05(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/lucid_dream.ogg")
 class MusicDisc06(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/railway.ogg")
+class MusicDisc07(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/cyllindrical.ogg")
+class MusicDisc08(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/welded.ogg")
+class MusicDisc09(originalID: ItemID) : MusicDiscPrototype(originalID, "basegame", "audio/music/discs/hangdrum.ogg")

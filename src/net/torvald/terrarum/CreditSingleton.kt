@@ -8,8 +8,8 @@ import net.torvald.unicode.ENDASH
 object CreditSingleton {
 
     val credit: List<String>; get() =
-            ("Programming, Arts, Directed by CuriousTorvald (minjaesong)\n" +
-             "Sound Effects by FreeSound.org and Klankbeeld\n" +
+            ("Programming, Arts, Directed by CuriousTorvald\n" +
+             "Music by Orstphone\n" +
              "Translation Databases:\n" +
              "$ENDASH © 2018 The Polyglot Project. Distributed under CC0.\n" +
              "$ENDASH Entry from the Microsoft Language Portal. © 2018 Microsoft Corporation. All rights reserved.\n" +
@@ -18,7 +18,7 @@ object CreditSingleton {
 
 $BULLET Terrarum
 
-Copyright (C) 2013-2024 CuriousTorvald (minjaesong)
+© 2013-2024 CuriousTorvald (minjaesong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 $BULLET Terrarum Sans Bitmap
 
-Copyright (c) 2017-2022 Minjae Song ("CuriousTorvald") and the contributors
+© 2017-2024 Minjae Song ("CuriousTorvald") and the contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ THE SOFTWARE.
 
 $BULLET Joise
 
-Copyright (C) 2013 Jason Taylor
+© 2013 Jason Taylor
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ Accidental Noise Library
 Joise is a derivative work based on Josua Tippetts' C++ library:
 http://accidentalnoise.sourceforge.net/index.html
 
-Copyright (C) 2011 Joshua Tippetts
+© 2011 Joshua Tippetts
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -102,7 +102,7 @@ Copyright (C) 2011 Joshua Tippetts
 
 $BULLET Vector2.java, Epsilon.java
 
-Copyright (c) 2010-2015 William Bittle  http://www.dyn4j.org/
+© 2010-2015 William Bittle  http://www.dyn4j.org/
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -131,7 +131,7 @@ Kotlin translated and modified code Copyright (C) 2016 Minjaesong (CuriousTorval
 
 $BULLET PRTree, a Priority R-Tree, a spatial index for java code
 
-Copyright (c) 2008-2012 Robert Olofsson.
+© 2008-2012 Robert Olofsson.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -165,7 +165,7 @@ SUCH DAMAGE.
 
 $BULLET HUSLColorConverter.java
 
-Copyright (c) 2016 Alexei Boronine
+© 2016 Alexei Boronine
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -193,13 +193,13 @@ GraalVM Community Edition consists of multiple modules. The software as a whole,
 as well as the JVMCI and VisualVM modules, are released under version 2 of the
 GNU General Public License with the “Classpath” Exception.
 
-Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
+© 2015, 2019, Oracle and/or its affiliates. All rights reserved.
 
 
 
 $BULLET Apache Commons Codec
 
-Copyright 2002-2023 The Apache Software Foundation
+© 2002-2023 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (https://www.apache.org/).
@@ -208,7 +208,7 @@ The Apache Software Foundation (https://www.apache.org/).
 
 $BULLET Apache Commons CSV
 
-Copyright 2005-2023 The Apache Software Foundation
+© 2005-2023 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (https://www.apache.org/).
@@ -217,20 +217,20 @@ The Apache Software Foundation (https://www.apache.org/).
 
 $BULLET Apache Commons Math
 
-Copyright 2001-2022 The Apache Software Foundation
+© 2001-2022 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
 This product includes software developed for Orekit by
 CS Systèmes d'Information (http://www.c-s.fr/)
-Copyright 2010-2012 CS Systèmes d'Information
+© 2010-2012 CS Systèmes d'Information
 
 
 
 $BULLET JTransforms
 
-Copyright (c) 2007 onward, Piotr Wendykier
+© 2007 onward, Piotr Wendykier
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -271,6 +271,26 @@ limitations under the License.
 
 
 
+$BULLET Music:
+
+    - music/discs/3_over_4.ogg
+    - music/discs/cyllindrical.ogg
+    - music/discs/fog.ogg
+    - music/discs/geometry.ogg
+    - music/discs/hangdrum.ogg
+    - music/discs/hdma.ogg
+    - music/discs/lucid_dream.ogg
+    - music/discs/railway.ogg
+    - music/discs/welded.ogg
+
+℗ 2021, 2022, 2023, 2024 Orstphone
+Check out the original tracks at:
+Apple Music: <https://music.apple.com/kr/artist/orstphone/1587723053>
+Bandcamp: <https://orstphone.bandcamp.com/>
+YouTube: <https://www.youtube.com/@Orstphone>
+
+
+
 $BULLET Foleys:
 
     - ambient/season/crepuscular.*.ogg
@@ -281,7 +301,7 @@ $BULLET Foleys:
     - ambient/season/matutinal.*.ogg
     - ambient/season/nocturnal.*.ogg
 
-Copyright (C) 2011, 2013, 2015, 2020, 2021 Klankbeeld
+℗ 2011, 2013, 2015, 2020, 2021 Klankbeeld
 Sound from <https://www.freesound.org/people/klankbeeld>
 
     - effects/steps/GRSS.*.ogg
@@ -292,22 +312,22 @@ Sound from <https://www.freesound.org/people/klankbeeld>
     - effects/door/wooden_open.*.ogg
     - effects/door/wooden_close.*.ogg
 
-Copyright (C) 2020, 2021, 2022 Nox Sound
+℗ 2020, 2021, 2022 Nox Sound
 Sound from <https://freesound.org/people/Nox_Sound>
 
     - effects/static/phono_pops.ogg
     
-Copyright (C) 2011 Veezay
+℗ 2011 Veezay
 Sound from <https://freesound.org/people/veezay>
 
     - effects/static/tape_hiss.ogg
     
-Copyright (C) 2017 Stephen Holdaway
+℗ 2017 Stephen Holdaway
 Sound from <https://freesound.org/people/stecman>
 
     - effects/static/film_pops_lowpass.ogg
     
-Copyright (C) 2015 Joe DeShon
+℗ 2015 Joe DeShon
 Sound from <https://freesound.org/people/joedeshon>
 
 
@@ -317,12 +337,12 @@ $BULLET Impulse Responses:
     - convolution/EchoThief - *.bin
     
 EchoThief Impulse Response Library
-Copyright 2013-2023 Chris Warren <cwarren@sdsu.edu>
+℗ 2013-2023 Chris Warren <cwarren@sdsu.edu>
 
     - convolution/Soundwoofer - *.bin
     
 Soundwoofer Free Impulse Response Library
-Copyright 2018 Soundwoofer Team
+℗ 2018 Soundwoofer Team
 <https://soundwoofer.com/User/Index?uid=soundwoofer>
 """).split('\n')
 
