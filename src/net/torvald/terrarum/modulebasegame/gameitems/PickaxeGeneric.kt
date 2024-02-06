@@ -109,6 +109,14 @@ object PickaxeCore {
                         makeDust(tile, x, y, 9)
                         makeNoise(actor, tile)
                     }
+
+
+                    // temporary: spawn random record on prob 1/65536 when digging dirts
+                    if (ItemCodex[tileBroken]?.hasTag("CULTIVABLE") == true && Math.random() < 1.0 / 65536.0) {
+                        val drop = "item@basegame:${32769 + Math.random().times(9).toInt()}"
+                        dropItem(drop, x, y)
+                    }
+
                 }
                 // tile not busted
                 if (Math.random() < actionInterval) {

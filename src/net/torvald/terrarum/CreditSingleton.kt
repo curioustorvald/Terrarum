@@ -284,7 +284,7 @@ $BULLET Music:
     - music/discs/welded.ogg
 
 ℗ 2021, 2022, 2023, 2024 Orstphone
-Check out the original tracks at:
+Check out the original tracks on:
 Apple Music: <https://music.apple.com/kr/artist/orstphone/1587723053>
 Bandcamp: <https://orstphone.bandcamp.com/>
 YouTube: <https://www.youtube.com/@Orstphone>
