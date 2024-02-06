@@ -153,6 +153,23 @@ class OreLead(originalID: ItemID) : OreItemBase(originalID, true) {
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,6)
 }
 
+class GemQuartz(originalID: ItemID) : OreItemBase(originalID, true) {
+    override var originalName = "ITEM_GEM_QUARTZ"
+    override var smeltingProduct: ItemID? = "item@basegame:149"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(13,6)
+}
+class GemAmethyst(originalID: ItemID) : OreItemBase(originalID, true) {
+    override var originalName = "ITEM_GEM_AMETHYST"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(14,6)
+}
+class ItemRockSalt(originalID: ItemID) : OreItemBase(originalID, true) {
+    override var originalName = "ITEM_ROCK_SALT"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(10,6)
+}
+
 
 class ItemCoalCoke(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_COAL_COKE"

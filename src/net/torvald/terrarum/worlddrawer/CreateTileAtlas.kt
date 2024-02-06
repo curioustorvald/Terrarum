@@ -367,6 +367,11 @@ class CreateTileAtlas {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X4)
             drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_16X4)
         }
+        // predefined by the image dimension: 256x128
+        else if (tilesPixmap.width == TILE_SIZE * 16 && tilesPixmap.height == TILE_SIZE * 8) {
+            addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X8)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_16X8)
+        }
         // predefined by the image dimension: 256x256
         else if (tilesPixmap.width == TILE_SIZE * 16 && tilesPixmap.height == TILE_SIZE * 16) {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X16)
@@ -511,7 +516,8 @@ class CreateTileAtlas {
             const val MASK_TORCH = 3
             const val MASK_PLATFORM = 4
             const val MASK_16X4 = 5
-            const val MASK_16X16 = 6
+            const val MASK_16X8 = 6
+            const val MASK_16X16 = 7
 
             fun maskTypeToTileCount(maskType: Int) = when (maskType) {
                 MASK_NA -> 1
@@ -520,6 +526,7 @@ class CreateTileAtlas {
                 MASK_TORCH -> 4
                 MASK_PLATFORM -> 8
                 MASK_16X4 -> 64
+                MASK_16X8 -> 128
                 MASK_16X16 -> 256
                 else -> throw IllegalArgumentException("Unknown maskType: $maskType")
             }

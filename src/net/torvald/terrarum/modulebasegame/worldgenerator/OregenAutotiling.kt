@@ -62,6 +62,15 @@ class OregenAutotiling(world: GameWorld, isFinal: Boolean, seed: Long, val tilin
                             BlocksDrawer.connectLut16[autotiled] or mult.shl(4)
                         }
 
+                        "a16x8" -> {
+                            // get placement (tile connection) info
+                            val mult = getHashCoord(x, y, 8)
+                            val autotiled = getNearbyOres8(x, y).foldIndexed(0) { index, acc, placement ->
+                                acc or (placement.item == ore).toInt(index)
+                            }
+                            BlocksDrawer.connectLut16[autotiled] or mult.shl(4)
+                        }
+
                         "a16x16" -> {
                             // get placement (tile connection) info
                             val mult = getHashCoord(x, y, 16)

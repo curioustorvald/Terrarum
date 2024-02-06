@@ -332,17 +332,20 @@ internal object TerragenTest : NoiseMaker {
         Block.STONE_MARBLE to Color(0.8f, 0.8f, 0.8f, 1f)
     )
 
-    private val COPPER_ORE = 0x00e9c8ff
-    private val IRON_ORE = 0xff7e74ff.toInt()
-    private val COAL_ORE = 0x383314ff.toInt()
-    private val ZINC_ORE = 0xefde76ff.toInt()
-    private val TIN_ORE = 0xcd8b62ff.toInt()
-    private val GOLD_ORE = 0xffcc00ff.toInt()
-    private val SILVER_ORE = 0xd5d9f9ff.toInt()
-    private val LEAD_ORE = 0xff9300ff.toInt()
+    private val COPPER_ORE = 0//x00e9c8ff.toInt()
+    private val IRON_ORE = 0//xff7e74ff.toInt()
+    private val COAL_ORE = 0//x383314ff.toInt()
+    private val ZINC_ORE = 0//xefde76ff.toInt()
+    private val TIN_ORE = 0//xcd8b62ff.toInt()
+    private val GOLD_ORE = 0//xffcc00ff.toInt()
+    private val SILVER_ORE = 0//xd5d9f9ff.toInt()
+    private val LEAD_ORE = 0//xff9300ff.toInt()
+    private val QUARTZ = 0//x55ff33ff.toInt()
+    private val AMETHYST = 0//xee77ffff.toInt()
+    private val ROCKSALT = 0xff00ffff.toInt()
 
     private val oreCols = listOf(
-        COPPER_ORE, IRON_ORE, COAL_ORE, ZINC_ORE, TIN_ORE, GOLD_ORE, SILVER_ORE, LEAD_ORE
+        COPPER_ORE, IRON_ORE, COAL_ORE, ZINC_ORE, TIN_ORE, GOLD_ORE, SILVER_ORE, LEAD_ORE, ROCKSALT, QUARTZ, AMETHYST
     )
 
     private val terragenYscaling = (NOISEBOX_HEIGHT / 2400.0).pow(0.75)
@@ -353,7 +356,7 @@ internal object TerragenTest : NoiseMaker {
         val cave = if (noiseValue[1] < 0.5) 0 else 1
         val ore = (noiseValue.subList(2, noiseValue.size)).zip(oreCols).firstNotNullOfOrNull { (n, colour) -> if (n > 0.5) colour else null }
 
-        val isMarble = noiseValue[10] > 0.5
+        val isMarble = false // noiseValue[13] > 0.5
 
         val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
         val terrBlock = if (cave == 0) Block.AIR else if (isMarble) Block.STONE_MARBLE else wallBlock
@@ -687,6 +690,9 @@ internal object TerragenTest : NoiseMaker {
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:6", 0.009, 0.300, 0.474, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:7", 0.013, 0.300, 0.476, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:8", 0.017, 0.020, 0.511, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:256", 0.010, -0.366, 0.528, 2.4)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:257", 0.007, 0.100, 0.494, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:258", 0.019, 0.015, 0.509, 1.0)),
 
             Joise(generateRockLayer(groundScalingCached, seed, params, (0..7).map {
                 thicknesses[it] + marblerng.nextTriangularBal() * 0.006 to (2.6 * terragenYscaling) + it * 0.18 + marblerng.nextTriangularBal() * 0.09

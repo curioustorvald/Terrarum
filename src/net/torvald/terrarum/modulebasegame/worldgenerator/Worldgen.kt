@@ -146,7 +146,7 @@ object Worldgen {
         val start = (0.00342f * world.height - 3.22f).floorToInt().coerceAtLeast(1)
         // this value has to extend up, otherwise the player may spawn into the chopped-off mountaintop
         // this value has to extend down into the rock layer, otherwise, if the bottom of the bottom chunk is dirt, they will turn into grasses
-        return start - 1 to start + 6
+        return start - 1 to start + 7
     }
 
     private val rockScoreMin = 40
