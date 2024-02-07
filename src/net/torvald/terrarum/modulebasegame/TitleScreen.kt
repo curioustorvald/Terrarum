@@ -335,8 +335,8 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private fun drawLineOnWorld(x1: Float, y1: Float, x2: Float, y2: Float) {
         val w = 2.0f
         App.shapeRender.rectLine(
-            x1 - WorldCamera.x, App.scr.height - (y1 - WorldCamera.y),
-            x2 - WorldCamera.x, App.scr.height - (y2 - WorldCamera.y),
+            x1 - WorldCamera.x, y1 - WorldCamera.y,
+            x2 - WorldCamera.x, y2 - WorldCamera.y,
             w
         )
     }
