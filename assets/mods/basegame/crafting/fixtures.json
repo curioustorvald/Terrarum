@@ -62,5 +62,12 @@
     "ingredients": [
       [1, 20, "$WOOD"] /* 1 chest = 20 wood */
     ]
+  },
+
+  "item@basegame:30": { /* turntable */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 4, "item@basegame:144", 14, "$WOOD", 10, "item@basegame:113"] /* 1 turntable = 4 quartz, 14 wood, 10 iron */
+    ]
   }
 }

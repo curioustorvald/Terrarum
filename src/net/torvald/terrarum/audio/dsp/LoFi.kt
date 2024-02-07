@@ -24,7 +24,7 @@ import kotlin.math.tanh
 open class LoFi(
     staticModule: String, staticPath: String,
     irModule: String, irPath: String,
-    val crossfeed: Float, gain: Float = 1f / 256f
+    val crossfeed: Float, gain: Float = 1f / 256f, saturationLim: Float = 1f
 ): TerrarumAudioFilter(), DspCompressor {
     override val downForce = arrayOf(1.0f, 1.0f)
 
@@ -72,8 +72,9 @@ open class LoFi(
      * Default function is `tanh(x)`
      */
     open fun saturate(v: Float): Float {
-        return tanh(v)
+        return K * tanh(v / K)
     }
+    private val K = saturationLim.coerceIn(0f, 1f)
 
     override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
         convolver.drawDebugView(batch, x, y)

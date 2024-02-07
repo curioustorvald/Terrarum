@@ -20,3 +20,20 @@ class ItemJukebox(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald
     override var originalName = "ITEM_JUKEBOX"
 
 }
+
+/**
+ * Created by minjaesong on 2024-02-07.
+ */
+class ItemMusicalTurntable(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureMusicalTurntable") {
+
+
+    override var baseMass = 20.0
+    override val isDynamic = false
+    override val materialId = ""
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(7,3)
+
+    override var baseToolSize: Double? = baseMass
+    override var originalName = "ITEM_TURNTABLE"
+
+}

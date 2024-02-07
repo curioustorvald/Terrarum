@@ -7,9 +7,9 @@ import net.torvald.terrarum.ModMgr
  *
  * Created by minjaesong on 2024-01-24.
  */
-class Phono(irModule: String, irPath: String, crossfeed: Float, gain: Float) : LoFi(
+class Phono(irModule: String, irPath: String, crossfeed: Float, gain: Float, saturationLim: Float) : LoFi(
     "basegame", "audio/effects/static/phono_pops.ogg",
-    irModule, irPath, crossfeed, gain
+    irModule, irPath, crossfeed, gain, saturationLim
 )
 
 /**
@@ -17,9 +17,9 @@ class Phono(irModule: String, irPath: String, crossfeed: Float, gain: Float) : L
  *
  * Created by minjaesong on 2024-01-24.
  */
-class Tape(irModule: String, irPath: String, crossfeed: Float, gain: Float) : LoFi(
+class Tape(irModule: String, irPath: String, crossfeed: Float, gain: Float, saturationLim: Float) : LoFi(
     "basegame", "audio/effects/static/tape_hiss.ogg",
-    irModule, irPath, crossfeed, gain
+    irModule, irPath, crossfeed, gain, saturationLim
 )
 
 /**
@@ -29,7 +29,7 @@ class Tape(irModule: String, irPath: String, crossfeed: Float, gain: Float) : Lo
  *
  * Created by minjaesong on 2024-01-24.
  */
-class Holo(irModule: String, irPath: String, crossfeed: Float, gain: Float) : LoFi(
+class Holo(irModule: String, irPath: String, crossfeed: Float, gain: Float, saturationLim: Float) : LoFi(
     "basegame", "audio/effects/static/film_pops_lowpass.ogg",
-    irModule, irPath, crossfeed, gain
+    irModule, irPath, crossfeed, gain, saturationLim
 )

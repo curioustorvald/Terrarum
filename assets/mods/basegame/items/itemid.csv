@@ -28,6 +28,7 @@ id;classname;tags
 27;net.torvald.terrarum.modulebasegame.gameitems.ItemFurnaceAndAnvil;FIXTURE,CRAFTING
 28;net.torvald.terrarum.modulebasegame.gameitems.ItemJukebox;FIXTURE,MUSIC
 29;net.torvald.terrarum.modulebasegame.gameitems.ItemCharcoal;COMBUSTIBLE
+30;net.torvald.terrarum.modulebasegame.gameitems.ItemMusicalTurntable;FIXTURE,MUSIC
 
 # ingots
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT
@@ -78,15 +79,15 @@ id;classname;tags
 
 # data storage (discs; 256)
 # 32768 is a reserved number for a blank disc
-32769;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc01;MUSIC
-32770;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc02;MUSIC
-32771;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc03;MUSIC
-32772;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc04;MUSIC
-32773;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc05;MUSIC
-32774;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc06;MUSIC
-32775;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc07;MUSIC
-32776;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc08;MUSIC
-32777;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc09;MUSIC
+32769;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc01;MUSIC,PHONO
+32770;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc02;MUSIC,PHONO
+32771;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc03;MUSIC,PHONO
+32772;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc04;MUSIC,PHONO
+32773;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc05;MUSIC,PHONO
+32774;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc06;MUSIC,PHONO
+32775;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc07;MUSIC,PHONO
+32776;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc08;MUSIC,PHONO
+32777;net.torvald.terrarum.modulebasegame.gameitems.MusicDisc09;MUSIC,PHONO
 
 # data storage (tapestries; 256)
 #33023;net.torvald.terrarum.modulebasegame.gameitems.ItemTapestry;FIXTURE

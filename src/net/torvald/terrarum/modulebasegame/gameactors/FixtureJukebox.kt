@@ -18,6 +18,7 @@ import net.torvald.terrarum.audio.dsp.LoFi
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.audio.dsp.Phono
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gameitems.ItemID
@@ -217,19 +218,11 @@ class FixtureJukebox : Electric, PlaysMusic {
     }
 
     private fun loadConvolver(it: TerrarumAudioMixerTrack?) {
-        it?.filters?.set(filterIndex, Phono(
-            "basegame",
-            "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin",
-            0f, 5f / 16f
-        ))
+        Companion.loadConvolver(filterIndex, it, "basegame", "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin")
     }
 
     private fun unloadConvolver(music: MusicContainer?) {
-        if (music != null) {
-            musicTracks[music]?.let {
-                it.filters[filterIndex] = NullFilter
-            }
-        }
+        Companion.unloadConvolver(this, filterIndex, music)
     }
 
     override fun reload() {
@@ -242,8 +235,25 @@ class FixtureJukebox : Electric, PlaysMusic {
     override fun dispose() {
         App.audioMixerReloadHooks.remove(this)
         super.dispose()
-//        testMusic.gdxMusic.dispose()
 
         // no need to dispose of backlamp and playmech: they share the same texture with the main sprite
+    }
+
+    companion object {
+        fun loadConvolver(filterIndex: Int, it: TerrarumAudioMixerTrack?, module: String, path: String, gain: Float = 5f / 16f, satLim: Float = 1f) {
+            it?.filters?.set(filterIndex, Phono(
+                module,
+                path,
+                0f, gain, satLim
+            ))
+        }
+
+        fun unloadConvolver(actor: Actor, filterIndex: Int, music: MusicContainer?) {
+            if (music != null) {
+                actor.musicTracks[music]?.let {
+                    it.filters[filterIndex] = NullFilter
+                }
+            }
+        }
     }
 }
