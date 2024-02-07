@@ -73,7 +73,7 @@ class WeatherObjectCloud(
             else "UNKNOWN"
         }
         else {
-            life += 1
+            life += world.worldTime.timeDelta
         }
     }
 
