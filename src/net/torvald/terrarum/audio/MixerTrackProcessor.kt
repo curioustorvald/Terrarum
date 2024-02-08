@@ -36,6 +36,9 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
 
     internal var streamBuf: AudioProcessBuf? = null
 
+    internal var jitterMode = 0
+    internal var jitterIntensity = 0f
+
     private var fout1 = listOf(emptyBuf, emptyBuf)
 
     val maxSigLevel = arrayOf(0.0, 0.0)
@@ -84,7 +87,10 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
             }
 
             bytesRead
-        }, { purgeStreamBuf() })
+        }, { purgeStreamBuf() }).also {
+            it.jitterMode = jitterMode
+            it.jitterIntensity = jitterIntensity
+        }
     }
 
     private fun read0(buffer: ByteArray, bytesRead: Int): Int {

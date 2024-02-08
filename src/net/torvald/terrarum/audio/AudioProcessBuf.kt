@@ -1,10 +1,12 @@
 package net.torvald.terrarum.audio
 
+import com.jme3.math.FastMath
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.floorToInt
+import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.serialise.toUint
 import org.dyn4j.Epsilon
 import kotlin.math.PI
@@ -27,17 +29,40 @@ private data class Frac(var nom: Int, val denom: Int) {
 class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) -> Int?, val onAudioFinished: () -> Unit) {
 
     var playbackSpeed = 1f
-        set(value) {
-            field = value.coerceIn(0.5f, 2f)
-        }
+    var jitterMode = 0 // 0: none, 1: phono, 2: tape
+    var jitterIntensity = 0f
+
+
+    private fun _jitterPhonoEccentricity(t: Float): Float {
+        val a = FastMath.TWO_PI * t * RPM
+        val b = 60f * SAMPLING_RATE
+        return sin(a / b).toRate()
+    }
+
+    private fun jitterMode1(t: Float): Float {
+        return _jitterPhonoEccentricity(t)
+    }
+
+    private fun Float.toRate(): Float {
+        return if (this >= 0f) 1f + this
+        else 1f / (1f - this)
+    }
+
+    private val playRate: Float
+        get() = playbackSpeed.coerceIn(0.5f, 2f)/*(playbackSpeed * when (jitterMode) {  // disabled until arraycopy negative length bug is resolved
+            1 -> jitterMode1(totalSamplesPlayed.toFloat())
+            else -> 0f
+        } * jitterIntensity).coerceIn(0.5f, 2f)*/
 
     private val internalSamplingRate
-        get() = inputSamplingRate * playbackSpeed
+        get() = inputSamplingRate * playRate
 
     private val doResample
-        get() = !(inputSamplingRate == SAMPLING_RATE && (playbackSpeed - 1f).absoluteValue < (1f / 1024f))
+        get() = !(inputSamplingRate == SAMPLING_RATE && (playRate - 1f).absoluteValue < (1f / 1024f))
 
     companion object {
+        private val RPM = 45f
+
         private val epsilon: Double = Epsilon.E
 
         private val TAPS = 4 // 2*a tap lanczos intp. Lower = greater artefacts
@@ -111,10 +136,12 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
 
     var validSamplesInBuf = 0
 
+    var totalSamplesPlayed = 0L
+
     private val finL = FloatArray(fetchSize + 2 * PADSIZE)
     private val finR = FloatArray(fetchSize + 2 * PADSIZE)
-    private val fmidL = FloatArray((fetchSize / q + 1.0).toInt() * 2)
-    private val fmidR = FloatArray((fetchSize / q + 1.0).toInt() * 2)
+    private val fmidL = FloatArray((fetchSize * 2 + 1.0).toInt())
+    private val fmidR = FloatArray((fetchSize * 2 + 1.0).toInt())
     private val foutL = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
     private val foutR = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
     private val readBuf = ByteArray(fetchSize * 4)
@@ -179,6 +206,7 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
                 }
 
                 validSamplesInBuf += writeCount
+                totalSamplesPlayed += writeCount
             }
         }
         else {

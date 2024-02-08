@@ -55,7 +55,7 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
 
 
         App.audioMixerReloadHooks[this] = {
-            loadConvolver(musicTracks[musicNowPlaying])
+            loadEffector(musicTracks[musicNowPlaying])
         }
 
         despawnHook = {
@@ -120,7 +120,7 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
             App.printdbg(this, "Title: $title, artist: $artist")
 
             musicNowPlaying = MusicContainer(title, musicFile.file(), Gdx.audio.newMusic(musicFile)) {
-                unloadConvolver(musicNowPlaying)
+                unloadEffector(musicNowPlaying)
                 musicNowPlaying?.gdxMusic?.tryDispose()
                 musicNowPlaying = null
 
@@ -132,7 +132,7 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
             }
 
             App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 2f) {
-                startAudio(musicNowPlaying!!) { loadConvolver(it) }
+                startAudio(musicNowPlaying!!) { loadEffector(it) }
             }
 
             (sprite as SheetSpriteAnimation).currentRow = 0
@@ -152,18 +152,20 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
     private fun stopDiscPlayback() {
         musicNowPlaying?.let {
             stopAudio(it)
-            unloadConvolver(it)
+            unloadEffector(it)
         }
 
         (sprite as SheetSpriteAnimation).currentRow = 1
     }
 
-    private fun loadConvolver(it: TerrarumAudioMixerTrack?) {
+    private fun loadEffector(it: TerrarumAudioMixerTrack?) {
         FixtureJukebox.loadConvolver(filterIndex, it, "basegame", "audio/convolution/Soundwoofer - small_speaker_Gallien Krueger GK 250ML B5 Left A 230 200 320.bin", 3.5f / 16f, 0.8f)
+        FixtureJukebox.setJitter(it, 1, 0.01f)
     }
 
-    private fun unloadConvolver(music: MusicContainer?) {
+    private fun unloadEffector(music: MusicContainer?) {
         FixtureJukebox.unloadConvolver(this, filterIndex, music)
+        FixtureJukebox.unsetJitter(this, music)
     }
 
     override fun reload() {

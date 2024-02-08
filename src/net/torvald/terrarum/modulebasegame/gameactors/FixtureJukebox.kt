@@ -2,7 +2,6 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
@@ -13,8 +12,6 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.AudioMixer.Companion.DEFAULT_FADEOUT_LEN
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
-import net.torvald.terrarum.audio.dsp.Convolv
-import net.torvald.terrarum.audio.dsp.LoFi
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.audio.dsp.Phono
 import net.torvald.terrarum.gameactors.AVKey
@@ -93,7 +90,7 @@ class FixtureJukebox : Electric, PlaysMusic {
 
 
         App.audioMixerReloadHooks[this] = {
-            loadConvolver(musicTracks[musicNowPlaying])
+            loadEffector(musicTracks[musicNowPlaying])
         }
 
         despawnHook = {
@@ -131,7 +128,7 @@ class FixtureJukebox : Electric, PlaysMusic {
             printdbg(this, "Title: $title, artist: $artist")
 
             musicNowPlaying = MusicContainer(title, musicFile.file(), Gdx.audio.newMusic(musicFile)) {
-                unloadConvolver(musicNowPlaying)
+                unloadEffector(musicNowPlaying)
                 discCurrentlyPlaying = null
                 musicNowPlaying?.gdxMusic?.tryDispose()
                 musicNowPlaying = null
@@ -149,7 +146,7 @@ class FixtureJukebox : Electric, PlaysMusic {
             discCurrentlyPlaying = index
 
             App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
-                startAudio(musicNowPlaying!!) { loadConvolver(it) }
+                startAudio(musicNowPlaying!!) { loadEffector(it) }
             }
 
 
@@ -210,19 +207,21 @@ class FixtureJukebox : Electric, PlaysMusic {
     private fun stopDiscPlayback() {
         musicNowPlaying?.let {
             stopAudio(it)
-            unloadConvolver(it)
+            unloadEffector(it)
         }
 
         backLamp.currentFrame = 0
         playMech.currentFrame = 0
     }
 
-    private fun loadConvolver(it: TerrarumAudioMixerTrack?) {
-        Companion.loadConvolver(filterIndex, it, "basegame", "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin")
+    private fun loadEffector(it: TerrarumAudioMixerTrack?) {
+        loadConvolver(filterIndex, it, "basegame", "audio/convolution/Soundwoofer - large_speaker_Marshall JVM 205C SM57 A 0 0 1.bin")
+        setJitter(it, 1, 0.005f)
     }
 
-    private fun unloadConvolver(music: MusicContainer?) {
-        Companion.unloadConvolver(this, filterIndex, music)
+    private fun unloadEffector(music: MusicContainer?) {
+        unloadConvolver(this, filterIndex, music)
+        unsetJitter(this, music)
     }
 
     override fun reload() {
@@ -248,11 +247,25 @@ class FixtureJukebox : Electric, PlaysMusic {
             ))
         }
 
+        fun setJitter(it: TerrarumAudioMixerTrack?, mode: Int, intensity: Float) {
+            it?.let {
+                it.processor.jitterMode = mode
+                it.processor.jitterIntensity = intensity
+            }
+        }
+
         fun unloadConvolver(actor: Actor, filterIndex: Int, music: MusicContainer?) {
             if (music != null) {
                 actor.musicTracks[music]?.let {
                     it.filters[filterIndex] = NullFilter
                 }
+            }
+        }
+
+        fun unsetJitter(actor: Actor, music: MusicContainer?) {
+            actor.musicTracks[music]?.let {
+                it.processor.jitterMode = 0
+                it.processor.jitterIntensity = 0f
             }
         }
     }
