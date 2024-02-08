@@ -180,7 +180,7 @@ class AssembledSpriteAnimation(
                             val w = image.regionWidth * scale
                             val h = image.regionHeight * scale
                             val fposX = posX.floorToFloat() + drawPos.x * scale
-                            val fposY = posY.floorToFloat() + drawPos.y * scale - h
+                            val fposY = (posY - 0.5f).floorToFloat() + drawPos.y * scale - h
 
                             // draw
                             if (flipHorizontal && flipVertical)
@@ -205,7 +205,7 @@ class AssembledSpriteAnimation(
                         val w = image.regionWidth * scale
                         val h = image.regionHeight * scale
                         val fposX = posX.floorToFloat() + drawPos.x * scale
-                        val fposY = posY.floorToFloat() + drawPos.y * scale
+                        val fposY = (posY - 0.5f).floorToFloat() + drawPos.y * scale
 
                         if (flipHorizontal && flipVertical)
                             batch.draw(image, fposX + txFlp, fposY + tyFlp, -w, -h)
