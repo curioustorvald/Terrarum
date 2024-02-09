@@ -72,7 +72,7 @@ basegame
     // Commit counts up to the Release 0.3.2: 2732
     // Commit counts up to the Release 0.3.3: 3020
 
-//    val VERSION_SNAPSHOT = if (App.IS_DEVELOPMENT_BUILD) Snapshot(0) else null // for normal dev
+//    val VERSION_SNAPSHOT = Snapshot(0) // for normal dev
 //    val VERSION_SNAPSHOT = ForcedSnapshot("24w04a") // for snapshot release
     val VERSION_SNAPSHOT = null // for the release
 
