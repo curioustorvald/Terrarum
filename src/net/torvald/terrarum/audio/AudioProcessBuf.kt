@@ -6,7 +6,6 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.floorToInt
-import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.serialise.toUint
 import org.dyn4j.Epsilon
 import kotlin.math.PI

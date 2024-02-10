@@ -12,7 +12,6 @@ import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RAT
 import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.modulebasegame.BuildingMaker
 import java.lang.Thread.MAX_PRIORITY
 import java.util.*
 import kotlin.math.*
@@ -311,16 +310,8 @@ class AudioMixer : Disposable {
     private var muteLatched = false
 
     fun update(delta: Float) {
-        // test the panning
-        /*musicTrack.getFilter<BinoPan>().let {
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                it.pan = (it.pan + 0.001f).coerceIn(-1f, 1f)
-            }
-            else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                it.pan = (it.pan - 0.001f).coerceIn(-1f, 1f)
-            }
-        }*/
-        if (Terrarum.ingame is BuildingMaker) {
+        // enable manual mixer on BuildingMaker
+        if (Terrarum.ingame?.javaClass?.canonicalName == "net.torvald.terrarum.modulebasegame.BuildingMaker") {
             val mixDelta = if (testAudioMixRatio >= 0.0) 0.001 else (0.001 * MaterialCodex["AIIR"].sondrefl).absoluteValue
 
             if (Gdx.input.isKeyPressed(Input.Keys.UP))
