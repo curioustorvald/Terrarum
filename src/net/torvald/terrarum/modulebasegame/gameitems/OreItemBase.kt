@@ -155,7 +155,7 @@ class OreLead(originalID: ItemID) : OreItemBase(originalID, true) {
 
 class GemQuartz(originalID: ItemID) : OreItemBase(originalID, true) {
     override var originalName = "ITEM_GEM_QUARTZ"
-    override var smeltingProduct: ItemID? = "item@basegame:149"
+    override var smeltingProduct: ItemID? = "basegame:149"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(13,6)
 }

@@ -96,16 +96,9 @@ class ItemCodex {
      * Returns the item in the Codex. If the item is static, its clone will be returned (you are free to modify the returned item).
      * However, if the item is dynamic, the item itself will be returned.
      *
-     * The returned object is a clone of the original object. Modifying fields will NOT affect the game.
+     * The returned object is mutable. Modifying fields WILL affect the game.
      */
     operator fun get(code: ItemID?): GameItem? {
-        return get0(code)?.clone()
-    }
-
-    /**
-     * Same as `get` but the object is mutable.
-     */
-    fun get0(code: ItemID?): GameItem? {
         if (code == null) return null
 
         if (code.startsWith("$PREFIX_DYNAMICITEM:"))
@@ -119,7 +112,7 @@ class ItemCodex {
         }
         else // generic item
             return itemCodex[code] // from CSV
-    }
+   }
 
     fun dynamicToStaticID(dynamicID: ItemID) = dynamicToStaticTable[dynamicID]!!
     fun fixtureToItemID(fixture: FixtureBase) = fixtureToSpawnerItemID[fixture.javaClass.canonicalName]!!

@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameitems
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ReferencingRanges.PREFIX_ACTORITEM
 import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
 import net.torvald.terrarum.ReferencingRanges.PREFIX_VIRTUALTILE

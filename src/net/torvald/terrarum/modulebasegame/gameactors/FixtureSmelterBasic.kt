@@ -249,6 +249,10 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
             if (progress >= CALORIES_PER_ROASTING) {
                 val smeltingProduct = oreItemProp.smeltingProduct!!
+
+                // check if the item even exists
+                if (ItemCodex[smeltingProduct] == null) throw NullPointerException("No item prop for $smeltingProduct")
+
                 if (productItem == null)
                     productItem = InventoryPair(smeltingProduct, 1L)
                 else

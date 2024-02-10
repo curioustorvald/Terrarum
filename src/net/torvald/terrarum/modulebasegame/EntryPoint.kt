@@ -50,8 +50,8 @@ class EntryPoint : ModuleEntryPoint() {
 
         // add smelting recipe for sands
         BlockCodex.filter { it.hasTag("SAND") }.forEach { (itemID, _) ->
-            ItemCodex.get0(itemID)!!.tags.add("SMELTABLE")
-            ItemCodex.get0(itemID)!!.smeltingProduct = "basegame:148"
+            ItemCodex[itemID]!!.tags.add("SMELTABLE")
+            ItemCodex[itemID]!!.smeltingProduct = "basegame:148"
         }
 
         println("\n[Basegame.EntryPoint] Welcome back!")
