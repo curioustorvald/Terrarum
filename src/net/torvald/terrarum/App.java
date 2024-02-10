@@ -1221,7 +1221,7 @@ public class App implements ApplicationListener {
 
 
         audioBufferSize = getConfigInt("audio_buffer_size");
-        audioMixer = new AudioMixer(audioBufferSize);
+        audioMixer = new AudioMixer();
         audioMixerInitialised = true;
         audioManagerThread = new Thread(new AudioManagerRunnable(audioMixer), "TerrarumAudioManager");
         audioManagerThread.setPriority(MAX_PRIORITY); // higher = more predictable; audio delay is very noticeable so it gets high priority
@@ -1257,7 +1257,7 @@ public class App implements ApplicationListener {
         audioMixer.dispose();
 
         audioBufferSize = bufferSize;
-        audioMixer = new AudioMixer(audioBufferSize);
+        audioMixer = new AudioMixer();
 
         // paste music tracks
         for (int i = 0; i < audioMixer.getDynamicTracks().length; i++) {

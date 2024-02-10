@@ -5,12 +5,12 @@ import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.audio.AudioMixer
+import net.torvald.terrarum.audio.MusicContainer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.modulebasegame.TerrarumMusicGovernor
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef

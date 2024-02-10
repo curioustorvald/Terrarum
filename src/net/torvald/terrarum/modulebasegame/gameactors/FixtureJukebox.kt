@@ -11,6 +11,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.AudioMixer.Companion.DEFAULT_FADEOUT_LEN
+import net.torvald.terrarum.audio.MusicContainer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.audio.dsp.Phono
@@ -20,7 +21,6 @@ import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.MusicContainer
 import net.torvald.terrarum.modulebasegame.TerrarumMusicGovernor
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef

@@ -13,7 +13,6 @@ import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.BuildingMaker
-import net.torvald.terrarum.modulebasegame.MusicContainer
 import java.lang.Thread.MAX_PRIORITY
 import java.util.*
 import kotlin.math.*
@@ -23,7 +22,7 @@ import kotlin.math.*
  *
  * Created by minjaesong on 2023-11-07.
  */
-class AudioMixer(val bufferSize: Int): Disposable {
+class AudioMixer : Disposable {
 
     companion object {
         const val SPEED_OF_SOUND_AIR = 340f
