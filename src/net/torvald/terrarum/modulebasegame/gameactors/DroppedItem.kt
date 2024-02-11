@@ -147,6 +147,8 @@ open class DroppedItem : ActorWithBody {
             this.lightBoxList[0].light = getLum(this.itemID)
         }
 
+        super.updateImpl(delta)
+
         timeSinceSpawned += delta
 
         // merge into the already existing droppeditem with isStationary==true if one is detected

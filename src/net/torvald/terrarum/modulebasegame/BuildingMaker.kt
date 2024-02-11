@@ -689,6 +689,8 @@ class MovableWorldCamera(val parent: BuildingMaker) : ActorHumanoid(0, physProp 
     )
 
     override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
+
         // confine the camera so it won't wrap
         this.hitbox.hitboxStart.setCoerceIn(coerceInStart, coerceInEnd)
     }
