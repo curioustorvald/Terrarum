@@ -4,14 +4,13 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
 import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
-import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.TitleScreen
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -98,6 +97,10 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         oldScreen = 0
     }
 
+    // disable save button if autosave is will be there within five seconds
+    private val gameCanBeSaved: Boolean
+        get() = (App.getConfigInt("autosaveinterval").div(1000f) - ((Terrarum.ingame as? TerrarumIngame)?.autosaveTimer ?: 0f)) >= 5f
+
     init {
         uiItems.add(gameMenuButtons)
 
@@ -105,50 +108,55 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         gameMenuButtons.selectionChangeListener = { _, new ->
             when (new) {
                 0 -> {
-                    screen = 3; gameMenuButtons.deselect()
-                    full.handler.lockToggle()
-                    full.lockTransition()
+
+                    if (gameCanBeSaved) {
+
+                        screen = 3; gameMenuButtons.deselect()
+                        full.handler.lockToggle()
+                        full.lockTransition()
 
 
-                    // save the game
-                    val onError = { _: Throwable ->
-                        // TODO: show some error indicator
-                        screen = 0
-                        full.handler.unlockToggle()
-                        full.unlockTransition()
-                    }
-
-                    val onSuccessful = {
-                        // return to normal state
-                        System.gc()
-                        screen = 0
-                        full.handler.unlockToggle()
-                        full.unlockTransition()
-                        (INGAME as TerrarumIngame).autosaveTimer = 0f
-                    }
-
-
-                    /*val saveTime_t = App.getTIME_T()
-                    val playerSavefile = getPlayerSaveFiledesc(INGAME.playerSavefileName)
-                    val worldSavefile = getWorldSaveFiledesc(INGAME.worldSavefileName)
-                    INGAME.makeSavegameBackupCopy(playerSavefile)
-                    WriteSavegame(saveTime_t, WriteSavegame.SaveMode.PLAYER, INGAME.playerDisk, playerSavefile, INGAME as TerrarumIngame, false, onError) {
-
-                        INGAME.makeSavegameBackupCopy(worldSavefile)
-                        WriteSavegame(saveTime_t, WriteSavegame.SaveMode.WORLD, INGAME.worldDisk, worldSavefile, INGAME as TerrarumIngame, false, onError) {
-                            // callback:
-                            // rebuild the disk skimmers
-                            INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().forEach {
-                                printdbg(this, "Game Save callback -- rebuilding the disk skimmer for IngamePlayer ${it.actorValue.getAsString(AVKey.NAME)}")
-//                                it.rebuildingDiskSkimmer?.rebuild()
-                            }
-
-                            // return to normal state
-                            onSuccessful()
+                        // save the game
+                        val onError = { _: Throwable ->
+                            // TODO: show some error indicator
+                            screen = 0
+                            full.handler.unlockToggle()
+                            full.unlockTransition()
                         }
-                    }*/
 
-                    INGAME.saveTheGame(onSuccessful, onError)
+                        val onSuccessful = {
+                            // return to normal state
+                            System.gc()
+                            screen = 0
+                            full.handler.unlockToggle()
+                            full.unlockTransition()
+                            (INGAME as TerrarumIngame).autosaveTimer = 0f
+                        }
+
+
+                        /*val saveTime_t = App.getTIME_T()
+                        val playerSavefile = getPlayerSaveFiledesc(INGAME.playerSavefileName)
+                        val worldSavefile = getWorldSaveFiledesc(INGAME.worldSavefileName)
+                        INGAME.makeSavegameBackupCopy(playerSavefile)
+                        WriteSavegame(saveTime_t, WriteSavegame.SaveMode.PLAYER, INGAME.playerDisk, playerSavefile, INGAME as TerrarumIngame, false, onError) {
+
+                            INGAME.makeSavegameBackupCopy(worldSavefile)
+                            WriteSavegame(saveTime_t, WriteSavegame.SaveMode.WORLD, INGAME.worldDisk, worldSavefile, INGAME as TerrarumIngame, false, onError) {
+                                // callback:
+                                // rebuild the disk skimmers
+                                INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().forEach {
+                                    printdbg(this, "Game Save callback -- rebuilding the disk skimmer for IngamePlayer ${it.actorValue.getAsString(AVKey.NAME)}")
+    //                                it.rebuildingDiskSkimmer?.rebuild()
+                                }
+
+                                // return to normal state
+                                onSuccessful()
+                            }
+                        }*/
+
+                        INGAME.saveTheGame(onSuccessful, onError)
+
+                    }
 
 
                 }
@@ -183,6 +191,17 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                 }
             }
         }
+
+
+        // when the save button is disabled, show time countdown
+        gameMenuButtons.buttons[0].textfun = {
+            if (gameCanBeSaved)
+                Lang["MENU_IO_SAVE_GAME"]
+            else {
+                val timeRemainSec = (App.getConfigInt("autosaveinterval").div(1000f) - ((Terrarum.ingame as? TerrarumIngame)?.autosaveTimer ?: 0f))
+                Lang["MENU_IO_SAVE_GAME"] + " (${timeRemainSec.ceilToInt()})"
+            }
+        }
     }
 
     private val controlHintX = ((width - 480) / 2).toFloat()
@@ -195,6 +214,9 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     // `screens` order
     private val screenRenders = arrayOf(
         { frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera ->
+            // update button status
+            gameMenuButtons.buttons[0].isEnabled = gameCanBeSaved
+
             // control hints
             App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, UIInventoryFull.yEnd - 20)
             // text buttons
