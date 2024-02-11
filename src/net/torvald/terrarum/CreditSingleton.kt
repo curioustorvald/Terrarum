@@ -330,6 +330,11 @@ Sound from <https://freesound.org/people/stecman>
 ℗ 2015 Joe DeShon
 Sound from <https://freesound.org/people/joedeshon>
 
+    - effects/static/bonfire.ogg
+    
+℗ 2019 DrinkingWindGames
+Sound from <https://freesound.org/people/DrinkingWindGames>
+
 
 
 $BULLET Impulse Responses:
