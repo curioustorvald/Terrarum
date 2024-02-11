@@ -21,6 +21,8 @@ The basegame (and by extension this music player) does support the Gapless Playb
 However, because of the inherent limitation of the MP3 format, the Gapless Playback is not achievable
 without extensive hacks. If you do care, please convert your MP3 files into WAV or OGG format.
 
+Every track on the album must have the same sampling rate, as the "streaming buffer" used for the gapless
+playback cannot change its sampling rate mid-stream.
 
 ## SACD-Quality WAV File Incompatibility
 
