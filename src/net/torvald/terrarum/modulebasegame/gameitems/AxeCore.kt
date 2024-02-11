@@ -57,6 +57,7 @@ object AxeCore {
 
             val actorvalue = actor.actorValue
             val tile = INGAME.world.getTileFromTerrain(x, y)
+            val tileprop = BlockCodex[tile]
 
             item?.using = true
 
@@ -71,8 +72,8 @@ object AxeCore {
             if (!ret1) return ret1*/
 
 
-            // check if tile under mouse is leaves
-            if (BlockCodex[tile].hasTag("LEAVES")) {
+            // check if tile under mouse is to be immediately busted
+            if (tileprop.hasTag("LEAVES")) { // leaves (randomly drops stick)
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
@@ -93,8 +94,35 @@ object AxeCore {
 
                 usageStatus = usageStatus or true
             }
+            else if (tileprop.hasTag("WOODEN")) { // tiles with WOODEN tag (plank, wooden platform, wooden scaffolding)
+                val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+                val swingDmgToFrameDmg = delta.toDouble() / actionInterval
+
+                INGAME.world.inflictTerrainDamage(
+                    x, y,
+                    Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg
+                ).let { tileBroken ->
+                    // tile busted
+                    if (tileBroken != null) {
+                        val drop = BlockCodex[tileBroken].drop
+
+                        if (drop.isNotBlank()) {
+                            PickaxeCore.dropItem(drop, x, y)
+                        }
+
+                        PickaxeCore.makeDust(tile, x, y, 9)
+                        PickaxeCore.makeNoise(actor, tile)
+                    }
+                    // tile not busted
+                    if (Math.random() < actionInterval) {
+                        PickaxeCore.makeDust(tile, x, y, 1)
+                    }
+                }
+
+                usageStatus = usageStatus or true
+            }
             // check if tile under mouse is a tree
-            else if (BlockCodex[tile].hasAllTag(listOf("TREE", "TREETRUNK") + additionalCheckTags)) {
+            else if (tileprop.hasAllTag(listOf("TREE", "TREETRUNK") + additionalCheckTags)) {
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
