@@ -572,7 +572,7 @@ object ModMgr {
             override var baseMass: Double = tile.density / 100.0
             override var baseToolSize: Double? = null
             override var inventoryCategory = if (isWall) Category.WALL else Category.BLOCK
-            override var isDynamic = false
+            override var canBeDynamic = false
             override val materialId = tile.material
             override var equipPosition = EquipPosition.HAND_GRIP
             //        override val itemImage: TextureRegion

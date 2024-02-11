@@ -14,7 +14,7 @@ open class OreItemBase(originalID: ItemID, private val registerToOreDict: Boolea
     override var baseMass = 10.0
     override var baseToolSize: Double? = null
     override var inventoryCategory = Category.GENERIC
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = "OORE"
     override var equipPosition = EquipPosition.HAND_GRIP
 

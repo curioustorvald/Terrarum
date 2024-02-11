@@ -41,7 +41,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     override var dynamicID: ItemID = originalID
     @Transient override var baseMass = 1.0
     @Transient override var inventoryCategory = Category.FIXTURE
-    override val isDynamic = false
+    override val canBeDynamic = false
     @Transient override val materialId = ""
 
     @Transient override var equipPosition: Int = EquipPosition.HAND_GRIP

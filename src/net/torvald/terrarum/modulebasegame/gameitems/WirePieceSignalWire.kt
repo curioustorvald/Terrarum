@@ -18,7 +18,7 @@ class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, priva
     override var baseMass = 0.001
     override var baseToolSize: Double? = null
     override var inventoryCategory = Category.WIRE
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet(atlasID).get(sheetX, sheetY)

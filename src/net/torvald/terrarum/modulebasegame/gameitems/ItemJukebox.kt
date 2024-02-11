@@ -11,7 +11,7 @@ class ItemJukebox(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald
 
 
     override var baseMass = 200.0
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(6,3)
@@ -28,7 +28,7 @@ class ItemMusicalTurntable(originalID: ItemID) : FixtureItemBase(originalID, "ne
 
 
     override var baseMass = 20.0
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(7,3)

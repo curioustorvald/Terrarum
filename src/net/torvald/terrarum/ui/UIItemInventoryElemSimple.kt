@@ -2,7 +2,6 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -98,7 +97,7 @@ class UIItemInventoryElemSimple(
 
 
             // if item has durability, draw that and don't draw count; durability and itemCount cannot coexist
-            if (item!!.maxDurability > 0.0) {
+            if (item!!.isCurrentlyDynamic && item!!.maxDurability > 0.0) {
                 // draw durability metre
                 val barFullLen = width
                 val barOffset = posX
@@ -133,11 +132,11 @@ class UIItemInventoryElemSimple(
 
 
             // set tooltip accordingly
-            if (tooltipShowing[hash] != true && item != null && mouseUp) {
+            if (tooltipShowing[hash] != true && mouseUp) {
 //                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
 
                 val grey = App.fontGame.toColorCode(11, 11, 11)
-                val itemIDstr = "\n$grey(${item?.originalID}${if (item?.originalID == item?.dynamicID) "" else "/${item?.dynamicID}"})"
+                val itemIDstr = "\n$grey(${item?.originalID}${if (item?.isCurrentlyDynamic == true) "/${item?.dynamicID}" else ""})"
                 val nameStr0 = if (item?.nameSecondary?.isNotBlank() == true) "${item?.name}\n$grey${item?.nameSecondary}" else "${item?.name}"
                 val nameStr = if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) nameStr0 + itemIDstr else nameStr0
                 val descStr = Lang.getOrNull("TOOLTIP_${item?.originalID}")?.replace("\n","\n$grey")

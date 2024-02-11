@@ -11,7 +11,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class ItemSmelterBasic(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSmelterBasic") {
     override var baseMass = 100.0
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(4,3)

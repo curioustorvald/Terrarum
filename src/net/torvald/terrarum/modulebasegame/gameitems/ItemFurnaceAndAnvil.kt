@@ -11,7 +11,7 @@ class ItemFurnaceAndAnvil(originalID: ItemID) : FixtureItemBase(originalID, "net
 
 
     override var baseMass = 100.0
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(5,3)

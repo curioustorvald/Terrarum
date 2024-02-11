@@ -3,7 +3,6 @@ package net.torvald.terrarum.gameitems
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ReferencingRanges.PREFIX_ACTORITEM
 import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
 import net.torvald.terrarum.ReferencingRanges.PREFIX_VIRTUALTILE
@@ -115,7 +114,10 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      *
      *         The opposite of this is called STATIC and their example is a Block.
      */
-    abstract val isDynamic: Boolean
+    abstract val canBeDynamic: Boolean
+
+    val isCurrentlyDynamic: Boolean
+        get() = originalID != dynamicID
 
     /**
      * Where to equip the item.

@@ -40,7 +40,7 @@ object MusicDiscHelper {
 open class MusicDiscPrototype(originalID: ItemID, module: String, path: String) : ItemFileRef(originalID) {
     override var refPath = path
     override var refModuleName = module
-    override val isDynamic = false
+    override val canBeDynamic = false
     @Transient override var ref = ModMgr.getFile(refModuleName, refPath)
     override var mediumIdentifier = "music_disc"
 

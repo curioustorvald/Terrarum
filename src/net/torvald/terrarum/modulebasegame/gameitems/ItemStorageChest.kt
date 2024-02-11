@@ -14,7 +14,7 @@ class ItemStorageChest(originalID: ItemID) : FixtureItemBase(originalID, "net.to
 
     override var dynamicID: ItemID = originalID
     override var baseMass = FixtureTikiTorch.MASS
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/storage_chest.tga")

@@ -88,7 +88,7 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
     override var baseMass = 0.1
     override var baseToolSize: Double? = baseMass
     override var inventoryCategory = Category.TOOL
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1, 3)

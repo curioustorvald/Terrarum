@@ -64,7 +64,7 @@ open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
     override var baseMass = 1.0
     override var baseToolSize: Double? = null
     override var inventoryCategory = Category.MISC
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override var equipPosition = EquipPosition.HAND_GRIP
 

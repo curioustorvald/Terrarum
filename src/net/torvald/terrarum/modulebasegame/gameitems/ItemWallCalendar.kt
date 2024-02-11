@@ -11,7 +11,7 @@ class ItemWallCalendar(originalID: ItemID) : FixtureItemBase(originalID, "net.to
 
     override var dynamicID: ItemID = originalID
     override var baseMass = 1.0
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/calendar.tga")

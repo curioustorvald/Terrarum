@@ -83,7 +83,7 @@ class ActorInventory() : FixtureInventory() {
 
         if (amount < 0) throw IllegalArgumentException("Consuming negative amount of an item (expected >=0, got $amount)")
 
-        if (item.stackable && !item.isDynamic) {
+        if (item.stackable && !item.canBeDynamic) {
             remove(item, amount)
         }
         else if (item.isUnique) {
@@ -93,7 +93,7 @@ class ActorInventory() : FixtureInventory() {
             val newItem: GameItem
 
             // unpack newly-made dynamic item (e.g. any weapon, floppy disk)
-            if (item.isDynamic && item.originalID == item.dynamicID) {
+            if (item.canBeDynamic && !item.isCurrentlyDynamic) {
                 itemEquipped[item.equipPosition] = null
                 remove(item, 1)
 

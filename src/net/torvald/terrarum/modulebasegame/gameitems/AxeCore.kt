@@ -235,7 +235,7 @@ class AxeCopper(originalID: ItemID) : GameItem(originalID) {
 
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
     override var inventoryCategory = Category.TOOL
-    override val isDynamic = true
+    override val canBeDynamic = true
     override val materialId = "CUPR"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
     override val itemImage: TextureRegion
@@ -264,7 +264,7 @@ class AxeIron(originalID: ItemID) : GameItem(originalID) {
 
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
     override var inventoryCategory = Category.TOOL
-    override val isDynamic = true
+    override val canBeDynamic = true
     override val materialId = "IRON"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
     override val itemImage: TextureRegion
@@ -293,7 +293,7 @@ class AxeSteel(originalID: ItemID) : GameItem(originalID) {
 
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
     override var inventoryCategory = Category.TOOL
-    override val isDynamic = true
+    override val canBeDynamic = true
     override val materialId = "STAL"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
     override val itemImage: TextureRegion
@@ -322,7 +322,7 @@ class AxeWood(originalID: ItemID) : GameItem(originalID) {
 
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
     override var inventoryCategory = Category.TOOL
-    override val isDynamic = true
+    override val canBeDynamic = true
     override val materialId = "WOOD"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
     override val itemImage: TextureRegion
@@ -351,7 +351,7 @@ class AxeStone(originalID: ItemID) : GameItem(originalID) {
 
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
     override var inventoryCategory = Category.TOOL
-    override val isDynamic = true
+    override val canBeDynamic = true
     override val materialId = "ROCK"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
     override val itemImage: TextureRegion

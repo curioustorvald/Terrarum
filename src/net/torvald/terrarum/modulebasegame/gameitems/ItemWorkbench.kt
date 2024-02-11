@@ -10,7 +10,7 @@ class ItemWorkbench(originalID: ItemID) : FixtureItemBase(originalID, "net.torva
 
 
     override var baseMass = 20.0
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/workbench.tga")

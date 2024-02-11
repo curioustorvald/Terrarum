@@ -12,7 +12,7 @@ class ItemTypewriter(originalID: ItemID) : FixtureItemBase(originalID, "net.torv
 
     override var dynamicID: ItemID = originalID
     override var baseMass = FixtureTikiTorch.MASS
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSheet("basegame", "sprites/fixtures/typewriter.tga", 32, 16)

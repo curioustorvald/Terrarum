@@ -14,7 +14,7 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
 
     override var baseToolSize: Double? = PickaxeCore.BASE_MASS_AND_SIZE
     override var inventoryCategory = Category.TOOL
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = "CUPR"
     override var baseMass = 2.0
     override val itemImage: TextureRegion

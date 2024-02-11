@@ -46,7 +46,7 @@ open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
                 actorValue[AVKey.SCALE] = value
             }
         override var inventoryCategory = "npc"
-        override val isDynamic = false
+        override val canBeDynamic = false
         override val materialId = ""
 
         override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {

@@ -192,7 +192,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         override var baseMass: Double = 0.0
         override var baseToolSize: Double? = null
         override var inventoryCategory = "should_not_be_seen"
-        override val isDynamic = false
+        override val canBeDynamic = false
         override val materialId = ""
 
         init {

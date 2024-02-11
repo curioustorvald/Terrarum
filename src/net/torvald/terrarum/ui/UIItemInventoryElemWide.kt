@@ -168,7 +168,7 @@ class UIItemInventoryElemWide(
 //                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
 
                 val grey = App.fontGame.toColorCode(11, 11, 11)
-                val itemIDstr = "\n$grey(${item?.originalID}${if (item?.originalID == item?.dynamicID) "" else "/${item?.dynamicID}"})"
+                val itemIDstr = "\n$grey(${item?.originalID}${if (item?.isCurrentlyDynamic == true) "/${item?.dynamicID}" else ""})"
                 val nameStr0 = if (item?.nameSecondary?.isNotBlank() == true) "${item?.name}\n$grey${item?.nameSecondary}" else "${item?.name}"
                 val nameStr = if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) nameStr0 + itemIDstr else nameStr0
                 val descStr = Lang.getOrNull("TOOLTIP_${item?.originalID}")?.replace("\n","\n$grey")

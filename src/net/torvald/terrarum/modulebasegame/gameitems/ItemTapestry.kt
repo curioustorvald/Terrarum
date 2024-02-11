@@ -16,7 +16,7 @@ class ItemTapestry(originalID: ItemID) : FixtureItemBase(originalID, "net.torval
 
     override var dynamicID: ItemID = originalID
     override var baseMass = 6.0
-    override val isDynamic = false
+    override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
