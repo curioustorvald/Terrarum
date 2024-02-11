@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
@@ -133,7 +134,7 @@ class ActorInventory() : FixtureInventory() {
                 // auto pull the same item if the player has one
                 (actor as Pocketed).inventory.let { inv ->
                     inv.itemList.filter { ItemCodex[it.itm]?.originalID == newItem.originalID }.firstOrNull()?.let { (itm, qty) ->
-                        println("AutoEquip item $itm")
+                        printdbg(this, "AutoEquip item $itm")
 
                         actor.equipItem(itm)
                         // also unequip on the quickslot
