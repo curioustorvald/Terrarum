@@ -111,8 +111,13 @@ object PickaxeCore {
                     }
 
 
-                    // temporary: spawn random record on prob 1/65536 when digging dirts
-                    if (ItemCodex[tileBroken]?.hasTag("CULTIVABLE") == true && Math.random() < 1.0 / 65536.0) {
+                    // temporary: spawn random record on prob 1/4096 when digging dirts/sands/gravels
+                    val itemprop = ItemCodex[tileBroken]
+                    if (Math.random() < 1.0 / 4096.0 &&
+                            (itemprop?.hasTag("CULTIVABLE") == true ||
+                            itemprop?.hasTag("SAND") == true ||
+                            itemprop?.hasTag("GRAVEL") == true)
+                        ) {
                         val drop = "item@basegame:${32769 + Math.random().times(9).toInt()}"
                         dropItem(drop, x, y)
                     }
