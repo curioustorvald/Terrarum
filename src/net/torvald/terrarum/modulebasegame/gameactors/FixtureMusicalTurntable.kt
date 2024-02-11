@@ -70,8 +70,8 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
     override val canBeDespawned: Boolean
         get() = disc == null
 
-    override fun update(delta: Float) {
-        super.update(delta)
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
 
         // right click
         if (mouseUp) {

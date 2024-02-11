@@ -69,7 +69,7 @@ class WireActor : ActorWithBody, NoSerialise {
         )
     }
 
-    override fun update(delta: Float) {
+    override fun updateImpl(delta: Float) {
     }
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {

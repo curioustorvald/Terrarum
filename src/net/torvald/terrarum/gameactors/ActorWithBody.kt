@@ -517,9 +517,7 @@ open class ActorWithBody : Actor {
         feetPosTile.set(hIntTilewiseHitbox.centeredX.floorToInt(), hIntTilewiseHitbox.endY.floorToInt())
     }
 
-    override fun update(delta: Float) {
-        super.update(delta)
-
+    override fun updateImpl(delta: Float) {
         // re-scale hitbox
         // it's just much better to poll them than use perfectly-timed setter because latter simply cannot exist
         hitbox.canonicalResize(baseHitboxW * scale, baseHitboxH * scale)

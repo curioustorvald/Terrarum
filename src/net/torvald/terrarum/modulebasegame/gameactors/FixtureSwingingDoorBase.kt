@@ -366,9 +366,8 @@ open class FixtureSwingingDoorBase : FixtureBase {
     private var lastDoorHandler = 0 // 0: automatic, 1: manual
     private var doorCloseQueueHandler = 0
 
-    override fun update(delta: Float) {
-        super.update(delta)
-
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
 
         // debug colouring
 //        this.sprite?.colourFilter =

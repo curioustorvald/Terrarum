@@ -6,11 +6,13 @@ import com.badlogic.gdx.backends.lwjgl3.audio.Mp3
 import com.badlogic.gdx.backends.lwjgl3.audio.Ogg
 import com.badlogic.gdx.backends.lwjgl3.audio.OggInputStream
 import com.badlogic.gdx.backends.lwjgl3.audio.Wav
+import com.badlogic.gdx.utils.Disposable
 import com.jcraft.jorbis.VorbisFile
 import javazoom.jl.decoder.Bitstream
 import net.torvald.reflection.extortField
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App
+import net.torvald.terrarum.tryDispose
 import java.io.File
 import java.io.FileInputStream
 import javax.sound.sampled.AudioSystem
@@ -20,7 +22,7 @@ data class MusicContainer(
     val file: File,
     val gdxMusic: Music,
     internal var songFinishedHook: (Music) -> Unit = {}
-) {
+): Disposable {
     val samplingRate: Int
     val codec: String
 
@@ -132,4 +134,8 @@ data class MusicContainer(
     }
 
     override fun equals(other: Any?) = this.file.path == (other as MusicContainer).file.path
+
+    override fun dispose() {
+        gdxMusic.dispose()
+    }
 }

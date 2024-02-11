@@ -7,6 +7,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.audio.MusicContainer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.TrackVolume
+import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.savegame.toBigEndian
@@ -51,13 +52,18 @@ abstract class Actor : Comparable<Actor>, Runnable {
         OVERLAY // screen overlay, not affected by lightmap
     }
 
-    open fun update(delta: Float) {
+    fun update(delta: Float) {
         if (!canBeDespawned) flagDespawn = false // actively deny despawning request if cannot be despawned
         if (canBeDespawned && flagDespawn) {
             despawn()
             despawned = true
         }
+        if (!despawned) {
+            updateImpl(delta)
+        }
     }
+
+    open fun updateImpl(delta: Float) {}
 
     var actorValue = ActorValue(this)
     @Volatile var flagDespawn = false
@@ -95,6 +101,15 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
     open fun despawn() {
         if (canBeDespawned) {
+            musicTracks1.forEach { name ->
+                val it = App.audioMixer.dynamicTracks[name.substring(2).toInt() - 1]
+
+                println("stop track $name")
+                it.stop()
+                it.filters[0] = NullFilter
+                it.filters[1] = NullFilter
+            }
+
             despawnHook(this)
         }
     }
@@ -108,6 +123,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
 //    @Transient val soundTracks = HashMap<Sound, TerrarumAudioMixerTrack>()
     @Transient val musicTracks = HashMap<MusicContainer, TerrarumAudioMixerTrack>()
+    @Transient private val musicTracks1 = ArrayList<String>()
 
     /*open fun startAudio(sound: Sound) {
         getTrackByAudio(sound)?.let {
@@ -117,7 +133,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
         }
     }*/
 
-    private fun getTrackByAudio(music: MusicContainer): TerrarumAudioMixerTrack? {
+    fun getTrackByAudio(music: MusicContainer): TerrarumAudioMixerTrack? {
         // get existing track
         var track = musicTracks[music]
 
@@ -130,6 +146,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
             // if the request was successful, put it into the hashmap
             if (track != null) {
                 musicTracks[music] = track
+                musicTracks1.add(track.name)
             }
         }
 
@@ -138,6 +155,9 @@ abstract class Actor : Comparable<Actor>, Runnable {
         return track
     }
 
+    /**
+     * To loop the audio, set `music.gdxMusic.isLooping` to `true`
+     */
     open fun startAudio(music: MusicContainer, volume: TrackVolume = 1.0, doSomethingWithTrack: (TerrarumAudioMixerTrack) -> Unit = {}) {
         getTrackByAudio(music)?.let {
             it.stop()

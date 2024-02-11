@@ -93,7 +93,7 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
     override fun dispose() {
     }
 
-    override fun update(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (isVisible) {
             val hbx = (Terrarum.mouseTileX - floor((hitbox.width - 0.5).div(2) / TILE_SIZED)) * TILE_SIZED
             val hby = (Terrarum.mouseTileY - floor((hitbox.height - 0.5) / TILE_SIZED)) * TILE_SIZED

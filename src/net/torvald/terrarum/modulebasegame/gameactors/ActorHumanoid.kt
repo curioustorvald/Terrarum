@@ -201,13 +201,13 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         }
     }
 
-    override fun update(delta: Float) {
+    override fun updateImpl(delta: Float) {
         // update lightbox
         lightBoxList[0].light = actorValueColour
         shadeBoxList[0].light = actorValueShade
 
 
-        super.update(delta)
+        super.updateImpl(delta)
 
         if (vehicleRiding is IngamePlayer)
             throw Error("Attempted to 'ride' player object. ($vehicleRiding)")

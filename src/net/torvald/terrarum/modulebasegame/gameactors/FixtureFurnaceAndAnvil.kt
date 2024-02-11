@@ -1,8 +1,13 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.Gdx
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
+import net.torvald.terrarum.audio.MusicContainer
+import net.torvald.terrarum.audio.decibelsToFullscale
+import net.torvald.terrarum.audio.dsp.Gain
+import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
@@ -47,7 +52,19 @@ class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
         }
 
         actorValue[AVKey.BASEMASS] = 100.0
+
+        despawnHook = {
+            stopAudio(static) {
+                it.filters[filterIndex] = NullFilter
+            }
+        }
     }
+
+    @Transient val static = MusicContainer("bonfire", ModMgr.getFile("basegame", "audio/effects/static/bonfire.ogg"), Gdx.audio.newMusic(
+        ModMgr.getGdxFile("basegame", "audio/effects/static/bonfire.ogg")
+    ).also {
+        it.isLooping = true
+    })
 
     @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 0.0, TerrarumAppConfiguration.TILE_SIZED * 2, TerrarumAppConfiguration.TILE_SIZED * 2), Cvec(0.5f, 0.18f, 0f, 0f)))
 
@@ -68,9 +85,8 @@ class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
     private var nextDelay = 0.25f
     private var spawnTimer = 0f
 
-    override fun update(delta: Float) {
-        super.update(delta)
-
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
 
         // emit smokes TODO: only when hot
         if (spawnTimer >= nextDelay) {
@@ -88,5 +104,28 @@ class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
         }
 
         spawnTimer += delta
+
+
+        // manage audio
+        getTrackByAudio(static).let {
+            if (it != null && !it.isPlaying) {
+                startAudio(static) {
+                    it.filters[filterIndex] = Gain(0f)
+                }
+            }
+        }
+        getTrackByAudio(static)?.let {
+            if (it.filters[filterIndex] !is Gain) // just in case...
+                it.filters[filterIndex] = Gain(0f)
+
+            (it.filters[filterIndex] as Gain).gain = 0.4f // TODO randomsied undulation
+        }
+    }
+
+    @Transient private val filterIndex = 0
+
+    override fun dispose() {
+        super.dispose()
+        static.dispose()
     }
 }

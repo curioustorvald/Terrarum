@@ -116,8 +116,8 @@ open class Electric : FixtureBase {
         }
     }
 
-    override fun update(delta: Float) {
-        super.update(delta)
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
         oldSinkStatus.indices.forEach { index ->
             val wx = (index % blockBox.width) + intTilewiseHitbox.startX.toInt()
             val wy = (index / blockBox.width) + intTilewiseHitbox.startY.toInt()
@@ -478,7 +478,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
                 wireConsumption.clear()
             }
 
-            despawnHook(this)
+
+            super.despawn()
         }
         else {
             printdbg(this, "failed to despawn at T${INGAME.WORLD_UPDATE_TIMER}: ${nameFun()}")
@@ -494,8 +495,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     /**
      * This function MUST BE super-called for make despawn call to work at all.
      */
-    override fun update(delta: Float) {
-        super.update(delta)
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
     }
 
     /**
@@ -511,7 +512,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
             despawned = true
         }
         // actual actor removal is performed by the TerrarumIngame.killOrKnockdownActors
-        super.update(delta)
+        super.updateImpl(delta)
     }
 
     override fun flagDespawn() {

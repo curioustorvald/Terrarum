@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -9,6 +10,9 @@ import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.audio.MusicContainer
+import net.torvald.terrarum.audio.dsp.Gain
+import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
@@ -76,6 +80,12 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
         this.mainUI = UISmelterBasic(this)
     }
+
+    @Transient val static = MusicContainer("bonfire", ModMgr.getFile("basegame", "audio/effects/static/bonfire.ogg"), Gdx.audio.newMusic(
+        ModMgr.getGdxFile("basegame", "audio/effects/static/bonfire.ogg")
+    ).also {
+        it.isLooping = true
+    })
 
     @Transient val light = Cvec(0.5f, 0.18f, 0f, 0f)
 
@@ -190,8 +200,8 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
         }
     }
 
-    override fun update(delta: Float) {
-        super.update(delta)
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
 
         val oreItemProp = ItemCodex[oreItem?.itm]
         val fuelItemProp = ItemCodex[fireboxItem?.itm]
@@ -277,6 +287,35 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
             spawnTimer += delta
         else
             spawnTimer = 0f
+
+
+
+        // manage audio
+        getTrackByAudio(static).let {
+            if (it == null || (temperature > 0f && !it.isPlaying)) {
+                startAudio(static) {
+                    it.filters[filterIndex] = Gain(0f)
+                }
+            }
+            else if (it != null && it.isPlaying && temperature <= 0f) {
+                stopAudio(static) {
+                    it.filters[filterIndex] = NullFilter
+                }
+            }
+        }
+        getTrackByAudio(static)?.let {
+            if (it.filters[filterIndex] !is Gain) // just in case...
+                it.filters[filterIndex] = Gain(0f)
+
+            (it.filters[filterIndex] as Gain).gain = (it.maxVolume * temperature).toFloat() // TODO randomsied undulation
+        }
+
     }
 
+    @Transient private val filterIndex = 0
+
+    override fun dispose() {
+        super.dispose()
+        static.dispose()
+    }
 }

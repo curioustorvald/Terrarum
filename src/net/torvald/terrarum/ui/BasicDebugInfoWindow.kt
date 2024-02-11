@@ -546,13 +546,15 @@ class BasicDebugInfoWindow : UICanvas() {
 //        Toolkit.fillArea(batch, x - stripGap, y - stripGap, strips.size * (stripW + stripGap) + stripGap, stripH + 2*stripGap)
 
         strips.forEachIndexed { index, track ->
-            // get clipping status
-            track.processor.hasClipping.forEachIndexed { channel, b ->
-                if (b) mixerLastTimeHadClipping[index][channel] = System.currentTimeMillis()
-            }
+            if (index < trackCount) {
+                // get clipping status
+                track.processor.hasClipping.forEachIndexed { channel, b ->
+                    if (b) mixerLastTimeHadClipping[index][channel] = System.currentTimeMillis()
+                }
 
-            // draw
-            drawStrip(batch, x + index * (STRIP_W + stripGap), y, track, index)
+                // draw
+                drawStrip(batch, x + index * (STRIP_W + stripGap), y, track, index)
+            }
         }
     }
 

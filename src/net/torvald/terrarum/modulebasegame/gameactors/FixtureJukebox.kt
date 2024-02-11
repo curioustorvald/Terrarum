@@ -103,8 +103,8 @@ class FixtureJukebox : Electric, PlaysMusic {
     override val canBeDespawned: Boolean
         get() = discInventory.isEmpty()
 
-    override fun update(delta: Float) {
-        super.update(delta)
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
 
         // supress the normal background music playback
         if (musicIsPlaying && !flagDespawn) {

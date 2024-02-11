@@ -125,7 +125,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         override fun dispose() {
         }
 
-        override fun update(delta: Float) {
+        override fun updateImpl(delta: Float) {
             hitbox.setPosition(
                     Terrarum.mouseTileX * 16.0,
                     Terrarum.mouseTileY * 16.0
@@ -187,7 +187,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         override fun drawGlow(frameDelta: Float, batch: SpriteBatch) { }
 
-        override fun update(delta: Float) { }
+        override fun updateImpl(delta: Float) { }
 
         override fun onActorValueChange(key: String, value: Any?) { }
 
@@ -688,9 +688,7 @@ class MovableWorldCamera(val parent: BuildingMaker) : ActorHumanoid(0, physProp 
             parent.world.height * TILE_SIZE - (App.scr.height - hitbox.height) / 2.0
     )
 
-    override fun update(delta: Float) {
-        super.update(delta)
-
+    override fun updateImpl(delta: Float) {
         // confine the camera so it won't wrap
         this.hitbox.hitboxStart.setCoerceIn(coerceInStart, coerceInEnd)
     }

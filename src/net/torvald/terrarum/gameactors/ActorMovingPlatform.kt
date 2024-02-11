@@ -19,6 +19,9 @@ open class ActorMovingPlatform() : ActorWithBody() {
         setHitboxDimension(TILE_SIZE * tilewiseWidth, TILE_SIZE, 0, 0)
     }
 
+    override fun updateImpl(delta: Float) {
+        TODO("Not yet implemented")
+    }
 
     /**
      * Make the actor its externalV controlled by this platform

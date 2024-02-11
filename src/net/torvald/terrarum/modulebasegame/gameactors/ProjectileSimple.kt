@@ -75,7 +75,7 @@ open class ProjectileSimple : ActorWithBody, Projectile {
         collisionType = COLLISION_KINEMATIC
     }
 
-    override fun update(delta: Float) {
+    override fun updateImpl(delta: Float) {
         // hit something and despawn
         lifetimeCounter += delta
         if (walledTop || walledBottom || walledRight || walledLeft || lifetimeCounter >= lifetimeMax ||
@@ -86,8 +86,6 @@ open class ProjectileSimple : ActorWithBody, Projectile {
         }
 
         posPre.set(centrePosPoint)
-
-        super.update(delta)
     }
 
     /**

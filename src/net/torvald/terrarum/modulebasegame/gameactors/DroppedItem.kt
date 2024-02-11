@@ -140,14 +140,12 @@ open class DroppedItem : ActorWithBody {
         }
     }
 
-    override fun update(delta: Float) {
+    override fun updateImpl(delta: Float) {
         renderOrder = RenderOrder.OVERLAY // for some reason the "overlaying" won't work without this
 
         if (this.itemID.isBlock() || this.itemID.isItem()) {
             this.lightBoxList[0].light = getLum(this.itemID)
         }
-
-        super.update(delta)
 
         timeSinceSpawned += delta
 

@@ -67,8 +67,8 @@ open class SaplingBase(val species: Int) : Cultivable(72000) {
         }
     }
 
-    override fun update(delta: Float) {
-        super.update(delta)
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
 
         // these have to run every frame to make the sprite static
         (sprite as SheetSpriteAnimation).currentRow = species

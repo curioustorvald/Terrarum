@@ -29,9 +29,7 @@ class PhysTestLuarLander : ActorWithBody(RenderOrder.MIDTOP, PhysProperties.PHYS
         super.run()
     }
 
-    override fun update(delta: Float) {
-        super.update(delta)
-
+    override fun updateImpl(delta: Float) {
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             controllerV!!.y = avSpeedCap
         }

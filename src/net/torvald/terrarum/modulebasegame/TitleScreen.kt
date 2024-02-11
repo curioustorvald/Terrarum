@@ -606,7 +606,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         override fun drawBody(frameDelta: Float, batch: SpriteBatch) { }
         override fun drawGlow(frameDelta: Float, batch: SpriteBatch) { }
 
-        override fun update(delta: Float) {
+        override fun updateImpl(delta: Float) {
             ai.update(this, delta)
         }
 

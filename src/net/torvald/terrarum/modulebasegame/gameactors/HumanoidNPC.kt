@@ -84,9 +84,9 @@ open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
         isVisible = true
     }
 
-    override fun update(delta: Float) {
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
         ai.update(this, delta)
-        super.update(delta)
     }
 
     override fun moveLeft(amount: Float) { // hit the buttons on the controller box

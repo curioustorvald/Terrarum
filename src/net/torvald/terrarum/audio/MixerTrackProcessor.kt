@@ -138,15 +138,16 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                 (track.filters[DS_FLTIDX_PAN] as BinoPan).earDist = App.audioMixer.listenerHeadSize
 
                 if (App.audioMixer.actorNowPlaying != null) {
-                    if (track.trackingTarget == null || track.trackingTarget == App.audioMixer.actorNowPlaying) {
+                    val trackingTarget = track.trackingTarget
+                    if (trackingTarget == null || trackingTarget == App.audioMixer.actorNowPlaying) {
                         // "reset" the track
                         track.volume = track.maxVolume
                         (track.filters[DS_FLTIDX_PAN] as BinoPan).pan = 0f
                         (track.filters[DS_FLTIDX_LOW] as Lowpass).setCutoff(SAMPLING_RATE / 2f)
                     }
-                    else if (track.trackingTarget is ActorWithBody) {
-                        val relativeXpos = relativeXposition(App.audioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
-                        val distFromActor = distBetweenActors(App.audioMixer.actorNowPlaying!!, track.trackingTarget as ActorWithBody)
+                    else if (trackingTarget is ActorWithBody) {
+                        val relativeXpos = relativeXposition(App.audioMixer.actorNowPlaying!!, trackingTarget as ActorWithBody)
+                        val distFromActor = distBetweenActors(App.audioMixer.actorNowPlaying!!, trackingTarget as ActorWithBody)
                         val vol = track.maxVolume * getVolFun(distFromActor / distFalloff).coerceAtLeast(0.0)
                         track.volume = vol
                         (track.filters[DS_FLTIDX_PAN] as BinoPan).pan = (1.3f * relativeXpos / distFalloff).toFloat()
@@ -154,11 +155,11 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                             (SAMPLING_RATED*0.5) / (24.0 * (distFromActor / distFalloff).sqr() + 1.0)
                         )
 
-                        val sourceVec = (track.trackingTarget as ActorWithBody).let { it.externalV + (it.controllerV ?: Vector2()) }
+                        val sourceVec = (trackingTarget as ActorWithBody).let { it.externalV + (it.controllerV ?: Vector2()) }
                         val listenerVec = App.audioMixer.actorNowPlaying!!.let { it.externalV + (it.controllerV ?: Vector2()) }
                         val distFromActorNext = distBetweenPoints(
                             App.audioMixer.actorNowPlaying!!.centrePosVector + listenerVec,
-                            (track.trackingTarget as ActorWithBody).centrePosVector + sourceVec
+                            (trackingTarget as ActorWithBody).centrePosVector + sourceVec
                         )
                         val isApproaching = if (distFromActorNext <= distFromActor) 1.0 else -1.0
                         val relativeSpeed = (sourceVec - listenerVec).magnitude * GAME_TO_SI_VELO * isApproaching

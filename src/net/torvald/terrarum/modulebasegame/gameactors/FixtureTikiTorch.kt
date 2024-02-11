@@ -51,10 +51,10 @@ internal class FixtureTikiTorch : FixtureBase {
     private var nextDelay = 0.25f
     private var spawnTimer = 0f
 
-    override fun update(delta: Float) {
-        lightBoxList[0].light = BlockCodex[Block.TORCH].getLumCol(rndHash1, rndHash2)
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
 
-        super.update(delta)
+        lightBoxList[0].light = BlockCodex[Block.TORCH].getLumCol(rndHash1, rndHash2)
 
         if (spawnTimer >= nextDelay) {
             (Terrarum.ingame as TerrarumIngame).addParticle(ParticleVanishingSprite(

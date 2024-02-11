@@ -38,8 +38,8 @@ class FixtureTypewriter : FixtureBase {
         actorValue[AVKey.BASEMASS] = 3.6
     }
 
-    override fun update(delta: Float) {
-        super.update(delta)
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
 
         (sprite as SheetSpriteAnimation).currentRow = 1 + (carriagePosition.toFloat() / TYPEWRITER_COLUMNS * 10).roundToInt()
     }
