@@ -114,7 +114,7 @@ class UIItemInventoryElemWide(
 
             batch.color = nameColour
             val hasSecondaryName = (item?.nameSecondary?.isNotBlank() == true)
-            val itemNameRow1Y = if (hasSecondaryName) 1f else if (item!!.maxDurability > 0.0) textOffsetY else ((height - App.fontGame.lineHeight) / 2).roundToFloat()
+            val itemNameRow1Y = if (hasSecondaryName) 1f else if (/*item!!.isCurrentlyDynamic &&*/ item!!.maxDurability > 0.0) textOffsetY else ((height - App.fontGame.lineHeight) / 2).roundToFloat()
             val itemNameRow2Y = App.fontGame.lineHeight.toInt() - 2*itemNameRow1Y
 
             // draw name of the item
@@ -136,7 +136,7 @@ class UIItemInventoryElemWide(
             val percentage = if (item!!.maxDurability < 0.00001f) 0f else item!!.durability / item!!.maxDurability
             val durabilityCol = UIItemInventoryCellCommonRes.getHealthMeterColour(percentage, 0f, 1f)
             val durabilityBack = durabilityCol mul UIItemInventoryCellCommonRes.meterBackDarkening
-            if (item!!.maxDurability > 0.0) {
+            if (/*item!!.isCurrentlyDynamic &&*/ item!!.maxDurability > 0.0) { // it's more helpful for newly created tools to have durability meter
                 batch.color = durabilityBack
                 Toolkit.drawStraightLine(batch, barOffset, posY + durabilityBarOffY, barOffset + barFullLen, durabilityBarThickness, false)
                 batch.color = durabilityCol

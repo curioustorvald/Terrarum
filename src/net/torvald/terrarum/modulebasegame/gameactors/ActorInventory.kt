@@ -127,8 +127,22 @@ class ActorInventory() : FixtureInventory() {
 
             // damage the item
             newItem.durability -= (baseDamagePerSwing * swingDmgToFrameDmg).toFloat()
-            if (newItem.durability <= 0)
+            if (newItem.durability <= 0) {
                 remove(newItem, 1)
+
+                // auto pull the same item if the player has one
+                (actor as Pocketed).inventory.let { inv ->
+                    inv.itemList.filter { ItemCodex[it.itm]?.originalID == newItem.originalID }.firstOrNull()?.let { (itm, qty) ->
+                        println("AutoEquip item $itm")
+
+                        actor.equipItem(itm)
+                        // also unequip on the quickslot
+                        actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
+                            setQuickslotItem(it, itm)
+                        }
+                    }
+                }
+            }
 
             //println("[ActorInventory] consumed; ${item.durability}")
         }
