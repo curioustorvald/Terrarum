@@ -3,6 +3,7 @@ package net.torvald.terrarum.audio
 import com.badlogic.gdx.Gdx
 import com.jme3.math.FastMath
 import net.torvald.reflection.forceInvoke
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.serialise.toUint
@@ -40,7 +41,7 @@ object AudioHelper {
         val sampleCount = (ir.length().toInt() / 8)//.coerceAtMost(65536)
         val fftLen = FastMath.nextPowerOfTwo(sampleCount)
 
-        println("IR '${ir.path}' Sample Count = $sampleCount; FFT Length = $fftLen")
+        printdbg(this, "IR '${ir.path}' Sample Count = $sampleCount; FFT Length = $fftLen")
 
         val conv = Array(2) { FloatArray(fftLen) }
 

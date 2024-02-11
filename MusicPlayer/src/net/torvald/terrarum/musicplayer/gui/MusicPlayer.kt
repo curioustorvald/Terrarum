@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.JsonValue
 import com.jme3.math.FastMath
 import net.torvald.reflection.extortField
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -493,7 +494,8 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         }
         else if (ingame.musicGovernor.playCaller is PlaysMusic && !jukeboxStopMonitorAlert && !App.audioMixer.musicTrack.isPlaying) {
             jukeboxStopMonitorAlert = true
-            ingame.musicGovernor.stopMusic(this, false, ingame.musicGovernor.getRandomMusicInterval())
+            val interval = ingame.musicGovernor.getRandomMusicInterval()
+            ingame.musicGovernor.stopMusic(this, false, interval)
         }
         else if (App.audioMixer.musicTrack.isPlaying) {
             jukeboxStopMonitorAlert = false

@@ -53,8 +53,9 @@ class TerrarumMusicGovernor : MusicGovernor() {
                     printdbg(this, "MusicTitle: ${muscon.name}")
 
                     muscon.songFinishedHook =  {
-                        if (it == App.audioMixer.musicTrack.currentTrack?.gdxMusic)
-                            stopMusic(this)
+                        if (it == App.audioMixer.musicTrack.currentTrack?.gdxMusic) {
+                            stopMusic(this, true, getRandomMusicInterval())
+                        }
                     }
                 }
             }
