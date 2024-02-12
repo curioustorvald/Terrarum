@@ -250,7 +250,7 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
         // roast items
         if (oreItem != null &&
-            fuelCaloriesNow > 0f &&
+            temperature > 0f &&
             oreItemProp?.smeltingProduct != null &&
             (productItem == null || oreItemProp.smeltingProduct == productItem!!.itm)
         ) {
