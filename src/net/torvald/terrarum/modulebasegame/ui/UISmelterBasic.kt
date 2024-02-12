@@ -119,8 +119,6 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                         else
                             smelter.changeFireboxItemCount(-addCount2)
                     }
-                    if (smelter.fireboxItem != null && smelter.fireboxItem!!.qty == 0L) smelter.fireboxItem = null
-                    else if (smelter.fireboxItem != null && smelter.fireboxItem!!.qty < 0L) throw Error("Item removal count is larger than what was on the slot")
                     itemListUpdateKeepCurrentFilter()
                 }
                 else {
@@ -238,7 +236,6 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                     getPlayerInventory().add(smelter.oreItem!!.itm, -removeCount2)
                     smelter.changeOreItemCount(removeCount2)
                 }
-                if (smelter.oreItem!!.qty == 0L) smelter.oreItem = null
                 itemListUpdateKeepCurrentFilter()
             }
             else {
@@ -297,7 +294,6 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                     getPlayerInventory().add(smelter.fireboxItem!!.itm, -removeCount2)
                     smelter.changeFireboxItemCount(removeCount2)
                 }
-                if (smelter.fireboxItem!!.qty == 0L) smelter.fireboxItem = null
                 itemListUpdateKeepCurrentFilter()
             }
             else {
@@ -347,7 +343,6 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                     getPlayerInventory().add(smelter.productItem!!.itm, -removeCount2)
                     smelter.changeProductItemCount(removeCount2)
                 }
-                if (smelter.productItem!!.qty == 0L) smelter.productItem = null
                 itemListUpdateKeepCurrentFilter()
             }
             else {
