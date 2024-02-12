@@ -36,8 +36,8 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
 
     internal var streamBuf: AudioProcessBuf? = null
 
-    internal var jitterMode = 0
-    internal var jitterIntensity = 0f
+//    internal var jitterMode = 0
+//    internal var jitterIntensity = 0f
 
     private var fout1 = listOf(emptyBuf, emptyBuf)
 
@@ -88,8 +88,8 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
 
             bytesRead
         }, { purgeStreamBuf() }).also {
-            it.jitterMode = jitterMode
-            it.jitterIntensity = jitterIntensity
+//            it.jitterMode = jitterMode
+//            it.jitterIntensity = jitterIntensity
         }
     }
 
@@ -168,7 +168,7 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
 
                         track.processor.streamBuf?.playbackSpeed = dopplerFactor.toFloat()
 
-//                        printdbg("dist=$distFromActor\tvol=${fullscaleToDecibels(vol)}\tcutoff=${(track.filters[1] as Lowpass).cutoff}\tdopplerFactor=$dopplerFactor")
+//                        printdbg("dist=$distFromActor\tdopplerFactor=$dopplerFactor")
                     }
                 }
                 else {
@@ -208,7 +208,7 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
             }
             // source channel: skip processing if there's no active input
 //            else if (track.getSidechains().any { it != null && !it.isBus && !it.isMaster && !it.streamPlaying } && !track.streamPlaying) {
-            else if (!track.streamPlaying || streamBuf == null) {
+            else if (!track.streamPlaying || streamBuf == null || streamBuf!!.validSamplesInBuf < App.audioBufferSize) {
                 samplesL1 = emptyBuf
                 samplesR1 = emptyBuf
 

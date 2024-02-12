@@ -108,6 +108,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
                 it.stop()
                 it.filters[0] = NullFilter
                 it.filters[1] = NullFilter
+                it.processor.streamBuf?.pitch = 1f
             }
 
             despawnHook(this)

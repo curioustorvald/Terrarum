@@ -106,6 +106,10 @@ class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
         spawnTimer += delta
 
 
+        // update sound randomiser
+        volRand.update(delta)
+
+
         // manage audio
         getTrackByAudio(static).let {
             if (it != null && !it.isPlaying) {
@@ -118,11 +122,12 @@ class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
             if (it.filters[filterIndex] !is Gain) // just in case...
                 it.filters[filterIndex] = Gain(0f)
 
-            (it.filters[filterIndex] as Gain).gain = 0.4f // TODO randomsied undulation
+            (it.filters[filterIndex] as Gain).gain = 0.4f * volRand.get()
         }
     }
 
     @Transient private val filterIndex = 0
+    @Transient private val volRand = ParamRandomiser(0.8f, 0.4f)
 
     override fun dispose() {
         super.dispose()

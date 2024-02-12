@@ -27,6 +27,7 @@ private data class Frac(var nom: Int, val denom: Int) {
  */
 class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) -> Int?, val onAudioFinished: () -> Unit) {
 
+    var pitch: Float = 1f
     var playbackSpeed = 1f
     var jitterMode = 0 // 0: none, 1: phono, 2: tape
     var jitterIntensity = 0f
@@ -47,8 +48,8 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
         else 1f / (1f - this)
     }
 
-    private val playRate: Float
-        get() = playbackSpeed.coerceIn(0.5f, 2f)/*(playbackSpeed * when (jitterMode) {  // disabled until arraycopy negative length bug is resolved
+    internal val playRate: Float
+        get() = (playbackSpeed * pitch).coerceIn(0.5f, 2f)/*(playbackSpeed * when (jitterMode) {  // disabled until arraycopy negative length bug is resolved
             1 -> jitterMode1(totalSamplesPlayed.toFloat())
             else -> 0f
         } * jitterIntensity).coerceIn(0.5f, 2f)*/
@@ -133,9 +134,9 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
         }
     }
 
-    var validSamplesInBuf = 0
+    var validSamplesInBuf = 0; private set
 
-    var totalSamplesPlayed = 0L
+    private var totalSamplesPlayed = 0L
 
     private val finL = FloatArray(fetchSize + 2 * PADSIZE)
     private val finR = FloatArray(fetchSize + 2 * PADSIZE)
@@ -155,7 +156,8 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
     }
 
     fun fetchBytes() {
-        val readCount = if (validSamplesInBuf < App.audioBufferSize) fetchSize else 0
+        val samplesInBuf = validSamplesInBuf
+        val readCount = if (samplesInBuf < App.audioBufferSize) fetchSize else 0
         val writeCount = (readCount / q).roundToInt()
 
         fun getFromReadBuf(i: Int, bytesRead: Int) = if (i < bytesRead) readBuf[i].toUint() else 0
@@ -195,16 +197,16 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
                     resampleBlock(finL, finR, fmidL, fmidR, writeCount)
 
                     // fill in the output buffers
-                    System.arraycopy(fmidL, 0, foutL, validSamplesInBuf, writeCount)
-                    System.arraycopy(fmidR, 0, foutR, validSamplesInBuf, writeCount)
+                    System.arraycopy(fmidL, 0, foutL, samplesInBuf, writeCount)
+                    System.arraycopy(fmidR, 0, foutR, samplesInBuf, writeCount)
                 }
                 else {
                     // fill in the output buffers
-                    System.arraycopy(finL, 0, foutL, validSamplesInBuf, writeCount)
-                    System.arraycopy(finR, 0, foutR, validSamplesInBuf, writeCount)
+                    System.arraycopy(finL, 0, foutL, samplesInBuf, writeCount)
+                    System.arraycopy(finR, 0, foutR, samplesInBuf, writeCount)
                 }
 
-                validSamplesInBuf += writeCount
+                validSamplesInBuf = samplesInBuf + writeCount
                 totalSamplesPlayed += writeCount
             }
         }
@@ -216,20 +218,22 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
     }
 
     fun getLR(): Pair<FloatArray, FloatArray> {
+        val samplesInBuf = validSamplesInBuf
+
         // copy into the out
         val outL = FloatArray(App.audioBufferSize)
         val outR = FloatArray(App.audioBufferSize)
         System.arraycopy(foutL, 0, outL, 0, App.audioBufferSize)
         System.arraycopy(foutR, 0, outR, 0, App.audioBufferSize)
         // shift bytes in the fout
-        System.arraycopy(foutL, App.audioBufferSize, foutL, 0, validSamplesInBuf - App.audioBufferSize)
-        System.arraycopy(foutR, App.audioBufferSize, foutR, 0, validSamplesInBuf - App.audioBufferSize)
-        for (i in validSamplesInBuf until App.audioBufferSize) {
+        System.arraycopy(foutL, App.audioBufferSize, foutL, 0, samplesInBuf - App.audioBufferSize)
+        System.arraycopy(foutR, App.audioBufferSize, foutR, 0, samplesInBuf - App.audioBufferSize)
+        for (i in samplesInBuf until App.audioBufferSize) {
             foutL[i] = 0f
             foutR[i] = 0f
         }
         // decrement necessary variables
-        validSamplesInBuf -= App.audioBufferSize
+        validSamplesInBuf = samplesInBuf - App.audioBufferSize
 
         return outL to outR
     }

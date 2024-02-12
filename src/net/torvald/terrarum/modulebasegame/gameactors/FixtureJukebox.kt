@@ -248,10 +248,10 @@ class FixtureJukebox : Electric, PlaysMusic {
         }
 
         fun setJitter(it: TerrarumAudioMixerTrack?, mode: Int, intensity: Float) {
-            it?.let {
-                it.processor.jitterMode = mode
-                it.processor.jitterIntensity = intensity
-            }
+//            it?.let {
+//                it.processor.jitterMode = mode
+//                it.processor.jitterIntensity = intensity
+//            }
         }
 
         fun unloadConvolver(actor: Actor, filterIndex: Int, music: MusicContainer?) {
@@ -263,10 +263,10 @@ class FixtureJukebox : Electric, PlaysMusic {
         }
 
         fun unsetJitter(actor: Actor, music: MusicContainer?) {
-            actor.musicTracks[music]?.let {
-                it.processor.jitterMode = 0
-                it.processor.jitterIntensity = 0f
-            }
+//            actor.musicTracks[music]?.let {
+//                it.processor.jitterMode = 0
+//                it.processor.jitterIntensity = 0f
+//            }
         }
     }
 }

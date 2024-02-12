@@ -4,11 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.MusicContainer
 import net.torvald.terrarum.audio.dsp.Gain
@@ -289,6 +289,9 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
             spawnTimer = 0f
 
 
+        // update sound randomiser
+        volRand.update(delta)
+
 
         // manage audio
         getTrackByAudio(static).let {
@@ -307,12 +310,13 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
             if (it.filters[filterIndex] !is Gain) // just in case...
                 it.filters[filterIndex] = Gain(0f)
 
-            (it.filters[filterIndex] as Gain).gain = (it.maxVolume * temperature).toFloat() // TODO randomsied undulation
+            (it.filters[filterIndex] as Gain).gain = (it.maxVolume * temperature * volRand.get()).toFloat()
         }
 
     }
 
     @Transient private val filterIndex = 0
+    @Transient private val volRand = ParamRandomiser(0.8f, 0.4f)
 
     override fun dispose() {
         super.dispose()
