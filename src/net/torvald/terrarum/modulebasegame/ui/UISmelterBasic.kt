@@ -197,6 +197,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                 clickedOn = 1
                 self.forceHighlighted = true
                 fireboxItemSlot.forceHighlighted = false
+                playerThings.itemList.itemPage = 0
                 itemListUpdate { ItemCodex.hasTag(it.itm, "SMELTABLE") }
             }
             else if (smelter.oreItem != null) {
@@ -255,6 +256,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                 clickedOn = 2
                 self.forceHighlighted = true
                 oreItemSlot.forceHighlighted = false
+                playerThings.itemList.itemPage = 0
                 itemListUpdate { ItemCodex.hasTag(it.itm, "COMBUSTIBLE") }
             }
             else if (smelter.fireboxItem != null) {
@@ -312,6 +314,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
                 clickedOn = 0
                 oreItemSlot.forceHighlighted = false
                 fireboxItemSlot.forceHighlighted = false
+                playerThings.itemList.itemPage = 0
                 itemListUpdate()
             }
 
