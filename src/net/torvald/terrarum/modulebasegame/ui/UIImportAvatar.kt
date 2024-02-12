@@ -85,7 +85,7 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
     private var mouseOnLink = false
     private var pathW = 0
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
 
         pathW = App.fontGame.getWidth(App.importDir)
@@ -113,7 +113,7 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
     }
     private lateinit var wotKeys: List<String>
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
         val textboxWidth = wotKeys.maxOf { App.fontGame.getWidth(it) }
         val textX = (Toolkit.drawWidth - textboxWidth) / 2

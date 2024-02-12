@@ -191,7 +191,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         }
     internal var controlSelected = -1
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach {
             it.update(delta)
             if (it is UIItemKeycap && it.mousePushed && ControlPresets.presetLabels[presetSelector.selection] == "Custom") {
@@ -206,7 +206,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         controlPalette.update(delta)
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 //        batch.color = borderNormal
 //        Toolkit.drawBoxBorder(batch, drawX, drawY, width, height)
 //        batch.color = fillCol

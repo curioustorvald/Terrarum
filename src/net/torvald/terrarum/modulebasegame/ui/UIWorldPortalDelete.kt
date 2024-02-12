@@ -40,12 +40,12 @@ class UIWorldPortalDelete(private val full: UIWorldPortal) : UICanvas() {
     }
 
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
     }
 
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         full.selectedButton?.let {
             val buttonYdelta = (App.scr.tvSafeGraphicsHeight + 172 + 36) - it.posY
             val buttonXdelta = (Toolkit.drawWidth - it.width) / 2 - it.posX

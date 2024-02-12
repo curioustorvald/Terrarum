@@ -58,13 +58,13 @@ class UIWorldPortalRename(private val full: UIWorldPortal) : UICanvas() {
     }
 
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
     }
 
     private var oldPosX = full.posX
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val posXDelta = posX - oldPosX
 
         // ugh why won't you just scroll along??

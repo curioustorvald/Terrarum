@@ -115,11 +115,11 @@ class WearableWorldRadarUI(val device: VM) : UICanvas() {
     override var height = 140
     override var openCloseTime = 0f
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         device.update(delta)
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
 
         batch.color = Color.WHITE

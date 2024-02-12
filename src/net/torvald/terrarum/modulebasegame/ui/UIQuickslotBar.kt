@@ -50,7 +50,7 @@ class UIQuickslotBar : UICanvas() {
     }
 
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         val newSelection = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
 
         if (selection != newSelection) {
@@ -87,7 +87,7 @@ class UIQuickslotBar : UICanvas() {
 
     private val itemCntTextCol = Color(0x404040ff)
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.let { actor ->
             for (i in 0 until SLOT_COUNT) {

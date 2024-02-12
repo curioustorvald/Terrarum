@@ -267,7 +267,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
         remoCon.setNewRemoConContents(menus[mode])
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
 
         if (mode < 2) {
 
@@ -307,7 +307,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
         }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         if (mode == 2) {
             loadFired += 1

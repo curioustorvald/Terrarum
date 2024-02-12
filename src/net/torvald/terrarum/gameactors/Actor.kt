@@ -63,7 +63,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
         }
     }
 
-    open fun updateImpl(delta: Float) {}
+    abstract fun updateImpl(delta: Float)
 
     var actorValue = ActorValue(this)
     @Volatile var flagDespawn = false

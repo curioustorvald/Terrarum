@@ -71,7 +71,7 @@ class ConsoleWindow : UICanvas() {
 
     private val lb = ArrayList<String>()
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         Terrarum.ingame?.let {
             if (Authenticator.b()) {
                 lb.clear()
@@ -104,7 +104,7 @@ class ConsoleWindow : UICanvas() {
         textinput.isEnabled = (isOpened && !isClosing)
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // background
         batch.color = UIColour
         Toolkit.fillArea(batch, drawOffX, drawOffY, width.toFloat(), height.toFloat())

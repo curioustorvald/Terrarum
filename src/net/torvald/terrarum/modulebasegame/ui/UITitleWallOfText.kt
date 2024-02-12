@@ -44,12 +44,12 @@ open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
     init {
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         textArea.update(delta)
         scrollbar?.update(delta)
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
         textArea.render(frameDelta, batch, camera)
         scrollbar?.render(frameDelta, batch, camera)
@@ -116,11 +116,11 @@ class UISystemInfo(val remoCon: UIRemoCon) : UICanvas() {
         tb2x = tb1x + tb1w + gap
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uptime = App.getTIME_T() - App.startupTime
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         var i = 0
 
         v.forEach { (k, v0) ->

@@ -18,11 +18,11 @@ class UILoadNewCharacter(val full: UILoadSavegame) : UICanvas() {
     override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         TODO("Not yet implemented")
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         TODO("Not yet implemented")
     }
 

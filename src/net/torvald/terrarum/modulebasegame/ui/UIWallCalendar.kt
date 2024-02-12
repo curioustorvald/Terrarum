@@ -58,7 +58,7 @@ class UIWallCalendar : UICanvas(
     private var mouseOverCell = -1
     private var mouseOverSeason = -1
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         mouseOverCell = if (relativeMouseX in drawStartX until drawStartX + 8 * (cellWidth + 1) &&
             relativeMouseY in cellsStartY - 1 until cellsStartY - 1 + 17 * (cellHeight + 3)) {
 
@@ -80,7 +80,7 @@ class UIWallCalendar : UICanvas(
         }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         UIInventoryFull.drawBackground(batch, 1f)
 
         val thisYear = INGAME.world.worldTime.years

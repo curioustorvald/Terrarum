@@ -404,7 +404,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         INGAME.setTooltipMessage(null)
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
 
         oreItemSlot.item = ItemCodex[smelter.oreItem?.itm]
@@ -502,7 +502,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     )
 
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = backdropColour
 //        batch.draw(smelterBackdrops.get(1,0), backdropX, backdropY, smelterBackdrops.tileW * 6f, smelterBackdrops.tileH * 6f)
 //        batch.color = backdropColour mul Color(1f, 1f, 1f, smelter.temperature)

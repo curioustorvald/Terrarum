@@ -108,11 +108,11 @@ class UIWorldPortalUseInvitation(val full: UIWorldPortal) : UICanvas() {
         importReturnCode = 0
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // error messages
         if (importReturnCode != 0) {
             batch.color = Toolkit.Theme.COL_RED

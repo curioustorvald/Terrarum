@@ -115,7 +115,7 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
         addUIitem(backButton)
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (!uiLocked) {
             uiItems.forEach { it.update(delta) }
         }
@@ -126,7 +126,7 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
         }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
         // ui title
 //        val titlestr = Lang["CONTEXT_WORLD_NEW"]

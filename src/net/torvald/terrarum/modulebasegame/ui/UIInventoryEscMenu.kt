@@ -310,7 +310,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     }
 
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         val yeet = screens[screen]
         if (oldScreen != screen) {
             val yeOlde = screens[oldScreen]
@@ -336,7 +336,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             yeet.update(delta)
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
         batch.color = Color.WHITE
         screenRenders[screen](frameDelta, batch, camera)

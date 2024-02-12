@@ -111,7 +111,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
         }
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         mouseVec.x = relativeMouseX.toDouble()
         mouseVec.y = relativeMouseY.toDouble()
 
@@ -150,7 +150,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
         parent.tappedOnUI = true
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // draw back
         batch.color = backCol
         Toolkit.fillCircle(batch,0, 0, SIZE, SIZE)

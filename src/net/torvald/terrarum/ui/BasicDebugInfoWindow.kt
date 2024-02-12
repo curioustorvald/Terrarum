@@ -91,7 +91,7 @@ class BasicDebugInfoWindow : UICanvas() {
         world = ingame?.world
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         val player = ingame?.actorNowPlaying
         val hitbox = player?.hitbox
 
@@ -135,7 +135,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val tileCursX = 0; private val tileCursY = 4
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         TerrarumIngame.setCameraPosition(batch, App.shapeRender, camera, 0f, 0f)
 
         // toggle show-something

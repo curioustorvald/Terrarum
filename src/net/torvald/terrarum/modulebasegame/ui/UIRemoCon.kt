@@ -90,7 +90,7 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
     private var oldSelectedItem: UIItemTextButton? = null
     private var openUI: UICanvas? = null
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (mouseActionAvailable) {
             mouseActionAvailable = false
 
@@ -220,7 +220,7 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
         openUI = external
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         remoConTray.render(frameDelta, batch, camera)
         openUI?.render(frameDelta, batch, camera)
     }

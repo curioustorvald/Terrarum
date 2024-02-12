@@ -48,7 +48,7 @@ class UIQuickslotPie : UICanvas() {
 
     var selection: Int = -1
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (selection >= 0 && (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying != null)
             (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
                     selection % slotCount
@@ -69,7 +69,7 @@ class UIQuickslotPie : UICanvas() {
 
     private val drawColor = Color(1f, 1f, 1f, 1f)
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // draw radial thingies
         for (i in 0 until slotCount) {
             val qs = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.inventory?.getQuickslotItem(i)

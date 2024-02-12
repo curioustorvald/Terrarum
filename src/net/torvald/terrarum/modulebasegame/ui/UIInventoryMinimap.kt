@@ -59,13 +59,13 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     private var oldPanX = minimapPanX
     private var oldPanY = minimapPanY
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         MinimapComposer.setWorld(INGAME.world)
 //        MinimapComposer.update()
         minimapRerenderTimer += Gdx.graphics.deltaTime
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
         val cellOffY = INVENTORY_CELLS_OFFSET_Y()
         val worldWidth = INGAME.world.width

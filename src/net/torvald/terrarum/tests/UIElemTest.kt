@@ -118,11 +118,11 @@ class DummyTogglePane : UICanvas() {
         uiItems.add(textin)
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.inUse {
             batch.color = Color.CORAL
             Toolkit.fillArea(batch, 0f, 0f, 800f, 600f)

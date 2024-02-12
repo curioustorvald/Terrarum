@@ -337,7 +337,7 @@ class UIInventoryFull(
     internal var offsetY = ((App.scr.height - internalHeight) / 2).toFloat()
         private set
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (handler.openFired) {
             rebuildList()
         }
@@ -351,7 +351,7 @@ class UIInventoryFull(
     //private val gradHeight = 48f
 
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         drawBackground(batch, 1f)
 

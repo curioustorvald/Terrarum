@@ -30,7 +30,7 @@ class UIBuildingMakerToolbox : UICanvas() {
         tools[selectedTool].highlighted = true
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         tools.forEachIndexed { counter, it ->
             it.update(delta)
 
@@ -38,7 +38,7 @@ class UIBuildingMakerToolbox : UICanvas() {
         }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         tools.forEach { it.render(frameDelta, batch, camera) }
     }
 

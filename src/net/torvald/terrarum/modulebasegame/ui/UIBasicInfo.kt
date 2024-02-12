@@ -42,7 +42,7 @@ class UIBasicInfo() : UICanvas() {
     private val TEMP_KELVIN = 0
     private val TEMP_CELCIUS = 1
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (ELon) {
             ELuptimer += delta
         }
@@ -87,7 +87,7 @@ class UIBasicInfo() : UICanvas() {
 
     private val lcdLitCol: Color = lcdLitColELoff
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = drawCol
         batch.draw(atlas.get(0, 0), 0f, 0f)
 

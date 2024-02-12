@@ -226,7 +226,7 @@ internal class UIStorageChest : UICanvas(
         return false
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         catBar.update(delta)
         itemListChest.update(delta)
         itemListPlayer.update(delta)
@@ -265,7 +265,7 @@ internal class UIStorageChest : UICanvas(
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}"
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // background fill
         UIInventoryFull.drawBackground(batch, 1f)
 

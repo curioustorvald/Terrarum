@@ -99,7 +99,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
         catch (e: UninitializedPropertyAccessException) {}
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (scrollTarget != listScroll) {
             if (scrollAnimCounter < scrollAnimLen) {
                 scrollAnimCounter += delta
@@ -138,7 +138,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
         moduleCells.clear()
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
 
         lateinit var savePixmap: Pixmap

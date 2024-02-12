@@ -47,7 +47,7 @@ class Notification : UICanvas() {
         handler.alwaysUpdate = true
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (messageDisplaying == null && messageQueue.notEmpty() && handler.isClosed) {
             messageDisplaying = messageQueue.removeFirst()
             displayTimer = 0f
@@ -66,7 +66,7 @@ class Notification : UICanvas() {
         }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
         fontCol.a = handler.opacity * OPACITY
 

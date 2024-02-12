@@ -110,11 +110,11 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
         rebuild()
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         uiItems.forEach { it.render(frameDelta, batch, camera) }
 
         // chest name text
@@ -212,11 +212,11 @@ class UIJukeboxSonglistPanel(val parent: UIJukebox) : UICanvas() {
         }
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         uiItems.forEach { it.render(frameDelta, batch, camera) }
     }
 

@@ -14,7 +14,6 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.savegame.toHex
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.unsafe.UnsafeHelper
 
 /**
@@ -159,7 +158,7 @@ object TerrarumPostProcessor : Disposable {
 
                 if (KeyToggler.isOn(Input.Keys.F3)) {
                     if (!debugUI.isOpened && !debugUI.isOpening) debugUI.setAsOpen()
-                    batch.inUse { debugUI.renderUI(frameDelta, batch, camera) }
+                    batch.inUse { debugUI.renderImpl(frameDelta, batch, camera) }
                 }
                 else {
                     if (!debugUI.isClosed && !debugUI.isClosing) debugUI.setAsClose()

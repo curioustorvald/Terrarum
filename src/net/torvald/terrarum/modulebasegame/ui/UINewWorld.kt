@@ -254,7 +254,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
         importReturnCode = 0
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (uiItemsChangeRequest != null) {
             uiItemsChangeRequest!!()
             uiItemsChangeRequest = null
@@ -263,7 +263,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
         // ui title
 //        val titlestr = Lang["CONTEXT_WORLD_NEW"]

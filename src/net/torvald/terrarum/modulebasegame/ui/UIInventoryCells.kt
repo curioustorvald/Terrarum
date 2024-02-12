@@ -126,7 +126,7 @@ internal class UIInventoryCells(
         itemList.rebuild(full.catBar.catIconsMeaning[newcat]) // have to manually rebuild, too!
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         itemList.update(delta)
         equipped.update(delta)
 
@@ -152,7 +152,7 @@ internal class UIInventoryCells(
         }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         //itemList.posX = itemList.initialX + inventoryScrOffX.roundToInt()
         itemList.render(frameDelta, batch, camera)
         //equipped.posX = equipped.initialX + inventoryScrOffX.roundToInt()

@@ -69,7 +69,7 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
 
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // draw title bar
         batch.color = UINSMenu.DEFAULT_TITLEBACKCOL
         blendNormalStraightAlpha(batch)
@@ -96,7 +96,7 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
 
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
 
     }
 

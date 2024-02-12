@@ -99,7 +99,7 @@ class UITitleLanguage(remoCon: UIRemoCon?) : UICanvas() {
 
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (initialMouseBlock && !Terrarum.mouseDown) {
             initialMouseBlock = false
         }
@@ -110,7 +110,7 @@ class UITitleLanguage(remoCon: UIRemoCon?) : UICanvas() {
         }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         batch.color = Color.WHITE
         textArea1.render(frameDelta, batch, camera)

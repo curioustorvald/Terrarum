@@ -310,7 +310,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         totalTBH64 = maxOf(loadOrderPlayer.size, loadOrderWorld.size) * App.fontGame.lineHeight.toInt()
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         altDown = Gdx.input.isKeyPressed(Keys.ALT_LEFT) || Gdx.input.isKeyPressed(Keys.ALT_RIGHT)
 
         when (mode) {
@@ -344,7 +344,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
     private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         if (mode != MODE_SHOW_LOAD_ORDER) {
             val buttonYdelta = (full.titleTopGradEnd) - full.playerButtonSelected!!.posY
             full.playerButtonSelected!!.render(frameDelta, batch, camera, 0, buttonYdelta)

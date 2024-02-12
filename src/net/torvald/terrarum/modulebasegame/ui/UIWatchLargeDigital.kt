@@ -54,7 +54,7 @@ class UIWatchLargeDigital() : UICanvas() {
         get() = INGAME.world.worldTime
 
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (ELon) {
             ELuptimer += delta
         }
@@ -69,7 +69,7 @@ class UIWatchLargeDigital() : UICanvas() {
         }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // disabling light button
         batch.color = Color.WHITE
         batch.draw(watchface, -1f, -1f)

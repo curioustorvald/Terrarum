@@ -1,12 +1,9 @@
 package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 
 
 /**
@@ -157,7 +154,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                         mouseOverCall?.setAsOpen()
                     }
 
-                    mouseOverCall?.updateUI(delta)
+                    mouseOverCall?.updateImpl(delta)
                     mouseUpListener.invoke(itemRelativeMouseX, itemRelativeMouseY)
                 }
                 else {
@@ -179,7 +176,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                 mouseOverCall?.render(frameDelta, batch, camera)
 
                 if (mouseUp) {
-                    mouseOverCall?.renderUI(frameDelta, batch, camera)
+                    mouseOverCall?.renderImpl(frameDelta, batch, camera)
                 }
 //            }
         }

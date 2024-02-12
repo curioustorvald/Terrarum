@@ -1,11 +1,9 @@
 package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
@@ -145,7 +143,7 @@ abstract class UICanvas(
     /** **DO NOT CALL THIS FUNCTION FOR THE ACTUAL UPDATING OF THE UI — USE update() INSTEAD**
      *
      * Override this for the actual update. Note that you must update uiItems by yourself. */
-    abstract fun updateUI(delta: Float)
+    abstract fun updateImpl(delta: Float)
     /** **DO NOT CALL THIS FUNCTION FOR THE ACTUAL RENDERING OF THE UI — USE render() INSTEAD**
      *
      * Override this for the actual render. Note that you must render uiItems by yourself.
@@ -156,7 +154,7 @@ abstract class UICanvas(
      * The transparency of the handler is independent of the draw, you must set the drawing color yourself
      * (use handler.opacity or handler.opacityColour)
      */
-    abstract fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera)
+    abstract fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera)
 
     /**
      * Do not modify ui.handler.openCloseCounter here.

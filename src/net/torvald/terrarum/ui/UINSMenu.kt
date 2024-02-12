@@ -172,7 +172,7 @@ class UINSMenu(
         width -= poppedUIItem.ui.width
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         /*listStack.forEach {
             it.list.update(delta)
         }*/ // fucking concurrent modification
@@ -186,7 +186,7 @@ class UINSMenu(
 
     private val borderCol = Color(1f, 1f, 1f, 0.35f)
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         listStack.forEach {
             // draw title bar
             batch.color = titleBackCol

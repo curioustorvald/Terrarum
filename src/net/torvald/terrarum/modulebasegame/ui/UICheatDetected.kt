@@ -32,7 +32,7 @@ class UICheatDetected : UICanvas() {
 
     private val backgroundCol = Color(0x00000080)
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         Terrarum.ingame?.consoleHandler?.setAsClose()
         Terrarum.ingame?.consoleHandler?.isVisible = false
 
@@ -48,7 +48,7 @@ class UICheatDetected : UICanvas() {
         App.fontGame.draw(batch, txt, width.minus(txtW).ushr(1).toFloat(), height.minus(txtH).ushr(1).toFloat())
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         INGAME.pause()
     }
 

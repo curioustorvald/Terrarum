@@ -43,7 +43,7 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private var oldBufferSize = App.getConfigInt("audio_buffer_size")
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
 
         App.getConfigInt("audio_buffer_size").let {
@@ -55,7 +55,7 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // undo sound fadeout/muting when this panel is opened
         if (handler.openCloseCounter == 0f && App.audioMixer.fadeBus.getFilter<Lowpass>().cutoff < SAMPLING_RATE / 2) {
             App.audioMixer.requestLowpassOut(0.25)

@@ -145,7 +145,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
 
     private var oldPosX = full.posX
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
     }
 
@@ -159,7 +159,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")
 
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val memoryGaugeXpos = hx - memoryGaugeWidth/2
         val memoryGaugeYpos = drawY + sizeSelY + buttonHeight + 10
         val textXpos = memoryGaugeXpos + 3

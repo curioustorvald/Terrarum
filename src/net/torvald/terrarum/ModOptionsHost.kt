@@ -87,12 +87,12 @@ class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
         ControlPanelCommon.register(this, width, "basegame.modcontrolpanel.$modname", modOptions)
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
         deferred(); deferred = {}
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         try {
             // the actual control panel
             ControlPanelCommon.render("basegame.modcontrolpanel.$currentlySelectedModule", width, batch)

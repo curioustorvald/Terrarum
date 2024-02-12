@@ -165,7 +165,7 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
         addUIitem(imeSelection)
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         keyboardTestPanel.mouseoverUpdateLatch =
                 (!keyboardLayoutSelection.paletteShowing &&
                  !imeSelection.paletteShowing)
@@ -173,7 +173,7 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
 
         val txt1 = Lang["MENU_LABEL_KEYBOARD_LAYOUT"]; val tw1 = App.fontGame.getWidth(txt1)

@@ -347,7 +347,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         else -> "CONTEXT_DESCRIPTION_HUGE"
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
         if (::worldCells.isInitialized) worldCells.forEach { it.update(delta) }
 
@@ -390,7 +390,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private var selectedWorldThumb: TextureRegion? = null
 
     val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val memoryGaugeXpos = hx - memoryGaugeWidth - gridGap/2
         val memoryGaugeYpos = y + listHeight - buttonHeight
         val textXpos = memoryGaugeXpos + 3

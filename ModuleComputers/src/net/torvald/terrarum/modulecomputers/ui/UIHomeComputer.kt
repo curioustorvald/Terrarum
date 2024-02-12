@@ -47,10 +47,10 @@ internal class UIHomeComputer : UICanvas(
             "$KEYCAP_CTRL$KEYCAP_SHIFT$KEYCAP_R$KEYCAP_S Reset\u3000" +
             "$KEYCAP_CTRL$KEYCAP_SHIFT$KEYCAP_R$KEYCAP_Q SysRq"
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
     }
 
-    override fun renderUI(frameDelta: Float, otherBatch: SpriteBatch, otherCamera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, otherBatch: SpriteBatch, otherCamera: OrthographicCamera) {
         otherBatch.end()
 
         fbo.inAction(camera, batch) {

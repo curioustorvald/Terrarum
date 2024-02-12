@@ -408,14 +408,14 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         return false
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         // NO super.update due to an infinite recursion
         this.uiItems.forEach { it.update(delta) }
 
         if (openingClickLatched && !Terrarum.mouseDown) openingClickLatched = false
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // NO super.render due to an infinite recursion
         this.uiItems.forEach { it.render(frameDelta, batch, camera) }
 

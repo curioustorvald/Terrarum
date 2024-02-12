@@ -2,7 +2,6 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -227,7 +226,7 @@ void main() {
 
 
         if (isVisible || alwaysUpdate) {
-            ui.updateUI(delta)
+            ui.updateImpl(delta)
         }
 
         if (isOpening) {
@@ -301,7 +300,7 @@ void main() {
 
             batch.shader = shader
             shader.setUniformf("opacity", opacity * parentOpacity)
-            ui.renderUI(frameDelta, batch, camera)
+            ui.renderImpl(frameDelta, batch, camera)
             //ingameGraphics.flush()
 
             batch.shader = null

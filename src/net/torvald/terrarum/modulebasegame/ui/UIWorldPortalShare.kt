@@ -43,7 +43,7 @@ class UIWorldPortalShare(private val full: UIWorldPortal) : UICanvas() {
         addUIitem(backButton)
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
     }
 
@@ -60,7 +60,7 @@ class UIWorldPortalShare(private val full: UIWorldPortal) : UICanvas() {
 
     private lateinit var wotKeys: List<String>
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
 
         val textY = drawY + (height/2) - App.fontGame.lineHeight.toInt() * 4 - 2

@@ -141,7 +141,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
     }
 
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (!scrollBar.mouseUp) currentPalette.forEach { it.update(delta) }
         tabs.update(delta)
         closeButton.update(delta)
@@ -166,7 +166,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
 
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
 
         // border

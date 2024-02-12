@@ -184,7 +184,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
     private var mouseOnButton: Int? = null
     private var mouseOnList: Int? = null
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         val shouldPlayerBeDisabled = shouldPlayerBeDisabled
 
         // process transition request
@@ -655,7 +655,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
         get() = relativeMouseX.toFloat() in _posX-capsuleMosaicSize .. _posX+width+capsuleMosaicSize &&
                 relativeMouseY.toFloat() in _posY .. _posY+height
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         widthForFreqMeter = if (transitionOngoing && modeNext >= MODE_MOUSE_UP || mode >= MODE_MOUSE_UP)
             uiWidthFromTextWidth(nameLength)
         else

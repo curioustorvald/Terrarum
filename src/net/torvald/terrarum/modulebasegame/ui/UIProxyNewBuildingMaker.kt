@@ -19,10 +19,10 @@ class UIProxyNewBuildingMaker(val remoCon: UIRemoCon) : UICanvas() {
     override var height: Int = 0
     override var openCloseTime: Second = 0f
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
     }
 
     override fun doOpening(delta: Float) {

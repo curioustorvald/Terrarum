@@ -47,7 +47,7 @@ class Noticelet : UICanvas() {
         setAsAlwaysVisible()
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         // update timer and animation
         messageQueue.forEach {
             it.akku += delta
@@ -75,7 +75,7 @@ class Noticelet : UICanvas() {
 
     private var ypos = 1f // 1: bottom, -1: top
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val px = Toolkit.drawWidthf
         val py = App.scr.halfhf + awayFromCentre * ypos - (if (ypos < 0) h else 0f)
 

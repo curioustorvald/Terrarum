@@ -136,7 +136,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         }
     }
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         if (scrollTarget != listScroll) {
             if (scrollAnimCounter < scrollAnimLen) {
                 scrollAnimCounter += delta
@@ -171,7 +171,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
 
         val cells = playerCells

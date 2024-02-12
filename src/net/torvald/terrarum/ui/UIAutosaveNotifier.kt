@@ -40,7 +40,7 @@ class UIAutosaveNotifier : UICanvas() {
     private var normalCol = Color.WHITE
     private var errorCol = Toolkit.Theme.COL_RED
 
-    override fun updateUI(delta: Float) {
+    override fun updateImpl(delta: Float) {
         spinnerTimer += delta
         while (spinnerTimer > spinnerInterval) {
             spinnerFrame = (spinnerFrame + 1) % 32
@@ -56,7 +56,7 @@ class UIAutosaveNotifier : UICanvas() {
         }
     }
 
-    override fun renderUI(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+    override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         val spin = spinner.get(spinnerFrame % 8, spinnerFrame / 8)
         val offX = App.scr.width - WIDTH - (App.scr.tvSafeGraphicsWidth * 1.25f).roundToInt().toFloat()
         val offY = App.scr.height - HEIGHT - App.scr.tvSafeGraphicsHeight - 9f // +9 to align to quickslot and watch UI
