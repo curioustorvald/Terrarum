@@ -127,7 +127,7 @@ class ActorInventory() : FixtureInventory() {
             val swingDmgToFrameDmg = App.UPDATE_RATE.toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
             // damage the item
-            newItem.durability -= (baseDamagePerSwing * swingDmgToFrameDmg).toFloat()
+            newItem.durability -= (baseDamagePerSwing * swingDmgToFrameDmg / 1.5f).toFloat()
             if (newItem.durability <= 0) {
                 remove(newItem, 1)
 

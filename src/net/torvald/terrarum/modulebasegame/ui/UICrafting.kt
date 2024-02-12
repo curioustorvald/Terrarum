@@ -356,6 +356,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
     fun resetUI() {
         // reset spinner
         resetSpinner()
+
         // reset selected recipe status
         recipeClicked = null
         filterPlayerListUsing(recipeClicked)
@@ -363,6 +364,10 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         ingredients.clear()
         playerThings.removeFromForceHighlightList(oldSelectedItems)
         itemListIngredients.rebuild(FILTER_CAT_ALL)
+
+        // reset scroll
+        itemListCraftable.itemPage = 0
+        playerThings.itemList.itemPage = 0
 
         refreshCraftButtonStatus()
     }

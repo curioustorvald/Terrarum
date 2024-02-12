@@ -22,7 +22,7 @@ object Calculate {
      * TODO Newtons as unit?
      */
     @JvmStatic fun pickaxePower(actor: ActorWithBody, material: Material?): Float {
-        return (4.0 * (material?.forceMod?.toDouble() ?: 0.15) * (actor.avStrength / 1000.0)).toFloat()
+        return (6.0 * (material?.forceMod?.toDouble() ?: 0.15) * (actor.avStrength / 1000.0)).toFloat()
     }
 
     @JvmStatic fun hatchetPower(actor: ActorWithBody, material: Material?): Float {
