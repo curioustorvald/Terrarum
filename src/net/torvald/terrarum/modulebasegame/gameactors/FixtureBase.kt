@@ -39,7 +39,7 @@ open class Electric : FixtureBase {
         mainUI: UICanvas? = null,
         inventory: FixtureInventory? = null,
         id: ActorID? = null
-    ) : super(renderOrder, PhysProperties.IMMOBILE, id) {
+    ) : super(renderOrder, PhysProperties.IMMOBILE(), id) {
         blockBox = blockBox0
         setHitboxDimension(TILE_SIZE * blockBox.width, TILE_SIZE * blockBox.height, 0, 0)
         this.blockBoxProps = blockBoxProps
@@ -162,7 +162,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
     internal var actorThatInstalledThisFixture: UUID? = null
 
-    protected constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)
+    protected constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE(), null)
     protected constructor(renderOrder: RenderOrder, physProp: PhysProperties, id: ActorID?) : super(renderOrder, physProp, id)
 
     /**
@@ -186,7 +186,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
                 mainUI: UICanvas? = null,
                 inventory: FixtureInventory? = null,
                 id: ActorID? = null
-    ) : super(renderOrder, PhysProperties.IMMOBILE, id) {
+    ) : super(renderOrder, PhysProperties.IMMOBILE(), id) {
         blockBox = blockBox0
         setHitboxDimension(TILE_SIZE * blockBox.width, TILE_SIZE * blockBox.height, 0, 0)
         this.blockBoxProps = blockBoxProps

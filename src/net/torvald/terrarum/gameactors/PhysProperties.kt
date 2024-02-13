@@ -1,33 +1,35 @@
 package net.torvald.terrarum.gameactors
 
 data class PhysProperties(
-        val immobileBody: Boolean = false,
-        var usePhysics: Boolean = true,
-        val useStairs: Boolean = false
+    val immobileBody: Boolean = false,
+    var usePhysics: Boolean = true,
+    val useStairs: Boolean = false,
+    val ignorePlatform: Boolean = true
 ) {
     companion object {
-        val HUMANOID_DEFAULT = PhysProperties(
-                immobileBody = false,
-                usePhysics = true,
-                useStairs = true
+        fun HUMANOID_DEFAULT() = PhysProperties(
+            immobileBody = false,
+            usePhysics = true,
+            useStairs = true,
+            ignorePlatform = false,
         )
         /** e.g. dropped items, balls */
-        val PHYSICS_OBJECT = PhysProperties(
-                immobileBody = false,
-                usePhysics = true,
-                useStairs = false
+        fun PHYSICS_OBJECT() = PhysProperties(
+            immobileBody = false,
+            usePhysics = true,
+            useStairs = false,
         )
         /** e.g. voice maker */
-        val IMMOBILE = PhysProperties(
-                immobileBody = true,
-                usePhysics = false,
-                useStairs = false
+        fun IMMOBILE() = PhysProperties(
+            immobileBody = true,
+            usePhysics = false,
+            useStairs = false,
         )
         /** e.g. camera */
-        val MOBILE_OBJECT = PhysProperties(
-                immobileBody = false,
-                usePhysics = false,
-                useStairs = false
+        fun MOBILE_OBJECT() = PhysProperties(
+            immobileBody = false,
+            usePhysics = false,
+            useStairs = false,
         )
     }
 }

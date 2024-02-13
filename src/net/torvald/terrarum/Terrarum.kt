@@ -355,7 +355,7 @@ object Terrarum : Disposable {
      *
      * override var referenceID: Int = generateUniqueReferenceID()
      */
-    fun generateUniqueReferenceID(renderOrder: Actor.RenderOrder): ActorID {
+    fun generateUniqueReferenceID(): ActorID {
         // render orders can be changed arbitrarily so the whole "renderorder to actor id" is only there for an initial sorting
         fun hasCollision(value: ActorID) =
                 try {
@@ -644,6 +644,7 @@ inline fun Boolean.toInt(shift: Int = 0) = if (this) 1.shl(shift) else 0
 inline fun Boolean.toLong(shift: Int = 0) = if (this) 1L.shl(shift) else 0L
 inline fun Int.bitCount() = java.lang.Integer.bitCount(this)
 inline fun Long.bitCount() = java.lang.Long.bitCount(this)
+inline fun Double.signedSqrt() = this.abs().sqrt() * this.sign
 
 
 fun absMax(left: Double, right: Double): Double {
@@ -1011,9 +1012,15 @@ fun distBetweenPoints(a: Vector2, b: Vector2): Double {
  * @return positive if the otherActor is on the right side of the player, negative if on the left
  */
 fun relativeXposition(thisActor: ActorWithBody, otherActor: ActorWithBody): Double {
+    return relativeXposition(thisActor, otherActor.centrePosVector)
+}
+/**
+ * @return positive if the otherActor is on the right side of the player, negative if on the left
+ */
+fun relativeXposition(thisActor: ActorWithBody, otherActor: Vector2): Double {
     val ww = INGAME.world.width * TILE_SIZED
     val thisPos = thisActor.centrePosVector
-    val pos1 = otherActor.centrePosVector
+    val pos1 = otherActor
     val pos2 = Vector2(pos1.x + ww, pos1.y)
     val pos3 = Vector2(pos1.x - ww, pos1.y)
     val posToUse = listOf(
@@ -1023,6 +1030,7 @@ fun relativeXposition(thisActor: ActorWithBody, otherActor: ActorWithBody): Doub
     ).sortedBy { it.second }.first().first
     return posToUse.x - thisPos.x
 }
+
 fun distBetween(a: ActorWithBody, bpos: Vector2): Double {
     val ww = INGAME.world.width * TILE_SIZED
     val apos1 = a.centrePosVector

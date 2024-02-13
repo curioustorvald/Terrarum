@@ -17,7 +17,7 @@ object CreatureBuilder {
      * @Param jsonFileName with extension
      */
     operator fun invoke(module: String, jsonFileName: String): ActorWithBody {
-        val actor = ActorWithBody(Actor.RenderOrder.MIDDLE, physProp = PhysProperties.HUMANOID_DEFAULT)
+        val actor = ActorWithBody(Actor.RenderOrder.MIDDLE, physProp = PhysProperties.HUMANOID_DEFAULT())
         InjectCreatureRaw(actor.actorValue, module, jsonFileName)
 
 

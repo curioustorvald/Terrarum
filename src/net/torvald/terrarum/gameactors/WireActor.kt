@@ -24,7 +24,7 @@ class WireActor : ActorWithBody, NoSerialise {
 
     private constructor()
 
-    constructor(id: ActorID) : super(RenderOrder.OVERLAY, PhysProperties.IMMOBILE, id)
+    constructor(id: ActorID) : super(RenderOrder.OVERLAY, PhysProperties.IMMOBILE(), id)
 
     init {
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 0)

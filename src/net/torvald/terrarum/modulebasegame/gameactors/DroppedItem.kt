@@ -33,7 +33,7 @@ open class DroppedItem : ActorWithBody {
 
     var itemCount = 1L
 
-    protected constructor() : super(RenderOrder.OVERLAY, PhysProperties.PHYSICS_OBJECT)
+    protected constructor() : super(RenderOrder.OVERLAY, PhysProperties.PHYSICS_OBJECT())
 
     private var timeSinceSpawned = 0f
 
@@ -51,7 +51,7 @@ open class DroppedItem : ActorWithBody {
      * @param topLeftX world-wise coord
      * @param topLeftY world-wise coord
      */
-    constructor(itemID: ItemID, centreX: Double, bottomY: Double, spawnVelo: Vector2? = null) : super(RenderOrder.OVERLAY, PhysProperties.PHYSICS_OBJECT) {
+    constructor(itemID: ItemID, centreX: Double, bottomY: Double, spawnVelo: Vector2? = null) : super(RenderOrder.OVERLAY, PhysProperties.PHYSICS_OBJECT()) {
         this.itemID = itemID
 
         if (itemID.isActor())

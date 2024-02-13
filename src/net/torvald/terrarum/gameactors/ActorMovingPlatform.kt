@@ -14,7 +14,7 @@ open class ActorMovingPlatform() : ActorWithBody() {
     @Transient protected val actorsRiding = ArrayList<ActorID>() // saving actorID due to serialisation issues
 
     init {
-        physProp = PhysProperties.PHYSICS_OBJECT
+        physProp = PhysProperties.PHYSICS_OBJECT()
 
         setHitboxDimension(TILE_SIZE * tilewiseWidth, TILE_SIZE, 0, 0)
     }

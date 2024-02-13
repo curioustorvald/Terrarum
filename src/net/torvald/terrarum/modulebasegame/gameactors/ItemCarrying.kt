@@ -13,7 +13,7 @@ class ItemCarrying : ActorWithBody {
 
     private constructor()
 
-    constructor(itemID: ItemID) : super(RenderOrder.MIDTOP, PhysProperties.IMMOBILE) {
+    constructor(itemID: ItemID) : super(RenderOrder.MIDTOP, PhysProperties.IMMOBILE()) {
         this.itemID = itemID
     }
 

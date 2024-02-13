@@ -52,7 +52,7 @@ open class ProjectileSimple : ActorWithBody, Projectile {
     constructor(type: Int,
                 fromPoint: Vector2, // projected coord
                 toPoint: Vector2    // arriving coord
-             ) : super(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
+             ) : super(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT()) {
         this.type = type
 
 

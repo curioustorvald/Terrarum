@@ -29,9 +29,13 @@ import kotlin.math.pow
  */
 open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, LandHolder, HistoricalFigure {
 
+    init {
+        this.physProp = PhysProperties.HUMANOID_DEFAULT()
+    }
+
     protected constructor()
 
-    constructor(birth: Long, death: Long? = null, physProp: PhysProperties = PhysProperties.HUMANOID_DEFAULT) : super() {
+    constructor(birth: Long, death: Long? = null, physProp: PhysProperties = PhysProperties.HUMANOID_DEFAULT()) : super() {
         actorValue[AVKey.__HISTORICAL_BORNTIME] = birth
         death?.let { actorValue[AVKey.__HISTORICAL_DEADTIME] = death }
         this.physProp = physProp

@@ -27,7 +27,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
      * Valid RefID is equal to or greater than 16777216.
      * @return Reference ID. (16777216-0x7FFF_FFFF)
      */
-    open var referenceID: ActorID = 0 // in old time this was nullable without initialiser. If you're going to revert to that, add the reason why this should be nullable.
+    open var referenceID: ActorID = Terrarum.generateUniqueReferenceID() // in old time this was nullable without initialiser. If you're going to revert to that, add the reason why this should be nullable.
 
     /**
      * RenderOrder does not affect ReferenceID "too much" (ID generation will still depend on it, but it's just because of ye olde tradition by now)
@@ -40,7 +40,8 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
     // needs zero-arg constructor for serialiser to work
     constructor(renderOrder: RenderOrder, id: ActorID?) : this() {
-        referenceID = id ?: Terrarum.generateUniqueReferenceID(renderOrder)
+        if (id != null) referenceID = id
+        this.renderOrder = renderOrder
     }
 
 

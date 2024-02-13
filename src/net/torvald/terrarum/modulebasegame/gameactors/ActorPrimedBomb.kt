@@ -1,33 +1,29 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.spriteanimation.SingleImageSprite
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.modulebasegame.ExplosionManager
-import org.dyn4j.geometry.Vector2
 
 /**
  * Created by minjaesong on 2024-02-13.
  */
-open class ActorPrimedBomb : ActorWithBody {
+open class ActorPrimedBomb(
+    private var explosionPower: Float = 1f,
+    private var fuse: Second = 1f,
+) : ActorWithBody() {
 
-    protected constructor() {
+    init {
         renderOrder = RenderOrder.MIDTOP
+        physProp = PhysProperties.PHYSICS_OBJECT()
     }
 
-    private var explosionPower: Float = 1f
-    private var fuse: Second = 1f
-
-    constructor(
-        initialPos: Vector2,
-        initialVelo: Vector2,
-        power: Float,
-        fuse: Second
-    ) {
+    protected constructor() : this(1f, 1f) {
         renderOrder = RenderOrder.MIDTOP
-
-        this.explosionPower = power
-        this.fuse = fuse
+        physProp = PhysProperties.PHYSICS_OBJECT()
     }
 
     override fun updateImpl(delta: Float) {
@@ -41,4 +37,24 @@ open class ActorPrimedBomb : ActorWithBody {
             flagDespawn()
         }
     }
+}
+
+
+/**
+ * Created by minjaesong on 2024-02-14.
+ */
+class ActorCherryBomb : ActorPrimedBomb(500f, 4.5f) {
+
+    init {
+        val itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(0,13)
+
+        setHitboxDimension(7, 7, 2, -2)
+        sprite = SingleImageSprite(this, itemImage)
+
+        avBaseMass = 1.0
+        density = 1400.0
+    }
+
+
+
 }

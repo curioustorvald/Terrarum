@@ -403,7 +403,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         printdbg(this, "Player localhash: ${codices.player.localHashStr}, hasSprite: ${codices.player.sprite != null}")
 
         // assign new random referenceID for player
-        codices.player.referenceID = Terrarum.generateUniqueReferenceID(Actor.RenderOrder.MIDDLE)
+        codices.player.referenceID = Terrarum.generateUniqueReferenceID()
         forceAddActor(codices.player)
 
 

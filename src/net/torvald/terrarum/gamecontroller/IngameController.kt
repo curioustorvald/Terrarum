@@ -149,12 +149,17 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 terrarumIngame.worldSecondaryClickStart(actor, App.UPDATE_RATE)
             }
 
+            val itemProp = ItemCodex[itemOnGrip]
+
             // unlatch when:
             // - not clicking anymore
             // - using any item that is not fixture (blocks, picks)
             // DON'T unlatch when:
             // - performing barehand action
-            if (!Terrarum.mouseDown || inventoryCategoryAllowClickAndDrag.contains(ItemCodex[itemOnGrip]?.inventoryCategory) || ItemCodex[itemOnGrip]?.tags?.contains("ACTINGBLOCK") == true) {
+            if (!Terrarum.mouseDown ||
+                inventoryCategoryAllowClickAndDrag.contains(itemProp?.inventoryCategory) && itemProp?.disallowToolDragging != true ||
+                itemProp?.tags?.contains("ACTINGBLOCK") == true
+                ) {
                 worldPrimaryClickLatched = false
             }
 

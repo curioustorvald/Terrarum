@@ -22,7 +22,7 @@ import kotlin.math.floor
  *
  * MarkerMode must be set manually after calling `setGhost` -- the `unsetGhost` will not reset the field.
  */
-class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = PhysProperties.MOBILE_OBJECT), NoSerialise {
+class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = PhysProperties.MOBILE_OBJECT()), NoSerialise {
 
     enum class MarkerMode {
         FIXTURE_GHOST, BLOCK_MARKER

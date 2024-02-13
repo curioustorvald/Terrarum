@@ -12,7 +12,7 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 /**
  * Created by minjaesong on 2016-03-05.
  */
-class PhysTestBall : ActorWithBody(RenderOrder.MIDDLE, PhysProperties.PHYSICS_OBJECT) {
+class PhysTestBall : ActorWithBody(RenderOrder.MIDDLE, PhysProperties.PHYSICS_OBJECT()) {
 
     private var color = Color.GOLD
 

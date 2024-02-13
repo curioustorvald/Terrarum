@@ -44,7 +44,7 @@ import kotlin.math.*
  */
 open class ActorWithBody : Actor {
 
-    var physProp = PhysProperties.HUMANOID_DEFAULT
+    var physProp = PhysProperties.HUMANOID_DEFAULT()
 
     // copied from old interface Luminous
     /**
@@ -1460,7 +1460,7 @@ open class ActorWithBody : Actor {
              externalV.y + (controllerV?.y ?: 0.0) >= 0.0 &&
              this.downButtonHeld == 0 && this.axisY <= 0f) ||
             // platforms, moving downward, for the case of NOT ActorHumanoid
-            (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
+            (this !is ActorHumanoid && !physProp.ignorePlatform && BlockCodex[tile].isPlatform &&
              externalV.y + (controllerV?.y ?: 0.0) >= 0.0)
     // TODO: as for the platform, only apply it when it's a feet tile
 

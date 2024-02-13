@@ -89,14 +89,6 @@ class ItemLogsRosewood(originalID: ItemID) : OreItemBase(originalID) {
         return BlockBase.blockStartPrimaryUse(actor, this, "basegame:75", delta)
     }
 }
-class OreStick(originalID: ItemID) : OreItemBase(originalID) {
-    override var originalName = "ITEM_WOOD_STICK"
-    override val materialId = "WOOD"
-    override var calories = 600.0
-    override var smokiness = 0.2f
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,6)
-}
 
 
 
@@ -261,11 +253,4 @@ class IngotSolder(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_INGOT_SOLDER"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(14,5)
-}
-
-
-class ItemClayBall(originalID: ItemID) : OreItemBase(originalID) {
-    override var originalName = "BLOCK_CLAY"
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(11,6)
 }
