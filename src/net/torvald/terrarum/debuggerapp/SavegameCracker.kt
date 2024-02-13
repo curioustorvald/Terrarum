@@ -293,6 +293,31 @@ class SavegameCracker(
             if (worldIndex.isNotBlank()) println("${ccNoun}World UUID: $ccNoun2$worldIndex")
         }
     }
+
+    @Command("Removes the specified chunk(s) completely", "IDs")
+    fun discardchunk(args: List<String>) {
+        letdisk { disk ->
+            val ids = args[1]
+            val range = if (ids.matches(Regex("""[0-9]+-[0-9]+""")))
+                ids.substringBefore('-').toLong()..ids.substringAfter('-').toLong()
+            else
+                ids.toLong()..ids.toLong()
+
+            var rms = 0
+
+            range.forEach {
+                // TODO update according to the savegame format
+                val fileIDs = (0..15).map { layer -> 4294967296L + layer.shl(24) or it }
+                fileIDs.forEach {
+                    if (disk.entries.containsKey(it)) rms += 1
+                    disk.entries.remove(it)
+                    VDUtil.getAsDirectory(disk, 0).remove(it)
+                }
+            }
+
+            println("${cc0}$rms entries removed")
+        }
+    }
 }
 
 internal annotation class Command(val help: String = "", val synopsis: String = "")

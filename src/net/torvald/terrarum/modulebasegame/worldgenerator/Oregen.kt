@@ -58,7 +58,10 @@ class Oregen(world: GameWorld, isFinal: Boolean, private val caveAttenuateBiasSc
                     noiseValues.zip(oreTiles).firstNotNullOfOrNull { (n, tile) -> if (n > 0.5) tile else null }
                 val backingTile = world.getTileFromTerrain(x, y)
 
-                if (tileToPut != null && BlockCodex[backingTile].hasAllTagOf("ROCK", "OREBEARING")) {
+                val blockTagNonGrata = ores.firstOrNull { it.tile == tileToPut }?.blockTagNonGrata ?: hashSetOf()
+                val backingTileProp = BlockCodex[backingTile]
+
+                if (tileToPut != null && backingTileProp.hasAllTagOf("ROCK", "OREBEARING") && backingTileProp.hasNoTag(blockTagNonGrata)) {
                     // actually put the ore block
                     world.setTileOre(x, y, tileToPut, 0) // autotiling will be handled by the other worldgen process
                 }
@@ -153,4 +156,5 @@ data class OregenParams(
     val scale: Double, // also adjust this if you've touched the bias value. Number can be greater than 1.0
     val ratio: Double, // how stretched the ore veins are. >1.0 = stretched horizontally, <1.0 = stretched vertically
     val tiling: String, // a16, a47, r16, r8
+    val blockTagNonGrata: HashSet<String>,
 )

@@ -70,7 +70,12 @@ internal class UIInventoryCells(
 
             // tooltip
             if (Terrarum.mouseScreenX.toFloat() in encumbBarXPos..encumbBarXPos+UIInventoryCells.weightBarWidth && Terrarum.mouseScreenY.toFloat() in encumbBarYPos..encumbBarYPos+UIInventoryFull.controlHelpHeight - 6f) {
-                INGAME.setTooltipMessage("${actorInventory.capacity}/${actorInventory.maxCapacity}")
+                val capaStr = if (actorInventory.capacity >= 1125899906842624.0) /* 2^50 */
+                    "${actorInventory.capacity}"
+                else
+                    "${(actorInventory.capacity * 100L).toLong() / 100.0}"
+
+                INGAME.setTooltipMessage("$capaStr/${actorInventory.maxCapacity}.0")
                 tooltipShowing[10001] = true
             }
             else {

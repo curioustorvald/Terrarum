@@ -343,9 +343,10 @@ internal object TerragenTest : NoiseMaker {
     private val QUARTZ = 0//x55ff33ff.toInt()
     private val AMETHYST = 0//xee77ffff.toInt()
     private val ROCKSALT = 0xff00ffff.toInt()
+    private val NITRE = 0xdbd6a1ff.toInt()
 
     private val oreCols = listOf(
-        COPPER_ORE, IRON_ORE, COAL_ORE, ZINC_ORE, TIN_ORE, GOLD_ORE, SILVER_ORE, LEAD_ORE, ROCKSALT, QUARTZ, AMETHYST
+        COPPER_ORE, IRON_ORE, COAL_ORE, ZINC_ORE, TIN_ORE, GOLD_ORE, SILVER_ORE, LEAD_ORE, ROCKSALT, QUARTZ, AMETHYST, NITRE
     )
 
     private val terragenYscaling = (NOISEBOX_HEIGHT / 2400.0).pow(0.75)
@@ -693,6 +694,7 @@ internal object TerragenTest : NoiseMaker {
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:256", 0.010, -0.366, 0.528, 2.4)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:257", 0.007, 0.100, 0.494, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:258", 0.019, 0.015, 0.509, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:259", 0.010, -0.166, 0.517, 1.4)),
 
             Joise(generateRockLayer(groundScalingCached, seed, params, (0..7).map {
                 thicknesses[it] + marblerng.nextTriangularBal() * 0.006 to (2.6 * terragenYscaling) + it * 0.18 + marblerng.nextTriangularBal() * 0.09

@@ -1,16 +1,17 @@
-"id";"freq";"power";"scale";"ratio";"tiling";"comment"
-"1";"0.026";"0.010";"0.517";"1.0";"a16x16";"copper (malachite)"
-"2";"0.045";"0.011";"0.517";"1.0";"a16x16";"iron (haematite)"
-"3";"0.017";"0.070";"0.511";"3.8";"a16x4";"coal"
-"4";"0.019";"0.011";"0.511";"1.0";"a16x16";"zinc (sphalerite)"
-"5";"0.017";"0.017";"0.511";"1.0";"a16x16";"tin (cassiterite)"
-"6";"0.009";"0.300";"0.474";"1.0";"a16x16";"natural gold"
-"7";"0.013";"0.300";"0.476";"1.0";"a16x16";"natural silver"
-"8";"0.017";"0.020";"0.511";"1.0";"a16x16";"lead (galena)"
+"id";"freq";"power";"scale";"ratio";"tiling";"comment";"blocktagnongrata"
+"1";"0.026";"0.010";"0.517";"1.0";"a16x16";"copper (malachite)";""
+"2";"0.045";"0.011";"0.517";"1.0";"a16x16";"iron (haematite)";""
+"3";"0.017";"0.070";"0.511";"3.8";"a16x4";"coal";""
+"4";"0.019";"0.011";"0.511";"1.0";"a16x16";"zinc (sphalerite)";""
+"5";"0.017";"0.017";"0.511";"1.0";"a16x16";"tin (cassiterite)";""
+"6";"0.009";"0.300";"0.474";"1.0";"a16x16";"natural gold";""
+"7";"0.013";"0.300";"0.476";"1.0";"a16x16";"natural silver";""
+"8";"0.017";"0.020";"0.511";"1.0";"a16x16";"lead (galena)";""
 
-"256";"0.010";"-0.366";"0.528";"2.4";"a16x8";"rocksalt"
-"257";"0.007";"0.100";"0.494";"1.0";"a16x8";"amethyst"
-"258";"0.019";"0.015";"0.509";"1.0";"a16x8";"quartz"
+"256";"0.010";"-0.366";"0.528";"2.4";"a16x8";"rocksalt";"DEEPROCK"
+"257";"0.007";"0.100";"0.494";"1.0";"a16x8";"amethyst";""
+"258";"0.019";"0.015";"0.509";"1.0";"a16x8";"quartz";""
+"259";"0.010";"-0.166";"0.517";"1.4";"a16x8";"nitre";"DEEPROCK"
 
 ################################################################################
 
@@ -31,4 +32,5 @@
 #   - r16: use the hash of the tile position as a variant selection, module 16
 #   - r8: use the hash of the tile position as a variant selection, module 8
 #
-# comment: human-readable comments, not actually parsed
+# comment: human-readable comments, not actually used
+# blocktagnongrata: blocks with matching tag will not bear the ore. leave empty "" to allow all

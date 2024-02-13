@@ -623,8 +623,9 @@ object ModMgr {
                     val scale = rec.get("scale").toDouble()
                     val ratio = rec.get("ratio").toDouble()
                     val tiling = rec.get("tiling")
+                    val blockTagNonGrata = rec.get("blocktagnongrata").split(',').map { it.trim().toUpperCase() }.toHashSet()
 
-                    Worldgen.registerOre(OregenParams(tile, freq, power, scale, ratio, tiling))
+                    Worldgen.registerOre(OregenParams(tile, freq, power, scale, ratio, tiling, blockTagNonGrata))
                 }
             }
             catch (e: IOException) {

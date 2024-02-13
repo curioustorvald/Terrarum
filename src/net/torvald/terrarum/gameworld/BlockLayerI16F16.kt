@@ -16,13 +16,13 @@ import net.torvald.util.Float16
  *
  * Created by minjaesong on 2023-10-10.
  */
-class BlockLayerI16F16(val width: Int, val height: Int) : BlockLayer {
+class BlockLayerI16F16(override val width: Int, override val height: Int) : BlockLayer {
     override val bytesPerBlock = BYTES_PER_BLOCK
 
     // for some reason, all the efforts of saving the memory space were futile.
 
     // using unsafe pointer gets you 100 fps, whereas using directbytebuffer gets you 90
-    internal val ptr: UnsafePtr = UnsafeHelper.allocate(width * height * BYTES_PER_BLOCK)
+    internal val ptr: UnsafePtr = UnsafeHelper.allocate(width * height * bytesPerBlock)
 
     val ptrDestroyed: Boolean
         get() = ptr.destroyed
@@ -48,7 +48,7 @@ class BlockLayerI16F16(val width: Int, val height: Int) : BlockLayer {
         return object : Iterator<Byte> {
             private var iteratorCount = 0L
             override fun hasNext(): Boolean {
-                return iteratorCount < width * height * BYTES_PER_BLOCK
+                return iteratorCount < width * height * bytesPerBlock
             }
             override fun next(): Byte {
                 iteratorCount += 1
@@ -58,7 +58,7 @@ class BlockLayerI16F16(val width: Int, val height: Int) : BlockLayer {
     }
 
     override fun unsafeGetTile(x: Int, y: Int): Int {
-        val offset = BYTES_PER_BLOCK * (y * width + x)
+        val offset = getOffset(x, y)
         val lsb = ptr[offset]
         val msb = ptr[offset + 1]
         val hbits = (ptr[offset + 2].toUint() or ptr[offset + 3].toUint().shl(8)).toShort()
@@ -68,7 +68,7 @@ class BlockLayerI16F16(val width: Int, val height: Int) : BlockLayer {
     }
 
     internal fun unsafeGetTile1(x: Int, y: Int): Pair<Int, Float> {
-        val offset = BYTES_PER_BLOCK * (y * width + x)
+        val offset = getOffset(x, y)
         val lsb = ptr[offset]
         val msb = ptr[offset + 1]
         val hbits = (ptr[offset + 2].toUint() or ptr[offset + 3].toUint().shl(8)).toShort()
@@ -78,12 +78,12 @@ class BlockLayerI16F16(val width: Int, val height: Int) : BlockLayer {
     }
 
     override fun unsafeToBytes(x: Int, y: Int): ByteArray {
-        val offset = BYTES_PER_BLOCK * (y * width + x)
+        val offset = getOffset(x, y)
         return byteArrayOf(ptr[offset + 1], ptr[offset + 0], ptr[offset + 3], ptr[offset + 2])
     }
 
     internal fun unsafeSetTile(x: Int, y: Int, tile0: Int, fill: Float) {
-        val offset = BYTES_PER_BLOCK * (y * width + x)
+        val offset = getOffset(x, y)
         val hbits = Float16.fromFloat(fill).toInt().and(0xFFFF)
 
         val tile = if (fill < FLUID_MIN_MASS) 0 else tile0
@@ -102,7 +102,7 @@ class BlockLayerI16F16(val width: Int, val height: Int) : BlockLayer {
     }
 
     override fun unsafeSetTile(x: Int, y: Int, bytes: ByteArray) {
-        val offset = BYTES_PER_BLOCK * (y * width + x)
+        val offset = getOffset(x, y)
         ptr[offset] = bytes[1]
         ptr[offset + 1] = bytes[0]
         ptr[offset + 2] = bytes[3]

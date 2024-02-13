@@ -19,7 +19,6 @@ MoneyDisp
 MusicTest
 Possess
 PrintWorld
-Save
 Seed
 SetAV
 SetBulletin
@@ -29,7 +28,6 @@ SetTurb
 SetTime
 SetTimeDelta
 SpawnPhysTestBall
-StreamerMode
 Teleport
 ToggleNoClip
 Zoom

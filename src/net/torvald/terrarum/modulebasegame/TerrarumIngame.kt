@@ -1116,7 +1116,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             Point2iMod(pcx - 2, pcy + 1), Point2iMod(pcx - 1, pcy + 1), Point2iMod(pcx, pcy + 1), Point2iMod(pcx + 1, pcy + 1),  Point2iMod(pcx + 2, pcy + 1),
             Point2iMod(pcx - 1, pcy + 2), Point2iMod(pcx, pcy + 2), Point2iMod(pcx + 1, pcy + 2),
         ).filter { it.y in 0 until world.height }.filter {  (cx, cy) ->
-            world.chunkFlags[cy][cx].and(0x7F) == 0.toByte()
+            if (cy !in 0 until world.height / CHUNK_H) false
+            else (world.chunkFlags[cy][cx].and(0x7F) == 0.toByte())
         }.forEach { (cx, cy) ->
             Worldgen.generateChunkIngame(cx, cy) { cx, cy ->
                 listOf(0,1,2).forEach { layer ->

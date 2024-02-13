@@ -56,6 +56,7 @@ id;classname;tags
 144;net.torvald.terrarum.modulebasegame.gameitems.GemQuartz;SMELTABLE,SIO2
 145;net.torvald.terrarum.modulebasegame.gameitems.GemAmethyst;SMELTABLE,SIO2
 146;net.torvald.terrarum.modulebasegame.gameitems.ItemRockSalt;
+147;net.torvald.terrarum.modulebasegame.gameitems.ItemNitre;
 
 # tree seeds by tree species
 160;net.torvald.terrarum.modulebasegame.gameitems.ItemSeedOak;SEEDLING

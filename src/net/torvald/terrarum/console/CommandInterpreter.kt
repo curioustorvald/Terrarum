@@ -15,19 +15,20 @@ import java.util.regex.Pattern
 internal object CommandInterpreter {
 
     private val commandsNoAuth = arrayOf(
-            "auth",
-            "qqq",
-            "setlocale",
-            "getlocale",
-            "help",
-            "version",
-            "tips",
-            "screenshot",
-            "resize",
-            "echo",
-            "error",
-            "seed",
-            "quicksave"
+        "auth",
+        "qqq",
+        "setlocale",
+        "getlocale",
+        "help",
+        "version",
+        "tips",
+        "screenshot",
+        "resize",
+        "echo",
+        "error",
+        "seed",
+        "quicksave",
+        "uuid"
     )
 
     internal fun execute(command: String) {
