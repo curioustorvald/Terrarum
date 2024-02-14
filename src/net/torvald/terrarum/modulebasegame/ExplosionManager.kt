@@ -14,7 +14,7 @@ object ExplosionManager {
     private const val CALC_RADIUS = 127
     private const val CALC_WIDTH = CALC_RADIUS * 2 + 1
 
-    fun goBoom(world: GameWorld, tx: Int, ty: Int, power: Float) {
+    fun goBoom(world: GameWorld, tx: Int, ty: Int, power: Float, callback: () -> Unit) {
         // create a copy of the tilemap
         val tilemap = BlockLayerI16(CALC_WIDTH, CALC_WIDTH)
 
@@ -23,7 +23,7 @@ object ExplosionManager {
             memcpyFromWorld(world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, tilemap)
         }
 
-        createExplosionWorker(tilemap, tx, ty, power, world).start()
+        createExplosionWorker(tilemap, tx, ty, power, world, callback).start()
     }
 
     private fun memcpyFromWorld(world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerI16) {
@@ -64,7 +64,7 @@ object ExplosionManager {
      * @param ty tilewise centre-y of the explosive
      * @param outWorld world object to write the result to
      */
-    private fun createExplosionWorker(tilemap: BlockLayerI16, tx: Int, ty: Int, power: Float, outWorld: GameWorld): Thread {
+    private fun createExplosionWorker(tilemap: BlockLayerI16, tx: Int, ty: Int, power: Float, outWorld: GameWorld, callback: () -> Unit): Thread {
         return Thread {
             // simulate explosion like lightmaprenderer
 
@@ -74,6 +74,8 @@ object ExplosionManager {
 
             // dispose of the tilemap copy
             tilemap.tryDispose()
+
+            callback()
         }
     }
 

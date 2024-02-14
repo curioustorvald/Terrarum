@@ -335,6 +335,16 @@ Sound from <https://freesound.org/people/joedeshon>
 ℗ 2019 DrinkingWindGames
 Sound from <https://freesound.org/people/DrinkingWindGames>
 
+    - effects/explosion/bang_bomb.ogg
+    
+℗ 2019 Richwise
+Sound from <https://freesound.org/people/richwise>
+
+    - effects/explosion/bang_small.ogg
+    
+℗ 2009 Superex1110
+Sound from <https://freesound.org/people/Superex1110/>
+
 
 
 $BULLET Impulse Responses:

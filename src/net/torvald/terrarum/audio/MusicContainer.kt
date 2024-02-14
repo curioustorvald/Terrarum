@@ -6,6 +6,7 @@ import com.badlogic.gdx.backends.lwjgl3.audio.Mp3
 import com.badlogic.gdx.backends.lwjgl3.audio.Ogg
 import com.badlogic.gdx.backends.lwjgl3.audio.OggInputStream
 import com.badlogic.gdx.backends.lwjgl3.audio.Wav
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.Disposable
 import com.jcraft.jorbis.VorbisFile
 import javazoom.jl.decoder.Bitstream
@@ -20,7 +21,7 @@ import javax.sound.sampled.AudioSystem
 data class MusicContainer(
     val name: String,
     val file: File,
-    val gdxMusic: Music,
+    val loop: Boolean = false,
     internal var songFinishedHook: (Music) -> Unit = {}
 ): Disposable {
     val samplingRate: Int
@@ -29,7 +30,11 @@ data class MusicContainer(
     var samplesRead = 0L; internal set
     val samplesTotal: Long
 
+    val gdxMusic = Gdx.audio.newMusic(FileHandle(file))
+
     init {
+        gdxMusic.isLooping = loop
+
         gdxMusic.setOnCompletionListener(songFinishedHook)
 
         samplingRate = when (gdxMusic) {

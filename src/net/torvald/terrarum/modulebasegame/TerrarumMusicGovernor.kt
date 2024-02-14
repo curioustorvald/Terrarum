@@ -46,8 +46,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
             try {
                 MusicContainer(
                     fileToName(it.name),
-                    it,
-                    Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath))
+                    it
                 ).also { muscon ->
 
                     printdbg(this, "MusicTitle: ${muscon.name}")
@@ -149,10 +148,8 @@ class TerrarumMusicGovernor : MusicGovernor() {
                 MusicContainer(
                     fileHandle.nameWithoutExtension().replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
                     fileHandle.file(),
-                    Gdx.audio.newMusic(fileHandle).also {
-                        it.isLooping = true
-                    }
-                ) {  }
+                    loop = true,
+                )
             }
             catch (e: GdxRuntimeException) {
                 e.printStackTrace()

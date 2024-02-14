@@ -119,7 +119,7 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
 
             App.printdbg(this, "Title: $title, artist: $artist")
 
-            musicNowPlaying = MusicContainer(title, musicFile.file(), Gdx.audio.newMusic(musicFile)) {
+            musicNowPlaying = MusicContainer(title, musicFile.file()) {
                 unloadEffector(musicNowPlaying)
                 musicNowPlaying?.gdxMusic?.tryDispose()
                 musicNowPlaying = null

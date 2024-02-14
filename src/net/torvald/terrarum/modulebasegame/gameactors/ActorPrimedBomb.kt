@@ -1,9 +1,10 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.Gdx
 import net.torvald.spriteanimation.SingleImageSprite
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.INGAME
-import net.torvald.terrarum.Second
+import net.torvald.terrarum.*
+import net.torvald.terrarum.audio.MusicContainer
+import net.torvald.terrarum.audio.decibelsToFullscale
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.modulebasegame.ExplosionManager
@@ -19,6 +20,7 @@ open class ActorPrimedBomb(
     init {
         renderOrder = RenderOrder.MIDTOP
         physProp = PhysProperties.PHYSICS_OBJECT()
+        elasticity = 0.34
     }
 
     protected constructor() : this(1f, 1f) {
@@ -26,16 +28,36 @@ open class ActorPrimedBomb(
         physProp = PhysProperties.PHYSICS_OBJECT()
     }
 
+    private var explosionCalled = false
+
+    @Transient private val boomSound = MusicContainer(
+        "boom", ModMgr.getFile("basegame", "audio/effects/explosion/bang_bomb.ogg")
+    ) {
+        this.flagDespawn()
+    }
+
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
 
         fuse -= delta
 
-        if (fuse <= 0f) {
+        if (fuse <= 0f && !explosionCalled) {
+            explosionCalled = true
             physProp.usePhysics = false
-            ExplosionManager.goBoom(INGAME.world, intTilewiseHitbox.centeredX.toInt(), intTilewiseHitbox.centeredY.toInt(), explosionPower)
-            flagDespawn()
+
+            this.isVisible = false // or play explosion anim
+            startAudio(boomSound, 10.0)
+
+            ExplosionManager.goBoom(INGAME.world, intTilewiseHitbox.centeredX.toInt(), intTilewiseHitbox.centeredY.toInt(), explosionPower) {
+
+
+            }
         }
+    }
+
+    override fun dispose() {
+        super.dispose()
+        boomSound.dispose()
     }
 }
 

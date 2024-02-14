@@ -166,6 +166,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
             it.trackingTarget = this
             it.currentTrack = music
             it.maxVolumeFun = { volume }
+            it.volume = volume
             doSomethingWithTrack(it)
             it.play()
         }

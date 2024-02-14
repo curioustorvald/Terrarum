@@ -127,7 +127,7 @@ class FixtureJukebox : Electric, PlaysMusic {
 
             printdbg(this, "Title: $title, artist: $artist")
 
-            musicNowPlaying = MusicContainer(title, musicFile.file(), Gdx.audio.newMusic(musicFile)) {
+            musicNowPlaying = MusicContainer(title, musicFile.file()) {
                 unloadEffector(musicNowPlaying)
                 discCurrentlyPlaying = null
                 musicNowPlaying?.gdxMusic?.tryDispose()

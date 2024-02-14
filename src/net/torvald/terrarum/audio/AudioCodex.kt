@@ -31,7 +31,7 @@ class AudioCodex {
     fun getRandomAudio(identifier: String): MusicContainer? {
         val file = audio[identifier]?.random()
         return if (file != null) {
-            MusicContainer(file.nameWithoutExtension(), file.file(), Gdx.audio.newMusic(file)) {
+            MusicContainer(file.nameWithoutExtension(), file.file()) {
                 it.tryDispose()
             }
         }
