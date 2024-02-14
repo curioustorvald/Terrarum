@@ -109,11 +109,13 @@ object WorldSimulator {
 
     fun buryGrassImmediately() {
         ingame.terrainChangeQueue.toList().forEach {
-            val blockProp = BlockCodex[it.new]
-            if (blockProp.isSolid && !blockProp.isActorBlock) {
-                if (world.getTileFromTerrain(it.posX, it.posY + 1) == Block.GRASS) {
-                    //grassPlacedByPlayer.add(it)
-                    world.setTileTerrain(it.posX, it.posY + 1, Block.DIRT, true)
+            if (it != null) {
+                val blockProp = BlockCodex[it.new]
+                if (blockProp.isSolid && !blockProp.isActorBlock) {
+                    if (world.getTileFromTerrain(it.posX, it.posY + 1) == Block.GRASS) {
+                        //grassPlacedByPlayer.add(it)
+                        world.setTileTerrain(it.posX, it.posY + 1, Block.DIRT, true)
+                    }
                 }
             }
         }

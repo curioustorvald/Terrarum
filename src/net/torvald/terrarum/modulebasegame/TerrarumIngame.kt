@@ -1358,21 +1358,21 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                     if (it is CuedByTerrainChange) {
                         terrainChangeQueue.toList().forEach { cue ->
 //                            printdbg(this, "Ingame actors terrainChangeCue: ${cue}")
-                            it.updateForTerrainChange(cue)
+                            if (cue != null) it.updateForTerrainChange(cue)
                         }
                     }
 
                     if (it is CuedByWallChange) {
                         wallChangeQueue.toList().forEach { cue ->
 //                            printdbg(this, "Ingame actors wallChangeCue: ${cue}")
-                            it.updateForWallChange(cue)
+                            if (cue != null) it.updateForWallChange(cue)
                         }
                     }
 
                     if (it is CuedByWireChange) {
                         wireChangeQueue.toList().forEach { cue ->
 //                            printdbg(this, "Ingame actors wireChangeCue: ${cue}")
-                            it.updateForWireChange(cue)
+                            if (cue != null) it.updateForWireChange(cue)
                         }
                     }
                 }

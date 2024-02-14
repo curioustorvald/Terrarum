@@ -17,7 +17,6 @@ import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.isBlock
-import net.torvald.terrarum.gameitems.isWall
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
@@ -606,18 +605,18 @@ object LightmapRenderer {
     }
 
     private const val giScale = 0.35f
-    private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, lightmap: UnsafeCvecArray, swipeDiag: Boolean) {//, distFromLightSrc: Ivec4) {
-        if (x2 < 0 || y2 < 0 || x2 >= LIGHTMAP_WIDTH || y2 >= LIGHTMAP_HEIGHT) return
+    private fun _swipeTask(x: Int, y: Int, xOld: Int, yOld: Int, lightmap: UnsafeCvecArray, swipeDiag: Boolean) {//, distFromLightSrc: Ivec4) {
+        if (xOld < 0 || yOld < 0 || xOld >= LIGHTMAP_WIDTH || yOld >= LIGHTMAP_HEIGHT) return
 
         _mapLightLevelThis.getAndSet(_ambientAccumulator, x, y)
 
         if (!swipeDiag) {
             _mapThisTileOpacity.getAndSet(_thisTileOpacity, x, y)
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity, lightmap))
+            _ambientAccumulator.maxAndAssign(darkenColoured(xOld, yOld, _thisTileOpacity, lightmap))
         }
         else {
             _mapThisTileOpacity2.getAndSet(_thisTileOpacity2, x, y)
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2, lightmap))
+            _ambientAccumulator.maxAndAssign(darkenColoured(xOld, yOld, _thisTileOpacity2, lightmap))
         }
 
         _mapLightLevelThis.setVec(x, y, _ambientAccumulator)

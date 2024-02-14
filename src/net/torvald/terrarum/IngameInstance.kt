@@ -152,9 +152,9 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     var actorsRTree: PRTree<ActorWithBody> = PRTree(actorMBRConverter, 24) // no lateinit!
         protected set
 
-    val terrainChangeQueue = ArrayList<BlockChangeQueueItem>()
-    val wallChangeQueue = ArrayList<BlockChangeQueueItem>()
-    val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
+    val terrainChangeQueue = ArrayList<BlockChangeQueueItem?>() // keep it nullable to deal with the concurrentmodification better
+    val wallChangeQueue = ArrayList<BlockChangeQueueItem?>()
+    val wireChangeQueue = ArrayList<BlockChangeQueueItem?>() // if 'old' is set and 'new' is blank, it's a wire cutter
 
     val modifiedChunks = Array(16) { TreeSet<Int>() }
 

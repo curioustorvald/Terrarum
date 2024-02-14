@@ -1,35 +1,35 @@
 package net.torvald.terrarum.modulebasegame
 
 import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.getOffset
 import net.torvald.terrarum.tryDispose
 import net.torvald.unsafe.UnsafeHelper
-import kotlin.math.max
-import kotlin.math.min
+import java.lang.Math.pow
+import kotlin.math.*
 
 /**
  * Created by minjaesong on 2024-02-13.
  */
 object ExplosionManager {
-
-    private const val CALC_RADIUS = 127
-    private const val CALC_WIDTH = CALC_RADIUS * 2 + 1
-
     fun goBoom(world: GameWorld, tx: Int, ty: Int, power: Float, callback: () -> Unit) {
+        val CALC_RADIUS = power.ceilToInt() + 2
+        val CALC_WIDTH = CALC_RADIUS * 2 + 1
+
         // create a copy of the tilemap
         val tilemap = BlockLayerI16(CALC_WIDTH, CALC_WIDTH)
 
         // fill in the tilemap copy
         for (line in 0 until CALC_WIDTH) {
-            memcpyFromWorld(world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, tilemap)
+            memcpyFromWorld(CALC_RADIUS, CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, tilemap)
         }
 
-        createExplosionWorker(world, tilemap, tx, ty, power, world, callback).start()
+        createExplosionWorker(CALC_RADIUS, CALC_WIDTH, world, tilemap, tx, ty, power, world, callback).start()
     }
 
-    private fun memcpyFromWorld(world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerI16) {
+    private fun memcpyFromWorld(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerI16) {
         // if the bounding box must wrap around
         if (xStart > world.width - CALC_RADIUS) {
             val lenLeft = world.width - xStart
@@ -67,33 +67,31 @@ object ExplosionManager {
      * @param ty tilewise centre-y of the explosive from the world
      * @param outWorld world object to write the result to
      */
-    private fun createExplosionWorker(world: GameWorld, tilemap: BlockLayerI16, tx: Int, ty: Int, power: Float, outWorld: GameWorld, callback: () -> Unit): Thread { return Thread {
-        val lightmap = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // explosion power map
-        val _mapThisTileOpacity = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // the tile strengths
-        val _mapThisTileOpacity2 = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // the tile strengths
-        val _mapLightLevelThis = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // the explosion powers
-        var _thisTileLuminosity = 0f // ???
-        var _ambientAccumulator = 0f // ambient explosion power
-        var _thisTileOpacity = 0f
-        var _thisTileOpacity2 = 0f
+    private fun createExplosionWorker(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, tilemap: BlockLayerI16, tx: Int, ty: Int, power: Float, outWorld: GameWorld, callback: () -> Unit): Thread { return Thread {
+        val mapBoomPow = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // explosion power map
+        val mapTileStr = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // the tile strengths
+        val mapTileStr2 = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // the tile strengths
+        var boomPow = 0f // ???
+        var ambientAccumulator = 0f // ambient explosion power
+        var tileStr = 0f
+        var tileStr2 = 0f
 
 
-        fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, swipeDiag: Boolean) {//, distFromLightSrc: Ivec4) {
-            if (x2 < 0 || y2 < 0 || x2 >= CALC_WIDTH || y2 >= CALC_WIDTH) return
+        fun _swipeTask(x: Int, y: Int, xOld: Int, yOld: Int, swipeDiag: Boolean) {//, distFromLightSrc: Ivec4) {
+            if (xOld < 0 || yOld < 0 || xOld >= CALC_WIDTH || yOld >= CALC_WIDTH) return
 
-            _ambientAccumulator = _mapLightLevelThis[x, y]
+            ambientAccumulator = mapBoomPow[x, y]
 
             if (!swipeDiag) {
-                _thisTileOpacity = _mapThisTileOpacity[x, y]
-                _ambientAccumulator = maxOf(_ambientAccumulator, lightmap[x2, y2] - _thisTileOpacity)
+                tileStr = mapTileStr[x, y]
+                ambientAccumulator = maxOf(ambientAccumulator, mapBoomPow[xOld, yOld] - tileStr)
             }
             else {
-                _thisTileOpacity2 = _mapThisTileOpacity2[x, y]
-                _ambientAccumulator = maxOf(_ambientAccumulator, lightmap[x2, y2] - _thisTileOpacity2)
+                tileStr2 = mapTileStr2[x, y]
+                ambientAccumulator = maxOf(ambientAccumulator, mapBoomPow[xOld, yOld] - tileStr2)
             }
 
-            _mapLightLevelThis[x, y] = _ambientAccumulator
-            lightmap[x, y] = _ambientAccumulator
+            mapBoomPow[x, y] = ambientAccumulator
         }
         fun swipeBoomPower(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int, strengthmap: UnsafeFloatArray, swipeDiag: Boolean) {
             var swipeX = sx
@@ -157,47 +155,50 @@ object ExplosionManager {
                 val ly = rawy - (ty - CALC_RADIUS - 1)
                 val (worldX, worldY) = world.coerceXY(rawx, rawy)
 
-                val _thisTerrain = world.getTileFromTerrainRaw(worldX, worldY)
-                val _thisTerrainProp = BlockCodex[world.tileNumberToNameMap[_thisTerrain.toLong()]]
+                val thisTerrain = world.getTileFromTerrainRaw(worldX, worldY)
+                val thisTerrainProp = BlockCodex[world.tileNumberToNameMap[thisTerrain.toLong()]]
+                val thisTerrainDmg = world.getTerrainDamage(worldX, worldY)
 
                 // create tile strength map
-                _mapThisTileOpacity.set(lx, ly, _thisTerrainProp.strength.toFloat())
-                _mapThisTileOpacity2.set(lx, ly, _thisTerrainProp.strength.toFloat() * 1.41421356f)
+                mapTileStr[lx, ly] = thisTerrainProp.strength.toFloat().minus(thisTerrainDmg).toBlastResistance()
+                mapTileStr2[lx, ly] = thisTerrainProp.strength.toFloat().minus(thisTerrainDmg).times(1.4142135f.blastToDmg()).toBlastResistance()
 
                 // initialise explosion power map with the explosive
                 if (tx == worldX && ty == worldY) {
-                    _thisTileLuminosity = maxOf(_thisTileLuminosity, power)
-                    _mapLightLevelThis.max(lx, ly, _thisTileLuminosity)
+                    boomPow = maxOf(boomPow, power)
+                    mapBoomPow.max(lx, ly, boomPow)
                 }
             }
         }
 
         // simulate explosion like strengthmaprenderer
-        r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap)
-        r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap)
+        r1(mapBoomPow);r2(mapBoomPow);r3(mapBoomPow);r4(mapBoomPow)
+        r1(mapBoomPow);r2(mapBoomPow);r3(mapBoomPow);r4(mapBoomPow)
 
         // write lightmap to the tilemap
         for (rawy in worldYstart until worldYstart + CALC_WIDTH) {
             for (rawx in worldXstart until worldXstart + CALC_WIDTH) {
                 val lx = rawx - (tx - CALC_RADIUS - 1)
                 val ly = rawy - (ty - CALC_RADIUS - 1)
-                world.inflictTerrainDamage(rawx, rawy, lightmap[lx, ly].toDouble())
+                world.inflictTerrainDamage(rawx, rawy, mapBoomPow[lx, ly].blastToDmg().toDouble())
             }
         }
 
         // memcpy the tilemap to the world
 
         // dispose of the tilemap copy
-        lightmap.destroy()
-        _mapThisTileOpacity.destroy()
-        _mapThisTileOpacity2.destroy()
-        _mapLightLevelThis.destroy()
+        mapBoomPow.destroy()
+        mapTileStr.destroy()
+        mapTileStr2.destroy()
         tilemap.tryDispose()
 
         callback()
     } }
 
 
+    private val q = 2.828427f
+    private fun Float.toBlastResistance() = this.pow(1f / q)
+    private fun Float.blastToDmg() = this.pow(q)
 
 
     private class UnsafeFloatArray(val width: Int, val height: Int) {

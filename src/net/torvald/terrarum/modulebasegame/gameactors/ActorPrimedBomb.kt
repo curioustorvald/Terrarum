@@ -65,7 +65,7 @@ open class ActorPrimedBomb(
 /**
  * Created by minjaesong on 2024-02-14.
  */
-class ActorCherryBomb : ActorPrimedBomb(100f, 4.5f) {
+class ActorCherryBomb : ActorPrimedBomb(32f, 4.5f) { // 14
 
     init {
         val itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(0,13)
