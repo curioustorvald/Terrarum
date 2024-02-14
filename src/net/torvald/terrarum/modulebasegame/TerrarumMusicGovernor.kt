@@ -194,7 +194,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     protected var ambState = 0
     protected var ambFired = false
 
-    fun getRandomMusicInterval() = 25f + Math.random().toFloat() * 10f
+    fun getRandomMusicInterval() = 3.6f + Math.random().toFloat() * 1.2f // use shorter gap a la mixtape
 
     var stopCaller: Any? = null; private set
     var playCaller: Any? = null; private set

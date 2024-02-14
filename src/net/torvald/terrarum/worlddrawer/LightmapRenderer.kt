@@ -213,29 +213,26 @@ object LightmapRenderer {
         // 'NEWLIGHT2' LIGHT SWIPER
         // O((8*2)n) where n is a size of the map.
         /* - */fun r1(lightmap: UnsafeCvecArray) {
-            swipeDiag = false
             for (line in 1 until LIGHTMAP_HEIGHT - 1) {
                 swipeLight(
                         1, line,
                         LIGHTMAP_WIDTH - 2, line,
                         1, 0,
-                        lightmap
+                        lightmap, false
                 )
             }
         }
         /* | */fun r2(lightmap: UnsafeCvecArray) {
-            swipeDiag = false
             for (line in 1 until LIGHTMAP_WIDTH - 1) {
                 swipeLight(
                         line, 1,
                         line, LIGHTMAP_HEIGHT - 2,
                         0, 1,
-                        lightmap
+                        lightmap, false
                 )
             }
         }
         /* \ */fun r3(lightmap: UnsafeCvecArray) {
-            swipeDiag = true
             /* construct indices such that:
                   56789ABC
                4 1       w-2
@@ -268,12 +265,11 @@ object LightmapRenderer {
                         max(1, i - LIGHTMAP_HEIGHT + 4), max(1, LIGHTMAP_HEIGHT - 2 - i),
                         min(LIGHTMAP_WIDTH - 2, i + 1), min(LIGHTMAP_HEIGHT - 2, (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) - i),
                         1, 1,
-                        lightmap
+                        lightmap, true
                 )
             }
         }
         /* / */fun r4(lightmap: UnsafeCvecArray) {
-            swipeDiag = true
             /*
                 1       w-2
                 /////---/
@@ -302,7 +298,7 @@ object LightmapRenderer {
                         max(1, i - LIGHTMAP_HEIGHT + 4), min(LIGHTMAP_HEIGHT - 2, i + 1),
                         min(LIGHTMAP_WIDTH - 2, i + 1), max(1, (LIGHTMAP_HEIGHT - 2) - (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 6) + i),
                         1, -1,
-                        lightmap
+                        lightmap, true
                 )
             }
         }
@@ -324,11 +320,7 @@ object LightmapRenderer {
             //      why dark spots appear in the first place)
             // - Multithreading? I have absolutely no idea.
             // - If you naively slice the screen (job area) to multithread, the seam will appear.
-            r1(lightmap);r2(lightmap);
-
-//            if (!App.getConfigBoolean("fx_newlight")) {
-                r3(lightmap);r4(lightmap)
-//            }
+            r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap)
         }
 
         App.measureDebugTime("Renderer.Precalculate2") {
@@ -341,11 +333,8 @@ object LightmapRenderer {
         }
 
         App.measureDebugTime("Renderer.LightRuns2") {
-            r1(lightmap);r2(lightmap);
-//            if (!App.getConfigBoolean("fx_newlight")) {
-                r3(lightmap);r4(lightmap) // two looks better than one
-//            }
             // no rendering trickery will eliminate the need of 2nd pass, even the "decay out"
+            r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap)
         }
 
         App.getConfigInt("lightpasses").let { passcnt ->
@@ -617,68 +606,43 @@ object LightmapRenderer {
     }
 
     private const val giScale = 0.35f
-    private var swipeX = -1
-    private var swipeY = -1
-    private var swipeDiag = false
-    private val distFromLightSrc = Ivec4()
-    private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, lightmap: UnsafeCvecArray) {//, distFromLightSrc: Ivec4) {
+    private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, lightmap: UnsafeCvecArray, swipeDiag: Boolean) {//, distFromLightSrc: Ivec4) {
         if (x2 < 0 || y2 < 0 || x2 >= LIGHTMAP_WIDTH || y2 >= LIGHTMAP_HEIGHT) return
 
-//        _ambientAccumulator.set(_mapLightLevelThis.getVec(x, y))
         _mapLightLevelThis.getAndSet(_ambientAccumulator, x, y)
 
         if (!swipeDiag) {
             _mapThisTileOpacity.getAndSet(_thisTileOpacity, x, y)
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity, lightmap))//, distFromLightSrc))
+            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity, lightmap))
         }
         else {
             _mapThisTileOpacity2.getAndSet(_thisTileOpacity2, x, y)
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2, lightmap))//, distFromLightSrc))
+            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2, lightmap))
         }
 
         _mapLightLevelThis.setVec(x, y, _ambientAccumulator)
         lightmap.setVec(x, y, _ambientAccumulator)
     }
-    private fun swipeLight(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int, lightmap: UnsafeCvecArray) {
-        swipeX = sx; swipeY = sy
-//        if (App.getConfigBoolean("fx_newlight")) distFromLightSrc.broadcast(0)
+    private fun swipeLight(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int, lightmap: UnsafeCvecArray, swipeDiag: Boolean) {
+        var swipeX = sx
+        var swipeY = sy
         while (swipeX*dx <= ex*dx && swipeY*dy <= ey*dy) {
             // conduct the task #1
             // spread towards the end
-
-            _swipeTask(swipeX, swipeY, swipeX-dx, swipeY-dy, lightmap)//, distFromLightSrc)
+            _swipeTask(swipeX, swipeY, swipeX-dx, swipeY-dy, lightmap, swipeDiag)
 
             swipeX += dx
             swipeY += dy
-
-//            if (App.getConfigBoolean("fx_newlight")) {
-//                distFromLightSrc.add(1)
-//
-//                if (_mapLightLevelThis.getR(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
-//                if (_mapLightLevelThis.getG(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
-//                if (_mapLightLevelThis.getB(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
-//                if (_mapLightLevelThis.getA(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
-//            }
         }
 
         swipeX = ex; swipeY = ey
-//        if (App.getConfigBoolean("fx_newlight")) distFromLightSrc.broadcast(0)
         while (swipeX*dx >= sx*dx && swipeY*dy >= sy*dy) {
             // conduct the task #2
             // spread towards the start
-            _swipeTask(swipeX, swipeY, swipeX+dx, swipeY+dy, lightmap)//, distFromLightSrc)
+            _swipeTask(swipeX, swipeY, swipeX+dx, swipeY+dy, lightmap, swipeDiag)
 
             swipeX -= dx
             swipeY -= dy
-
-//            if (App.getConfigBoolean("fx_newlight")) {
-//                distFromLightSrc.add(1)
-//
-//                if (_mapLightLevelThis.getR(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
-//                if (_mapLightLevelThis.getG(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
-//                if (_mapLightLevelThis.getB(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
-//                if (_mapLightLevelThis.getA(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
-//            }
         }
     }
 
