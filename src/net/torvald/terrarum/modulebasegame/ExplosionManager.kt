@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame
 
+import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.OreCodex
@@ -11,12 +12,23 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.gameworld.getOffset
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.unsafe.UnsafeHelper
+import java.util.concurrent.*
 import kotlin.math.*
 
 /**
  * Created by minjaesong on 2024-02-13.
  */
 object ExplosionManager {
+
+    private val executor = Executors.newSingleThreadExecutor()
+    private val futures = ArrayList<Future<*>>()
+    private val runners = ArrayList<CallableWithState>()
+
+    data class CallableWithState(
+        val runner: Callable<Unit>,
+        var executed: Boolean = false
+    )
+
     fun goBoom(world: GameWorld, tx: Int, ty: Int, power: Float, dropProbNonOre: Float, dropProbOre: Float, callback: () -> Unit) {
         val CALC_RADIUS = power.ceilToInt() + 2
         val CALC_WIDTH = CALC_RADIUS * 2 + 1
@@ -31,7 +43,29 @@ object ExplosionManager {
             memcpyFromWorldBreakage(CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, breakmap)
         }
 
-        createExplosionWorker(CALC_RADIUS, CALC_WIDTH, world, breakmap, tilemap, tx, ty, power, dropProbNonOre, dropProbOre, callback).start()
+        val runner = createExplosionWorker(CALC_RADIUS, CALC_WIDTH, world, breakmap, tilemap, tx, ty, power, dropProbNonOre, dropProbOre, callback)
+//        futures.add(executor.submit(runner))
+
+        runners.removeIf { it.executed }
+        runners.add(CallableWithState(runner))
+    }
+
+    init {
+        Thread {
+            while (true) {
+                try {
+                    val job = runners.first { !it.executed }
+                    val executor = Executors.newSingleThreadExecutor()
+                    executor.submit(job.runner).get(500L, TimeUnit.MILLISECONDS)
+                    executor.shutdownNow()
+                    job.executed = true
+                }
+                catch (_: TimeoutException) { }
+                catch (_: NoSuchElementException) { }
+
+                Thread.sleep(50L)
+            }
+        }.start()
     }
 
     private fun memcpyFromWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerI16) {
@@ -125,8 +159,8 @@ object ExplosionManager {
         power: Float,
         dropProbNonOre: Float,
         dropProbOre: Float,
-        callback: () -> Unit): Thread
-    { return Thread {
+        callback: () -> Unit): Callable<Unit>
+    { return Callable {
         val mapBoomPow = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // explosion power map
         val mapTileStr = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // the tile strengths
         val mapTileStr2 = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // the tile strengths

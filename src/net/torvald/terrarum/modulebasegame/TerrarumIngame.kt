@@ -876,8 +876,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             repossessActor()
 
             // process actor addition requests
-            actorAdditionQueue.forEach { forceAddActor(it.first, it.second) }
-            actorAdditionQueue.clear()
+            val addCueCpy = actorAdditionQueue.toList()
+            addCueCpy.forEach { forceAddActor(it.first, it.second) }
+            actorAdditionQueue.removeAll(addCueCpy)
             // determine whether the inactive actor should be activated
             wakeDormantActors()
             // update NOW; allow one last update for the actors flagged to despawn
@@ -885,10 +886,11 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             // determine whether the actor should keep being activated or be dormant
             killOrKnockdownActors()
             // process actor removal requests
-            actorRemovalQueue.forEach { forceRemoveActor(it.first, it.second) }
-            actorRemovalQueue.clear()
+            val remCueCpy = actorRemovalQueue.toList()
+            remCueCpy.forEach { forceRemoveActor(it.first, it.second) }
+            actorRemovalQueue.removeAll(remCueCpy)
             // update particles
-            particlesContainer.forEach { if (!it.flagDespawn) particlesActive++; it.update(delta) }
+            particlesContainer.toList().forEach { if (!it.flagDespawn) particlesActive++; it.update(delta) }
             // TODO thread pool(?)
             CollisionSolver.process()
 

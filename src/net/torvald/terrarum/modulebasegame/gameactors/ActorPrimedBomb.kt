@@ -46,10 +46,6 @@ open class ActorPrimedBomb(
 
         if (fuse <= 0f && !explosionCalled) {
             explosionCalled = true
-            physProp.usePhysics = false
-
-            this.isVisible = false // or play explosion anim
-            startAudio(boomSound, 10.0)
 
             ExplosionManager.goBoom(
                 INGAME.world,
@@ -58,7 +54,11 @@ open class ActorPrimedBomb(
                 explosionPower,
                 dropProbNonOre,
                 dropProbOre
-            ) {}
+            ) {
+                physProp.usePhysics = false
+                this.isVisible = false // or play explosion anim
+                startAudio(boomSound, 10.0)
+            }
         }
     }
 
