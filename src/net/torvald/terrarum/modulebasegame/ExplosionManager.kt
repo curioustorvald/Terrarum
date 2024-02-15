@@ -1,13 +1,12 @@
 package net.torvald.terrarum.modulebasegame
 
+import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.ceilToInt
-import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.getOffset
 import net.torvald.terrarum.tryDispose
 import net.torvald.unsafe.UnsafeHelper
-import java.lang.Math.pow
 import kotlin.math.*
 
 /**
@@ -19,17 +18,19 @@ object ExplosionManager {
         val CALC_WIDTH = CALC_RADIUS * 2 + 1
 
         // create a copy of the tilemap
-        val tilemap = BlockLayerI16(CALC_WIDTH, CALC_WIDTH)
+        val tilemap = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH)
+        val breakagemap = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH)
 
         // fill in the tilemap copy
         for (line in 0 until CALC_WIDTH) {
-            memcpyFromWorld(CALC_RADIUS, CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, tilemap)
+            memcpyFromWorldTiles(CALC_RADIUS, CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, tilemap)
+            memcpyFromWorldBreakage(CALC_RADIUS, CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, breakagemap)
         }
 
-        createExplosionWorker(CALC_RADIUS, CALC_WIDTH, world, tilemap, tx, ty, power, world, callback).start()
+        createExplosionWorker(CALC_RADIUS, CALC_WIDTH, world, breakagemap, tilemap, tx, ty, power, callback).start()
     }
 
-    private fun memcpyFromWorld(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerI16) {
+    private fun memcpyFromWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: UnsafeFloatArray) {
         // if the bounding box must wrap around
         if (xStart > world.width - CALC_RADIUS) {
             val lenLeft = world.width - xStart
@@ -61,13 +62,27 @@ object ExplosionManager {
         }
     }
 
+    private fun memcpyFromWorldBreakage(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: UnsafeFloatArray) {
+        for (x in xStart until xStart + CALC_WIDTH) {
+            out[x - xStart, yOff] = world.getTerrainDamage(x, yStart + yOff)
+        }
+    }
+
     /**
      * @param tilemap a portion copy of the tilemap from the world, centred to the explosive
      * @param tx tilewise centre-x of the explosive from the world
      * @param ty tilewise centre-y of the explosive from the world
      * @param outWorld world object to write the result to
      */
-    private fun createExplosionWorker(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, tilemap: BlockLayerI16, tx: Int, ty: Int, power: Float, outWorld: GameWorld, callback: () -> Unit): Thread { return Thread {
+    private fun createExplosionWorker(
+        CALC_RADIUS: Int, CALC_WIDTH: Int,
+        world: GameWorld,
+        breakmap: UnsafeFloatArray,
+        tilemap: UnsafeFloatArray,
+        tx: Int, ty: Int,
+        power: Float,
+        callback: () -> Unit): Thread
+    { return Thread {
         val mapBoomPow = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // explosion power map
         val mapTileStr = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // the tile strengths
         val mapTileStr2 = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // the tile strengths
@@ -157,7 +172,7 @@ object ExplosionManager {
 
                 val thisTerrain = world.getTileFromTerrainRaw(worldX, worldY)
                 val thisTerrainProp = BlockCodex[world.tileNumberToNameMap[thisTerrain.toLong()]]
-                val thisTerrainDmg = world.getTerrainDamage(worldX, worldY)
+                val thisTerrainDmg = breakmap[lx, ly]//world.getTerrainDamage(worldX, worldY)
 
                 // create tile strength map
                 mapTileStr[lx, ly] = thisTerrainProp.strength.toFloat().minus(thisTerrainDmg).toBlastResistance()
@@ -175,7 +190,7 @@ object ExplosionManager {
         r1(mapBoomPow);r2(mapBoomPow);r3(mapBoomPow);r4(mapBoomPow)
         r1(mapBoomPow);r2(mapBoomPow);r3(mapBoomPow);r4(mapBoomPow)
 
-        // write lightmap to the tilemap
+        //// just write to the damagemap lol
         for (rawy in worldYstart until worldYstart + CALC_WIDTH) {
             for (rawx in worldXstart until worldXstart + CALC_WIDTH) {
                 val lx = rawx - (tx - CALC_RADIUS - 1)
@@ -184,43 +199,72 @@ object ExplosionManager {
             }
         }
 
-        // memcpy the tilemap to the world
+        // write lightmap to the tilemap and breakmap
+        /*for (y in 0 until CALC_WIDTH) {
+            for (x in 0 until CALC_WIDTH) {
+                val boompower = mapBoomPow[x, y]
+                val tile = world.tileNumberToNameMap[tilemap.unsafeGetTile(x, y).toLong()]
+                val tileprop = BlockCodex[tile]
+                val breakage = breakmap[x, y]
+
+                // remove tile
+                if (tileprop.strength - (breakage + boompower) <= 0f) {
+                    tilemap.unsafeSetTile(x, y, world.tileNameToNumberMap[Block.AIR]!!)
+                    breakmap[x, y] = 0f
+                }
+                // write new breakage
+                else {
+                    breakmap[x, y] = breakage + boompower
+                }
+            }
+        }*/
+
+        // memcpy the tilemap and breakmap to the world
+
+
 
         // dispose of the tilemap copy
         mapBoomPow.destroy()
+        breakmap.destroy()
         mapTileStr.destroy()
         mapTileStr2.destroy()
-        tilemap.tryDispose()
+        tilemap.destroy()
+        breakmap.destroy()
 
         callback()
     } }
 
 
     private val q = 2.828427f
-    private fun Float.toBlastResistance() = this.pow(1f / q)
-    private fun Float.blastToDmg() = this.pow(q)
+    private fun Float.toBlastResistance() = if (this <= 0f) 0f else this.pow(1f / q)
+    private fun Float.blastToDmg() = if (this <= 0f) 0f else this.pow(q)
 
 
     private class UnsafeFloatArray(val width: Int, val height: Int) {
-        private val SIZE_IN_BYTES = 4L * width * height
+        val bytesPerBlock: Long = 4L
+        private val SIZE_IN_BYTES = bytesPerBlock * width * height
         val array = UnsafeHelper.allocate(SIZE_IN_BYTES)
+        val ptr get() = array
 
         init {
             array.fillWith(0)
         }
 
         private inline fun toAddr(x: Int, y: Int) = (width * y + x).toLong()
+        inline fun getOffset(x: Int, y: Int) = bytesPerBlock * toAddr(x, y)
 
         operator fun set(x: Int, y: Int, value: Float) {
             array.setFloat(toAddr(x, y), value)
         }
 
         operator fun get(x: Int, y: Int) = array.getFloat(toAddr(x, y))
+
         fun max(x: Int, y: Int, value: Float) {
             set(x, y, maxOf(get(x, y), value))
         }
 
         fun destroy() = this.array.destroy()
+
     }
 
 }

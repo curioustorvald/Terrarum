@@ -645,6 +645,8 @@ open class GameWorld(
      * @return true if block is broken
      */
     fun inflictTerrainDamage(x: Int, y: Int, damage: Double): ItemID? {
+        if (damage.isNaN()) throw IllegalArgumentException("Cannot inflict NaN amount of damage at($x, $y)")
+
         val damage = damage.toFloat()
         val addr = LandUtil.getBlockAddr(this, x, y)
 
@@ -679,6 +681,8 @@ open class GameWorld(
      * @return true if block is broken
      */
     fun inflictWallDamage(x: Int, y: Int, damage: Double): ItemID? {
+        if (damage.isNaN()) throw IllegalArgumentException("Cannot inflict NaN amount of damage at($x, $y)")
+
         val damage = damage.toFloat()
         val addr = LandUtil.getBlockAddr(this, x, y)
 

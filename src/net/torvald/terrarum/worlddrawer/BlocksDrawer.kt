@@ -446,6 +446,7 @@ internal object BlocksDrawer {
                 }
 
                 val breakage =  if (mode == TERRAIN || mode == ORES) world.getTerrainDamage(x, y) else if (mode == WALL) world.getWallDamage(x, y) else 0f
+                if (breakage.isNaN()) throw IllegalStateException("Block breakage at ($x, $y) is NaN (mode=$mode)")
                 val maxHealth = if (mode == TERRAIN || mode == ORES) BlockCodex[world.getTileFromTerrain(x, y)].strength else if (mode == WALL) BlockCodex[world.getTileFromWall(x, y)].strength else 1
                 val breakingStage = if (mode == TERRAIN || mode == WALL || mode == ORES) (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt() else 0
 
