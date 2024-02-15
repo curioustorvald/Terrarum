@@ -377,10 +377,7 @@ object LightmapRenderer {
 
                     val heldItem = it.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
-                    val light = if (heldItem != null && (heldItem.isBlock()))
-                            BlockCodex[heldItem].getLumCol(0, 0)
-                        else
-                            Cvec(0)
+                    val light = ItemCodex[heldItem]?.getLumCol() ?: Cvec(0)
 
 
                     Lightbox(Hitbox(

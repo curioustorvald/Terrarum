@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.utils.JsonValue
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.App.setToGameConfig
 import net.torvald.terrarum.audio.AudioCodex
@@ -537,13 +538,10 @@ object ModMgr {
             Terrarum.blockCodex.fromModule(module, "blocks/blocks.csv") { tile ->
                 // register blocks as items
                 ItemCodex[tile.id] = makeNewItemObj(tile, false)
-
                 if (IS_DEVELOPMENT_BUILD) print(tile.id+" ")
 
                 if (BlockCodex[tile.id].isWallable) {
-                    ItemCodex["wall@" + tile.id] = makeNewItemObj(tile, true).also {
-                        it.tags.add("WALL")
-                    }
+                    ItemCodex["wall@" + tile.id] = makeNewItemObj(tile, true)
                     if (IS_DEVELOPMENT_BUILD) print("wall@" + tile.id + " ")
                 }
 
@@ -585,8 +583,12 @@ object ModMgr {
 //                )
 //            }
 
+            @Transient private var isWall1: Boolean = true
+
             init {
+                isWall1 = isWall
                 tags.addAll(tile.tags)
+                if (isWall) tags.add("WALL")
                 originalName =
                     if (isWall && tags.contains("UNLIT")) "${tile.nameKey}>>=BLOCK_UNLIT_TEMPLATE>>=BLOCK_WALL_NAME_TEMPLATE"
                     else if (isWall) "${tile.nameKey}>>=BLOCK_WALL_NAME_TEMPLATE"
@@ -594,6 +596,9 @@ object ModMgr {
                     else tile.nameKey
             }
 
+            override fun getLumCol() =
+                if (isWall1) Cvec(0)
+                else BlockCodex[originalID].getLumCol(0, 0)
 
             override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
                 return BlockBase.blockStartPrimaryUse(actor, this, dynamicID, delta)

@@ -741,8 +741,8 @@ internal object WeatherMixer : RNGConsumer {
 
     }
 
-    private operator fun Cvec.times(other: Float) = Cvec(this.r * other, this.g * other, this.b * other, this.a * other)
-    private infix fun Cvec.max(other: Cvec) = Cvec(
+    operator fun Cvec.times(other: Float) = Cvec(this.r * other, this.g * other, this.b * other, this.a * other)
+    infix fun Cvec.max(other: Cvec) = Cvec(
         if (this.r > other.r) this.r else other.r,
         if (this.g > other.g) this.g else other.g,
         if (this.b > other.b) this.b else other.b,

@@ -1,7 +1,10 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.gdx.graphics.Cvec
+import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 
@@ -47,4 +50,20 @@ class ItemGunpowder(originalID: ItemID) : LightIngredientBase(originalID) {
     override var originalName = "ITEM_GUNPOWDER"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,12)
+}
+
+/**
+ * Created by minjaesong on 2024-02-15.
+ */
+class ItemTorch(originalID: ItemID) : LightIngredientBase(originalID) {
+    override var baseMass = 0.8 // from blocks.csv
+    override var inventoryCategory = Category.FIXTURE
+
+    override var originalName = "BLOCK_TORCH"
+    override val itemImage: TextureRegion
+        get() = FixtureItemBase.getItemImageFromSingleImage("basegame", "items/torch.tga")
+    override val itemImageEmissive: TextureRegion
+        get() = FixtureItemBase.getItemImageFromSingleImage("basegame", "items/torch_emsv.tga")
+
+    override fun getLumCol() = BlockCodex[Block.TORCH].getLumCol(0, 0)
 }

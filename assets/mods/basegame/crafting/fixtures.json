@@ -1,5 +1,5 @@
 {
-  "basegame:176": { /* torch */
+  "item@basegame:33": { /* torch */
     "workbench": "",
     "ingredients": [
       [5, 1, "item@basegame:18", 1, "item@basegame:130"], /* 5 torches = 1 stick, 1 coal */
@@ -9,8 +9,7 @@
   "item@basegame:5": { /* tiki torch */
     "workbench": "",
     "ingredients": [
-      [1, 1, "$WOOD", 3, "item@basegame:18", 1, "basegame:176"], /* 1 tiki torch = 1 wood, 3 sticks, 1 torch */
-      [1, 1, "$WOOD", 3, "item@basegame:18", 1, "basegame:192"]
+      [1, 1, "$WOOD", 3, "item@basegame:18", 1, "item@basegame:33"] /* 1 tiki torch = 1 wood, 3 sticks, 1 torch */
     ]
   },
 

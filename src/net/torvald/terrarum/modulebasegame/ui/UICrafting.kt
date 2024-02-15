@@ -506,7 +506,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
             return if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
                 candidate.maxByOrNull { it.qty }?.itm ?: (
                     (ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.hasTag(ingredient.key)) it.key else null }) ?:
-                        throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed")
+                        throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed (ingredient: $ingredient)")
                 )
             }
             else {

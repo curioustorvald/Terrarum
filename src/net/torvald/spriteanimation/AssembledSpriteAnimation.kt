@@ -133,13 +133,6 @@ class AssembledSpriteAnimation(
         }
     }
 
-    private fun fetchItemImage(item: GameItem) = if (isEmissive)
-        ItemCodex.getItemImageEmissive(item)
-    else if (isGlow)
-        ItemCodex.getItemImageGlow(item)
-    else
-        ItemCodex.getItemImage(item)
-
     private fun fetchItemImage(mode: Int, item: GameItem) = when (mode) {
         0 -> ItemCodex.getItemImage(item)
         1 -> ItemCodex.getItemImageGlow(item)

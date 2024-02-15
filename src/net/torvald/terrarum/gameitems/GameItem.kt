@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameitems
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.ReferencingRanges.PREFIX_ACTORITEM
 import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
@@ -27,6 +28,8 @@ typealias ItemID = String
 abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneable {
 
     constructor() : this("-uninitialised-")
+
+    open fun getLumCol(): Cvec = Cvec(0)
 
     /**
      * For items with COMBUSTIBLE tag only

@@ -10,6 +10,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitems.*
+import net.torvald.terrarum.weather.WeatherMixer.max
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -130,12 +131,14 @@ open class DroppedItem : ActorWithBody {
         else if (itemID.isWall())
             BlockCodex[itemID.substringAfter('@')].getLumCol(randKey1, randKey2)
         else {
-            Cvec(
-                ItemCodex[itemID]?.itemProperties?.getAsFloat(AVKey.LUMR) ?: 0f,
-                ItemCodex[itemID]?.itemProperties?.getAsFloat(AVKey.LUMG) ?: 0f,
-                ItemCodex[itemID]?.itemProperties?.getAsFloat(AVKey.LUMB) ?: 0f,
-                ItemCodex[itemID]?.itemProperties?.getAsFloat(AVKey.LUMA) ?: 0f,
-            )
+            val itemprop = ItemCodex[itemID]
+            (itemprop?.getLumCol() ?: Cvec(0)).max(
+                Cvec(
+                itemprop?.itemProperties?.getAsFloat(AVKey.LUMR) ?: 0f,
+                itemprop?.itemProperties?.getAsFloat(AVKey.LUMG) ?: 0f,
+                itemprop?.itemProperties?.getAsFloat(AVKey.LUMB) ?: 0f,
+                itemprop?.itemProperties?.getAsFloat(AVKey.LUMA) ?: 0f,
+            ))
         }
     }
 

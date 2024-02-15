@@ -31,6 +31,7 @@ id;classname;tags
 30;net.torvald.terrarum.modulebasegame.gameitems.ItemMusicalTurntable;FIXTURE,MUSIC
 31;net.torvald.terrarum.modulebasegame.gameitems.ItemGunpowder;POWDER,EXPLOSIVE
 32;net.torvald.terrarum.modulebasegame.gameitems.ItemCherryBomb;EXPLOSIVE,THROWABLE
+33;net.torvald.terrarum.modulebasegame.gameitems.ItemTorch;FIXTURE,LIGHT
 
 # ingots
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT

@@ -1797,7 +1797,7 @@ open class ActorWithBody : Actor {
             if (spriteGlow != null)
                 drawSpriteInGoodPosition(frameDelta, spriteGlow!!, batch, 1)
             else if (sprite != null)
-                drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 0, Color.BLACK) // use black version of normal sprite as a substitution
+                drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 1, Color.BLACK) // use black version of normal sprite as a substitution
         }
     }
 
@@ -1807,7 +1807,7 @@ open class ActorWithBody : Actor {
             if (spriteEmissive != null)
                 drawSpriteInGoodPosition(frameDelta, spriteEmissive!!, batch, 2)
             else if (sprite != null)
-                drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 0, Color.BLACK) // use black version of normal sprite as a substitution
+                drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 2, Color.BLACK) // use black version of normal sprite as a substitution
         }
     }
 
