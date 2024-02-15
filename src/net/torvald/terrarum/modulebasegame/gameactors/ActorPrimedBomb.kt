@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.Gdx
 import net.torvald.spriteanimation.SingleImageSprite
 import net.torvald.terrarum.*
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.MusicContainer
 import net.torvald.terrarum.audio.decibelsToFullscale
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -48,7 +49,12 @@ open class ActorPrimedBomb(
             this.isVisible = false // or play explosion anim
             startAudio(boomSound, 10.0)
 
-            ExplosionManager.goBoom(INGAME.world, intTilewiseHitbox.centeredX.toInt(), intTilewiseHitbox.centeredY.toInt(), explosionPower) {
+            ExplosionManager.goBoom(
+                INGAME.world,
+                hitbox.centeredX.div(TILE_SIZED).minus(1.0).toInt(),
+                hitbox.startY.div(TILE_SIZED).minus(1.0).toInt(),
+                explosionPower
+            ) {
 
 
             }

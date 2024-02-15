@@ -1,11 +1,11 @@
 package net.torvald.terrarum.modulebasegame
 
-import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.ceilToInt
+import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.getOffset
-import net.torvald.terrarum.tryDispose
 import net.torvald.unsafe.UnsafeHelper
 import kotlin.math.*
 
@@ -18,19 +18,19 @@ object ExplosionManager {
         val CALC_WIDTH = CALC_RADIUS * 2 + 1
 
         // create a copy of the tilemap
-        val tilemap = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH)
-        val breakagemap = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH)
+        val tilemap = BlockLayerI16(CALC_WIDTH, CALC_WIDTH)
+        val breakmap = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH)
 
         // fill in the tilemap copy
         for (line in 0 until CALC_WIDTH) {
             memcpyFromWorldTiles(CALC_RADIUS, CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, tilemap)
-            memcpyFromWorldBreakage(CALC_RADIUS, CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, breakagemap)
+            memcpyFromWorldBreakage(CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, breakmap)
         }
 
-        createExplosionWorker(CALC_RADIUS, CALC_WIDTH, world, breakagemap, tilemap, tx, ty, power, callback).start()
+        createExplosionWorker(CALC_RADIUS, CALC_WIDTH, world, breakmap, tilemap, tx, ty, power, callback).start()
     }
 
-    private fun memcpyFromWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: UnsafeFloatArray) {
+    private fun memcpyFromWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerI16) {
         // if the bounding box must wrap around
         if (xStart > world.width - CALC_RADIUS) {
             val lenLeft = world.width - xStart
@@ -62,9 +62,47 @@ object ExplosionManager {
         }
     }
 
-    private fun memcpyFromWorldBreakage(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: UnsafeFloatArray) {
+    private fun memcpyToWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerI16) {
+        // if the bounding box must wrap around
+        if (xStart > world.width - CALC_RADIUS) {
+            val lenLeft = world.width - xStart
+            val lenRight = CALC_WIDTH - lenLeft
+
+            UnsafeHelper.memcpy(
+                out.ptr,
+                out.getOffset(0, yOff),
+                world.layerTerrain.ptr,
+                world.layerTerrain.getOffset(xStart, yStart + yOff),
+                world.layerTerrain.bytesPerBlock * lenLeft
+            )
+            UnsafeHelper.memcpy(
+                out.ptr,
+                out.getOffset(lenLeft, yOff),
+                world.layerTerrain.ptr,
+                world.layerTerrain.getOffset(0, yStart + yOff),
+                world.layerTerrain.bytesPerBlock * lenRight
+            )
+        }
+        else {
+            UnsafeHelper.memcpy(
+                out.ptr,
+                out.getOffset(0, yOff),
+                world.layerTerrain.ptr,
+                world.layerTerrain.getOffset(xStart, yStart + yOff),
+                world.layerTerrain.bytesPerBlock * CALC_WIDTH
+            )
+        }
+    }
+
+    private fun memcpyFromWorldBreakage(CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: UnsafeFloatArray) {
         for (x in xStart until xStart + CALC_WIDTH) {
             out[x - xStart, yOff] = world.getTerrainDamage(x, yStart + yOff)
+        }
+    }
+
+    private fun memcpyToWorldBreakage(CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: UnsafeFloatArray) {
+        for (x in xStart until xStart + CALC_WIDTH) {
+            world.inflictTerrainDamage(x, yStart + yOff, out[x - xStart, yOff].toDouble())
         }
     }
 
@@ -78,7 +116,7 @@ object ExplosionManager {
         CALC_RADIUS: Int, CALC_WIDTH: Int,
         world: GameWorld,
         breakmap: UnsafeFloatArray,
-        tilemap: UnsafeFloatArray,
+        tilemap: BlockLayerI16,
         tx: Int, ty: Int,
         power: Float,
         callback: () -> Unit): Thread
@@ -191,18 +229,18 @@ object ExplosionManager {
         r1(mapBoomPow);r2(mapBoomPow);r3(mapBoomPow);r4(mapBoomPow)
 
         //// just write to the damagemap lol
-        for (rawy in worldYstart until worldYstart + CALC_WIDTH) {
+        /*for (rawy in worldYstart until worldYstart + CALC_WIDTH) {
             for (rawx in worldXstart until worldXstart + CALC_WIDTH) {
                 val lx = rawx - (tx - CALC_RADIUS - 1)
                 val ly = rawy - (ty - CALC_RADIUS - 1)
                 world.inflictTerrainDamage(rawx, rawy, mapBoomPow[lx, ly].blastToDmg().toDouble())
             }
-        }
+        }*/
 
         // write lightmap to the tilemap and breakmap
-        /*for (y in 0 until CALC_WIDTH) {
+        for (y in 0 until CALC_WIDTH) {
             for (x in 0 until CALC_WIDTH) {
-                val boompower = mapBoomPow[x, y]
+                val boompower = mapBoomPow[x, y].blastToDmg()
                 val tile = world.tileNumberToNameMap[tilemap.unsafeGetTile(x, y).toLong()]
                 val tileprop = BlockCodex[tile]
                 val breakage = breakmap[x, y]
@@ -217,10 +255,13 @@ object ExplosionManager {
                     breakmap[x, y] = breakage + boompower
                 }
             }
-        }*/
+        }
 
         // memcpy the tilemap and breakmap to the world
-
+        for (line in 0 until CALC_WIDTH) {
+            memcpyToWorldTiles(CALC_RADIUS, CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, tilemap)
+            memcpyToWorldBreakage(CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, breakmap)
+        }
 
 
         // dispose of the tilemap copy
@@ -228,7 +269,7 @@ object ExplosionManager {
         breakmap.destroy()
         mapTileStr.destroy()
         mapTileStr2.destroy()
-        tilemap.destroy()
+        tilemap.ptr.destroy()
         breakmap.destroy()
 
         callback()
