@@ -114,7 +114,7 @@ open class UIItemInventoryItemGrid(
         fun getEstimatedW(horizontalCells: Int) = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
         fun getEstimatedH(verticalCells: Int) = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
 
-        fun createInvCellGenericKeyDownFun(): (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit {
+        fun createInvCellGenericKeyDownFun(listRebuildFun: () -> Unit): (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit {
             return { item: GameItem?, amount: Long, keycode: Int, _, _ ->
                 if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
                     val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
@@ -139,6 +139,8 @@ open class UIItemInventoryItemGrid(
                                 inventory.setQuickslotItem(it, null)
                             }
                         }
+
+                        listRebuildFun()
                     }
                 }
             }

@@ -97,7 +97,7 @@ internal class UIInventoryCells(
                 INVENTORY_CELLS_OFFSET_X(),
                 INVENTORY_CELLS_OFFSET_Y(),
                 CELLS_HOR, CELLS_VRT,
-                keyDownFun = createInvCellGenericKeyDownFun(),
+                keyDownFun = createInvCellGenericKeyDownFun { rebuildList() },
                 touchDownFun = createInvCellGenericTouchDownFun { rebuildList() },
                 wheelFun = { _, _, _, _, _, _ -> },
             )

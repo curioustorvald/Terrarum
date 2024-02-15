@@ -54,7 +54,7 @@ class UIItemInventoryEquippedView(
             amount = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
             itemImage = null,
             drawBackOnNull = true,
-            keyDownFun = createInvCellGenericKeyDownFun(),
+            keyDownFun = { _, _, _, _, _ -> },
             touchDownFun = createInvCellGenericTouchDownFun(inventoryListRebuildFun), // to "unselect" the equipped item and main item grid would "untick" accordingly
             wheelFun = { _, _, _, _, _, _ -> },
             emptyCellIcon = equipPosIcon.get(cellToIcon[it], 1),
