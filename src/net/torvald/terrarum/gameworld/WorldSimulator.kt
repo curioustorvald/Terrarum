@@ -179,9 +179,7 @@ object WorldSimulator {
                     val actor = result.get()
                     // if hitbox overlaps, pick up
                     val s = actor.scale
-                    val w = actor.baseHitboxW * s
-                    val h = actor.baseHitboxH * s
-                    val pickupDistSqr = w*w + h*h// TODO refer to the actorValue
+                    val pickupDistSqr = (96f * s).sqr()// TODO refer to the actorValue
 //                    println("${result.distance}\pickupDistSqr")
                     if (result.distance < pickupDistSqr) {
                         droppedItem.onItemPickup(actor)
