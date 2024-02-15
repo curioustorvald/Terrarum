@@ -584,7 +584,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                     if (currentPenTarget and PENTARGET_WALL != 0)
                         world.setTileWall(x, y, Block.AIR, true)
                     if (currentPenTarget and PENTARGET_ORE != 0)
-                        world.setTileOre(x, y, Block.NULL, 0)
+                        world.setTileOre(x, y, Block.AIR, 0)
                 }
 
                 PENMODE_EYEDROPPER -> {

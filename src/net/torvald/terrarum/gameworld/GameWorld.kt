@@ -642,9 +642,9 @@ open class GameWorld(
     }
 
     /**
-     * @return true if block is broken
+     * @return ItemID of the broken block AND ore if the block is broken, `null` otherwise
      */
-    fun inflictTerrainDamage(x: Int, y: Int, damage: Double): ItemID? {
+    fun inflictTerrainDamage(x: Int, y: Int, damage: Double): Pair<ItemID?, ItemID?> {
         if (damage.isNaN()) throw IllegalArgumentException("Cannot inflict NaN amount of damage at($x, $y)")
 
         val damage = damage.toFloat()
@@ -667,12 +667,13 @@ open class GameWorld(
         // remove tile from the world
         if ((terrainDamages[addr] ?: 0f) >= BlockCodex[getTileFromTerrain(x, y)].strength) {
             val tileBroke = getTileFromTerrain(x, y)
+            val oreBroke = getTileFromOre(x, y)
             setTileTerrain(x, y, Block.AIR, false)
             terrainDamages.remove(addr)
-            return tileBroke
+            return tileBroke.let { if (it == Block.AIR) null else it } to oreBroke.item.let { if (it == Block.AIR) null else it }
         }
 
-        return null
+        return null to null
     }
     fun getTerrainDamage(x: Int, y: Int): Float =
             terrainDamages[LandUtil.getBlockAddr(this, x, y)] ?: 0f

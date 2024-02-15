@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
@@ -89,42 +90,43 @@ object PickaxeCore {
             // filter passed, do the job
             val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
             val swingDmgToFrameDmg = delta.toDouble() / actionInterval
-            val (oreOnTile, _) = INGAME.world.getTileFromOre(x, y)
 
             INGAME.world.inflictTerrainDamage(
                     x, y,
                     Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg
-            ).let { tileBroken ->
-                // tile busted
-                if (tileBroken != null) {
+            ).let { (tileBroken, oreBroken) ->
+                
+                // drop ore
+                if (oreBroken != null) {
                     if (Math.random() < dropProbability) {
-                        val drop = if (oreOnTile != Block.AIR)
-                            OreCodex[oreOnTile].item
-                        else
-                            BlockCodex[tileBroken].drop
-
-                        if (drop.isNotBlank()) {
-                            dropItem(drop, x, y)
-                        }
-                        makeDust(tile, x, y, 9)
-                        makeNoise(actor, tile)
+                        val drop = OreCodex[oreBroken].item
+                        if (drop.isNotBlank()) dropItem(drop, x, y)
+                    }
+                }
+                // drop tile
+                else if (tileBroken != null) {
+                    if (Math.random() < dropProbability) {
+                        val drop = BlockCodex[tileBroken].drop
+                        if (drop.isNotBlank()) dropItem(drop, x, y)
                     }
 
-
-                    // temporary: spawn random record on prob 1/4096 when digging dirts/sands/gravels
+                    // temperary: drop random disc
                     val itemprop = ItemCodex[tileBroken]
                     if (Math.random() < 1.0 / 4096.0 &&
-                            (itemprop?.hasTag("CULTIVABLE") == true ||
-                            itemprop?.hasTag("SAND") == true ||
-                            itemprop?.hasTag("GRAVEL") == true)
-                        ) {
-                        val drop = "item@basegame:${32769 + Math.random().times(9).toInt()}"
-                        dropItem(drop, x, y)
+                        (itemprop?.hasTag("CULTIVABLE") == true ||
+                        itemprop?.hasTag("SAND") == true ||
+                        itemprop?.hasTag("GRAVEL") == true)
+                    ) {
+                        dropItem(getRandomDisc(), x, y)
                     }
-
                 }
-                // tile not busted
-                if (Math.random() < actionInterval) {
+
+                // make dust
+                if (tileBroken != null || oreBroken != null) {
+                    makeDust(tile, x, y, 9)
+                    makeNoise(actor, tile)
+                }
+                else {
                     makeDust(tile, x, y, 1)
                 }
             }
@@ -146,6 +148,16 @@ object PickaxeCore {
         )
     }
 
+    fun getRandomDisc() = "item@basegame:${32769 + Math.random().times(9).toInt()}"
+
+    private fun makeDustIndices(amount: Int): List<Int> {
+        val ret = ArrayList<Int>()
+        repeat((amount / 9f).ceilToInt()) {
+            ret.addAll((0..8).toList().shuffled())
+        }
+        return ret.subList(0, amount)
+    }
+
     private val pixelOffs = intArrayOf(2, 7, 12) // hard-coded assuming TILE_SIZE=16
     fun makeDust(tile: ItemID, x: Int, y: Int, density: Int = 9, drawCol: Color = Color.WHITE) {
         val pw = 3
@@ -162,7 +174,7 @@ object PickaxeCore {
         }
         val tileNum = baseTilenum + representativeTilenum // the particle won't match the visible tile anyway because of the seasons stuff
 
-        val indices = (0..8).toList().shuffled().subList(0, density)
+        val indices = makeDustIndices(density)
         for (it in indices) {
             val u = pixelOffs[it % 3]
             val v = pixelOffs[it / 3]

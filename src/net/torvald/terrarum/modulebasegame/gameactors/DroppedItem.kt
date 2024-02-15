@@ -4,11 +4,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.BlockCodex
-import net.torvald.terrarum.INGAME
-import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.*
@@ -56,6 +53,8 @@ open class DroppedItem : ActorWithBody {
 
         if (itemID.isActor())
             throw RuntimeException("Attempted to create DroppedItem actor of a real actor; the real actor must be dropped instead.")
+        else if (itemID.isOre())
+            this.itemID = OreCodex[itemID].item
 
         isVisible = true
 

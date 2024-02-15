@@ -1,11 +1,14 @@
 package net.torvald.terrarum.modulebasegame
 
 import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.gameworld.getOffset
+import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.unsafe.UnsafeHelper
 import kotlin.math.*
 
@@ -13,7 +16,7 @@ import kotlin.math.*
  * Created by minjaesong on 2024-02-13.
  */
 object ExplosionManager {
-    fun goBoom(world: GameWorld, tx: Int, ty: Int, power: Float, callback: () -> Unit) {
+    fun goBoom(world: GameWorld, tx: Int, ty: Int, power: Float, dropProbNonOre: Float, dropProbOre: Float, callback: () -> Unit) {
         val CALC_RADIUS = power.ceilToInt() + 2
         val CALC_WIDTH = CALC_RADIUS * 2 + 1
 
@@ -27,7 +30,7 @@ object ExplosionManager {
             memcpyFromWorldBreakage(CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, breakmap)
         }
 
-        createExplosionWorker(CALC_RADIUS, CALC_WIDTH, world, breakmap, tilemap, tx, ty, power, callback).start()
+        createExplosionWorker(CALC_RADIUS, CALC_WIDTH, world, breakmap, tilemap, tx, ty, power, dropProbNonOre, dropProbOre, callback).start()
     }
 
     private fun memcpyFromWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerI16) {
@@ -119,6 +122,8 @@ object ExplosionManager {
         tilemap: BlockLayerI16,
         tx: Int, ty: Int,
         power: Float,
+        dropProbNonOre: Float,
+        dropProbOre: Float,
         callback: () -> Unit): Thread
     { return Thread {
         val mapBoomPow = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH) // explosion power map
@@ -146,7 +151,7 @@ object ExplosionManager {
 
             mapBoomPow[x, y] = ambientAccumulator
         }
-        fun swipeBoomPower(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int, strengthmap: UnsafeFloatArray, swipeDiag: Boolean) {
+        fun swipeBoomPower(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int, swipeDiag: Boolean) {
             var swipeX = sx
             var swipeY = sy
             while (swipeX*dx <= ex*dx && swipeY*dy <= ey*dy) {
@@ -169,31 +174,31 @@ object ExplosionManager {
             }
         }
 
-        fun r1(strengthmap: UnsafeFloatArray) {
+        fun r1() {
             for (line in 1 until CALC_WIDTH - 1) {
-                swipeBoomPower(1, line, CALC_WIDTH - 2, line, 1, 0, strengthmap, false)
+                swipeBoomPower(1, line, CALC_WIDTH - 2, line, 1, 0, false)
             }
         }
-        fun r2(strengthmap: UnsafeFloatArray) {
+        fun r2() {
             for (line in 1 until CALC_WIDTH - 1) {
-                swipeBoomPower(line, 1, line, CALC_WIDTH - 2, 0, 1, strengthmap, false)
+                swipeBoomPower(line, 1, line, CALC_WIDTH - 2, 0, 1, false)
             }
         }
-        fun r3(strengthmap: UnsafeFloatArray) {
+        fun r3() {
             for (i in 0 until CALC_WIDTH + CALC_WIDTH - 5) {
                 swipeBoomPower(
                     max(1, i - CALC_WIDTH + 4), max(1, CALC_WIDTH - 2 - i),
                     min(CALC_WIDTH - 2, i + 1), min(CALC_WIDTH - 2, (CALC_WIDTH + CALC_WIDTH - 5) - i),
-                    1, 1, strengthmap, true
+                    1, 1, true
                 )
             }
         }
-        fun r4(strengthmap: UnsafeFloatArray) {
+        fun r4() {
             for (i in 0 until CALC_WIDTH + CALC_WIDTH - 5) {
                 swipeBoomPower(
                     max(1, i - CALC_WIDTH + 4), min(CALC_WIDTH - 2, i + 1),
                     min(CALC_WIDTH - 2, i + 1), max(1, (CALC_WIDTH - 2) - (CALC_WIDTH + CALC_WIDTH - 6) + i),
-                    1, -1, strengthmap, true
+                    1, -1, true
                 )
             }
         }
@@ -225,44 +230,42 @@ object ExplosionManager {
         }
 
         // simulate explosion like strengthmaprenderer
-        r1(mapBoomPow);r2(mapBoomPow);r3(mapBoomPow);r4(mapBoomPow)
-        r1(mapBoomPow);r2(mapBoomPow);r3(mapBoomPow);r4(mapBoomPow)
+        r1();r2();r3();r4()
+        r1();r2();r3();r4()
 
         //// just write to the damagemap lol
-        /*for (rawy in worldYstart until worldYstart + CALC_WIDTH) {
-            for (rawx in worldXstart until worldXstart + CALC_WIDTH) {
-                val lx = rawx - (tx - CALC_RADIUS - 1)
-                val ly = rawy - (ty - CALC_RADIUS - 1)
-                world.inflictTerrainDamage(rawx, rawy, mapBoomPow[lx, ly].blastToDmg().toDouble())
-            }
-        }*/
+        for (wy in worldYstart until worldYstart + CALC_WIDTH) {
+            for (wx in worldXstart until worldXstart + CALC_WIDTH) {
+                val lx = wx - (tx - CALC_RADIUS - 1)
+                val ly = wy - (ty - CALC_RADIUS - 1)
+                world.inflictTerrainDamage(wx, wy, mapBoomPow[lx, ly].blastToDmg().toDouble()).let { (tile, ore) ->
+                    if (ore != null) {
+                        // drop ore
+                        if (Math.random() < dropProbOre) {
+                            PickaxeCore.dropItem(ore, wx, wy)
+                        }
+                    }
+                    else if (tile != null) {
+                        // drop tile
+                        if (Math.random() < dropProbNonOre) {
+                            PickaxeCore.dropItem(tile, wx, wy)
+                        }
 
-        // write lightmap to the tilemap and breakmap
-        for (y in 0 until CALC_WIDTH) {
-            for (x in 0 until CALC_WIDTH) {
-                val boompower = mapBoomPow[x, y].blastToDmg()
-                val tile = world.tileNumberToNameMap[tilemap.unsafeGetTile(x, y).toLong()]
-                val tileprop = BlockCodex[tile]
-                val breakage = breakmap[x, y]
+                        PickaxeCore.makeDust(tile, wx, wy, 8 + (5 * Math.random()).toInt())
 
-                // remove tile
-                if (tileprop.strength - (breakage + boompower) <= 0f) {
-                    tilemap.unsafeSetTile(x, y, world.tileNameToNumberMap[Block.AIR]!!)
-                    breakmap[x, y] = 0f
-                }
-                // write new breakage
-                else {
-                    breakmap[x, y] = breakage + boompower
+                        // drop random disc
+                        val itemprop = ItemCodex[tile]
+                        if (Math.random() < (1.0 / 4096.0) * (dropProbNonOre) && // prob: 1/16384
+                            (itemprop?.hasTag("CULTIVABLE") == true ||
+                                    itemprop?.hasTag("SAND") == true ||
+                                    itemprop?.hasTag("GRAVEL") == true)
+                        ) {
+                            PickaxeCore.dropItem(PickaxeCore.getRandomDisc(), wx, wy)
+                        }
+                    }
                 }
             }
         }
-
-        // memcpy the tilemap and breakmap to the world
-        for (line in 0 until CALC_WIDTH) {
-            memcpyToWorldTiles(CALC_RADIUS, CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, tilemap)
-            memcpyToWorldBreakage(CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, breakmap)
-        }
-
 
         // dispose of the tilemap copy
         mapBoomPow.destroy()

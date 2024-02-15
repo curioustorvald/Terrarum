@@ -14,8 +14,10 @@ import net.torvald.terrarum.modulebasegame.ExplosionManager
  * Created by minjaesong on 2024-02-13.
  */
 open class ActorPrimedBomb(
-    private var explosionPower: Float = 1f,
+    @Transient private var explosionPower: Float = 1f,
     private var fuse: Second = 1f,
+    @Transient private var dropProbNonOre: Float = 0.25f,
+    @Transient private var dropProbOre: Float = 0.75f
 ) : ActorWithBody() {
 
     init {
@@ -53,11 +55,10 @@ open class ActorPrimedBomb(
                 INGAME.world,
                 hitbox.centeredX.div(TILE_SIZED).minus(1.0).toInt(),
                 hitbox.startY.div(TILE_SIZED).minus(1.0).toInt(),
-                explosionPower
-            ) {
-
-
-            }
+                explosionPower,
+                dropProbNonOre,
+                dropProbOre
+            ) {}
         }
     }
 

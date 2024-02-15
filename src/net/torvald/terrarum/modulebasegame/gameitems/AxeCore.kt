@@ -101,7 +101,7 @@ object AxeCore {
                 INGAME.world.inflictTerrainDamage(
                     x, y,
                     Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg
-                ).let { tileBroken ->
+                ).let { (tileBroken, _) ->
                     // tile busted
                     if (tileBroken != null) {
                         val drop = BlockCodex[tileBroken].drop
@@ -129,7 +129,7 @@ object AxeCore {
                 INGAME.world.inflictTerrainDamage(
                     x, y,
                     Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg
-                ).let { tileBroken ->
+                ).let { (tileBroken, _) ->
                     // tile busted
                     if (tileBroken != null) {
                         var upCtr = 0
