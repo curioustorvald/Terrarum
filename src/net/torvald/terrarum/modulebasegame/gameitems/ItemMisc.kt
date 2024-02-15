@@ -5,6 +5,7 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 
@@ -66,4 +67,12 @@ class ItemTorch(originalID: ItemID) : LightIngredientBase(originalID) {
         get() = FixtureItemBase.getItemImageFromSingleImage("basegame", "items/torch_emsv.tga")
 
     override fun getLumCol() = BlockCodex[Block.TORCH].getLumCol(0, 0)
+
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
+        return BlockBase.blockStartPrimaryUse(actor, this, "basegame:176", delta)
+    }
+
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
+        BlockBase.blockEffectWhenEquipped(actor, delta)
+    }
 }
