@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame
 
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.ItemCodex
+import net.torvald.terrarum.OreCodex
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gameworld.BlockLayerI16
@@ -239,18 +240,16 @@ object ExplosionManager {
                 val lx = wx - (tx - CALC_RADIUS - 1)
                 val ly = wy - (ty - CALC_RADIUS - 1)
                 world.inflictTerrainDamage(wx, wy, mapBoomPow[lx, ly].blastToDmg().toDouble()).let { (tile, ore) ->
-                    if (ore != null) {
-                        // drop ore
-                        if (Math.random() < dropProbOre) {
-                            PickaxeCore.dropItem(ore, wx, wy)
+                    if (ore != null || tile != null) {
+                        // drop item
+                        val prob = if (ore != null) dropProbOre else dropProbNonOre
+                        if (Math.random() < prob) {
+                            val drop = if (ore != null) OreCodex[ore].item else BlockCodex[tile].drop
+                            PickaxeCore.dropItem(drop, wx, wy)
                         }
                     }
-                    else if (tile != null) {
-                        // drop tile
-                        if (Math.random() < dropProbNonOre) {
-                            PickaxeCore.dropItem(tile, wx, wy)
-                        }
 
+                    if (tile != null) {
                         PickaxeCore.makeDust(tile, wx, wy, 8 + (5 * Math.random()).toInt())
 
                         // drop random disc

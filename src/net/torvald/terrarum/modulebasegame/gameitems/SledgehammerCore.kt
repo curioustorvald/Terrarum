@@ -100,9 +100,8 @@ object SledgehammerCore {
                 if (tileBroken != null) {
                     if (Math.random() < dropProbability) {
                         val drop = BlockCodex[tileBroken].drop
-                        if (drop.isNotBlank()) {
-                            PickaxeCore.dropItem("wall@$drop", x, y)
-                        }
+                        PickaxeCore.dropItem("wall@$drop", x, y)
+
                         PickaxeCore.makeDust(wall, x, y, 9, WALL_OVERLAY_COLOUR)
                         PickaxeCore.makeNoise(actor, wall)
                     }

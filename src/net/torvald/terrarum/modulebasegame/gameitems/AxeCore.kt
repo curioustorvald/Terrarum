@@ -105,10 +105,7 @@ object AxeCore {
                     // tile busted
                     if (tileBroken != null) {
                         val drop = BlockCodex[tileBroken].drop
-
-                        if (drop.isNotBlank()) {
-                            PickaxeCore.dropItem(drop, x, y)
-                        }
+                        PickaxeCore.dropItem(drop, x, y)
 
                         PickaxeCore.makeDust(tile, x, y, 9)
                         PickaxeCore.makeNoise(actor, tile)

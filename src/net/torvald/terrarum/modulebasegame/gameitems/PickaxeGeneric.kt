@@ -95,19 +95,19 @@ object PickaxeCore {
                     x, y,
                     Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg
             ).let { (tileBroken, oreBroken) ->
-                
+
                 // drop ore
                 if (oreBroken != null) {
                     if (Math.random() < dropProbability) {
                         val drop = OreCodex[oreBroken].item
-                        if (drop.isNotBlank()) dropItem(drop, x, y)
+                        dropItem(drop, x, y)
                     }
                 }
                 // drop tile
                 else if (tileBroken != null) {
                     if (Math.random() < dropProbability) {
                         val drop = BlockCodex[tileBroken].drop
-                        if (drop.isNotBlank()) dropItem(drop, x, y)
+                        dropItem(drop, x, y)
                     }
 
                     // temperary: drop random disc
@@ -139,6 +139,7 @@ object PickaxeCore {
     }
 
     fun dropItem(item: ItemID, tx: Int, ty: Int) {
+        if (item.isBlank()) return
         INGAME.queueActorAddition(
             DroppedItem(
                 item,
