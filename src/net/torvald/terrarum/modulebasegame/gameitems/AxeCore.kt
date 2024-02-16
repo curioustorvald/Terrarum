@@ -79,7 +79,8 @@ object AxeCore {
 
                 INGAME.world.inflictTerrainDamage(
                     x, y,
-                    Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg
+                    Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg,
+                    false
                 ).let { tileBroken ->
                     // tile busted
                     if (tileBroken != null) {
@@ -100,7 +101,8 @@ object AxeCore {
 
                 INGAME.world.inflictTerrainDamage(
                     x, y,
-                    Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg
+                    Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg,
+                    false
                 ).let { (tileBroken, _) ->
                     // tile busted
                     if (tileBroken != null) {
@@ -125,7 +127,8 @@ object AxeCore {
 
                 INGAME.world.inflictTerrainDamage(
                     x, y,
-                    Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg
+                    Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg,
+                    false
                 ).let { (tileBroken, _) ->
                     // tile busted
                     if (tileBroken != null) {

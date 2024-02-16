@@ -295,6 +295,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
 
 
     open fun modified(layer: Int, x: Int, y: Int) {
+//        printdbg(this, "Chunk modified: layer $layer ($x, $y)")
         modifiedChunks[layer].add(LandUtil.toChunkNum(world, x, y))
     }
 

@@ -140,7 +140,7 @@ object ExplosionManager {
 
     private fun memcpyToWorldBreakage(CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: UnsafeFloatArray) {
         for (x in xStart until xStart + CALC_WIDTH) {
-            world.inflictTerrainDamage(x, yStart + yOff, out[x - xStart, yOff].toDouble())
+            world.inflictTerrainDamage(x, yStart + yOff, out[x - xStart, yOff].toDouble(), false)
         }
     }
 
@@ -273,7 +273,7 @@ object ExplosionManager {
             for (wx in worldXstart until worldXstart + CALC_WIDTH) {
                 val lx = wx - (tx - CALC_RADIUS - 1)
                 val ly = wy - (ty - CALC_RADIUS - 1)
-                world.inflictTerrainDamage(wx, wy, mapBoomPow[lx, ly].blastToDmg().toDouble()).let { (tile, ore) ->
+                world.inflictTerrainDamage(wx, wy, mapBoomPow[lx, ly].blastToDmg().toDouble(), false).let { (tile, ore) ->
                     if (ore != null || tile != null) {
                         // drop item
                         val prob = if (ore != null) dropProbOre else dropProbNonOre

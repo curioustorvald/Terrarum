@@ -644,7 +644,7 @@ open class GameWorld(
     /**
      * @return ItemID of the broken block AND ore if the block is broken, `null` otherwise
      */
-    fun inflictTerrainDamage(x: Int, y: Int, damage: Double): Pair<ItemID?, ItemID?> {
+    fun inflictTerrainDamage(x: Int, y: Int, damage: Double, bypassEvent: Boolean): Pair<ItemID?, ItemID?> {
         if (damage.isNaN()) throw IllegalArgumentException("Cannot inflict NaN amount of damage at($x, $y)")
 
         val damage = damage.toFloat()
@@ -660,6 +660,10 @@ open class GameWorld(
         }
         else { // normal situation
             terrainDamages[addr] = terrainDamages[addr]!! + damage
+        }
+
+        if (!bypassEvent) {
+            Terrarum.ingame?.modified(LandUtil.LAYER_TERR, x, y)
         }
 
         //println("[GameWorld] accumulated damage: ${terrainDamages[addr]}")
@@ -681,7 +685,7 @@ open class GameWorld(
     /**
      * @return true if block is broken
      */
-    fun inflictWallDamage(x: Int, y: Int, damage: Double): ItemID? {
+    fun inflictWallDamage(x: Int, y: Int, damage: Double, bypassEvent: Boolean): ItemID? {
         if (damage.isNaN()) throw IllegalArgumentException("Cannot inflict NaN amount of damage at($x, $y)")
 
         val damage = damage.toFloat()
@@ -695,6 +699,10 @@ open class GameWorld(
         }
         else { // normal situation
             wallDamages[addr] = wallDamages[addr]!! + damage
+        }
+
+        if (!bypassEvent) {
+            Terrarum.ingame?.modified(LandUtil.LAYER_TERR, x, y)
         }
 
         // remove tile from the world

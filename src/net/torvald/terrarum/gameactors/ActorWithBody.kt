@@ -588,7 +588,7 @@ open class ActorWithBody : Actor {
 //                                printdbg(this, it)
                                 val dmgPerTile = terrainDamage / it.size
                                 it.forEach { (x, y) ->
-                                    world?.inflictTerrainDamage(x, y, dmgPerTile)
+                                    world?.inflictTerrainDamage(x, y, dmgPerTile, false)
                                 }
                             }
                         }

@@ -93,7 +93,8 @@ object PickaxeCore {
 
             INGAME.world.inflictTerrainDamage(
                     x, y,
-                    Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg
+                    Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg,
+                false
             ).let { (tileBroken, oreBroken) ->
 
                 // drop ore

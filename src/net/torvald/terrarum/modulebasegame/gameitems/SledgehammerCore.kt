@@ -94,7 +94,8 @@ object SledgehammerCore {
 
             INGAME.world.inflictWallDamage(
                 x, y,
-                Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg
+                Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg,
+                false
             ).let { tileBroken ->
                 // tile busted
                 if (tileBroken != null) {
