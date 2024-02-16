@@ -306,7 +306,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
     var nearbyCraftingStations = emptyList<String>(); protected set
 
     fun getCraftingStationsWithinReach(): List<String> {
-        val reach = INGAME.actorNowPlaying!!.actorValue.getAsDouble(AVKey.REACH)!! * (INGAME.actorNowPlaying!!.actorValue.getAsDouble(AVKey.REACHBUFF) ?: 1.0) * INGAME.actorNowPlaying!!.scale
+        val reach = 2 * INGAME.actorNowPlaying!!.actorValue.getAsDouble(AVKey.REACH)!! * (INGAME.actorNowPlaying!!.actorValue.getAsDouble(AVKey.REACHBUFF) ?: 1.0) * INGAME.actorNowPlaying!!.scale
         val nearbyCraftingStations = INGAME.findKNearestActors(INGAME.actorNowPlaying!!, 256) {
             it is CraftingStation && (distBetweenActors(it, INGAME.actorNowPlaying!!) < reach)
         }
