@@ -54,14 +54,14 @@ object ExplosionManager {
         Thread {
             while (true) {
                 try {
-                    val job = runners.first { !it.executed }
-                    val executor = Executors.newSingleThreadExecutor()
-                    executor.submit(job.runner).get(500L, TimeUnit.MILLISECONDS)
-                    executor.shutdownNow()
-                    job.executed = true
+                    runners.toList().firstOrNull { !it.executed }?.let { job ->
+                        val executor = Executors.newSingleThreadExecutor()
+                        executor.submit(job.runner).get(500L, TimeUnit.MILLISECONDS)
+                        executor.shutdownNow()
+                        job.executed = true
+                    }
                 }
                 catch (_: TimeoutException) { }
-                catch (_: NoSuchElementException) { }
 
                 Thread.sleep(50L)
             }

@@ -805,7 +805,7 @@ class BasicDebugInfoWindow : UICanvas() {
         drawFaderHandle(batch, sliderX.toFloat(), faderY + 18f + meterHeight - faderKnobDbFs * meterHeight)
 
         // currently streaming
-        if (track.streamPlaying) {
+        if (track.streamPlaying.get()) {
             batch.color = ICON_GREEN
             App.fontSmallNumbers.draw(batch, "\u00C0", x + 17f, faderY + 1f)
         }

@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.audio.MusicContainer
@@ -12,6 +13,9 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.savegame.toBigEndian
 import net.torvald.terrarum.utils.PasswordBase32
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 typealias ActorID = Int
@@ -72,6 +76,8 @@ abstract class Actor : Comparable<Actor>, Runnable {
     @Transient open val canBeDespawned = true
     @Volatile internal var despawned = false
 
+    @Transient open val stopMusicOnDespawn = true
+
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
 
@@ -105,8 +111,12 @@ abstract class Actor : Comparable<Actor>, Runnable {
             musicTracks1.forEach { name ->
                 val it = App.audioMixer.dynamicTracks[name.substring(2).toInt() - 1]
 
-                println("stop track $name")
-                it.stop()
+                printdbg(this, "stop track $name")
+
+                if (stopMusicOnDespawn) {
+                    it.stop()
+                }
+
                 it.filters[0] = NullFilter
                 it.filters[1] = NullFilter
                 it.processor.streamBuf?.pitch = 1f
@@ -149,6 +159,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
             if (track != null) {
                 musicTracks[music] = track
                 musicTracks1.add(track.name)
+                track.stop()
             }
         }
 
@@ -161,14 +172,20 @@ abstract class Actor : Comparable<Actor>, Runnable {
      * To loop the audio, set `music.gdxMusic.isLooping` to `true`
      */
     open fun startAudio(music: MusicContainer, volume: TrackVolume = 1.0, doSomethingWithTrack: (TerrarumAudioMixerTrack) -> Unit = {}) {
-        getTrackByAudio(music)?.let {
-            it.stop()
-            it.trackingTarget = this
-            it.currentTrack = music
-            it.maxVolumeFun = { volume }
-            it.volume = volume
-            doSomethingWithTrack(it)
-            it.play()
+        getTrackByAudio(music).let {
+            if (it == null) {
+                printdbg(this, "cannot startAudio $music")
+            }
+            else {
+                printdbg(this, "startAudio $music")
+                it.trackingTarget = this
+                it.currentTrack = music
+                it.maxVolumeFun = { volume }
+                it.volume = volume
+                doSomethingWithTrack(it)
+//                it.play()
+                it.playRequested.set(true)
+            }
         }
     }
 
@@ -177,9 +194,15 @@ abstract class Actor : Comparable<Actor>, Runnable {
     }*/
 
     open fun stopAudio(music: MusicContainer, doSomethingWithTrack: (TerrarumAudioMixerTrack) -> Unit = {}) {
-        musicTracks[music]?.let {
-            doSomethingWithTrack(it)
-            it.stop()
+        musicTracks[music].let {
+            if (it == null) {
+//                printdbg(this, "cannot stopAudio $music")
+            }
+            else {
+//                printdbg(this, "stopAudio $music")
+                doSomethingWithTrack(it)
+                it.stop()
+            }
         }
     }
 

@@ -340,10 +340,11 @@ Sound from <https://freesound.org/people/DrinkingWindGames>
 ℗ 2019 Richwise
 Sound from <https://freesound.org/people/richwise>
 
-    - effects/explosion/bang_small.ogg
-    
-℗ 2009 Superex1110
-Sound from <https://freesound.org/people/Superex1110/>
+    - effects/explosion/fuse.ogg
+    - effects/explosion/fuse_continue.ogg
+
+℗ 2012, 2015 j1987 and ScouseMouseJB
+Sound from <https://freesound.org/people/j1987> and <https://freesound.org/people/ScouseMouseJB>
 
 
 

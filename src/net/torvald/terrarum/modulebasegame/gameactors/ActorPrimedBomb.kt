@@ -38,9 +38,35 @@ open class ActorPrimedBomb(
     ) {
         this.flagDespawn()
     }
+    @Transient private val fuseSound = MusicContainer(
+        "fuse", ModMgr.getFile("basegame", "audio/effects/explosion/fuse.ogg")
+    ) {
+        this.flagDespawn()
+    }
+    @Transient private val fuseSoundCont = MusicContainer(
+        "fuse_continue", ModMgr.getFile("basegame", "audio/effects/explosion/fuse_continue.ogg")
+    ) {
+        this.flagDespawn()
+    }
+
+    private var fuseSoundStatus = 0 // this value must be stored into the savegame
+    @Transient private var fuseSoundFired = false
+
+    override val stopMusicOnDespawn: Boolean
+        get() = this.isVisible
 
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
+
+        if (!fuseSoundFired && fuse > 0f) {
+            fuseSoundFired = true
+            if (fuseSoundStatus == 0) {
+                startAudio(fuseSound, 2.0)
+                fuseSoundStatus = 1
+            }
+            else
+                startAudio(fuseSoundCont, 2.0)
+        }
 
         fuse -= delta
 
@@ -57,6 +83,7 @@ open class ActorPrimedBomb(
             ) {
                 physProp.usePhysics = false
                 this.isVisible = false // or play explosion anim
+                stopAudio(fuseSound)
                 startAudio(boomSound, 10.0)
             }
         }
@@ -65,6 +92,8 @@ open class ActorPrimedBomb(
     override fun dispose() {
         super.dispose()
         boomSound.dispose()
+        fuseSound.dispose()
+        fuseSoundCont.dispose()
     }
 }
 

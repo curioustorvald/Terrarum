@@ -453,9 +453,9 @@ class AudioMixer : Disposable {
     }
 
     fun startAmb(song: MusicContainer) {
-        val ambientTrack = if (!ambientTrack1.streamPlaying)
+        val ambientTrack = if (!ambientTrack1.streamPlaying.get())
             ambientTrack1
-        else if (!ambientTrack2.streamPlaying)
+        else if (!ambientTrack2.streamPlaying.get())
             ambientTrack2
         else if (ambientTrack1.playStartedTime < ambientTrack2.playStartedTime)
             ambientTrack1

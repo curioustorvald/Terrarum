@@ -181,8 +181,15 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
 
 
             // fetch deviceBufferSize amount of sample from the disk
-            if (track.trackType != TrackType.MASTER && track.trackType != TrackType.BUS && track.streamPlaying) {
-                if (streamBuf == null && track.currentTrack != null) allocateStreamBuf(track)
+            if (track.playRequested.get()) {
+                track.play()
+            }
+
+            if (track.trackType != TrackType.MASTER && track.trackType != TrackType.BUS && track.streamPlaying.get()) {
+                if (streamBuf == null && track.currentTrack != null) {
+                    allocateStreamBuf(track)
+                }
+
                 streamBuf!!.fetchBytes()
             }
 
@@ -208,7 +215,7 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
             }
             // source channel: skip processing if there's no active input
 //            else if (track.getSidechains().any { it != null && !it.isBus && !it.isMaster && !it.streamPlaying } && !track.streamPlaying) {
-            else if (!track.streamPlaying || streamBuf == null || streamBuf!!.validSamplesInBuf < App.audioBufferSize) {
+            else if (!track.streamPlaying.get() || streamBuf == null || streamBuf!!.validSamplesInBuf < App.audioBufferSize) {
                 samplesL1 = emptyBuf
                 samplesR1 = emptyBuf
 

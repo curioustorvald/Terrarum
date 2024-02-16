@@ -5,11 +5,14 @@ import com.badlogic.gdx.backends.lwjgl3.audio.OpenALLwjgl3Audio
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.audio.dsp.TerrarumAudioFilter
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.getHashStr
 import net.torvald.terrarum.hashStrMap
+import net.torvald.terrarum.printStackTrace
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.log10
 import kotlin.math.pow
 
@@ -60,7 +63,7 @@ class TerrarumAudioMixerTrack(
 
     var trackingTarget: Actor? = null
 
-    internal var streamPlaying = false
+    internal val streamPlaying = AtomicBoolean(false)
     var playStartedTime = 0L; internal set
 
 
@@ -70,7 +73,7 @@ class TerrarumAudioMixerTrack(
         other.nextTrack = this.nextTrack
         other.volume = this.volume
         other.trackingTarget = this.trackingTarget
-        other.streamPlaying = this.streamPlaying
+        other.streamPlaying.set(this.streamPlaying.get())
         other.playStartedTime = this.playStartedTime
         filters.indices.forEach { i ->
             other.filters[i].copyParamsFrom(this.filters[i])
@@ -133,15 +136,18 @@ class TerrarumAudioMixerTrack(
         nextTrack = nextNext
     }
 
+    val playRequested = AtomicBoolean(false)
+
 
     fun play() {
         playStartedTime = System.nanoTime()
-        streamPlaying = true
+        streamPlaying.set(true)
+        playRequested.set(false)
 //        currentTrack?.gdxMusic?.play()
     }
 
     val isPlaying: Boolean
-        get() = streamPlaying//currentTrack?.gdxMusic?.isPlaying
+        get() = streamPlaying.get()//currentTrack?.gdxMusic?.isPlaying
 
     override fun dispose() {
         /*if (isMaster) { // uncomment to multithread
@@ -158,7 +164,7 @@ class TerrarumAudioMixerTrack(
     fun stop() {
         currentTrack?.reset()
 
-        streamPlaying = false
+        streamPlaying.set(false)
 //        playStartedTime = 0L
 
         if (trackingTarget != null && currentTrack != null) {

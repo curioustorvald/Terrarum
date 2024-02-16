@@ -41,13 +41,13 @@ data class MusicContainer(
             is Wav.Music -> {
                 val rate = gdxMusic.extortField<Wav.WavInputStream>("input")!!.sampleRate
 
-                App.printdbg(this, "music $name is WAV; rate = $rate")
+//                App.printdbg(this, "music $name is WAV; rate = $rate")
                 rate
             }
             is Ogg.Music -> {
                 val rate = gdxMusic.extortField<OggInputStream>("input")!!.sampleRate
 
-                App.printdbg(this, "music $name is OGG; rate = $rate")
+//                App.printdbg(this, "music $name is OGG; rate = $rate")
                 rate
             }
             is Mp3.Music -> {
@@ -62,11 +62,11 @@ data class MusicContainer(
 //                val rate = header.sampleRate
 //                gdxMusic.reset()
 
-                App.printdbg(this, "music $name is MP3; rate = $rate")
+//                App.printdbg(this, "music $name is MP3; rate = $rate")
                 rate
             }
             else -> {
-                App.printdbg(this, "music $name is ${gdxMusic::class.qualifiedName}; rate = default")
+//                App.printdbg(this, "music $name is ${gdxMusic::class.qualifiedName}; rate = default")
                 TerrarumAudioMixerTrack.SAMPLING_RATE
             }
         }
