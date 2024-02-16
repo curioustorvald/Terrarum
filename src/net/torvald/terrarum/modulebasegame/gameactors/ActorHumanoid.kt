@@ -482,6 +482,8 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
      * @author minjaesong
      */
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
+        // Heading flag
+        walkHeading = if (left) LEFT else RIGHT
 
 
         if (avAcceleration.isNaN()) {
@@ -489,30 +491,33 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         }
 
 
-        if (left && walledLeft || !left && walledRight) return
+        if (left && walledLeft || !left && walledRight) {
+            walkHStop()
 
+            controllerV?.x = 0.0
+        }
+        else {
+            isWalkingH = true
 
-        readonly_totalX =
+            readonly_totalX =
                 if (absAxisVal == AXIS_KEYBOARD)
                     avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f)
                 else
                     avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f) * absAxisVal
 
-        if (absAxisVal != AXIS_KEYBOARD)
-            controllerV?.x?.let { controllerV!!.x = controllerV!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal) }
-        else
-            controllerV?.x?.let { controllerV!!.x = controllerV!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
+            if (absAxisVal != AXIS_KEYBOARD)
+                controllerV?.x?.let {
+                    controllerV!!.x = controllerV!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal)
+                }
+            else
+                controllerV?.x?.let { controllerV!!.x = controllerV!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
 
-        if (walkCounterX <= WALK_FRAMES_TO_MAX_ACCEL) {
-          walkCounterX += 1
+
+            if (walkCounterX <= WALK_FRAMES_TO_MAX_ACCEL) {
+                walkCounterX += 1
+            }
         }
 
-        isWalkingH = true
-
-
-
-        // Heading flag
-        walkHeading = if (left) LEFT else RIGHT
     }
 
     /**

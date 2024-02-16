@@ -11,6 +11,11 @@ import java.net.URL
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 /**
  * Created by minjaesong on 2023-10-03.
@@ -35,14 +40,18 @@ object CheckUpdate {
 
         var ret: String? = null
         var fail: Throwable? = null
-        try {
-            // check the http connection before we do anything to the fs
-            val client = HttpClient.newBuilder().build()
-            val request = HttpRequest.newBuilder().uri(URI.create(url)).build()
-            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-            ret = if (response.statusCode() >= 400) null else response.body()
 
-            printdbg(this, "HTTP ${response.statusCode()}")
+        try {
+            val callable = Callable {
+                // check the http connection before we do anything to the fs
+                val client = HttpClient.newBuilder().build()
+                val request = HttpRequest.newBuilder().uri(URI.create(url)).build()
+                val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+                ret = if (response.statusCode() >= 400) null else response.body()
+                printdbg(this, "HTTP ${response.statusCode()}")
+            }
+            val exec = Executors.newSingleThreadExecutor()
+            exec.submit(callable).get(5L, TimeUnit.SECONDS)
         }
         catch (e: Throwable) {
             fail = e

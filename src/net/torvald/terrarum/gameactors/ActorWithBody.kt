@@ -1207,6 +1207,8 @@ open class ActorWithBody : Actor {
         IMPORTANT AF NOTE: things are ASYMMETRIC!
          */
 
+        val canUseStairs = option and COLLIDING_LR != 0 && (externalV + (controllerV ?: Vector2())).y.absoluteValue < 1.0
+
         if (option.popcnt() == 1) {
             val (x1, x2, y1, y2) = hitbox.getWallDetection(option)
 
@@ -1215,7 +1217,12 @@ open class ActorWithBody : Actor {
             val tyStart = y1/*.plus(HALF_PIXEL)*/.floorToInt()
             val tyEnd =   y2/*.plus(HALF_PIXEL)*/.floorToInt()
 
-            return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM).first == 2
+            return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM).first.let { status ->
+                if (canUseStairs)
+                    status == 2
+                else
+                    status > 0
+            }
         }
         else if (option == COLLIDING_ALLSIDE) {
             return isWalled(hitbox, COLLIDING_LEFT) || isWalled(hitbox, COLLIDING_RIGHT) ||
