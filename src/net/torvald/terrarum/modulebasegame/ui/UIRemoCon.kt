@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -13,6 +12,7 @@ import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TitleScreen
+import net.torvald.terrarum.serialise.TryResize
 import net.torvald.terrarum.serialise.WriteConfig
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -81,7 +81,10 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
 
     private fun generateNewRemoCon(node: QNDTreeNode<String>): UIRemoConElement {
         val labels = Array(node.children.size) { node.children[it].data?.split(yamlSep)?.get(0)?.split(tagSep)?.get(0) ?: "(null)" }
-        val tags = Array(node.children.size) { arrayOf(node.children[it].data?.split(yamlSep)?.get(0)?.split(tagSep)?.getOrNull(1) ?: "") }
+        val tags = Array(node.children.size) { node.children[it].data?.split(yamlSep)?.get(0)?.split(tagSep).let {
+            if (it.isNullOrEmpty() || it.size < 2) emptyArray<String>()
+            else it.subList(1, it.size).toTypedArray()
+        } }
         currentRemoConLabelCount = labels.size
         return UIRemoConElement(this, labels, tags)
     }
@@ -112,7 +115,9 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
                             }
                             else if (it.textfun() == Lang["MENU_LABEL_RETURN"]) {
                                 val tag = it.tags
+                                if (tag.contains("RESIZEIFNEEDED")) TryResize.pre()
                                 if (tag.contains("WRITETOCONFIG")) WriteConfig()
+                                if (tag.contains("RESIZEIFNEEDED")) TryResize()
 
                                 if (IS_DEVELOPMENT_BUILD) print("[UIRemoCon] Returning from ${currentRemoConContents.data}")
 

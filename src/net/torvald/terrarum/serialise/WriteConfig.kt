@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
 import net.torvald.terrarum.App
 import net.torvald.terrarum.KVHashMap
+import net.torvald.terrarum.Principii
 import net.torvald.terrarum.utils.JsonFetcher
 
 /**
@@ -64,6 +65,43 @@ object WriteConfig {
         //writer.write(getJson())
         writer.write(jsoner.prettyPrint(App.gameConfig))
         writer.close()
+    }
+
+}
+
+/**
+ * Created by minjaesong on 2024-02-17.
+ */
+object TryResize {
+    private val gameConfig = KVHashMap()
+
+    private var doResize = false
+
+    fun pre() {
+        // read from disk and build config from it
+        val oldJsonMap = JsonFetcher.invoke(App.configDir)
+        // make config
+        var entry: JsonValue? = oldJsonMap.child
+        while (entry != null) {
+            setToGameConfigForced(entry, null)
+            entry = entry.next
+        }
+
+
+        // check for discrepancy
+        listOf("screenwidth", "screenheight").forEach {
+            if (gameConfig.getAsInt(it) != App.getConfigInt(it))
+                doResize = doResize or true
+        }
+    }
+
+    private fun setToGameConfigForced(value: JsonValue, modName: String?) {
+        gameConfig[if ((modName == null)) value.name else modName + ":" + value.name] =
+            if (value.isArray) value.asDoubleArray() else if (value.isDouble) value.asDouble() else if (value.isBoolean) value.asBoolean() else if (value.isLong) value.asInt() else value.asString()
+    }
+
+    operator fun invoke() {
+        // it just wouldn't work, the only way to make it work will be calling game restart from the launcher
     }
 
 }

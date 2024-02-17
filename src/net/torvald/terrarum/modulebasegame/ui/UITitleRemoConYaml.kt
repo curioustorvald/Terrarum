@@ -22,7 +22,7 @@ object UITitleRemoConYaml {
  - MENU_LABEL_LANGUAGE : net.torvald.terrarum.modulebasegame.ui.UITitleLanguage
  - CREDITS_GAME : net.torvald.terrarum.ModOptionsHost
  - GAME_GENRE_MISC : net.torvald.terrarum.modulebasegame.ui.UIPerformanceControlPanel
- - MENU_LABEL_RETURN+WRITETOCONFIG
+ - MENU_LABEL_RETURN+WRITETOCONFIG+RESIZEIFNEEDED
 - MENU_MODULES : net.torvald.terrarum.modulebasegame.ui.UITitleModules
  - MENU_LABEL_RETURN
 - MENU_LABEL_CREDITS
