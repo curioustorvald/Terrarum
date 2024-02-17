@@ -1,25 +1,17 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRangeTools
-import net.torvald.terrarum.gameparticles.createRandomBlockParticle
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.itemproperties.Item
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.AxeCore.BASE_MASS_AND_SIZE
 import net.torvald.terrarum.modulebasegame.gameitems.AxeCore.TOOL_DURABILITY_BASE
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
-import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
 
 /**
@@ -77,6 +69,10 @@ object AxeCore {
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
+                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toInt()) {
+                    PickaxeCore.makeNoiseTileTouching(actor, tile)
+                }
+
                 INGAME.world.inflictTerrainDamage(
                     x, y,
                     Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg,
@@ -99,6 +95,10 @@ object AxeCore {
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
+                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toInt()) {
+                    PickaxeCore.makeNoiseTileTouching(actor, tile)
+                }
+
                 INGAME.world.inflictTerrainDamage(
                     x, y,
                     Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg,
@@ -110,7 +110,7 @@ object AxeCore {
                         PickaxeCore.dropItem(drop, x, y)
 
                         PickaxeCore.makeDust(tile, x, y, 9)
-                        PickaxeCore.makeNoise(actor, tile)
+                        PickaxeCore.makeNoiseTileBurst(actor, tile)
                     }
                     // tile not busted
                     if (Math.random() < actionInterval) {
@@ -124,6 +124,10 @@ object AxeCore {
             else if (tileprop.hasAllTag(listOf("TREE", "TREETRUNK") + additionalCheckTags)) {
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
+
+                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toInt()) {
+                    PickaxeCore.makeNoiseTileTouching(actor, tile)
+                }
 
                 INGAME.world.inflictTerrainDamage(
                     x, y,
@@ -207,7 +211,7 @@ object AxeCore {
                         // drop the item under cursor
                         PickaxeCore.dropItem(BlockCodex[tileBroken].drop, x, y) // todo use log item if applicable
                         PickaxeCore.makeDust(tile, x, y, 9)
-                        PickaxeCore.makeNoise(actor, tile)
+                        PickaxeCore.makeNoiseTileBurst(actor, tile)
                     }
                     // tile not busted
                     if (Math.random() < actionInterval) {

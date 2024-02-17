@@ -9,7 +9,6 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
-import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
@@ -371,8 +370,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         }
 
         when (soundSource) {
-            1 -> PickaxeCore.makeNoise(this, wallTile)
-            0 -> PickaxeCore.makeNoise(this, terrTile)
+            1 -> PickaxeCore.makeNoiseTileBurst(this, wallTile)
+            0 -> PickaxeCore.makeNoiseTileBurst(this, terrTile)
         }
 
         // make some dust

@@ -168,8 +168,8 @@ open class FixtureSwingingDoorBase : FixtureBase {
         }
 
         when (soundSource) {
-            1 -> PickaxeCore.makeNoise(this, wallTile)
-            0 -> PickaxeCore.makeNoise(this, terrTile)
+            1 -> PickaxeCore.makeNoiseTileBurst(this, wallTile)
+            0 -> PickaxeCore.makeNoiseTileBurst(this, terrTile)
         }
 
         // make some dust

@@ -24,6 +24,7 @@ class AudioCodex {
     }
 
     fun getRandomFootstep(materialID: String) = getRandomAudio("effects.steps.$materialID")
+    fun getRandomMining(materialID: String) = getRandomAudio("effects.mining.$materialID")
 
     /**
      * @param identifier

@@ -2,23 +2,16 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRangeTools
-import net.torvald.terrarum.gameparticles.createRandomBlockParticle
 import net.torvald.terrarum.itemproperties.Calculate
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.SledgehammerCore.BASE_MASS_AND_SIZE
 import net.torvald.terrarum.modulebasegame.gameitems.SledgehammerCore.TOOL_DURABILITY_BASE
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
-import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
 
 /**
@@ -51,13 +44,10 @@ object SledgehammerCore {
 
         var usageStatus = false
 
-
-
         for (oy in 0 until mh) for (ox in 0 until mw) {
             val x = mx + xoff + ox
             val y = my + yoff + oy
 
-            val mousePoint = Point2d(x.toDouble(), y.toDouble())
             val actorvalue = actor.actorValue
             val wall = INGAME.world.getTileFromWall(x, y)
             val tileTerrain = INGAME.world.getTileFromTerrain(x, y)
@@ -92,6 +82,10 @@ object SledgehammerCore {
             val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
             val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
+            if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toInt()) {
+                PickaxeCore.makeNoiseTileTouching(actor, wall)
+            }
+
             INGAME.world.inflictWallDamage(
                 x, y,
                 Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg,
@@ -104,7 +98,7 @@ object SledgehammerCore {
                         PickaxeCore.dropItem("wall@$drop", x, y)
 
                         PickaxeCore.makeDust(wall, x, y, 9, WALL_OVERLAY_COLOUR)
-                        PickaxeCore.makeNoise(actor, wall)
+                        PickaxeCore.makeNoiseTileBurst(actor, wall)
                     }
                 }
                 // tile not busted

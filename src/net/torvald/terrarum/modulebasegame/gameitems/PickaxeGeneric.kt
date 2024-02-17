@@ -3,7 +3,6 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
@@ -91,6 +90,10 @@ object PickaxeCore {
             val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
             val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
+            if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toInt()) {
+                makeNoiseTileTouching(actor, tile)
+            }
+
             INGAME.world.inflictTerrainDamage(
                     x, y,
                     Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg,
@@ -125,9 +128,9 @@ object PickaxeCore {
                 // make dust
                 if (tileBroken != null || oreBroken != null) {
                     makeDust(tile, x, y, 9)
-                    makeNoise(actor, tile)
+                    makeNoiseTileBurst(actor, tile)
                 }
-                else {
+                else if (Math.random() < actionInterval) {
                     makeDust(tile, x, y, 1)
                 }
             }
@@ -196,7 +199,13 @@ object PickaxeCore {
         }
     }
 
-    fun makeNoise(actor: ActorWithBody, tile: ItemID) {
+    fun makeNoiseTileTouching(actor: ActorWithBody, tile: ItemID) {
+        Terrarum.audioCodex.getRandomMining(BlockCodex[tile].material)?.let {
+            actor.startAudio(it, 1.0)
+        }
+    }
+
+    fun makeNoiseTileBurst(actor: ActorWithBody, tile: ItemID) {
         Terrarum.audioCodex.getRandomFootstep(BlockCodex[tile].material)?.let {
             actor.startAudio(it, 2.0)
         }
