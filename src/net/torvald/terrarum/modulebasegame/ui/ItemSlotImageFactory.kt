@@ -17,6 +17,9 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 object ItemSlotImageFactory {
 
+    val TILE_WIDTH = 38
+    val TILE_HEIGHT = 42
+
     val CELLCOLOUR_BLACK_OPAQUE = Color(0x404040_FF)
     val CELLCOLOUR_WHITE_OPAQUE = Color(0xC0C0C0_FF.toInt())
 
@@ -27,7 +30,7 @@ object ItemSlotImageFactory {
     /** Blend mode: screen */
     val CELLCOLOUR_BLACK_ACTIVE = Color(0x282828ff)
 
-    val slotImage = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slots_atlas2.tga"), 38, 42) // must have same w/h as slotLarge
+    val slotImage = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slots_atlas2.tga"), TILE_WIDTH, TILE_HEIGHT) // must have same w/h as slotLarge
 
     fun produce(isBlack: Boolean, number: Int = 10, item: GameItem?): ItemSlotImage {
         return ItemSlotImage(slotImage.get(number, 0 or isBlack.toInt().shl(1)), ItemCodex.getItemImage(item))

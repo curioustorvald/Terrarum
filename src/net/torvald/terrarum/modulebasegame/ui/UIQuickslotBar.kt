@@ -51,7 +51,20 @@ class UIQuickslotBar : UICanvas() {
 
 
     override fun updateImpl(delta: Float) {
-        val newSelection = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
+        var newSelection = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
+
+        // make clicking work
+        if (mouseUp && mousePushed) {
+            for (i in 0 until SLOT_COUNT) {
+                val slotX = cellSize / 2 + (cellSize + gutter) * i - ItemSlotImageFactory.TILE_WIDTH/2
+                val slotY = cellSize / 2 - ItemSlotImageFactory.TILE_WIDTH/2
+
+                if (relativeMouseX in slotX until slotX + cellSize && relativeMouseY in slotY until slotY + cellSize) {
+                    newSelection = i
+                    (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, i)
+                }
+            }
+        }
 
         if (selection != newSelection) {
             nameShowupFired = true
