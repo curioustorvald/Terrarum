@@ -4,7 +4,7 @@ data class PhysProperties(
     val immobileBody: Boolean = false,
     var usePhysics: Boolean = true,
     val useStairs: Boolean = false,
-    val ignorePlatform: Boolean = true
+    var ignorePlatform: Boolean = true
 ) {
     companion object {
         fun HUMANOID_DEFAULT() = PhysProperties(

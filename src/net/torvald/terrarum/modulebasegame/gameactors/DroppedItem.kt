@@ -88,6 +88,8 @@ open class DroppedItem : ActorWithBody {
         actorValue.set(AVKey.FALLDAMPENMULT, 0.1)
 
         printdbg(this, "DroppedItem with itemID '${itemID}'")
+
+        physProp.ignorePlatform = false
     }
 
 
