@@ -73,7 +73,7 @@ class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
         val modOptions: ControlPanelOptions = mod.configPlan.map {
             val options = it.split("->")
             val labelfun = if (options[1].startsWith("Lang:")) {
-                { Lang[options[1].substringAfter(":")] }
+                { Lang[options[1].substringAfter(":"), true] }
             }
             else {
                 { options[1] }

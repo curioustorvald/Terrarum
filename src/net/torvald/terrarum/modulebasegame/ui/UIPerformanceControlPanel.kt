@@ -16,18 +16,18 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         handler.allowESCtoClose = false
 
         ControlPanelCommon.register(this, width, "basegame.performancecontrolpanel", arrayOf(
-            arrayOf("", { Lang["MENU_OPTIONS_GAMEPLAY"] }, "h1"),
-                arrayOf("autosaveinterval", { Lang["MENU_OPTIONS_AUTOSAVE"] + " (${Lang["CONTEXT_TIME_MINUTE_PLURAL"]})" }, "spinnerimul,5,120,5,60000"),
-                arrayOf("notificationshowuptime", { Lang["MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION"] + " (${Lang["CONTEXT_TIME_SECOND_PLURAL"]})" }, "spinnerimul,2,10,1,1000"),
-                arrayOf("savegamecomp", { Lang["MENU_OPTIONS_SAVEFORMAT"] }, "textsel,zstd=MENU_OPTIONS_SAVEFORMAT_SMALL,snappy=MENU_OPTIONS_SAVEFORMAT_FAST"),
-            arrayOf("", { Lang["MENU_MODULES"] }, "h1"),
-                arrayOf("enablescriptmods", { Lang["MENU_OPTIONS_ENABLE_SCRIPT_MODS"] }, "toggle"),
+            arrayOf("", { Lang["MENU_OPTIONS_GAMEPLAY", true] }, "h1"),
+                arrayOf("autosaveinterval", { Lang["MENU_OPTIONS_AUTOSAVE", true] + " (${Lang["CONTEXT_TIME_MINUTE_PLURAL"].lowercase()})" }, "spinnerimul,5,120,5,60000"),
+                arrayOf("notificationshowuptime", { Lang["MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION"] + " (${Lang["CONTEXT_TIME_SECOND_PLURAL"].lowercase()})" }, "spinnerimul,2,10,1,1000"),
+                arrayOf("savegamecomp", { Lang["MENU_OPTIONS_SAVEFORMAT", true] }, "textsel,zstd=MENU_OPTIONS_SAVEFORMAT_SMALL,snappy=MENU_OPTIONS_SAVEFORMAT_FAST"),
+            arrayOf("", { Lang["MENU_MODULES", true] }, "h1"),
                 arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
+                arrayOf("enablescriptmods", { Lang["MENU_OPTIONS_ENABLE_SCRIPT_MODS", true] }, "toggle"),
                 arrayOf("", { "${Lang["MENU_LABEL_WARN_ACE"]}" }, "emph"),
-            arrayOf("", { Lang["MENU_LABEL_JVM_DNT"] }, "h1"),
-                arrayOf("jvm_xmx", { Lang["MENU_OPTIONS_JVM_HEAP_MAX"] + " (GB)" }, "spinner,2,32,1"),
-                arrayOf("jvm_extra_cmd", { Lang["MENU_LABEL_EXTRA_JVM_ARGUMENTS"] }, "typein"),
+            arrayOf("", { Lang["MENU_LABEL_JVM_DNT", true] }, "h1"),
                 arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
+                arrayOf("jvm_xmx", { Lang["MENU_OPTIONS_JVM_HEAP_MAX", true] + " (GB)" }, "spinner,2,32,1"),
+                arrayOf("jvm_extra_cmd", { Lang["MENU_LABEL_EXTRA_JVM_ARGUMENTS", true] }, "typein"),
             )
         )
     }

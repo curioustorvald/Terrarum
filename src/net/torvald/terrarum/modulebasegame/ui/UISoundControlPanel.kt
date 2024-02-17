@@ -20,20 +20,20 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         handler.allowESCtoClose = false
 
         ControlPanelCommon.register(this, width, "basegame.soundcontrolpanel", arrayOf(
-            arrayOf("", { Lang["MENU_OPTIONS_SOUND_VOLUME"] }, "h1"),
-                arrayOf("mastervolume", { Lang["MENU_OPTIONS_MASTER_VOLUME"] }, "sliderd,0,1"),
+            arrayOf("", { Lang["MENU_OPTIONS_SOUND_VOLUME", true] }, "h1"),
+                arrayOf("mastervolume", { Lang["MENU_OPTIONS_MASTER_VOLUME", true] }, "sliderd,0,1"),
                 arrayOf("", { "" }, "pp"),
-                arrayOf("bgmvolume", { Lang["MENU_LABEL_MUSIC"] }, "sliderd,0,1"),
+                arrayOf("bgmvolume", { Lang["MENU_LABEL_MUSIC", true] }, "sliderd,0,1"),
                 arrayOf("", { "" }, "pp"),
-                arrayOf("ambientvolume", { Lang["MENU_LABEL_AMBIENT_SOUNDS"] }, "sliderd,0,1"),
+                arrayOf("ambientvolume", { Lang["MENU_LABEL_AMBIENT_SOUNDS", true] }, "sliderd,0,1"),
                 arrayOf("", { "" }, "pp"),
-                arrayOf("sfxvolume", { Lang["CREDITS_SFX"] }, "sliderd,0,1"),
+                arrayOf("sfxvolume", { Lang["CREDITS_SFX", true] }, "sliderd,0,1"),
                 arrayOf("", { "" }, "pp"),
-                arrayOf("guivolume", { Lang["MENU_LABEL_INTERFACE"] }, "sliderd,0,1"),
+                arrayOf("guivolume", { Lang["MENU_LABEL_INTERFACE", true] }, "sliderd,0,1"),
                 arrayOf("", { "" }, "pp"),
-            arrayOf("", { Lang["MENU_LABEL_AUDIO_ENGINE"] }, "h1"),
-                arrayOf("audio_speaker_setup", { Lang["MENU_OPTIONS_SPEAKER_SETUP"] }, "textsel,headphone=MENU_OPTIONS_SPEAKER_HEADPHONE,stereo=MENU_OPTIONS_SPEAKER_STEREO"),
-                arrayOf("audio_buffer_size", { Lang["MENU_OPTIONS_AUDIO_BUFFER_SIZE"] }, "spinnersel,128,256,512,1024,2048"),
+            arrayOf("", { Lang["MENU_LABEL_AUDIO_ENGINE", true] }, "h1"),
+                arrayOf("audio_speaker_setup", { Lang["MENU_OPTIONS_SPEAKER_SETUP", true] }, "textsel,headphone=MENU_OPTIONS_SPEAKER_HEADPHONE,stereo=MENU_OPTIONS_SPEAKER_STEREO"),
+                arrayOf("audio_buffer_size", { Lang["MENU_OPTIONS_AUDIO_BUFFER_SIZE", true] }, "spinnersel,128,256,512,1024,2048"),
                 arrayOf("", { "${Lang["MENU_LABEL_AUDIO_BUFFER_INSTRUCTION"]}" }, "p"),
 
         ))

@@ -217,7 +217,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         // title
         // todo show "Keyboard"/"Gamepad" accordingly
         batch.color = Color.WHITE
-        val title = Lang["MENU_CONTROLS_KEYBOARD"]
+        val title = Lang["MENU_CONTROLS_KEYBOARD", true]
         App.fontUITitle.draw(batch, title, drawX.toFloat() + (width - App.fontUITitle.getWidth(title)) / 2, drawY.toFloat())
 
 
@@ -473,18 +473,18 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
 
         // texts. Sorted in the same way as UIItemControlPaletteBaloon.iconButtons
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], col0 + 72, posY + 41)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], col1 + 40, posY + 41)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB", true], col0 + 72, posY + 41)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP", true], col1 + 40, posY + 41)
 
-        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], col0 + 40, row1 - 2)
-        App.fontGame.draw(batch, Lang["GAME_CRAFTING"], col0 + 40, row2 - 2)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_GRAPPLE"], col0 + 40, row3 - 2)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_QUICKSEL"], col0 + 40, row4 - 2)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY", true], col0 + 40, row1 - 2)
+        App.fontGame.draw(batch, Lang["GAME_CRAFTING", true], col0 + 40, row2 - 2)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_GRAPPLE", true], col0 + 40, row3 - 2)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_QUICKSEL", true], col0 + 40, row4 - 2)
 
-        App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], col1 + 40, row1 - 2)
-        App.fontGame.draw(batch, Lang["MENU_LABEL_IME_TOGGLE"], col1 + 40, row2 - 2)
-        App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], col1 + 40, row3 - 2)
-        App.fontGame.draw(batch, Lang["GAME_INVENTORY_DROP"], col1 + 40, row4 - 2)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM", true], col1 + 40, row1 - 2)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_IME_TOGGLE", true], col1 + 40, row2 - 2)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_MENU", true], col1 + 40, row3 - 2)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY_DROP", true], col1 + 40, row4 - 2)
     }
 
 

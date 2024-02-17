@@ -134,7 +134,7 @@ object Lang {
      * - `BLOCK_AIR` – Prints out `Lang.get("BLOCK_AIR")`
      * - `BLOCK_AIR>>=BLOCK_WALL_NAME_TEMPLATE` – Prints out `Formatter().format(Lang.get("BLOCK_WALL_NAME_TEMPLATE"), Lang.get("BLOCK_AIR")).toString()`
      */
-    operator fun get(key: String, capitalise: Boolean = true): String {
+    operator fun get(key: String, capitalise: Boolean = false): String {
         fun getstr(s: String) = getByLocale(s, App.GAME_LOCALE, capitalise) ?: getByLocale(s, FALLBACK_LANG_CODE, capitalise) ?: "$$s"
 
 
@@ -164,19 +164,45 @@ object Lang {
     }
 
     /**
-     * Does NOT parse the operators
+     * @param localecode int the form of "en", "de" or "daDK" or something
      */
-    fun getByLocale(key: String, locale: String, capitalise: Boolean): String? {
+    private fun getJavaLocaleFromTerrarumLocaleCode(localecode: String): Locale {
+        val localecode = localecode.substring(0 until minOf(4, localecode.length))
+        val lang = localecode.substring(0..1)
+        val country = if (localecode.length == 4) localecode.substring(2..3) else null
+        return if (country == null) Locale(lang) else Locale(lang, country)
+    }
+
+    private val capCache = HashMap<String/*Locale*/, HashMap<String/*Key*/, String/*Text*/>>()
+
+    private fun CAP(key: String, locale: String): String? {
         val ret = langpack["${key}_$locale"] ?: return null
 
-        fun String.CAP() = if (capitalise) this.capitalize() else this
+        if (!capCache.containsKey(locale))
+            capCache[locale] = HashMap<String, String>()
+
+        if (!capCache[locale]!!.containsKey(key)) {
+            capCache[locale]!![key] = TitlecaseConverter(ret, locale)
+        }
+
+        return capCache[locale]!![key]!!
+    }
+
+    private fun NOCAP(key: String, locale: String): String? {
+        return langpack["${key}_$locale"] ?: return null
+    }
+    /**
+     * Does NOT parse the operators
+     */
+    fun getByLocale(key: String, locale: String, capitalise: Boolean = false): String? {
+        val s = if (capitalise) CAP(key, locale) else NOCAP(key, locale)
 
         return if (locale.startsWith("bg"))
-            "${App.fontGame.charsetOverrideBulgarian}${ret.CAP()}${App.fontGame.charsetOverrideDefault}"
+            "${App.fontGame.charsetOverrideBulgarian}$s${App.fontGame.charsetOverrideDefault}"
         else if (locale.startsWith("sr"))
-            "${App.fontGame.charsetOverrideSerbian}${ret.CAP()}${App.fontGame.charsetOverrideDefault}"
+            "${App.fontGame.charsetOverrideSerbian}$s${App.fontGame.charsetOverrideDefault}"
         else
-            ret.CAP()
+            s
     }
 
     private fun String.getEndTag() = this.split("_").last()

@@ -1,6 +1,7 @@
 {
   "APP_WARNING_HEALTH_AND_SAFETY": "WARNING-HEALTH AND SAFETY",
   "CONTEXT_CHARACTER": "Character",
+  "CONTEXT_ESTIMATED_MINUTES": "Estimated: about {0} minute",
   "CONTEXT_ESTIMATED_MINUTES_PLURAL": "Estimated: about {0} minutes",
   "CONTEXT_TIME_MINUTE_PLURAL": "Minutes",
   "CONTEXT_TIME_SECOND_PLURAL": "Seconds",
@@ -42,7 +43,7 @@
   "MENU_OPTIONS_LIGHT_UPDATE_PASSES": "Light Calculation Depth",
   "MENU_OPTIONS_MASTER_VOLUME": "Master Volume",
   "MENU_OPTIONS_NONE" : "None",
-  "MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION": "Show notification for",
+  "MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION": "Show Notification for",
   "MENU_OPTIONS_PARTICLES": "Particles",
   "MENU_OPTIONS_PERFORMANCE": "Performance",
   "MENU_OPTIONS_SAVEFORMAT": "Savegame Format",

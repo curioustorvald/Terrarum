@@ -176,15 +176,15 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
 
-        val txt1 = Lang["MENU_LABEL_KEYBOARD_LAYOUT"]; val tw1 = App.fontGame.getWidth(txt1)
+        val txt1 = Lang["MENU_LABEL_KEYBOARD_LAYOUT", true]; val tw1 = App.fontGame.getWidth(txt1)
         App.fontGame.draw(batch, txt1, selDrawX + (halfselw - tw1) / 2, keyboardLayoutSelection.posY - 40)
 
-        val txt2 = Lang["MENU_LABEL_IME"]; val tw2 = App.fontGame.getWidth(txt2)
+        val txt2 = Lang["MENU_LABEL_IME", true]; val tw2 = App.fontGame.getWidth(txt2)
         App.fontGame.draw(batch, txt2, selDrawX + halfselw + (halfselw - tw2) / 2, keyboardLayoutSelection.posY - 40)
 
         // title
         // todo show "Keyboard"/"Gamepad" accordingly
-        val title = Lang["MENU_CONTROLS_KEYBOARD"]
+        val title = Lang["MENU_CONTROLS_KEYBOARD", true]
         batch.color = Color.WHITE
         App.fontUITitle.draw(batch, title, drawX.toFloat() + (width - App.fontUITitle.getWidth(title)) / 2, drawY.toFloat())
 

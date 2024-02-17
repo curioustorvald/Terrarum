@@ -296,7 +296,10 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             val (wx, wy) = TerrarumIngame.NEW_WORLD_SIZE[sizeSelector.selection]
             val etaSec = Worldgen.getEstimationSec(wx, wy)
             val etaMin = etaSec.div(60f).roundToInt().coerceAtLeast(1)
-            val etaText = Lang.getAndUseTemplate("CONTEXT_ESTIMATED_MINUTES_PLURAL", true, etaMin)
+            val etaText = if (etaMin == 1)
+                Lang.getAndUseTemplate("CONTEXT_ESTIMATED_MINUTES", true, etaMin)
+            else
+                Lang.getAndUseTemplate("CONTEXT_ESTIMATED_MINUTES_PLURAL", true, etaMin)
             val etaTextPrint = etaText + (if (App.IS_DEVELOPMENT_BUILD) " ($etaSec s)" else "")
 
             Toolkit.drawTextCentered(batch, App.fontGame, etaTextPrint, width, drawX, drawY + sizeSelY + inputLineY3)

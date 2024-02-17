@@ -9,7 +9,7 @@
   "APP_NOMODULE_1": "No Module is currently loaded.",
   "APP_NOMODULE_2": "Please configure your Load Order and restart:",
   "MENU_LABEL_AUDIO_BUFFER_INSTRUCTION": "Set it to the minimum value in which you do not hear a stuttering.\nIf your audio is stuttering, increase the value until the stuttering is gone.\nLarger value will increase the processing stability but also the delay.",
-  "MENU_LABEL_KEYCONFIG_HELP1": "Click On the Keycap to Assign Actions",
+  "MENU_LABEL_KEYCONFIG_HELP1": "Click on the Keycap to Assign Actions",
 
   "MENU_LABEL_WARN_ACE": "Script mods may damage your game or result in other unexpected behaviour.\nOnly use the mods you know they can be trusted."
 }
