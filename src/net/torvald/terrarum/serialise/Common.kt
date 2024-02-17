@@ -687,7 +687,7 @@ object Common {
     }
 
     fun decodeToUUID(str: String): UUID {
-        val code = str.replace(" ", "").trim()
+        val code = str.uppercase().replace(" ", "").trim()
         val b = PasswordBase32.decode(code + (if (code.length == 25) "Y" else ""), 16)
 
         /*b.forEach {

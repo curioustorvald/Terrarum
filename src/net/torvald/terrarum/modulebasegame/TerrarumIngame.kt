@@ -1539,8 +1539,13 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     fun performBarehandAction(actor: ActorWithBody, delta: Float, mwx: Double, mwy: Double, mtx: Int, mty: Int) {
 
-        val canAttackOrDig = actor.scale * actor.baseHitboxH >= (actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0)
+        // for giant actors punching every structure pickaxe can dig out
+        val canAttackOrDig =
+            actor.scale * actor.baseHitboxH >= (actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0)
 
+        // for players punching dirts or weaker blocks
+        val canDigSoftTileOnly =
+            actor is ActorHumanoid && (actor.baseHitboxH * actor.scale) >= 32f
 
         fun getActorsAtVicinity(worldX: Double, worldY: Double, radius: Double): List<ActorWithBody> {
             val outList = java.util.ArrayList<ActorWithBody>()
@@ -1610,6 +1615,13 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 barehandPickInUse = true
                 PickaxeCore.startPrimaryUse(actor, delta, null, mtx, mty, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize)
             }
+        }
+        else if (canDigSoftTileOnly) {
+            barehandPickInUse = true
+            val tileUnderCursor = INGAME.world.getTileFromTerrain(mtx, mty)
+            val tileprop = BlockCodex[tileUnderCursor]
+            if (tileprop.strength <= 12)
+                PickaxeCore.startPrimaryUse(actor, delta, null, mtx, mty, 1.0, 1, 1)
         }
     }
 
