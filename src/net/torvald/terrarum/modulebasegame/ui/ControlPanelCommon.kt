@@ -119,6 +119,8 @@ object ControlPanelCommon {
             }
         }
         else if (args.startsWith("typeinres")) {
+            val oldwidth = App.scr.width
+            val oldheight = App.scr.height
             val keyWidth = optionNames[0]
             val keyHeight = optionNames[1]
             UIItemTextLineInput(parent, x, y, CONFIG_SPINNER_WIDTH,
@@ -178,8 +180,8 @@ object ControlPanelCommon {
                     }
                     else {
                         it.markAsInvalid()
-                        App.setConfig(keyWidth, TerrarumScreenSize.defaultW)
-                        App.setConfig(keyHeight, TerrarumScreenSize.defaultH)
+                        App.setConfig(keyWidth, oldwidth)
+                        App.setConfig(keyHeight, oldheight)
                     }
                 }
             }
