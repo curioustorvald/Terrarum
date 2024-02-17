@@ -1,7 +1,13 @@
 package net.torvald.terrarum.itemproperties
 
 import com.badlogic.gdx.utils.JsonValue
+import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.isBlock
+import net.torvald.terrarum.gameitems.isWall
+import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarum.utils.forEachSiblingsIndexed
 
@@ -10,6 +16,10 @@ import net.torvald.terrarum.utils.forEachSiblingsIndexed
  */
 class CraftingCodex {
 
+    /**
+     * Key: final product of the given recipes. Equal to the recipe.product
+     * Value: the recipes
+     */
     @Transient internal val props = HashMap<ItemID, ArrayList<CraftingRecipe>>() // the key ItemID and value.product must be equal
 
     fun addRecipe(recipe: CraftingRecipe) {
@@ -89,10 +99,23 @@ class CraftingCodex {
     }
 
     /**
+     * Returns list of items that uses the given `item`.
+     *
      * @return list of itemIDs and corresponding recipes
      */
-    fun getRecipesUsingTheseItems(items: List<ItemID>): List<CraftingRecipe> {
-        TODO()
+    fun getCraftableRecipesUsingTheseItems(item: ItemID): List<CraftingRecipe> {
+        return props.values.flatten().filter { recipe ->
+            recipe.ingredients.any { ingredient ->
+                when (ingredient.keyMode) {
+                    CraftingItemKeyMode.TAG -> if (item.isBlock() || item.isWall())
+                        Terrarum.blockCodex[item].hasTag(ingredient.key)
+                    else
+                        Terrarum.itemCodex[item]!!.hasTag(ingredient.key)
+
+                    CraftingItemKeyMode.VERBATIM -> (item == ingredient.key)
+                }
+            }
+        }
     }
 
     /**

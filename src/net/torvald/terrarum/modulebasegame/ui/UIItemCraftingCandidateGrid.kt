@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
+import net.torvald.terrarum.ui.UIItemCatBar.Companion.CAT_ALL
 
 /**
  * Created by minjaesong on 2022-06-28.
@@ -95,34 +96,42 @@ class UIItemCraftingCandidateGrid(
         highlightRecipe(highlightedRecipe)
     }
 
-    private var currentFilter1 = arrayOf("")
+    private var currentFilter0 = arrayOf(CAT_ALL)
+    private var currentFilter1 = CAT_ALL
+
+    fun rebuild() = rebuild(currentFilter0)
 
     override fun rebuild(filter: Array<String>) {
 //        printdbg(this, "Rebuilding crafting candidate with following filters: ${filter.joinToString()}")
-        currentFilter1 = filter
+        currentFilter1 = filter.first()
+        currentFilter0 = arrayOf(currentFilter1)
 
         // filtering policy: if the player have all the ingredient item (regardless of the amount!), make the recipe visible
         craftingRecipes.clear()
-        CraftingRecipeCodex.props.forEach { (_, recipes) ->
-            recipes.forEach {
+
+
+
+        if (currentFilter1 == CAT_ALL)
+            CraftingRecipeCodex.props.forEach { (_, recipes) ->
+                recipes.forEach {
+                    if (isCraftable((parentUI as UICrafting).getPlayerInventory(), it, (parentUI as UICrafting).nearbyCraftingStations)) {
+                        craftingRecipes.add(it)
+                    }
+                }
+            }
+        else
+            CraftingRecipeCodex.getCraftableRecipesUsingTheseItems(currentFilter1).forEach {
                 if (isCraftable((parentUI as UICrafting).getPlayerInventory(), it, (parentUI as UICrafting).nearbyCraftingStations)) {
                     craftingRecipes.add(it)
                 }
-                else {
-//                    printdbg(this, "  Skipping $recipes: insufficient ingredients")
-                }
             }
-        }
+
+
 
         recipesSortList.clear() // kinda like the output list
 
         craftingRecipes.forEach {
-            if (
-                filter.contains((ItemCodex[it.product]?.inventoryCategory ?: throw IllegalArgumentException("Unknown item: ${it.product}"))) ||
-                filter[0] == UIItemCatBar.CAT_ALL
-                ) {
-                recipesSortList.add(it)
-            }
+            recipesSortList.add(it)
         }
 
         // map sortList to item list
@@ -155,11 +164,11 @@ class UIItemCraftingCandidateGrid(
     }
 
     override fun rebuild(filterFun: (InventoryPair) -> Boolean) {
-        rebuild(currentFilter1)
+        rebuild(currentFilter0)
     }
 
     override fun rebuild(filterFun: (InventoryPair) -> Boolean, itemAppendix: ItemID) {
-        rebuild(currentFilter1)
+        rebuild(currentFilter0)
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {

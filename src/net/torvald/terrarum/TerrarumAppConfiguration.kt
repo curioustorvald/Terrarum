@@ -73,8 +73,8 @@ basegame
     // Commit counts up to the Release 0.3.3: 3020
 
 //    val VERSION_SNAPSHOT = Snapshot(0) // for normal dev
-    val VERSION_SNAPSHOT = ForcedSnapshot("24w07c") // for snapshot release
-//    val VERSION_SNAPSHOT = null // for the release
+//    val VERSION_SNAPSHOT = ForcedSnapshot("24w07d") // for snapshot release
+    val VERSION_SNAPSHOT = null // for the release
 
     const val VERSION_TAG: String = ""
 

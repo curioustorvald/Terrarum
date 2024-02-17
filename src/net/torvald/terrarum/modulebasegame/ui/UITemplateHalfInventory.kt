@@ -82,10 +82,6 @@ class UITemplateHalfInventory(
         itemList.rebuild(predicate, appendix)
     }
 
-    fun removeFromForceHighlightList(items: List<ItemID>) {
-        itemList.removeFromForceHighlightList(items)
-    }
-
     fun setGetInventoryFun(getter: () -> ActorInventory) {
         itemList.getInventory = getter
     }
