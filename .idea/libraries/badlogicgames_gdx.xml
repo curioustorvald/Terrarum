@@ -1,16 +1,16 @@
 <component name="libraryTable">
   <library name="badlogicgames.gdx" type="repository">
-    <properties maven-id="com.badlogicgames.gdx:gdx:1.12.0" />
+    <properties maven-id="com.badlogicgames.gdx:gdx:1.12.1" />
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/gdx-1.12.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/gdx-1.12.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/gdx-jnigen-loader-2.3.1.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$PROJECT_DIR$/lib/gdx-1.12.0-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/gdx-1.12.1-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/gdx-jnigen-loader-2.3.1-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar://$PROJECT_DIR$/lib/gdx-1.12.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/gdx-1.12.1-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/gdx-jnigen-loader-2.3.1-sources.jar!/" />
     </SOURCES>
   </library>
