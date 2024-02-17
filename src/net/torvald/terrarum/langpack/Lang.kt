@@ -123,7 +123,7 @@ object Lang {
 
     private val bindOp = ">>="
 
-    fun getOrNull(key: String?, capitalise: Boolean = true) =
+    fun getOrNull(key: String?, capitalise: Boolean = false) =
         if (key == null) null else get(key, capitalise).let {
             if (it.startsWith("$")) null else it
         }
@@ -154,7 +154,7 @@ object Lang {
         return sb.toString()
     }
 
-    fun getAndUseTemplate(key: String, capitalise: Boolean = true, vararg arguments: Any?): String {
+    fun getAndUseTemplate(key: String, capitalise: Boolean = false, vararg arguments: Any?): String {
         var raw = get(key, capitalise)
         arguments.forEachIndexed { index, it0 ->
             val it = if (capitalise) it0.toString().capitalize() else it0.toString()
