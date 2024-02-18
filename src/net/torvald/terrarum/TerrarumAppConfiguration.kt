@@ -71,7 +71,7 @@ basegame
     // Commit counts up to the Release 0.3.1: 2278
     // Commit counts up to the Release 0.3.2: 2732
     // Commit counts up to the Release 0.3.3: 3020
-    // Commit counts up to the Release 0.4.0: 3630
+    // Commit counts up to the Release 0.4.0: 3631
 
 //    val VERSION_SNAPSHOT = Snapshot(0) // for normal dev
 //    val VERSION_SNAPSHOT = ForcedSnapshot("24w07d") // for snapshot release
