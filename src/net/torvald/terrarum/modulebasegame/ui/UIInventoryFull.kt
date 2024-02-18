@@ -140,10 +140,10 @@ class UIInventoryFull(
 
         }
 
-        internal var xEnd = (Toolkit.drawWidth + internalWidth).div(2).toFloat()
-            private set
-        internal var yEnd = -YPOS_CORRECTION + (App.scr.height + internalHeight).div(2).toFloat()
-            private set
+        internal val xEnd: Float
+            get() = (Toolkit.drawWidth + internalWidth).div(2).toFloat()
+        internal val yEnd: Float
+            get() = -YPOS_CORRECTION + (App.scr.height + internalHeight).div(2).toFloat()
     }
 
     //val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
@@ -442,9 +442,6 @@ class UIInventoryFull(
 
         offsetX = ((width - internalWidth) / 2).toFloat()
         offsetY = ((App.scr.height - internalHeight) / 2).toFloat()
-
-        xEnd = (width + internalWidth).div(2).toFloat()
-        yEnd = -YPOS_CORRECTION + (scr.height + internalHeight).div(2).toFloat()
     }
 }
 
