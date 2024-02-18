@@ -66,16 +66,16 @@ basegame
      * e.g. 0x02010034 will be translated as 2.1.52
      *
      */
-    const val VERSION_RAW: Long = 0x0000_000004_000000
+    const val VERSION_RAW: Long = 0x0000_000004_000001
     // Commit counts up to the Release 0.3.0: 2259
     // Commit counts up to the Release 0.3.1: 2278
     // Commit counts up to the Release 0.3.2: 2732
     // Commit counts up to the Release 0.3.3: 3020
     // Commit counts up to the Release 0.4.0: 3631
 
-//    val VERSION_SNAPSHOT = Snapshot(0) // for normal dev
+    val VERSION_SNAPSHOT = Snapshot(0) // for normal dev
 //    val VERSION_SNAPSHOT = ForcedSnapshot("24w07d") // for snapshot release
-    val VERSION_SNAPSHOT = null // for the release
+//    val VERSION_SNAPSHOT = null // for the release
 
     const val VERSION_TAG: String = ""
 

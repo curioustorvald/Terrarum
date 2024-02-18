@@ -15,7 +15,7 @@ import org.apache.commons.codec.digest.DigestUtils
  *      - BE CRACKABLE (crackstation.net)
  *
  * Example passwords would be:
- *  aryll -> beedle -> ciela -> daruk -> ... -> linebeck -> mido -> navi -> ...
+ *  aryll -> beedle -> ciela -> daruk -> epona -> ... -> linebeck -> mido -> navi -> ...
  *
  * Notes:
  *      do NOT put plaintext anywhere in the code (except for comments maybe)
@@ -36,7 +36,7 @@ internal object Authenticator : ConsoleCommand {
 //            println("auth passwd: '$pwd'")
 //            println("hash: $hashedPwd")
 
-            if ("c40232ae7b8020da3ab1449a015e7cc23f249a790856b63b1b69c6a5de019fed".equals(hashedPwd, ignoreCase = true)) {
+            if ("4a26c5cd64195c4a52d2e3770e56c1d0c65861d2a03b47f8ba5d25ca033b9c42".equals(hashedPwd, ignoreCase = true)) {
                 // beedle
                 val msg = if (a) "Locked" else "Authenticated"
                 Echo(msg)

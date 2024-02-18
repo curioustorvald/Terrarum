@@ -344,7 +344,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         addUIitem(spinnerCraftCount)
         addUIitem(buttonCraft)
         // temporarily disabled for 0.4 release
-        if (TerrarumAppConfiguration.VERSION_RAW >= 0x0000_000005_000000) {
+        if (TerrarumAppConfiguration.VERSION_RAW >= 0x0000_000004_000001) {
             addUIitem(menuButtonCraft)
             addUIitem(menuButtonTechView)
         }
