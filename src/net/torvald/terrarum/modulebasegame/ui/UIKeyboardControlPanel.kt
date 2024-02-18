@@ -401,37 +401,37 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
     // TEXT IS MANUALLY PRINTED ON render() !!
     private val iconButtons = arrayOf(
         // left up right down
-        UIItemImageButton(parent, Keebsym.LEFT, initialX = col0 - 34, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-        UIItemImageButton(parent, Keebsym.UP, initialX = col0, initialY = initialY + 26, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-        UIItemImageButton(parent, Keebsym.DOWN, initialX = col0, initialY = initialY + 60, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-        UIItemImageButton(parent, Keebsym.RIGHT, initialX = col0 + 34, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.LEFT, initialX = col0 - 34, initialY = initialY + 43, highlightable = false),
+        UIItemImageButton(parent, Keebsym.UP, initialX = col0, initialY = initialY + 26, highlightable = false),
+        UIItemImageButton(parent, Keebsym.DOWN, initialX = col0, initialY = initialY + 60, highlightable = false),
+        UIItemImageButton(parent, Keebsym.RIGHT, initialX = col0 + 34, initialY = initialY + 43, highlightable = false),
 
         // jump
-        UIItemImageButton(parent, Keebsym.JUMP, initialX = col1, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.JUMP, initialX = col1, initialY = initialY + 43, highlightable = false),
 
         // inventory
-        UIItemImageButton(parent, Keebsym.INVENTORY, initialX = col0, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.INVENTORY, initialX = col0, initialY = row1, highlightable = false),
         // crafting
-        UIItemImageButton(parent, Keebsym.CRAFTING, initialX = col0, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.CRAFTING, initialX = col0, initialY = row2, highlightable = false),
         // hook
-        UIItemImageButton(parent, Keebsym.HOOK, initialX = col0, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.HOOK, initialX = col0, initialY = row3, highlightable = false),
         // quicksel
-        UIItemImageButton(parent, Keebsym.PIE, initialX = col0, initialY = row4, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.PIE, initialX = col0, initialY = row4, highlightable = false),
 
         // zoom
-        UIItemImageButton(parent, Keebsym.ZOOM, initialX = col1, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.ZOOM, initialX = col1, initialY = row1, highlightable = false),
         // IME
-        UIItemImageButton(parent, Keebsym.IME(), initialX = col1, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.IME(), initialX = col1, initialY = row2, highlightable = false),
         // system menu
-        UIItemImageButton(parent, Keebsym.MENU, initialX = col1, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.MENU, initialX = col1, initialY = row3, highlightable = false),
         // toss item
-        UIItemImageButton(parent, Keebsym.DISCARD, initialX = col1, initialY = row4, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.DISCARD, initialX = col1, initialY = row4, highlightable = false),
 
     )
 
     // close button is just for the cosmetics; the uiitem closes when you click anywhere on the UI
-    private val closeButton2 = UIItemImageButton(parent, Keebsym.CLOSE, initialX = initialX + width - 20, initialY = initialY, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0))
-    private val closeButton1 = UIItemImageButton(parent, Keebsym.CLOSE, initialX = initialX + 1, initialY = initialY, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0))
+    private val closeButton2 = UIItemImageButton(parent, Keebsym.CLOSE, initialX = initialX + width - 20, initialY = initialY, highlightable = false)
+    private val closeButton1 = UIItemImageButton(parent, Keebsym.CLOSE, initialX = initialX + 1, initialY = initialY, highlightable = false)
 
     // indices must correspond with what's on the UIItemControlPaletteBaloon.iconButtons
     companion object {

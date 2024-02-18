@@ -91,8 +91,11 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         }}
     }
 
-    private val itemListCraftable: UIItemCraftingCandidateGrid // might be changed to something else
-    private val itemListIngredients: UIItemInventoryItemGrid // this one is definitely not to be changed
+    private val catIcons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
+
+
+    internal val itemListCraftable: UIItemCraftingCandidateGrid // might be changed to something else
+    internal val itemListIngredients: UIItemInventoryItemGrid // this one is definitely not to be changed
     private val buttonCraft: UIItemTextButton
     private val spinnerCraftCount: UIItemSpinner
 
@@ -311,11 +314,40 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
 
         handler.allowESCtoClose = true
 
+
+        val menuButtonTechView = UIItemImageButton(
+            this, catIcons.get(20, 1),
+            initialX = itemListCraftable.navRemoCon.posX + 12,
+            initialY = itemListCraftable.navRemoCon.getIconPosY(-2) - 8,
+            highlightable = true
+        ).also {
+            it.clickOnceListener = { _, _ ->
+                full?.transitionPanel?.setLeftUIto(1)
+                full?.transitionPanel?.uis?.get(0)?.show()
+                it.highlighted = false
+            }
+        }
+
+        val menuButtonCraft = UIItemImageButton(
+            this, catIcons.get(19, 1),
+            initialX = itemListCraftable.navRemoCon.posX + 12,
+            initialY = itemListCraftable.navRemoCon.getIconPosY(-1) - 8,
+            activeCol = Toolkit.Theme.COL_SELECTED,
+            inactiveCol = Toolkit.Theme.COL_SELECTED,
+            highlightable = true
+        )
+
+
         addUIitem(itemListCraftable)
         addUIitem(itemListIngredients)
         addUIitem(playerThings)
         addUIitem(spinnerCraftCount)
         addUIitem(buttonCraft)
+        // temporarily disabled for 0.4 release
+        if (TerrarumAppConfiguration.VERSION_RAW >= 0x0000_000005_000000) {
+            addUIitem(menuButtonCraft)
+            addUIitem(menuButtonTechView)
+        }
     }
 
     private fun filterPlayerListUsing(recipe: CraftingCodex.CraftingRecipe?) {

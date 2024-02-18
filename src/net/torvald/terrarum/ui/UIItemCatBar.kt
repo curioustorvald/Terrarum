@@ -63,10 +63,6 @@ class UIItemCatBar(
             object : UIItemImageButton(
                     inventoryUI,
                     catIcons.get(iconIndexX, iconIndexY),
-                    activeBackCol = Color(0),
-                    backgroundCol = Color(0),
-                    highlightBackCol = Color(0),
-                    activeBackBlendMode = BlendMode.NORMAL,
                     initialX = posX + iconPosX,
                     initialY = posY + iconPosY,
                     highlightable = true
@@ -105,10 +101,6 @@ class UIItemCatBar(
                 UIItemImageButton(
                     inventoryUI,
                     iconIndex[index],
-                    activeBackCol = Color(0),
-                    backgroundCol = Color(0),
-                    highlightBackCol = Color(0),
-                    activeBackBlendMode = BlendMode.NORMAL,
                     initialX = iconPosX,
                     initialY = posY + iconPosY,
                     inactiveCol = if (index == 0 || index == 3) Color.WHITE else Color(0xffffff7f.toInt()),

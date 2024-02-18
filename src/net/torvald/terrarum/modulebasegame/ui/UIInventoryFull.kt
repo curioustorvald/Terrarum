@@ -246,17 +246,18 @@ class UIInventoryFull(
 
 
     //    private val transitionalMinimap = UIInventoryMinimap(this)
-    private val transitionalCraftingUI = UICrafting(this)
-    private val transitionalItemCells = UIInventoryCells(this)
-    private val transitionalEscMenu = UIInventoryEscMenu(this)
-    private val transitionPanel = UIItemHorizontalFadeSlide(
+    internal val transitionalCraftingUI = UICrafting(this)
+    internal val transitionalTechTreeViewUI = UITechView(this)
+    internal val transitionalItemCells = UIInventoryCells(this)
+    internal val transitionalEscMenu = UIInventoryEscMenu(this)
+    val transitionPanel = UIItemHorizontalFadeSlide(
         this,
         (width - internalWidth) / 2,
         INVENTORY_CELLS_OFFSET_Y(),
         width,
         App.scr.height,
         1f,
-        listOf(transitionalCraftingUI),
+        listOf(transitionalCraftingUI, transitionalTechTreeViewUI),
         listOf(transitionalItemCells),
         listOf(transitionalEscMenu)
     )
@@ -319,6 +320,7 @@ class UIInventoryFull(
         transitionPanel.forcePosition(0)
         catBar.setSelectedPanel(0)
         transitionalCraftingUI.resetUI()
+        transitionalTechTreeViewUI.resetUI()
         it.setAsOpen()
     }
 
@@ -387,7 +389,7 @@ class UIInventoryFull(
 
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
-        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
+        transitionPanel.allUIs.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.pause()
         INGAME.setTooltipMessage(null)
 
@@ -399,7 +401,7 @@ class UIInventoryFull(
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
-        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
+        transitionPanel.allUIs.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.resume()
         INGAME.setTooltipMessage(null)
 
@@ -415,14 +417,14 @@ class UIInventoryFull(
 
     override fun endOpening(delta: Float) {
         super.endOpening(delta)
-        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f)  }
+        transitionPanel.allUIs.forEach { it.opacity = 1f  }
 
         shouldIFadeIn = null
     }
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
-        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
+        transitionPanel.allUIs.forEach { it.opacity = 0f }
         INGAME.setTooltipMessage(null) // required!
 //        MinimapComposer.revalidateAll()
 

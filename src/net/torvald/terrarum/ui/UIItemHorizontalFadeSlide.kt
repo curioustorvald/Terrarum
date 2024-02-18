@@ -37,6 +37,7 @@ class UIItemHorizontalFadeSlide(
     private var rightUI: UICanvas = uisOnRight.firstOrNull() ?: NullUI
 
     override val uis: List<UICanvas>; get() = listOf(leftUI, centreUI, rightUI)
+    val allUIs : List<UICanvas>; get() = uisOnLeft + uisOnCentre + uisOnRight
 
     fun setLeftUIto(index: Int) {
         leftUI = uisOnLeft[index]
@@ -50,36 +51,59 @@ class UIItemHorizontalFadeSlide(
 
     init {
         // re-position the uis according to the initial choice of currentPosition
-        uisOnLeft.forEachIndexed { index, it ->
+        uisOnLeft.forEach {
             it.posX = getOffX(0)
             it.initialX = getOffX(0)
+            it.opacity = getOpacity(0)
             it.posY = 0
             it.initialY = 0
-            it.opacity = getOpacity(0)
         }
-        uisOnCentre.forEachIndexed { index, it ->
+        uisOnCentre.forEach {
             it.posX = getOffX(1)
             it.initialX = getOffX(1)
+            it.opacity = getOpacity(1)
             it.posY = 0
             it.initialY = 0
-            it.opacity = getOpacity(1)
         }
-        uisOnRight.forEachIndexed { index, it ->
+        uisOnRight.forEach {
             it.posX = getOffX(2)
             it.initialX = getOffX(2)
+            it.opacity = getOpacity(2)
             it.posY = 0
             it.initialY = 0
-            it.opacity = getOpacity(2)
         }
     }
 
-    override fun onTransition(currentPosition: Float, uis: List<UICanvas>) {
-        uis.forEachIndexed { index, it ->
-            it.posX = getOffX(index)
+    override fun onTransition(currentPosition: Float) {
+        uisOnLeft.forEach {
+            it.posX = getOffX(0)
+            it.opacity = getOpacity(0)
             it.posY = it.initialY
-            it.opacity = getOpacity(index)
         }
+        uisOnCentre.forEach {
+            it.posX = getOffX(1)
+            it.opacity = getOpacity(1)
+            it.posY = it.initialY
+        }
+        uisOnRight.forEach {
+            it.posX = getOffX(2)
+            it.opacity = getOpacity(2)
+            it.posY = it.initialY
+        }
+
         INGAME.setTooltipMessage(null)
+    }
+
+    override fun show() {
+        uisOnLeft.forEach { it.show() }
+        uisOnCentre.forEach { it.show() }
+        uisOnRight.forEach { it.show() }
+    }
+
+    override fun hide() {
+        uisOnLeft.forEach { it.hide() }
+        uisOnCentre.forEach { it.hide() }
+        uisOnRight.forEach { it.hide() }
     }
 
     override fun dispose() {

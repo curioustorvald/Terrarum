@@ -100,7 +100,6 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
                 height = TILESREGION_SIZE,
                 highlightCol = Color.WHITE,
                 activeCol = Color.WHITE,
-                backgroundCol = Color(0)
             )
             val paletteItem2 = UIItemImageButton(
                 this, ItemCodex.getItemImage(prop.id)!!,
@@ -112,7 +111,6 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
                 highlightCol = Color.WHITE,
                 activeCol = WALL_OVERLAY_COLOUR,
                 inactiveCol = WALL_OVERLAY_COLOUR,
-                backgroundCol = Color(0)
             )
 
             paletteItem.clickOnceListener = { _, _ -> parent.setPencilColour(prop.id) }

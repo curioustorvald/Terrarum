@@ -34,8 +34,12 @@ class UIItemListNavBarVertical(
         const val LIST_TO_CONTROL_GAP = 12
     }
 
-    private fun getIconPosY(index: Int) =
-        posY + 26 * index
+    fun getIconPosY(index: Int) =
+        if (index >= 0)
+            posY + 26 * index
+        else
+            (posY + height) + (26 * index)
+
     private val catIcons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
     private val iconPosX = posX + LIST_TO_CONTROL_GAP
 
@@ -43,11 +47,6 @@ class UIItemListNavBarVertical(
         UIItemImageButton(
             parentUI,
             catIcons.get(index + 14, 0),
-            backgroundCol = Color(0),
-            activeBackCol = Color(0),
-            highlightBackCol = Color(0),
-            activeBackBlendMode = BlendMode.NORMAL,
-            activeCol = Toolkit.Theme.COL_MOUSE_UP,
             initialX = iconPosX,
             initialY = getIconPosY(index),
             highlightable = true
@@ -57,10 +56,6 @@ class UIItemListNavBarVertical(
     val scrollUpButton = UIItemImageButton(
         parentUI,
         catIcons.get(18, 0),
-        backgroundCol = Color(0),
-        activeBackCol = Color(0),
-        activeBackBlendMode = BlendMode.NORMAL,
-        activeCol = Toolkit.Theme.COL_MOUSE_UP,
         initialX = iconPosX,
         initialY = getIconPosY(2 - (!hasGridModeButtons).toInt(1)),
         highlightable = false
@@ -69,10 +64,6 @@ class UIItemListNavBarVertical(
     val scrollDownButton = UIItemImageButton(
         parentUI,
         catIcons.get(19, 0),
-        backgroundCol = Color(0),
-        activeBackCol = Color(0),
-        activeBackBlendMode = BlendMode.NORMAL,
-        activeCol = Toolkit.Theme.COL_MOUSE_UP,
         initialX = iconPosX,
         initialY = getIconPosY(3 - (!hasGridModeButtons).toInt(1)),
         highlightable = false

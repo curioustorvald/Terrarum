@@ -58,9 +58,6 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
 
         UIItemImageButton(
                 this, toolIcons.get(it, 0),
-                backgroundCol = Color(0),
-                highlightBackCol = Color(0),
-                activeBackCol = Color(0),
                 initialX = newvec.x.roundToInt(),
                 initialY = newvec.y.roundToInt(),
                 width = ICON_SIZE, height = ICON_SIZE,

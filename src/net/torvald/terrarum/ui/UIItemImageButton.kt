@@ -19,18 +19,18 @@ open class UIItemImageButton(
         /** Colour when mouse is over */
         val activeCol: Color = Toolkit.Theme.COL_MOUSE_UP,
         /** Colour when mouse is over */
-        val activeBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_ACTIVECOL,
+        val activeBackCol: Color = Color(0),//UIItemTextButtonList.DEFAULT_BACKGROUND_ACTIVECOL,
         /** Colour when mouse is over */
         val activeBackBlendMode: String = BlendMode.NORMAL,
         /** Colour when clicked/selected */
         val highlightCol: Color = Toolkit.Theme.COL_SELECTED,
         /** Colour when clicked/selected */
-        val highlightBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_HIGHLIGHTCOL,
+        val highlightBackCol: Color = Color(0),//UIItemTextButtonList.DEFAULT_BACKGROUND_HIGHLIGHTCOL,
         /** Colour when clicked/selected */
         val highlightBackBlendMode: String = BlendMode.NORMAL,
         /** Colour on normal status */
         val inactiveCol: Color = Toolkit.Theme.COL_LIST_DEFAULT,
-        val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
+        val backgroundCol: Color = Color(0),//UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
         val backgroundBlendMode: String = BlendMode.NORMAL,
 
         initialX: Int,

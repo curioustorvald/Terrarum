@@ -46,7 +46,7 @@ open class UIItemTransitionContainer(
         transitionRequested = false
         transitionTimer = 0f
         currentPosition = target.toFloat()
-        onTransition(currentPosition, uis)
+        onTransition(currentPosition)
     }
 
     override fun update(delta: Float) {
@@ -54,7 +54,7 @@ open class UIItemTransitionContainer(
         uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.update(delta) }
     }
 
-    open fun onTransition(currentPosition: Float, uis: List<UICanvas>) {}
+    open fun onTransition(currentPosition: Float) {}
 
     open val currentUI: UICanvas
         get() = uis[currentPosition.roundToInt()]
@@ -78,7 +78,7 @@ open class UIItemTransitionContainer(
                 currentPosition = transitionReqTarget
             }
 
-            onTransition(currentPosition, uis)
+            onTransition(currentPosition)
         }
 
         uis.forEachIndexed { index, ui ->
