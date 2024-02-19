@@ -144,7 +144,7 @@ class AudioMixer : Disposable {
         return (headSize0 ?: 0f).times(scale).coerceAtLeast(BinoPan.EARDIST_DEFAULT)
     }
 
-    private val millisecUnitTime = 400L // 384 * p, p is multiplied to compensate the time takes for writing samples
+    private val millisecUnitTime = 100L // 48 * p, p is multiplied to compensate the time takes for writing samples
     private val sleepMS = App.audioBufferSize / millisecUnitTime
     private val sleepNS = (App.audioBufferSize / millisecUnitTime * 1000000).toInt() % 1000000
 
