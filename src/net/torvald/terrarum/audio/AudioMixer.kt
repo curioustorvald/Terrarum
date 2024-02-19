@@ -144,6 +144,10 @@ class AudioMixer : Disposable {
         return (headSize0 ?: 0f).times(scale).coerceAtLeast(BinoPan.EARDIST_DEFAULT)
     }
 
+    private val millisecUnitTime = 400L // 384 * p, p is multiplied to compensate the time takes for writing samples
+    private val sleepMS = App.audioBufferSize / millisecUnitTime
+    private val sleepNS = (App.audioBufferSize / millisecUnitTime * 1000000).toInt() % 1000000
+
     fun createProcessingThread(): Thread = Thread {
         // serial precessing
         while (processing) {
@@ -168,6 +172,8 @@ class AudioMixer : Disposable {
             while (processing && !masterTrack.pcmQueue.isEmpty) {
                 masterTrack.adev!!.writeSamples(masterTrack.pcmQueue.removeFirst()) // it blocks until the queue is consumed
             }
+
+            Thread.sleep(sleepMS, sleepNS)
         }
 
         // parallel processing, it seems even on the 7950X this is less efficient than serial processing...

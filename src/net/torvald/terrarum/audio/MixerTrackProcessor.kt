@@ -103,6 +103,8 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
         return newRead
     }
 
+    var bufEmpty = true; private set
+
     override fun run() {
 //        while (running) { // uncomment to multithread
             /*synchronized(pauseLock) { // uncomment to multithread
@@ -196,7 +198,7 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
             var samplesL1: FloatArray
             var samplesR1: FloatArray
 
-            var bufEmpty = false
+            bufEmpty = false
 
             // get samples and apply the fader
             if (track.trackType == TrackType.MASTER || track.trackType == TrackType.BUS) {
