@@ -6,7 +6,7 @@ import net.torvald.terrarum.gameitems.ItemID
 
 class ItemSeedOak(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.SaplingOak") {
     override var originalName = "ITEM_SEED_OAK"
-    override var baseMass = 10.0
+    override var baseMass = 1.0
     override val materialId = "OOZE"
     override var inventoryCategory = Category.GENERIC
     override val itemImage: TextureRegion
@@ -14,7 +14,7 @@ class ItemSeedOak(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald
 }
 class ItemSeedEbony(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.SaplingEbony") {
     override var originalName = "ITEM_SEED_EBONY"
-    override var baseMass = 10.0
+    override var baseMass = 1.0
     override val materialId = "OOZE"
     override var inventoryCategory = Category.GENERIC
     override val itemImage: TextureRegion
@@ -22,7 +22,7 @@ class ItemSeedEbony(originalID: ItemID) : FixtureItemBase(originalID, "net.torva
 }
 class ItemSeedBirch(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.SaplingBirch") {
     override var originalName = "ITEM_SEED_BIRCH"
-    override var baseMass = 10.0
+    override var baseMass = 1.0
     override val materialId = "OOZE"
     override var inventoryCategory = Category.GENERIC
     override val itemImage: TextureRegion
@@ -30,7 +30,7 @@ class ItemSeedBirch(originalID: ItemID) : FixtureItemBase(originalID, "net.torva
 }
 class ItemSeedRosewood(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.SaplingRosewood") {
     override var originalName = "ITEM_SEED_ROSEWOOD"
-    override var baseMass = 10.0
+    override var baseMass = 1.0
     override val materialId = "OOZE"
     override var inventoryCategory = Category.GENERIC
     override val itemImage: TextureRegion
