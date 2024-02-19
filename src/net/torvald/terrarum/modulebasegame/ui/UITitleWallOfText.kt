@@ -1,14 +1,17 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CreditSingleton
 import net.torvald.terrarum.ceilToInt
-import net.torvald.terrarum.ui.*
-import java.util.TreeMap
+import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItemTextArea
+import net.torvald.terrarum.ui.UIItemVertSlider
 import kotlin.math.roundToInt
 
 open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
@@ -91,12 +94,16 @@ class UISystemInfo(val remoCon: UIRemoCon) : UICanvas() {
     private var uptime: Long = 0L
 
     init {
+
+        // auto resize for fullscreen
+        val disp = Lwjgl3ApplicationConfiguration.getDisplayMode(Lwjgl3ApplicationConfiguration.getPrimaryMonitor())
+
         v.add("${App.GAME_NAME}" to App.getVERSION_STRING())
         v.add("JRE" to System.getProperty("java.version"))
         v.add("Gdx" to com.badlogic.gdx.Version.VERSION)
         v.add("LWJGL" to "${org.lwjgl.Version.VERSION_MAJOR}.${org.lwjgl.Version.VERSION_MINOR}.${org.lwjgl.Version.VERSION_REVISION}")
         v.add("OS" to "${App.OSName} ${App.OSVersion}")
-        v.add("Display" to "${App.scr.width}\u00D7${App.scr.height}@${App.scr.magn.times(100).roundToInt()}%")
+        v.add("Display" to "${App.scr.windowW}\u00D7${App.scr.windowH}@${App.scr.magn.times(100).roundToInt()}%, ${disp.bitsPerPixel}bpp (internally ${App.scr.width}\u00D7${App.scr.height})")
         v.add("Processor" to "${App.THREAD_COUNT}\u2009\u00D7\u2009${App.processor}")
         v.add("Architecture" to App.systemArch)
         v.add("CPUID" to App.processorVendor.let { if (it == "null" || it == null) "n/a" else it })
