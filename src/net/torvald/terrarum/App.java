@@ -442,12 +442,12 @@ public class App implements ApplicationListener {
 
             if (useFullscreen) {
                 // auto resize for fullscreen
-                var disp = Lwjgl3ApplicationConfiguration.getDisplayMode();
+                var disp = Lwjgl3ApplicationConfiguration.getDisplayMode(Lwjgl3ApplicationConfiguration.getPrimaryMonitor());
                 var newWidth = ((int)(disp.width / magn)) & 0x7FFFFFFE;
                 var newHeight = ((int)(disp.height / magn)) & 0x7FFFFFFE;
                 scr.setDimension(newWidth, newHeight, magn);
 
-                appConfig.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
+                appConfig.setFullscreenMode(disp);
 
             }
             else

@@ -9,6 +9,7 @@ import net.torvald.terrarum.CreditSingleton
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.ui.*
 import java.util.TreeMap
+import kotlin.math.roundToInt
 
 open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
     init {
@@ -95,6 +96,7 @@ class UISystemInfo(val remoCon: UIRemoCon) : UICanvas() {
         v.add("Gdx" to com.badlogic.gdx.Version.VERSION)
         v.add("LWJGL" to "${org.lwjgl.Version.VERSION_MAJOR}.${org.lwjgl.Version.VERSION_MINOR}.${org.lwjgl.Version.VERSION_REVISION}")
         v.add("OS" to "${App.OSName} ${App.OSVersion}")
+        v.add("Display" to "${App.scr.width}\u00D7${App.scr.height}@${App.scr.magn.times(100).roundToInt()}%")
         v.add("Processor" to "${App.THREAD_COUNT}\u2009\u00D7\u2009${App.processor}")
         v.add("Architecture" to App.systemArch)
         v.add("CPUID" to App.processorVendor.let { if (it == "null" || it == null) "n/a" else it })
