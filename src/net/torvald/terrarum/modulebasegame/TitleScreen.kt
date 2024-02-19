@@ -35,6 +35,8 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadSimpleWorld
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItemTextButton
+import net.torvald.terrarum.utils.OpenURL
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
@@ -494,17 +496,46 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
             // update available!
             if (App.hasUpdate) {
-                batch.color = Toolkit.Theme.COL_SELECTED
+
+                batch.color = if (System.currentTimeMillis() % 1500 < 750L)
+                    Toolkit.Theme.COL_MOUSE_UP
+                else
+                    Toolkit.Theme.COL_SELECTED
+
+                val tx = UIRemoCon.menubarOffX + UIRemoCon.UIRemoConElement.paddingLeft / 2 + uiRemoCon.posX
+                val ty1 = UIRemoCon.menubarOffY - uiRemoCon.height + uiRemoCon.posY - 60
+                val ty2 = ty1 + 28
                 App.fontGame.draw(
                     batch,
                     Lang["MENU_UPDATE_UPDATE_AVAILABLE"],
-                    UIRemoCon.menubarOffX + UIRemoCon.UIRemoConElement.paddingLeft / 2 + uiRemoCon.posX,
-                    UIRemoCon.menubarOffY - uiRemoCon.height + uiRemoCon.posY
+                    tx, ty1
                 )
+
+
+                val tw = App.fontGame.getWidth("<${TerrarumAppConfiguration.FIXED_LATEST_DOWNLOAD_LINK}>")
+                if (Terrarum.mouseScreenX in tx - 32 until tx + tw + 32 &&
+                    Terrarum.mouseScreenY in ty2 - 16 until ty2 + App.fontGame.lineHeight.toInt() + 16) {
+
+                    if (Gdx.input.isButtonJustPressed(App.getConfigInt("config_mouseprimary"))) {
+                        OpenURL(TerrarumAppConfiguration.FIXED_LATEST_DOWNLOAD_LINK)
+                    }
+                    batch.color = Toolkit.Theme.COL_SELECTED
+                }
+                else
+                    batch.color = Toolkit.Theme.COL_MOUSE_UP
+
+                App.fontGame.draw(
+                    batch,
+                    "<${TerrarumAppConfiguration.FIXED_LATEST_DOWNLOAD_LINK}>",
+                    tx, ty2
+                )
+
             }
         }
 
     }
+
+
 
     override fun pause() {
     }

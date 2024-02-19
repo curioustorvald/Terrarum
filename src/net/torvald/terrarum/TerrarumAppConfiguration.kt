@@ -2,6 +2,7 @@ package net.torvald.terrarum
 
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.toUint
+import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -47,6 +48,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 basegame
 """
+
+    val FIXED_LATEST_DOWNLOAD_LINK = URL("https://github.com/curioustorvald/Terrarum/releases/latest")
 
     /**
      *

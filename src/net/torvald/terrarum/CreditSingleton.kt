@@ -282,7 +282,6 @@ $BULLET Music:
     - music/discs/lucid_dream.ogg
     - music/discs/railway.ogg
     - music/discs/welded.ogg
-
 ℗ 2021, 2022, 2023, 2024 Orstphone
 Check out the original tracks on:
 Apple Music: <https://music.apple.com/kr/artist/orstphone/1587723053>
@@ -300,7 +299,6 @@ $BULLET Foleys:
     - ambient/season/diurnal_winter.*.ogg
     - ambient/season/matutinal.*.ogg
     - ambient/season/nocturnal.*.ogg
-
 ℗ 2011, 2013, 2015, 2020, 2021 Klankbeeld
 Sound from <https://www.freesound.org/people/klankbeeld>
 
@@ -311,38 +309,31 @@ Sound from <https://www.freesound.org/people/klankbeeld>
     - effects/steps/WOOD.*.ogg
     - effects/door/wooden_open.*.ogg
     - effects/door/wooden_close.*.ogg
-
 ℗ 2020, 2021, 2022 Nox Sound
 Sound from <https://freesound.org/people/Nox_Sound>
 
     - effects/static/phono_pops.ogg
-    
 ℗ 2011 Veezay
 Sound from <https://freesound.org/people/veezay>
 
     - effects/static/tape_hiss.ogg
-    
 ℗ 2017 Stephen Holdaway
 Sound from <https://freesound.org/people/stecman>
 
     - effects/static/film_pops_lowpass.ogg
-    
 ℗ 2015 Joe DeShon
 Sound from <https://freesound.org/people/joedeshon>
 
     - effects/static/bonfire.ogg
-    
 ℗ 2019 DrinkingWindGames
 Sound from <https://freesound.org/people/DrinkingWindGames>
 
     - effects/explosion/bang_bomb.ogg
-    
 ℗ 2019 Richwise
 Sound from <https://freesound.org/people/richwise>
 
     - effects/explosion/fuse.ogg
     - effects/explosion/fuse_continue.ogg
-
 ℗ 2012, 2015 j1987 and ScouseMouseJB
 Sound from <https://freesound.org/people/j1987> and <https://freesound.org/people/ScouseMouseJB>
 
@@ -351,12 +342,10 @@ Sound from <https://freesound.org/people/j1987> and <https://freesound.org/peopl
 $BULLET Impulse Responses:
 
     - convolution/EchoThief - *.bin
-    
 EchoThief Impulse Response Library
 ℗ 2013-2023 Chris Warren <cwarren@sdsu.edu>
 
     - convolution/Soundwoofer - *.bin
-    
 Soundwoofer Free Impulse Response Library
 ℗ 2018 Soundwoofer Team
 <https://soundwoofer.com/User/Index?uid=soundwoofer>
