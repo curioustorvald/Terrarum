@@ -15,7 +15,7 @@ import java.io.File
 object Clipboard {
     private val IS_MACOS = App.operationSystem == "OSX"
 
-    fun fetch(): String = Gdx.app.clipboard.contents
+    fun fetch(): String = Gdx.app.clipboard.contents ?: ""
 
     fun copy(s: String) {
         Gdx.app.clipboard.contents = s
