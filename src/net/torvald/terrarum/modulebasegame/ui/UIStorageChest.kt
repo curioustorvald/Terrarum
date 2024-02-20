@@ -7,6 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.getWidthOfCells
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
@@ -44,7 +45,7 @@ internal class UIStorageChest : UICanvas(
 
     override fun getNegotiator() = negotiator
     override fun getFixtureInventory(): FixtureInventory = chestInventory
-    override fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
+    override fun getPlayerInventory(): ActorInventory = INGAME.actorNowPlaying!!.inventory
 
     private val catBar: UIItemCatBar
     private val itemListChest: UITemplateHalfInventory

@@ -254,7 +254,7 @@ open class FixtureInventory() {
     /**
      * How encumbered the actor is. 1.0 if weight of the items are exactly same as the capacity limit, >1.0 if encumbered.
      */
-    val encumberment: Double
+    open val encumberment: Double
         get() = if (capacityMode == CAPACITY_MODE_NO_ENCUMBER)
             0.0
         else if (capacityMode == CAPACITY_MODE_WEIGHT)

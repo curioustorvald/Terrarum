@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar
+import net.torvald.terrarum.sqr
 
 /**
  * Created by minjaesong on 2016-03-15.
@@ -37,6 +38,21 @@ class ActorInventory() : FixtureInventory() {
             if (capacityMode == CAPACITY_MODE_COUNT)
                 field = value
         }
+
+    val maxCapacityByActor: Double
+        get() = maxCapacity * ((actor.actorValue.getAsDouble(AVKey.SCALE) ?: 1.0) * (actor.actorValue.getAsDouble(AVKey.SCALEBUFF) ?: 1.0)).sqr()
+
+    /**
+     * How encumbered the actor is. 1.0 if weight of the items are exactly same as the capacity limit, >1.0 if encumbered.
+     */
+    override val encumberment: Double
+        get() = if (capacityMode == CAPACITY_MODE_NO_ENCUMBER)
+            0.0
+        else if (capacityMode == CAPACITY_MODE_WEIGHT)
+            capacity / maxCapacityByActor
+        else
+            0.0
+
 
     /**
      * List of all equipped items (tools, armours, rings, necklaces, etc.)

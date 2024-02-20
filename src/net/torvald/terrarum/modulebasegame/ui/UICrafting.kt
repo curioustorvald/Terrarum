@@ -11,6 +11,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.isWall
 import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.CraftingStation
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
@@ -113,7 +114,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
 
     override fun getNegotiator() = negotiator
     override fun getFixtureInventory(): FixtureInventory = TODO()
-    override fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
+    override fun getPlayerInventory(): ActorInventory = INGAME.actorNowPlaying!!.inventory
 
     private val halfSlotOffset = (UIItemInventoryElemSimple.height + listGap) / 2
 
@@ -463,9 +464,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         // let itemlists be sorted
         itemListCraftable.rebuild()
         playerThings.rebuild(FILTER_CAT_ALL)
-        encumbrancePerc = getPlayerInventory().let {
-            it.capacity.toFloat() / it.maxCapacity
-        }
+        encumbrancePerc = getPlayerInventory().encumberment.toFloat()
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

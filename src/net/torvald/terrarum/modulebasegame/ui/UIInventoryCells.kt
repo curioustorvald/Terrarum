@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HOR
@@ -36,7 +37,7 @@ internal class UIInventoryCells(
         val weightBarWidth = UIItemInventoryElemSimple.height * 2f + UIItemInventoryItemGrid.listGap
 //        var encumbBarYPos = (App.scr.height + internalHeight).div(2) - 20 + 3f
 
-        fun drawEncumbranceBar(batch: SpriteBatch, encumbBarXPos: Float, encumbBarYPos: Float, encumbrancePerc: Float, actorInventory: FixtureInventory) {
+        fun drawEncumbranceBar(batch: SpriteBatch, encumbBarXPos: Float, encumbBarYPos: Float, encumbrancePerc: Float, actorInventory: ActorInventory) {
             //draw player encumb
             // encumbrance meter
             val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
@@ -75,7 +76,7 @@ internal class UIInventoryCells(
                 else
                     "${(actorInventory.capacity * 100L).toLong() / 100.0}"
 
-                INGAME.setTooltipMessage("$capaStr/${actorInventory.maxCapacity}.0")
+                INGAME.setTooltipMessage("$capaStr/${actorInventory.maxCapacityByActor}")
                 tooltipShowing[10001] = true
             }
             else {

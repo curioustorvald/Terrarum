@@ -1,4 +1,6 @@
 {
   "gameplay_max_crafting": 100,
-  "showpickaxetooltip": true
+  "showpickaxetooltip": true,
+  "gameplay_unit_distance": "meter",
+  "gameplay_unit_temperature": "celsius"
 }

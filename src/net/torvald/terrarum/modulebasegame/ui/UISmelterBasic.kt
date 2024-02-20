@@ -7,6 +7,7 @@ import net.torvald.colourutil.cieluv_getGradient
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureSmelterBasic
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
@@ -128,7 +129,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         }
     }
 
-    fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
+    fun getPlayerInventory(): ActorInventory = INGAME.actorNowPlaying!!.inventory
 
     private var listModeButtonPushed = false
 
@@ -357,9 +358,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         // let itemlists be sorted
         inventoryFilter = { _: InventoryPair -> true }
         playerThings.rebuild(FILTER_CAT_ALL)
-        encumbrancePerc = getPlayerInventory().let {
-            it.capacity.toFloat() / it.maxCapacity
-        }
+        encumbrancePerc = getPlayerInventory().encumberment.toFloat()
     }
     
     private var inventoryFilter = { _: InventoryPair -> true }
@@ -368,17 +367,13 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         // let itemlists be sorted
         inventoryFilter = filter
         playerThings.rebuild(filter)
-        encumbrancePerc = getPlayerInventory().let {
-            it.capacity.toFloat() / it.maxCapacity
-        }
+        encumbrancePerc = getPlayerInventory().encumberment.toFloat()
     }
 
     private fun itemListUpdateKeepCurrentFilter() {
         // let itemlists be sorted
         playerThings.rebuild(inventoryFilter)
-        encumbrancePerc = getPlayerInventory().let {
-            it.capacity.toFloat() / it.maxCapacity
-        }
+        encumbrancePerc = getPlayerInventory().encumberment.toFloat()
     }
 
     init {
