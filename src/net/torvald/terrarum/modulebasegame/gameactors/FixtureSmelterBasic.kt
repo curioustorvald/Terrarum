@@ -290,7 +290,7 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
         // manage audio
         getTrackByAudio(static).let {
-            if (it == null || (temperature > 0f && !it.isPlaying)) {
+            if (it == null || (temperature > 0f && !it.isPlaying && !it.playRequested.get())) {
                 startAudio(static) {
                     it.filters[filterIndex] = Gain(0f)
                 }
@@ -300,12 +300,13 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
                     it.filters[filterIndex] = NullFilter
                 }
             }
-        }
-        getTrackByAudio(static)?.let {
-            if (it.filters[filterIndex] !is Gain) // just in case...
-                it.filters[filterIndex] = Gain(0f)
 
-            (it.filters[filterIndex] as Gain).gain = (it.maxVolume * temperature * volRand.get()).toFloat()
+            if (it != null) {
+                if (it.filters[filterIndex] !is Gain) // just in case...
+                    it.filters[filterIndex] = Gain(0f)
+
+                (it.filters[filterIndex] as Gain).gain = (it.maxVolume * temperature * volRand.get()).toFloat()
+            }
         }
 
     }

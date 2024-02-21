@@ -162,6 +162,8 @@ class TerrarumAudioMixerTrack(
     override fun equals(other: Any?) = this.hash == (other as TerrarumAudioMixerTrack).hash
 
     fun stop() {
+        printdbg(this, "Stop music (mixertrack=${this.name}, musictrack=$currentTrack)")
+
         currentTrack?.reset()
 
         streamPlaying.set(false)

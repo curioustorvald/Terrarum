@@ -248,7 +248,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      * Condition for (if the tile is solid) is always implied regardless of this function. See [canSpawnHere0]
      */
     open fun canSpawnOnThisFloor(itemID: ItemID): Boolean {
-        return true
+        val blockprop = BlockCodex[itemID]
+        return blockprop.isSolid || blockprop.isPlatform
     }
 
     fun canSpawnHere(posX0: Int, posY0: Int): Boolean {
@@ -277,7 +278,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
             val xs = posX until posX + blockBox.width
             cannotSpawn = cannotSpawn or xs.any { x ->
                 world!!.getTileFromTerrain(x, y).let {
-                    !BlockCodex[it].isSolid || !canSpawnOnThisFloor(it)
+                    !canSpawnOnThisFloor(it)
                 }
             }
         }

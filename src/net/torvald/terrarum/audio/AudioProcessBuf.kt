@@ -147,7 +147,7 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
     private val readBuf = ByteArray(fetchSize * 4)
 
     init {
-        printdbg(this, "App.audioMixerBufferSize=${App.audioBufferSize}")
+//        printdbg(this, "App.audioMixerBufferSize=${App.audioBufferSize}")
     }
 
     private fun shift(array: FloatArray, size: Int) {

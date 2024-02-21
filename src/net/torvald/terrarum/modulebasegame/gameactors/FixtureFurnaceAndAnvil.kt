@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.MusicContainer
 import net.torvald.terrarum.audio.decibelsToFullscale
 import net.torvald.terrarum.audio.dsp.Gain
@@ -19,6 +20,7 @@ import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.UICrafting
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.unsafe.UnsafeHelper
 
 /**
  * Created by minjaesong on 2023-12-05.
@@ -81,6 +83,8 @@ class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
     private var nextDelay = 0.25f
     private var spawnTimer = 0f
 
+    @Transient private var audioStatus = 0
+
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
 
@@ -108,17 +112,33 @@ class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
 
         // manage audio
         getTrackByAudio(static).let {
-            if (it != null && !it.isPlaying) {
-                startAudio(static) {
-                    it.filters[filterIndex] = Gain(0f)
+            printdbg(this, "hasbuf=${it?.processor?.streamBuf}, playing=${it?.isPlaying}, playRequested=${it?.playRequested}")
+
+            if (it != null) {
+
+                if (audioStatus == 0) {
+                    startAudio(static) {
+                        it.filters[filterIndex] = Gain(0f)
+                        audioStatus = 1
+                    }
                 }
             }
-        }
-        getTrackByAudio(static)?.let {
-            if (it.filters[filterIndex] !is Gain) // just in case...
-                it.filters[filterIndex] = Gain(0f)
+            else {
+//                printdbg(this, "Track is null! (old audio status=$audioStatus")
+                audioStatus = 0
+            }
 
-            (it.filters[filterIndex] as Gain).gain = 0.4f * volRand.get()
+            if (it != null) {
+                if (it.processor.streamBuf != null || it.playRequested.get()) {
+                    if (it.filters[filterIndex] !is Gain) // just in case...
+                        it.filters[filterIndex] = Gain(0f)
+
+                    (it.filters[filterIndex] as Gain).gain = 0.4f * volRand.get()
+                }
+                else {
+                    audioStatus = 0
+                }
+            }
         }
     }
 

@@ -161,6 +161,9 @@ abstract class Actor : Comparable<Actor>, Runnable {
                 musicTracks1.add(track.name)
                 track.stop()
             }
+            else {
+//                printdbg(this, "Could not get a free track")
+            }
         }
 
 //        printdbg(this, "Dynamic Source ${track?.name}")
@@ -182,9 +185,9 @@ abstract class Actor : Comparable<Actor>, Runnable {
                 it.currentTrack = music
                 it.maxVolumeFun = { volume }
                 it.volume = volume
-                doSomethingWithTrack(it)
 //                it.play()
                 it.playRequested.set(true)
+                doSomethingWithTrack(it)
             }
         }
     }
