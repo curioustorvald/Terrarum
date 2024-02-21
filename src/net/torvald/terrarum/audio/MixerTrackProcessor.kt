@@ -381,15 +381,6 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
 }
 
 
-private fun <T> Queue<T>.removeFirstOrElse(function: () -> T): T {
-    return if (this.isEmpty) {
-        this.removeFirst()
-    }
-    else {
-        function()
-    }
-}
-
 
 class FeedSamplesToAdev(val bufferSize: Int, val rate: Int, val track: TerrarumAudioMixerTrack) : Runnable {
     init {

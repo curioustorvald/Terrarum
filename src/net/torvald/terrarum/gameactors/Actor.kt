@@ -160,6 +160,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
                 musicTracks[music] = track
                 musicTracks1.add(track.name)
                 track.stop()
+                track.trackingTarget = this
             }
             else {
 //                printdbg(this, "Could not get a free track")

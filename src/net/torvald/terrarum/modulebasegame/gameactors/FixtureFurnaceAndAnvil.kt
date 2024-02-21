@@ -112,8 +112,7 @@ class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
 
         // manage audio
         getTrackByAudio(static).let {
-            printdbg(this, "hasbuf=${it?.processor?.streamBuf}, playing=${it?.isPlaying}, playRequested=${it?.playRequested}")
-
+//            printdbg(this, "Checking out track ${it?.name}")
             if (it != null) {
 
                 if (audioStatus == 0) {

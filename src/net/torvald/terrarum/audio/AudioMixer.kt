@@ -124,7 +124,7 @@ class AudioMixer : Disposable {
      */
     fun getFreeTrackNoMatterWhat(): TerrarumAudioMixerTrack {
         synchronized(this) {
-            return getFreeTrack() ?: dynamicTracks.minBy { it.playStartedTime }
+            return getFreeTrack() ?: dynamicTracks.minBy { it.playStartedTime }.also { it.checkedOutTime = System.nanoTime() }
         }
     }
 
@@ -134,7 +134,10 @@ class AudioMixer : Disposable {
     fun getFreeTrack(): TerrarumAudioMixerTrack? {
         synchronized(this) {
             return dynamicTracks.filter { it.trackingTarget == null && !it.isPlaying }
-                .minByOrNull { it.playStartedTime }
+                .minByOrNull { maxOf(it.checkedOutTime, it.playStartedTime) }
+                .also {
+                    it?.checkedOutTime = System.nanoTime()
+                }
         }
     }
 

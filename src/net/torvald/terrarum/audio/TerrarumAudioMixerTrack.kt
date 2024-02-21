@@ -65,7 +65,7 @@ class TerrarumAudioMixerTrack(
 
     internal val streamPlaying = AtomicBoolean(false)
     var playStartedTime = 0L; internal set
-
+    var checkedOutTime = 0L; internal set
 
     fun copyStatusTo(other: TerrarumAudioMixerTrack) {
         other.pullNextTrack = this.pullNextTrack
@@ -163,7 +163,7 @@ class TerrarumAudioMixerTrack(
 
     fun stop() {
         printdbg("TerrarumAudioMixerTrack $name", "Stop music (mixertrack=${this.name}, musictrack=$currentTrack)")
-        printStackTrace("TerrarumAudioMixerTrack $name")
+//        printStackTrace("TerrarumAudioMixerTrack $name")
 
         currentTrack?.reset()
 
