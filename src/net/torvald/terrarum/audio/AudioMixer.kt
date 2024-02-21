@@ -123,14 +123,19 @@ class AudioMixer : Disposable {
      * Return oldest dynamic track, even if the track is currently playing
      */
     fun getFreeTrackNoMatterWhat(): TerrarumAudioMixerTrack {
-        return getFreeTrack() ?: dynamicTracks.minBy { it.playStartedTime }
+        synchronized(this) {
+            return getFreeTrack() ?: dynamicTracks.minBy { it.playStartedTime }
+        }
     }
 
     /**
      * Return oldest dynamic track that is not playing
      */
     fun getFreeTrack(): TerrarumAudioMixerTrack? {
-        return dynamicTracks.filter { it.trackingTarget == null && !it.isPlaying }.minByOrNull { it.playStartedTime }
+        synchronized(this) {
+            return dynamicTracks.filter { it.trackingTarget == null && !it.isPlaying }
+                .minByOrNull { it.playStartedTime }
+        }
     }
 
     var listenerHeadSize = BinoPan.EARDIST_DEFAULT; private set

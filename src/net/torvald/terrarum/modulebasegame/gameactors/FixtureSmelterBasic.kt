@@ -289,6 +289,7 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
 
 
         // manage audio
+        // FIXME this code is also killing the audio played by the other fixture (FixtureFurnaceAndAnvil)
         getTrackByAudio(static).let {
             if (it == null || (temperature > 0f && !it.isPlaying && !it.playRequested.get())) {
                 startAudio(static) {
