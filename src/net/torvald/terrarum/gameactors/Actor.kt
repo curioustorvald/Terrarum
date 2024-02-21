@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.audio.MusicContainer
@@ -163,7 +164,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
                 track.trackingTarget = this
             }
             else {
-//                printdbg(this, "Could not get a free track")
+                printdbgerr(this, "Could not get a free track")
             }
         }
 
