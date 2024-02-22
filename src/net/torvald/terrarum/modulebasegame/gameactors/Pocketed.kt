@@ -21,28 +21,31 @@ interface Pocketed {
     fun unequipItem(item: GameItem?) {
         if (item == null) return
 
+        // check equipposition of the given item
         if (item.equipPosition == GameItem.EquipPosition.NULL)
             throw Error("Unequipping the item that cannot be equipped in the first place")
 
+        // check if the actor even has the items
         if (!inventory.contains(item)) {
             //throw Error("Unequipping the item that does not exist in inventory")
             System.err.println("[Pocketed] Warning -- Unequipping the item that does not exist in inventory")
             return // just do nothing
         }
 
-        inventory.itemEquipped[item.equipPosition] = null
+        // check if the actor actually have the item equipped
+        if (inventory.itemEquipped[item.equipPosition] == item.dynamicID) {
+            inventory.itemEquipped[item.equipPosition] = null
 
-        // NOTE: DON'T TOUCH QUICKSLOT HERE
-        // Relevant Actorvalue is NOT being updated on time
-        // They're being safely handled by UIItemInventoryElem*.touchDown() and ActorInventory.remove
+            // NOTE: DON'T TOUCH QUICKSLOT HERE
+            // Relevant Actorvalue is NOT being updated on time
+            // They're being safely handled by UIItemInventoryElem*.touchDown() and ActorInventory.remove
 
-        item.effectOnUnequip(this as ActorWithBody)
+            item.effectOnUnequip(this as ActorWithBody)
+        }
     }
 
     fun unequipItem(itemID: ItemID?) {
-        itemID?.let {
-            unequipItem(ItemCodex[itemID])
-        } ?: return
+        unequipItem(ItemCodex[itemID])
     }
 
     // no need for equipSlot(Int)
@@ -50,7 +53,13 @@ interface Pocketed {
         if (slot < 0 || slot > GameItem.EquipPosition.INDEX_MAX)
             throw IllegalArgumentException("Slot index out of range: $slot")
 
-        unequipItem(inventory.itemEquipped[slot])
+        val itemID = inventory.itemEquipped[slot]
+
+        if (itemID != null) {
+            val item = ItemCodex[itemID]!!
+            inventory.itemEquipped[slot] = null
+            item.effectOnUnequip(this as ActorWithBody)
+        }
     }
 
     /**
