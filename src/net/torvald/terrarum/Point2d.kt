@@ -11,6 +11,8 @@ class Point2d() : Cloneable {
     var x: Double = 0.0
     var y: Double = 0.0
 
+    constructor(other: Point2d) : this(other.x, other.y)
+
     constructor(x: Double, y: Double) : this() {
         this.x = x
         this.y = y

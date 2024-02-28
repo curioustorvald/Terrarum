@@ -13,12 +13,20 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.ActorWithBody.Companion.METER
+import net.torvald.terrarum.gameactors.ActorWithBody.Companion.SI_TO_GAME_ACC
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
+import net.torvald.terrarum.modulebasegame.gameitems.ItemThrowable
+import net.torvald.terrarum.modulebasegame.gameitems.getThrowPosAndVector
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.weather.WeatherMixer.render
@@ -27,6 +35,7 @@ import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
+import org.dyn4j.geometry.Vector2
 import kotlin.system.exitProcess
 
 
@@ -248,6 +257,8 @@ object IngameRenderer : Disposable {
             drawToRGB(frameDelta, actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
             drawToA(frameDelta, actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
             drawOverlayActors(frameDelta, actorsRenderOverlay)
+
+            if (player != null && player is Pocketed) drawAimGuide(frameDelta, player)
         }
 
         batch.color = Color.WHITE
@@ -729,6 +740,101 @@ object IngameRenderer : Disposable {
             // BlocksDrawer.renderWhateverGlow_TERRAIN
         }
     }
+
+    private fun drawAimGuide(frameDelta: Float, player: ActorWithBody) {
+        fboRGB_lightMixed.inActionF(camera, batch) { fb ->
+
+            setCameraPosition(0f, 0f)
+            // BlocksDrawer.renderWhateverGlow_WALL
+
+            batch.inUse {
+                batch.shader = null
+                batch.color = Color.WHITE
+
+                moveCameraToWorldCoord()
+
+                (player as Pocketed).inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]?.let { itemID ->
+                    val heldItem = ItemCodex[itemID] // will be null for blocks
+                    // this is a case-by-case affair
+                    when (heldItem) {
+                        is ItemThrowable -> drawAimGuideForThrowable(fb, batch, frameDelta, player, world, heldItem)
+                    }
+                }
+            }
+
+            setCameraPosition(0f, 0f)
+            // BlocksDrawer.renderWhateverGlow_TERRAIN
+        }
+    }
+
+    private val externalV = Vector2()
+    private fun drawAimGuideForThrowable(frameBuffer: FrameBuffer, batch: SpriteBatch, frameDelta: Float, player: ActorWithBody, world: GameWorld, item: ItemThrowable) {
+        val (throwPos, throwVector) = getThrowPosAndVector(player)
+        val grav = world.gravitation
+        externalV.set(throwVector)
+
+        batch.color = Color.WHITE // TODO get better colour
+
+
+        var c = 0
+        while (c < 50) {
+            // plot a dot
+            Toolkit.fillArea(batch, throwPos.x.toFloat(), throwPos.y.toFloat(), 2f, 2f)
+
+            // simulate physics
+            applyGravitation(grav, 7.0) // TODO use actual value instead of 7.0
+
+            // FIXME the ActorWithBody phys sim -- horizontal speed is lost aggressively
+
+            // move the point
+            throwPos += externalV
+
+
+            // break if colliding with a tile
+            if (BlockCodex[world.getTileFromTerrain(throwPos.x.div(TILE_SIZED).toInt(), throwPos.x.div(TILE_SIZED).toInt())].isSolid)
+                break
+
+            c++
+        }
+
+    }
+
+    private fun applyGravitation(gravitation: Vector2, hitboxWidth: Double) {
+        applyForce(getDrag(externalV, gravitation, hitboxWidth))
+    }
+
+    private fun Int.viscosityToMult(): Double = 16.0 / (16.0 + this)
+
+    private fun applyForce(acc: Vector2) {
+        val speedMultByTile = BlockCodex[Block.AIR].viscosity.viscosityToMult()
+        externalV += acc * speedMultByTile
+    }
+
+    private fun getDrag(externalForce: Vector2, gravitation: Vector2, hitboxWidth: Double): Vector2 {
+        val dragCoefficient = 1.2
+
+        /**
+         * weight; gravitational force in action
+         * W = mass * G (9.8 [m/s^2])
+         */
+        val W: Vector2 = gravitation * Terrarum.PHYS_TIME_FRAME
+        /**
+         * Area
+         */
+        val A: Double = (hitboxWidth / METER).sqr() // this is not physically accurate but it's needed to make large playable characters more controllable
+        /**
+         * Drag of atmosphere
+         * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity sqr) * A (area)
+         */
+        val D: Vector2 = Vector2(externalForce.x.magnSqr(), externalForce.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
+
+        val V: Vector2 = (W - D) / Terrarum.PHYS_TIME_FRAME * SI_TO_GAME_ACC
+
+        return V
+
+        // FIXME v * const, where const = 1.0 for FPS=60, sqrt(2.0) for FPS=30, etc.
+        //       this is "close enough" solution and not perfect.
+   }
 
 
     private fun invokeInit() {

@@ -31,19 +31,11 @@ open class ItemThrowable(originalID: ItemID, private val throwableActorClassName
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long = mouseInInteractableRange(actor) { mx, my, mtx, mty ->
-
-        val playerCentrePos = actor.centrePosVector
-        val mousePos = Vector2(mx, my)
-
-        val actorPowMult = actor.avStrength / 2000.0
-        val relativeX = relativeXposition(actor, mousePos)
-        val relativeY = my - playerCentrePos.y
-        val powX = relativeX / TILE_SIZED * 3.0 * actorPowMult
-        val powY = relativeY / TILE_SIZED * 3.0 * actorPowMult
+        val (throwPos, throwForce) = getThrowPosAndVector(actor)
 
         val lobbed = Class.forName(throwableActorClassName).getDeclaredConstructor().newInstance() as ActorWithBody
-        lobbed.setPosition(playerCentrePos)
-        lobbed.externalV.set(powX, powY)
+        lobbed.setPosition(throwPos)
+        lobbed.externalV.set(throwForce)
         setupLobbedActor(lobbed)
 
         Terrarum.ingame?.queueActorAddition(lobbed)
@@ -52,6 +44,24 @@ open class ItemThrowable(originalID: ItemID, private val throwableActorClassName
 
         1L
     }
+
+
+}
+
+/**
+ * @return pair of throwing start position, throwing force
+ */
+fun getThrowPosAndVector(actor: ActorWithBody): Pair<Vector2, Vector2> {
+    val playerCentrePos = Vector2(actor.centrePosVector) // make a COPY of the actor.centrePosPoint
+    val mousePos = Vector2(Terrarum.mouseX, Terrarum.mouseY)
+
+    val actorPowMult = actor.avStrength / 2000.0
+    val relativeX = relativeXposition(actor, mousePos)
+    val relativeY = mousePos.y - playerCentrePos.y
+    val powX = relativeX / TILE_SIZED * 3.0 * actorPowMult
+    val powY = relativeY / TILE_SIZED * 3.0 * actorPowMult
+
+    return Pair(playerCentrePos, Vector2(powX, powY))
 }
 
 
