@@ -524,8 +524,16 @@ open class GameWorld(
         if (wiringGraph[blockAddr]!![itemID] == null)
             wiringGraph[blockAddr]!![itemID] = WiringSimCell(0, vector)
 
-        wiringGraph[blockAddr]!![itemID]!!.emt.set(vector)
+        // out = max(old, new)
+        val old = wiringGraph[blockAddr]!![itemID]!!.emt
+
+        wiringGraph[blockAddr]!![itemID]!!.emt.set(old max vector)
     }
+
+    private infix fun Vector2.max(other: Vector2) = Vector2(
+        maxOf(this.x, other.x),
+        maxOf(this.y, other.y)
+    )
 
     fun addWireRecvStateOf(x: Int, y: Int, itemID: ItemID, state: WireReceptionState) {
         val (x, y) = coerceXY(x, y)
