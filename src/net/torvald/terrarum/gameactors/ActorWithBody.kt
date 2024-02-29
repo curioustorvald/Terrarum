@@ -443,7 +443,7 @@ open class ActorWithBody : Actor {
 
     fun setPosition(pos: Point2d) = setPosition(pos.x, pos.y)
     fun setPosition(pos: Vector2) = setPosition(pos.x, pos.y)
-
+    fun setPositionFromCentrePoint(pos: Vector2) = setPosition(pos.x, pos.y + (hitbox.height) / 2)
 
     /**
      * ONLY FOR INITIAL SETUP

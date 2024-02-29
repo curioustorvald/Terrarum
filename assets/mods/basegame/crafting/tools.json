@@ -57,5 +57,9 @@
   "item@basegame:21": { /* steel sledgehammer */
     "workbench": "basiccrafting,metalworking",
     "ingredients": [[1, 6, "item@basegame:26", 2, "item@basegame:18"]] /* 6 bars, 2 sticks */
+  },
+  "item@basegame:9": { /* wire cutter */
+    "workbench": "basiccrafting,metalworking",
+    "ingredients": [[1, 1, "item@basegame:112", 1, "item@basegame:113"]] /* 1 copper ingot, 1 iron ingot */
   }
 }

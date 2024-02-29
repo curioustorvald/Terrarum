@@ -24,4 +24,18 @@ class WireProp {
      * Mainly intended to be used by third-party modules
      */
     val extra = Codex()
+
+    @Transient var tags = HashSet<String>()
+
+    fun hasTag(s: String) = tags.contains(s)
+    fun hasAnyTagOf(vararg s: String) = s.any { hasTag(it) }
+    fun hasAnyTag(s: Collection<String>) = s.any { hasTag(it) }
+    fun hasAnyTag(s: Array<String>) = s.any { hasTag(it) }
+    fun hasAllTagOf(vararg s: String) = s.all { hasTag(it) }
+    fun hasAllTag(s: Collection<String>) = s.all { hasTag(it) }
+    fun hasAllTag(s: Array<String>) = s.all { hasTag(it) }
+    fun hasNoTagOf(vararg s: String) = s.none { hasTag(it) }
+    fun hasNoTag(s: Collection<String>) = s.none { hasTag(it) }
+    fun hasNoTag(s: Array<String>) = s.none { hasTag(it) }
+
 }

@@ -34,7 +34,7 @@ open class ItemThrowable(originalID: ItemID, private val throwableActorClassName
         val (throwPos, throwForce) = getThrowPosAndVector(actor)
 
         val lobbed = Class.forName(throwableActorClassName).getDeclaredConstructor().newInstance() as ActorWithBody
-        lobbed.setPosition(throwPos)
+        lobbed.setPositionFromCentrePoint(throwPos)
         lobbed.externalV.set(throwForce)
         setupLobbedActor(lobbed)
 

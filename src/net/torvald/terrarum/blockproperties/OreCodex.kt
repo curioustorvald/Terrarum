@@ -53,7 +53,7 @@ class OreCodex {
     private fun setProp(modname: String, key: Int, record: CSVRecord) {
         val prop = OreProp()
         prop.id = "ores@$modname:$key"
-        prop.tags = record.get("tags").split(',').map { it.trim() }.toHashSet()
+        prop.tags = record.get("tags").split(',').map { it.trim().toUpperCase() }.toHashSet()
         prop.item = record.get("item").let { if (it == null) "" else if (it.contains(':')) it else "$modname:$it" }
 
         oreProps[prop.id] = prop

@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.WireCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -26,6 +27,7 @@ class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, priva
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP
         originalName = "ITEM_WIRE"
+        tags.addAll(WireCodex[originalID].tags)
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {

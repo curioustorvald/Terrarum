@@ -39,15 +39,15 @@ class WireCodex {
      * @param module name of the module
      * @param path to the "wires" directory, not path to the CSV; must end with a slash!
      */
-    fun fromModule(module: String, path: String) {
+    fun fromModule(module: String, path: String, blockRegisterHook: (WireProp) -> Unit) {
         printdbg(this, "Building wire properties table for module $module")
         try {
-            register(module, path, CSVFetcher.readFromModule(module, path + "wires.csv"))
+            register(module, path, CSVFetcher.readFromModule(module, path + "wires.csv"), blockRegisterHook)
         }
         catch (e: IOException) { e.printStackTrace() }
     }
 
-    fun fromCSV(module: String, path: String, csvString: String) {
+    fun fromCSV(module: String, path: String, csvString: String, blockRegisterHook: (WireProp) -> Unit) {
         printdbg(this, "Building wire properties table for module $module")
 
         val csvParser = org.apache.commons.csv.CSVParser.parse(
@@ -57,10 +57,10 @@ class WireCodex {
         val csvRecordList = csvParser.records
         csvParser.close()
 
-        register(module, path, csvRecordList)
+        register(module, path, csvRecordList, blockRegisterHook)
     }
 
-    private fun register(module: String, path: String, records: List<CSVRecord>) {
+    private fun register(module: String, path: String, records: List<CSVRecord>, blockRegisterHook: (WireProp) -> Unit) {
         records.forEach {
             setProp(module, it.intVal("id"), it)
         }
@@ -73,9 +73,12 @@ class WireCodex {
                 val t = TextureRegionPack(ModMgr.getGdxFile(module, "$path$wireid.tga"), TILE_SIZE, TILE_SIZE)
                 /*return*/t
             }
+
+            wireProps[id]?.let(blockRegisterHook)
         }
 
         CommonResourcePool.loadAll()
+
     }
 
     fun getAll() = wireProps.values
@@ -134,6 +137,7 @@ class WireCodex {
         prop.inputType = record.get("inputtype") ?: prop.accepts
         prop.outputType = record.get("outputtype") ?: prop.accepts
         prop.canBranch = record.boolVal("branching")
+        prop.tags = record.get("tags").split(',').map { it.trim().toUpperCase() }.toHashSet()
 
         wireProps[prop.id] = prop
 

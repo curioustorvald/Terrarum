@@ -6,7 +6,7 @@ id;classname;tags
 5;net.torvald.terrarum.modulebasegame.gameitems.ItemTikiTorch;FIXTURE,LIGHT
 6;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChest;FIXTURE,STORAGE
 7;net.torvald.terrarum.modulebasegame.gameitems.WireGraphDebugger;TOOL,WIRE
-8;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalEmitter;FIXTURE
+8;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalEmitter;FIXTURE,SIGNAL
 9;net.torvald.terrarum.modulebasegame.gameitems.WireCutterAll;TOOL,WIRE
 10;net.torvald.terrarum.modulebasegame.gameitems.ItemTypewriter;FIXTURE,PRINTING
 11;net.torvald.terrarum.modulebasegame.gameitems.ItemWallCalendar;FIXTURE
@@ -32,6 +32,7 @@ id;classname;tags
 31;net.torvald.terrarum.modulebasegame.gameitems.ItemGunpowder;POWDER,EXPLOSIVE
 32;net.torvald.terrarum.modulebasegame.gameitems.ItemCherryBomb;EXPLOSIVE,THROWABLE
 33;net.torvald.terrarum.modulebasegame.gameitems.ItemTorch;FIXTURE,LIGHT
+34;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalSwitchManual;FIXTURE,SIGNAL
 
 # ingots
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT

@@ -332,6 +332,10 @@ class InventoryPair : Comparable<InventoryPair> {
     operator fun component2() = qty
 
     override fun compareTo(other: InventoryPair) = this.itm.compareTo(other.itm)
+
+    override fun toString(): String {
+        return if (qty == -1L) "$itm" else "$itm ($qty)"
+    }
 }
 
 class InventoryTransactionFailedError(msg: String) : Error(msg)

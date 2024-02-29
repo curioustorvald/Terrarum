@@ -786,7 +786,7 @@ object IngameRenderer : Disposable {
                 if (c > 0) Toolkit.fillArea(
                     batch,
                     throwPos.x.toFloat(),
-                    throwPos.y.toFloat() - cubeSize.toFloat() / 2f,
+                    throwPos.y.toFloat(),
                     2f,
                     2f
                 )
@@ -801,11 +801,19 @@ object IngameRenderer : Disposable {
 
 
                 // break if colliding with a tile
-                if (BlockCodex[world.getTileFromTerrain(
-                        throwPos.x.div(TILE_SIZED).toInt(),
-                        (throwPos.y - cubeSize / 2).div(TILE_SIZED).toInt()
-                    )].isSolid
-                )
+                val hitSolid = listOf(
+                    throwPos + Vector2(-cubeSize/2, -cubeSize/2),
+                    throwPos + Vector2(-cubeSize/2, +cubeSize/2),
+                    throwPos + Vector2(+cubeSize/2, +cubeSize/2),
+                    throwPos + Vector2(+cubeSize/2, -cubeSize/2),
+                ).any {
+                    val wx = (it.x / TILE_SIZED).toInt()
+                    val wy = (it.y / TILE_SIZED).toInt()
+                    val tile = world.getTileFromTerrain(wx, wy)
+                    BlockCodex[tile].isSolid
+                }
+
+                if (hitSolid)
                     break
 
                 c++

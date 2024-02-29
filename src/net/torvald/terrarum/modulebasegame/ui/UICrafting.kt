@@ -21,7 +21,6 @@ import net.torvald.terrarum.modulebasegame.ui.UITemplateHalfInventory.Companion.
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemCatBar.Companion.FILTER_CAT_ALL
 import net.torvald.unicode.getKeycapPC
-import kotlin.math.ceil
 
 /**
  * This UI has inventory, but it's just there to display all craftable items and should not be serialised.
@@ -251,7 +250,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
                     recipeClicked = recipe
 //                        printdbg(this, "Recipe selected: $recipe")
                     recipe?.ingredients?.forEach { ingredient ->
-                        val selectedItem = getItemForIngredient(playerInventory, ingredient)
+                        val selectedItem = resolveIngredientKey(playerInventory, ingredient, recipe.product)
                         selectedItems.add(selectedItem)
                         ingredients.add(selectedItem, ingredient.qty)
                     }
@@ -357,7 +356,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         else {
             val items = recipe.ingredients.flatMap {
                 getItemCandidatesForIngredient(getPlayerInventory(), it).map { it.itm }
-            }.sorted()
+            }.filter { it != recipe.product }.sorted() // filter out the product itself from the ingredient
 
             val filterFun = { pair: InventoryPair ->
                 items.binarySearch(pair.itm) >= 0
@@ -561,10 +560,13 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
             }
         }
 
-        fun getItemForIngredient(inventory: FixtureInventory, ingredient: CraftingCodex.CraftingIngredients): ItemID {
-            val candidate = getItemCandidatesForIngredient(inventory, ingredient)
+        fun resolveIngredientKey(inventory: FixtureInventory, ingredient: CraftingCodex.CraftingIngredients, product: ItemID): ItemID {
+            val candidate = getItemCandidatesForIngredient(inventory, ingredient).filter { it.itm != product }
+
+            printdbg(this, "resolveIngredientKey product=$product, candidate=$candidate")
 
             return if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
+                // filter out the product itself from the ingredient
                 candidate.maxByOrNull { it.qty }?.itm ?: (
                     (ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.hasTag(ingredient.key)) it.key else null }) ?:
                         throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed (ingredient: $ingredient)")
@@ -581,7 +583,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         fun recipeToIngredientRecord(inventory: FixtureInventory, recipe: CraftingCodex.CraftingRecipe, nearbyCraftingStations: List<String>): List<RecipeIngredientRecord> {
             val hasStation = if (recipe.workbench.isBlank()) true else nearbyCraftingStations.containsAll(recipe.workbench.split(','))
             return recipe.ingredients.map { ingredient ->
-                val selectedItem = getItemForIngredient(inventory, ingredient)
+                val selectedItem = resolveIngredientKey(inventory, ingredient, recipe.product)
                 val howManyPlayerHas = inventory.searchByID(selectedItem)?.qty ?: 0L
                 val howManyTheRecipeWants = ingredient.qty
 

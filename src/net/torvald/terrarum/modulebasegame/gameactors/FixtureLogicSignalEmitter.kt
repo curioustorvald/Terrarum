@@ -7,6 +7,9 @@ import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
+/**
+ * Created by minjaesong on 2021-08-08.
+ */
 class FixtureLogicSignalEmitter : Electric {
 
     @Transient override val spawnNeedsFloor = false
