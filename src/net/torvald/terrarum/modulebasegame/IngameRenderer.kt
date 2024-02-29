@@ -22,6 +22,7 @@ import net.torvald.terrarum.gameactors.ActorWithBody.Companion.SI_TO_GAME_ACC
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
@@ -769,33 +770,49 @@ object IngameRenderer : Disposable {
     }
     private val cubeSize = 7.0
     private val externalV = Vector2()
+    private val maxStep = 56
     private fun drawAimGuideForThrowable(frameBuffer: FrameBuffer, batch: SpriteBatch, frameDelta: Float, player: ActorWithBody, world: GameWorld, item: ItemThrowable) {
-        val (throwPos, throwVector) = getThrowPosAndVector(player)
-        val grav = world.gravitation
-        externalV.set(throwVector)
-
-        batch.color = Color.WHITE // TODO get better colour
-
-
-        var c = 0
-        while (c < 100) {
-            // plot a dot
-            Toolkit.fillArea(batch, throwPos.x.toFloat(), throwPos.y.toFloat() - cubeSize.toFloat() / 2f, 2f, 2f)
-
-            // simulate physics
-            applyGravitation(grav, cubeSize) // TODO use actual value instead of `cubeSize`
-            // move the point
-            throwPos += externalV
-            // more physics
-            setHorizontalFriction()
-            setVerticalFriction()
+        mouseInInteractableRange(player) { mx, my, mtx, mty ->
+            val (throwPos, throwVector) = getThrowPosAndVector(player)
+            val grav = world.gravitation
+            externalV.set(throwVector)
 
 
-            // break if colliding with a tile
-            if (BlockCodex[world.getTileFromTerrain(throwPos.x.div(TILE_SIZED).toInt(), (throwPos.y - cubeSize/2).div(TILE_SIZED).toInt())].isSolid)
-                break
+            var c = 0
+            while (c < maxStep) {
+                batch.color = Color(0.9f, 0.9f, 0.9f, 0.9f * (1f - (c.toFloat() / maxStep).sqr()))
 
-            c++
+                // plot a dot
+                if (c > 0) Toolkit.fillArea(
+                    batch,
+                    throwPos.x.toFloat(),
+                    throwPos.y.toFloat() - cubeSize.toFloat() / 2f,
+                    2f,
+                    2f
+                )
+
+                // simulate physics
+                applyGravitation(grav, cubeSize) // TODO use actual value instead of `cubeSize`
+                // move the point
+                throwPos += externalV
+                // more physics
+                setHorizontalFriction()
+                setVerticalFriction()
+
+
+                // break if colliding with a tile
+                if (BlockCodex[world.getTileFromTerrain(
+                        throwPos.x.div(TILE_SIZED).toInt(),
+                        (throwPos.y - cubeSize / 2).div(TILE_SIZED).toInt()
+                    )].isSolid
+                )
+                    break
+
+                c++
+            }
+
+
+            1L
         }
 
     }
