@@ -21,6 +21,7 @@ import net.torvald.terrarum.gameactors.ActorWithBody.Companion.METER
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.SI_TO_GAME_ACC
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
@@ -766,7 +767,7 @@ object IngameRenderer : Disposable {
             // BlocksDrawer.renderWhateverGlow_TERRAIN
         }
     }
-
+    private val cubeSize = 7.0
     private val externalV = Vector2()
     private fun drawAimGuideForThrowable(frameBuffer: FrameBuffer, batch: SpriteBatch, frameDelta: Float, player: ActorWithBody, world: GameWorld, item: ItemThrowable) {
         val (throwPos, throwVector) = getThrowPosAndVector(player)
@@ -777,21 +778,21 @@ object IngameRenderer : Disposable {
 
 
         var c = 0
-        while (c < 50) {
+        while (c < 100) {
             // plot a dot
-            Toolkit.fillArea(batch, throwPos.x.toFloat(), throwPos.y.toFloat(), 2f, 2f)
+            Toolkit.fillArea(batch, throwPos.x.toFloat(), throwPos.y.toFloat() - cubeSize.toFloat() / 2f, 2f, 2f)
 
             // simulate physics
-            applyGravitation(grav, 7.0) // TODO use actual value instead of 7.0
-
-            // FIXME the ActorWithBody phys sim -- horizontal speed is lost aggressively
-
+            applyGravitation(grav, cubeSize) // TODO use actual value instead of `cubeSize`
             // move the point
             throwPos += externalV
+            // more physics
+            setHorizontalFriction()
+            setVerticalFriction()
 
 
             // break if colliding with a tile
-            if (BlockCodex[world.getTileFromTerrain(throwPos.x.div(TILE_SIZED).toInt(), throwPos.x.div(TILE_SIZED).toInt())].isSolid)
+            if (BlockCodex[world.getTileFromTerrain(throwPos.x.div(TILE_SIZED).toInt(), (throwPos.y - cubeSize/2).div(TILE_SIZED).toInt())].isSolid)
                 break
 
             c++
@@ -799,14 +800,19 @@ object IngameRenderer : Disposable {
 
     }
 
+    private val bodyFriction = BlockCodex[Block.AIR].friction.frictionToMult()
+    private val bodyViscosity = BlockCodex[Block.AIR].viscosity.viscosityToMult()
+
+
     private fun applyGravitation(gravitation: Vector2, hitboxWidth: Double) {
         applyForce(getDrag(externalV, gravitation, hitboxWidth))
     }
 
+    private fun Int.frictionToMult(): Double = this / 16.0
     private fun Int.viscosityToMult(): Double = 16.0 / (16.0 + this)
 
     private fun applyForce(acc: Vector2) {
-        val speedMultByTile = BlockCodex[Block.AIR].viscosity.viscosityToMult()
+        val speedMultByTile = bodyViscosity
         externalV += acc * speedMultByTile
     }
 
@@ -835,6 +841,36 @@ object IngameRenderer : Disposable {
         // FIXME v * const, where const = 1.0 for FPS=60, sqrt(2.0) for FPS=30, etc.
         //       this is "close enough" solution and not perfect.
    }
+
+    /** about stopping
+     * for about get moving, see updateMovementControl */
+    private fun setHorizontalFriction() {
+        val friction =  0.3 * bodyFriction
+
+        if (externalV.x < 0) {
+            externalV.x += friction
+            if (externalV.x > 0) externalV.x = 0.0 // compensate overshoot
+        }
+        else if (externalV.x > 0) {
+            externalV.x -= friction
+            if (externalV.x < 0) externalV.x = 0.0 // compensate overshoot
+        }
+    }
+
+    private fun setVerticalFriction() {
+        val friction =  0.3 * bodyFriction
+
+        if (externalV.y < 0) {
+            externalV.y += friction
+            if (externalV.y > 0) externalV.y = 0.0 // compensate overshoot
+        }
+        else if (externalV.y > 0) {
+            externalV.y -= friction
+            if (externalV.y < 0) externalV.y = 0.0 // compensate overshoot
+        }
+    }
+
+
 
 
     private fun invokeInit() {

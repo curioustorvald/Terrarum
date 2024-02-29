@@ -589,7 +589,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
     private fun applyVelo(x: Int): Double {
         return if (x < WALK_FRAMES_TO_MAX_ACCEL)
-            0.5 - 0.5 * Math.cos(Math.PI * x / WALK_FRAMES_TO_MAX_ACCEL)
+            x.toDouble() / WALK_FRAMES_TO_MAX_ACCEL //0.5 - 0.5 * Math.cos(Math.PI * x / WALK_FRAMES_TO_MAX_ACCEL)
         else 1.0
     }
 
