@@ -753,7 +753,7 @@ object IngameRenderer : Disposable {
                     val heldItem = ItemCodex[itemID] // will be null for blocks
                     // this is a case-by-case affair
                     when (heldItem) {
-                        is ItemThrowable -> drawAimGuideForThrowable(fb, batch, frameDelta, player, world, heldItem)
+                        is ItemThrowable -> drawTrajectoryForThrowable(fb, batch, frameDelta, player, world, heldItem)
                     }
                 }
             }
@@ -765,7 +765,9 @@ object IngameRenderer : Disposable {
     private val cubeSize = 7.0
     private val externalV = Vector2()
     private val maxStep = 56
-    private fun drawAimGuideForThrowable(frameBuffer: FrameBuffer, batch: SpriteBatch, frameDelta: Float, player: ActorWithBody, world: GameWorld, item: ItemThrowable) {
+    private fun drawTrajectoryForThrowable(frameBuffer: FrameBuffer, batch: SpriteBatch, frameDelta: Float, player: ActorWithBody, world: GameWorld, item: ItemThrowable) {
+        val ww = world.width * TILE_SIZEF
+
         mouseInInteractableRange(player) { mx, my, mtx, mty ->
             val (throwPos, throwVector) = getThrowPosAndVector(player)
             val grav = world.gravitation
@@ -777,13 +779,11 @@ object IngameRenderer : Disposable {
                 batch.color = Color(0.9f, 0.9f, 0.9f, 0.9f * (1f - (c.toFloat() / maxStep).sqr()))
 
                 // plot a dot
-                if (c > 0) Toolkit.fillArea(
-                    batch,
-                    throwPos.x.toFloat(),
-                    throwPos.y.toFloat(),
-                    2f,
-                    2f
-                )
+                if (c > 0) {
+                    Toolkit.fillArea(batch, throwPos.x.toFloat(), throwPos.y.toFloat(), 2f, 2f)
+                    Toolkit.fillArea(batch, throwPos.x.toFloat() + ww, throwPos.y.toFloat(), 2f, 2f)
+                    Toolkit.fillArea(batch, throwPos.x.toFloat() - ww, throwPos.y.toFloat(), 2f, 2f)
+                }
 
                 // simulate physics
                 applyGravitation(grav, cubeSize) // TODO use actual value instead of `cubeSize`
