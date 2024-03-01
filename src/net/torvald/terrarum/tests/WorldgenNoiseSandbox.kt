@@ -332,16 +332,16 @@ internal object TerragenTest : NoiseMaker {
         Block.STONE_MARBLE to Color(0.8f, 0.8f, 0.8f, 1f)
     )
 
-    private val COPPER_ORE = 0//x00e9c8ff.toInt()
-    private val IRON_ORE = 0//xff7e74ff.toInt()
-    private val COAL_ORE = 0//x383314ff.toInt()
-    private val ZINC_ORE = 0//xefde76ff.toInt()
-    private val TIN_ORE = 0//xcd8b62ff.toInt()
-    private val GOLD_ORE = 0//xffcc00ff.toInt()
-    private val SILVER_ORE = 0//xd5d9f9ff.toInt()
-    private val LEAD_ORE = 0//xff9300ff.toInt()
-    private val QUARTZ = 0//x55ff33ff.toInt()
-    private val AMETHYST = 0//xee77ffff.toInt()
+    private val COPPER_ORE = 0x00e9c8ff.toInt()
+    private val IRON_ORE = 0xff7e74ff.toInt()
+    private val COAL_ORE = 0x383314ff.toInt()
+    private val ZINC_ORE = 0xefde76ff.toInt()
+    private val TIN_ORE = 0xcd8b62ff.toInt()
+    private val GOLD_ORE = 0xffcc00ff.toInt()
+    private val SILVER_ORE = 0xd5d9f9ff.toInt()
+    private val LEAD_ORE = 0xff9300ff.toInt()
+    private val QUARTZ = 0x55ff33ff.toInt()
+    private val AMETHYST = 0xee77ffff.toInt()
     private val ROCKSALT = 0xff00ffff.toInt()
     private val NITRE = 0xdbd6a1ff.toInt()
 
@@ -684,7 +684,7 @@ internal object TerragenTest : NoiseMaker {
             Joise(groundScalingCached),
             Joise(caveScaling),
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:1", 0.026, 0.010, 0.517, 1.0)),
-            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:2", 0.045, 0.011, 0.517, 1.0)),
+            Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:2", 0.031, 0.011, 0.521, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:3", 0.017, 0.070, 0.511, 3.8)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:4", 0.019, 0.011, 0.511, 1.0)),
             Joise(generateOreVeinModule(caveAttenuateBiasScaledCache, seed shake "ores@basegame:5", 0.017, 0.017, 0.511, 1.0)),
