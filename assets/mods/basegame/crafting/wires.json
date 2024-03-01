@@ -18,5 +18,12 @@
       [10, 1, "item@basegame:112"], /* 1 copper */
       [1, 1, "$SIGNALWIRE"] /* 1 other signal wire */
     ]
+  },
+
+  "item@basegame:35": { /* copper bulb */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [2, 1, "item@basegame:112", 1, "item@basegame:113"] /* 1 copper, 1 iron */
+    ]
   }
 }

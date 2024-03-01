@@ -33,6 +33,7 @@ id;classname;tags
 32;net.torvald.terrarum.modulebasegame.gameitems.ItemCherryBomb;EXPLOSIVE,THROWABLE
 33;net.torvald.terrarum.modulebasegame.gameitems.ItemTorch;FIXTURE,LIGHT
 34;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalSwitchManual;FIXTURE,SIGNAL
+35;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalBulb;FIXTURE,SIGNAL
 
 # ingots
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT

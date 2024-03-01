@@ -11,17 +11,17 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalEmitter
 /**
  * Created by minjaesong on 2024-03-01.
  */
-class ItemSignalSwitchManual(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSignalSwitchManual") {
+class ItemSignalBulb(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSignalBulb") {
 
     override var dynamicID: ItemID = originalID
     override var baseMass = FixtureLogicSignalEmitter.MASS
     override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8, 3)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9, 3)
 
     override var baseToolSize: Double? = baseMass
-    override var originalName = "ITEM_LOGIC_SIGNAL_SWITCH"
+    override var originalName = "ITEM_COPPER_BULB"
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         super.effectWhileEquipped(actor, delta)
