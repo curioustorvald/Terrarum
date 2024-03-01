@@ -34,6 +34,7 @@ id;classname;tags
 33;net.torvald.terrarum.modulebasegame.gameitems.ItemTorch;FIXTURE,LIGHT
 34;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalSwitchManual;FIXTURE,SIGNAL
 35;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalBulb;FIXTURE,SIGNAL
+36;net.torvald.terrarum.modulebasegame.gameitems.ItemWireRollingMill;FIXTURE,CRAFTING
 
 # ingots
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT
