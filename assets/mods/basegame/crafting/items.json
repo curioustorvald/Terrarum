@@ -1,7 +1,7 @@
 {
   "item@basegame:31": { /* gunpowder */
     "workbench": "basiccrafting",
-    "ingredients": [[10, 3, "item@basegame:147", 1, "item@basegame:29", 1, "item@basegame:129"]] /* 3 nitre, 1 charcoal, 1 iron ore */
+    "ingredients": [[8, 3, "item@basegame:147", 1, "item@basegame:29"]] /* 3 nitre, 1 charcoal */
   },
   "item@basegame:32": { /* cherry bomb */
     "workbench": "",
