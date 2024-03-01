@@ -4,6 +4,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
@@ -69,7 +72,17 @@ class ItemTorch(originalID: ItemID) : LightIngredientBase(originalID) {
     override fun getLumCol() = BlockCodex[Block.TORCH].getLumCol(0, 0)
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
-        return BlockBase.blockStartPrimaryUse(actor, this, "basegame:176", delta)
+        val mwx = (Terrarum.mouseX / TILE_SIZE).toInt()
+        val mwy = (Terrarum.mouseY / TILE_SIZE).toInt()
+        val wall = BlockCodex[INGAME.world.getTileFromWall(mwx, mwy)]
+        val terr1 = BlockCodex[INGAME.world.getTileFromTerrain(mwx - 1, mwy)]
+        val terr2 = BlockCodex[INGAME.world.getTileFromTerrain(mwx, mwy + 1)]
+        val terr3 = BlockCodex[INGAME.world.getTileFromTerrain(mwx + 1, mwy)]
+
+        if (wall.isSolid || terr1.isSolid || terr2.isSolid || terr3.isSolid)
+            return BlockBase.blockStartPrimaryUse(actor, this, "basegame:176", delta)
+        else
+            return -1L
     }
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {

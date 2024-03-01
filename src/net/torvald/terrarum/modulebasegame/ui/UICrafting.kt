@@ -563,7 +563,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
         fun resolveIngredientKey(inventory: FixtureInventory, ingredient: CraftingCodex.CraftingIngredients, product: ItemID): ItemID {
             val candidate = getItemCandidatesForIngredient(inventory, ingredient).filter { it.itm != product }
 
-            printdbg(this, "resolveIngredientKey product=$product, candidate=$candidate")
+//            printdbg(this, "resolveIngredientKey product=$product, candidate=$candidate")
 
             return if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
                 // filter out the product itself from the ingredient
