@@ -37,7 +37,10 @@ object WorldCamera {
     // zoomed coords. Currently only being used by the lightmaprenderer.
     // What about others? We just waste 3/4 of the framebuffer
     val zoomedX: Int
-        get() = x + (width * zoomSamplePoint).toInt()
+        get() {
+            val t = (if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0).toFloat()
+            return x + (width * zoomSamplePoint - (t * (zoom - 1f)) / 2f).toInt()
+        }
     val zoomedY: Int
         get() = y + (height * zoomSamplePoint).toInt()
 
