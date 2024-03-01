@@ -21,7 +21,6 @@ import net.torvald.terrarum.gameactors.ActorWithBody.Companion.METER
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.SI_TO_GAME_ACC
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.GameItem
-import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
@@ -31,7 +30,6 @@ import net.torvald.terrarum.modulebasegame.gameitems.ItemThrowable
 import net.torvald.terrarum.modulebasegame.gameitems.getThrowPosAndVector
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.weather.WeatherMixer
-import net.torvald.terrarum.weather.WeatherMixer.render
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
@@ -217,6 +215,17 @@ object IngameRenderer : Disposable {
 
     private var oldCamX = 0
 
+    private fun FlippingSpriteBatch.drawFramebufferWithZoom(buf: TextureRegion, zoom: Float) {
+        val t = (if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0).toFloat()
+
+        this.draw(buf,
+            -0.5f * buf.regionWidth * zoom + 0.5f * buf.regionWidth + t * (zoom - 1f),
+            -0.5f * buf.regionHeight * zoom + 0.5f * buf.regionHeight,
+            buf.regionWidth * zoom,
+            buf.regionHeight * zoom
+        )
+    }
+
     operator fun invoke(
         frameDelta: Float,
         gamePaused: Boolean,
@@ -300,12 +309,7 @@ object IngameRenderer : Disposable {
                     blendNormalStraightAlpha(batch)
                     batch.shader = shaderBlendGlow
                     shaderBlendGlow.setUniformi("tex1", 1)
-                    batch.draw(rgbTex,
-                            -0.5f * rgbTex.regionWidth * zoom + 0.5f * rgbTex.regionWidth,
-                            -0.5f * rgbTex.regionHeight * zoom + 0.5f * rgbTex.regionHeight,
-                            rgbTex.regionWidth * zoom,
-                            rgbTex.regionHeight * zoom
-                    )
+                    batch.drawFramebufferWithZoom(rgbTex, zoom)
                 }
 
             }
@@ -317,12 +321,7 @@ object IngameRenderer : Disposable {
                 batch.inUse {
                     blendNormalStraightAlpha(batch)
                     batch.shader = null
-                    batch.draw(rgbTex,
-                            -0.5f * rgbTex.regionWidth * zoom + 0.5f * rgbTex.regionWidth,
-                            -0.5f * rgbTex.regionHeight * zoom + 0.5f * rgbTex.regionHeight,
-                            rgbTex.regionWidth * zoom,
-                            rgbTex.regionHeight * zoom
-                    )
+                    batch.drawFramebufferWithZoom(rgbTex, zoom)
 
                     // indicator
                     batch.color = Color.RED
@@ -344,12 +343,7 @@ object IngameRenderer : Disposable {
                 batch.inUse {
                     blendNormalStraightAlpha(batch)
                     batch.shader = null
-                    batch.draw(aTex,
-                            -0.5f * aTex.regionWidth * zoom + 0.5f * aTex.regionWidth,
-                            -0.5f * aTex.regionHeight * zoom + 0.5f * aTex.regionHeight,
-                            aTex.regionWidth * zoom,
-                            aTex.regionHeight * zoom
-                    )
+                    batch.drawFramebufferWithZoom(aTex, zoom)
 
                     // indicator
                     batch.color = Color.WHITE
