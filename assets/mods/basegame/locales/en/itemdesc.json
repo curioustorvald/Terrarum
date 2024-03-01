@@ -16,6 +16,9 @@
   "TOOLTIP_item@basegame:4": "Breaks down walls",
   "TOOLTIP_item@basegame:5": "Provides light but fancier",
   "TOOLTIP_item@basegame:6": "“I am sworn to keep your burdens.”", /* skyrim/lydia reference */
+  "TOOLTIP_item@basegame:37": "“I am sworn to keep your burdens.”", /* skyrim/lydia reference */
+  "TOOLTIP_item@basegame:38": "“I am sworn to keep your burdens.”", /* skyrim/lydia reference */
+  "TOOLTIP_item@basegame:39": "“I am sworn to keep your burdens.”", /* skyrim/lydia reference */
   "TOOLTIP_item@basegame:8": "Emits a signal",
   "TOOLTIP_item@basegame:9": "An electricians’ best friend",
   "TOOLTIP_item@basegame:10": "“Who needs a Book and Quill when you’ve got this?”", /* a jab on the Minecraft item Book and Quill */

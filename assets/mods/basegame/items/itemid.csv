@@ -35,6 +35,9 @@ id;classname;tags
 34;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalSwitchManual;FIXTURE,SIGNAL
 35;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalBulb;FIXTURE,SIGNAL
 36;net.torvald.terrarum.modulebasegame.gameitems.ItemWireRollingMill;FIXTURE,CRAFTING
+37;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChestEbony;FIXTURE,STORAGE
+38;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChestBirch;FIXTURE,STORAGE
+39;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChestRosewood;FIXTURE,STORAGE
 
 # ingots
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT

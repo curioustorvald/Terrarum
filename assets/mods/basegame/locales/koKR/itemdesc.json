@@ -16,6 +16,9 @@
   "TOOLTIP_item@basegame:4": "벽을 부숩니다",
   "TOOLTIP_item@basegame:5": "빛을 더 이쁘게 냅니다",
   "TOOLTIP_item@basegame:6": "“짐을 맡아두기로 한 몸이니까요.”", /* skyrim/lydia reference */
+  "TOOLTIP_item@basegame:37": "“짐을 맡아두기로 한 몸이니까요.”", /* skyrim/lydia reference */
+  "TOOLTIP_item@basegame:38": "“짐을 맡아두기로 한 몸이니까요.”", /* skyrim/lydia reference */
+  "TOOLTIP_item@basegame:39": "“짐을 맡아두기로 한 몸이니까요.”", /* skyrim/lydia reference */
   "TOOLTIP_item@basegame:8": "신호를 만들어냅니다",
   "TOOLTIP_item@basegame:9": "전기공의 친한 친구",
   "TOOLTIP_item@basegame:10": "“이게 있는데 책과 깃펜이 왜 필요하죠?”", /* a jab on the Minecraft item Book and Quill */

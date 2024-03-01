@@ -65,7 +65,25 @@
   "item@basegame:6": { /* storage chest */
     "workbench": "basiccrafting",
     "ingredients": [
-      [1, 20, "$WOOD"] /* 1 chest = 20 wood */
+      [1, 20, "basegame:48"] /* 1 chest = 20 wood */
+    ]
+  },
+  "item@basegame:37": { /* storage chest */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 20, "basegame:49"] /* 1 chest = 20 wood */
+    ]
+  },
+  "item@basegame:38": { /* storage chest */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 20, "basegame:50"] /* 1 chest = 20 wood */
+    ]
+  },
+  "item@basegame:39": { /* storage chest */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 20, "basegame:51"] /* 1 chest = 20 wood */
     ]
   },
 
