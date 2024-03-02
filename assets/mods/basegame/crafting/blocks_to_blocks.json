@@ -32,25 +32,25 @@
   "basegame:272": { /* scaffolding */
     "workbench": "",
     "ingredients": [
-      [2, 2, "item@basegame:18", 2, "basegame:161"] /* 2 sticks and 2 platform */
+      [2, 2, "item@basegame:18", 2, "basegame:48"] /* 2 sticks and 2 wood */
     ]
   },
   "basegame:273": { /* scaffolding */
     "workbench": "",
     "ingredients": [
-      [2, 2, "item@basegame:18", 2, "basegame:162"] /* 2 sticks and 2 platform */
+      [2, 2, "item@basegame:18", 2, "basegame:49"] /* 2 sticks and 2 wood */
     ]
   },
   "basegame:274": { /* scaffolding */
     "workbench": "",
     "ingredients": [
-      [2, 2, "item@basegame:18", 2, "basegame:163"] /* 2 sticks and 2 platform */
+      [2, 2, "item@basegame:18", 2, "basegame:50"] /* 2 sticks and 2 wood */
     ]
   },
   "basegame:275": { /* scaffolding */
     "workbench": "",
     "ingredients": [
-      [2, 2, "item@basegame:18", 2, "basegame:164"] /* 2 sticks and 2 platform */
+      [2, 2, "item@basegame:18", 2, "basegame:51"] /* 2 sticks and 2 wood */
     ]
   }
 }
