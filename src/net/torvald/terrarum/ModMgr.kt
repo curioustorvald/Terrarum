@@ -569,7 +569,7 @@ object ModMgr {
         private fun makeNewItemObj(tile: BlockProp, isWall: Boolean) = object : GameItem(
             if (isWall) "wall@"+tile.id else tile.id
         ) {
-            override var baseMass: Double = tile.density / 100.0
+            override var baseMass: Double = (tile.density / 100.0) * (if (tile.isPlatform) 0.5 else 1.0)
             override var baseToolSize: Double? = null
             override var inventoryCategory = if (isWall) Category.WALL else Category.BLOCK
             override var canBeDynamic = false
