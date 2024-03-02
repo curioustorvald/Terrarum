@@ -11,6 +11,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.getKeycapConsole
 import net.torvald.unicode.getKeycapPC
 import kotlin.math.roundToInt
@@ -69,6 +70,13 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
     private val spinnerInterval = 1f / 60
 
     internal lateinit var cellLoadThread: Thread
+
+    init {
+        CommonResourcePool.addToLoadingList("gradtile32") {
+            TextureRegionPack("assets/graphics/gui/gradtile32.tga", 1, 32)
+        }
+        CommonResourcePool.loadAll()
+    }
 
     fun advanceMode() {
         App.printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
@@ -175,14 +183,16 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         batch.end()
 
         val cells = playerCells
+        val grad = CommonResourcePool.getAsTextureRegionPack("gradtile32")
+        val w = 4096f
 
-        lateinit var savePixmap: Pixmap
         sliderFBO.inAction(camera, batch) {
             gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 
             full.setCameraPosition(batch, camera, 0f, 0f)
             batch.color = Color.WHITE
             batch.inUse {
+                blendNormalStraightAlpha(batch)
                 for (index in 0 until cells.size) {
                     val it = cells[index]
 
@@ -195,49 +205,30 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
                     if (App.getConfigBoolean("fx_streamerslayout"))
                         it.posX -= uiXdiffChatOverlay
                 }
-            }
-            savePixmap = Pixmap.createFromFrameBuffer(0, 0, sliderFBO.width, sliderFBO.height)
-            savePixmap.blending = Pixmap.Blending.None
-        }
 
 
-        // implement "wipe-out" by CPU-rendering (*deep exhale*)
-        //savePixmap.setColor(1f,1f,1f,0f)
-        savePixmap.setColor(0f, 0f, 0f, 0f)
-        savePixmap.fillRectangle(0, savePixmap.height - titleTopGradStart, savePixmap.width, titleTopGradStart)
-        // top grad
-        for (y in titleTopGradStart until titleTopGradEnd) {
-            val alpha = (y - titleTopGradStart).toFloat() / gradAreaHeight
-            for (x in 0 until savePixmap.width) {
-                val col = savePixmap.getPixel(x, savePixmap.height - y)
-                val blendAlpha = (col.and(0xFF) * alpha).roundToInt()
-                savePixmap.drawPixel(x, savePixmap.height - y, col.and(0xFFFFFF00.toInt()) or blendAlpha)
+                // wipe out top and bottom
+                blendAlphaMask(batch)
+                batch.color = Color.WHITE
+                batch.draw(grad.get(3,0), 0f, 0f, w, titleTopGradStart.toFloat())
+                batch.draw(grad.get(1,0), 0f, titleTopGradStart.toFloat(), w, grad.tileH.toFloat())
+                batch.draw(grad.get(2,0), 0f, titleTopGradEnd.toFloat(), w, (titleBottomGradStart - titleTopGradEnd).toFloat())
+                batch.draw(grad.get(0,0), 0f, titleBottomGradStart.toFloat(), w, grad.tileH.toFloat())
+                batch.draw(grad.get(3,0), 0f, titleBottomGradEnd.toFloat(), w, 4096f)
             }
         }
-        // bottom grad
-        for (y in titleBottomGradStart until titleBottomGradEnd) {
-            val alpha = 1f - ((y - titleBottomGradStart).toFloat() / gradAreaHeight)
-            for (x in 0 until savePixmap.width) {
-                val col = savePixmap.getPixel(x, savePixmap.height - y)
-                val blendAlpha = (col.and(0xFF) * alpha).roundToInt()
-                savePixmap.drawPixel(x, savePixmap.height - y, col.and(0xFFFFFF00.toInt()) or blendAlpha)
-            }
-        }
-        savePixmap.setColor(0f, 0f, 0f, 0f)
-        savePixmap.fillRectangle(0, 0, savePixmap.width, height - titleBottomGradEnd + 1)
 
 
 
         full.setCameraPosition(batch, camera, 0f, 0f)
-        val saveTex = TextureRegion(Texture(savePixmap)); saveTex.flip(false, true)
         batch.inUse {
-            batch.draw(saveTex, posX + (width - uiWidth - 10) / 2f, 0f)
+            batch.color = Color.WHITE
+            blendNormalStraightAlpha(batch)
+            (batch as FlippingSpriteBatch).drawFlipped(sliderFBO.colorBufferTexture, posX + (width - uiWidth - 10) / 2f, 0f)
             // Control help
             App.fontGame.draw(batch, controlHelp, posX + full.uiX.toFloat(), controlHelperY.toFloat())
         }
 
-        saveTex.texture.dispose()
-        savePixmap.dispose()
 
         batch.begin()
 
