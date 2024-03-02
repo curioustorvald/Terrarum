@@ -124,6 +124,8 @@ object AxeCore {
             else if (tileprop.hasAllTag(listOf("TREE", "TREETRUNK") + additionalCheckTags)) {
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
+                val isLargeTree = tileprop.hasTag("TREELARGE")
+                val axePowerMult = if (isLargeTree) 0.5f else 1f
 
                 if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toInt()) {
                     PickaxeCore.makeNoiseTileTouching(actor, tile)
@@ -131,7 +133,7 @@ object AxeCore {
 
                 INGAME.world.inflictTerrainDamage(
                     x, y,
-                    Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg,
+                    Calculate.hatchetPower(actor, item?.material) * swingDmgToFrameDmg * axePowerMult,
                     false
                 ).let { (tileBroken, _) ->
                     // tile busted
