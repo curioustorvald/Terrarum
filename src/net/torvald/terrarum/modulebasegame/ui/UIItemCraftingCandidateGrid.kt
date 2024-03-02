@@ -2,7 +2,6 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import net.torvald.terrarum.CraftingRecipeCodex
 import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.ui.UIItemCatBar
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -15,7 +14,7 @@ import net.torvald.terrarum.ui.UIItemCatBar.Companion.CAT_ALL
  * Created by minjaesong on 2022-06-28.
  */
 class UIItemCraftingCandidateGrid(
-    parentUI: UICrafting,
+    parentUI: UICraftingWorkbench,
     initialX: Int, initialY: Int,
     horizontalCells: Int, verticalCells: Int,
     drawScrollOnRightside: Boolean = false,
@@ -83,7 +82,7 @@ class UIItemCraftingCandidateGrid(
 
     private fun isCraftable(player: FixtureInventory, recipe: CraftingCodex.CraftingRecipe, nearbyCraftingStations: List<String>): Boolean {
 //        printdbg(this, "Is this recipe craftable? $recipe")
-        return UICrafting.recipeToIngredientRecord(player, recipe, nearbyCraftingStations).none {
+        return UICraftingWorkbench.recipeToIngredientRecord(player, recipe, nearbyCraftingStations).none {
 //            printdbg(this, "    considering ingredient ${it.selectedItem}, ${it.howManyRecipeWants} is required and got ${it.howManyPlayerHas}; crafting station available? ${it.craftingStationAvailable}")
             it.howManyPlayerHas <= 0L || !it.craftingStationAvailable
         }
@@ -114,14 +113,14 @@ class UIItemCraftingCandidateGrid(
         if (currentFilter1 == CAT_ALL)
             CraftingRecipeCodex.props.forEach { (_, recipes) ->
                 recipes.forEach {
-                    if (isCraftable((parentUI as UICrafting).getPlayerInventory(), it, (parentUI as UICrafting).nearbyCraftingStations)) {
+                    if (isCraftable((parentUI as UICraftingWorkbench).getPlayerInventory(), it, (parentUI as UICraftingWorkbench).nearbyCraftingStations)) {
                         craftingRecipes.add(it)
                     }
                 }
             }
         else
             CraftingRecipeCodex.getCraftableRecipesUsingTheseItems(currentFilter1).forEach {
-                if (isCraftable((parentUI as UICrafting).getPlayerInventory(), it, (parentUI as UICrafting).nearbyCraftingStations)) {
+                if (isCraftable((parentUI as UICraftingWorkbench).getPlayerInventory(), it, (parentUI as UICraftingWorkbench).nearbyCraftingStations)) {
                     craftingRecipes.add(it)
                 }
             }

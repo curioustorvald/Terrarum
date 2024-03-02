@@ -247,7 +247,6 @@ class UIInventoryFull(
 
     //    private val transitionalMinimap = UIInventoryMinimap(this)
     internal val transitionalCraftingUI = UICrafting(this)
-    internal val transitionalTechTreeViewUI = UITechView(this)
     internal val transitionalItemCells = UIInventoryCells(this)
     internal val transitionalEscMenu = UIInventoryEscMenu(this)
     val transitionPanel = UIItemHorizontalFadeSlide(
@@ -257,7 +256,7 @@ class UIInventoryFull(
         width,
         App.scr.height,
         1f,
-        listOf(transitionalCraftingUI, transitionalTechTreeViewUI),
+        listOf(transitionalCraftingUI),
         listOf(transitionalItemCells),
         listOf(transitionalEscMenu)
     )
@@ -320,7 +319,6 @@ class UIInventoryFull(
         transitionPanel.forcePosition(0)
         catBar.setSelectedPanel(0)
         transitionalCraftingUI.resetUI()
-        transitionalTechTreeViewUI.resetUI()
         it.setAsOpen()
     }
 

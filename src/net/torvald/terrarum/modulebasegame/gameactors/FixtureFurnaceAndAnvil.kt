@@ -1,12 +1,9 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.Gdx
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.MusicContainer
-import net.torvald.terrarum.audio.decibelsToFullscale
 import net.torvald.terrarum.audio.dsp.Gain
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.blockproperties.Block
@@ -18,9 +15,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.UICrafting
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import net.torvald.unsafe.UnsafeHelper
 
 /**
  * Created by minjaesong on 2023-12-05.

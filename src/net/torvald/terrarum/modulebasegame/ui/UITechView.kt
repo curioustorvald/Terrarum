@@ -14,10 +14,10 @@ import net.torvald.unicode.getKeycapPC
 /**
  * Created by minjaesong on 2024-02-18.
  */
-class UITechView(val full: UIInventoryFull?, private val colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme,
+class UITechView(val inventoryUI: UIInventoryFull?, val parentContainer: UICrafting, private val colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme,
 ) : UICanvas(
-    toggleKeyLiteral = if (full == null) "control_key_inventory" else null,
-    toggleButtonLiteral = if (full == null) "control_gamepad_start" else null
+    toggleKeyLiteral = if (inventoryUI == null) "control_key_inventory" else null,
+    toggleButtonLiteral = if (inventoryUI == null) "control_gamepad_start" else null
 ) {
 
     override var width = Toolkit.drawWidth
@@ -34,10 +34,10 @@ class UITechView(val full: UIInventoryFull?, private val colourTheme: InventoryC
 
 //    private val navbarX = posX1 + UIItemListNavBarVertical.LIST_TO_CONTROL_GAP
 //    private val navbarY = posY1
-    private val navbarX = full!!.transitionalCraftingUI.itemListCraftable.navRemoCon.posX + 12
-    private val navbarY = full!!.transitionalCraftingUI.itemListCraftable.navRemoCon.posY - 8
+    private val navbarX = parentContainer.transitionalCraftingUI.itemListCraftable.navRemoCon.posX + 12
+    private val navbarY = parentContainer.transitionalCraftingUI.itemListCraftable.navRemoCon.posY - 8
     private val navbarWidth = UIItemListNavBarVertical.WIDTH
-    private val navbarHeight = full!!.transitionalCraftingUI.itemListCraftable.height
+    private val navbarHeight = parentContainer.transitionalCraftingUI.itemListCraftable.height
 
     private val panelX = 32 + navbarX
     private val panelY = navbarY
@@ -61,8 +61,7 @@ class UITechView(val full: UIInventoryFull?, private val colourTheme: InventoryC
         highlightable = true
     ).also {
         it.clickOnceListener = { _, _ ->
-            full?.transitionPanel?.setLeftUIto(0)
-            full?.transitionPanel?.uis?.get(0)?.show()
+            parentContainer.showCraftingUI()
             it.highlighted = false
         }
     }
