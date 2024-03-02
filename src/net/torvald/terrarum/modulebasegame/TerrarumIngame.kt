@@ -319,6 +319,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 (!tileProp.isSolid && !wallProp.isSolid).toInt().toFloat()
             }
         )
+
+        loadedTime_t = App.getTIME_T()
     }
 
     data class NewGameParams(
