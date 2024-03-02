@@ -439,7 +439,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     }
 
     open fun saveTheGame(onSuccessful: () -> Unit, onError: (Throwable) -> Unit) {
-
+        loadedTime_t = App.getTIME_T()
     }
 
     /**

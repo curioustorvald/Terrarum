@@ -495,6 +495,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
                 App.savegameWorlds[world.worldIndex] = SavegameCollection.collectFromBaseFilename(File(worldsDir), worldSavefileName)
                 App.savegameWorldsName[world.worldIndex] = worldName
+
+                loadedTime_t = App.getTIME_T()
             }
         }
     }
@@ -1184,6 +1186,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
                 // return to normal state
                 onSuccessful()
+
+                loadedTime_t = App.getTIME_T()
             }
         }
     }
@@ -1414,6 +1418,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 val timeDiff = System.nanoTime() - start
                 debugTimers.put("Last Autosave Duration", timeDiff)
                 printdbg(this, "Last Autosave Duration: ${(timeDiff) / 1000000000} s")
+
+
+                loadedTime_t = App.getTIME_T()
             }
         }
 
