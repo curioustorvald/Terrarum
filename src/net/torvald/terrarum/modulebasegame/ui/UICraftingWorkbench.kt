@@ -295,6 +295,8 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
 
 
                 if (itemCraftable) {
+                    val itemEquippedBefore = player.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
+
                     itemListIngredients.getInventory().forEach { (itm, qty) ->
                         player.remove(itm, qty * craftMult)
                     }
@@ -304,6 +306,11 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
                     resetUI() // also clears forcehighlightlist
                     playerThings.rebuild(FILTER_CAT_ALL)
                     itemListCraftable.rebuild(FILTER_CAT_ALL)
+
+                    // preserve equipped item
+                    if (itemEquippedBefore != null && player.searchByID(itemEquippedBefore) != null) {
+                        player.itemEquipped[GameItem.EquipPosition.HAND_GRIP] = itemEquippedBefore
+                    }
                 }
             } }
             refreshCraftButtonStatus()
