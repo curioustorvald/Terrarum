@@ -89,6 +89,15 @@ open class Electric : FixtureBase {
     /** Triggered when 'digital_bit' is held low. This function WILL NOT be triggered simultaneously with the falling edge. Level detection only considers the real component (labeled as 'x') of the vector */
     open fun onSignalLow(readFrom: BlockBoxIndex) {}
 
+    fun getWireStateAt(offsetX: Int, offsetY: Int, type: String): Vector2 {
+        val wx = offsetX + intTilewiseHitbox.startX.toInt()
+        val wy = offsetY + intTilewiseHitbox.startY.toInt()
+        return WireCodex.getAllWiresThatAccepts(type).fold(Vector2()) { acc, (id, _) ->
+            INGAME.world.getWireEmitStateOf(wx, wy, id).let {
+                Vector2(acc.x + (it?.x ?: 0.0), acc.y + (it?.y ?: 0.0))
+            }
+        }
+    }
 
     private val oldSinkStatus: Array<Vector2>
 

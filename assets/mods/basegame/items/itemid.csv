@@ -42,6 +42,7 @@ id;classname;tags
 41;net.torvald.terrarum.modulebasegame.gameitems.ItemTableEbony;FIXTURE,SURFACE
 42;net.torvald.terrarum.modulebasegame.gameitems.ItemTableBirch;FIXTURE,SURFACE
 43;net.torvald.terrarum.modulebasegame.gameitems.ItemTableRosewood;FIXTURE,SURFACE
+44;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalBlocker;FIXTURE,SIGNAL
 
 # ingots
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT
