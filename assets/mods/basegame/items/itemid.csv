@@ -20,7 +20,7 @@ id;classname;tags
 19;net.torvald.terrarum.modulebasegame.gameitems.AxeCopper;TOOL,AXE
 20;net.torvald.terrarum.modulebasegame.gameitems.AxeIron;TOOL,AXE
 21;net.torvald.terrarum.modulebasegame.gameitems.AxeSteel;TOOL,AXE
-#22;net.torvald.terrarum.modulebasegame.gameitems.AxeWood;TOOL,AXE
+22;net.torvald.terrarum.modulebasegame.gameitems.AxeWood;TOOL,AXE
 23;net.torvald.terrarum.modulebasegame.gameitems.PickaxeStone;TOOL,PICK
 24;net.torvald.terrarum.modulebasegame.gameitems.AxeStone;TOOL,AXE
 25;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBall;
@@ -38,6 +38,10 @@ id;classname;tags
 37;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChestEbony;FIXTURE,STORAGE
 38;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChestBirch;FIXTURE,STORAGE
 39;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChestRosewood;FIXTURE,STORAGE
+40;net.torvald.terrarum.modulebasegame.gameitems.ItemTable;FIXTURE,SURFACE
+41;net.torvald.terrarum.modulebasegame.gameitems.ItemTableEbony;FIXTURE,SURFACE
+42;net.torvald.terrarum.modulebasegame.gameitems.ItemTableBirch;FIXTURE,SURFACE
+43;net.torvald.terrarum.modulebasegame.gameitems.ItemTableRosewood;FIXTURE,SURFACE
 
 # ingots
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT

@@ -34,6 +34,7 @@
   "TOOLTIP_item@basegame:20": "Cuts trees",
   "TOOLTIP_item@basegame:21": "Cuts trees",
   "TOOLTIP_item@basegame:22": "Cuts trees, just barely",
+  /*"TOOLTIP_item@basegame:22": "Perhaps it’s more useful for casting than actually using",*/
   "TOOLTIP_item@basegame:23": "Breaks rocks",
   "TOOLTIP_item@basegame:24": "Cuts trees",
   "TOOLTIP_item@basegame:25": "Finer grains of dirts that gets stronger when burned",

@@ -37,7 +37,7 @@ class FixtureStorageChest : FixtureBase {
         actorValue[AVKey.BASEMASS] = MASS
 
 
-        printStackTrace(this)
+//        printStackTrace(this)
     }
 
     override fun reload() {

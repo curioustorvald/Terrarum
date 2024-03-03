@@ -92,5 +92,30 @@
     "ingredients": [
       [1, 4, "item@basegame:144", 14, "$WOOD", 10, "item@basegame:113"] /* 1 turntable = 4 quartz, 14 wood, 10 iron */
     ]
+  },
+
+  "item@basegame:40": { /* table */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 10, "basegame:48"] /* 10 wood */
+    ]
+  },
+  "item@basegame:41": { /* table */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 10, "basegame:49"] /* 10 wood */
+    ]
+  },
+  "item@basegame:42": { /* table */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 10, "basegame:50"] /* 10 wood */
+    ]
+  },
+  "item@basegame:43": { /* table */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 10, "basegame:51"] /* 10 wood */
+    ]
   }
 }
