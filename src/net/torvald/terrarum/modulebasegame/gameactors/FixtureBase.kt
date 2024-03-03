@@ -89,14 +89,9 @@ open class Electric : FixtureBase {
     /** Triggered when 'digital_bit' is held low. This function WILL NOT be triggered simultaneously with the falling edge. Level detection only considers the real component (labeled as 'x') of the vector */
     open fun onSignalLow(readFrom: BlockBoxIndex) {}
 
-    fun getWireStateAt(offsetX: Int, offsetY: Int, type: String): Vector2 {
-        val wx = offsetX + intTilewiseHitbox.startX.toInt()
-        val wy = offsetY + intTilewiseHitbox.startY.toInt()
-        return WireCodex.getAllWiresThatAccepts(type).fold(Vector2()) { acc, (id, _) ->
-            INGAME.world.getWireEmitStateOf(wx, wy, id).let {
-                Vector2(acc.x + (it?.x ?: 0.0), acc.y + (it?.y ?: 0.0))
-            }
-        }
+    fun getWireStateAt(offsetX: Int, offsetY: Int): Vector2 {
+        val index = pointToBlockBoxIndex(offsetX, offsetY)
+        return oldSinkStatus[index]
     }
 
     private val oldSinkStatus: Array<Vector2>
@@ -112,6 +107,12 @@ open class Electric : FixtureBase {
             }
         }
 
+        val new2 = WireCodex.getAllWiresThatAccepts(wireSinkTypes[index] ?: "").fold(Vector2()) { acc, (id, _) ->
+            INGAME.world.getWireEmitStateOf(wx, wy, id).let {
+                Vector2(acc.x + (it?.x ?: 0.0), acc.y + (it?.y ?: 0.0))
+            }
+        }
+
         if (sinkType == "digital_bit") {
             if (new.x - old.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTIC_THRESHOLD_HIGH)
                 onRisingEdge(index)
@@ -122,11 +123,16 @@ open class Electric : FixtureBase {
             else if (new.y <= ELECTRIC_THRESHOLD_LOW)
                 onSignalLow(index)
         }
+
+        oldSinkStatus[index].set(new2)
     }
 
+    /**
+     * Refrain from updating signal output from this function: there will be 1 extra tick delay if you do so
+     */
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
-        oldSinkStatus.indices.forEach { index ->
+        /*oldSinkStatus.indices.forEach { index ->
             val wx = (index % blockBox.width) + intTilewiseHitbox.startX.toInt()
             val wy = (index / blockBox.width) + intTilewiseHitbox.startY.toInt()
             val new = WireCodex.getAllWiresThatAccepts(getWireSinkAt(index % blockBox.width, index / blockBox.width) ?: "").fold(Vector2()) { acc, (id, _) ->
@@ -135,7 +141,7 @@ open class Electric : FixtureBase {
                 }
             }
             oldSinkStatus[index].set(new)
-        }
+        }*/
     }
 }
 

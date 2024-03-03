@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
@@ -30,6 +31,9 @@ interface Reorientable {
  * Created by minjaesong on 2024-03-04.
  */
 class FixtureSignalBlocker : Electric, Reorientable {
+
+    @Transient override val spawnNeedsWall = false
+    @Transient override val spawnNeedsFloor = false
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 2, 2),
@@ -95,19 +99,19 @@ class FixtureSignalBlocker : Electric, Reorientable {
 
     private val I: Boolean
         get() = when (orientation) {
-            0 -> getWireStateAt(0, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            1 -> getWireStateAt(1, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            2 -> getWireStateAt(1, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            3 -> getWireStateAt(0, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
+            0 -> getWireStateAt(0, 0).x >= ELECTIC_THRESHOLD_HIGH
+            1 -> getWireStateAt(1, 0).x >= ELECTIC_THRESHOLD_HIGH
+            2 -> getWireStateAt(1, 1).x >= ELECTIC_THRESHOLD_HIGH
+            3 -> getWireStateAt(0, 1).x >= ELECTIC_THRESHOLD_HIGH
             else -> throw IllegalStateException("Orientation not in range ($orientation)")
         }
 
     private val J: Boolean
         get() = when (orientation) {
-            0 -> getWireStateAt(0, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            1 -> getWireStateAt(0, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            2 -> getWireStateAt(1, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            3 -> getWireStateAt(1, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
+            0 -> getWireStateAt(0, 1).x >= ELECTIC_THRESHOLD_HIGH
+            1 -> getWireStateAt(0, 0).x >= ELECTIC_THRESHOLD_HIGH
+            2 -> getWireStateAt(1, 0).x >= ELECTIC_THRESHOLD_HIGH
+            3 -> getWireStateAt(1, 1).x >= ELECTIC_THRESHOLD_HIGH
             else -> throw IllegalStateException("Orientation not in range ($orientation)")
         }
 
@@ -119,7 +123,7 @@ class FixtureSignalBlocker : Electric, Reorientable {
             3 -> 0 to 0
             else -> throw IllegalStateException("Orientation not in range ($orientation)")
         }
-        setWireConsumptionAt(x, y, Vector2(I nimply J, 0.0))
+        setWireEmissionAt(x, y, Vector2(I nimply J, 0.0))
     }
 
     override fun onRisingEdge(readFrom: BlockBoxIndex) {
@@ -130,9 +134,17 @@ class FixtureSignalBlocker : Electric, Reorientable {
         updateK()
     }
 
+    override fun onSignalHigh(readFrom: BlockBoxIndex) {
+        updateK()
+    }
+
+    override fun onSignalLow(readFrom: BlockBoxIndex) {
+        updateK()
+    }
+
     private infix fun Boolean.nimply(other: Boolean) = (this && !other).toInt().toDouble()
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
-        TODO()
+        super.drawBody(frameDelta, batch)
     }
 }
