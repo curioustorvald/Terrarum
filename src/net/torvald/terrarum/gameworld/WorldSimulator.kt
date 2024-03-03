@@ -92,12 +92,7 @@ object WorldSimulator {
         App.measureDebugTime("WorldSimulator.growGrass") { growOrKillGrass() }
         App.measureDebugTime("WorldSimulator.fluids") { /*moveFluids(delta)*/ }
         App.measureDebugTime("WorldSimulator.fallables") { displaceFallables(delta) }
-        if (ingame.WORLD_UPDATE_TIMER % 2 == 1) {
-            App.measureDebugTime("WorldSimulator.wires") { simulateWires(delta) }
-        }
-        else {
-            // TODO update logic
-        }
+        App.measureDebugTime("WorldSimulator.wires") { simulateWires(delta) }
         App.measureDebugTime("WorldSimulator.collisionDroppedItem") { collideDroppedItems() }
         App.measureDebugTime("WorldSimulator.dropTreeLeaves") { dropTreeLeaves() }
 
