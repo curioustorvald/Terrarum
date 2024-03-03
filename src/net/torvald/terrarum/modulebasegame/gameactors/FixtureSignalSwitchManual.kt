@@ -28,11 +28,17 @@ class FixtureSignalSwitchManual : Electric {
 
     init {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_switch.tga")
+        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_switch_glow.tga")
 
         density = 1400.0
         setHitboxDimension(TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE, 0, 1)
 
         makeNewSprite(TextureRegionPack(itemImage.texture, TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE)).let {
+            it.setRowsAndFrames(2,8)
+            it.currentFrame = variant
+            it.delays = floatArrayOf(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+        }
+        makeNewSpriteGlow(TextureRegionPack(itemImage2.texture, TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE)).let {
             it.setRowsAndFrames(2,8)
             it.currentFrame = variant
             it.delays = floatArrayOf(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
