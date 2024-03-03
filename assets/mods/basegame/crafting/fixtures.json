@@ -34,7 +34,7 @@
   "item@basegame:36": { /* wire rolling mill */
     "workbench": "basiccrafting",
     "ingredients": [
-      [1, 1, "$WOOD", 1, "$ROCK", 5, "item@basegame:113"] /* 1 plank, 2 stone, 5 iron ingot */
+      [1, 1, "$WOOD", 2, "$ROCK", 5, "item@basegame:113"] /* 1 plank, 2 stone, 5 iron ingot */
     ]
   },
 
