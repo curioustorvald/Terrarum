@@ -14,7 +14,6 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 class FixtureSignalBulb : Electric {
 
     @Transient override val spawnNeedsFloor = false
-    @Transient override val spawnNeedsWall = true
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 1, 1),
