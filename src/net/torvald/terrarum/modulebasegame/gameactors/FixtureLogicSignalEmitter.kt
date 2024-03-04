@@ -35,6 +35,10 @@ class FixtureLogicSignalEmitter : Electric {
         setWireEmissionAt(0, 0, Vector2(1.0, 0.0))
     }
 
+    override fun updateSignal() {
+        setWireEmissionAt(0, 0, Vector2(1.0, 0.0))
+    }
+
     override fun dispose() { }
 
     companion object {

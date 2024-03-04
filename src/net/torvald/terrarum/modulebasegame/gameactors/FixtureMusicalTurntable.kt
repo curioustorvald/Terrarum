@@ -28,7 +28,9 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 1, 1),
         nameFun = { Lang["ITEM_TURNTABLE"] }
-    )
+    ) {
+        clickLatch.forceLatch()
+    }
 
     @Transient var musicNowPlaying: MusicContainer? = null; private set
 

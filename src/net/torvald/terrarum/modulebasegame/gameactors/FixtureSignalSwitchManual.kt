@@ -21,7 +21,9 @@ class FixtureSignalSwitchManual : Electric {
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 1, 1),
         nameFun = { Lang["ITEM_LOGIC_SIGNAL_SWITCH"] }
-    )
+    ) {
+        clickLatch.forceLatch()
+    }
 
     private val variant = (Math.random() * 8).toInt()
     private var state = false // false = off

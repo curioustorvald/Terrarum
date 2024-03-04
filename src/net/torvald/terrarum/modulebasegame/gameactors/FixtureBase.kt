@@ -76,8 +76,9 @@ open class Electric : FixtureBase {
     // these are characteristic properties of the fixture (they have constant value) so must not be serialised
     @Transient val wireEmitterTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
     @Transient val wireSinkTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
-    @Transient val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
-    @Transient val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
+
+    val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
+    val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
 
     // these are NOT constant so they ARE serialised. Type: Map<SinkType (String) -> Charge (Double>
     // Use case: signal buffer (sinkType=digital_bit), battery (sinkType=electricity), etc.
