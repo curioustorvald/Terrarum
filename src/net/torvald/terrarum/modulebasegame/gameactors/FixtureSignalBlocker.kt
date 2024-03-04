@@ -135,18 +135,8 @@ class FixtureSignalBlocker : Electric, Reorientable {
         val two   = isSignalHigh(1, 0)
         val four  = isSignalHigh(0, 1)
         val eight = isSignalHigh(1, 1)
-        // WHY READING FROM wireEmission DOES NOT WORK????
-        // fixme actually read from wireEmission as the gate's output has propagation delay but current sprite "hack" does not consider it
 
-        var state = one.toInt(0) or two.toInt(1) or four.toInt(2) or eight.toInt(3)
-
-        state = state or when (orientation) {
-            0 -> 2
-            1 -> 8
-            2 -> 4
-            3 -> 1
-            else -> throw IllegalStateException("Orientation not in range ($orientation)")
-        } * output
+        val state = one.toInt(0) or two.toInt(1) or four.toInt(2) or eight.toInt(3)
 
         (sprite as SheetSpriteAnimation).currentRow = state
         (spriteEmissive as SheetSpriteAnimation).currentRow = state

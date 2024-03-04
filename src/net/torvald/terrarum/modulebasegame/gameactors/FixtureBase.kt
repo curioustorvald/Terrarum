@@ -108,6 +108,10 @@ open class Electric : FixtureBase {
         }
     }
 
+    fun getWireEmissionAt(offsetX: Int, offsetY: Int): Vector2 {
+        return wireEmission[pointToBlockBoxIndex(offsetX, offsetY)] ?: Vector2()
+    }
+
     /**
      * returns true if at least one of following condition is `true`
      * - `getWireStateAt(x, y, "digital_bit").x` is equal to or greater than `ELECTIC_THRESHOLD_HIGH`
@@ -129,10 +133,6 @@ open class Electric : FixtureBase {
     fun isSignalLow(offsetX: Int, offsetY: Int) =
         getWireStateAt(offsetX, offsetY, "digital_bit").x <= ELECTRIC_THRESHOLD_LOW ||
         getWireEmissionAt(offsetX, offsetY).x <= ELECTRIC_THRESHOLD_LOW
-
-    fun getWireEmissionAt(offsetX: Int, offsetY: Int): Vector2 {
-        return wireEmission[pointToBlockBoxIndex(offsetY, offsetY)] ?: Vector2()
-    }
 
     private val oldSinkStatus: Array<Vector2>
     private val newSinkStatus: Array<Vector2>
