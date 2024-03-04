@@ -23,6 +23,7 @@ open class Electric : FixtureBase {
 
     protected constructor() : super() {
         oldSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
+        newSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
     }
 
     /**
@@ -51,6 +52,7 @@ open class Electric : FixtureBase {
             App.disposables.add(mainUI)
 
         oldSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
+        newSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
     }
 
     companion object {
@@ -59,8 +61,10 @@ open class Electric : FixtureBase {
         const val ELECTRIC_THRESHOLD_EDGE_DELTA = 0.7
     }
 
+    fun getWireEmitterAt(blockBoxIndex: BlockBoxIndex) = this.wireEmitterTypes[blockBoxIndex]
     fun getWireEmitterAt(point: Point2i) = this.wireEmitterTypes[pointToBlockBoxIndex(point)]
     fun getWireEmitterAt(x: Int, y: Int) = this.wireEmitterTypes[pointToBlockBoxIndex(x, y)]
+    fun getWireSinkAt(blockBoxIndex: BlockBoxIndex) = this.wireSinkTypes[blockBoxIndex]
     fun getWireSinkAt(point: Point2i) = this.wireSinkTypes[pointToBlockBoxIndex(point)]
     fun getWireSinkAt(x: Int, y: Int) = this.wireSinkTypes[pointToBlockBoxIndex(x, y)]
 
@@ -79,33 +83,42 @@ open class Electric : FixtureBase {
     // Use case: signal buffer (sinkType=digital_bit), battery (sinkType=electricity), etc.
     val chargeStored: HashMap<String, Double> = HashMap()
 
+    private val newStates = HashMap<BlockBoxIndex, Vector2>()
 
     /** Triggered when 'digital_bit' rises from low to high. Edge detection only considers the real component (labeled as 'x') of the vector */
     open fun onRisingEdge(readFrom: BlockBoxIndex) {}
     /** Triggered when 'digital_bit' rises from high to low. Edge detection only considers the real component (labeled as 'x') of the vector */
     open fun onFallingEdge(readFrom: BlockBoxIndex) {}
     /** Triggered when 'digital_bit' is held high. This function WILL NOT be triggered simultaneously with the rising edge. Level detection only considers the real component (labeled as 'x') of the vector */
-    open fun onSignalHigh(readFrom: BlockBoxIndex) {}
+    //open fun onSignalHigh(readFrom: BlockBoxIndex) {}
     /** Triggered when 'digital_bit' is held low. This function WILL NOT be triggered simultaneously with the falling edge. Level detection only considers the real component (labeled as 'x') of the vector */
-    open fun onSignalLow(readFrom: BlockBoxIndex) {}
+    //open fun onSignalLow(readFrom: BlockBoxIndex) {}
 
-    fun getWireStateAt(offsetX: Int, offsetY: Int): Vector2 {
+    open fun updateSignal() {}
+
+    fun getWireStateAt(offsetX: Int, offsetY: Int, sinkType: WireEmissionType): Vector2 {
         val index = pointToBlockBoxIndex(offsetX, offsetY)
-        return oldSinkStatus[index]
-    }
-
-    private val oldSinkStatus: Array<Vector2>
-
-    open fun updateOnWireGraphTraversal(offsetX: Int, offsetY: Int, sinkType: WireEmissionType) {
-        val index = pointToBlockBoxIndex(offsetX, offsetY)
-        val old = oldSinkStatus[index]
         val wx = offsetX + intTilewiseHitbox.startX.toInt()
         val wy = offsetY + intTilewiseHitbox.startY.toInt()
-        val new = WireCodex.getAllWiresThatAccepts("digital_bit").fold(Vector2()) { acc, (id, _) ->
+
+        return WireCodex.getAllWiresThatAccepts(sinkType).fold(Vector2()) { acc, (id, _) ->
             INGAME.world.getWireEmitStateOf(wx, wy, id).let {
                 Vector2(acc.x + (it?.x ?: 0.0), acc.y + (it?.y ?: 0.0))
             }
         }
+    }
+
+    fun getWireEmissionAt(offsetX: Int, offsetY: Int): Vector2 {
+        return wireEmission[pointToBlockBoxIndex(offsetY, offsetY)] ?: Vector2()
+    }
+
+    private val oldSinkStatus: Array<Vector2>
+    private val newSinkStatus: Array<Vector2>
+
+    open fun updateOnWireGraphTraversal(offsetX: Int, offsetY: Int, sinkType: WireEmissionType) {
+        val index = pointToBlockBoxIndex(offsetX, offsetY)
+        val wx = offsetX + intTilewiseHitbox.startX.toInt()
+        val wy = offsetY + intTilewiseHitbox.startY.toInt()
 
         val new2 = WireCodex.getAllWiresThatAccepts(wireSinkTypes[index] ?: "").fold(Vector2()) { acc, (id, _) ->
             INGAME.world.getWireEmitStateOf(wx, wy, id).let {
@@ -113,16 +126,6 @@ open class Electric : FixtureBase {
             }
         }
 
-        if (sinkType == "digital_bit") {
-            if (new.x - old.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTIC_THRESHOLD_HIGH)
-                onRisingEdge(index)
-            else if (old.x - new.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x <= ELECTRIC_THRESHOLD_LOW)
-                onFallingEdge(index)
-            else if (new.x >= ELECTIC_THRESHOLD_HIGH)
-                onSignalHigh(index)
-            else if (new.y <= ELECTRIC_THRESHOLD_LOW)
-                onSignalLow(index)
-        }
 
         oldSinkStatus[index].set(new2)
     }
@@ -132,14 +135,42 @@ open class Electric : FixtureBase {
      */
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
-        /*oldSinkStatus.indices.forEach { index ->
-            val wx = (index % blockBox.width) + intTilewiseHitbox.startX.toInt()
-            val wy = (index / blockBox.width) + intTilewiseHitbox.startY.toInt()
-            val new = WireCodex.getAllWiresThatAccepts(getWireSinkAt(index % blockBox.width, index / blockBox.width) ?: "").fold(Vector2()) { acc, (id, _) ->
-                INGAME.world.getWireEmitStateOf(wx, wy, id).let {
-                    Vector2(acc.x + (it?.x ?: 0.0), acc.y + (it?.y ?: 0.0))
+
+        val risingEdgeIndices = ArrayList<BlockBoxIndex>()
+        val fallingEdgeIndices = ArrayList<BlockBoxIndex>()
+
+        for (y in 0 until blockBox.height) {
+            for (x in 0 until blockBox.width) {
+                // get indices of "rising edges"
+                // get indices of "falling edges"
+
+                val wx = x + intTilewiseHitbox.startX.toInt()
+                val wy = y + intTilewiseHitbox.startY.toInt()
+                val new = WireCodex.getAllWiresThatAccepts(getWireSinkAt(x, y) ?: "").fold(Vector2()) { acc, (id, _) ->
+                    INGAME.world.getWireEmitStateOf(wx, wy, id).let {
+                        Vector2(acc.x + (it?.x ?: 0.0), acc.y + (it?.y ?: 0.0))
+                    }
                 }
+                val index = pointToBlockBoxIndex(x, y)
+
+                if (new.x - oldSinkStatus[index].x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTIC_THRESHOLD_HIGH)
+                    risingEdgeIndices.add(index)
+                else if (oldSinkStatus[index].x - new.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x <= ELECTRIC_THRESHOLD_LOW)
+                    fallingEdgeIndices.add(index)
+
+
+                oldSinkStatus[index].set(new)
             }
+        }
+
+
+        risingEdgeIndices.forEach { onRisingEdge(it) }
+        fallingEdgeIndices.forEach { onFallingEdge(it) }
+        updateSignal()
+
+
+
+        /*oldSinkStatus.indices.forEach { index ->
             oldSinkStatus[index].set(new)
         }*/
     }

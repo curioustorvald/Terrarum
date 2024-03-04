@@ -49,11 +49,8 @@ class FixtureSignalBulb : Electric {
         (spriteEmissive as SheetSpriteAnimation).currentRow = state.toInt()
     }
 
-    override fun onSignalHigh(readFrom: BlockBoxIndex) {
-        light(true)
-    }
-
-    override fun onSignalLow(readFrom: BlockBoxIndex) {
-        light(false)
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
+        light(getWireStateAt(0, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH)
     }
 }

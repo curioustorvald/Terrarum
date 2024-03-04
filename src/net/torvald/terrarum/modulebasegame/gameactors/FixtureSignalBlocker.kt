@@ -85,11 +85,11 @@ class FixtureSignalBlocker : Electric, Reorientable {
 
         makeNewSprite(TextureRegionPack(itemImage.texture, 2*TILE_SIZE, 2*TILE_SIZE)).let {
             it.setRowsAndFrames(16,4)
-            it.delays = FloatArray(8) { Float.POSITIVE_INFINITY }
+            it.delays = FloatArray(16) { Float.POSITIVE_INFINITY }
         }
         makeNewSpriteEmissive(TextureRegionPack(itemImage2.texture, 2*TILE_SIZE, 2*TILE_SIZE)).let {
             it.setRowsAndFrames(16,4)
-            it.delays = FloatArray(8) { Float.POSITIVE_INFINITY }
+            it.delays = FloatArray(16) { Float.POSITIVE_INFINITY }
         }
 
         setEmitterAndSink()
@@ -103,19 +103,19 @@ class FixtureSignalBlocker : Electric, Reorientable {
 
     private val I: Boolean
         get() = when (orientation) {
-            0 -> getWireStateAt(0, 0).x >= ELECTIC_THRESHOLD_HIGH
-            1 -> getWireStateAt(1, 0).x >= ELECTIC_THRESHOLD_HIGH
-            2 -> getWireStateAt(1, 1).x >= ELECTIC_THRESHOLD_HIGH
-            3 -> getWireStateAt(0, 1).x >= ELECTIC_THRESHOLD_HIGH
+            0 -> getWireStateAt(0, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
+            1 -> getWireStateAt(1, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
+            2 -> getWireStateAt(1, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
+            3 -> getWireStateAt(0, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
             else -> throw IllegalStateException("Orientation not in range ($orientation)")
         }
 
     private val J: Boolean
         get() = when (orientation) {
-            0 -> getWireStateAt(0, 1).x >= ELECTIC_THRESHOLD_HIGH
-            1 -> getWireStateAt(0, 0).x >= ELECTIC_THRESHOLD_HIGH
-            2 -> getWireStateAt(1, 0).x >= ELECTIC_THRESHOLD_HIGH
-            3 -> getWireStateAt(1, 1).x >= ELECTIC_THRESHOLD_HIGH
+            0 -> getWireStateAt(0, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
+            1 -> getWireStateAt(0, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
+            2 -> getWireStateAt(1, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
+            3 -> getWireStateAt(1, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
             else -> throw IllegalStateException("Orientation not in range ($orientation)")
         }
 
@@ -130,10 +130,10 @@ class FixtureSignalBlocker : Electric, Reorientable {
         setWireEmissionAt(x, y, Vector2(I nimply J, 0.0))
 
         // update sprite
-        val one = getWireStateAt(0, 0).x >= ELECTIC_THRESHOLD_HIGH
-        val two = getWireStateAt(1, 0).x >= ELECTIC_THRESHOLD_HIGH
-        val four = getWireStateAt(0, 1).x >= ELECTIC_THRESHOLD_HIGH
-        val eight = getWireStateAt(1, 1).x >= ELECTIC_THRESHOLD_HIGH
+        val one   = getWireStateAt(0, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH || getWireEmissionAt(0, 0).x >= ELECTIC_THRESHOLD_HIGH
+        val two   = getWireStateAt(1, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH || getWireEmissionAt(1, 0).x >= ELECTIC_THRESHOLD_HIGH
+        val four  = getWireStateAt(0, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH || getWireEmissionAt(0, 1).x >= ELECTIC_THRESHOLD_HIGH
+        val eight = getWireStateAt(1, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH || getWireEmissionAt(1, 1).x >= ELECTIC_THRESHOLD_HIGH
 
         val state = one.toInt(0) or two.toInt(1) or four.toInt(2) or eight.toInt(3)
 
@@ -141,22 +141,10 @@ class FixtureSignalBlocker : Electric, Reorientable {
         (spriteEmissive as SheetSpriteAnimation).currentRow = state
     }
 
-    override fun onRisingEdge(readFrom: BlockBoxIndex) {
-        updateK()
-    }
-
-    override fun onFallingEdge(readFrom: BlockBoxIndex) {
-        updateK()
-    }
-
-    override fun onSignalHigh(readFrom: BlockBoxIndex) {
-        updateK()
-    }
-
-    override fun onSignalLow(readFrom: BlockBoxIndex) {
-        updateK()
-    }
-
     private infix fun Boolean.nimply(other: Boolean) = (this && !other).toInt().toDouble()
+
+    override fun updateSignal() {
+        updateK()
+    }
 
 }

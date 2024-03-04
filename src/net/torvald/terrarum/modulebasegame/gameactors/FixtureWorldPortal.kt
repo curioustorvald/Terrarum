@@ -62,6 +62,9 @@ class FixtureWorldPortal : Electric {
     }
 
     override fun onRisingEdge(readFrom: BlockBoxIndex) {
+        if (getWireSinkAt(readFrom) != "digital_bit") return
+
+
         printdbg(this, "teleport! $teleportRequest")
         teleportRequest?.let {
             if (it.worldDiskToLoad != null && it.worldLoadParam != null) {
