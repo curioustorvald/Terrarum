@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App.printdbg
+import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
@@ -79,13 +78,18 @@ class FixtureSignalBlocker : Electric, Reorientable {
 
     init {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_blocker.tga")
+        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_blocker_emsv.tga")
 
         density = 1400.0
         setHitboxDimension(2*TILE_SIZE, 2*TILE_SIZE, 0, 1)
 
         makeNewSprite(TextureRegionPack(itemImage.texture, 2*TILE_SIZE, 2*TILE_SIZE)).let {
-            it.setRowsAndFrames(8,4)
-            it.delays = floatArrayOf(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+            it.setRowsAndFrames(16,4)
+            it.delays = FloatArray(8) { Float.POSITIVE_INFINITY }
+        }
+        makeNewSpriteEmissive(TextureRegionPack(itemImage2.texture, 2*TILE_SIZE, 2*TILE_SIZE)).let {
+            it.setRowsAndFrames(16,4)
+            it.delays = FloatArray(8) { Float.POSITIVE_INFINITY }
         }
 
         setEmitterAndSink()
@@ -124,6 +128,17 @@ class FixtureSignalBlocker : Electric, Reorientable {
             else -> throw IllegalStateException("Orientation not in range ($orientation)")
         }
         setWireEmissionAt(x, y, Vector2(I nimply J, 0.0))
+
+        // update sprite
+        val one = getWireStateAt(0, 0).x >= ELECTIC_THRESHOLD_HIGH
+        val two = getWireStateAt(1, 0).x >= ELECTIC_THRESHOLD_HIGH
+        val four = getWireStateAt(0, 1).x >= ELECTIC_THRESHOLD_HIGH
+        val eight = getWireStateAt(1, 1).x >= ELECTIC_THRESHOLD_HIGH
+
+        val state = one.toInt(0) or two.toInt(1) or four.toInt(2) or eight.toInt(3)
+
+        (sprite as SheetSpriteAnimation).currentRow = state
+        (spriteEmissive as SheetSpriteAnimation).currentRow = state
     }
 
     override fun onRisingEdge(readFrom: BlockBoxIndex) {
@@ -144,7 +159,4 @@ class FixtureSignalBlocker : Electric, Reorientable {
 
     private infix fun Boolean.nimply(other: Boolean) = (this && !other).toInt().toDouble()
 
-    override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
-        super.drawBody(frameDelta, batch)
-    }
 }
