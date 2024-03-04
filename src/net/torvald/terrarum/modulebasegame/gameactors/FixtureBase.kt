@@ -56,7 +56,7 @@ open class Electric : FixtureBase {
     }
 
     companion object {
-        const val ELECTIC_THRESHOLD_HIGH = 0.9
+        const val ELECTRIC_THRESHOLD_HIGH = 0.9
         const val ELECTRIC_THRESHOLD_LOW = 0.1
         const val ELECTRIC_THRESHOLD_EDGE_DELTA = 0.7
     }
@@ -108,6 +108,28 @@ open class Electric : FixtureBase {
         }
     }
 
+    /**
+     * returns true if at least one of following condition is `true`
+     * - `getWireStateAt(x, y, "digital_bit").x` is equal to or greater than `ELECTIC_THRESHOLD_HIGH`
+     * - `getWireEmissionAt(x, y).x` is equal to or greater than `ELECTIC_THRESHOLD_HIGH`
+     *
+     * This function does NOT check if the given port receives/emits `digital_bit` signal; if not, the result is undefined.
+     */
+    fun isSignalHigh(offsetX: Int, offsetY: Int) =
+        getWireStateAt(offsetX, offsetY, "digital_bit").x >= ELECTRIC_THRESHOLD_HIGH ||
+        getWireEmissionAt(offsetX, offsetY).x >= ELECTRIC_THRESHOLD_HIGH
+
+    /**
+     * returns true if at least one of following condition is `true`
+     * - `getWireStateAt(x, y, "digital_bit").x` is equal to or lesser than `ELECTRIC_THRESHOLD_LOW`
+     * - `getWireEmissionAt(x, y).x` is equal to or lesser than `ELECTRIC_THRESHOLD_LOW`
+     *
+     * This function does NOT check if the given port receives/emits `digital_bit` signal; if not, the result is undefined.
+     */
+    fun isSignalLow(offsetX: Int, offsetY: Int) =
+        getWireStateAt(offsetX, offsetY, "digital_bit").x <= ELECTRIC_THRESHOLD_LOW ||
+        getWireEmissionAt(offsetX, offsetY).x <= ELECTRIC_THRESHOLD_LOW
+
     fun getWireEmissionAt(offsetX: Int, offsetY: Int): Vector2 {
         return wireEmission[pointToBlockBoxIndex(offsetY, offsetY)] ?: Vector2()
     }
@@ -153,7 +175,7 @@ open class Electric : FixtureBase {
                 }
                 val index = pointToBlockBoxIndex(x, y)
 
-                if (new.x - oldSinkStatus[index].x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTIC_THRESHOLD_HIGH)
+                if (new.x - oldSinkStatus[index].x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTRIC_THRESHOLD_HIGH)
                     risingEdgeIndices.add(index)
                 else if (oldSinkStatus[index].x - new.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x <= ELECTRIC_THRESHOLD_LOW)
                     fallingEdgeIndices.add(index)

@@ -51,6 +51,6 @@ class FixtureSignalBulb : Electric {
 
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
-        light(getWireStateAt(0, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH)
+        light(getWireStateAt(0, 0, "digital_bit").x >= ELECTRIC_THRESHOLD_HIGH)
     }
 }

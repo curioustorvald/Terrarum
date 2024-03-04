@@ -103,19 +103,19 @@ class FixtureSignalBlocker : Electric, Reorientable {
 
     private val I: Boolean
         get() = when (orientation) {
-            0 -> getWireStateAt(0, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            1 -> getWireStateAt(1, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            2 -> getWireStateAt(1, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            3 -> getWireStateAt(0, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
+            0 -> getWireStateAt(0, 0, "digital_bit").x >= ELECTRIC_THRESHOLD_HIGH
+            1 -> getWireStateAt(1, 0, "digital_bit").x >= ELECTRIC_THRESHOLD_HIGH
+            2 -> getWireStateAt(1, 1, "digital_bit").x >= ELECTRIC_THRESHOLD_HIGH
+            3 -> getWireStateAt(0, 1, "digital_bit").x >= ELECTRIC_THRESHOLD_HIGH
             else -> throw IllegalStateException("Orientation not in range ($orientation)")
         }
 
     private val J: Boolean
         get() = when (orientation) {
-            0 -> getWireStateAt(0, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            1 -> getWireStateAt(0, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            2 -> getWireStateAt(1, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
-            3 -> getWireStateAt(1, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH
+            0 -> getWireStateAt(0, 1, "digital_bit").x >= ELECTRIC_THRESHOLD_HIGH
+            1 -> getWireStateAt(0, 0, "digital_bit").x >= ELECTRIC_THRESHOLD_HIGH
+            2 -> getWireStateAt(1, 0, "digital_bit").x >= ELECTRIC_THRESHOLD_HIGH
+            3 -> getWireStateAt(1, 1, "digital_bit").x >= ELECTRIC_THRESHOLD_HIGH
             else -> throw IllegalStateException("Orientation not in range ($orientation)")
         }
 
@@ -127,21 +127,32 @@ class FixtureSignalBlocker : Electric, Reorientable {
             3 -> 0 to 0
             else -> throw IllegalStateException("Orientation not in range ($orientation)")
         }
-        setWireEmissionAt(x, y, Vector2(I nimply J, 0.0))
+        val output = I nimply J
+        setWireEmissionAt(x, y, Vector2(output.toDouble(), 0.0))
 
         // update sprite
-        val one   = getWireStateAt(0, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH || getWireEmissionAt(0, 0).x >= ELECTIC_THRESHOLD_HIGH
-        val two   = getWireStateAt(1, 0, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH || getWireEmissionAt(1, 0).x >= ELECTIC_THRESHOLD_HIGH
-        val four  = getWireStateAt(0, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH || getWireEmissionAt(0, 1).x >= ELECTIC_THRESHOLD_HIGH
-        val eight = getWireStateAt(1, 1, "digital_bit").x >= ELECTIC_THRESHOLD_HIGH || getWireEmissionAt(1, 1).x >= ELECTIC_THRESHOLD_HIGH
+        val one   = isSignalHigh(0, 0)
+        val two   = isSignalHigh(1, 0)
+        val four  = isSignalHigh(0, 1)
+        val eight = isSignalHigh(1, 1)
+        // WHY READING FROM wireEmission DOES NOT WORK????
+        // fixme actually read from wireEmission as the gate's output has propagation delay but current sprite "hack" does not consider it
 
-        val state = one.toInt(0) or two.toInt(1) or four.toInt(2) or eight.toInt(3)
+        var state = one.toInt(0) or two.toInt(1) or four.toInt(2) or eight.toInt(3)
+
+        state = state or when (orientation) {
+            0 -> 2
+            1 -> 8
+            2 -> 4
+            3 -> 1
+            else -> throw IllegalStateException("Orientation not in range ($orientation)")
+        } * output
 
         (sprite as SheetSpriteAnimation).currentRow = state
         (spriteEmissive as SheetSpriteAnimation).currentRow = state
     }
 
-    private infix fun Boolean.nimply(other: Boolean) = (this && !other).toInt().toDouble()
+    private infix fun Boolean.nimply(other: Boolean) = (this && !other).toInt()
 
     override fun updateSignal() {
         updateK()
