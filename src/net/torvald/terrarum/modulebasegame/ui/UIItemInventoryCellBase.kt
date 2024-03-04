@@ -65,7 +65,7 @@ abstract class UIItemInventoryCellBase(
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (mouseUp) {
+        if (mouseUp && !parentUI.openingClickLatched) {
             touchDownFun(item, amount, button, extraInfo, this)
             super.touchDown(screenX, screenY, pointer, button)
         }

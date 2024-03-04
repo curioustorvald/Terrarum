@@ -446,8 +446,6 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
         itemListCraftable.numberMultiplier = 1L
     }
 
-    private var openingClickLatched = false
-
     override fun show() {
         nearbyCraftingStations = getCraftingStationsWithinReach()
 //        printdbg(this, "Nearby crafting stations: $nearbyCraftingStations")
@@ -455,7 +453,7 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
         playerThings.setGetInventoryFun { INGAME.actorNowPlaying!!.inventory }
         itemListUpdate()
 
-        openingClickLatched = Terrarum.mouseDown
+        super.show()
 
         tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
@@ -472,18 +470,9 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
         encumbrancePerc = getPlayerInventory().encumberment.toFloat()
     }
 
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (!openingClickLatched) {
-            return super.touchDown(screenX, screenY, pointer, button)
-        }
-        return false
-    }
-
     override fun updateImpl(delta: Float) {
         // NO super.update due to an infinite recursion
         this.uiItems.forEach { it.update(delta) }
-
-        if (openingClickLatched && !Terrarum.mouseDown) openingClickLatched = false
     }
 
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {

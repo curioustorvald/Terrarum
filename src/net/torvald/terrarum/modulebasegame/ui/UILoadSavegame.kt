@@ -132,6 +132,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     override fun show() {
 //        takeAutosaveSelectorDown()
+        super.show()
         transitionPanel.show()
 
         nodesForListing.parent = remoCon.treeRoot
@@ -140,6 +141,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     override fun hide() {
+        super.hide()
         transitionPanel.hide()
     }
 

@@ -119,10 +119,12 @@ class UITitleLanguage(remoCon: UIRemoCon?) : UICanvas() {
 
     override fun show() {
         initialMouseBlock = true
+        super.show()
     }
 
     override fun hide() {
         initialMouseBlock = true
+        super.hide()
     }
 
 

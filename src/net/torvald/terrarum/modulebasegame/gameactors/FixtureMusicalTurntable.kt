@@ -65,7 +65,7 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
 
     internal var disc: ItemID? = null
 
-    @Transient private val clickLatch = MouseLatch(listOf(App.getConfigInt("config_mousesecondary")))
+    @Transient private val clickLatch = MouseLatch()
 
     override val canBeDespawned: Boolean
         get() = disc == null

@@ -691,6 +691,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
 
+    private var worldPrimaryClickLatch = false
     // left click: use held item, attack, pick up fixture if i'm holding a pickaxe or hammer (aka tool), do 'bare hand action' if holding nothing
     override fun worldPrimaryClickStart(actor: ActorWithBody, delta: Float) {
         //println("[Ingame] worldPrimaryClickStart $delta")
@@ -699,6 +700,12 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         val itemOnGrip = ItemCodex[(actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)]
         // bring up the UIs of the fixtures (e.g. crafting menu from a crafting table)
+        var uiOpened = false
+        val fixtureUnderMouse0: List<FixtureBase> = getActorsUnderMouse(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
+        if (fixtureUnderMouse0.size > 1) {
+            App.printdbgerr(this, "Multiple fixtures at world coord ${Terrarum.mouseX}, ${Terrarum.mouseY}")
+        }
+        val fixtureUnderMouse = fixtureUnderMouse0.firstOrNull()
 
         ////////////////////////////////
 
@@ -708,12 +715,41 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
             if (consumptionSuccessful > -1)
                 (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
+
+            worldPrimaryClickLatch = true
         }
-        // #2. If I'm not holding any item and I can do barehandaction (size big enough that barehandactionminheight check passes), perform it
-        else if (itemOnGrip == null) {
+        else {
             mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
-                performBarehandAction(actor, delta, mwx, mwy, mtx, mty)
-                0L
+                // #2. interact with the fixture
+                // scan for the one with non-null UI.
+                // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
+                if (fixtureUnderMouse != null) {
+                    if (!worldPrimaryClickLatch) {
+                        worldPrimaryClickLatch = true
+                        fixtureUnderMouse.let { fixture ->
+                            fixture.mainUI?.let { ui ->
+                                uiOpened = true
+
+                                // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
+                                // when it's not null, the UI will be updated and rendered
+                                // when the UI is closed, it'll be replaced with a null value
+                                uiFixture = ui
+                                ui.setPosition(
+                                    (Toolkit.drawWidth - ui.width) / 4,
+                                    (App.scr.height - ui.height) / 4 // what the fuck?
+                                )
+                                ui.setAsOpen()
+                            }
+                        }
+                    }
+                    0L
+                }
+                // #3. If not holding any item and can do barehandaction (size big enough that barehandactionminheight check passes), do it
+                else {
+                    performBarehandAction(actor, delta, mwx, mwy, mtx, mty)
+                    0L
+                }
+
             }
         }
     }
@@ -728,46 +764,26 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         if (canPerformBarehandAction) {
             endPerformBarehandAction(actor)
         }
+
+        worldPrimaryClickLatch = false
     }
 
-    // right click: use fixture
     override fun worldSecondaryClickStart(actor: ActorWithBody, delta: Float) {
         val itemOnGrip = ItemCodex[(actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)]
-        var uiOpened = false
-        val actorsUnderMouse: List<FixtureBase> = getActorsAt(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
-        if (actorsUnderMouse.size > 1) {
-            App.printdbgerr(this, "Multiple fixtures at world coord ${Terrarum.mouseX}, ${Terrarum.mouseY}")
+
+        // #1. If ~~there is no UI under and~~ I'm holding an item, use it
+        // don't want to open the UI and use the item at the same time, would ya?
+        if (itemOnGrip != null) {
+            val consumptionSuccessful = itemOnGrip.startSecondaryUse(actor, delta)
+            if (consumptionSuccessful > -1)
+                (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
         }
-
-        // #1. Try to open a UI under the cursor
-        // scan for the one with non-null UI.
-        // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
-        for (kk in actorsUnderMouse.indices) {
-            if (mouseInInteractableRange(actor) { _, _, _, _ ->
-                actorsUnderMouse[kk].let { fixture ->
-                    fixture.mainUI?.let { ui ->
-                        uiOpened = true
-
-                        // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
-                        // when it's not null, the UI will be updated and rendered
-                        // when the UI is closed, it'll be replaced with a null value
-                        uiFixture = ui
-                        ui.setPosition(
-                                (Toolkit.drawWidth - ui.width) / 4,
-                                (App.scr.height - ui.height) / 4 // what the fuck?
-                        )
-//                        if (fixture.mainUIopenFun == null)
-                            ui.setAsOpen()
-//                        else
-//                            fixture.mainUIopenFun!!.invoke(ui)
-                    }
-                }
+        // #2. Try to pick up the fixture
+        else {
+            mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
+                pickupFixture(actor, delta, mwx, mwy, mtx, mty)
                 0L
-            } == 0L) break
-        }
-
-        if (!uiOpened) {
-            //...
+            }
         }
     }
 
@@ -1546,8 +1562,20 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    fun performBarehandAction(actor: ActorWithBody, delta: Float, mwx: Double, mwy: Double, mtx: Int, mty: Int) {
+    private fun getActorsAtVicinity(worldX: Double, worldY: Double, radius: Double): List<ActorWithBody> {
+        val outList = java.util.ArrayList<ActorWithBody>()
+        try {
+            actorsRTree.find(worldX - radius, worldY - radius, worldX + radius, worldY + radius, outList)
+        }
+        catch (e: NullPointerException) {
+        }
+        return outList
+    }
 
+    private fun getPunchSize(actor: ActorWithBody) = actor.scale * actor.actorValue.getAsDouble(AVKey.BAREHAND_BASE_DIGSIZE)!!
+
+
+    fun performBarehandAction(actor: ActorWithBody, delta: Float, mwx: Double, mwy: Double, mtx: Int, mty: Int) {
         // for giant actors punching every structure pickaxe can dig out
         val canAttackOrDig =
             actor.scale * actor.baseHitboxH >= (actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0)
@@ -1556,62 +1584,15 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val canDigSoftTileOnly =
             actor is ActorHumanoid && (actor.baseHitboxH * actor.scale) >= 32f
 
-        fun getActorsAtVicinity(worldX: Double, worldY: Double, radius: Double): List<ActorWithBody> {
-            val outList = java.util.ArrayList<ActorWithBody>()
-            try {
-                actorsRTree.find(worldX - radius, worldY - radius, worldX + radius, worldY + radius, outList)
-            }
-            catch (e: NullPointerException) {
-            }
-            return outList
-        }
 
-
-        val punchSize = actor.scale * actor.actorValue.getAsDouble(AVKey.BAREHAND_BASE_DIGSIZE)!!
+        val punchSize = getPunchSize(actor)
         val punchBlockSize = punchSize.div(TILE_SIZED).floorToInt()
 
         val mouseUnderPunchableTree = BlockCodex[world.getTileFromTerrain(mtx, mty)].hasAnyTagOf("LEAVES", "TREESMALL")
 
-        // if there are attackable actor or fixtures
-        val actorsUnderMouse: List<ActorWithBody> = getActorsAtVicinity(mwx, mwy, punchSize / 2.0).sortedBy {
-            (mwx - it.hitbox.centeredX).sqr() + (mwy - it.hitbox.centeredY).sqr()
-        } // sorted by the distance from the mouse
 
-        // prioritise actors
-        val fixturesUnderHand = ArrayList<FixtureBase>()
-        val mobsUnderHand = ArrayList<ActorWithBody>()
-        actorsUnderMouse.forEach {
-            if (it is FixtureBase) // && it.mainUI == null) // pickup avail check must be done against fixture.canBeDespawned
-                fixturesUnderHand.add(it)
-            else if (it !is FixtureBase)
-                mobsUnderHand.add(it)
-        }
-
-        // pickup a fixture
-        if (fixturesUnderHand.size > 0 && fixturesUnderHand[0].canBeDespawned &&
-            System.nanoTime() - fixturesUnderHand[0].spawnRequestedTime > 500000000) { // don't pick up the fixture if it was recently placed (0.5 seconds)
-            val fixture = fixturesUnderHand[0]
-            val fixtureItem = ItemCodex.fixtureToItemID(fixture)
-            printdbg(this, "Fixture pickup at F${WORLD_UPDATE_TIMER}: ${fixture.javaClass.canonicalName} -> $fixtureItem")
-            // 0. hide tooltips
-            setTooltipMessage(null)
-            // 1. put the fixture to the inventory
-            fixture.flagDespawn()
-            // 2. register this item(fixture) to the quickslot so that the player sprite would be actually lifting the fixture
-            if (actor is Pocketed) {
-                actor.inventory.add(fixtureItem)
-                actor.equipItem(fixtureItem)
-                actor.inventory.setQuickslotItemAtSelected(fixtureItem)
-                // 2-1. unregister if other slot has the same item
-                for (k in 0..9) {
-                    if (actor.inventory.getQuickslotItem(k)?.itm == fixtureItem && k != actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)) {
-                        actor.inventory.setQuickslotItem(k, null)
-                    }
-                }
-            }
-        }
         // punch a small tree/shrub
-        else if (mouseUnderPunchableTree) {
+        if (mouseUnderPunchableTree) {
             barehandAxeInUse = true
             AxeCore.startPrimaryUse(actor, delta, null, mtx, mty, punchBlockSize.coerceAtLeast(1), punchBlockSize.coerceAtLeast(1), listOf("TREESMALL"))
         }
@@ -1632,6 +1613,55 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             if (tileprop.strength <= 12)
                 PickaxeCore.startPrimaryUse(actor, delta, null, mtx, mty, 1.0, 1, 1)
         }
+    }
+
+    private fun getActorsUnderMouse(mwx: Double, mwy: Double): List<ActorWithBody> {
+        val actorsUnderMouse: List<ActorWithBody> = getActorsAt(mwx, mwy).filter { it !is InternalActor }.sortedBy {
+            (mwx - it.hitbox.centeredX).sqr() + (mwy - it.hitbox.centeredY).sqr()
+        } // sorted by the distance from the mouse
+        return actorsUnderMouse
+    }
+
+    fun pickupFixture(actor: ActorWithBody, delta: Float, mwx: Double, mwy: Double, mtx: Int, mty: Int, assignToQuickslot: Boolean = true) {
+        printdbg(this, "Pickup fixture fired")
+
+        val nearestActorUnderMouse = getActorsUnderMouse(mwx, mwy).firstOrNull()
+
+        // pickup a fixture
+        if (nearestActorUnderMouse != null && nearestActorUnderMouse is FixtureBase && nearestActorUnderMouse.canBeDespawned &&
+            System.nanoTime() - nearestActorUnderMouse.spawnRequestedTime > 500000000) { // don't pick up the fixture if it was recently placed (0.5 seconds)
+            val fixture = nearestActorUnderMouse
+            val fixtureItem = ItemCodex.fixtureToItemID(fixture)
+            printdbg(this, "Fixture pickup at F${WORLD_UPDATE_TIMER}: ${fixture.javaClass.canonicalName} -> $fixtureItem")
+            // 0. hide tooltips
+            setTooltipMessage(null)
+            if (!fixture.flagDespawn) {
+                // 1. put the fixture to the inventory
+                fixture.flagDespawn()
+                // 2. register this item(fixture) to the quickslot so that the player sprite would be actually lifting the fixture
+                if (actor is Pocketed) {
+                    actor.inventory.add(fixtureItem)
+
+                    if (assignToQuickslot) {
+                        actor.equipItem(fixtureItem)
+                        actor.inventory.setQuickslotItemAtSelected(fixtureItem)
+                        // 2-1. unregister if other slot has the same item
+                        for (k in 0..9) {
+                            if (actor.inventory.getQuickslotItem(k)?.itm == fixtureItem && k != actor.actorValue.getAsInt(
+                                    AVKey.__PLAYER_QUICKSLOTSEL
+                                )
+                            ) {
+                                actor.inventory.setQuickslotItem(k, null)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if (nearestActorUnderMouse != null && nearestActorUnderMouse.canBeDespawned) {
+
+        }
+        // TODO pickup a mob
     }
 
     override fun hide() {

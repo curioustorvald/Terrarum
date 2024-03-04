@@ -7,11 +7,16 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameitems.ItemID
 
 /**
- * FIXME Constructor is super expensive
- *
+ * Created by minjaesong on 2024-03-05.
+ */
+interface InternalActor {
+
+}
+
+/**
  * Created by minjaesong on 2021-07-30.
  */
-class WireActor : ActorWithBody, NoSerialise {
+class WireActor : ActorWithBody, NoSerialise, InternalActor {
 
     companion object {
         val WIRE_NEARBY = arrayOf(

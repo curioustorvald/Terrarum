@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
@@ -183,14 +184,12 @@ internal class UIStorageChest : UICanvas(
         addUIitem(itemListPlayer)
     }
 
-    private var openingClickLatched = false
-
     override fun show() {
+        super.show()
+
         itemListPlayer.itemList.getInventory = { INGAME.actorNowPlaying!!.inventory }
 
         itemListUpdate()
-
-        openingClickLatched = Terrarum.mouseDown
 
         tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
@@ -221,18 +220,13 @@ internal class UIStorageChest : UICanvas(
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (!openingClickLatched) {
-            return super.touchDown(screenX, screenY, pointer, button)
-        }
-        return false
+        return super.touchDown(screenX, screenY, pointer, button)
     }
 
     override fun updateImpl(delta: Float) {
         catBar.update(delta)
         itemListChest.update(delta)
         itemListPlayer.update(delta)
-
-        if (openingClickLatched && !Terrarum.mouseDown) openingClickLatched = false
     }
 
     private val thisOffsetX = Toolkit.hdrawWidth - getWidthOfCells(6) - halfSlotOffset

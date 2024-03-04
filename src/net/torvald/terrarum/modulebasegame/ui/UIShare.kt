@@ -32,6 +32,8 @@ class UIShare : UICanvas() {
     private var shareCode = ""
 
     override fun show() {
+        super.show()
+
         shareCode = Common.encodeUUID(INGAME.world.worldIndex)
 
         App.printdbg(this, shareCode)

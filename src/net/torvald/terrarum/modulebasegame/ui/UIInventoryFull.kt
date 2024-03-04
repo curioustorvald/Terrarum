@@ -323,13 +323,9 @@ class UIInventoryFull(
     }
 
     override fun show() {
-        transitionPanel.show()
+        super.show()
         tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
-    }
-
-    override fun hide() {
-        transitionPanel.hide()
     }
 
     internal var offsetX = ((width - internalWidth) / 2).toFloat()

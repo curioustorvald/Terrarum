@@ -65,6 +65,11 @@ abstract class UICanvas(
         doNotWarnConstant: Boolean = false
 ): Disposable {
 
+    internal var openingClickLatched = false
+
+    val justOpened: Boolean
+        get() = handler.justOpened
+
     abstract var width: Int
     abstract var height: Int
 
@@ -130,6 +135,7 @@ abstract class UICanvas(
 
     /** A function that is run ONCE when the UI is requested to be opened; will work identical to [endOpening] if [openCloseTime] is zero */
     open fun show() {
+        openingClickLatched = true
         uiItems.forEach { it.show() }
         handler.subUIs.forEach { it.show() }
     }
@@ -137,6 +143,7 @@ abstract class UICanvas(
     open fun hide() {
         uiItems.forEach { it.hide() }
         handler.subUIs.forEach { it.hide() }
+        openingClickLatched = true // just in case `justOpened` detection fails
     }
 
 
@@ -208,7 +215,7 @@ abstract class UICanvas(
     }
     /** Called by the screen's InputProcessor */
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (this.isVisible && mouseInScreen(screenX, screenY)) {
+        if (this.isVisible && mouseInScreen(screenX, screenY) && !openingClickLatched) {
             uiItems.forEach { it.touchDown(screenX, screenY, pointer, button) }
             handler.subUIs.forEach { it.touchDown(screenX, screenY, pointer, button) }
             return true

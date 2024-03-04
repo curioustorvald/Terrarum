@@ -141,6 +141,8 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
             }
             catch (e: UninitializedPropertyAccessException) {
             }
+
+            super.show()
         }
     }
 
@@ -299,6 +301,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
     }
 
     override fun hide() {
+        super.hide()
         showCalled = false
         cellLoadThread.interrupt()
     }

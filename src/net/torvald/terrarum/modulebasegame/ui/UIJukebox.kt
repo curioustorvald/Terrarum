@@ -74,23 +74,20 @@ class UIJukebox : UICanvas(
         addUIitem(transitionPanel)
     }
 
-    private var openingClickLatched = false
-
     override fun show() {
-        openingClickLatched = Terrarum.mouseDown
+        super.show()
         transitionPanel.show()
         tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }
 
     override fun hide() {
+        super.hide()
         transitionPanel.hide()
     }
 
     override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
-
-        if (openingClickLatched && !Terrarum.mouseDown) openingClickLatched = false
     }
 
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
@@ -108,10 +105,7 @@ class UIJukebox : UICanvas(
 
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (!openingClickLatched) {
-            return super.touchDown(screenX, screenY, pointer, button)
-        }
-        return false
+        return super.touchDown(screenX, screenY, pointer, button)
     }
 
     override fun doOpening(delta: Float) {

@@ -59,7 +59,7 @@ class FixtureSignalSwitchManual : Electric {
         setWireEmissionAt(0, 0, Vector2(state.toInt().toDouble(), 0.0))
     }
 
-    @Transient private val clickLatch = MouseLatch(listOf(App.getConfigInt("config_mousesecondary")))
+    @Transient private val clickLatch = MouseLatch()
 
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)

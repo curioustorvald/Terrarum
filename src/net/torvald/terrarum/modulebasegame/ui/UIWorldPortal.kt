@@ -156,18 +156,13 @@ class UIWorldPortal : UICanvas(
     }
 
     override fun show() {
-        super.show()
         transitionPanel.forcePosition(0)
-        transitionPanel.show()
+        super.show()
         INGAME.setTooltipMessage(null)
 
         // add current world to the player's worldportaldict
         addWorldToPlayersDict(INGAME.world.worldIndex)
         cleanUpWorldDict()
-    }
-
-    override fun hide() {
-        transitionPanel.hide()
     }
 
     override fun dispose() {

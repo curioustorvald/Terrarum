@@ -180,6 +180,7 @@ internal class UIInventoryCells(
     }
 
     override fun show() {
+        super.show()
         tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }

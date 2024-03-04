@@ -139,14 +139,12 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
         addUIitem(itemListPlayer)
     }
 
-    private var openingClickLatched = false
-
     override fun show() {
+        super.show()
+
         itemListPlayer.getInventory = { INGAME.actorNowPlaying!!.inventory }
 
         itemListUpdate()
-
-        openingClickLatched = Terrarum.mouseDown
 
         tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
@@ -177,9 +175,7 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (!openingClickLatched) {
-            return super.touchDown(screenX, screenY, pointer, button)
-        }
+        return super.touchDown(screenX, screenY, pointer, button)
         return false
     }
 
@@ -187,8 +183,6 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
         catBar.update(delta)
         itemListChest.update(delta)
         itemListPlayer.update(delta)
-
-        if (openingClickLatched && !Terrarum.mouseDown) openingClickLatched = false
     }
 
     private val thisOffsetX = Toolkit.hdrawWidth - UIInventoryFull.getWidthOfCells(6) - halfSlotOffset

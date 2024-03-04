@@ -256,8 +256,6 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     open fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long = -1
 
     /**
-     * I have decided that left and right clicks must do the same thing, so no secondary use from now on. --Torvald on 2019-05-26
-     *
      * Apply effects (continuously or not) while secondary button is down
      * The item will NOT be consumed, so you will want to consume it yourself by inventory.consumeItem(item)
      *
@@ -267,10 +265,10 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      *
      * note: DO NOT super() this!
      */
-    //open fun startSecondaryUse(delta: Float): Boolean = false
+    open fun startSecondaryUse(actor: ActorWithBody, delta: Float): Long = -1
 
     open fun endPrimaryUse(actor: ActorWithBody, delta: Float): Boolean = false
-    //open fun endSecondaryUse(actor: ActorWithBody, delta: Float): Boolean = false
+    open fun endSecondaryUse(actor: ActorWithBody, delta: Float): Boolean = false
 
     /**
      * Effects applied immediately only once when thrown (discarded) from pocket

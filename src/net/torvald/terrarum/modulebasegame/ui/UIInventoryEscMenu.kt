@@ -304,6 +304,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     )
 
     override fun show() {
+        super.show()
         tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
         toInitScreen()

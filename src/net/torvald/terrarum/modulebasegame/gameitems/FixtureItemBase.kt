@@ -104,6 +104,11 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
         // return true when placed, false when cannot be placed
     }
 
+    override fun startSecondaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
+        (INGAME as TerrarumIngame).pickupFixture(actor, delta, mwx, mwy, mtx, mty, false)
+        -1
+    }
+
     /**
      * Also see: [net.torvald.terrarum.modulebasegame.gameactors.FixtureBase.Companion]
      */

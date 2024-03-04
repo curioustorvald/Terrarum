@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
@@ -108,6 +109,8 @@ void main() {
      */
     var openFired = false
     var closeFired = false
+
+    internal var justOpened = true
 
     var opacity = 1f
         /*set(value) {
@@ -227,6 +230,10 @@ void main() {
 
         if (isVisible || alwaysUpdate) {
             ui.updateImpl(delta)
+            if (ui.openingClickLatched && !Terrarum.mouseDown) {
+                ui.openingClickLatched = false
+//                printdbg(this, "UIHandler.update Unlatching openingClick")
+            }
         }
 
         if (isOpening) {
@@ -241,11 +248,13 @@ void main() {
 
             if (openCloseCounter < ui.openCloseTime) {
                 ui.doOpening(delta)
+                justOpened = false
                 // println("UIHandler.opening ${UI.javaClass.simpleName}")
             }
             else {
                 ui.doOpening(0f)
                 ui.endOpening(delta)
+                justOpened = false
                 isOpening = false
                 isClosing = false
                 isOpened = true
@@ -347,6 +356,8 @@ void main() {
             openFired = true
 
             openCloseCounter = 0f
+
+            justOpened = true
         }
     }
 

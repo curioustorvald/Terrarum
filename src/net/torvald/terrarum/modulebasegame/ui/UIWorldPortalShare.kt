@@ -50,6 +50,8 @@ class UIWorldPortalShare(private val full: UIWorldPortal) : UICanvas() {
     private var shareCode = ""
 
     override fun show() {
+        super.show()
+
         shareCode = Common.encodeUUID(INGAME.world.worldIndex)
 
 

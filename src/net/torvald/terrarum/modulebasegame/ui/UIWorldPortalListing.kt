@@ -304,6 +304,8 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private var threadFired = false
 
     override fun show() {
+        super.show()
+
         listPage = 0
         showSpinner = true
 
@@ -464,7 +466,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     }
 
     override fun hide() {
-        uiItems.forEach { it.hide() }
+        super.hide()
         if (::worldCells.isInitialized) worldCells.forEach { it.hide() }
 
         if (::worldCells.isInitialized) worldCells.forEach { it.tryDispose() }
@@ -553,18 +555,6 @@ class UIItemWorldCellsSimple(
     private val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")
 
     var highlighted = false
-
-    override fun show() {
-        super.show()
-    }
-
-    override fun hide() {
-        super.hide()
-    }
-
-    override fun update(delta: Float) {
-        super.update(delta)
-    }
 
     fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera, offX: Int, offY: Int) {
         super.render(frameDelta, batch, camera)

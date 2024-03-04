@@ -70,6 +70,7 @@ class UITemplateHalfInventory(
 
     }
 
+
     fun rebuild(category: Array<String>) {
         itemList.rebuild(category)
     }

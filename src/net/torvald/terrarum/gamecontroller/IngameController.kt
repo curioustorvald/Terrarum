@@ -208,7 +208,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             }
         }
 
-        terrarumIngame.uiContainer.forEach { it?.keyDown(keycode) } // for KeyboardControlled UIcanvases
+        terrarumIngame.uiContainer.forEach { if (it?.justOpened == false) it.keyDown(keycode) } // for KeyboardControlled UIcanvases
         
         // Debug UIs
         if (keycode == Input.Keys.GRAVE) {
@@ -233,7 +233,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             terrarumIngame.uiQuickBar.setAsOpen()
         }
 
-        terrarumIngame.uiContainer.forEach { it?.keyUp(keycode) } // for KeyboardControlled UIcanvases
+        terrarumIngame.uiContainer.forEach { if (it?.justOpened == false) it.keyUp(keycode) } // for KeyboardControlled UIcanvases
         
         // screenshot key
         if (keycode == Input.Keys.F12) f12Down = false
@@ -243,27 +243,25 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     }
 
     override fun keyTyped(character: Char): Boolean {
-        terrarumIngame.uiContainer.forEach { if (it?.isVisible == true) it.keyTyped(character) }
+        terrarumIngame.uiContainer.forEach { if (it?.justOpened == false && it.isVisible) it.keyTyped(character) }
         return true
     }
 
     private fun tTouchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        // don't separate Player from this! Physics will break, esp. airborne manoeuvre
-        if (!terrarumIngame.paused && !terrarumIngame.playerControlDisabled) {
-            // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
-            if (terrarumIngame.uiContainer.map { if ((it?.isOpening == true || it?.isOpened == true) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
+        // disable the IFs: the "unlatching" must happen no matter what, even if a UI is been opened
 
-                if (
-                        terrarumIngame.actorNowPlaying != null &&
-                        (button == App.getConfigInt("config_mouseprimary") ||
-                        button == App.getConfigInt("config_mousesecondary"))) {
+//        if (!terrarumIngame.paused && !terrarumIngame.playerControlDisabled) {
+            // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
+//            if (terrarumIngame.uiContainer.map { if ((it?.isOpening == true || it?.isOpened == true) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
+
+                if (button == App.getConfigInt("config_mouseprimary")) {
                     terrarumIngame.worldPrimaryClickEnd(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
                 }
                 if (button == App.getConfigInt("config_mousesecondary")) {
                     terrarumIngame.worldSecondaryClickEnd(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
                 }
-            }
-        }
+//            }
+//        }
 
         // pie menu
         if (button == App.getConfigInt("control_mouse_quicksel")) {
@@ -271,7 +269,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             terrarumIngame.uiQuickBar.setAsOpen()
         }
 
-        terrarumIngame.uiContainer.forEach { it?.touchUp(screenX, screenY, pointer, button) } // for MouseControlled UIcanvases
+        terrarumIngame.uiContainer.forEach { if (it?.justOpened == false) it.touchUp(screenX, screenY, pointer, button) } // for MouseControlled UIcanvases
         return true
     }
 
@@ -289,17 +287,17 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 it.actorValue.set(AVKey.__PLAYER_QUICKSLOTSEL, selection fmod UIQuickslotBar.SLOT_COUNT)
             }
         }
-        terrarumIngame.uiContainer.forEach { it?.scrolled(amountX, amountY) }
+        terrarumIngame.uiContainer.forEach { if (it?.justOpened == false) it?.scrolled(amountX, amountY) }
         return true
     }
 
     private fun tTouchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        terrarumIngame.uiContainer.forEach { it?.touchDragged(screenX, screenY, pointer) }
+        terrarumIngame.uiContainer.forEach { if (it?.justOpened == false) it.touchDragged(screenX, screenY, pointer) }
         return true
     }
 
     private fun tTouchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        terrarumIngame.uiContainer.forEach { it?.touchDown(screenX, screenY, pointer, button) }
+        terrarumIngame.uiContainer.forEach { if (it?.justOpened == false) it.touchDown(screenX, screenY, pointer, button) }
         
         // pie menu
         if (button == App.getConfigInt("control_mouse_quicksel")) {

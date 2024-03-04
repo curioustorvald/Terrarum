@@ -155,6 +155,11 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                     }
 
                     mouseOverCall?.updateImpl(delta)
+                    if (mouseOverCall?.openingClickLatched == true && !Terrarum.mouseDown) {
+                        mouseOverCall?.openingClickLatched = false
+//                        App.printdbg(this, "UIItem.update Unlatching openingClick of mouseOverCall")
+                    }
+
                     mouseUpListener.invoke(itemRelativeMouseX, itemRelativeMouseY)
                 }
                 else {
