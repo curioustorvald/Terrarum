@@ -582,7 +582,7 @@ object IngameRenderer : Disposable {
                     batch.shader.setUniformi("u_pattern", 1)
                     batch.draw(
                         lightTex,
-                        xrem, yrem,
+                        xrem, yrem - TILE_SIZEF * 0.5f,
                         lightTex.regionWidth * lightmapDownsample,
                         lightTex.regionHeight * lightmapDownsample
                     )
@@ -700,7 +700,7 @@ object IngameRenderer : Disposable {
                 batch.shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
                 batch.shader.setUniformi("u_pattern", 1)
                 batch.draw(lightTex,
-                        xrem, yrem,
+                    xrem, yrem - TILE_SIZEF * 0.5f,
                         lightTex.regionWidth * lightmapDownsample,
                         lightTex.regionHeight * lightmapDownsample
                 )
