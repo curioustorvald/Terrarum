@@ -9,6 +9,8 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
 /**
+ * Implements a Nimply gate.
+ *
  * Created by minjaesong on 2024-03-04.
  */
 interface Reorientable {
@@ -21,7 +23,7 @@ interface Reorientable {
      */
     fun orientAnticlockwise()
     /**
-     * strictly 0 1 2 3. If your fixture can only be oriented in two ways, use value 0 2.
+     * strictly 0 1 2 3. If your fixture can only be oriented in two ways, use value 0 1(normal, 90 deg) or 0 2(normal, upside-down/flipped).
      */
     var orientation: Int
 }
@@ -39,7 +41,7 @@ class FixtureSignalBlocker : Electric, Reorientable {
         nameFun = { Lang["ITEM_LOGIC_SIGNAL_BLOCKER"] }
     )
 
-    override var orientation = 0
+    override var orientation = 0 // 0 1 2 3
 
     private fun setEmitterAndSink() {
         when (orientation) {

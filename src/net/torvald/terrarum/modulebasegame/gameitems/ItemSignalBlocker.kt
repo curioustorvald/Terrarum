@@ -34,3 +34,30 @@ class ItemSignalBlocker(originalID: ItemID) : FixtureItemBase(originalID, "net.t
     }
 
 }
+
+/**
+ * Created by minjaesong on 2024-03-05.
+ */
+class ItemSignalLatch(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSignalLatch") {
+
+    override var dynamicID: ItemID = originalID
+    override var baseMass = FixtureLogicSignalEmitter.MASS
+    override val canBeDynamic = false
+    override val materialId = ""
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(11, 3)
+
+    override var baseToolSize: Double? = baseMass
+    override var originalName = "ITEM_LOGIC_SIGNAL_LATCH"
+
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
+        super.effectWhileEquipped(actor, delta)
+        (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "signal"
+    }
+
+    override fun effectOnUnequip(actor: ActorWithBody) {
+        super.effectOnUnequip(actor)
+        (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
+    }
+
+}
