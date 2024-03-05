@@ -59,17 +59,21 @@ class Noticelet : UICanvas() {
         }
         toDelete.clear()
 
+        // make way for the mouse cursor
+        /*
         if (Terrarum.mouseScreenX.toFloat() in Toolkit.drawWidthf * 0.25f..Toolkit.drawWidthf * 0.75f) {
             if (ypos == -1f && Terrarum.mouseScreenY < App.scr.halfhf - awayFromCentre)
                 ypos = 1f
             else if (ypos == 1f && Terrarum.mouseScreenY > App.scr.halfhf + awayFromCentre)
                 ypos = -1f
         }
+
+         */
     }
 
     private val h = 24f
     private val gap = 8f
-    private val awayFromCentre = 120f
+    private val awayFromCentre = 56f//120f
 
     private val toDelete = ArrayList<Notice>()
 
@@ -80,7 +84,7 @@ class Noticelet : UICanvas() {
         val py = App.scr.halfhf + awayFromCentre * ypos - (if (ypos < 0) h else 0f)
 
         messageQueue.forEachIndexed { index, notice ->
-            drawNoticelet(batch, px,  py + (h + gap) * index * ypos, notice)
+            drawNoticelet(batch, App.scr.tvSafeGraphicsWidth.toFloat(),  py + (h + gap) * index * ypos, notice)
         }
     }
 
@@ -99,7 +103,7 @@ class Noticelet : UICanvas() {
         val strLen = App.fontGame.getWidth(str)
         val icon = ItemCodex.getItemImage(notice.item) ?: CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
         val width = 4f + icon.regionWidth + 4 + strLen + 4
-        val dx = ((x - width) / 2).floorToFloat()
+        val dx = x//((x - width) / 2).floorToFloat()
         val dy = y
 
         val opacity = if (notice.akku < openCloseTime)
