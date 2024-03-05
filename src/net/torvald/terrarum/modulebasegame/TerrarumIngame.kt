@@ -692,6 +692,13 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
     private var worldPrimaryClickLatch = false
+
+    private fun fireFixtureInteractEvent(fixture: FixtureBase, mwx: Double, mwy: Double) {
+        if (fixture.mouseUp) {
+            fixture.onInteract(mwx, mwy)
+        }
+    }
+
     // left click: use held item, attack, pick up fixture if i'm holding a pickaxe or hammer (aka tool), do 'bare hand action' if holding nothing
     override fun worldPrimaryClickStart(actor: ActorWithBody, delta: Float) {
         //println("[Ingame] worldPrimaryClickStart $delta")
@@ -709,12 +716,24 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         ////////////////////////////////
 
-        // #1. If ~~there is no UI under and~~ I'm holding an item, use it
+        // #1. If holding an item, use it
         // don't want to open the UI and use the item at the same time, would ya?
         if (itemOnGrip != null) {
             val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
             if (consumptionSuccessful > -1)
                 (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
+
+            // TODO filter blocks/walls/wires/wire cutter
+            if (fixtureUnderMouse != null) {
+                if (!worldPrimaryClickLatch) {
+                    mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
+                        fixtureUnderMouse.let { fixture ->
+                            fireFixtureInteractEvent(fixture, mwx, mwy)
+                        }
+                        0L
+                    }
+                }
+            }
 
             worldPrimaryClickLatch = true
         }
@@ -739,6 +758,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                                     (App.scr.height - ui.height) / 4 // what the fuck?
                                 )
                                 ui.setAsOpen()
+                            }
+
+                            if (!uiOpened) {
+                                fireFixtureInteractEvent(fixture, mwx, mwy)
                             }
                         }
                     }

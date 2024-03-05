@@ -242,6 +242,19 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     open fun onSpawn(tx: Int, ty: Int) {}
 
     /**
+     * If the fixture has mainUI, do NOT override this function! Opening of the UI is handled by TerrarumIngame.worldPrimaryClickStart
+     *
+     * For someone might be concerened, you don't need to have a MouseLatch or worry about the `if (mouseUp)`; it's considered by the Ingame
+     *
+     * Fired when "just clicked" by mousePrimary
+     *
+     * @param mx Terrarum.mouseX (mouse position in the world)
+     * @param my Terrarum.omuseY (mouse position in the world)
+     */
+    open fun onInteract(mx: Double, my: Double) {
+    }
+
+    /**
      * Making the sprite: do not address the CommonResourcePool directly; just do it like this snippet:
      *
      * ```makeNewSprite(FixtureBase.getSpritesheet("basegame", "sprites/fixtures/tiki_torch.tga", 16, 32))```

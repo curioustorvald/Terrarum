@@ -28,9 +28,7 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 1, 1),
         nameFun = { Lang["ITEM_TURNTABLE"] }
-    ) {
-        clickLatch.forceLatch()
-    }
+    )
 
     @Transient var musicNowPlaying: MusicContainer? = null; private set
 
@@ -67,42 +65,36 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
 
     internal var disc: ItemID? = null
 
-    @Transient private val clickLatch = MouseLatch()
-
     override val canBeDespawned: Boolean
         get() = disc == null
 
-    override fun updateImpl(delta: Float) {
-        super.updateImpl(delta)
+    override fun onInteract(mx: Double, my: Double) {
+        if (disc == null) {
+            if (INGAME.actorNowPlaying != null) {
+                val itemOnGrip =
+                    INGAME.actorNowPlaying!!.inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)
+                val itemProp = ItemCodex[itemOnGrip]
 
-        // right click
-        if (mouseUp) {
-            clickLatch.latch {
-                if (disc == null) {
-                    if (INGAME.actorNowPlaying != null) {
-                        val itemOnGrip =
-                            INGAME.actorNowPlaying!!.inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)
-                        val itemProp = ItemCodex[itemOnGrip]
-
-                        if (itemProp?.hasAllTagOf("MUSIC", "PHONO") == true) {
-                            disc = itemOnGrip
-                            INGAME.actorNowPlaying!!.removeItem(itemOnGrip!!)
-                            playDisc()
-                        }
-                    }
-                }
-                else {
-                    stopGracefully()
-                    PickaxeCore.dropItem(
-                        disc!!,
-                        intTilewiseHitbox.canonicalX.toInt(),
-                        intTilewiseHitbox.canonicalY.toInt()
-                    )
-                    disc = null
+                if (itemProp?.hasAllTagOf("MUSIC", "PHONO") == true) {
+                    disc = itemOnGrip
+                    INGAME.actorNowPlaying!!.removeItem(itemOnGrip!!)
+                    playDisc()
                 }
             }
         }
+        else {
+            stopGracefully()
+            PickaxeCore.dropItem(
+                disc!!,
+                intTilewiseHitbox.canonicalX.toInt(),
+                intTilewiseHitbox.canonicalY.toInt()
+            )
+            disc = null
+        }
+    }
 
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
 
         // supress the normal background music playback
         if (musicIsPlaying && !flagDespawn) {

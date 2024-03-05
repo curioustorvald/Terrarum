@@ -366,6 +366,25 @@ open class FixtureSwingingDoorBase : FixtureBase {
     private var lastDoorHandler = 0 // 0: automatic, 1: manual
     private var doorCloseQueueHandler = 0
 
+    override fun onInteract(mx: Double, my: Double) {
+        // keep opened/closed as long as the mouse is down
+        if (doorStateTimer != 0f) {
+            oldStateBeforeMouseDown = doorState
+        }
+
+        if (oldStateBeforeMouseDown == 0) {
+            if (mouseOnLeftSide(mx, my))
+                openToLeft(1)
+            else if (mouseOnRightSide(mx, my))
+                openToRight(1)
+        }
+        else {
+            closeDoor(1)
+        }
+
+        doorStateTimer = 0f
+    }
+
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
 
@@ -389,34 +408,10 @@ open class FixtureSwingingDoorBase : FixtureBase {
             }
 
             // manual opening/closing
-            if (mouseUp && Gdx.input.isButtonPressed(App.getConfigInt("config_mousesecondary"))) {
+            // is handled on the onInteract()
 
-                INGAME.actorNowPlaying?.let { player ->
-                    mouseInInteractableRange(player) { mx, my, _, _ ->
-                        // keep opened/closed as long as the mouse is down
-                        if (doorStateTimer != 0f) {
-                            oldStateBeforeMouseDown = doorState
-                        }
-
-                        if (oldStateBeforeMouseDown == 0) {
-                            if (mouseOnLeftSide(mx, my))
-                                openToLeft(1)
-                            else if (mouseOnRightSide(mx, my))
-                                openToRight(1)
-                        }
-                        else {
-                            closeDoor(1)
-                        }
-
-                        doorStateTimer = 0f
-
-                        0L
-                    }
-                }
-
-            }
             // automatic opening/closing
-            else if (doorStateTimer > doorHoldLength[doorState]!!) {
+            if (doorStateTimer > doorHoldLength[doorState]!!) {
 //                val actors = INGAME.actorContainerActive.filterIsInstance<ActorWithBody>()
 
                 // auto opening and closing

@@ -21,9 +21,7 @@ class FixtureSignalSwitchManual : Electric {
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 1, 1),
         nameFun = { Lang["ITEM_LOGIC_SIGNAL_SWITCH"] }
-    ) {
-        clickLatch.forceLatch()
-    }
+    )
 
     private val variant = (Math.random() * 8).toInt()
     private var state = false // false = off
@@ -61,19 +59,9 @@ class FixtureSignalSwitchManual : Electric {
         setWireEmissionAt(0, 0, Vector2(state.toInt().toDouble(), 0.0))
     }
 
-    @Transient private val clickLatch = MouseLatch()
-
-    override fun updateImpl(delta: Float) {
-        super.updateImpl(delta)
-
-        // right click
-        if (mouseUp) {
-            clickLatch.latch {
-                state = !state
-                (sprite as SheetSpriteAnimation).currentRow = state.toInt()
-                setWireEmissionAt(0, 0, Vector2(state.toInt().toDouble(), 0.0))
-            }
-        }
-
+    override fun onInteract(mx: Double, my: Double) {
+        state = !state
+        (sprite as SheetSpriteAnimation).currentRow = state.toInt()
+        setWireEmissionAt(0, 0, Vector2(state.toInt().toDouble(), 0.0))
     }
 }
