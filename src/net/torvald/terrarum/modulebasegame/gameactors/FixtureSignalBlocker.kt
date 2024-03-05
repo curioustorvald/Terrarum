@@ -71,10 +71,14 @@ class FixtureSignalBlocker : Electric, Reorientable {
 
     override fun orientClockwise() {
         orientation = (orientation + 1) % 4
+        (sprite as SheetSpriteAnimation).currentFrame = orientation
+        (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation
         setEmitterAndSink(); updateK()
     }
     override fun orientAnticlockwise() {
         orientation = (orientation - 1) % 4
+        (sprite as SheetSpriteAnimation).currentFrame = orientation
+        (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation
         setEmitterAndSink(); updateK()
     }
 

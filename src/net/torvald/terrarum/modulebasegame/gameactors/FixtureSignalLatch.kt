@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
@@ -47,10 +48,14 @@ class FixtureSignalLatch : Electric, Reorientable {
 
     override fun orientClockwise() {
         orientation = (orientation + 2) % 4
+        (sprite as SheetSpriteAnimation).currentFrame = orientation / 2
+        (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation / 2
         setEmitterAndSink(); updateQ()
     }
     override fun orientAnticlockwise() {
         orientation = (orientation - 2) % 4
+        (sprite as SheetSpriteAnimation).currentFrame = orientation / 2
+        (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation / 2
         setEmitterAndSink(); updateQ()
     }
 
@@ -63,12 +68,12 @@ class FixtureSignalLatch : Electric, Reorientable {
         setHitboxDimension(2*TILE_SIZE, 3*TILE_SIZE, 0, 1)
 
         makeNewSprite(TextureRegionPack(itemImage.texture, 2*TILE_SIZE, 3*TILE_SIZE)).let {
-            it.setRowsAndFrames(16,4)
-            it.delays = FloatArray(16) { Float.POSITIVE_INFINITY }
+            it.setRowsAndFrames(32,2)
+            it.delays = FloatArray(32) { Float.POSITIVE_INFINITY }
         }
         makeNewSpriteEmissive(TextureRegionPack(itemImage2.texture, 2*TILE_SIZE, 3*TILE_SIZE)).let {
-            it.setRowsAndFrames(16,4)
-            it.delays = FloatArray(16) { Float.POSITIVE_INFINITY }
+            it.setRowsAndFrames(32,2)
+            it.delays = FloatArray(32) { Float.POSITIVE_INFINITY }
         }
 
         setEmitterAndSink()
@@ -137,7 +142,17 @@ class FixtureSignalLatch : Electric, Reorientable {
 
         CLK0old = CLK0
 
-        // TODO update sprite
+        // update sprite
+        val one = isSignalHigh(0, 0)
+        val two = isSignalHigh(1, 0)
+        val four = isSignalHigh(0, 1) or isSignalHigh(1, 1)
+        val eight = isSignalHigh(0, 2)
+        val sixteen = isSignalHigh(1, 2)
+
+        val state = one.toInt(0) or two.toInt(1) or four.toInt(2) or eight.toInt(3) or sixteen.toInt(4)
+
+        (sprite as SheetSpriteAnimation).currentRow = state
+        (spriteEmissive as SheetSpriteAnimation).currentRow = state
     }
 
     override fun updateSignal() {
