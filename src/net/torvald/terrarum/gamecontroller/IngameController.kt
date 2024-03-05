@@ -287,7 +287,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 it.actorValue.set(AVKey.__PLAYER_QUICKSLOTSEL, selection fmod UIQuickslotBar.SLOT_COUNT)
             }
         }
-        terrarumIngame.uiContainer.forEach { if (it?.justOpened == false) it?.scrolled(amountX, amountY) }
+        terrarumIngame.uiContainer.forEach { if (it?.justOpened == false) it.scrolled(amountX, amountY) }
         return true
     }
 

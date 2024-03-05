@@ -720,13 +720,13 @@ object LightmapRenderer {
                         val arrayY = y.convY()
 
                         val (red, grn, blu, uvl) = lightmap.getVec(arrayX, arrayY)
-//                    val redw = (red.sqrt() - 1f) * (7f / 24f)
-//                    val grnw = (grn.sqrt() - 1f)
-//                    val bluw = (blu.sqrt() - 1f) * (7f / 72f)
-//                    val bluwv = (blu.sqrt() - 1f) * (1f / 50f)
-//                    val uvlwr = (uvl.sqrt() - 1f) * (1f / 13f)
-//                    val uvlwg = (uvl.sqrt() - 1f) * (1f / 10f)
-//                    val uvlwb = (uvl.sqrt() - 1f) * (1f / 8f)
+//                        val redw = (grn.sqrt() - 1f) * (1f / 53f)
+//                        val grnw = (red.sqrt() - 1f) * (1f / 39f)
+//                        val bluw = (blu.sqrt() - 1f) * (1f / 159f)
+//                        val bluwv = (blu.sqrt() - 1f) * (1f / 39f)
+//                        val uvlwr = (uvl.sqrt() - 1f) * (1f / 947f)
+//                        val uvlwg = (uvl.sqrt() - 1f) * (1f / 1279f)
+//                        val uvlwb = (uvl.sqrt() - 1f) * (1f / 319f)
 
                         if (solidMultMagic == null)
                             lightBuffer.drawPixel(
@@ -735,14 +735,14 @@ object LightmapRenderer {
                                 0
                             )
                         else
-                        /*lightBuffer.drawPixel(
-                            x - this_x_start,
-                            lightBuffer.height - 1 - y + this_y_start, // flip Y
-                                (max(red,grnw,bluw,uvlwr) * solidMultMagic).tonemap().times(255f).roundToInt().shl(24) or
-                                        (max(redw,grn,bluw,uvlwg) * solidMultMagic).tonemap().times(255f).roundToInt().shl(16) or
-                                        (max(redw,grnw,blu,uvlwb) * solidMultMagic).tonemap().times(255f).roundToInt().shl(8) or
-                                        (max(bluwv,uvl) * solidMultMagic).tonemap().times(255f).roundToInt()
-                        )*/
+                            /*lightBuffer.drawPixel(
+                                x - this_x_start,
+                                lightBuffer.height - 1 - y + this_y_start, // flip Y
+                                    (maxOf(red,grnw,bluw,uvlwr) * solidMultMagic).tonemap().times(255f).roundToInt().shl(24) or
+                                            (maxOf(redw,grn,bluw,uvlwg) * solidMultMagic).tonemap().times(255f).roundToInt().shl(16) or
+                                            (maxOf(redw,grnw,blu,uvlwb) * solidMultMagic).tonemap().times(255f).roundToInt().shl(8) or
+                                            (maxOf(bluwv,uvl) * solidMultMagic).tonemap().times(255f).roundToInt()
+                            )*/
                             lightBuffer.drawPixel(
                                 x - this_x_start,
                                 lightBuffer.height - 1 - y + this_y_start, // flip Y
