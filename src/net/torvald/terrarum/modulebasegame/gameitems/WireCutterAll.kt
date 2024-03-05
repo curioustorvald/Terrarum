@@ -6,10 +6,10 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.Terrarum.toInt
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameitems.FixtureInteractionBlocked
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRangeTools
-import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.BlockBase.wireNodeMirror
@@ -82,7 +82,7 @@ object WireCutterBase {
  *
  * Created by minjaesong on 2021-09-18.
  */
-class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
+class WireCutterAll(originalID: ItemID) : GameItem(originalID), FixtureInteractionBlocked {
 
     override var dynamicID: ItemID = originalID
     override var baseMass = 0.1

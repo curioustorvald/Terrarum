@@ -23,6 +23,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
+import net.torvald.terrarum.gameitems.FixtureInteractionBlocked
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
@@ -716,33 +717,22 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         ////////////////////////////////
 
-        // #1. If holding an item, use it
+        // #1. Consume an consumables
         // don't want to open the UI and use the item at the same time, would ya?
-        if (itemOnGrip != null) {
+        if (itemOnGrip?.isConsumable == true) {
+            // click filtering (latch stuff) is handled by IngameController (see inventoryCategoryAllowClickAndDrag)
             val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
             if (consumptionSuccessful > -1)
                 (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
 
-            // TODO filter blocks/walls/wires/wire cutter
-            if (fixtureUnderMouse != null) {
-                if (!worldPrimaryClickLatch) {
-                    mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
-                        fixtureUnderMouse.let { fixture ->
-                            fireFixtureInteractEvent(fixture, mwx, mwy)
-                        }
-                        0L
-                    }
-                }
-            }
-
             worldPrimaryClickLatch = true
         }
-        else {
+        else { // held item is not consumable or holding no items
             mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
                 // #2. interact with the fixture
                 // scan for the one with non-null UI.
                 // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
-                if (fixtureUnderMouse != null) {
+                if (fixtureUnderMouse != null && itemOnGrip !is FixtureInteractionBlocked) {
                     if (!worldPrimaryClickLatch) {
                         worldPrimaryClickLatch = true
                         fixtureUnderMouse.let { fixture ->
@@ -765,14 +755,22 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                             }
                         }
                     }
-                    0L
                 }
-                // #3. If not holding any item and can do barehandaction (size big enough that barehandactionminheight check passes), do it
+                // #3. If no fixture under mouse or FixtureInteractionBlocked, use the item
+                else if (itemOnGrip != null) {
+                    // click filtering (latch stuff) is handled by IngameController (see inventoryCategoryAllowClickAndDrag)
+                    val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
+                    if (consumptionSuccessful > -1)
+                        (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
+
+                    worldPrimaryClickLatch = true
+                }
+                // #4. If not holding any item and can do barehandaction (size big enough that barehandactionminheight check passes), do it
                 else {
                     performBarehandAction(actor, delta, mwx, mwy, mtx, mty)
-                    0L
                 }
 
+                0L
             }
         }
     }
@@ -794,14 +792,12 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     override fun worldSecondaryClickStart(actor: ActorWithBody, delta: Float) {
         val itemOnGrip = ItemCodex[(actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)]
 
-        // #1. If ~~there is no UI under and~~ I'm holding an item, use it
+        // #1. Perform item's secondaryUse
         // don't want to open the UI and use the item at the same time, would ya?
-        if (itemOnGrip != null) {
-            val consumptionSuccessful = itemOnGrip.startSecondaryUse(actor, delta)
-            if (consumptionSuccessful > -1)
-                (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
-        }
-        // #2. Try to pick up the fixture
+        val consumptionSuccessful = itemOnGrip?.startSecondaryUse(actor, delta) ?: -1
+        if (consumptionSuccessful > -1)
+            (actor as Pocketed).inventory.consumeItem(itemOnGrip!!, consumptionSuccessful)
+        // #2. If #1 failed, try to pick up the fixture
         else {
             mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
                 pickupFixture(actor, delta, mwx, mwy, mtx, mty)

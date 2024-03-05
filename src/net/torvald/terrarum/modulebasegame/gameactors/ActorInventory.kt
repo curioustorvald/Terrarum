@@ -100,7 +100,7 @@ class ActorInventory() : FixtureInventory() {
 
         if (amount < 0) throw IllegalArgumentException("Consuming negative amount of an item (expected >=0, got $amount)")
 
-        if (item.stackable && !item.canBeDynamic) {
+        if (item.isConsumable) {
             remove(item, amount)
         }
         else if (item.isUnique) {

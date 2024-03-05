@@ -103,8 +103,10 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
 
     var itemProperties = ItemValue()
 
-    /** Single-use then destroyed (e.g. Tiles), same as "consumable" */
+    /** Single-use then destroyed (e.g. Tiles) */
     @Transient var stackable: Boolean = true
+    val isConsumable: Boolean
+        get() = stackable && !canBeDynamic
 
 
     /**
@@ -449,3 +451,8 @@ fun ItemID.isBlock() = !this.contains('@') && !this.isDynamic()
 fun ItemID.isWall() = this.startsWith("wall@")
 fun ItemID.isFluid() = this.startsWith("fluid@")
 fun ItemID.isOre() = this.startsWith("ores@")
+
+/**
+ * Created by minjaesong on 2024-03-06.
+ */
+interface FixtureInteractionBlocked
