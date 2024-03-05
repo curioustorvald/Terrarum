@@ -1644,12 +1644,18 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     fun pickupFixture(actor: ActorWithBody, delta: Float, mwx: Double, mwy: Double, mtx: Int, mty: Int, assignToQuickslot: Boolean = true) {
         printdbg(this, "Pickup fixture fired")
 
-        val nearestActorUnderMouse = getActorsUnderMouse(mwx, mwy).firstOrNull()
+        val actorsUnderMouse = getActorsUnderMouse(mwx, mwy)
+
+        val fixture = actorsUnderMouse.firstOrNull {
+            it is FixtureBase && it.canBeDespawned &&
+                    System.nanoTime() - it.spawnRequestedTime > 500000000 // don't pick up the fixture if it was recently placed (0.5 seconds)
+        } as? FixtureBase
+        val mob = actorsUnderMouse.firstOrNull {
+            it !is FixtureBase && it.physProp.usePhysics && !it.physProp.immobileBody
+        } as? ActorWithBody
 
         // pickup a fixture
-        if (nearestActorUnderMouse != null && nearestActorUnderMouse is FixtureBase && nearestActorUnderMouse.canBeDespawned &&
-            System.nanoTime() - nearestActorUnderMouse.spawnRequestedTime > 500000000) { // don't pick up the fixture if it was recently placed (0.5 seconds)
-            val fixture = nearestActorUnderMouse
+        if (fixture != null) {
             val fixtureItem = ItemCodex.fixtureToItemID(fixture)
             printdbg(this, "Fixture pickup at F${WORLD_UPDATE_TIMER}: ${fixture.javaClass.canonicalName} -> $fixtureItem")
             // 0. hide tooltips
@@ -1677,10 +1683,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 }
             }
         }
-        else if (nearestActorUnderMouse != null && nearestActorUnderMouse.canBeDespawned) {
-
+        else if (mob != null) {
+            // TODO pickup a mob
         }
-        // TODO pickup a mob
     }
 
     override fun hide() {
