@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.WireCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameitems.FixtureInteractionBlocked
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.Material
@@ -13,7 +14,8 @@ import net.torvald.terrarum.itemproperties.Material
  *
  * Created by minjaesong on 2019-03-10.
  */
-class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, private val sheetX: Int, private val sheetY: Int) : GameItem(originalID) {
+class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, private val sheetX: Int, private val sheetY: Int)
+    : GameItem(originalID), FixtureInteractionBlocked {
 
     override var dynamicID: ItemID = originalID
     override var baseMass = 0.001

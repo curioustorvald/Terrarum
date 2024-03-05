@@ -14,6 +14,7 @@ import net.torvald.terrarum.blockproperties.OreCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.IME
+import net.torvald.terrarum.gameitems.FixtureInteractionBlocked
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.CraftingCodex
@@ -568,7 +569,7 @@ object ModMgr {
 
         private fun makeNewItemObj(tile: BlockProp, isWall: Boolean) = object : GameItem(
             if (isWall) "wall@"+tile.id else tile.id
-        ) {
+        ), FixtureInteractionBlocked {
             override var baseMass: Double = (tile.density / 100.0) * (if (tile.isPlatform) 0.5 else 1.0)
             override var baseToolSize: Double? = null
             override var inventoryCategory = if (isWall) Category.WALL else Category.BLOCK
