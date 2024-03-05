@@ -459,7 +459,7 @@ class CreateTileAtlas {
                 val i = if (renderMask == MASK_47) (if (i < 41) i else i + 1) else i // to compensate the discontinuity between 40th and 41st tile
                 _drawToAtlantes(diffuse, atlasCursor, i % txOfPixmap, i / txOfPixmap, SIX_SEASONS)
                 _drawToAtlantes(glow, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, GLOW)
-                _drawToAtlantes(emissive, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, EMISSIVE)
+                _drawToAtlantes(emissive, atlasCursor, i % txOfPixmapEmissive, i / txOfPixmapEmissive, EMISSIVE)
                 atlasCursor += 1
             }
         }
