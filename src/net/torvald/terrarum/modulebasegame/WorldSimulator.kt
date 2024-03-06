@@ -1,4 +1,4 @@
-package net.torvald.terrarum.gameworld
+package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.utils.Queue
 import net.torvald.random.HQRNG
@@ -11,16 +11,14 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Controllable
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameitems.AxeCore
-import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import org.dyn4j.geometry.Vector2
 import kotlin.math.cosh
 import kotlin.math.min
 import kotlin.math.roundToInt
-import kotlin.math.sqrt
 
 /**
  * Created by minjaesong on 2016-08-03.
