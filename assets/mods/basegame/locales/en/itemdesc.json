@@ -19,7 +19,6 @@
   "TOOLTIP_item@basegame:37": "“I am sworn to keep your burdens.”", /* skyrim/lydia reference */
   "TOOLTIP_item@basegame:38": "“I am sworn to keep your burdens.”", /* skyrim/lydia reference */
   "TOOLTIP_item@basegame:39": "“I am sworn to keep your burdens.”", /* skyrim/lydia reference */
-  "TOOLTIP_item@basegame:8": "Emits a signal",
   "TOOLTIP_item@basegame:9": "An electricians’ best friend",
   "TOOLTIP_item@basegame:10": "“Who needs a Book and Quill when you’ve got this?”", /* a jab on the Minecraft item Book and Quill */
   "TOOLTIP_item@basegame:11": "Tells what day it is",
@@ -46,5 +45,12 @@
 
   "TOOLTIP_item@basegame:114": "A precious fuel for the steel production",
 
-  "TOOLTIP_item@basegame:320": "Travel multiverse!\nWarning: a pair is needed for the return trip"
+  "TOOLTIP_item@basegame:320": "Travel multiverse!\nWarning: a pair is needed for the return trip",
+
+
+  "TOOLTIP_item@basegame:8": "Emits a signal",
+  "TOOLTIP_item@basegame:34": "Selectively emits a signal",
+  "TOOLTIP_item@basegame:35": "Shows a signal status",
+  "TOOLTIP_item@basegame:44": "Cuts the signal using the cutting signal",
+  "TOOLTIP_item@basegame:45": "Latches onto the signal on the latch signal"
 }

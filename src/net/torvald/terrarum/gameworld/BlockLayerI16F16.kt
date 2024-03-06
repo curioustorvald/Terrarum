@@ -1,11 +1,12 @@
 package net.torvald.terrarum.gameworld
 
 import net.torvald.terrarum.App
-import net.torvald.terrarum.gameworld.WorldSimulator.FLUID_MIN_MASS
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.unsafe.UnsafePtr
 import net.torvald.util.Float16
+
+const val FLUID_MIN_MASS = 1f / 1024f //Ignore cells that are almost dry (smaller than epsilon of float16)
 
 /**
  *  * Memory layout:

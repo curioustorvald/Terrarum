@@ -19,7 +19,6 @@
   "TOOLTIP_item@basegame:37": "“짐을 맡아두기로 한 몸이니까요.”", /* skyrim/lydia reference */
   "TOOLTIP_item@basegame:38": "“짐을 맡아두기로 한 몸이니까요.”", /* skyrim/lydia reference */
   "TOOLTIP_item@basegame:39": "“짐을 맡아두기로 한 몸이니까요.”", /* skyrim/lydia reference */
-  "TOOLTIP_item@basegame:8": "신호를 만들어냅니다",
   "TOOLTIP_item@basegame:9": "전기공의 친한 친구",
   "TOOLTIP_item@basegame:10": "“이게 있는데 책과 깃펜이 왜 필요하죠?”", /* a jab on the Minecraft item Book and Quill */
   "TOOLTIP_item@basegame:11": "오늘이 무슨 날인지 알려줍니다",
@@ -45,5 +44,11 @@
 
   "TOOLTIP_item@basegame:114": "강철 생산의 소중한 연료입니다",
 
-  "TOOLTIP_item@basegame:320": "멀티버스를 여행하세요!\n경고: 2개를 만들어야 왕복이 가능합니다"
+  "TOOLTIP_item@basegame:320": "멀티버스를 여행하세요!\n경고: 2개를 만들어야 왕복이 가능합니다",
+
+  "TOOLTIP_item@basegame:8": "신호를 만들어냅니다",
+  "TOOLTIP_item@basegame:34": "선택적으로 신호를 만들어냅니다",
+  "TOOLTIP_item@basegame:35": "신호의 상태를 보여줍니다",
+  "TOOLTIP_item@basegame:44": "지나가는 신호를 자르기 신호에 따라 자릅니다",
+  "TOOLTIP_item@basegame:45": "들어오는 신호를 걸쇠 신호에 따라 잠시 저장합니다"
 }
