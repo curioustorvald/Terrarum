@@ -58,5 +58,11 @@
     "ingredients": [
       [2, 1, "basegame:21", 1, "item@basegame:116"] /* 1 marbles, 1 tin, 2 copper */
     ]
+  },
+  "item@basegame:46": { /* signal repeater */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 1, "basegame:21", 1, "item@basegame:116"] /* 1 marbles, 1 tin, 2 copper */
+    ]
   }
 }

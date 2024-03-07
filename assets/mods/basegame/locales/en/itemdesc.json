@@ -52,5 +52,6 @@
   "TOOLTIP_item@basegame:34": "Selectively emits a signal",
   "TOOLTIP_item@basegame:35": "Shows a signal status",
   "TOOLTIP_item@basegame:44": "Cuts the signal using the cutting signal",
-  "TOOLTIP_item@basegame:45": "Latches onto the signal on the latch signal"
+  "TOOLTIP_item@basegame:45": "Latches onto the signal on the latch signal",
+  "TOOLTIP_item@basegame:46": "Delays a signal by a short amount"
 }

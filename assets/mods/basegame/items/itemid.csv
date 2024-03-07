@@ -44,6 +44,7 @@ id;classname;tags
 43;net.torvald.terrarum.modulebasegame.gameitems.ItemTableRosewood;FIXTURE,SURFACE
 44;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalBlocker;FIXTURE,SIGNAL
 45;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalLatch;FIXTURE,SIGNAL
+46;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalRepeaterHorz;FIXTURE,SIGNAL
 
 # ingots
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT
