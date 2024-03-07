@@ -1,10 +1,12 @@
 package net.torvald.terrarum.blockproperties
 
+import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.modulebasegame.gameactors.WireEmissionType
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.apache.commons.csv.CSVRecord
@@ -17,8 +19,9 @@ import java.io.IOException
 class WireCodex {
 
     @Transient val wireProps = HashMap<ItemID, WireProp>()
-
     @Transient private val nullProp = WireProp()
+
+    @Transient val wirePorts = HashMap<WireEmissionType, Triple<TextureRegionPack, Int, Int>>()
 
     fun clear() {
         wireProps.clear()
@@ -79,6 +82,45 @@ class WireCodex {
 
         CommonResourcePool.loadAll()
 
+    }
+
+    fun portsFromModule(module: String, path: String) {
+        printdbg(this, "Building wire ports table for module $module")
+        try {
+            registerPorts(module, path, CSVFetcher.readFromModule(module, path + "wireports.csv"))
+        }
+        catch (e: IOException) { e.printStackTrace() }
+    }
+
+    private fun registerPorts(module: String, path: String, records: List<CSVRecord>) {
+        val spriteSheetFiles = ArrayList<Pair<FileHandle, String>>()
+        val tempRecords = HashMap<WireEmissionType, Triple<String, Int, Int>>()
+
+        records.forEach {
+            val type = it.get("accepts")
+            val fileModule = it.get("fileModule")
+            val filePath = it.get("file")
+            val x = it.get("xpos").toInt()
+            val y = it.get("ypos").toInt()
+
+            val file = ModMgr.getGdxFile(fileModule, filePath)
+            val fileID = "wireport:$fileModule.${filePath.replace('\\','/')}"
+
+            spriteSheetFiles.add(file to fileID)
+
+            tempRecords[type] = Triple(fileID, x, y)
+        }
+
+        spriteSheetFiles.forEach { (file, id) ->
+            CommonResourcePool.addToLoadingList(id) {
+                TextureRegionPack(file, TILE_SIZE, TILE_SIZE)
+            }
+        }
+        CommonResourcePool.loadAll()
+
+        tempRecords.forEach { type, (fileID, x, y) ->
+            wirePorts[type] = Triple(CommonResourcePool.getAsTextureRegionPack(fileID), x, y)
+        }
     }
 
     fun getAll() = wireProps.values
@@ -158,5 +200,9 @@ class WireCodex {
 
     fun getAllWiresThatAccepts(accept: String): List<Pair<ItemID, WireProp>> {
         return wireProps.filter { it.value.accepts == accept }.toList()
+    }
+
+    fun getWirePortSpritesheet(emissionType: WireEmissionType): Triple<TextureRegionPack, Int, Int>? {
+        return wirePorts[emissionType]
     }
 }

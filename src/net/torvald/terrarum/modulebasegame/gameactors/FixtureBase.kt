@@ -73,6 +73,13 @@ open class Electric : FixtureBase {
     fun setWireEmissionAt(x: Int, y: Int, emission: Vector2) { wireEmission[pointToBlockBoxIndex(x, y)] = emission }
     fun setWireConsumptionAt(x: Int, y: Int, consumption: Vector2) { wireConsumption[pointToBlockBoxIndex(x, y)] = consumption }
 
+    fun clearStatus() {
+        wireSinkTypes.clear()
+        wireEmitterTypes.clear()
+        wireEmission.clear()
+        wireConsumption.clear()
+    }
+
     // these are characteristic properties of the fixture (they have constant value) so must not be serialised
     @Transient val wireEmitterTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
     @Transient val wireSinkTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()

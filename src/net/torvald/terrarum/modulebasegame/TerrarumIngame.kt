@@ -57,7 +57,6 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.worlddrawer.LightmapRenderer.LIGHTMAP_OVERRENDER
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.unicode.EMDASH
 import net.torvald.util.CircularArray
@@ -710,7 +709,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         var uiOpened = false
         val fixtureUnderMouse0: List<FixtureBase> = getActorsUnderMouse(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
         if (fixtureUnderMouse0.size > 1) {
-            App.printdbgerr(this, "Multiple fixtures at world coord ${Terrarum.mouseX}, ${Terrarum.mouseY}")
+            App.printdbgerr(this, "Multiple fixtures at tile coord ${Terrarum.mouseX / TILE_SIZED}, ${Terrarum.mouseY / TILE_SIZED}: [${fixtureUnderMouse0.map { it.javaClass.simpleName }.joinToString()}]")
         }
         val fixtureUnderMouse = fixtureUnderMouse0.firstOrNull()
 
@@ -954,6 +953,12 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             measureDebugTime("Ingame.FillUpWiresBuffer*") {
                 if (WORLD_UPDATE_TIMER % 2 == 1) {
                     fillUpWiresBuffer()
+                }
+            }
+            measureDebugTime("Ingame.FillUpWirePortsView*") {
+                if (WORLD_UPDATE_TIMER % 2 == 0) {
+                    val fixtures = INGAME.actorContainerActive.filterIsInstance<Electric>()
+                    fillUpWirePortsView(fixtures)
                 }
             }
             oldCamX = WorldCamera.x
@@ -1227,17 +1232,22 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
     private val maxRenderableWires = ReferencingRanges.ACTORS_WIRES.last - ReferencingRanges.ACTORS_WIRES.first + 1
+    private val maxRenderablePorts = ReferencingRanges.ACTORS_WIRE_PORTS.last - ReferencingRanges.ACTORS_WIRE_PORTS.first + 1
     private val wireActorsContainer = Array(maxRenderableWires) { WireActor(ReferencingRanges.ACTORS_WIRES.first + it).let {
+        forceAddActor(it)
+        /*^let*/ it
+    } }
+    private val wirePortActorsContainer = Array(maxRenderablePorts) { WirePortActor(ReferencingRanges.ACTORS_WIRE_PORTS.first + it).let {
         forceAddActor(it)
         /*^let*/ it
     } }
 
     private fun fillUpWiresBuffer() {
-        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorToInt() - LIGHTMAP_OVERRENDER
-        val for_y_end = for_y_start + BlocksDrawer.tilesInVertical + 2*LIGHTMAP_OVERRENDER
+        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorToInt() - 1
+        val for_y_end = for_y_start + BlocksDrawer.tilesInVertical + 2*1
 
-        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorToInt() - LIGHTMAP_OVERRENDER
-        val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal + 2*LIGHTMAP_OVERRENDER
+        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorToInt() - 1
+        val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal + 2*1
 
         var wiringCounter = 0
         for (y in for_y_start..for_y_end) {
@@ -1269,9 +1279,39 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
         for (i in wiringCounter until maxRenderableWires) {
-            wireActorsContainer[i].isUpdate = false
-            wireActorsContainer[i].isVisible = false
-            wireActorsContainer[i].forceDormant = true
+            val wireActor = wireActorsContainer[i]
+            wireActor.isUpdate = false
+            wireActor.isVisible = false
+            wireActor.forceDormant = true
+        }
+    }
+
+    private fun fillUpWirePortsView(fixtures: List<Electric>) {
+        var portsCounter = 0
+
+        fixtures.forEach {
+            (it.wireSinkTypes.toList() + it.wireEmitterTypes.toList()).forEach { (boxIndex, type) ->
+                if (portsCounter < wirePortActorsContainer.size) {
+                    val wireActor = wirePortActorsContainer[portsCounter]
+                    val (wx, wy) = it.worldBlockPos!! + it.blockBoxIndexToPoint2i(boxIndex)
+
+                    wireActor.setPort(type, wx, wy)
+                    wireActor.isUpdate = true
+                    wireActor.isVisible = true
+                    wireActor.forceDormant = false
+
+                    portsCounter += 1
+                }
+            }
+        }
+
+
+
+        for (i in portsCounter until maxRenderablePorts) {
+            val wireActor = wirePortActorsContainer[i]
+            wireActor.isUpdate = false
+            wireActor.isVisible = false
+            wireActor.forceDormant = true
         }
     }
 
@@ -1641,8 +1681,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
     fun pickupFixture(actor: ActorWithBody, delta: Float, mwx: Double, mwy: Double, mtx: Int, mty: Int, assignToQuickslot: Boolean = true) {
-        printdbg(this, "Pickup fixture fired")
-
         val actorsUnderMouse = getActorsUnderMouse(mwx, mwy)
 
         val fixture = actorsUnderMouse.firstOrNull {

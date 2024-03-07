@@ -501,7 +501,7 @@ object WorldSimulator {
         wiresimGetSourceBlocks().let { sources ->
             // signal-emitting fixtures must set emitState of its own tiles via update()
             sources.forEach {
-                it.wireEmitterTypes.forEach { bbi, wireType ->
+                it.wireEmitterTypes.forEach { (bbi, wireType) ->
 
                     val startingPoint = it.worldBlockPos!! + it.blockBoxIndexToPoint2i(bbi)
                     val signal = it.wireEmission[bbi] ?: Vector2(0.0, 0.0)

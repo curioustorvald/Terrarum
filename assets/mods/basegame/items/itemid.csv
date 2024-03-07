@@ -32,8 +32,8 @@ id;classname;tags
 31;net.torvald.terrarum.modulebasegame.gameitems.ItemGunpowder;POWDER,EXPLOSIVE
 32;net.torvald.terrarum.modulebasegame.gameitems.ItemCherryBomb;EXPLOSIVE,THROWABLE
 33;net.torvald.terrarum.modulebasegame.gameitems.ItemTorch;FIXTURE,LIGHT
-34;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalSwitchManual;FIXTURE,SIGNAL
-35;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalBulb;FIXTURE,SIGNAL
+34;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalSwitchManual;FIXTURE,SIGNAL
+35;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalBulb;FIXTURE,SIGNAL
 36;net.torvald.terrarum.modulebasegame.gameitems.ItemWireRollingMill;FIXTURE,CRAFTING
 37;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChestEbony;FIXTURE,STORAGE
 38;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChestBirch;FIXTURE,STORAGE
@@ -42,8 +42,8 @@ id;classname;tags
 41;net.torvald.terrarum.modulebasegame.gameitems.ItemTableEbony;FIXTURE,SURFACE
 42;net.torvald.terrarum.modulebasegame.gameitems.ItemTableBirch;FIXTURE,SURFACE
 43;net.torvald.terrarum.modulebasegame.gameitems.ItemTableRosewood;FIXTURE,SURFACE
-44;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalBlocker;FIXTURE,SIGNAL
-45;net.torvald.terrarum.modulebasegame.gameitems.ItemSignalLatch;FIXTURE,SIGNAL
+44;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalBlocker;FIXTURE,SIGNAL
+45;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalLatch;FIXTURE,SIGNAL
 
 # ingots
 26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT

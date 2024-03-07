@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalEmitter
 /**
  * Created by minjaesong on 2024-03-01.
  */
-class ItemSignalBulb(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSignalBulb") {
+class ItemLogicSignalBulb(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalBulb") {
 
     override var dynamicID: ItemID = originalID
     override var baseMass = FixtureLogicSignalEmitter.MASS

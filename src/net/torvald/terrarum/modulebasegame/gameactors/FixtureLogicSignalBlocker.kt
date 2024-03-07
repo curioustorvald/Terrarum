@@ -31,7 +31,7 @@ interface Reorientable {
 /**
  * Created by minjaesong on 2024-03-04.
  */
-class FixtureSignalBlocker : Electric, Reorientable {
+class FixtureLogicSignalBlocker : Electric, Reorientable {
 
     @Transient override val spawnNeedsWall = false
     @Transient override val spawnNeedsFloor = false
@@ -44,6 +44,7 @@ class FixtureSignalBlocker : Electric, Reorientable {
     override var orientation = 0 // 0 1 2 3
 
     private fun setEmitterAndSink() {
+        clearStatus()
         when (orientation) {
             0 -> {
                 setWireSinkAt(0, 0, "digital_bit")

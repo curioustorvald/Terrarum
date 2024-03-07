@@ -12,13 +12,13 @@ object ReferencingRanges {
     val ITEMS_DYNAMIC = 0x10_0000..0x0FFF_FFFF // 267 386 880 pseudo-items
     val ACTORS =  0x1000_0000..0x7FFE_FFFF
 
-    // there is a gap between 0x7FFF_0000..0x7FFF_BFFF
+    // there is a gap between 0x7FFF_0000..0x7FFF_7FFF
 
     // IDs doesn't effect the render order at all, but we're kinda enforcing these ID ranging.
     // However, these two wire-related actor will break the rule. But as we want them to render on top of others
     // in the same render orders, we're giveng them relatively high IDs for them.
-    val ACTORS_WIRES   = 0x7FFF_C000..0x7FFF_EFFF // Rendered front--wires
-    val ACTORS_WIRES_HELPER = 0x7FFF_F000..0x7FFF_FEFF // Rendered overlay--wiring port icons and logic gates
+    val ACTORS_WIRE_PORTS   = 0x7FFF_8000..0x7FFF_BEFF // Rendered front--wires
+    val ACTORS_WIRES = 0x7FFF_BF00..0x7FFF_FEFF // Rendered overlay--wiring port icons
 
     val ACTORS_INTERNAL_USE = 0x7FFF_FF00..0x7FFF_FFFF // Actor ID 0x7FFF_FFFF is pre-assigned to the block cursor!
 

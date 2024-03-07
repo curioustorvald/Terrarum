@@ -565,6 +565,7 @@ object ModMgr {
             Terrarum.wireCodex.fromModule(module, "wires/") { wire ->
 
             }
+            Terrarum.wireCodex.portsFromModule(module, "wires/")
         }
 
         private fun makeNewItemObj(tile: BlockProp, isWall: Boolean) = object : GameItem(

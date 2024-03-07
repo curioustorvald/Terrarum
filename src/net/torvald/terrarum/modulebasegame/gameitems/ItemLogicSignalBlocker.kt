@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalEmitter
 /**
  * Created by minjaesong on 2024-03-04.
  */
-class ItemSignalBlocker(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSignalBlocker") {
+class ItemLogicSignalBlocker(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalBlocker") {
 
     override var dynamicID: ItemID = originalID
     override var baseMass = FixtureLogicSignalEmitter.MASS
@@ -38,7 +38,7 @@ class ItemSignalBlocker(originalID: ItemID) : FixtureItemBase(originalID, "net.t
 /**
  * Created by minjaesong on 2024-03-05.
  */
-class ItemSignalLatch(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSignalLatch") {
+class ItemLogicSignalLatch(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalLatch") {
 
     override var dynamicID: ItemID = originalID
     override var baseMass = FixtureLogicSignalEmitter.MASS

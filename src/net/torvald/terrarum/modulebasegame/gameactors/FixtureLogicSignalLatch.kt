@@ -13,7 +13,7 @@ import org.dyn4j.geometry.Vector2
  *
  * Created by minjaesong on 2024-03-05.
  */
-class FixtureSignalLatch : Electric, Reorientable {
+class FixtureLogicSignalLatch : Electric, Reorientable {
 
     @Transient override val spawnNeedsWall = false
     @Transient override val spawnNeedsFloor = false
@@ -26,6 +26,7 @@ class FixtureSignalLatch : Electric, Reorientable {
     override var orientation = 0 // 0 2, where 2 is a mirror-image rather than rotation
 
     private fun setEmitterAndSink() {
+        clearStatus()
         when (orientation) {
             0 -> {
                 setWireSinkAt(0, 0, "digital_bit") // D

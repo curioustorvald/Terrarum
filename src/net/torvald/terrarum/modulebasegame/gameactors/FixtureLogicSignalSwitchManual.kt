@@ -7,49 +7,59 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import org.dyn4j.geometry.Vector2
 
 /**
  * Created by minjaesong on 2024-03-01.
  */
-class FixtureSignalBulb : Electric {
+class FixtureLogicSignalSwitchManual : Electric {
 
     @Transient override val spawnNeedsFloor = false
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 1, 1),
-        nameFun = { Lang["ITEM_COPPER_BULB"] }
+        nameFun = { Lang["ITEM_LOGIC_SIGNAL_SWITCH"] }
     )
 
+    private val variant = (Math.random() * 8).toInt()
+    private var state = false // false = off
+
     init {
-        val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/copper_bulb.tga")
-        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/copper_bulb_emissive.tga")
+        val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_switch.tga")
+        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_switch_glow.tga")
 
         density = 1400.0
         setHitboxDimension(TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE, 0, 1)
 
         makeNewSprite(TextureRegionPack(itemImage.texture, TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE)).let {
-            it.setRowsAndFrames(2,1)
+            it.setRowsAndFrames(2,8)
+            it.currentFrame = variant
             it.delays = floatArrayOf(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
         }
-
-        makeNewSpriteEmissive(TextureRegionPack(itemImage2.texture, TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE)).let {
-            it.setRowsAndFrames(2,1)
+        makeNewSpriteGlow(TextureRegionPack(itemImage2.texture, TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE)).let {
+            it.setRowsAndFrames(2,8)
+            it.currentFrame = variant
             it.delays = floatArrayOf(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
         }
 
         actorValue[AVKey.BASEMASS] = FixtureLogicSignalEmitter.MASS
 
 
-        setWireSinkAt(0, 0, "digital_bit")
+        setWireEmitterAt(0, 0, "digital_bit")
     }
 
-    private fun light(state: Boolean) {
+    override fun reload() {
+        super.reload()
+
+        (sprite as SheetSpriteAnimation).currentFrame = variant
+
         (sprite as SheetSpriteAnimation).currentRow = state.toInt()
-        (spriteEmissive as SheetSpriteAnimation).currentRow = state.toInt()
+        setWireEmissionAt(0, 0, Vector2(state.toInt().toDouble(), 0.0))
     }
 
-    override fun updateImpl(delta: Float) {
-        super.updateImpl(delta)
-        light(getWireStateAt(0, 0, "digital_bit").x >= ELECTRIC_THRESHOLD_HIGH)
+    override fun onInteract(mx: Double, my: Double) {
+        state = !state
+        (sprite as SheetSpriteAnimation).currentRow = state.toInt()
+        setWireEmissionAt(0, 0, Vector2(state.toInt().toDouble(), 0.0))
     }
 }
