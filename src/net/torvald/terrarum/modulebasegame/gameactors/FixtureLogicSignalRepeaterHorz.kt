@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.toInt
@@ -40,18 +41,18 @@ class FixtureLogicSignalRepeaterHorz : Electric, Reorientable {
         }
     }
 
+    private fun reorient() {
+        (sprite as SheetSpriteAnimation).currentFrame = orientation / 2
+        (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation / 2
+    }
 
     override fun orientClockwise() {
-        orientation = (orientation + 2) % 4
-        (sprite as SheetSpriteAnimation).currentFrame = orientation / 2
-        (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation / 2
-        setEmitterAndSink(); updateQ()
+        orientation = (orientation + 2) fmod 4
+        reorient(); setEmitterAndSink(); updateQ()
     }
     override fun orientAnticlockwise() {
-        orientation = (orientation - 2) % 4
-        (sprite as SheetSpriteAnimation).currentFrame = orientation / 2
-        (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation / 2
-        setEmitterAndSink(); updateQ()
+        orientation = (orientation - 2) fmod 4
+        reorient(); setEmitterAndSink(); updateQ()
     }
 
     init {
@@ -76,6 +77,7 @@ class FixtureLogicSignalRepeaterHorz : Electric, Reorientable {
 
     override fun reload() {
         super.reload()
+        reorient()
         setEmitterAndSink()
         updateQ()
     }

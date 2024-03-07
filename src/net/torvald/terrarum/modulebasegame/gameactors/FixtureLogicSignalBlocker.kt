@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.toInt
@@ -70,17 +71,18 @@ class FixtureLogicSignalBlocker : Electric, Reorientable {
         }
     }
 
-    override fun orientClockwise() {
-        orientation = (orientation + 1) % 4
+    private fun reorient() {
         (sprite as SheetSpriteAnimation).currentFrame = orientation
         (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation
-        setEmitterAndSink(); updateK()
+    }
+
+    override fun orientClockwise() {
+        orientation = (orientation + 1) fmod 4
+        reorient(); setEmitterAndSink(); updateK()
     }
     override fun orientAnticlockwise() {
-        orientation = (orientation - 1) % 4
-        (sprite as SheetSpriteAnimation).currentFrame = orientation
-        (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation
-        setEmitterAndSink(); updateK()
+        orientation = (orientation - 1) fmod 4
+        reorient(); setEmitterAndSink(); updateK()
     }
 
     init {
@@ -104,6 +106,7 @@ class FixtureLogicSignalBlocker : Electric, Reorientable {
 
     override fun reload() {
         super.reload()
+        reorient()
         setEmitterAndSink()
         updateK()
     }

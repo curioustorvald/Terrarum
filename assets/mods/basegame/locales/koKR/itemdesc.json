@@ -41,6 +41,7 @@
   "TOOLTIP_item@basegame:28": "음악 자판기입이다 (무료 플레이)",
   "TOOLTIP_item@basegame:29": "석탄과 비슷하고 똑같이 잘 타지만 재생 가능합니다",
   "TOOLTIP_item@basegame:36": "금속 주괴를 사용해 철사를 뽑아냅니다",
+  "TOOLTIP_item@basegame:47": "전자 장치의 방향을 바꿉니다",
 
   "TOOLTIP_item@basegame:114": "강철 생산의 소중한 연료입니다",
 
@@ -51,5 +52,5 @@
   "TOOLTIP_item@basegame:35": "신호의 상태를 보여줍니다",
   "TOOLTIP_item@basegame:44": "지나가는 신호를 자르기 신호에 따라 자릅니다",
   "TOOLTIP_item@basegame:45": "들어오는 신호를 걸쇠 신호에 따라 잠시 저장합니다",
-  "TOOLTIP_item@basegame:46": "들어오는 신호를 짧게 잠시 지연시킵니다"
+  "TOOLTIP_item@basegame:46": "들어오는 신호를 살짝 지연시킵니다"
 }

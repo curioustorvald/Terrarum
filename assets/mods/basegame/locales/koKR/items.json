@@ -83,5 +83,6 @@
   "ITEM_WOOD_STICK": "막대기",
   "ITEM_WOODEN_MALLET": "나무 망치",
   "ITEM_WORKBENCH": "작업대",
-  "ITEM_WORLD_PORTAL": "텔레포트 스테이션"
+  "ITEM_WORLD_PORTAL": "텔레포트 스테이션",
+  "ITEM_WRENCH": "렌치"
 }

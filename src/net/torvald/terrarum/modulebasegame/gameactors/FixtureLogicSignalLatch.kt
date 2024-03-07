@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.toInt
@@ -38,7 +39,7 @@ class FixtureLogicSignalLatch : Electric, Reorientable {
             2 -> {
                 setWireSinkAt(1, 0, "digital_bit") // D
                 setWireEmitterAt(0, 0, "digital_bit") // Q
-                setWireSinkAt(1, 0, "digital_bit") // CLK
+                setWireSinkAt(1, 1, "digital_bit") // CLK
                 setWireSinkAt(1, 2, "digital_bit") // S
                 setWireSinkAt(0, 2, "digital_bit") // R
             }
@@ -46,18 +47,18 @@ class FixtureLogicSignalLatch : Electric, Reorientable {
         }
     }
 
+    private fun reorient() {
+        (sprite as SheetSpriteAnimation).currentFrame = orientation / 2
+        (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation / 2
+    }
 
     override fun orientClockwise() {
-        orientation = (orientation + 2) % 4
-        (sprite as SheetSpriteAnimation).currentFrame = orientation / 2
-        (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation / 2
-        setEmitterAndSink(); updateQ()
+        orientation = (orientation + 2) fmod 4
+        reorient(); setEmitterAndSink(); updateQ()
     }
     override fun orientAnticlockwise() {
-        orientation = (orientation - 2) % 4
-        (sprite as SheetSpriteAnimation).currentFrame = orientation / 2
-        (spriteEmissive as SheetSpriteAnimation).currentFrame = orientation / 2
-        setEmitterAndSink(); updateQ()
+        orientation = (orientation - 2) fmod 4
+        reorient(); setEmitterAndSink(); updateQ()
     }
 
 
@@ -82,6 +83,7 @@ class FixtureLogicSignalLatch : Electric, Reorientable {
 
     override fun reload() {
         super.reload()
+        reorient()
         setEmitterAndSink()
         updateQ()
     }

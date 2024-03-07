@@ -691,6 +691,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
     private var worldPrimaryClickLatch = false
+    private var worldSecondaryClickLatch = false
 
     private fun fireFixtureInteractEvent(fixture: FixtureBase, mwx: Double, mwy: Double) {
         if (fixture.mouseUp) {
@@ -719,6 +720,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // don't want to open the UI and use the item at the same time, would ya?
         if (itemOnGrip?.isConsumable == true) {
             // click filtering (latch stuff) is handled by IngameController (see inventoryCategoryAllowClickAndDrag)
+            // To disable click dragging for tool/block/etc., put `override val disallowToolDragging = true` to the item's code
             val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
             if (consumptionSuccessful > -1)
                 (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
@@ -757,6 +759,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 // #3. If no fixture under mouse or FixtureInteractionBlocked, use the item
                 else if (itemOnGrip != null) {
                     // click filtering (latch stuff) is handled by IngameController (see inventoryCategoryAllowClickAndDrag)
+                    // To disable click dragging for tool/block/etc., put `override val disallowToolDragging = true` to the item's code
                     val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
                     if (consumptionSuccessful > -1)
                         (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
@@ -790,22 +793,25 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     override fun worldSecondaryClickStart(actor: ActorWithBody, delta: Float) {
         val itemOnGrip = ItemCodex[(actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)]
 
-        // #1. Perform item's secondaryUse
-        // don't want to open the UI and use the item at the same time, would ya?
-        val consumptionSuccessful = itemOnGrip?.startSecondaryUse(actor, delta) ?: -1
-        if (consumptionSuccessful > -1)
-            (actor as Pocketed).inventory.consumeItem(itemOnGrip!!, consumptionSuccessful)
-        // #2. If #1 failed, try to pick up the fixture
-        else {
-            mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
-                pickupFixture(actor, delta, mwx, mwy, mtx, mty)
-                0L
+        if (!worldSecondaryClickLatch) {
+            // #1. Perform item's secondaryUse
+            val consumptionSuccessful = itemOnGrip?.startSecondaryUse(actor, delta) ?: -1
+            if (consumptionSuccessful > -1)
+                (actor as Pocketed).inventory.consumeItem(itemOnGrip!!, consumptionSuccessful)
+            // #2. If #1 failed, try to pick up the fixture
+            else {
+                mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
+                    pickupFixture(actor, delta, mwx, mwy, mtx, mty)
+                    0L
+                }
             }
+
+            worldSecondaryClickLatch = true
         }
     }
 
     override fun worldSecondaryClickEnd(actor: ActorWithBody, delta: Float) {
-//        println("Secondary click start!")
+        worldSecondaryClickLatch = false
     }
 
 
@@ -1673,7 +1679,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    private fun getActorsUnderMouse(mwx: Double, mwy: Double): List<ActorWithBody> {
+    fun getActorsUnderMouse(mwx: Double, mwy: Double): List<ActorWithBody> {
         val actorsUnderMouse: List<ActorWithBody> = getActorsAt(mwx, mwy).filter { it !is InternalActor }.sortedBy {
             (mwx - it.hitbox.centeredX).sqr() + (mwy - it.hitbox.centeredY).sqr()
         } // sorted by the distance from the mouse
