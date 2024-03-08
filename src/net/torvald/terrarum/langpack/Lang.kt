@@ -197,6 +197,8 @@ object Lang {
     fun getByLocale(key: String, locale: String, capitalise: Boolean = false): String? {
         val s = if (capitalise) CAP(key, locale) else NOCAP(key, locale)
 
+        if (s == null) return null
+
         return if (locale.startsWith("bg"))
             "${App.fontGame.charsetOverrideBulgarian}$s${App.fontGame.charsetOverrideDefault}"
         else if (locale.startsWith("sr"))
