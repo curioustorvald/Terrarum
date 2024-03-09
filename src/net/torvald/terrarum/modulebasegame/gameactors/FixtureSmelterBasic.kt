@@ -18,6 +18,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleVanishingSprite
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -25,8 +26,20 @@ import net.torvald.terrarum.modulebasegame.ui.UISmelterBasic
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
- * No GUI yet!
- *
+ * Created by minjaesong on 2024-03-09.
+ */
+interface SmelterItemStatus {
+    fun set(itm: ItemID, qty: Long)
+    fun changeCount(delta: Long)
+    fun nullify()
+    fun isNull(): Boolean
+    fun isNotNull(): Boolean = !isNull()
+    val itm: ItemID?
+    val qty: Long?
+}
+
+
+/**
  * Created by minjaesong on 2023-12-04.
  */
 class FixtureSmelterBasic : FixtureBase, CraftingStation {
@@ -36,9 +49,76 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
     var temperature = 0f // 0f..1f
     var progress = 0f // 0f..1f
 
-    var oreItem: InventoryPair? = null
-    var fireboxItem: InventoryPair? = null
-    var productItem: InventoryPair? = null
+    internal var oreItem: InventoryPair? = null
+    internal var fireboxItem: InventoryPair? = null
+    internal var productItem: InventoryPair? = null
+
+    @Transient val oreItemStatus = object : SmelterItemStatus {
+        override fun set(itm: ItemID, qty: Long) {
+            if (oreItem != null) oreItem!!.set(itm, qty)
+            else oreItem = InventoryPair(itm, qty)
+        }
+        override fun changeCount(delta: Long) {
+            oreItem!!.qty += delta
+            if (oreItem!!.qty <= 0L) {
+                oreItem = null
+            }
+        }
+        override fun nullify() {
+            oreItem = null
+        }
+        override fun isNull(): Boolean {
+            return oreItem == null
+        }
+        override val itm: ItemID?
+            get() = oreItem?.itm
+        override val qty: Long?
+            get() = oreItem?.qty
+    }
+    @Transient val fireboxItemStatus = object : SmelterItemStatus {
+        override fun set(itm: ItemID, qty: Long) {
+            if (fireboxItem != null) fireboxItem!!.set(itm, qty)
+            else fireboxItem = InventoryPair(itm, qty)
+        }
+        override fun changeCount(delta: Long) {
+            fireboxItem!!.qty += delta
+            if (fireboxItem!!.qty <= 0L) {
+                fireboxItem = null
+            }
+        }
+        override fun nullify() {
+            fireboxItem = null
+        }
+        override fun isNull(): Boolean {
+            return fireboxItem == null
+        }
+        override val itm: ItemID?
+            get() = fireboxItem?.itm
+        override val qty: Long?
+            get() = fireboxItem?.qty
+    }
+    @Transient val productItemStatus = object : SmelterItemStatus {
+        override fun set(itm: ItemID, qty: Long) {
+            if (productItem != null) productItem!!.set(itm, qty)
+            else productItem = InventoryPair(itm, qty)
+        }
+        override fun changeCount(delta: Long) {
+            productItem!!.qty += delta
+            if (productItem!!.qty <= 0L) {
+                productItem = null
+            }
+        }
+        override fun nullify() {
+            productItem = null
+        }
+        override fun isNull(): Boolean {
+            return productItem == null
+        }
+        override val itm: ItemID?
+            get() = productItem?.itm
+        override val qty: Long?
+            get() = productItem?.qty
+    }
 
     override val canBeDespawned: Boolean
         get() = oreItem == null && fireboxItem == null && productItem == null
@@ -111,27 +191,6 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
     }
 
     @Transient private val RNG = HQRNG()
-
-    fun changeFireboxItemCount(delta: Long) {
-        fireboxItem!!.qty += delta
-        if (fireboxItem!!.qty <= 0L) {
-            fireboxItem = null
-        }
-    }
-
-    fun changeOreItemCount(delta: Long) {
-        oreItem!!.qty += delta
-        if (oreItem!!.qty <= 0L) {
-            oreItem = null
-        }
-    }
-
-    fun changeProductItemCount(delta: Long) {
-        productItem!!.qty += delta
-        if (productItem!!.qty <= 0L) {
-            productItem = null
-        }
-    }
 
     override fun drawEmissive(frameDelta: Float, batch: SpriteBatch) {
         if (isVisible && spriteEmissive != null) {
@@ -215,7 +274,7 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
             nextDelayBase = fuelItemProp.smokiness
             nextDelay = (nextDelayBase * (1.0 + RNG.nextTriangularBal() * 0.1)).toFloat()
 
-            changeFireboxItemCount(-1)
+            fireboxItemStatus.changeCount(-1)
         }
         // no item on the slot
         else if (fuelCaloriesNow <= 0f && fireboxItem == null) {
@@ -261,10 +320,10 @@ class FixtureSmelterBasic : FixtureBase, CraftingStation {
                 if (productItem == null)
                     productItem = InventoryPair(smeltingProduct, 1L)
                 else
-                    changeProductItemCount(1)
+                    productItemStatus.changeCount(1)
 
                 // take the ore item
-                changeOreItemCount(-1)
+                oreItemStatus.changeCount(-1)
 
                 progress = 0f
             }

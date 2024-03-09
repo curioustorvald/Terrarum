@@ -5,13 +5,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.colourutil.cieluv_getGradient
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
-import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureSmelterBasic
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
-import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemCatBar.Companion.FILTER_CAT_ALL
@@ -19,6 +16,7 @@ import net.torvald.terrarum.ui.UIItemInventoryElemWide.Companion.UNIQUE_ITEM_HAS
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.getKeycapPC
 import net.torvald.unicode.getMouseButton
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.roundToInt
 
 /**
@@ -32,106 +30,26 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     override var width = Toolkit.drawWidth
     override var height = App.scr.height
 
+    private var clickedOnState = AtomicInteger(0) // Used to set inventory filter and its behaviour. 0: default, 1: oreslot, 2: firebox
+
     private val playerThings = UITemplateHalfInventory(this, false).also {
-        it.itemListTouchDownFun = { gameItem, amount, button, _, _ ->
-            val amount = if (button == App.getConfigInt("config_mouseprimary"))
-                amount
-            else if (button == App.getConfigInt("config_mousesecondary"))
-                1
-            else
-                null
-
-            // oreslot
-            if (amount != null && gameItem != null) {
-                if (clickedOn == 1) {
-                    if (smelter.oreItem == null) {
-                        getPlayerInventory().remove(gameItem.dynamicID, amount)
-                        smelter.oreItem = InventoryPair(gameItem.dynamicID, amount)
-                    }
-                    else if (smelter.oreItem!!.itm == gameItem.dynamicID) {
-                        getPlayerInventory().remove(gameItem.dynamicID, amount)
-                        smelter.changeOreItemCount(amount)
-                    }
-                }
-                // firebox
-                else if (clickedOn == 2) {
-                    if (smelter.fireboxItem == null) {
-                        getPlayerInventory().remove(gameItem.dynamicID, amount)
-                        smelter.fireboxItem = InventoryPair(gameItem.dynamicID, amount)
-                    }
-                    else if (smelter.fireboxItem!!.itm == gameItem.dynamicID) {
-                        getPlayerInventory().remove(gameItem.dynamicID, amount)
-                        smelter.changeFireboxItemCount(amount)
-                    }
-                }
-            }
-
-            itemListUpdateKeepCurrentFilter()
-        }
-        it.itemListWheelFun = { gameItem, _, _, scrollY, _, _ ->
-            val scrollY = -scrollY
-            if (gameItem != null) {
-                val playerInventory = getPlayerInventory()
-                val addCount1 = scrollY.toLong()
-
-                if (clickedOn == 1 && (smelter.oreItem == null || smelter.oreItem!!.itm == gameItem.dynamicID)) {
-                    val itemToUse = smelter.oreItem?.itm ?: gameItem.dynamicID
-
-                    val addCount2 = scrollY.toLong().coerceIn(
-                        -(playerInventory.searchByID(itemToUse)?.qty ?: 0L),
-                        smelter.oreItem?.qty ?: 0L,
-                    )
-
-                    // add to the inventory slot
-                    if (smelter.oreItem != null && addCount1 >= 1L) {
-                        getPlayerInventory().add(smelter.oreItem!!.itm, addCount2)
-                        smelter.changeOreItemCount(-addCount2)
-                    }
-                    // remove from the inventory slot
-                    else if (addCount1 <= -1L) {
-                        playerInventory.remove(itemToUse, -addCount2)
-                        if (smelter.oreItem == null)
-                            smelter.oreItem = InventoryPair(itemToUse, -addCount2)
-                        else
-                            smelter.changeOreItemCount(-addCount2)
-                    }
-                    if (smelter.oreItem != null && smelter.oreItem!!.qty == 0L) smelter.oreItem = null
-                    else if (smelter.oreItem != null && smelter.oreItem!!.qty < 0L) throw Error("Item removal count is larger than what was on the slot")
-                    itemListUpdateKeepCurrentFilter()
-                }
-                else if (clickedOn == 2 && (smelter.fireboxItem == null || smelter.fireboxItem!!.itm == gameItem.dynamicID)) {
-                    val itemToUse = smelter.fireboxItem?.itm ?: gameItem.dynamicID
-
-                    val addCount2 = scrollY.toLong().coerceIn(
-                        -(playerInventory.searchByID(itemToUse)?.qty ?: 0L),
-                        smelter.fireboxItem?.qty ?: 0L,
-                    )
-
-                    // add to the inventory slot
-                    if (smelter.fireboxItem != null && addCount1 >= 1L) {
-                        getPlayerInventory().add(smelter.fireboxItem!!.itm, addCount2)
-                        smelter.changeFireboxItemCount(-addCount2)
-                    }
-                    // remove from the inventory slot
-                    else if (addCount1 <= -1L) {
-                        playerInventory.remove(itemToUse, -addCount2)
-                        if (smelter.fireboxItem == null)
-                            smelter.fireboxItem = InventoryPair(itemToUse, -addCount2)
-                        else
-                            smelter.changeFireboxItemCount(-addCount2)
-                    }
-                    itemListUpdateKeepCurrentFilter()
-                }
-                else {
-                    itemListUpdateKeepCurrentFilter()
-                }
-            }
-        }
+        it.itemListTouchDownFun = SmelterCommon.getPlayerSlotTouchDownFun(
+            clickedOnState,
+            smelter.fireboxItemStatus,
+            smelter.oreItemStatus,
+            { getPlayerInventory() },
+            { itemListUpdateKeepCurrentFilter() }
+        )
+        it.itemListWheelFun = SmelterCommon.getPlayerSlotWheelFun(
+            clickedOnState,
+            smelter.fireboxItemStatus,
+            smelter.oreItemStatus,
+            { getPlayerInventory() },
+            { itemListUpdateKeepCurrentFilter() }
+        )
     }
 
     fun getPlayerInventory(): ActorInventory = INGAME.actorNowPlaying!!.inventory
-
-    private var listModeButtonPushed = false
 
     init {
         CommonResourcePool.addToLoadingList("basegame_gui_smelter_icons") {
@@ -184,172 +102,67 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     ButtonSecondary: use only one item
      */
 
-    private var clickedOn = 0 // Used to set inventory filter and its behaviour. 0: default, 1: oreslot, 2: firebox
-
     private val oreItemSlot: UIItemInventoryElemSimple = UIItemInventoryElemSimple(
         this, oreX.toInt(), oreY.toInt(),
         updateOnNull = true,
         emptyCellIcon = smelterCellIcons.get(1, 1),
         keyDownFun = { _, _, _, _, _ -> },
-        touchDownFun = { _, _, button, _, self ->
-            if (clickedOn != 1) {
-                clickedOn = 1
-                self.forceHighlighted = true
-                fireboxItemSlot.forceHighlighted = false
-                playerThings.itemList.itemPage = 0
-                itemListUpdate { ItemCodex.hasTag(it.itm, "SMELTABLE") }
-            }
-            else if (smelter.oreItem != null) {
-                val removeCount = if (button == App.getConfigInt("config_mouseprimary"))
-                    smelter.oreItem!!.qty
-                else if (button == App.getConfigInt("config_mousesecondary"))
-                    1L
-                else
-                    null
-
-                if (removeCount != null) {
-                    getPlayerInventory().add(smelter.oreItem!!.itm, removeCount)
-                    smelter.changeOreItemCount(-removeCount)
-                }
-                itemListUpdateKeepCurrentFilter()
-            }
-            else {
-                itemListUpdateKeepCurrentFilter()
-            }
-        },
-        wheelFun = { _, _, _, scrollY, _, _ ->
-            val scrollY = -scrollY
-            if (clickedOn == 1 && smelter.oreItem != null) {
-                val playerInventory = getPlayerInventory()
-                val removeCount1 = scrollY.toLong()
-                val removeCount2 = scrollY.toLong().coerceIn(
-                    -smelter.oreItem!!.qty,
-                    playerInventory.searchByID(smelter.oreItem!!.itm)?.qty ?: 0L,
-                )
-
-                // add to the slot
-                if (removeCount1 >= 1L) {
-                    playerInventory.remove(smelter.oreItem!!.itm, removeCount2)
-                    smelter.changeOreItemCount(removeCount2)
-                }
-                // remove from the slot
-                else if (removeCount1 <= -1L) {
-                    getPlayerInventory().add(smelter.oreItem!!.itm, -removeCount2)
-                    smelter.changeOreItemCount(removeCount2)
-                }
-                itemListUpdateKeepCurrentFilter()
-            }
-            else {
-                itemListUpdateKeepCurrentFilter()
-            }
-        }
+        touchDownFun = SmelterCommon.getOreItemSlotTouchDownFun(
+            clickedOnState,
+            { fireboxItemSlot },
+            playerThings,
+            smelter.oreItemStatus,
+            { getPlayerInventory() },
+            { filter -> itemListUpdate(filter) },
+            { itemListUpdateKeepCurrentFilter() }
+        ),
+        wheelFun = SmelterCommon.getOreItemSlotWheelFun(
+            clickedOnState,
+            smelter.oreItemStatus,
+            { getPlayerInventory() },
+            { itemListUpdateKeepCurrentFilter() }
+        )
     )
     private val fireboxItemSlot: UIItemInventoryElemSimple = UIItemInventoryElemSimple(
         this, fireboxX.toInt(), fireboxY.toInt(),
         emptyCellIcon = smelterCellIcons.get(0, 0),
         updateOnNull = true,
         keyDownFun = { _, _, _, _, _ -> },
-        touchDownFun = { _, _, button, _, self ->
-            if (clickedOn != 2) {
-                clickedOn = 2
-                self.forceHighlighted = true
-                oreItemSlot.forceHighlighted = false
-                playerThings.itemList.itemPage = 0
-                itemListUpdate { ItemCodex.hasTag(it.itm, "COMBUSTIBLE") }
-            }
-            else if (smelter.fireboxItem != null) {
-                val removeCount = if (button == App.getConfigInt("config_mouseprimary"))
-                    smelter.fireboxItem!!.qty
-                else if (button == App.getConfigInt("config_mousesecondary"))
-                    1L
-                else
-                    null
-
-                if (removeCount != null) {
-                    getPlayerInventory().add(smelter.fireboxItem!!.itm, removeCount)
-                    smelter.changeFireboxItemCount(-removeCount)
-                }
-                itemListUpdateKeepCurrentFilter()
-            }
-            else {
-                itemListUpdateKeepCurrentFilter()
-            }
-        },
-        wheelFun = { _, _, _, scrollY, _, _ ->
-            val scrollY = -scrollY
-            if (clickedOn == 2 && smelter.fireboxItem != null) {
-                val playerInventory = getPlayerInventory()
-                val removeCount1 = scrollY.toLong()
-                val removeCount2 = scrollY.toLong().coerceIn(
-                    -smelter.fireboxItem!!.qty,
-                    playerInventory.searchByID(smelter.fireboxItem!!.itm)?.qty ?: 0L,
-                )
-
-                // add to the slot
-                if (removeCount1 >= 1L) {
-                    playerInventory.remove(smelter.fireboxItem!!.itm, removeCount2)
-                    smelter.changeFireboxItemCount(removeCount2)
-                }
-                // remove from the slot
-                else if (removeCount1 <= -1L) {
-                    getPlayerInventory().add(smelter.fireboxItem!!.itm, -removeCount2)
-                    smelter.changeFireboxItemCount(removeCount2)
-                }
-                itemListUpdateKeepCurrentFilter()
-            }
-            else {
-                itemListUpdateKeepCurrentFilter()
-            }
-        }
+        touchDownFun = SmelterCommon.getFireboxItemSlotTouchDownFun(
+            clickedOnState,
+            { oreItemSlot },
+            playerThings,
+            smelter.fireboxItemStatus,
+            { getPlayerInventory() },
+            { filter -> itemListUpdate(filter) },
+            { itemListUpdateKeepCurrentFilter() }
+        ),
+        wheelFun = SmelterCommon.getFireboxItemSlotWheelFun(
+            clickedOnState,
+            smelter.fireboxItemStatus,
+            { getPlayerInventory() },
+            { itemListUpdateKeepCurrentFilter() }
+        )
     )
     private val productItemslot: UIItemInventoryElemSimple = UIItemInventoryElemSimple(
         this, productX.toInt(), productY.toInt(),
         emptyCellIcon = smelterCellIcons.get(1, 0),
         keyDownFun = { _, _, _, _, _ -> },
-        touchDownFun = { _, _, button, _, self ->
-            if (clickedOn != 0) {
-                clickedOn = 0
-                oreItemSlot.forceHighlighted = false
-                fireboxItemSlot.forceHighlighted = false
-                playerThings.itemList.itemPage = 0
-                itemListUpdate()
-            }
-
-            if (smelter.productItem != null) {
-                val removeCount = if (button == App.getConfigInt("config_mouseprimary"))
-                    smelter.productItem!!.qty
-                else if (button == App.getConfigInt("config_mousesecondary"))
-                    1L
-                else
-                    null
-
-                if (removeCount != null) {
-                    getPlayerInventory().add(smelter.productItem!!.itm, removeCount)
-                    smelter.changeProductItemCount(-removeCount)
-                }
-                itemListUpdateKeepCurrentFilter()
-            }
-        },
-        wheelFun = { _, _, _, scrollY, _, _ ->
-            val scrollY = -scrollY
-            if (smelter.productItem != null) {
-                val removeCount1 = scrollY.toLong()
-                val removeCount2 = scrollY.toLong().coerceIn(
-                    -smelter.productItem!!.qty,
-                    0L,
-                )
-
-                // remove from the slot
-                if (removeCount1 <= -1L) {
-                    getPlayerInventory().add(smelter.productItem!!.itm, -removeCount2)
-                    smelter.changeProductItemCount(removeCount2)
-                }
-                itemListUpdateKeepCurrentFilter()
-            }
-            else {
-                itemListUpdateKeepCurrentFilter()
-            }
-        }
+        touchDownFun = SmelterCommon.getProductItemSlotTouchDownFun(
+            clickedOnState,
+            { oreItemSlot },
+            { fireboxItemSlot },
+            playerThings,
+            smelter.productItemStatus,
+            { getPlayerInventory() },
+            { itemListUpdate() },
+            { itemListUpdateKeepCurrentFilter() }
+        ),
+        wheelFun = SmelterCommon.getProductItemSlotWheelFun(
+            smelter.productItemStatus,
+            { getPlayerInventory() },
+            { itemListUpdateKeepCurrentFilter() }
+        )
     )
 
     private var encumbrancePerc = 0f
@@ -386,7 +199,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     override fun show() {
         super.show()
 
-        clickedOn = 0
+        clickedOnState.set(0)
         oreItemSlot.forceHighlighted = false
         fireboxItemSlot.forceHighlighted = false
 
@@ -423,7 +236,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
             !playerThings.itemList.navRemoCon.mouseUp
         ) {
 
-            clickedOn = 0
+            clickedOnState.set(0)
 
             oreItemSlot.forceHighlighted = false
             fireboxItemSlot.forceHighlighted = false
@@ -496,6 +309,9 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
 
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        val clickedOn = clickedOnState.get()
+
+
         batch.color = backdropColour
 //        batch.draw(smelterBackdrops.get(1,0), backdropX, backdropY, smelterBackdrops.tileW * 6f, smelterBackdrops.tileH * 6f)
 //        batch.color = backdropColour mul Color(1f, 1f, 1f, smelter.temperature)

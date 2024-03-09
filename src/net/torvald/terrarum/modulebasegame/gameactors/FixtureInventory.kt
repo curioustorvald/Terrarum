@@ -336,6 +336,11 @@ class InventoryPair : Comparable<InventoryPair> {
     override fun toString(): String {
         return if (qty == -1L) "$itm" else "$itm ($qty)"
     }
+
+    fun set(itm: ItemID, qty: Long) {
+        this.itm = itm
+        this.qty = qty
+    }
 }
 
 class InventoryTransactionFailedError(msg: String) : Error(msg)
