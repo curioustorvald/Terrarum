@@ -12,8 +12,15 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Created by minjaesong on 2024-03-09.
  */
-object SmelterCommon {
+object SmelterGuiEventBuilder {
 
+    const val PRODUCT_SLOT = 0
+    const val ORE_SLOT_FIRST = 1
+    const val FIRE_SLOT_FIRST = 2
+    
+    
+    
+    
     fun getPlayerSlotTouchDownFun(
         clickedOnState: AtomicInteger,
 
@@ -35,7 +42,7 @@ object SmelterCommon {
 
         // oreslot
         if (amount != null && gameItem != null) {
-            if (clickedOnState.get() == 1) {
+            if (clickedOnState.get() == ORE_SLOT_FIRST) {
                 if (oreItem.itm == gameItem.dynamicID) {
                     playerInventory.remove(gameItem.dynamicID, amount)
                     oreItem.changeCount(amount)
@@ -46,7 +53,7 @@ object SmelterCommon {
                 }
             }
             // firebox
-            else if (clickedOnState.get() == 2) {
+            else if (clickedOnState.get() == FIRE_SLOT_FIRST) {
                 if (fireboxItem.isNull()) {
                     playerInventory.remove(gameItem.dynamicID, amount)
                     fireboxItem.set(gameItem.dynamicID, amount)
@@ -77,7 +84,7 @@ object SmelterCommon {
         if (gameItem != null) {
             val addCount1 = scrollY.toLong()
 
-            if (clickedOnState.get() == 1 && (oreItem.isNull() || oreItem.itm == gameItem.dynamicID)) {
+            if (clickedOnState.get() == ORE_SLOT_FIRST && (oreItem.isNull() || oreItem.itm == gameItem.dynamicID)) {
                 val itemToUse = oreItem.itm ?: gameItem.dynamicID
 
                 val addCount2 = scrollY.toLong().coerceIn(
@@ -102,7 +109,7 @@ object SmelterCommon {
                 else if (oreItem.isNotNull() && oreItem.qty!! < 0L) throw Error("Item removal count is larger than what was on the slot")
                 itemListUpdateKeepCurrentFilter()
             }
-            else if (clickedOnState.get() == 2 && (fireboxItem.isNull() || fireboxItem.itm == gameItem.dynamicID)) {
+            else if (clickedOnState.get() == FIRE_SLOT_FIRST && (fireboxItem.isNull() || fireboxItem.itm == gameItem.dynamicID)) {
                 val itemToUse = fireboxItem.itm ?: gameItem.dynamicID
 
                 val addCount2 = scrollY.toLong().coerceIn(
@@ -138,7 +145,7 @@ object SmelterCommon {
     fun getOreItemSlotTouchDownFun(
         clickedOnState: AtomicInteger,
 
-        getFireboxItemSlot: () -> UIItemInventoryElemSimple,
+        buttonsToUnhighlight: () -> List<UIItemInventoryElemSimple>,
 
         playerThings: UITemplateHalfInventory,
 
@@ -150,10 +157,10 @@ object SmelterCommon {
         itemListUpdateKeepCurrentFilter: () -> Unit
 
     ): (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit { return { gameItem: GameItem?, amount: Long, mouseButton: Int, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
-        if (clickedOnState.get() != 1) {
-            clickedOnState.set(1)
+        if (clickedOnState.get() != ORE_SLOT_FIRST) {
+            clickedOnState.set(ORE_SLOT_FIRST)
             theButton.forceHighlighted = true
-            getFireboxItemSlot().forceHighlighted = false
+            buttonsToUnhighlight().forEach { it.forceHighlighted = false }
             playerThings.itemList.itemPage = 0
             itemListUpdate { ItemCodex.hasTag(it.itm, "SMELTABLE") }
         }
@@ -188,7 +195,7 @@ object SmelterCommon {
     ): (GameItem?, Long, Float, Float, Any?, UIItemInventoryCellBase) -> Unit { return { gameItem: GameItem?, amount: Long, scrollX: Float, scrollY: Float, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
         val playerInventory = getPlayerInventory()
         val scrollY = -scrollY
-        if (clickedOnState.get() == 1 && oreItem.isNotNull()) {
+        if (clickedOnState.get() == ORE_SLOT_FIRST && oreItem.isNotNull()) {
             val removeCount1 = scrollY.toLong()
             val removeCount2 = scrollY.toLong().coerceIn(
                 -oreItem.qty!!,
@@ -217,7 +224,7 @@ object SmelterCommon {
     fun getFireboxItemSlotTouchDownFun(
         clickedOnState: AtomicInteger,
 
-        getOreItemSlot: () -> UIItemInventoryElemSimple,
+        buttonsToUnhighlight: () -> List<UIItemInventoryElemSimple>,
 
         playerThings: UITemplateHalfInventory,
 
@@ -229,10 +236,10 @@ object SmelterCommon {
         itemListUpdateKeepCurrentFilter: () -> Unit
 
     ): (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit { return { gameItem: GameItem?, amount: Long, mouseButton: Int, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
-        if (clickedOnState.get() != 2) {
-            clickedOnState.set(2)
+        if (clickedOnState.get() != FIRE_SLOT_FIRST) {
+            clickedOnState.set(FIRE_SLOT_FIRST)
             theButton.forceHighlighted = true
-            getOreItemSlot().forceHighlighted = false
+            buttonsToUnhighlight().forEach { it.forceHighlighted = false }
             playerThings.itemList.itemPage = 0
             itemListUpdate { ItemCodex.hasTag(it.itm, "COMBUSTIBLE") }
         }
@@ -267,7 +274,7 @@ object SmelterCommon {
     ): (GameItem?, Long, Float, Float, Any?, UIItemInventoryCellBase) -> Unit { return { gameItem: GameItem?, amount: Long, scrollX: Float, scrollY: Float, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
         val playerInventory = getPlayerInventory()
         val scrollY = -scrollY
-        if (clickedOnState.get() == 2 && fireboxItem.isNotNull()) {
+        if (clickedOnState.get() == FIRE_SLOT_FIRST && fireboxItem.isNotNull()) {
             val removeCount1 = scrollY.toLong()
             val removeCount2 = scrollY.toLong().coerceIn(
                 -fireboxItem.qty!!,
@@ -296,8 +303,7 @@ object SmelterCommon {
     fun getProductItemSlotTouchDownFun(
         clickedOnState: AtomicInteger,
 
-        getOreItemSlot: () -> UIItemInventoryElemSimple,
-        getFireboxItemSlot: () -> UIItemInventoryElemSimple,
+        buttonsToUnhighlight: () -> List<UIItemInventoryElemSimple>,
 
         playerThings: UITemplateHalfInventory,
 
@@ -309,10 +315,9 @@ object SmelterCommon {
         itemListUpdateKeepCurrentFilter: () -> Unit
 
     ): (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit { return { gameItem: GameItem?, amount: Long, mouseButton: Int, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
-        if (clickedOnState.get() != 0) {
-            clickedOnState.set(0)
-            getOreItemSlot().forceHighlighted = false
-            getFireboxItemSlot().forceHighlighted = false
+        if (clickedOnState.get() != PRODUCT_SLOT) {
+            clickedOnState.set(PRODUCT_SLOT)
+            buttonsToUnhighlight().forEach { it.forceHighlighted = false }
             playerThings.itemList.itemPage = 0
             itemListUpdate()
         }

@@ -9,6 +9,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureSmelterBasic
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
+import net.torvald.terrarum.modulebasegame.ui.SmelterGuiEventBuilder.PRODUCT_SLOT
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemCatBar.Companion.FILTER_CAT_ALL
@@ -30,17 +31,17 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     override var width = Toolkit.drawWidth
     override var height = App.scr.height
 
-    private var clickedOnState = AtomicInteger(0) // Used to set inventory filter and its behaviour. 0: default, 1: oreslot, 2: firebox
+    private var clickedOnState = AtomicInteger(PRODUCT_SLOT) // Used to set inventory filter and its behaviour. 0: default, 1: oreslot, 2: firebox
 
     private val playerThings = UITemplateHalfInventory(this, false).also {
-        it.itemListTouchDownFun = SmelterCommon.getPlayerSlotTouchDownFun(
+        it.itemListTouchDownFun = SmelterGuiEventBuilder.getPlayerSlotTouchDownFun(
             clickedOnState,
             smelter.fireboxItemStatus,
             smelter.oreItemStatus,
             { getPlayerInventory() },
             { itemListUpdateKeepCurrentFilter() }
         )
-        it.itemListWheelFun = SmelterCommon.getPlayerSlotWheelFun(
+        it.itemListWheelFun = SmelterGuiEventBuilder.getPlayerSlotWheelFun(
             clickedOnState,
             smelter.fireboxItemStatus,
             smelter.oreItemStatus,
@@ -107,16 +108,16 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         updateOnNull = true,
         emptyCellIcon = smelterCellIcons.get(1, 1),
         keyDownFun = { _, _, _, _, _ -> },
-        touchDownFun = SmelterCommon.getOreItemSlotTouchDownFun(
+        touchDownFun = SmelterGuiEventBuilder.getOreItemSlotTouchDownFun(
             clickedOnState,
-            { fireboxItemSlot },
+            { listOf(fireboxItemSlot) },
             playerThings,
             smelter.oreItemStatus,
             { getPlayerInventory() },
             { filter -> itemListUpdate(filter) },
             { itemListUpdateKeepCurrentFilter() }
         ),
-        wheelFun = SmelterCommon.getOreItemSlotWheelFun(
+        wheelFun = SmelterGuiEventBuilder.getOreItemSlotWheelFun(
             clickedOnState,
             smelter.oreItemStatus,
             { getPlayerInventory() },
@@ -128,16 +129,16 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         emptyCellIcon = smelterCellIcons.get(0, 0),
         updateOnNull = true,
         keyDownFun = { _, _, _, _, _ -> },
-        touchDownFun = SmelterCommon.getFireboxItemSlotTouchDownFun(
+        touchDownFun = SmelterGuiEventBuilder.getFireboxItemSlotTouchDownFun(
             clickedOnState,
-            { oreItemSlot },
+            { listOf(oreItemSlot) },
             playerThings,
             smelter.fireboxItemStatus,
             { getPlayerInventory() },
             { filter -> itemListUpdate(filter) },
             { itemListUpdateKeepCurrentFilter() }
         ),
-        wheelFun = SmelterCommon.getFireboxItemSlotWheelFun(
+        wheelFun = SmelterGuiEventBuilder.getFireboxItemSlotWheelFun(
             clickedOnState,
             smelter.fireboxItemStatus,
             { getPlayerInventory() },
@@ -148,17 +149,16 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         this, productX.toInt(), productY.toInt(),
         emptyCellIcon = smelterCellIcons.get(1, 0),
         keyDownFun = { _, _, _, _, _ -> },
-        touchDownFun = SmelterCommon.getProductItemSlotTouchDownFun(
+        touchDownFun = SmelterGuiEventBuilder.getProductItemSlotTouchDownFun(
             clickedOnState,
-            { oreItemSlot },
-            { fireboxItemSlot },
+            { listOf(oreItemSlot, fireboxItemSlot) },
             playerThings,
             smelter.productItemStatus,
             { getPlayerInventory() },
             { itemListUpdate() },
             { itemListUpdateKeepCurrentFilter() }
         ),
-        wheelFun = SmelterCommon.getProductItemSlotWheelFun(
+        wheelFun = SmelterGuiEventBuilder.getProductItemSlotWheelFun(
             smelter.productItemStatus,
             { getPlayerInventory() },
             { itemListUpdateKeepCurrentFilter() }
@@ -199,7 +199,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     override fun show() {
         super.show()
 
-        clickedOnState.set(0)
+        clickedOnState.set(PRODUCT_SLOT)
         oreItemSlot.forceHighlighted = false
         fireboxItemSlot.forceHighlighted = false
 
@@ -236,7 +236,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
             !playerThings.itemList.navRemoCon.mouseUp
         ) {
 
-            clickedOnState.set(0)
+            clickedOnState.set(PRODUCT_SLOT)
 
             oreItemSlot.forceHighlighted = false
             fireboxItemSlot.forceHighlighted = false
