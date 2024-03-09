@@ -14,10 +14,11 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 object SmelterGuiEventBuilder {
 
+    const val SLOT_INDEX_STRIDE = 16
     const val PRODUCT_SLOT = 0
-    const val ORE_SLOT_FIRST = 1
-    const val FIRE_SLOT_FIRST = 2
-    
+    const val ORE_SLOT_FIRST = SLOT_INDEX_STRIDE
+    const val FIRE_SLOT_FIRST = 2*SLOT_INDEX_STRIDE
+
     
     
     
@@ -25,7 +26,7 @@ object SmelterGuiEventBuilder {
         clickedOnState: AtomicInteger,
 
         fireboxItemStatus: SmelterItemStatus,
-        oreItemStatus: SmelterItemStatus,
+        oreItemStatus: List<SmelterItemStatus>,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -42,7 +43,10 @@ object SmelterGuiEventBuilder {
 
         // oreslot
         if (amount != null && gameItem != null) {
-            if (clickedOnState.get() == ORE_SLOT_FIRST) {
+            val clicked = clickedOnState.get()
+
+            if (clicked in ORE_SLOT_FIRST until ORE_SLOT_FIRST + 16) {
+                val oreItemStatus = oreItemStatus[clicked - ORE_SLOT_FIRST]
                 if (oreItemStatus.itm == gameItem.dynamicID) {
                     playerInventory.remove(gameItem.dynamicID, amount)
                     oreItemStatus.changeCount(amount)
@@ -53,7 +57,7 @@ object SmelterGuiEventBuilder {
                 }
             }
             // firebox
-            else if (clickedOnState.get() == FIRE_SLOT_FIRST) {
+            else if (clicked == FIRE_SLOT_FIRST) {
                 if (fireboxItemStatus.isNull()) {
                     playerInventory.remove(gameItem.dynamicID, amount)
                     fireboxItemStatus.set(gameItem.dynamicID, amount)
@@ -73,7 +77,7 @@ object SmelterGuiEventBuilder {
         clickedOnState: AtomicInteger,
 
         fireboxItemStatus: SmelterItemStatus,
-        oreItemStatus: SmelterItemStatus,
+        oreItemStatus: List<SmelterItemStatus>,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -83,33 +87,36 @@ object SmelterGuiEventBuilder {
         val scrollY = -scrollY
         if (gameItem != null) {
             val addCount1 = scrollY.toLong()
+            val clicked = clickedOnState.get()
+            if (clicked in ORE_SLOT_FIRST until ORE_SLOT_FIRST + 16) {
+                val oreItemStatus = oreItemStatus[clicked - ORE_SLOT_FIRST]
+                if ((oreItemStatus.isNull() || oreItemStatus.itm == gameItem.dynamicID)) {
+                    val itemToUse = oreItemStatus.itm ?: gameItem.dynamicID
 
-            if (clickedOnState.get() == ORE_SLOT_FIRST && (oreItemStatus.isNull() || oreItemStatus.itm == gameItem.dynamicID)) {
-                val itemToUse = oreItemStatus.itm ?: gameItem.dynamicID
+                    val addCount2 = scrollY.toLong().coerceIn(
+                        -(playerInventory.searchByID(itemToUse)?.qty ?: 0L),
+                        oreItemStatus.qty ?: 0L,
+                    )
 
-                val addCount2 = scrollY.toLong().coerceIn(
-                    -(playerInventory.searchByID(itemToUse)?.qty ?: 0L),
-                    oreItemStatus.qty ?: 0L,
-                )
-
-                // add to the inventory slot
-                if (oreItemStatus.isNotNull() && addCount1 >= 1L) {
-                    playerInventory.add(oreItemStatus.itm!!, addCount2)
-                    oreItemStatus.changeCount(-addCount2)
-                }
-                // remove from the inventory slot
-                else if (addCount1 <= -1L) {
-                    playerInventory.remove(itemToUse, -addCount2)
-                    if (oreItemStatus.isNull())
-                        oreItemStatus.set(itemToUse, -addCount2)
-                    else
+                    // add to the inventory slot
+                    if (oreItemStatus.isNotNull() && addCount1 >= 1L) {
+                        playerInventory.add(oreItemStatus.itm!!, addCount2)
                         oreItemStatus.changeCount(-addCount2)
+                    }
+                    // remove from the inventory slot
+                    else if (addCount1 <= -1L) {
+                        playerInventory.remove(itemToUse, -addCount2)
+                        if (oreItemStatus.isNull())
+                            oreItemStatus.set(itemToUse, -addCount2)
+                        else
+                            oreItemStatus.changeCount(-addCount2)
+                    }
+                    if (oreItemStatus.qty == 0L) oreItemStatus.nullify()
+                    else if (oreItemStatus.isNotNull() && oreItemStatus.qty!! < 0L) throw Error("Item removal count is larger than what was on the slot")
+                    itemListUpdateKeepCurrentFilter()
                 }
-                if (oreItemStatus.qty == 0L) oreItemStatus.nullify()
-                else if (oreItemStatus.isNotNull() && oreItemStatus.qty!! < 0L) throw Error("Item removal count is larger than what was on the slot")
-                itemListUpdateKeepCurrentFilter()
             }
-            else if (clickedOnState.get() == FIRE_SLOT_FIRST && (fireboxItemStatus.isNull() || fireboxItemStatus.itm == gameItem.dynamicID)) {
+            else if (clicked == FIRE_SLOT_FIRST && (fireboxItemStatus.isNull() || fireboxItemStatus.itm == gameItem.dynamicID)) {
                 val itemToUse = fireboxItemStatus.itm ?: gameItem.dynamicID
 
                 val addCount2 = scrollY.toLong().coerceIn(
@@ -149,7 +156,7 @@ object SmelterGuiEventBuilder {
 
         playerThings: UITemplateHalfInventory,
 
-        oreItemStatus: SmelterItemStatus,
+        oreItemStatus: SmelterItemStatus, oreSlotIndex: Int,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -157,8 +164,8 @@ object SmelterGuiEventBuilder {
         itemListUpdateKeepCurrentFilter: () -> Unit
 
     ): (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit { return { gameItem: GameItem?, amount: Long, mouseButton: Int, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
-        if (clickedOnState.get() != ORE_SLOT_FIRST) {
-            clickedOnState.set(ORE_SLOT_FIRST)
+        if (clickedOnState.get() != ORE_SLOT_FIRST + oreSlotIndex) {
+            clickedOnState.set(ORE_SLOT_FIRST + oreSlotIndex)
             theButton.forceHighlighted = true
             buttonsToUnhighlight().forEach { it.forceHighlighted = false }
             playerThings.itemList.itemPage = 0
@@ -186,7 +193,7 @@ object SmelterGuiEventBuilder {
     fun getOreItemSlotWheelFun(
         clickedOnState: AtomicInteger,
 
-        oreItemStatus: SmelterItemStatus,
+        oreItemStatus: SmelterItemStatus, oreSlotIndex: Int,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -195,7 +202,7 @@ object SmelterGuiEventBuilder {
     ): (GameItem?, Long, Float, Float, Any?, UIItemInventoryCellBase) -> Unit { return { gameItem: GameItem?, amount: Long, scrollX: Float, scrollY: Float, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
         val playerInventory = getPlayerInventory()
         val scrollY = -scrollY
-        if (clickedOnState.get() == ORE_SLOT_FIRST && oreItemStatus.isNotNull()) {
+        if (clickedOnState.get() == ORE_SLOT_FIRST + oreSlotIndex && oreItemStatus.isNotNull()) {
             val removeCount1 = scrollY.toLong()
             val removeCount2 = scrollY.toLong().coerceIn(
                 -oreItemStatus.qty!!,

@@ -20,13 +20,13 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleVanishingSprite
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.ui.UISmelterBasic
+import net.torvald.terrarum.modulebasegame.ui.UIAlloyingFurnace
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2024-03-09.
  */
-class FixtureAlloyingCrucible : FixtureBase {
+class FixtureAlloyingFurnace : FixtureBase {
 
 
     var fuelCaloriesNow = 0.0 // arbitrary number, may as well be watts or joules
@@ -146,7 +146,7 @@ class FixtureAlloyingCrucible : FixtureBase {
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 2, 2), // temporary value, will be overwritten by spawn()
-        nameFun = { Lang["ITEM_ALLOYING_SMELTER"] },
+        nameFun = { Lang["ITEM_ALLOYING_FURNACE"] },
     ) {
         CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/bigger_smoke.tga"), 16, 16)
@@ -167,7 +167,7 @@ class FixtureAlloyingCrucible : FixtureBase {
 
         actorValue[AVKey.BASEMASS] = 100.0
 
-//        this.mainUI = UIAlloyingCrucible(this)
+        this.mainUI = UIAlloyingFurnace(this)
     }
 
 

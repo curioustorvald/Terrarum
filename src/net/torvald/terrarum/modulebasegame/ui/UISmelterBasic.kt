@@ -10,6 +10,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureSmelterBasic
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.SmelterGuiEventBuilder.PRODUCT_SLOT
+import net.torvald.terrarum.modulebasegame.ui.SmelterGuiEventBuilder.SLOT_INDEX_STRIDE
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemCatBar.Companion.FILTER_CAT_ALL
@@ -37,14 +38,14 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         it.itemListTouchDownFun = SmelterGuiEventBuilder.getPlayerSlotTouchDownFun(
             clickedOnState,
             smelter.fireboxItemStatus,
-            smelter.oreItemStatus,
+            listOf(smelter.oreItemStatus),
             { getPlayerInventory() },
             { itemListUpdateKeepCurrentFilter() }
         )
         it.itemListWheelFun = SmelterGuiEventBuilder.getPlayerSlotWheelFun(
             clickedOnState,
             smelter.fireboxItemStatus,
-            smelter.oreItemStatus,
+            listOf(smelter.oreItemStatus),
             { getPlayerInventory() },
             { itemListUpdateKeepCurrentFilter() }
         )
@@ -112,14 +113,14 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
             clickedOnState,
             { listOf(fireboxItemSlot) },
             playerThings,
-            smelter.oreItemStatus,
+            smelter.oreItemStatus, 1,
             { getPlayerInventory() },
             { filter -> itemListUpdate(filter) },
             { itemListUpdateKeepCurrentFilter() }
         ),
         wheelFun = SmelterGuiEventBuilder.getOreItemSlotWheelFun(
             clickedOnState,
-            smelter.oreItemStatus,
+            smelter.oreItemStatus, 1,
             { getPlayerInventory() },
             { itemListUpdateKeepCurrentFilter() }
         )
@@ -309,7 +310,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
 
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
-        val clickedOn = clickedOnState.get()
+        val clickedOn = clickedOnState.get() / SLOT_INDEX_STRIDE
 
 
         batch.color = backdropColour

@@ -47,7 +47,7 @@ class EntryPoint : ModuleEntryPoint() {
                 }
             }
         }
-        
+
         println("\n[Basegame.EntryPoint] Welcome back!")
     }
 
