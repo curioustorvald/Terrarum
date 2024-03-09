@@ -47,8 +47,6 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      */
     @Transient open var smokiness = Float.POSITIVE_INFINITY
 
-    @Transient open var smeltingProduct: ItemID? = null
-
     open var dynamicID: ItemID = originalID
     /**
      * if the ID is a Actor range, it's an actor contained in a pocket.

@@ -26,51 +26,62 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2024-03-09.
  */
-interface SmelterItemStatus {
-    fun set(itm: ItemID, qty: Long)
-    fun changeCount(delta: Long)
-    fun nullify()
-    fun isNull(): Boolean
-    fun isNotNull(): Boolean = !isNull()
-    val itm: ItemID?
-    val qty: Long?
-}
+class FixtureAlloyingCrucible : FixtureBase {
 
-/**
- * Created by minjaesong on 2023-12-04.
- */
-class FixtureSmelterBasic : FixtureBase {
 
     var fuelCaloriesNow = 0.0 // arbitrary number, may as well be watts or joules
     var fuelCaloriesMax: Double? = null
     var temperature = 0f // 0f..1f
     var progress = 0f // 0f..1f
 
-    internal var oreItem: InventoryPair? = null
+    internal var oreItem1: InventoryPair? = null
+    internal var oreItem2: InventoryPair? = null
     internal var fireboxItem: InventoryPair? = null
     internal var productItem: InventoryPair? = null
 
-    @Transient val oreItemStatus = object : SmelterItemStatus {
+    @Transient val oreItem1Status = object : SmelterItemStatus {
         override fun set(itm: ItemID, qty: Long) {
-            if (oreItem != null) oreItem!!.set(itm, qty)
-            else oreItem = InventoryPair(itm, qty)
+            if (oreItem1 != null) oreItem1!!.set(itm, qty)
+            else oreItem1 = InventoryPair(itm, qty)
         }
         override fun changeCount(delta: Long) {
-            oreItem!!.qty += delta
-            if (oreItem!!.qty <= 0L) {
-                oreItem = null
+            oreItem1!!.qty += delta
+            if (oreItem1!!.qty <= 0L) {
+                oreItem1 = null
             }
         }
         override fun nullify() {
-            oreItem = null
+            oreItem1 = null
         }
         override fun isNull(): Boolean {
-            return oreItem == null
+            return oreItem1 == null
         }
         override val itm: ItemID?
-            get() = oreItem?.itm
+            get() = oreItem1?.itm
         override val qty: Long?
-            get() = oreItem?.qty
+            get() = oreItem1?.qty
+    }
+    @Transient val oreItem2Status = object : SmelterItemStatus {
+        override fun set(itm: ItemID, qty: Long) {
+            if (oreItem2 != null) oreItem2!!.set(itm, qty)
+            else oreItem2 = InventoryPair(itm, qty)
+        }
+        override fun changeCount(delta: Long) {
+            oreItem2!!.qty += delta
+            if (oreItem2!!.qty <= 0L) {
+                oreItem2 = null
+            }
+        }
+        override fun nullify() {
+            oreItem2 = null
+        }
+        override fun isNull(): Boolean {
+            return oreItem2 == null
+        }
+        override val itm: ItemID?
+            get() = oreItem2?.itm
+        override val qty: Long?
+            get() = oreItem2?.qty
     }
     @Transient val fireboxItemStatus = object : SmelterItemStatus {
         override fun set(itm: ItemID, qty: Long) {
@@ -117,22 +128,25 @@ class FixtureSmelterBasic : FixtureBase {
             get() = productItem?.qty
     }
 
+
     override val canBeDespawned: Boolean
-        get() = oreItem == null && fireboxItem == null && productItem == null
+        get() = oreItem1 == null && oreItem2 == null && fireboxItem == null && productItem == null
+
 
     init {
-        CommonResourcePool.addToLoadingList("basegame/sprites/fixtures/smelter_tall.tga") {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/smelter_tall.tga"), 48, 64)
+        CommonResourcePool.addToLoadingList("basegame/sprites/fixtures/alloying_furnace.tga") {
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/alloying_furnace.tga"), 32, 32)
         }
-        CommonResourcePool.addToLoadingList("basegame/sprites/fixtures/smelter_tall_emsv.tga") {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/smelter_tall_emsv.tga"), 48, 64)
+        CommonResourcePool.addToLoadingList("basegame/sprites/fixtures/alloying_furnace_emsv.tga") {
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/alloying_furnace_emsv.tga"), 32, 32)
         }
         CommonResourcePool.loadAll()
     }
 
+
     constructor() : super(
-        BlockBox(BlockBox.NO_COLLISION, 3, 4), // temporary value, will be overwritten by spawn()
-        nameFun = { Lang["ITEM_SMELTER_SMALL"] },
+        BlockBox(BlockBox.NO_COLLISION, 2, 2), // temporary value, will be overwritten by spawn()
+        nameFun = { Lang["ITEM_ALLOYING_SMELTER"] },
     ) {
         CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/bigger_smoke.tga"), 16, 16)
@@ -142,31 +156,31 @@ class FixtureSmelterBasic : FixtureBase {
 
 
         density = BlockCodex[Block.STONE].density.toDouble()
-        setHitboxDimension(48, 64, 0, 0)
+        setHitboxDimension(32, 32, 0, 0)
 
-        makeNewSprite(CommonResourcePool.getAsTextureRegionPack("basegame/sprites/fixtures/smelter_tall.tga")).let {
+        makeNewSprite(CommonResourcePool.getAsTextureRegionPack("basegame/sprites/fixtures/alloying_furnace.tga")).let {
             it.setRowsAndFrames(1,1)
         }
-        makeNewSpriteEmissive(CommonResourcePool.getAsTextureRegionPack("basegame/sprites/fixtures/smelter_tall_emsv.tga")).let {
+        makeNewSpriteEmissive(CommonResourcePool.getAsTextureRegionPack("basegame/sprites/fixtures/alloying_furnace_emsv.tga")).let {
             it.setRowsAndFrames(1,1)
         }
 
         actorValue[AVKey.BASEMASS] = 100.0
 
-        this.mainUI = UISmelterBasic(this)
+//        this.mainUI = UIAlloyingCrucible(this)
     }
+
 
     @Transient val static = MusicContainer("bonfire", ModMgr.getFile("basegame", "audio/effects/static/bonfire.ogg"), true)
     @Transient val light = Cvec(0.5f, 0.18f, 0f, 0f)
 
-    @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 2*TILE_SIZED, TILE_SIZED * 2, TILE_SIZED * 2), light))
+    @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 0.0, TILE_SIZED * 2, TILE_SIZED * 2), light))
 
     @Transient private val actorBlocks = arrayOf(
-        arrayOf(Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, null),
-        arrayOf(Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, null),
-        arrayOf(Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, null),
-        arrayOf(Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION),
+        arrayOf(Block.ACTORBLOCK_NO_COLLISION, null),
+        arrayOf(Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION),
     )
+
     override fun placeActorBlocks() {
         forEachBlockbox { x, y, ox, oy ->
             val tile = actorBlocks[oy][ox]
@@ -176,14 +190,10 @@ class FixtureSmelterBasic : FixtureBase {
         }
     }
 
+
     private var nextDelayBase = 0.25f // use smokiness value of the item
     private var nextDelay = 0.25f // use smokiness value of the item
     private var spawnTimer = 0f
-
-    companion object {
-        @Transient val FUEL_CONSUMPTION = 1f
-        @Transient val CALORIES_PER_ROASTING = 10 * 60 // 10 seconds @ 60 ticks per second
-    }
 
     @Transient private val RNG = HQRNG()
 
@@ -256,7 +266,7 @@ class FixtureSmelterBasic : FixtureBase {
 
         // consume fuel
         if (fuelCaloriesNow > 0f) {
-            fuelCaloriesNow -= FUEL_CONSUMPTION
+            fuelCaloriesNow -= FixtureSmelterBasic.FUEL_CONSUMPTION
 
             // raise temperature
             temperature += 1f /2048f
@@ -296,10 +306,11 @@ class FixtureSmelterBasic : FixtureBase {
             (sprite as? SheetSpriteAnimation)?.delays?.set(0, Math.random().toFloat() * 0.4f + 0.1f)
         }
 
-        val smeltingProduct = CraftingRecipeCodex.getSmeltingProductOf(oreItem?.itm)
+        val smeltingProduct = CraftingRecipeCodex.getSmeltingProductOf(oreItem1?.itm, oreItem2?.itm)
 
         // roast items
-        if (oreItem != null &&
+        if (oreItem1 != null &&
+            oreItem2 != null &&
             temperature > 0f &&
             smeltingProduct != null &&
             (productItem == null || smeltingProduct.item == productItem!!.itm)
@@ -307,24 +318,25 @@ class FixtureSmelterBasic : FixtureBase {
 
             progress += temperature
 
-            if (progress >= CALORIES_PER_ROASTING) {
-                val smeltingProductItem = smeltingProduct.item
+            if (progress >= FixtureSmelterBasic.CALORIES_PER_ROASTING) {
+                val smeltingProduct = smeltingProduct.item
 
                 // check if the item even exists
-                if (ItemCodex[smeltingProductItem] == null) throw NullPointerException("No item prop for $smeltingProductItem")
+                if (ItemCodex[smeltingProduct] == null) throw NullPointerException("No item prop for $smeltingProduct")
 
                 if (productItem == null)
-                    productItem = InventoryPair(smeltingProductItem, 1L)
+                    productItem = InventoryPair(smeltingProduct, 1L)
                 else
                     productItemStatus.changeCount(1)
 
                 // take the ore item
-                oreItemStatus.changeCount(-1)
+                oreItem1Status.changeCount(-1)
+                oreItem2Status.changeCount(-1)
 
                 progress = 0f
             }
         }
-        else if (oreItem == null) {
+        else if (oreItem1 == null || oreItem2 == null) {
             progress = 0f
         }
 

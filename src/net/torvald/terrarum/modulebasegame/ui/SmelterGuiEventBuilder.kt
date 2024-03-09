@@ -24,8 +24,8 @@ object SmelterGuiEventBuilder {
     fun getPlayerSlotTouchDownFun(
         clickedOnState: AtomicInteger,
 
-        fireboxItem: SmelterItemStatus,
-        oreItem: SmelterItemStatus,
+        fireboxItemStatus: SmelterItemStatus,
+        oreItemStatus: SmelterItemStatus,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -43,24 +43,24 @@ object SmelterGuiEventBuilder {
         // oreslot
         if (amount != null && gameItem != null) {
             if (clickedOnState.get() == ORE_SLOT_FIRST) {
-                if (oreItem.itm == gameItem.dynamicID) {
+                if (oreItemStatus.itm == gameItem.dynamicID) {
                     playerInventory.remove(gameItem.dynamicID, amount)
-                    oreItem.changeCount(amount)
+                    oreItemStatus.changeCount(amount)
                 }
                 else {
                     playerInventory.remove(gameItem.dynamicID, amount)
-                    oreItem.set(gameItem.dynamicID, amount)
+                    oreItemStatus.set(gameItem.dynamicID, amount)
                 }
             }
             // firebox
             else if (clickedOnState.get() == FIRE_SLOT_FIRST) {
-                if (fireboxItem.isNull()) {
+                if (fireboxItemStatus.isNull()) {
                     playerInventory.remove(gameItem.dynamicID, amount)
-                    fireboxItem.set(gameItem.dynamicID, amount)
+                    fireboxItemStatus.set(gameItem.dynamicID, amount)
                 }
-                else if (fireboxItem.itm == gameItem.dynamicID) {
+                else if (fireboxItemStatus.itm == gameItem.dynamicID) {
                     playerInventory.remove(gameItem.dynamicID, amount)
-                    fireboxItem.changeCount(amount)
+                    fireboxItemStatus.changeCount(amount)
                 }
             }
         }
@@ -72,8 +72,8 @@ object SmelterGuiEventBuilder {
     fun getPlayerSlotWheelFun(
         clickedOnState: AtomicInteger,
 
-        fireboxItem: SmelterItemStatus,
-        oreItem: SmelterItemStatus,
+        fireboxItemStatus: SmelterItemStatus,
+        oreItemStatus: SmelterItemStatus,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -84,51 +84,51 @@ object SmelterGuiEventBuilder {
         if (gameItem != null) {
             val addCount1 = scrollY.toLong()
 
-            if (clickedOnState.get() == ORE_SLOT_FIRST && (oreItem.isNull() || oreItem.itm == gameItem.dynamicID)) {
-                val itemToUse = oreItem.itm ?: gameItem.dynamicID
+            if (clickedOnState.get() == ORE_SLOT_FIRST && (oreItemStatus.isNull() || oreItemStatus.itm == gameItem.dynamicID)) {
+                val itemToUse = oreItemStatus.itm ?: gameItem.dynamicID
 
                 val addCount2 = scrollY.toLong().coerceIn(
                     -(playerInventory.searchByID(itemToUse)?.qty ?: 0L),
-                    oreItem.qty ?: 0L,
+                    oreItemStatus.qty ?: 0L,
                 )
 
                 // add to the inventory slot
-                if (oreItem.isNotNull() && addCount1 >= 1L) {
-                    playerInventory.add(oreItem.itm!!, addCount2)
-                    oreItem.changeCount(-addCount2)
+                if (oreItemStatus.isNotNull() && addCount1 >= 1L) {
+                    playerInventory.add(oreItemStatus.itm!!, addCount2)
+                    oreItemStatus.changeCount(-addCount2)
                 }
                 // remove from the inventory slot
                 else if (addCount1 <= -1L) {
                     playerInventory.remove(itemToUse, -addCount2)
-                    if (oreItem.isNull())
-                        oreItem.set(itemToUse, -addCount2)
+                    if (oreItemStatus.isNull())
+                        oreItemStatus.set(itemToUse, -addCount2)
                     else
-                        oreItem.changeCount(-addCount2)
+                        oreItemStatus.changeCount(-addCount2)
                 }
-                if (oreItem.qty == 0L) oreItem.nullify()
-                else if (oreItem.isNotNull() && oreItem.qty!! < 0L) throw Error("Item removal count is larger than what was on the slot")
+                if (oreItemStatus.qty == 0L) oreItemStatus.nullify()
+                else if (oreItemStatus.isNotNull() && oreItemStatus.qty!! < 0L) throw Error("Item removal count is larger than what was on the slot")
                 itemListUpdateKeepCurrentFilter()
             }
-            else if (clickedOnState.get() == FIRE_SLOT_FIRST && (fireboxItem.isNull() || fireboxItem.itm == gameItem.dynamicID)) {
-                val itemToUse = fireboxItem.itm ?: gameItem.dynamicID
+            else if (clickedOnState.get() == FIRE_SLOT_FIRST && (fireboxItemStatus.isNull() || fireboxItemStatus.itm == gameItem.dynamicID)) {
+                val itemToUse = fireboxItemStatus.itm ?: gameItem.dynamicID
 
                 val addCount2 = scrollY.toLong().coerceIn(
                     -(playerInventory.searchByID(itemToUse)?.qty ?: 0L),
-                    fireboxItem.qty ?: 0L,
+                    fireboxItemStatus.qty ?: 0L,
                 )
 
                 // add to the inventory slot
-                if (fireboxItem.isNotNull() && addCount1 >= 1L) {
-                    playerInventory.add(fireboxItem.itm!!, addCount2)
-                    fireboxItem.changeCount(-addCount2)
+                if (fireboxItemStatus.isNotNull() && addCount1 >= 1L) {
+                    playerInventory.add(fireboxItemStatus.itm!!, addCount2)
+                    fireboxItemStatus.changeCount(-addCount2)
                 }
                 // remove from the inventory slot
                 else if (addCount1 <= -1L) {
                     playerInventory.remove(itemToUse, -addCount2)
-                    if (fireboxItem.isNull())
-                        fireboxItem.set(itemToUse, -addCount2)
+                    if (fireboxItemStatus.isNull())
+                        fireboxItemStatus.set(itemToUse, -addCount2)
                     else
-                        fireboxItem.changeCount(-addCount2)
+                        fireboxItemStatus.changeCount(-addCount2)
                 }
                 itemListUpdateKeepCurrentFilter()
             }
@@ -149,7 +149,7 @@ object SmelterGuiEventBuilder {
 
         playerThings: UITemplateHalfInventory,
 
-        oreItem: SmelterItemStatus,
+        oreItemStatus: SmelterItemStatus,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -164,17 +164,17 @@ object SmelterGuiEventBuilder {
             playerThings.itemList.itemPage = 0
             itemListUpdate { ItemCodex.hasTag(it.itm, "SMELTABLE") }
         }
-        else if (oreItem.isNotNull()) {
+        else if (oreItemStatus.isNotNull()) {
             val removeCount = if (mouseButton == App.getConfigInt("config_mouseprimary"))
-                oreItem.qty
+                oreItemStatus.qty
             else if (mouseButton == App.getConfigInt("config_mousesecondary"))
                 1L
             else
                 null
 
             if (removeCount != null) {
-                getPlayerInventory().add(oreItem.itm!!, removeCount)
-                oreItem.changeCount(-removeCount)
+                getPlayerInventory().add(oreItemStatus.itm!!, removeCount)
+                oreItemStatus.changeCount(-removeCount)
             }
             itemListUpdateKeepCurrentFilter()
         }
@@ -186,7 +186,7 @@ object SmelterGuiEventBuilder {
     fun getOreItemSlotWheelFun(
         clickedOnState: AtomicInteger,
 
-        oreItem: SmelterItemStatus,
+        oreItemStatus: SmelterItemStatus,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -195,22 +195,22 @@ object SmelterGuiEventBuilder {
     ): (GameItem?, Long, Float, Float, Any?, UIItemInventoryCellBase) -> Unit { return { gameItem: GameItem?, amount: Long, scrollX: Float, scrollY: Float, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
         val playerInventory = getPlayerInventory()
         val scrollY = -scrollY
-        if (clickedOnState.get() == ORE_SLOT_FIRST && oreItem.isNotNull()) {
+        if (clickedOnState.get() == ORE_SLOT_FIRST && oreItemStatus.isNotNull()) {
             val removeCount1 = scrollY.toLong()
             val removeCount2 = scrollY.toLong().coerceIn(
-                -oreItem.qty!!,
-                playerInventory.searchByID(oreItem.itm)?.qty ?: 0L,
+                -oreItemStatus.qty!!,
+                playerInventory.searchByID(oreItemStatus.itm)?.qty ?: 0L,
             )
 
             // add to the slot
             if (removeCount1 >= 1L) {
-                playerInventory.remove(oreItem.itm!!, removeCount2)
-                oreItem.changeCount(removeCount2)
+                playerInventory.remove(oreItemStatus.itm!!, removeCount2)
+                oreItemStatus.changeCount(removeCount2)
             }
             // remove from the slot
             else if (removeCount1 <= -1L) {
-                playerInventory.add(oreItem.itm!!, -removeCount2)
-                oreItem.changeCount(removeCount2)
+                playerInventory.add(oreItemStatus.itm!!, -removeCount2)
+                oreItemStatus.changeCount(removeCount2)
             }
             itemListUpdateKeepCurrentFilter()
         }
@@ -228,7 +228,7 @@ object SmelterGuiEventBuilder {
 
         playerThings: UITemplateHalfInventory,
 
-        fireboxItem: SmelterItemStatus,
+        fireboxItemStatus: SmelterItemStatus,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -243,17 +243,17 @@ object SmelterGuiEventBuilder {
             playerThings.itemList.itemPage = 0
             itemListUpdate { ItemCodex.hasTag(it.itm, "COMBUSTIBLE") }
         }
-        else if (fireboxItem.isNotNull()) {
+        else if (fireboxItemStatus.isNotNull()) {
             val removeCount = if (mouseButton == App.getConfigInt("config_mouseprimary"))
-                fireboxItem.qty
+                fireboxItemStatus.qty
             else if (mouseButton == App.getConfigInt("config_mousesecondary"))
                 1L
             else
                 null
 
             if (removeCount != null) {
-                getPlayerInventory().add(fireboxItem.itm!!, removeCount)
-                fireboxItem.changeCount(-removeCount)
+                getPlayerInventory().add(fireboxItemStatus.itm!!, removeCount)
+                fireboxItemStatus.changeCount(-removeCount)
             }
             itemListUpdateKeepCurrentFilter()
         }
@@ -265,7 +265,7 @@ object SmelterGuiEventBuilder {
     fun getFireboxItemSlotWheelFun(
         clickedOnState: AtomicInteger,
 
-        fireboxItem: SmelterItemStatus,
+        fireboxItemStatus: SmelterItemStatus,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -274,22 +274,22 @@ object SmelterGuiEventBuilder {
     ): (GameItem?, Long, Float, Float, Any?, UIItemInventoryCellBase) -> Unit { return { gameItem: GameItem?, amount: Long, scrollX: Float, scrollY: Float, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
         val playerInventory = getPlayerInventory()
         val scrollY = -scrollY
-        if (clickedOnState.get() == FIRE_SLOT_FIRST && fireboxItem.isNotNull()) {
+        if (clickedOnState.get() == FIRE_SLOT_FIRST && fireboxItemStatus.isNotNull()) {
             val removeCount1 = scrollY.toLong()
             val removeCount2 = scrollY.toLong().coerceIn(
-                -fireboxItem.qty!!,
-                playerInventory.searchByID(fireboxItem.itm)?.qty ?: 0L,
+                -fireboxItemStatus.qty!!,
+                playerInventory.searchByID(fireboxItemStatus.itm)?.qty ?: 0L,
             )
 
             // add to the slot
             if (removeCount1 >= 1L) {
-                playerInventory.remove(fireboxItem.itm!!, removeCount2)
-                fireboxItem.changeCount(removeCount2)
+                playerInventory.remove(fireboxItemStatus.itm!!, removeCount2)
+                fireboxItemStatus.changeCount(removeCount2)
             }
             // remove from the slot
             else if (removeCount1 <= -1L) {
-                playerInventory.add(fireboxItem.itm!!, -removeCount2)
-                fireboxItem.changeCount(removeCount2)
+                playerInventory.add(fireboxItemStatus.itm!!, -removeCount2)
+                fireboxItemStatus.changeCount(removeCount2)
             }
             itemListUpdateKeepCurrentFilter()
         }
@@ -307,7 +307,7 @@ object SmelterGuiEventBuilder {
 
         playerThings: UITemplateHalfInventory,
 
-        productItem: SmelterItemStatus,
+        productItemStatus: SmelterItemStatus,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -322,24 +322,24 @@ object SmelterGuiEventBuilder {
             itemListUpdate()
         }
 
-        if (productItem.isNotNull()) {
+        if (productItemStatus.isNotNull()) {
             val removeCount = if (mouseButton == App.getConfigInt("config_mouseprimary"))
-                productItem.qty
+                productItemStatus.qty
             else if (mouseButton == App.getConfigInt("config_mousesecondary"))
                 1L
             else
                 null
 
             if (removeCount != null) {
-                getPlayerInventory().add(productItem.itm!!, removeCount)
-                productItem.changeCount(-removeCount)
+                getPlayerInventory().add(productItemStatus.itm!!, removeCount)
+                productItemStatus.changeCount(-removeCount)
             }
             itemListUpdateKeepCurrentFilter()
         }
     } }
 
     fun getProductItemSlotWheelFun(
-        productItem: SmelterItemStatus,
+        productItemStatus: SmelterItemStatus,
 
         getPlayerInventory: () -> ActorInventory,
 
@@ -347,17 +347,17 @@ object SmelterGuiEventBuilder {
 
     ): (GameItem?, Long, Float, Float, Any?, UIItemInventoryCellBase) -> Unit { return { gameItem: GameItem?, amount: Long, scrollX: Float, scrollY: Float, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
         val scrollY = -scrollY
-        if (productItem.isNotNull()) {
+        if (productItemStatus.isNotNull()) {
             val removeCount1 = scrollY.toLong()
             val removeCount2 = scrollY.toLong().coerceIn(
-                -productItem.qty!!,
+                -productItemStatus.qty!!,
                 0L,
             )
 
             // remove from the slot
             if (removeCount1 <= -1L) {
-                getPlayerInventory().add(productItem.itm!!, -removeCount2)
-                productItem.changeCount(removeCount2)
+                getPlayerInventory().add(productItemStatus.itm!!, -removeCount2)
+                productItemStatus.changeCount(removeCount2)
             }
             itemListUpdateKeepCurrentFilter()
         }

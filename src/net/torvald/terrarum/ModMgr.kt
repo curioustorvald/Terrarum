@@ -846,10 +846,15 @@ object ModMgr {
 
     object GameCraftingRecipeLoader {
         const val recipePath = "crafting/"
+        const val smeltingPath = "smelting/"
 
         @JvmStatic operator fun invoke(module: String) {
             getFile(module, recipePath).listFiles { it: File -> it.name.lowercase().endsWith(".json") }?.forEach { jsonFile ->
                 Terrarum.craftingCodex.addFromJson(JsonFetcher(jsonFile), module, jsonFile.name)
+            }
+
+            getFile(module, smeltingPath).listFiles { it: File -> it.name.lowercase().endsWith(".json") }?.forEach { jsonFile ->
+                Terrarum.craftingCodex.addSmeltingFromJson(JsonFetcher(jsonFile), module, jsonFile.name)
             }
         }
     }

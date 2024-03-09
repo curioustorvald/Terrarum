@@ -1,0 +1,48 @@
+{
+  "$SAND": { /* sand -> crude glass */
+    "difficulty": 1.0,
+    "product": [1, "basegame:148"]
+  },
+  "item@basegame:144": { /* quartz -> clean glass */
+    "difficulty": 1.0,
+    "product": [1, "basegame:149"]
+  },
+
+  "$LOGS": { /* logs -> charcoal */
+    "difficulty": 1.0,
+    "product": [1, "item@basegame:29"]
+  },
+
+  "item@basegame:128": { /* copper ore -> ingot */
+    "difficulty": 1.0,
+    "product": [1, "item@basegame:112"]
+  },
+  "item@basegame:129": { /* iron ore -> ingot */
+    "difficulty": 1.0,
+    "product": [1, "item@basegame:113"]
+  },
+  "item@basegame:130": { /* coal -> coke */
+    "difficulty": 1.0,
+    "product": [1, "item@basegame:114"]
+  },
+  "item@basegame:131": { /* zinc ore -> ingot */
+    "difficulty": 1.0,
+    "product": [1, "item@basegame:115"]
+  },
+  "item@basegame:132": { /* tin ore -> ingot */
+    "difficulty": 1.0,
+    "product": [1, "item@basegame:116"]
+  },
+  "item@basegame:133": { /* gold ore -> ingot */
+    "difficulty": 1.0,
+    "product": [1, "item@basegame:117"]
+  },
+  "item@basegame:134": { /* silver ore -> ingot */
+    "difficulty": 1.0,
+    "product": [1, "item@basegame:118"]
+  },
+  "item@basegame:135": { /* lead ore -> ingot */
+    "difficulty": 1.0,
+    "product": [1, "item@basegame:119"]
+  }
+}
