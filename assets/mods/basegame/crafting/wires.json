@@ -35,6 +35,13 @@
     ]
   },
 
+  "item@basegame:50": { /* soldering wire */
+    "workbench": "wirerollingmill",
+    "ingredients": [
+      [10, 1, "item@basegame:181"] /* 1 solder bar */
+    ]
+  },
+
   "item@basegame:35": { /* copper bulb */
     "workbench": "basiccrafting",
     "ingredients": [

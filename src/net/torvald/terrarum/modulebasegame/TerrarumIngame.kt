@@ -716,63 +716,50 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         ////////////////////////////////
 
-        // #1. Consume an consumables
-        // don't want to open the UI and use the item at the same time, would ya?
-        if (itemOnGrip?.isConsumable == true) {
-            // click filtering (latch stuff) is handled by IngameController (see inventoryCategoryAllowClickAndDrag)
-            // To disable click dragging for tool/block/etc., put `override val disallowToolDragging = true` to the item's code
-            val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
-            if (consumptionSuccessful > -1)
-                (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
+        mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
+            // #1. interact with the fixture if NOT FixtureInteractionBlocked
+            // scan for the one with non-null UI.
+            // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
+            if (fixtureUnderMouse != null && itemOnGrip !is FixtureInteractionBlocked) {
+                if (!worldPrimaryClickLatch) {
+                    worldPrimaryClickLatch = true
+                    fixtureUnderMouse.let { fixture ->
+                        fixture.mainUI?.let { ui ->
+                            uiOpened = true
 
-            worldPrimaryClickLatch = true
-        }
-        else { // held item is not consumable or holding no items
-            mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
-                // #2. interact with the fixture
-                // scan for the one with non-null UI.
-                // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
-                if (fixtureUnderMouse != null && itemOnGrip !is FixtureInteractionBlocked) {
-                    if (!worldPrimaryClickLatch) {
-                        worldPrimaryClickLatch = true
-                        fixtureUnderMouse.let { fixture ->
-                            fixture.mainUI?.let { ui ->
-                                uiOpened = true
+                            // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
+                            // when it's not null, the UI will be updated and rendered
+                            // when the UI is closed, it'll be replaced with a null value
+                            uiFixture = ui
+                            ui.setPosition(
+                                (Toolkit.drawWidth - ui.width) / 4,
+                                (App.scr.height - ui.height) / 4 // what the fuck?
+                            )
+                            ui.setAsOpen()
+                        }
 
-                                // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
-                                // when it's not null, the UI will be updated and rendered
-                                // when the UI is closed, it'll be replaced with a null value
-                                uiFixture = ui
-                                ui.setPosition(
-                                    (Toolkit.drawWidth - ui.width) / 4,
-                                    (App.scr.height - ui.height) / 4 // what the fuck?
-                                )
-                                ui.setAsOpen()
-                            }
-
-                            if (!uiOpened) {
-                                fireFixtureInteractEvent(fixture, mwx, mwy)
-                            }
+                        if (!uiOpened) {
+                            fireFixtureInteractEvent(fixture, mwx, mwy)
                         }
                     }
                 }
-                // #3. If no fixture under mouse or FixtureInteractionBlocked, use the item
-                else if (itemOnGrip != null) {
-                    // click filtering (latch stuff) is handled by IngameController (see inventoryCategoryAllowClickAndDrag)
-                    // To disable click dragging for tool/block/etc., put `override val disallowToolDragging = true` to the item's code
-                    val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
-                    if (consumptionSuccessful > -1)
-                        (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
-
-                    worldPrimaryClickLatch = true
-                }
-                // #4. If not holding any item and can do barehandaction (size big enough that barehandactionminheight check passes), do it
-                else {
-                    performBarehandAction(actor, delta, mwx, mwy, mtx, mty)
-                }
-
-                0L
             }
+            // #2. If no fixture under mouse or FixtureInteractionBlocked, use the item
+            else if (itemOnGrip != null) {
+                // click filtering (latch stuff) is handled by IngameController (see inventoryCategoryAllowClickAndDrag)
+                // To disable click dragging for tool/block/etc., put `override val disallowToolDragging = true` to the item's code
+                val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
+                if (consumptionSuccessful > -1)
+                    (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
+
+                worldPrimaryClickLatch = true
+            }
+            // #3. If not holding any item and can do barehandaction (size big enough that barehandactionminheight check passes), do it
+            else {
+                performBarehandAction(actor, delta, mwx, mwy, mtx, mty)
+            }
+
+            0L
         }
     }
 

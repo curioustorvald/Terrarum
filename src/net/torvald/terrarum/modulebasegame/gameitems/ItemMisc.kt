@@ -89,3 +89,12 @@ class ItemTorch(originalID: ItemID) : LightIngredientBase(originalID) {
         BlockBase.blockEffectWhenEquipped(actor, delta)
     }
 }
+
+/**
+ * Created by minjaesong on 2024-03-11.
+ */
+class ItemSolderingWire(originalID: ItemID) : LightIngredientBase(originalID) {
+    override var originalName = "ITEM_SOLDERING_WIRE"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(6,2)
+}
