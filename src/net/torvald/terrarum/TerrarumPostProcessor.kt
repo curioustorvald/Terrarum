@@ -350,7 +350,7 @@ object TerrarumPostProcessor : Disposable {
     private val defaultResStr = "Ingame UI Area"
     private val currentResStr = "${App.scr.width}x${App.scr.height}"
     private val safeAreaStr = "TV Safe Area"
-    private val versionStr = "Version ${App.getVERSION_STRING()}"
+    private val versionStr = "${App.getVERSION_STRING()}"
     internal val thisIsDebugStr = "${App.GAME_NAME} ${if (App.IS_DEVELOPMENT_BUILD) "Development Build" else "Release"} $versionStr"
 
     /**

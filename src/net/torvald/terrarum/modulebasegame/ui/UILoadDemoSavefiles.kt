@@ -544,7 +544,7 @@ class UIItemPlayerCells(
             }
 
             val snap = loadable.getSaveSnapshotVersion()
-            versionString = genver + (if (snap != null) "-$snap" else "")
+            versionString = TerrarumAppConfiguration.convertVersionNumberToReadable(genver, snap)// genver + (if (snap != null) "-$snap" else "")
 
             val savegameVersionNum = // 0x GGGG GGGGGG GGGGGG YY WW RR
                 BigInteger(genverLong.toString()) * BigInteger("16777216") + BigInteger(snap?.hashCode()?.toString() ?: "16777215")

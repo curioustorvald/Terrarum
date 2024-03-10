@@ -70,16 +70,11 @@ public class App implements ApplicationListener {
     public static final String VERSION_TAG = TerrarumAppConfiguration.VERSION_TAG;
 
     public static final String getVERSION_STRING() {
-
-        var snap = TerrarumAppConfiguration.INSTANCE.getVERSION_SNAPSHOT();
-
-        return String.format("%d.%d.%d", VERSION_RAW >>> 48, (VERSION_RAW & 0xffff000000L) >>> 24, VERSION_RAW & 0xffffffL) +
-                (VERSION_TAG.isBlank() ? "" : "-"+VERSION_TAG) + (snap == null ? "" : (" (" + snap + ")"));
+        return TerrarumAppConfiguration.INSTANCE.getVERSION_STRING();
     }
 
     public static final String getVERSION_STRING_WITHOUT_SNAPSHOT() {
-        return String.format("%d.%d.%d", VERSION_RAW >>> 48, (VERSION_RAW & 0xffff000000L) >>> 24, VERSION_RAW & 0xffffffL) +
-                (VERSION_TAG.isBlank() ? "" : "-"+VERSION_TAG);
+        return TerrarumAppConfiguration.INSTANCE.getVERSION_STRING_WITHOUT_SNAPSHOT();
     }
 
     /**

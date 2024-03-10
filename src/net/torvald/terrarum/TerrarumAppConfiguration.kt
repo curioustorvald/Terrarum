@@ -77,11 +77,90 @@ basegame
     // Commit counts up to the Release 0.4.0: 3631
     // Commit counts up to the Release 0.4.1: 3678
 
+    val DEV_CYCLE: Map<String, Long> = mapOf(
+        "Alpha" to 0x0000_000004_000000,
+        "Beta" to 0x0000_FFFFFF_000000,
+    )
+
+    val VERSION_NUMBER: String = String.format(
+        "%d.%d.%d",
+        VERSION_RAW ushr 48,
+        (VERSION_RAW and 0xffff000000L) ushr 24,
+        VERSION_RAW and 0xffffffL
+    )
+
+    private val DEV_CYCLE_LIST_SORTED = DEV_CYCLE.toList().sortedBy { it.second }
+    val CURRENT_DEV_CYCLE: String? = DEV_CYCLE_LIST_SORTED.map { it.first to VERSION_RAW - it.second }.firstOrNull { it.second >= 0L }?.first
+
     val VERSION_SNAPSHOT = Snapshot(0) // for normal dev
 //    val VERSION_SNAPSHOT = ForcedSnapshot("24w07d") // for snapshot release
 //    val VERSION_SNAPSHOT = null // for the release
 
     const val VERSION_TAG: String = ""
+
+    val VERSION_STRING: String
+        get() {
+            val major = if (VERSION_RAW >= 0x0001_000000_000000)
+                VERSION_NUMBER
+            else if (CURRENT_DEV_CYCLE != null) {
+                val delta = VERSION_RAW - DEV_CYCLE[CURRENT_DEV_CYCLE]!!
+                CURRENT_DEV_CYCLE + " " + String.format("%d.%d", ((delta and 0xffff000000L) ushr 24) + 1, delta and 0xffffffL)
+            }
+            else
+                VERSION_NUMBER
+
+            val tag = if (VERSION_TAG.isNotBlank()) "-$VERSION_TAG" else ""
+
+            val snapshot = if (VERSION_SNAPSHOT == null) "" else " ($VERSION_SNAPSHOT)"
+
+            return "$major$tag$snapshot"
+        }
+
+    val VERSION_STRING_WITHOUT_SNAPSHOT: String
+        get() {
+            val major = if (VERSION_RAW >= 0x0001_000000_000000)
+                VERSION_NUMBER
+            else if (CURRENT_DEV_CYCLE != null) {
+                val delta = VERSION_RAW - DEV_CYCLE[CURRENT_DEV_CYCLE ?: ""]!!
+                CURRENT_DEV_CYCLE + " " + String.format("%d.%d", ((delta and 0xffff000000L) ushr 24) + 1, delta and 0xffffffL)
+            }
+            else
+                VERSION_NUMBER
+
+            val tag = if (VERSION_TAG.isNotBlank()) "-$VERSION_TAG" else ""
+
+            return "$major$tag"
+        }
+
+    fun convertVersionNumberToReadable(semverStr: String, snapshotObj: Snapshot? = null): String {
+        val numbers = semverStr.split('.')
+        val maj = numbers[0].toLong()
+        val min = numbers.getOrNull(1)?.toLong() ?: 0L
+        val pat = numbers.getOrNull(2)?.toLong() ?: 0L
+
+        val VERSION_RAW = maj.shl(48) or min.shl(24) or pat
+        val CURRENT_DEV_CYCLE: String? = DEV_CYCLE_LIST_SORTED.map { it.first to VERSION_RAW - it.second }.firstOrNull { it.second >= 0L }?.first
+
+        val major = if (VERSION_RAW >= 0x0001_000000_000000)
+            semverStr
+        else if (CURRENT_DEV_CYCLE != null) {
+            val delta = VERSION_RAW - DEV_CYCLE[CURRENT_DEV_CYCLE]!!
+            CURRENT_DEV_CYCLE + " " + String.format("%d.%d", ((delta and 0xffff000000L) ushr 24) + 1, delta and 0xffffffL)
+        }
+        else
+            semverStr
+
+//        val tag = if (VERSION_TAG.isNotBlank()) "-$VERSION_TAG" else ""
+
+        val snapshot = if (snapshotObj == null) "" else " (${snapshotObj})"
+
+        return "$major$snapshot"
+    }
+
+    fun convertVersionNumberToReadableShort(semverStr: String, snapshotObj: Snapshot? = null): String {
+        val s = convertVersionNumberToReadable(semverStr, snapshotObj)
+        return s.replace("Alpha", "α").replace("Beta", "β")
+    }
 
     //////////////////////////////////////////////////////////
     //             CONFIGURATION FOR TILE MAKER             //

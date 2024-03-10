@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
@@ -481,8 +482,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
             }
             val snap = this.getSaveSnapshotVersion()?.toString()
 
-//            val versionString = genver + (if (snap != null) "-$snap" else "")
-            val versionString = if (snap != null) "$snap" else genver
+            val versionString = if (snap != null) "$snap" else TerrarumAppConfiguration.convertVersionNumberToReadableShort(genver)
 
             return SavegameMeta(
                 lastPlayTime,

@@ -515,7 +515,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             printdbg(this, "loaded successfully.")
         }
         else {
-            App.getLoadScreen().addMessage("${App.GAME_NAME} version ${App.getVERSION_STRING()}")
+            App.getLoadScreen().addMessage("${App.GAME_NAME} ${App.getVERSION_STRING()}")
 
             App.getLoadScreen().addMessage("Creating new world")
 
