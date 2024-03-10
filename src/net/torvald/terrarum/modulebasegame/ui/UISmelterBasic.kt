@@ -113,14 +113,15 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
             clickedOnState,
             { listOf(fireboxItemSlot) },
             playerThings,
-            smelter.oreItemStatus, 1,
+            smelter.oreItemStatus, 0,
+            { ItemCodex.hasTag(it, "SMELTABLE") },
             { getPlayerInventory() },
             { filter -> itemListUpdate(filter) },
             { itemListUpdateKeepCurrentFilter() }
         ),
         wheelFun = SmelterGuiEventBuilder.getOreItemSlotWheelFun(
             clickedOnState,
-            smelter.oreItemStatus, 1,
+            smelter.oreItemStatus, 0,
             { getPlayerInventory() },
             { itemListUpdateKeepCurrentFilter() }
         )
@@ -230,6 +231,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         super.touchDown(screenX, screenY, pointer, button)
 
+        // unhighlight all cells when clicked outside
         if (!oreItemSlot.mouseUp &&
             !fireboxItemSlot.mouseUp &&
             !productItemslot.mouseUp &&
@@ -320,7 +322,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
         uiItems.forEach { it.render(frameDelta, batch, camera) }
 
-        drawProgressGauge(batch, oreItemSlot.posX, oreItemSlot.posY, smelter.progress.toFloat() / FixtureSmelterBasic.CALORIES_PER_ROASTING)
+        drawProgressGauge(batch, oreItemSlot.posX, oreItemSlot.posY, smelter.progress / FixtureSmelterBasic.CALORIES_PER_ROASTING)
         drawProgressGauge(batch, fireboxItemSlot.posX, fireboxItemSlot.posY, (smelter.fuelCaloriesNow / (smelter.fuelCaloriesMax ?: Double.POSITIVE_INFINITY)).toFloat())
         drawThermoGauge(batch, thermoX, thermoY, smelter.temperature)
 

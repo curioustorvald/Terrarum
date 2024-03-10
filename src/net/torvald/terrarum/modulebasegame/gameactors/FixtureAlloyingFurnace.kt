@@ -296,7 +296,7 @@ class FixtureAlloyingFurnace : FixtureBase {
             (Terrarum.ingame as TerrarumIngame).addParticle(
                 ParticleVanishingSprite(
                     CommonResourcePool.getAsTextureRegionPack("particles-tiki_smoke.tga"),
-                    25f, true, hitbox.startX + TILE_SIZED, hitbox.startY + 16, false, (Math.random() * 256).toInt()
+                    25f, true, hitbox.startX + TILE_SIZED / 2, hitbox.startY + 16, false, (Math.random() * 256).toInt()
                 )
             )
 

@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import net.torvald.terrarum.App
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.gameactors.SmelterItemStatus
@@ -158,6 +159,8 @@ object SmelterGuiEventBuilder {
 
         oreItemStatus: SmelterItemStatus, oreSlotIndex: Int,
 
+        oreItemFilter: (ItemID) -> Boolean,
+
         getPlayerInventory: () -> ActorInventory,
 
         itemListUpdate: ((InventoryPair) -> Boolean) -> Unit,
@@ -169,7 +172,7 @@ object SmelterGuiEventBuilder {
             theButton.forceHighlighted = true
             buttonsToUnhighlight().forEach { it.forceHighlighted = false }
             playerThings.itemList.itemPage = 0
-            itemListUpdate { ItemCodex.hasTag(it.itm, "SMELTABLE") }
+            itemListUpdate { oreItemFilter(it.itm) }
         }
         else if (oreItemStatus.isNotNull()) {
             val removeCount = if (mouseButton == App.getConfigInt("config_mouseprimary"))
