@@ -53,5 +53,6 @@
   "TOOLTIP_item@basegame:35": "신호의 상태를 보여줍니다",
   "TOOLTIP_item@basegame:44": "지나가는 신호를 자르기 신호에 따라 자릅니다",
   "TOOLTIP_item@basegame:45": "들어오는 신호를 걸쇠 신호에 따라 잠시 저장합니다",
-  "TOOLTIP_item@basegame:46": "들어오는 신호를 살짝 지연시킵니다"
+  "TOOLTIP_item@basegame:46": "들어오는 신호를 살짝 지연시킵니다",
+  "TOOLTIP_item@basegame:49": "들어오는 신호의 합을 구합니다"
 }

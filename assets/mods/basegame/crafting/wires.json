@@ -50,19 +50,25 @@
   "item@basegame:45": { /* signal latch */
     "workbench": "basiccrafting",
     "ingredients": [
-      [1, 3, "basegame:21", 1, "item@basegame:116", 2, "item@basegame:112"] /* 3 marbles, 1 tin, 2 copper */
+      [1, 3, "basegame:21", 1, "item@basegame:116", 2, "item@basegame:112"] /* 3 marbles, 3 tin, 3 copper */
     ]
   },
   "item@basegame:8": { /* signal emitter */
     "workbench": "basiccrafting",
     "ingredients": [
-      [2, 1, "basegame:21", 1, "item@basegame:116"] /* 1 marbles, 1 tin, 2 copper */
+      [2, 1, "basegame:21", 1, "item@basegame:116"] /* 1 marbles, 1 tin, 1 copper */
     ]
   },
   "item@basegame:46": { /* signal repeater */
     "workbench": "basiccrafting",
     "ingredients": [
-      [1, 1, "basegame:21", 1, "item@basegame:116"] /* 1 marbles, 1 tin, 2 copper */
+      [1, 1, "basegame:21", 1, "item@basegame:116"] /* 1 marbles, 1 tin, 1 copper */
+    ]
+  },
+  "item@basegame:49": { /* signal adder */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 1, "basegame:21", 1, "item@basegame:116"] /* 2 marbles, 2 tin, 2 copper */
     ]
   }
 }

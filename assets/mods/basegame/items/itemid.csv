@@ -47,6 +47,7 @@ id;classname;tags
 46;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalRepeaterHorz;FIXTURE,SIGNAL
 47;net.torvald.terrarum.modulebasegame.gameitems.ItemWrench;TOOL,WRENCH
 48;net.torvald.terrarum.modulebasegame.gameitems.ItemAlloyingFurnace;FIXTURE,STATION
+49;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalAdder;FIXTURE,SIGNAL
 
 # ingots
 112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper;INGOT

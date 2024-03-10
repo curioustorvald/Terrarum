@@ -88,3 +88,30 @@ class ItemLogicSignalRepeaterHorz(originalID: ItemID) : FixtureItemBase(original
     }
 
 }
+
+/**
+ * Created by minjaesong on 2024-03-10.
+ */
+class ItemLogicSignalAdder(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalAdder") {
+
+    override var dynamicID: ItemID = originalID
+    override var baseMass = FixtureLogicSignalEmitter.MASS
+    override val canBeDynamic = false
+    override val materialId = ""
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(14, 3)
+
+    override var baseToolSize: Double? = baseMass
+    override var originalName = "ITEM_LOGIC_SIGNAL_ADDER"
+
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
+        super.effectWhileEquipped(actor, delta)
+        (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "signal"
+    }
+
+    override fun effectOnUnequip(actor: ActorWithBody) {
+        super.effectOnUnequip(actor)
+        (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
+    }
+
+}

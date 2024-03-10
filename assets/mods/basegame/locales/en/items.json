@@ -38,6 +38,7 @@
   "ITEM_INGOT_TIN": "Tin Ingot",
   "ITEM_INGOT_ZINC": "Zinc Ingot",
   "ITEM_JUKEBOX": "Jukebox",
+  "ITEM_LOGIC_SIGNAL_ADDER": "Logic Signal Adder",
   "ITEM_LOGIC_SIGNAL_BLOCKER": "Logic Signal Blocker",
   "ITEM_LOGIC_SIGNAL_EMITTER": "Logic Signal Emitter",
   "ITEM_LOGIC_SIGNAL_LATCH": "Logic Signal Latch",
