@@ -16,7 +16,7 @@ import kotlin.properties.Delegates
 /**
  * Created by minjaesong on 2017-01-07.
  */
-internal class FixtureTapestry : FixtureBase, DeferredSpawn {
+internal class FixtureTapestry : FixtureBase {
 
     @Transient override val spawnNeedsWall = true
     @Transient override val spawnNeedsFloor = false
@@ -106,9 +106,17 @@ internal class FixtureTapestry : FixtureBase, DeferredSpawn {
 
 
         pixmap.dispose()
-        INGAME.disposables.add(texture)
-    }
+        App.disposables.add(texture)
 
+
+        spawn(
+            intTilewiseHitbox.canonicalX.toInt(),
+            intTilewiseHitbox.canonicalY.toInt(),
+            actorThatInstalledThisFixture,
+            tilewiseHitboxWidth,
+            tilewiseHitboxHeight
+        )
+    }
 
     override var tooltipText: String? = "TEST\nSTRING"//if (artName.length + artAuthor.length > 0) "$artName\n$artAuthor" else null
 }

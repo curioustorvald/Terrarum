@@ -63,7 +63,8 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
                 }
     }
 
-    val disposables = HashSet<Disposable>()
+    /** things to be disposed of when the current instance of the game disposed of */
+//    val disposables = HashSet<Disposable>()
 
     lateinit var worldDisk: VirtualDisk; internal set
     lateinit var playerDisk: VirtualDisk; internal set
@@ -231,7 +232,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         actorContainerInactive.forEach { it.dispose() }
         world.dispose()
 
-        disposables.forEach { it.tryDispose() }
+//        disposables.forEach { it.tryDispose() }
     }
 
     ////////////

@@ -4,6 +4,8 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
@@ -39,7 +41,9 @@ class FixtureLogicSignalEmitter : Electric {
         setWireEmissionAt(0, 0, Vector2(1.0, 0.0))
     }
 
-    override fun dispose() { }
+    override fun dispose() {
+        tooltipShowing.remove(tooltipHash)
+    }
 
     companion object {
         const val MASS = 1.0

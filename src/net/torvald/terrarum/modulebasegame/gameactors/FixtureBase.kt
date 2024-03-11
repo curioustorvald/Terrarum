@@ -186,6 +186,53 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     /**
+     * @param posX top-left
+     * @param posY top-left
+     */
+    open fun makeNoiseAndDust(posX: Int, posY: Int) {
+        val posYb = posY + blockBox.height - 1
+        val posXc = posX + blockBox.width / 2
+
+        // make some noise
+        var soundSource =
+            if (spawnNeedsWall) 1
+            else if (spawnNeedsFloor) 0
+            else 2
+        // 1: wall, 0: floor, 2: if wall is not solid, use wall; else, use floor
+        val wallTile = world!!.getTileFromWall(posXc, posYb)
+        val terrTile = world!!.getTileFromTerrain(posXc, posYb + 1)
+
+        if (soundSource == 2) {
+            soundSource = if (BlockCodex[wallTile].isSolid)
+                1
+            else
+                0
+        }
+
+        when (soundSource) {
+            1 -> PickaxeCore.makeNoiseTileBurst(this, wallTile)
+            0 -> PickaxeCore.makeNoiseTileBurst(this, terrTile)
+        }
+
+        // make some dust
+        if (soundSource == 0) {
+            val y = posY + blockBox.height
+            for (x in posX until posX + blockBox.width) {
+                val tile = world!!.getTileFromTerrain(x, y)
+                PickaxeCore.makeDust(tile, x, y - 1, 4 + (Math.random() + Math.random()).roundToInt())
+            }
+        }
+        else {
+            for (y in posY until posY + blockBox.height) {
+                for (x in posX until posX + blockBox.width) {
+                    val tile = world!!.getTileFromWall(x, y)
+                    PickaxeCore.makeDust(tile, x, y, 2 + (Math.random() + Math.random()).roundToInt())
+                }
+            }
+        }
+    }
+
+    /**
      * Adds this instance of the fixture to the world. Physical dimension is derived from [blockBox].
      *
      * @param posX0 tile-wise bottem-centre position of the fixture (usually [Terrarum.mouseTileX])
@@ -243,53 +290,6 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         onSpawn(posX0, posY0)
 
         return true
-    }
-
-    /**
-     * @param posX top-left
-     * @param posY top-left
-     */
-    open fun makeNoiseAndDust(posX: Int, posY: Int) {
-        val posYb = posY + blockBox.height - 1
-        val posXc = posX + blockBox.width / 2
-
-        // make some noise
-        var soundSource =
-            if (spawnNeedsWall) 1
-            else if (spawnNeedsFloor) 0
-            else 2
-        // 1: wall, 0: floor, 2: if wall is not solid, use wall; else, use floor
-        val wallTile = world!!.getTileFromWall(posXc, posYb)
-        val terrTile = world!!.getTileFromTerrain(posXc, posYb + 1)
-
-        if (soundSource == 2) {
-            soundSource = if (BlockCodex[wallTile].isSolid)
-                1
-            else
-                0
-        }
-
-        when (soundSource) {
-            1 -> PickaxeCore.makeNoiseTileBurst(this, wallTile)
-            0 -> PickaxeCore.makeNoiseTileBurst(this, terrTile)
-        }
-
-        // make some dust
-        if (soundSource == 0) {
-            val y = posY + blockBox.height
-            for (x in posX until posX + blockBox.width) {
-                val tile = world!!.getTileFromTerrain(x, y)
-                PickaxeCore.makeDust(tile, x, y - 1, 4 + (Math.random() + Math.random()).roundToInt())
-            }
-        }
-        else {
-            for (y in posY until posY + blockBox.height) {
-                for (x in posX until posX + blockBox.width) {
-                    val tile = world!!.getTileFromWall(x, y)
-                    PickaxeCore.makeDust(tile, x, y, 2 + (Math.random() + Math.random()).roundToInt())
-                }
-            }
-        }
     }
 
     /**
@@ -456,8 +456,6 @@ interface CuedByWallChange {
 interface CuedByWireChange {
     fun updateForWireChange(cue: IngameInstance.BlockChangeQueueItem)
 }
-
-interface DeferredSpawn
 
 /**
  * Standard 32-bit binary flags.

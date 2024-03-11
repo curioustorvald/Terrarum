@@ -98,7 +98,7 @@ open class ActorWithBody : Actor {
     val mouseUp: Boolean
         get() = hitbox.containsPoint((world?.width ?: 0) * TILE_SIZED, Terrarum.mouseX, Terrarum.mouseY)
 
-    @Transient private val tooltipHash = System.nanoTime()
+    @Transient protected val tooltipHash = System.nanoTime()
 
     var hitboxTranslateX: Int = 0// relative to spritePosX
     protected set
@@ -678,13 +678,16 @@ open class ActorWithBody : Actor {
             }
         }
 
-        if (tooltipText == null || !mouseUp) {
+        if (tooltipText == null || !mouseUp || flagDespawn) {
             tooltipShowing[tooltipHash] = false
         }
 
 //        isStationary = (hitbox - oldHitbox).magnitudeSquared < PHYS_EPSILON_VELO
         isStationary = isCloseEnough(hitbox.startX, oldHitbox.startX) && // this is supposed to be more accurate, idk
                        isCloseEnough(hitbox.startY, oldHitbox.startY)
+
+
+        printdbg(this, tooltipShowing.keys.sorted())
     }
 
     fun getDrag(externalForce: Vector2): Vector2 {
@@ -1929,6 +1932,7 @@ open class ActorWithBody : Actor {
 
     internal open fun flagDespawn() {
         flagDespawn = true
+        tooltipShowing.remove(tooltipHash)
     }
 
     open fun getSpriteHead(): TextureRegion? {
@@ -2252,6 +2256,7 @@ open class ActorWithBody : Actor {
         App.disposables.add(sprite)
         App.disposables.add(spriteGlow)
         App.disposables.add(spriteEmissive)
+        tooltipShowing.remove(tooltipHash)
     }
 }
 
