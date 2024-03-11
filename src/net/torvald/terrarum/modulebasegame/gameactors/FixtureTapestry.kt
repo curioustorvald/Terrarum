@@ -16,7 +16,7 @@ import kotlin.properties.Delegates
 /**
  * Created by minjaesong on 2017-01-07.
  */
-internal class FixtureTapestry : FixtureBase {
+internal class FixtureTapestry : FixtureBase, DeferredSpawn {
 
     @Transient override val spawnNeedsWall = true
     @Transient override val spawnNeedsFloor = false

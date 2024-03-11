@@ -23,6 +23,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -96,6 +97,8 @@ open class ActorWithBody : Actor {
     open var tooltipText: String? = null // null: display nothing
     val mouseUp: Boolean
         get() = hitbox.containsPoint((world?.width ?: 0) * TILE_SIZED, Terrarum.mouseX, Terrarum.mouseY)
+
+    @Transient private val tooltipHash = System.nanoTime()
 
     var hitboxTranslateX: Int = 0// relative to spritePosX
     protected set
@@ -669,11 +672,15 @@ open class ActorWithBody : Actor {
             feetPosTile.set(hIntTilewiseHitbox.centeredX.floorToInt(), hIntTilewiseHitbox.endY.floorToInt())
 
 
-            if (mouseUp && this.tooltipText != null) INGAME.setTooltipMessage(this.tooltipText)
+            if (mouseUp && tooltipText != null && tooltipShowing[tooltipHash] != true) {
+                INGAME.setTooltipMessage(tooltipText)
+                tooltipShowing[tooltipHash] = true
+            }
         }
 
-        // make sure tooltip to disable even when the actor's update is paused at unfortunate time
-        if (!mouseUp && INGAME.getTooltipMessage() == this.tooltipText) INGAME.setTooltipMessage(null)
+        if (tooltipText == null || !mouseUp) {
+            tooltipShowing[tooltipHash] = false
+        }
 
 //        isStationary = (hitbox - oldHitbox).magnitudeSquared < PHYS_EPSILON_VELO
         isStationary = isCloseEnough(hitbox.startX, oldHitbox.startX) && // this is supposed to be more accurate, idk
