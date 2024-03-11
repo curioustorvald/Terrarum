@@ -65,9 +65,9 @@ class ItemTorch(originalID: ItemID) : LightIngredientBase(originalID) {
 
     override var originalName = "BLOCK_TORCH"
     override val itemImage: TextureRegion
-        get() = FixtureItemBase.getItemImageFromSingleImage("basegame", "items/torch.tga")
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,14)
     override val itemImageEmissive: TextureRegion
-        get() = FixtureItemBase.getItemImageFromSingleImage("basegame", "items/torch_emsv.tga")
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,14)
 
     override fun getLumCol() = BlockCodex[Block.TORCH].getLumCol(0, 0)
 
