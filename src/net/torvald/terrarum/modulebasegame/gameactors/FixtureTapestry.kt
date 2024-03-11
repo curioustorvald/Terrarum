@@ -21,8 +21,9 @@ internal class FixtureTapestry : FixtureBase {
     @Transient override val spawnNeedsWall = true
     @Transient override val spawnNeedsFloor = false
 
-    var artName = ""; private set
-    var artAuthor = ""; private set
+    // these properties are transient as they are filled in by reading a binary file
+    @Transient var artName = ""; private set
+    @Transient var artAuthor = ""; private set
 
 //    val tw = 1
 //    val th = 1
@@ -109,6 +110,7 @@ internal class FixtureTapestry : FixtureBase {
         App.disposables.add(texture)
 
 
+        // must be re-spawned on reload to make it visible after load
         spawn(
             intTilewiseHitbox.canonicalX.toInt(),
             intTilewiseHitbox.canonicalY.toInt(),
@@ -118,5 +120,5 @@ internal class FixtureTapestry : FixtureBase {
         )
     }
 
-    override var tooltipText: String? = "TEST\nSTRING"//if (artName.length + artAuthor.length > 0) "$artName\n$artAuthor" else null
+    override var tooltipText: String? = if (artName.length + artAuthor.length > 0) "$artName\n$artAuthor" else null
 }

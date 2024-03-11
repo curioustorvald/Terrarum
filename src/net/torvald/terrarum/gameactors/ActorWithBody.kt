@@ -685,9 +685,6 @@ open class ActorWithBody : Actor {
 //        isStationary = (hitbox - oldHitbox).magnitudeSquared < PHYS_EPSILON_VELO
         isStationary = isCloseEnough(hitbox.startX, oldHitbox.startX) && // this is supposed to be more accurate, idk
                        isCloseEnough(hitbox.startY, oldHitbox.startY)
-
-
-        printdbg(this, tooltipShowing.keys.sorted())
     }
 
     fun getDrag(externalForce: Vector2): Vector2 {
