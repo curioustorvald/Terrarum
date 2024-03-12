@@ -66,23 +66,23 @@ class UIAlloyingFurnace(val smelter: FixtureAlloyingFurnace) : UICanvas(
     private val leftPanelY = playerThings.posY
 
     private val backdropColour = Color(0x999999_c8.toInt())
-    private val backdropZoom = 6
+    private val backdropZoom = 9f
     private val backdropX = (leftPanelX + (leftPanelWidth - smelterBackdrops.tileW * backdropZoom) / 2).toFloat()
     private val backdropY = (leftPanelY + (leftPanelHeight - smelterBackdrops.tileH * backdropZoom) / 2).toFloat()
 
-    private val oreX1 = backdropX + -1 * backdropZoom + 6 + 6
-    private val oreX2 = backdropX + 9 * backdropZoom + 6 - 5
-    private val oreY1 = backdropY + 3 * backdropZoom + 3
-    private val oreY2 = backdropY + 3 * backdropZoom + 3
+    private val oreX1 = backdropX + 3 * backdropZoom + 4
+    private val oreX2 = backdropX + 9 * backdropZoom - 1
+    private val oreY1 = backdropY + 6 * backdropZoom + 3
+    private val oreY2 = backdropY + 6 * backdropZoom + 3
 
-    private val fireboxX = backdropX + 4 * backdropZoom + 6
-    private val fireboxY = backdropY + 19 * backdropZoom + 3
+    private val fireboxX = backdropX + 6 * backdropZoom + 2
+    private val fireboxY = backdropY + 21 * backdropZoom - 2
 
-    private val productX = backdropX + 19 * backdropZoom + 3
-    private val productY = backdropY + 7 * backdropZoom + 3
+    private val productX = backdropX + 21 * backdropZoom + 1
+    private val productY = backdropY + 11 * backdropZoom - 3
 
-    private val thermoX = (backdropX + 16 * backdropZoom + 1).toInt()
-    private val thermoY = (backdropY + 19 * backdropZoom + 3).toInt()
+    private val thermoX = (backdropX + 16 * backdropZoom + 3).toInt()
+    private val thermoY = (backdropY + 21 * backdropZoom - 2).toInt()
 
 
     private val oreItemSlot1: UIItemInventoryElemSimple = UIItemInventoryElemSimple(
@@ -95,7 +95,7 @@ class UIAlloyingFurnace(val smelter: FixtureAlloyingFurnace) : UICanvas(
             { listOf(fireboxItemSlot, oreItemSlot2) },
             playerThings,
             smelter.oreItem1Status, 0,
-            { ItemCodex.hasAnyTagOf(it, "SMELTABLE", "INGOT") && ItemCodex.hasNoTagOf(it, "ALLOY") },
+            { ItemCodex.hasAnyTagOf(it, "INGOT") && ItemCodex.hasNoTagOf(it, "ALLOY") },
             { getPlayerInventory() },
             { filter -> itemListUpdate(filter) },
             { itemListUpdateKeepCurrentFilter() }
@@ -117,7 +117,7 @@ class UIAlloyingFurnace(val smelter: FixtureAlloyingFurnace) : UICanvas(
             { listOf(fireboxItemSlot, oreItemSlot1) },
             playerThings,
             smelter.oreItem2Status, 1,
-            { ItemCodex.hasAnyTagOf(it, "SMELTABLE", "INGOT") && ItemCodex.hasNoTagOf(it, "ALLOY") },
+            { ItemCodex.hasAnyTagOf(it, "INGOT") && ItemCodex.hasNoTagOf(it, "ALLOY") },
             { getPlayerInventory() },
             { filter -> itemListUpdate(filter) },
             { itemListUpdateKeepCurrentFilter() }
@@ -331,7 +331,7 @@ class UIAlloyingFurnace(val smelter: FixtureAlloyingFurnace) : UICanvas(
         batch.color = backdropColour
 //        batch.draw(smelterBackdrops.get(1,0), backdropX, backdropY, smelterBackdrops.tileW * 6f, smelterBackdrops.tileH * 6f)
 //        batch.color = backdropColour mul Color(1f, 1f, 1f, smelter.temperature)
-        batch.draw(smelterBackdrops.get(0,0), backdropX, backdropY, smelterBackdrops.tileW * 6f, smelterBackdrops.tileH * 6f)
+        batch.draw(smelterBackdrops.get(0,0), backdropX, backdropY, smelterBackdrops.tileW * backdropZoom, smelterBackdrops.tileH * backdropZoom)
 
         uiItems.forEach { it.render(frameDelta, batch, camera) }
 

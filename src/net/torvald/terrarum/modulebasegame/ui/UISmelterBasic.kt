@@ -72,7 +72,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     private val leftPanelY = playerThings.posY
 
     private val backdropColour = Color(0x999999_c8.toInt())
-    private val backdropZoom = 6
+    private val backdropZoom = 6f
     private val backdropX = (leftPanelX + (leftPanelWidth - smelterBackdrops.tileW * backdropZoom) / 2).toFloat()
     private val backdropY = (leftPanelY + (leftPanelHeight - smelterBackdrops.tileH * backdropZoom) / 2).toFloat()
 
@@ -318,7 +318,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
         batch.color = backdropColour
 //        batch.draw(smelterBackdrops.get(1,0), backdropX, backdropY, smelterBackdrops.tileW * 6f, smelterBackdrops.tileH * 6f)
 //        batch.color = backdropColour mul Color(1f, 1f, 1f, smelter.temperature)
-        batch.draw(smelterBackdrops.get(0,0), backdropX, backdropY, smelterBackdrops.tileW * 6f, smelterBackdrops.tileH * 6f)
+        batch.draw(smelterBackdrops.get(0,0), backdropX, backdropY, smelterBackdrops.tileW * backdropZoom, smelterBackdrops.tileH * backdropZoom)
 
         uiItems.forEach { it.render(frameDelta, batch, camera) }
 
