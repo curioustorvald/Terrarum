@@ -19,6 +19,7 @@ import org.dyn4j.geometry.Vector2
 import java.lang.Math.pow
 import kotlin.math.cosh
 import kotlin.math.min
+import kotlin.math.pow
 import kotlin.math.roundToInt
 
 /**
@@ -519,7 +520,7 @@ object WorldSimulator {
     }
 
     private fun calculateDecay(signal: Vector2, dist: Int, wire: ItemID, signalType: WireEmissionType): Vector2 {
-        return signal * pow(0.99, dist.toDouble())
+        return signal * 0.995.pow(dist.toDouble())
     }
 
     private fun traverseWireGraph(world: GameWorld, wire: ItemID, startingPoint: WireGraphCursor, signal: Vector2, signalType: WireEmissionType) {

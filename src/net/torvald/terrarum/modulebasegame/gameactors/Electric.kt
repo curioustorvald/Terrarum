@@ -49,9 +49,9 @@ open class Electric : FixtureBase {
     }
 
     companion object {
-        const val ELECTRIC_THRESHOLD_HIGH = 0.9
-        const val ELECTRIC_THRESHOLD_LOW = 0.1
-        const val ELECTRIC_THRESHOLD_EDGE_DELTA = 0.7
+        const val ELECTRIC_THRESHOLD_HIGH = 0.6666666666666666
+        const val ELECTRIC_THRESHOLD_LOW = 0.3333333333333333
+        const val ELECTRIC_THRESHOLD_EDGE_DELTA = 0.33333333333333337
     }
 
     fun getWireEmitterAt(blockBoxIndex: BlockBoxIndex) = this.wireEmitterTypes[blockBoxIndex]
