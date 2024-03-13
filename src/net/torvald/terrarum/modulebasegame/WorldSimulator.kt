@@ -16,6 +16,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRang
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameitems.AxeCore
 import org.dyn4j.geometry.Vector2
+import java.lang.Math.pow
 import kotlin.math.cosh
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -510,14 +511,18 @@ object WorldSimulator {
                         val simStartingPoint = WireGraphCursor(startingPoint, wire)
                         wireSimMarked.clear()
                         wireSimPoints.clear()
-                        traverseWireGraph(world, wire, simStartingPoint, signal)
+                        traverseWireGraph(world, wire, simStartingPoint, signal, wireType)
                     }
                 }
             }
         }
     }
 
-    private fun traverseWireGraph(world: GameWorld, wire: ItemID, startingPoint: WireGraphCursor, signal: Vector2) {
+    private fun calculateDecay(signal: Vector2, dist: Int, wire: ItemID, signalType: WireEmissionType): Vector2 {
+        return signal * pow(0.99, dist.toDouble())
+    }
+
+    private fun traverseWireGraph(world: GameWorld, wire: ItemID, startingPoint: WireGraphCursor, signal: Vector2, signalType: WireEmissionType) {
 
         val emissionType = WireCodex[wire].accepts
 
@@ -535,7 +540,7 @@ object WorldSimulator {
             wireSimMarked.add(point.longHash())
             oldTraversedNodes.add(point.copy())
             // do some signal action
-            world.setWireEmitStateOf(point.x, point.y, wire, signal)
+            world.setWireEmitStateOf(point.x, point.y, wire, calculateDecay(signal, point.len, wire, signalType))
         }
 
         fun isMarked(point: WireGraphCursor) = wireSimMarked.contains(point.longHash())
