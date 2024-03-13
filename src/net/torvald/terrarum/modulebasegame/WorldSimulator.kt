@@ -520,7 +520,8 @@ object WorldSimulator {
     }
 
     private fun calculateDecay(signal: Vector2, dist: Int, wire: ItemID, signalType: WireEmissionType): Vector2 {
-        return signal * 0.995.pow(dist.toDouble())
+        val d = WireCodex.wireDecays[wire]!!
+        return signal * d.pow(dist.toDouble())
     }
 
     private fun traverseWireGraph(world: GameWorld, wire: ItemID, startingPoint: WireGraphCursor, signal: Vector2, signalType: WireEmissionType) {

@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.WireEmissionType
 import net.torvald.terrarum.ui.Toolkit
+import kotlin.math.cos
 
 /**
  * Created by minjaesong on 2024-03-05.
@@ -63,11 +64,33 @@ class WireActor : ActorWithBody, NoSerialise, InternalActor {
     override fun updateImpl(delta: Float) {
     }
 
+    private fun essfun0(x: Double) = -cos(Math.PI * x) / 2.0 + 0.5
+    private fun essfun(x: Double) = essfun0(x)
+
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         if (isVisible && sprite != null) {
-            (sprite as SheetSpriteAnimation).currentRow = (world?.getWireEmitStateOf(worldX, worldY, wireID)?.isNotZero == true).toInt()
             BlendMode.resolve(drawMode, batch)
-            drawSpriteInGoodPosition(frameDelta, sprite!!, batch)
+
+            // signal wires?
+            if (WireCodex.wireProps[wireID]?.accepts == "digital_bit") {
+                val strength = world?.getWireEmitStateOf(worldX, worldY, wireID)?.x ?: 0.0
+
+                // draw base (unlit) sprite
+                batch.color = Color.WHITE
+                (sprite as SheetSpriteAnimation).currentRow = 0
+                drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 0, Color.WHITE)
+
+                // draw lit sprite
+                val alpha = Color(1f, 1f, 1f, essfun(strength.coerceIn(0.0, 1.0)).toFloat())
+                (sprite as SheetSpriteAnimation).currentRow = 1
+                drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 0, alpha)
+            }
+            else {
+                (sprite as SheetSpriteAnimation).currentRow = 0
+                drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 0, Color.WHITE)
+            }
+
+
         }
     }
 }

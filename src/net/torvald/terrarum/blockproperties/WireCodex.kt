@@ -23,6 +23,8 @@ class WireCodex {
 
     @Transient val wirePorts = HashMap<WireEmissionType, Triple<TextureRegionPack, Int, Int>>()
 
+    @Transient val wireDecays = HashMap<ItemID, Double>()
+
     fun clear() {
         wireProps.clear()
     }
@@ -120,6 +122,23 @@ class WireCodex {
 
         tempRecords.forEach { type, (fileID, x, y) ->
             wirePorts[type] = Triple(CommonResourcePool.getAsTextureRegionPack(fileID), x, y)
+        }
+    }
+
+    fun wireDecaysFromModule(module: String, path: String) {
+        printdbg(this, "Building wire ports table for module $module")
+        try {
+            registerDecays(module, path, CSVFetcher.readFromModule(module, path + "decayconsts.csv"))
+        }
+        catch (e: IOException) { e.printStackTrace() }
+    }
+
+    private fun registerDecays(module: String, path: String, records: List<CSVRecord>) {
+        records.forEach {
+            val item = it.get("wireItemID")
+            val d = it.get("const").toDouble()
+
+            wireDecays[item] = d
         }
     }
 
