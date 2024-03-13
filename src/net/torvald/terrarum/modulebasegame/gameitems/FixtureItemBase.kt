@@ -114,16 +114,16 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
      */
     companion object {
         /** Always use with Getter! */
-        fun getItemImageFromSheet(module: String, path: String, tileW: Int, tileH: Int): TextureRegion {
-            val id = "$module/${path.replace('\\','/')}"
+        fun getItemImageFromSheet(module: String, path: String, tileW: Int, tileH: Int, tileIndexX: Int = 0, tileIndexY: Int = 0): TextureRegion {
+            val id = "sheet:$module/${path.replace('\\','/')}"
             return (CommonResourcePool.getOrPut(id) {
                 TextureRegionPack(ModMgr.getGdxFile(module, path), tileW, tileH)
-            } as TextureRegionPack).get(0,0)
+            } as TextureRegionPack).get(tileIndexX, tileIndexY)
         }
 
         /** Always use with Getter! */
         fun getItemImageFromSingleImage(module: String, path: String): TextureRegion {
-            val id = "$module/${path.replace('\\','/')}"
+            val id = "singleton:$module/${path.replace('\\','/')}"
             return CommonResourcePool.getOrPut(id) {
                 TextureRegion(Texture(ModMgr.getGdxFile(module, path)))
             } as TextureRegion

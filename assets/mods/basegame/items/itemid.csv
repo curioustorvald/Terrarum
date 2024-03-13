@@ -49,6 +49,7 @@ id;classname;tags
 48;net.torvald.terrarum.modulebasegame.gameitems.ItemAlloyingFurnace;FIXTURE,STATION
 49;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalAdder;FIXTURE,SIGNAL
 50;net.torvald.terrarum.modulebasegame.gameitems.ItemSolderingWire;
+51;net.torvald.terrarum.modulebasegame.gameitems.ItemElectricWorkbench;FIXTURE,CRAFTING
 
 # ingots
 112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper;INGOT

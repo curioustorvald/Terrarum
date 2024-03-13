@@ -33,3 +33,29 @@ class FixtureWorkbench : FixtureBase, CraftingStation {
     }
 
 }
+
+/**
+ * Created by minjaesong on 2024-03-14.
+ */
+class FixtureElectricWorkbench : FixtureBase, CraftingStation {
+
+    @Transient override val tags = listOf("soldering")
+
+    constructor() : super(
+        BlockBox(BlockBox.NO_COLLISION, 2, 2),
+        nameFun = { Lang["ITEM_ELECTRIC_WORKBENCH"] },
+        mainUI = UICrafting(null)
+    ) {
+        val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/electric_workbench.tga")
+
+        density = BlockCodex[Block.PLANK_NORMAL].density.toDouble()
+        setHitboxDimension(itemImage.texture.width, itemImage.texture.height, 0, 0)
+
+        makeNewSprite(TextureRegionPack(itemImage.texture, 32, 32)).let {
+            it.setRowsAndFrames(2,1)
+        }
+
+        actorValue[AVKey.BASEMASS] = 40.0
+    }
+
+}
