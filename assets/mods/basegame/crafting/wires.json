@@ -16,7 +16,13 @@
       [1, 1, "$SIGNALWIRE"] /* 1 other signal wire */
     ]
   },
-  "wire@basegame:8195": { /* signal wire purple */
+  "wire@basegame:8195": { /* signal wire yellow */
+    "workbench": "",
+    "ingredients": [
+      [1, 1, "$SIGNALWIRE"] /* 1 other signal wire */
+    ]
+  },
+  "wire@basegame:8196": { /* signal wire purple */
     "workbench": "",
     "ingredients": [
       [1, 1, "$SIGNALWIRE"] /* 1 other signal wire */
@@ -40,7 +46,13 @@
       [10, 1, "item@basegame:112"] /* 1 copper */
     ]
   },
-  "wire@basegame:8195": { /* signal wire purble */
+  "wire@basegame:8195": { /* signal wire yellow */
+    "workbench": "wirerollingmill",
+    "ingredients": [
+      [10, 1, "item@basegame:112"] /* 1 copper */
+    ]
+  },
+  "wire@basegame:8196": { /* signal wire purple */
     "workbench": "wirerollingmill",
     "ingredients": [
       [10, 1, "item@basegame:112"] /* 1 copper */
