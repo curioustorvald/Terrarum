@@ -1,10 +1,11 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.Terrarum.toInt
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.FixtureInteractionBlocked
 import net.torvald.terrarum.gameitems.GameItem
@@ -13,8 +14,8 @@ import net.torvald.terrarum.gameitems.mouseInInteractableRangeTools
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.BlockBase.wireNodeMirror
-import net.torvald.terrarum.notEmptyOrNull
-import net.torvald.terrarum.toInt
+import net.torvald.terrarum.modulebasegame.ui.UIWireCutterPie
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.utils.WiringGraphMap
 
 /**
@@ -93,6 +94,8 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID), FixtureInteracti
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1, 3)
 
+    @Transient val selectorUI = UIWireCutterPie()
+
     init {
         stackable = false
         isUnique = true
@@ -100,8 +103,37 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID), FixtureInteracti
         originalName = "ITEM_WIRE_CUTTER"
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
-            WireCutterBase.startPrimaryUse(this, actor, delta) { true }
+
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
+        val itemToRemove = UIWireCutterPie.getWireItemID(actor.actorValue.getAsInt(AVKey.__PLAYER_WIRECUTTERSEL) ?: 0)
+
+        val filter = if (itemToRemove == "__all__") {
+            { it: ItemID -> true }
+        }
+        else {
+            { it: ItemID -> it == itemToRemove }
+        }
+
+        return WireCutterBase.startPrimaryUse(this, actor, delta, filter)
+    }
+
+    override fun startSecondaryUse(actor: ActorWithBody, delta: Float): Long {
+        (Terrarum.ingame as? TerrarumIngame)?.let {
+            it.wearableDeviceUI = selectorUI
+
+            if (!selectorUI.isOpening && !selectorUI.isOpened)
+                selectorUI.setAsOpen()
+        }
+
+        selectorUI.setPosition(Toolkit.hdrawWidth, App.scr.halfh)
+
+        return -1L // to keep the UI open
+    }
+
+    override fun endSecondaryUse(actor: ActorWithBody, delta: Float): Boolean {
+        selectorUI.setAsClose()
+        return true
+    }
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "wire_render_all"
@@ -109,5 +141,6 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID), FixtureInteracti
 
     override fun effectOnUnequip(actor: ActorWithBody) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
+        selectorUI.setAsClose()
     }
 }

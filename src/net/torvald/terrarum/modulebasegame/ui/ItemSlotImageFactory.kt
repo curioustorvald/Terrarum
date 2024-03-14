@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -32,13 +30,13 @@ object ItemSlotImageFactory {
 
     val slotImage = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slots_atlas2.tga"), TILE_WIDTH, TILE_HEIGHT) // must have same w/h as slotLarge
 
-    fun produce(isBlack: Boolean, number: Int = 10, item: GameItem?): ItemSlotImage {
-        return ItemSlotImage(slotImage.get(number, 0 or isBlack.toInt().shl(1)), ItemCodex.getItemImage(item))
+    fun produce(isBlack: Boolean, number: Int?, sprite: TextureRegion?): ItemSlotImage {
+        return ItemSlotImage(slotImage.get(number ?: 10, 0 or isBlack.toInt().shl(1)), sprite)
     }
 
-    fun produceLarge(isBlack: Boolean, number: Int = 10, item: GameItem?, hasGauge: Boolean): ItemSlotImage {
+    fun produceLarge(isBlack: Boolean, number: Int?, sprite: TextureRegion?, hasGauge: Boolean): ItemSlotImage {
         val y = if (hasGauge && isBlack) 9 else if (hasGauge && !isBlack) 8 else if (!hasGauge && isBlack) 3 else 1
-        return ItemSlotImage(slotImage.get(number, y), ItemCodex.getItemImage(item))
+        return ItemSlotImage(slotImage.get(number ?: 10, y), sprite)
     }
 
 

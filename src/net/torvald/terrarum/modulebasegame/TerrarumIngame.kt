@@ -798,6 +798,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
     override fun worldSecondaryClickEnd(actor: ActorWithBody, delta: Float) {
+        val itemOnGrip = (actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)
+        ItemCodex[itemOnGrip]?.endSecondaryUse(actor, delta)
+
         worldSecondaryClickLatch = false
     }
 

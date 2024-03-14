@@ -109,9 +109,9 @@ class UIQuickslotBar : UICanvas() {
                 val itemHasGauge = ((item?.maxDurability ?: 0) > 0.0) || item?.stackable == true
 
                 val image = if (i == selection)
-                    ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, item, itemHasGauge)
+                    ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, ItemCodex.getItemImage(item), itemHasGauge)
                 else
-                    ItemSlotImageFactory.produce(true, (i + 1) % SLOT_COUNT, item)
+                    ItemSlotImageFactory.produce(true, (i + 1) % SLOT_COUNT, ItemCodex.getItemImage(item))
 
                 val slotX = cellSize / 2 + (cellSize + gutter) * i
                 val slotY = cellSize / 2

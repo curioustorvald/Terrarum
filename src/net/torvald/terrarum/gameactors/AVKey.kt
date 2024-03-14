@@ -122,6 +122,8 @@ object AVKey {
 
     const val __PLAYER_QUICKSLOTSEL = "__quickslotselection"
 
+    const val __PLAYER_WIRECUTTERSEL = "__wirecutterselection"
+
     /** Double
      * When using tool/arm/etc. how long action button is held, in milliseconds (Int)
      * Or for NPCs, how long it has been waiting for next move

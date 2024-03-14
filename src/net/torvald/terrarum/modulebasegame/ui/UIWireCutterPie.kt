@@ -1,29 +1,23 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
-import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OPEN_CLOSE
-import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.SLOT_COUNT
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UINotControllable
 import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
 
 /**
- * The Sims styled pie representation of the Quickslot.
- *
- * Created by minjaesong on 2016-07-20.
+ * Created by minjaesong on 2024-03-14.
  */
-@UINotControllable
-class UIQuickslotPie : UICanvas() {
+class UIWireCutterPie : UICanvas() {
 
     init {
         handler.allowESCtoClose = false
@@ -31,10 +25,10 @@ class UIQuickslotPie : UICanvas() {
 
     private val cellSize = ItemSlotImageFactory.slotImage.tileW
 
-    private val slotCount = UIQuickslotBar.SLOT_COUNT
+    private val slotCount = 6
 
     private val slotDistanceFromCentre: Double
-            get() = cellSize * 2.666 * handler.scale
+        get() = cellSize * 2.666 * handler.scale
     override var width: Int = cellSize * 7
     override var height: Int = width
 
@@ -42,7 +36,7 @@ class UIQuickslotPie : UICanvas() {
     /**
      * In milliseconds
      */
-    override var openCloseTime: Second = COMMON_OPEN_CLOSE
+    override var openCloseTime: Second = UIQuickslotBar.COMMON_OPEN_CLOSE
 
     private val smallenSize = 0.92f
 
@@ -50,8 +44,8 @@ class UIQuickslotPie : UICanvas() {
 
     override fun updateImpl(delta: Float) {
         if (selection >= 0 && (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying != null)
-            (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
-                    selection % slotCount
+            (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying!!.actorValue[AVKey.__PLAYER_WIRECUTTERSEL] =
+                selection % slotCount
 
 
         // update controls
@@ -61,7 +55,7 @@ class UIQuickslotPie : UICanvas() {
             val deg = -(centre - cursorPos).direction.toFloat()
 
             selection = Math.round(deg * slotCount / FastMath.TWO_PI)
-            if (selection < 0) selection += SLOT_COUNT
+            if (selection < 0) selection += slotCount
 
             // TODO add gamepad support
         }
@@ -69,12 +63,37 @@ class UIQuickslotPie : UICanvas() {
 
     private val drawColor = Color(1f, 1f, 1f, 1f)
 
+    private fun getSprite(index: Int): TextureRegion {
+        val (x, y) = when (index) {
+            0 -> 1 to 3
+            1 -> 11 to 2
+            2 -> 12 to 2
+            3 -> 13 to 2
+            4 -> 14 to 2
+            5 -> 15 to 2
+            else -> throw IllegalArgumentException()
+        }
+        return CommonResourcePool.getAsItemSheet("basegame.items").get(x, y)
+    }
+
+    companion object {
+        fun getWireItemID(index: Int): String {
+            return when (index) {
+                0 -> "__all__"
+                1 -> "wire@basegame:8192"
+                2 -> "wire@basegame:8193"
+                3 -> "wire@basegame:8194"
+                4 -> "wire@basegame:8195"
+                5 -> "wire@basegame:8196"
+                else -> throw IllegalArgumentException()
+            }
+        }
+    }
+
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // draw radial thingies
         for (i in 0 until slotCount) {
-            val qs = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.inventory?.getQuickslotItem(i)
-            val item = ItemCodex[qs?.itm]
-            val itemHasGauge = ((item?.maxDurability ?: 0) > 0.0) || item?.stackable == true
+            val sprite = getSprite(i)
 
             // set position
             val angle = Math.PI * 2.0 * (i.toDouble() / slotCount) + Math.PI // 180 deg monitor-wise
@@ -82,9 +101,9 @@ class UIQuickslotPie : UICanvas() {
 
             // draw cells
             val image = if (i == selection)
-                ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, ItemCodex.getItemImage(item), itemHasGauge)
+                ItemSlotImageFactory.produceLarge(false, null, sprite, false)
             else
-                ItemSlotImageFactory.produce(true, (i + 1) % SLOT_COUNT, ItemCodex.getItemImage(item))
+                ItemSlotImageFactory.produce(true, null, sprite)
 
             val slotX = slotCentrePoint.x.toInt()
             val slotY = slotCentrePoint.y.toInt()
@@ -92,31 +111,6 @@ class UIQuickslotPie : UICanvas() {
             drawColor.a = UIQuickslotBar.DISPLAY_OPACITY
             batch.color = drawColor
             image.draw(batch, slotX, slotY)
-
-            // durability meter/item count for the selected cell
-            if (i == selection && item != null) {
-                if (item.maxDurability > 0.0) {
-                    val percentage = item.durability / item.maxDurability
-                    val barCol = UIItemInventoryCellCommonRes.getHealthMeterColour(percentage, 0f, 1f)
-                    val barBack = barCol mul UIItemInventoryCellCommonRes.meterBackDarkening
-                    val durabilityIndex = percentage.times(38).roundToInt()
-
-                    // draw bar background
-                    batch.color = barBack
-                    batch.draw(ItemSlotImageFactory.slotImage.get(8,7), slotX - 19f, slotY - 19f)
-                    // draw bar foreground
-                    batch.color = barCol
-                    batch.draw(ItemSlotImageFactory.slotImage.get(durabilityIndex % 10,4 + durabilityIndex / 10), slotX - 19f, slotY - 19f)
-                }
-                else if (item.stackable) {
-                    val amountString = qs!!.qty.toItemCountText()
-                    batch.color = Color(0xfff066_ff.toInt())
-                    val textLen = amountString.length * App.fontSmallNumbers.W
-                    val y = slotY + 25 - App.fontSmallNumbers.H
-                    val x = slotX - 19 + (38 - textLen) / 2
-                    App.fontSmallNumbers.draw(batch, amountString, x.toFloat(), y.toFloat())
-                }
-            }
         }
     }
 
@@ -142,4 +136,5 @@ class UIQuickslotPie : UICanvas() {
 
     override fun dispose() {
     }
+
 }
