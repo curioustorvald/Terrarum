@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -80,5 +81,15 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
     override fun setPosition(x: Int, y: Int) {
         transitionalCraftingUI.setPosition(x, y)
         transitionalTechtreePanel.setPosition(x, y)
+    }
+
+    override fun doOpening(delta: Float) {
+        super.doOpening(delta)
+        INGAME.pause()
+    }
+
+    override fun doClosing(delta: Float) {
+        super.doClosing(delta)
+        INGAME.resume()
     }
 }
