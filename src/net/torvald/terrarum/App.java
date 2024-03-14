@@ -1726,7 +1726,7 @@ public class App implements ApplicationListener {
         return DefaultConfig.INSTANCE.getHashMap();
     }
 
-    private static Object getConfigMaster(String key1) {
+    public static Object getConfigMaster(String key1) {
         String key = key1.toLowerCase();
 
         Object config;

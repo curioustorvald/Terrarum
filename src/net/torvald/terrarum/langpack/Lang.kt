@@ -2,9 +2,13 @@ package net.torvald.terrarum.langpack
 
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.tail
 import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.unicode.getKeycapPC
+import net.torvald.unicode.getMouseButton
 import java.io.File
 import java.util.*
+import kotlin.collections.HashMap
 
 class LangObject(val key: String, val fromLang: Boolean) {
     fun get() = if (fromLang) Lang[key] else key
@@ -137,21 +141,33 @@ object Lang {
     operator fun get(key: String, capitalise: Boolean = false): String {
         fun getstr(s: String) = getByLocale(s, App.GAME_LOCALE, capitalise) ?: getByLocale(s, FALLBACK_LANG_CODE, capitalise) ?: "$$s"
 
+        decodeCache[App.GAME_LOCALE]?.get("$key+$capitalise").let {
+            if (it != null) {
+                return it
+            }
+            else {
+                val args = key.split(bindOp).filter { it.isNotBlank() }.map { it.trim() }
+                if (args.isEmpty()) return ""
 
-        val args = key.split(bindOp).filter { it.isNotBlank() }.map { it.trim() }
-        if (args.isEmpty()) return ""
+                val sb = StringBuilder()
+                val formatter = Formatter(sb)
 
-        val sb = StringBuilder()
-        val formatter = Formatter(sb)
+                sb.append(getstr(args[0]))
+                args.subList(1, args.size).forEach {
+                    val oldstr = sb.toString()
+                    sb.clear()
+                    formatter.format(getstr(it), oldstr)
+                }
 
-        sb.append(getstr(args[0]))
-        args.subList(1, args.size).forEach {
-            val oldstr = sb.toString()
-            sb.clear()
-            formatter.format(getstr(it), oldstr)
+                if (decodeCache[App.GAME_LOCALE] == null) {
+                    decodeCache[App.GAME_LOCALE] = HashMap()
+                }
+                decodeCache[App.GAME_LOCALE]!!["$key+$capitalise"] = sb.toString()
+
+                return sb.toString()
+            }
         }
 
-        return sb.toString()
     }
 
     fun getAndUseTemplate(key: String, capitalise: Boolean = false, vararg arguments: Any?): String {
@@ -174,6 +190,7 @@ object Lang {
     }
 
     private val capCache = HashMap<String/*Locale*/, HashMap<String/*Key*/, String/*Text*/>>()
+    private val decodeCache = HashMap<String/*Locale*/, HashMap<String/*Key*/, String/*Text*/>>()
 
     private fun CAP(key: String, locale: String): String? {
         val ret = langpack["${key}_$locale"] ?: return null
@@ -191,20 +208,49 @@ object Lang {
     private fun NOCAP(key: String, locale: String): String? {
         return langpack["${key}_$locale"] ?: return null
     }
+
+
+    private val tagRegex = Regex("""\{[A-Z]+:[0-9A-Za-z_\- ]+\}""")
+
     /**
-     * Does NOT parse the operators
+     * Does NOT parse the bind operators, but DO parse the precomposed tags
      */
     fun getByLocale(key: String, locale: String, capitalise: Boolean = false): String? {
         val s = if (capitalise) CAP(key, locale) else NOCAP(key, locale)
 
         if (s == null) return null
 
-        return if (locale.startsWith("bg"))
+        val fetchedS = if (locale.startsWith("bg"))
             "${App.fontGame.charsetOverrideBulgarian}$s${App.fontGame.charsetOverrideDefault}"
         else if (locale.startsWith("sr"))
             "${App.fontGame.charsetOverrideSerbian}$s${App.fontGame.charsetOverrideDefault}"
         else
             s
+
+        // apply {DOMAIN:argument} form of template
+        var ret = "$fetchedS" // make copy of the str
+        tagRegex.findAll(fetchedS).forEach {
+            val matched0 = it.groupValues[0]
+            val matched = matched0.substring(1 until matched0.lastIndex) // strip off the brackets
+            val mode = matched.substringBefore(':')
+            val key = matched.substringAfter(':')
+
+            val resolved = when (mode) {
+                "MOUSE" -> { // cognates to gdx.Input.Button
+                    getMouseButton(App.getConfigInt(key)).toString()
+                }
+                "KEYCAP" -> { // cognates to gdx.Input.Keys
+                    getKeycapPC(App.getConfigInt(key)).toString()
+                }
+                "CONFIG" -> {
+                    App.getConfigMaster(key).toString()
+                }
+                else -> matched0
+            }
+
+            ret = ret.replace(matched0, resolved)
+        }
+        return ret
     }
 
     private fun String.getEndTag() = this.split("_").last()
