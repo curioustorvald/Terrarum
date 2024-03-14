@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
 import net.torvald.terrarum.ui.Toolkit
@@ -17,7 +18,7 @@ import kotlin.math.roundToInt
 /**
  * Created by minjaesong on 2024-03-14.
  */
-class UIWireCutterPie : UICanvas() {
+class UIWireCutterPie(val itemID: ItemID) : UICanvas() {
 
     init {
         handler.allowESCtoClose = false
@@ -43,9 +44,17 @@ class UIWireCutterPie : UICanvas() {
     var selection: Int = -1
 
     override fun updateImpl(delta: Float) {
-        if (selection >= 0 && (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying != null)
+        if (selection >= 0 && (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying != null) {
+            // change actorvalue
             (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying!!.actorValue[AVKey.__PLAYER_WIRECUTTERSEL] =
                 selection % slotCount
+
+            // change itemsprite somehow
+            val region = getSprite(selection % slotCount)
+            ItemCodex[itemID]?.itemImage?.let {
+                it.setRegion(region.regionX, region.regionY, region.regionWidth, region.regionHeight)
+            }
+        }
 
 
         // update controls
@@ -63,20 +72,20 @@ class UIWireCutterPie : UICanvas() {
 
     private val drawColor = Color(1f, 1f, 1f, 1f)
 
-    private fun getSprite(index: Int): TextureRegion {
-        val (x, y) = when (index) {
-            0 -> 1 to 3
-            1 -> 11 to 2
-            2 -> 12 to 2
-            3 -> 13 to 2
-            4 -> 14 to 2
-            5 -> 15 to 2
-            else -> throw IllegalArgumentException()
-        }
-        return CommonResourcePool.getAsItemSheet("basegame.items").get(x, y)
-    }
-
     companion object {
+        fun getSprite(index: Int): TextureRegion {
+            val (x, y) = when (index) {
+                0 -> 10 to 2
+                1 -> 11 to 2
+                2 -> 12 to 2
+                3 -> 13 to 2
+                4 -> 14 to 2
+                5 -> 15 to 2
+                else -> throw IllegalArgumentException()
+            }
+            return CommonResourcePool.getAsItemSheet("basegame.items").get(x, y)
+        }
+
         fun getWireItemID(index: Int): String {
             return when (index) {
                 0 -> "__all__"

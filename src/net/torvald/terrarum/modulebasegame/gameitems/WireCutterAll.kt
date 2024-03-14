@@ -94,7 +94,7 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID), FixtureInteracti
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1, 3)
 
-    @Transient val selectorUI = UIWireCutterPie()
+    @Transient val selectorUI = UIWireCutterPie(originalID)
 
     init {
         stackable = false
