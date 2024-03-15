@@ -66,22 +66,22 @@ class UIAlloyingFurnace(val smelter: FixtureAlloyingFurnace) : UICanvas(
     private val leftPanelY = playerThings.posY
 
     private val backdropColour = Color(0x999999_c8.toInt())
-    private val backdropZoom = 9f
+    private val backdropZoom = 10f
     private val backdropX = (leftPanelX + (leftPanelWidth - smelterBackdrops.tileW * backdropZoom) / 2).toFloat()
     private val backdropY = (leftPanelY + (leftPanelHeight - smelterBackdrops.tileH * backdropZoom) / 2).toFloat()
 
-    private val oreX1 = backdropX + 3 * backdropZoom + 4
-    private val oreX2 = backdropX + 9 * backdropZoom - 1
+    private val oreX1 = backdropX + 3 * backdropZoom + 7
+    private val oreX2 = backdropX + 9 * backdropZoom + 2
     private val oreY1 = backdropY + 6 * backdropZoom + 3
     private val oreY2 = backdropY + 6 * backdropZoom + 3
 
-    private val fireboxX = backdropX + 6 * backdropZoom + 2
+    private val fireboxX = backdropX + 6 * backdropZoom + 4
     private val fireboxY = backdropY + 21 * backdropZoom - 2
 
     private val productX = backdropX + 21 * backdropZoom + 1
     private val productY = backdropY + 11 * backdropZoom - 3
 
-    private val thermoX = (backdropX + 16 * backdropZoom + 3).toInt()
+    private val thermoX = (backdropX + 13 * backdropZoom + 3).toInt()
     private val thermoY = (backdropY + 21 * backdropZoom - 2).toInt()
 
 

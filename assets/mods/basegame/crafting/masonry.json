@@ -1,0 +1,16 @@
+{
+  /* stone brick */
+  "basegame:19": {
+    "workbench": "masonry",
+    "ingredients": [
+      [1, 1, "$ROCK"]
+    ]
+  },
+  /* white stone tile */
+  "basegame:18": {
+    "workbench": "masonry",
+    "ingredients": [
+      [1, 1, "basegame:21"]
+    ]
+  }
+}
