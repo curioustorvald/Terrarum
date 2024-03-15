@@ -28,6 +28,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     @Transient open val spawnNeedsWall: Boolean = false
     @Transient open val spawnNeedsFloor: Boolean = true
 
+    // if both spawnNeedsWall and spawnNeedsFloor are true, the condition will be interpreted as OR-condition
+
     /** Real time, in nanoseconds */
     @Transient var spawnRequestedTime: Long = 0L
         protected set
@@ -166,21 +168,32 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
         cannotSpawn = everyBlockboxPos.any { (x, y) -> !BlockCodex[world!!.getTileFromTerrain(x, y)].hasTag("INCONSEQUENTIAL") }
 
+
+        var cannotSpawnNoWall = false
+        var cannotSpawnNoFloor = false
+
         // check for walls, if spawnNeedsWall = true
         if (spawnNeedsWall) {
-            cannotSpawn = cannotSpawn or everyBlockboxPos.any { (x, y) -> !BlockCodex[world!!.getTileFromWall(x, y)].isSolid }
+            cannotSpawnNoWall = everyBlockboxPos.any { (x, y) -> !BlockCodex[world!!.getTileFromWall(x, y)].isSolid }
         }
 
         // check for floors, if spawnNeedsFloor == true
         if (spawnNeedsFloor) {
             val y = posY + blockBox.height
             val xs = posX until posX + blockBox.width
-            cannotSpawn = cannotSpawn or xs.any { x ->
+            cannotSpawnNoFloor = xs.any { x ->
                 world!!.getTileFromTerrain(x, y).let {
                     !canSpawnOnThisFloor(it)
                 }
             }
         }
+
+        if (spawnNeedsWall && spawnNeedsFloor)
+            cannotSpawn = cannotSpawn or (cannotSpawnNoWall && cannotSpawnNoFloor)
+        else if (spawnNeedsFloor)
+            cannotSpawn = cannotSpawn or cannotSpawnNoFloor
+        else if (spawnNeedsWall)
+            cannotSpawn = cannotSpawn or cannotSpawnNoWall
 
         return !cannotSpawn
     }

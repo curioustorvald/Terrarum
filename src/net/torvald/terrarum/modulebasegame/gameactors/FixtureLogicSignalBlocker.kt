@@ -34,8 +34,8 @@ interface Reorientable {
  */
 class FixtureLogicSignalBlocker : Electric, Reorientable {
 
-    @Transient override val spawnNeedsWall = false
-    @Transient override val spawnNeedsFloor = false
+    @Transient override val spawnNeedsFloor = true
+    @Transient override val spawnNeedsWall = true
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 2, 2),

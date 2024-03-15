@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.InventoryCellColourTheme
@@ -164,7 +162,7 @@ class UIItemInventoryElemWide(
 
 
             // set tooltip accordingly
-            if (tooltipShowing[hash] != true && item != null && mouseUp) {
+            if (tooltipShowing[tooltipHash] != true && item != null && mouseUp) {
 //                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
 
                 val grey = App.fontGame.toColorCode(11, 11, 11)
@@ -177,13 +175,13 @@ class UIItemInventoryElemWide(
 
                 INGAME.setTooltipMessage(finalStr)
 
-                tooltipShowing[hash] = true
+                tooltipShowing[tooltipHash] = true
 //                printdbg(this, tooltipShowing.entries)
             }
         }
 
         if (item == null || !mouseUp) {
-            tooltipShowing[hash] = false
+            tooltipShowing[tooltipHash] = false
         }
 
         // see IFs above?
@@ -191,10 +189,10 @@ class UIItemInventoryElemWide(
     }
 
     override fun dispose() {
-        tooltipShowing.remove(hash)
+        tooltipShowing.remove(tooltipHash)
     }
 
     override fun hide() {
-        tooltipShowing.remove(hash)
+        tooltipShowing.remove(tooltipHash)
     }
 }

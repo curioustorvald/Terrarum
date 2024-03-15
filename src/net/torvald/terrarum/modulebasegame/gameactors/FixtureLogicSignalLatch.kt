@@ -16,8 +16,8 @@ import org.dyn4j.geometry.Vector2
  */
 class FixtureLogicSignalLatch : Electric, Reorientable {
 
-    @Transient override val spawnNeedsWall = false
-    @Transient override val spawnNeedsFloor = false
+    @Transient override val spawnNeedsFloor = true
+    @Transient override val spawnNeedsWall = true
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 2, 3),

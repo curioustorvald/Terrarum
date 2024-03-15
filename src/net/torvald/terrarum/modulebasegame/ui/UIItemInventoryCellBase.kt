@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -39,7 +38,7 @@ abstract class UIItemInventoryCellBase(
     abstract override fun update(delta: Float)
     abstract override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera)
 
-    protected val hash = System.nanoTime()
+    protected val tooltipHash = System.nanoTime()
 
     /** Custom highlight rule to highlight tihs button to primary accent colour (blue by default).
      * Set to `null` to use default rule:

@@ -132,7 +132,7 @@ class UIItemInventoryElemSimple(
 
 
             // set tooltip accordingly
-            if (tooltipShowing[hash] != true && mouseUp) {
+            if (tooltipShowing[tooltipHash] != true && mouseUp) {
 //                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
 
                 val grey = App.fontGame.toColorCode(11, 11, 11)
@@ -145,7 +145,7 @@ class UIItemInventoryElemSimple(
 
                 INGAME.setTooltipMessage(finalStr)
 
-                tooltipShowing[hash] = true
+                tooltipShowing[tooltipHash] = true
 //                printdbg(this, tooltipShowing.entries)
             }
         }
@@ -160,7 +160,7 @@ class UIItemInventoryElemSimple(
         }
 
         if (item == null || !mouseUp) {
-            tooltipShowing[hash] = false
+            tooltipShowing[tooltipHash] = false
         }
 
         // see IFs above?
@@ -169,10 +169,10 @@ class UIItemInventoryElemSimple(
     }
 
     override fun dispose() {
-        tooltipShowing.remove(hash)
+        tooltipShowing.remove(tooltipHash)
     }
 
     override fun hide() {
-        tooltipShowing.remove(hash)
+        tooltipShowing.remove(tooltipHash)
     }
 }
