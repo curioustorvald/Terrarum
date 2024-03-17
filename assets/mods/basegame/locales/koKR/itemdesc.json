@@ -6,9 +6,10 @@
   "TOOLTIP_wire@basegame:8192": "신호를 전달합니다",
   "TOOLTIP_wire@basegame:8193": "신호를 전달합니다",
   "TOOLTIP_wire@basegame:8194": "신호를 전달합니다",
-  "TOOLTIP_wire@basegame:8196": "전력을 전달합니다",
-  "TOOLTIP_wire@basegame:8197": "전력을 전달합니다",
-  "TOOLTIP_wire@basegame:8198": "정보를 전달합니다",
+  "TOOLTIP_wire@basegame:8195": "신호를 전달합니다",
+  "TOOLTIP_wire@basegame:1": "전력을 전달합니다",
+  "TOOLTIP_wire@basegame:2": "전력을 전달합니다",
+  "TOOLTIP_wire@basegame:16": "정보를 전달합니다",
 
   "TOOLTIP_item@basegame:1": "돌을 부숩니다",
   "TOOLTIP_item@basegame:2": "돌을 부숩니다",

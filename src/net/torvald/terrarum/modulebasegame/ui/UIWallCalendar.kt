@@ -313,7 +313,7 @@ class UIWallCalendar : UICanvas(
 
         // cell texts
         batch.color = Toolkit.Theme.COL_LIST_DEFAULT
-        Toolkit.drawTextCentered(batch, App.fontGame, Lang.getAndUseTemplate("CONTEXT_CALENDAR_DATE_FORMAT_Y", false, thisYear), yearCellWidth, (width - yearCellWidth) / 2, y - 34)
+        Toolkit.drawTextCentered(batch, App.fontGame, Lang.getAndUseTemplate("CONTEXT_CALENDAR_DATE_FORMAT_Y", false, thisYear)!!, yearCellWidth, (width - yearCellWidth) / 2, y - 34)
         for (week in 0..7) {
             // highlight this week and the mouse-up
             batch.color = if (week == todayOfWeek) Toolkit.Theme.COL_SELECTED else if (week == mouseOverCell % 8) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_LIST_DEFAULT

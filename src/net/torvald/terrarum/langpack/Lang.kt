@@ -170,8 +170,9 @@ object Lang {
 
     }
 
-    fun getAndUseTemplate(key: String, capitalise: Boolean = false, vararg arguments: Any?): String {
-        var raw = get(key, capitalise)
+    fun getAndUseTemplate(key: String, capitalise: Boolean = false, vararg arguments: Any?): String? {
+        var raw = getOrNull(key, capitalise) ?: return null
+
         arguments.forEachIndexed { index, it0 ->
             val it = if (capitalise) it0.toString().capitalize() else it0.toString()
             raw = raw.replace("{${index}}", it)
