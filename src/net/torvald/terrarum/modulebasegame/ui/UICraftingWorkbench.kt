@@ -482,7 +482,7 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
         batch.color = Color.WHITE
 
         // text label for two inventory grids
-        val craftingLabel = Lang["GAME_CRAFTING"]
+        val craftingLabel = Lang["GAME_CRAFTABLE_ITEMS"]
         val ingredientsLabel = Lang["GAME_INVENTORY_INGREDIENTS"]
 
         App.fontGame.draw(batch, craftingLabel, thisOffsetX + (cellsWidth - App.fontGame.getWidth(craftingLabel)) / 2, thisOffsetY - INVENTORY_NAME_TEXT_GAP)

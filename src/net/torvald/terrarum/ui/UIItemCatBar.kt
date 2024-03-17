@@ -22,6 +22,7 @@ class UIItemCatBar(
         private val catArrangement: IntArray,
         internal val catIconsMeaning: List<Array<String>>,
         internal val catIconsLabels: List<() -> String>,
+        internal val superLabels: List<() -> String> = listOf({ "" }, { "" }, { "" }), // ["Crafting", "Inventory", "Menu"]
 
         val panelTransitionReqFun: (Int) -> Unit = {} // for side buttons; for the selection change, override selectionChangeListener
 ) : UIItem(parentUI, initialX, initialY) {
@@ -286,7 +287,28 @@ class UIItemCatBar(
             // label
             batch.color = Color.WHITE
             catIconsLabels[selectedIndex]().let {
-                App.fontGame.draw(batch, it, posX + ((width - App.fontGame.getWidth(it)) / 2), posY + highlighterYPos + 4)
+                App.fontGame.draw(batch, it, posX + ((width - App.fontGame.getWidth(it)) / 2), posY + highlighterYPos + 0)
+            }
+        }
+        else {
+            // generic label
+            batch.color = Color.WHITE
+            superLabels[1]().let {
+                App.fontGame.draw(batch, it, posX + ((width - App.fontGame.getWidth(it)) / 2), posY + highlighterYPos + 0)
+            }
+        }
+
+
+        // label under sidebuttons
+        if (showSideButtons) {
+            batch.color = Color.WHITE
+
+            superLabels[0]().let {
+                Toolkit.drawTextCentered(batch, App.fontGame, it, sideButtons[0].width, sideButtons[0].posX, posY + highlighterYPos + 0)
+            }
+
+            superLabels[2]().let {
+                Toolkit.drawTextCentered(batch, App.fontGame, it, sideButtons[3].width, sideButtons[3].posX, posY + highlighterYPos + 0)
             }
         }
 

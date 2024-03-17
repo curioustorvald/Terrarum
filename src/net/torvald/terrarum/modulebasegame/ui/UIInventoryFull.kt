@@ -241,6 +241,11 @@ class UIInventoryFull(
             { Lang["CONTEXT_ITEM_MAGIC"] },
             { Lang["GAME_GENRE_MISC"] },
         ),
+        superLabels = listOf(
+            { Lang["GAME_CRAFTING"] },
+            { Lang["GAME_INVENTORY"] },
+            { Lang["MENU_LABEL_MENU"] }
+        )
 
     ) { i -> if (!panelTransitionLocked) requestTransition(i) }
 

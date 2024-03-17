@@ -21,6 +21,8 @@ class UITemplateCatBar(
     catIconsMeaning: List<Array<String>>, // sortedBy: catArrangement
     catIconsLabels: List<() -> String>,
 
+    superLabels: List<() -> String> = listOf({ "" }, { "" }, { "" }),
+
 ) : UITemplate(parent) {
 
     val catBar = UIItemCatBar(
@@ -30,7 +32,7 @@ class UITemplateCatBar(
         UIInventoryFull.internalWidth,
         UIInventoryFull.catBarWidth,
         showSidebuttons,
-        catIcons, catArrangement, catIconsMeaning, catIconsLabels
+        catIcons, catArrangement, catIconsMeaning, catIconsLabels, superLabels
     )
 
     override fun getUIitems(): List<UIItem> {

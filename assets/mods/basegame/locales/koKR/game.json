@@ -17,7 +17,7 @@
   "GAME_ACTION_QUICKSEL": "빠른 선택",
   "GAME_ACTION_SELECT_SLOT": "슬롯 선택",
   "GAME_ACTION_TELEPORT": "텔레포트하기",
-  "GAME_CRAFTABLE_ITEMS": "제작 가능한 아이템",
+  "GAME_CRAFTABLE_ITEMS": "제작 레시피",
   "GAME_CRAFTING": "제작",
   "GAME_INVENTORY_BLOCKS": "블록",
   "GAME_INVENTORY_FAVORITES": "즐겨찾기",
