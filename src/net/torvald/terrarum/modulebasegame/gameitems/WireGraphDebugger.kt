@@ -7,6 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.GameItem.EquipPosition.HAND_GRIP
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
@@ -22,13 +23,12 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
     override var baseMass = 2.0
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,3)
+    override var equipPosition = HAND_GRIP
+    override var originalName = "ITEM_MULTIMETER"
 
     init {
-        equipPosition = GameItem.EquipPosition.HAND_GRIP
-        name = "Wire Debugger"
         stackable = false
         isUnique = true
-        originalName = "WIRE_DEBUGGER"
     }
 
     private val sb = StringBuilder()
