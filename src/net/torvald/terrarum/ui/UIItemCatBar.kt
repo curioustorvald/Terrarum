@@ -285,14 +285,14 @@ class UIItemCatBar(
             batch.draw(underlineIndTex, (highlighterXPos - buttonGapSize / 2), posY + highlighterYPos.toFloat())
 
             // label
-            batch.color = Color.WHITE
+            batch.color = labelCol
             catIconsLabels[selectedIndex]().let {
                 App.fontGame.draw(batch, it, posX + ((width - App.fontGame.getWidth(it)) / 2), posY + highlighterYPos + 0)
             }
         }
         else {
             // generic label
-            batch.color = Color.WHITE
+            batch.color = labelCol
             superLabels[1]().let {
                 App.fontGame.draw(batch, it, posX + ((width - App.fontGame.getWidth(it)) / 2), posY + highlighterYPos + 0)
             }
@@ -301,7 +301,7 @@ class UIItemCatBar(
 
         // label under sidebuttons
         if (showSideButtons) {
-            batch.color = Color.WHITE
+            batch.color = labelCol
 
             superLabels[0]().let {
                 Toolkit.drawTextCentered(batch, App.fontGame, it, sideButtons[0].width, sideButtons[0].posX, posY + highlighterYPos + 0)
@@ -314,6 +314,7 @@ class UIItemCatBar(
 
     }
 
+    private val labelCol = Color(0xe0e0e0ff.toInt())
 
 
 
