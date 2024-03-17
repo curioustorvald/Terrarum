@@ -43,6 +43,12 @@
       [1, 15, "$ROCK", 10, "item@basegame:25", 15, "item@basegame:113"] /* 1 smelter = 15 rocks, 10 clay balls, 15 iron ingot */
     ]
   },
+  "item@basegame:51": { /* electric workbench */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 12, "$WOOD", 5, "item@basegame:113"] /* 12 wood, 5 iron */
+    ]
+  },
 
 
 

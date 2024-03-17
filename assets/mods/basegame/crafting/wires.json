@@ -67,39 +67,45 @@
   },
 
   "item@basegame:35": { /* copper bulb */
-    "workbench": "basiccrafting",
+    "workbench": "soldering",
     "ingredients": [
-      [2, 1, "item@basegame:112", 1, "item@basegame:113"] /* 1 copper, 1 iron */
+      [2, 1, "item@basegame:112", 1, "item@basegame:113", 1, "item@basegame:50"] /* 1 copper, 1 iron, 1 soldering wire (temporary) */
     ]
   },
   "item@basegame:44": { /* signal blocker */
-    "workbench": "basiccrafting",
+    "workbench": "soldering",
     "ingredients": [
-      [1, 2, "$ROCK", 1, "item@basegame:116", 1, "item@basegame:112"] /* 2 rocks, 1 tin, 1 copper */
+      [1, 2, "$ROCK", 1, "$SEMICONDUCTOR", 1, "item@basegame:112", 1, "item@basegame:50"] /* 2 rocks, 1 tin, 1 copper, 1 soldering wire (temporary) */
     ]
   },
   "item@basegame:45": { /* signal latch */
-    "workbench": "basiccrafting",
+    "workbench": "soldering",
     "ingredients": [
-      [1, 3, "$ROCK", 1, "item@basegame:116", 2, "item@basegame:112"] /* 3 rocks, 3 tin, 3 copper */
+      [1, 3, "$ROCK", 1, "$SEMICONDUCTOR", 2, "item@basegame:112", 1, "item@basegame:50"] /* 3 rocks, 3 tin, 3 copper, 1 soldering wire (temporary) */
     ]
   },
   "item@basegame:8": { /* signal emitter */
-    "workbench": "basiccrafting",
+    "workbench": "soldering",
     "ingredients": [
-      [2, 1, "$ROCK", 1, "item@basegame:116"] /* 1 rocks, 1 tin, 1 copper */
+      [2, 1, "$ROCK", 1, "$SEMICONDUCTOR", 1, "item@basegame:50"] /* 1 rocks, 1 tin, 1 copper, 1 soldering wire (temporary) */
     ]
   },
   "item@basegame:46": { /* signal repeater */
-    "workbench": "basiccrafting",
+    "workbench": "soldering",
     "ingredients": [
-      [1, 1, "$ROCK", 1, "item@basegame:116"] /* 1 rocks, 1 tin, 1 copper */
+      [1, 1, "$ROCK", 1, "$SEMICONDUCTOR", 1, "item@basegame:50"] /* 1 rocks, 1 tin, 1 copper, 1 soldering wire (temporary) */
     ]
   },
   "item@basegame:49": { /* signal adder */
-    "workbench": "basiccrafting",
+    "workbench": "soldering",
     "ingredients": [
-      [1, 1, "$ROCK", 1, "item@basegame:116"] /* 2 rocks, 2 tin, 2 copper */
+      [1, 1, "$ROCK", 1, "$SEMICONDUCTOR", 1, "item@basegame:50"] /* 2 rocks, 2 tin, 2 copper, 1 soldering wire (temporary) */
+    ]
+  },
+  "item@basegame:52": { /* seven seg disp */
+    "workbench": "soldering",
+    "ingredients": [
+      [1, 4, "$ROCK", 7, "item@basegame:35", 5, "$SEMICONDUCTOR", 2, "item@basegame:112", 1, "item@basegame:50"] /* 4 rocks, 7 copper bulbs, 5 tin, 2 copper, 1 soldering wire (temporary) */
     ]
   }
 }

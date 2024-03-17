@@ -43,6 +43,7 @@
   "ITEM_LOGIC_SIGNAL_BLOCKER": "Logic Signal Blocker",
   "ITEM_LOGIC_SIGNAL_EMITTER": "Logic Signal Emitter",
   "ITEM_LOGIC_SIGNAL_LATCH": "Logic Signal Latch",
+  "ITEM_LOGIC_SIGNAL_NUMERIC_DISPLAY": "Logic Signal Numeric Display",
   "ITEM_LOGIC_SIGNAL_REPEATER": "Logic Signal Repeater",
   "ITEM_LOGIC_SIGNAL_SWITCH": "Logic Signal Switch",
   "ITEM_LOGS_BIRCH": "Birch Logs",
