@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.Float16FrameBuffer
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
+import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
@@ -765,25 +766,24 @@ object IngameRenderer : Disposable {
     private val cubeSize = 7.0
     private val externalV = Vector2()
     private val maxStep = 56
+    private val trajectoryFlow = 30
     private fun drawTrajectoryForThrowable(frameBuffer: FrameBuffer, batch: SpriteBatch, frameDelta: Float, player: ActorWithBody, world: GameWorld, item: ItemThrowable) {
         val ww = world.width * TILE_SIZEF
+
 
         mouseInInteractableRange(player) { mx, my, mtx, mty ->
             val (throwPos, throwVector) = getThrowPosAndVector(player)
             val grav = world.gravitation
+            val toff = (App.GLOBAL_RENDER_TIMER % trajectoryFlow) / trajectoryFlow.toFloat()
             externalV.set(throwVector)
 
+            val points = ArrayList<Pair<Float, Float>>()
 
             var c = 0
             while (c < maxStep) {
-                batch.color = Color(0.9f, 0.9f, 0.9f, 0.9f * (1f - (c.toFloat() / maxStep).sqr()))
 
                 // plot a dot
-                if (c > 0) {
-                    Toolkit.fillArea(batch, throwPos.x.toFloat(), throwPos.y.toFloat(), 2f, 2f)
-                    Toolkit.fillArea(batch, throwPos.x.toFloat() + ww, throwPos.y.toFloat(), 2f, 2f)
-                    Toolkit.fillArea(batch, throwPos.x.toFloat() - ww, throwPos.y.toFloat(), 2f, 2f)
-                }
+                points.add(throwPos.x.toFloat() to throwPos.y.toFloat())
 
                 // simulate physics
                 applyGravitation(grav, cubeSize) // TODO use actual value instead of `cubeSize`
@@ -807,15 +807,39 @@ object IngameRenderer : Disposable {
                     BlockCodex[tile].isSolid
                 }
 
-                if (hitSolid)
+                if (hitSolid) {
+                    points.add(throwPos.x.toFloat() to throwPos.y.toFloat())
                     break
+                }
 
                 c++
             }
 
 
+            if (points.size > 4) {
+                var v0 = points[0]
+                var v1 = points[0]
+                var v2 = points[1]
+                var v3 = points[2]
+                for (i in 3 until points.size) {
+                    // shift vars
+                    v0 = v1; v1 = v2; v2 = v3; v3 = points[i]
+
+                    val xp = FastMath.interpolateCatmullRom(toff, v0.first, v1.first, v2.first, v3.first)
+                    val yp = FastMath.interpolateCatmullRom(toff, v0.second, v1.second, v2.second, v3.second)
+
+                    batch.color = Color(0.9f, 0.9f, 0.9f, 0.9f * (1f - ((i-3+toff) / maxStep).sqr()))
+                    Toolkit.fillArea(batch, xp, yp, 2f, 2f)
+                    Toolkit.fillArea(batch, xp + ww, yp, 2f, 2f)
+                    Toolkit.fillArea(batch, xp - ww, yp, 2f, 2f)
+                }
+            }
+
+
             1L
         }
+
+
 
     }
 
