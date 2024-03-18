@@ -25,7 +25,7 @@ import kotlin.math.floor
 class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = PhysProperties.MOBILE_OBJECT()), NoSerialise {
 
     enum class MarkerMode {
-        FIXTURE_GHOST, BLOCK_MARKER
+        FIXTURE_GHOST, BLOCK_MARKER, HIDDEN
     }
 
     private val defaultSize = 16.0
@@ -45,12 +45,14 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
 
 
     init {
-        this.isVisible = false
+        this.isVisible = true
         renderOrder = Actor.RenderOrder.OVERLAY // for some reason the constructor didn't work
     }
 
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
+        this.isVisible = true
+
         if (isVisible) {
             if (markerMode == MarkerMode.FIXTURE_GHOST) {
                 if (INGAME.actorNowPlaying != null) {
@@ -114,6 +116,16 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
         ghost = null
         setGhostColourNone()
         hitbox.setDimension(TILE_SIZED, TILE_SIZED)
+        markerMode = MarkerMode.HIDDEN
+    }
+
+    fun hideMarker() {
+        unsetGhost()
+    }
+
+    fun showMarker(shape: Int) {
+        markerShape = shape
+        markerMode = MarkerMode.BLOCK_MARKER
     }
 
     fun setGhostColourNone() { ghostColour = Color.WHITE }

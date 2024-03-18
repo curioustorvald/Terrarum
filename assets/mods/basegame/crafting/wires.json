@@ -66,6 +66,13 @@
     ]
   },
 
+  "item@basegame:7": { /* multimeter */
+    "workbench": "soldering",
+    "ingredients": [
+      [2, 5, "item@basegame:112", 5, "item@basegame:117", 5, "item@basegame:177", 5, "$SEMICONDUCTOR", 1, "item@basegame:50"] /* 5 copper, 5 gold, 5 brass, 5 iron, 5 tin, 1 soldering wire (temporary) */
+    ]
+  },
+
   "item@basegame:35": { /* copper bulb */
     "workbench": "soldering",
     "ingredients": [

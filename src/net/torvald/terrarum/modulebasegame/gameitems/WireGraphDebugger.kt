@@ -37,9 +37,8 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "wire_render_all"
 
-        blockMarker.markerShape = 3
+        blockMarker.showMarker(3)
         blockMarker.markerColour = Color.YELLOW
-        blockMarker.isVisible = true
         blockMarker.update(delta)
 
         val mx = Terrarum.mouseTileX
@@ -77,7 +76,7 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
     override fun effectOnUnequip(actor: ActorWithBody) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
         (Terrarum.ingame!! as TerrarumIngame).setTooltipMessage(null)
-        blockMarker.isVisible = false
+        blockMarker.hideMarker()
         UIItemInventoryCellCommonRes.tooltipShowing.remove(tooltipHash)
     }
 }

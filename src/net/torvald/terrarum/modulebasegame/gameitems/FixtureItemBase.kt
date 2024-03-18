@@ -93,7 +93,6 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 
         (INGAME as TerrarumIngame).blockMarkingActor.let {
             it.unsetGhost()
-            it.setGhostColourNone()
         }
     }
 
