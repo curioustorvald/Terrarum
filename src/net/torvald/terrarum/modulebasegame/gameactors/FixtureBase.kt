@@ -27,6 +27,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
     @Transient open val spawnNeedsWall: Boolean = false
     @Transient open val spawnNeedsFloor: Boolean = true
+    @Transient open val spawnNeedsCeiling: Boolean = false
 
     // if both spawnNeedsWall and spawnNeedsFloor are true, the condition will be interpreted as OR-condition
 
@@ -178,8 +179,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         }
 
         // check for floors, if spawnNeedsFloor == true
-        if (spawnNeedsFloor) {
-            val y = posY + blockBox.height
+        if (spawnNeedsFloor || spawnNeedsCeiling) {
+            val y = posY + if (spawnNeedsFloor) blockBox.height else -1
             val xs = posX until posX + blockBox.width
             cannotSpawnNoFloor = xs.any { x ->
                 world!!.getTileFromTerrain(x, y).let {
@@ -188,9 +189,9 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
             }
         }
 
-        if (spawnNeedsWall && spawnNeedsFloor)
+        if (spawnNeedsWall && (spawnNeedsFloor || spawnNeedsCeiling))
             cannotSpawn = cannotSpawn or (cannotSpawnNoWall && cannotSpawnNoFloor)
-        else if (spawnNeedsFloor)
+        else if (spawnNeedsFloor || spawnNeedsCeiling)
             cannotSpawn = cannotSpawn or cannotSpawnNoFloor
         else if (spawnNeedsWall)
             cannotSpawn = cannotSpawn or cannotSpawnNoWall
@@ -210,10 +211,14 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         var soundSource =
             if (spawnNeedsWall) 1
             else if (spawnNeedsFloor) 0
+            else if (spawnNeedsCeiling) 3
             else 2
         // 1: wall, 0: floor, 2: if wall is not solid, use wall; else, use floor
         val wallTile = world!!.getTileFromWall(posXc, posYb)
-        val terrTile = world!!.getTileFromTerrain(posXc, posYb + 1)
+        val terrTile = if (soundSource == 3)
+            world!!.getTileFromTerrain(posXc, posYb - blockBox.height)
+        else
+            world!!.getTileFromTerrain(posXc, posYb + 1)
 
         if (soundSource == 2) {
             soundSource = if (BlockCodex[wallTile].isSolid)
@@ -224,12 +229,19 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
         when (soundSource) {
             1 -> PickaxeCore.makeNoiseTileBurst(this, wallTile)
-            0 -> PickaxeCore.makeNoiseTileBurst(this, terrTile)
+            0, 3 -> PickaxeCore.makeNoiseTileBurst(this, terrTile)
         }
 
         // make some dust
         if (soundSource == 0) {
             val y = posY + blockBox.height
+            for (x in posX until posX + blockBox.width) {
+                val tile = world!!.getTileFromTerrain(x, y)
+                PickaxeCore.makeDust(tile, x, y - 1, 4 + (Math.random() + Math.random()).roundToInt())
+            }
+        }
+        else if (soundSource == 3) {
+            val y = posY
             for (x in posX until posX + blockBox.width) {
                 val tile = world!!.getTileFromTerrain(x, y)
                 PickaxeCore.makeDust(tile, x, y - 1, 4 + (Math.random() + Math.random()).roundToInt())

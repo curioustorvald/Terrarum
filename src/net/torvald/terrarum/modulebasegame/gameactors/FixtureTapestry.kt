@@ -34,16 +34,16 @@ internal class FixtureTapestry : FixtureBase {
     private var tilewiseHitboxWidth by Delegates.notNull<Int>()
     private var tilewiseHitboxHeight by Delegates.notNull<Int>()
 
-    private constructor() : super(
-            BlockBox(BlockBox.NO_COLLISION, 1, 1),
-            renderOrder = RenderOrder.BEHIND,
-            nameFun = { Lang["ITEM_TAPESTRY"] }
+    constructor() : super(
+        BlockBox(BlockBox.NO_COLLISION, 1, 1),
+        renderOrder = RenderOrder.BEHIND,
+        nameFun = { Lang["ITEM_TAPESTRY"] }
     )
 
     constructor(rawBytes: ByteArray, framingMaterial: ItemID) : super(
-            BlockBox(BlockBox.NO_COLLISION, 1, 1),
-            renderOrder = RenderOrder.BEHIND,
-            nameFun = { Lang["ITEM_TAPESTRY"] }
+        BlockBox(BlockBox.NO_COLLISION, 1, 1),
+        renderOrder = RenderOrder.BEHIND,
+        nameFun = { Lang["ITEM_TAPESTRY"] }
     ) {
         this.rawBytes = rawBytes
         this.frameBlock = framingMaterial
