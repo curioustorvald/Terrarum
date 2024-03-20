@@ -189,6 +189,7 @@ class FixtureTextSignCopper : Electric {
         pixmapOverlayEmsv.dispose()
         pixmapOverlayUnlitEmsv.dispose()
         overlays.forEach { it.dispose() }
+        batch.dispose()
     }
 
 

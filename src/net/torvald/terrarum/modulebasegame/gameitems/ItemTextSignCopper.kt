@@ -18,7 +18,9 @@ class ItemTextSignCopper(originalID: ItemID) : FixtureItemBase(originalID, "net.
     override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(10, 3)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(14, 4)
+    override val itemImageEmissive: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(13, 4)
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_COPPER_SIGN"
