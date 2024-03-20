@@ -432,7 +432,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                         wireActor.renderOrder = Actor.RenderOrder.OVERLAY
                     }
                     else {
-                        wireActor.renderOrder = Actor.RenderOrder.BEHIND
+                        wireActor.renderOrder = Actor.RenderOrder.FAR_BEHIND
                     }
 
                     wireActor.isUpdate = true
@@ -458,14 +458,15 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         _testMarkerDrawCalls = 0L
 
         IngameRenderer.invoke(delta, false,
-                screenZoom,
-                listOf(),
-                listOf(),
-                listOf(),
-                listOf(),
-                if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays,
-                particles,
-                uiContainer = uiContainer
+            screenZoom,
+            listOf(),
+            listOf(),
+            listOf(),
+            listOf(),
+            listOf(),
+            if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays,
+            particles,
+            uiContainer = uiContainer
         )
 
         App.setDebugTime("Test.MarkerDrawCalls", _testMarkerDrawCalls)

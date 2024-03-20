@@ -135,8 +135,8 @@ open class Electric : FixtureBase {
         getWireStateAt(offsetX, offsetY, "digital_bit").x <= ELECTRIC_THRESHOLD_LOW ||
         getWireEmissionAt(offsetX, offsetY).x <= ELECTRIC_THRESHOLD_LOW
 
-    private val oldSinkStatus: Array<Vector2>
-    private val newSinkStatus: Array<Vector2>
+    protected var oldSinkStatus: Array<Vector2>
+    protected var newSinkStatus: Array<Vector2>
 
     open fun updateOnWireGraphTraversal(offsetX: Int, offsetY: Int, sinkType: WireEmissionType) {
         val index = pointToBlockBoxIndex(offsetX, offsetY)

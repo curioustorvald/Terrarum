@@ -51,6 +51,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
 
     enum class RenderOrder {
+        FAR_BEHIND, // wires
         BEHIND, // tapestries, some particles (obstructed by terrain)
         MIDDLE, // actors
         MIDTOP, // bullets, thrown items

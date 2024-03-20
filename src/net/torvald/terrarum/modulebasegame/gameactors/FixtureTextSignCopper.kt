@@ -5,13 +5,11 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.spriteanimation.SheetSpriteAnimation
-import net.torvald.terrarum.App
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import org.dyn4j.geometry.Vector2
 import java.util.*
 
 /**
@@ -28,16 +26,39 @@ class FixtureTextSignCopper : Electric {
     var text = "헬로 월드!"
     var panelCount = 5
 
+    private var initialised = false
+
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 2, 2),
         renderOrder = RenderOrder.BEHIND,
         nameFun = { Lang["ITEM_COPPER_SIGN"] }
-    )
+    ) {
+        reload()
+    }
+
+    constructor(text: String, panelCount: Int) : super(
+        BlockBox(BlockBox.NO_COLLISION, panelCount, 2),
+        renderOrder = RenderOrder.BEHIND,
+        nameFun = { Lang["ITEM_COPPER_SIGN"] }
+    ) {
+        this.text = text
+        this.panelCount = panelCount
+        reload()
+    }
 
     override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawn(posX, posY, installersUUID, panelCount.coerceAtLeast(2), 2)
 
     override fun reload() {
         super.reload()
+
+        if (!initialised) {
+            initialised = true
+
+            blockBox = BlockBox(BlockBox.NO_COLLISION, panelCount, 2)
+            setHitboxDimension(TILE_SIZE * blockBox.width, TILE_SIZE * blockBox.height, 0, 2)
+            oldSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
+            newSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
+        }
 
         // must be re-spawned on reload to make it visible after load
         spawn(
@@ -100,11 +121,11 @@ class FixtureTextSignCopper : Electric {
 
         makeNewSprite(TextureRegionPack(Texture(pixmapSprite), W * panelCount, H / 2)).let {
             it.setRowsAndFrames(2, 1)
-            it.delays = FloatArray(1) { Float.POSITIVE_INFINITY }
+            it.delays = FloatArray(2) { Float.POSITIVE_INFINITY }
         }
         makeNewSpriteEmissive(TextureRegionPack(Texture(pixmapSpriteEmsv), W * panelCount, H / 2)).let {
             it.setRowsAndFrames(2, 1)
-            it.delays = FloatArray(1) { Float.POSITIVE_INFINITY }
+            it.delays = FloatArray(2) { Float.POSITIVE_INFINITY }
         }
 
         textOverlay = SheetSpriteAnimation(this).also {

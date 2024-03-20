@@ -231,6 +231,7 @@ object IngameRenderer : Disposable {
         frameDelta: Float,
         gamePaused: Boolean,
         zoom: Float = 1f,
+        actorsRenderFarBehind : List<ActorWithBody>,
         actorsRenderBehind : List<ActorWithBody>,
         actorsRenderMiddle : List<ActorWithBody>,
         actorsRenderMidTop : List<ActorWithBody>,
@@ -240,11 +241,13 @@ object IngameRenderer : Disposable {
         player: ActorWithBody? = null,
         uiContainer: UIContainer? = null,
     ) {
-        renderingActorsCount = (actorsRenderBehind.size) +
-                               (actorsRenderMiddle.size) +
-                               (actorsRenderMidTop.size) +
-                               (actorsRenderFront.size) +
-                               (actorsRenderOverlay.size)
+        renderingActorsCount =
+            (actorsRenderFarBehind.size) +
+            (actorsRenderBehind.size) +
+            (actorsRenderMiddle.size) +
+            (actorsRenderMidTop.size) +
+            (actorsRenderFront.size) +
+            (actorsRenderOverlay.size)
         renderingUIsCount = uiContainer?.countVisible() ?: 0
 
         invokeInit()
@@ -259,15 +262,15 @@ object IngameRenderer : Disposable {
             measureDebugTime("Renderer.LightRun*") {
                 // recalculate for even frames, or if the sign of the cam-x changed
                 if (App.GLOBAL_RENDER_TIMER % 3 == 0 || Math.abs(WorldCamera.x - oldCamX) >= world.width * 0.85f * TILE_SIZEF || newWorldLoadedLatch) {
-                    LightmapRenderer.recalculate(actorsRenderBehind + actorsRenderFront + actorsRenderMidTop + actorsRenderMiddle + actorsRenderOverlay)
+                    LightmapRenderer.recalculate(actorsRenderFarBehind + actorsRenderBehind + actorsRenderFront + actorsRenderMidTop + actorsRenderMiddle + actorsRenderOverlay)
                 }
                 oldCamX = WorldCamera.x
             }
 
             prepLightmapRGBA()
             BlocksDrawer.renderData()
-            drawToRGB(frameDelta, actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
-            drawToA(frameDelta, actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
+            drawToRGB(frameDelta, actorsRenderFarBehind, actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
+            drawToA(frameDelta, actorsRenderFarBehind, actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
             drawOverlayActors(frameDelta, actorsRenderOverlay)
 
             if (player != null && player is Pocketed) drawAimGuide(frameDelta, player)
@@ -464,6 +467,7 @@ object IngameRenderer : Disposable {
 
     private fun drawToRGB(
         frameDelta: Float,
+        actorsRenderFarBehind: List<ActorWithBody>?,
         actorsRenderBehind: List<ActorWithBody>?,
         actorsRenderMiddle: List<ActorWithBody>?,
         actorsRenderMidTop: List<ActorWithBody>?,
@@ -485,6 +489,7 @@ object IngameRenderer : Disposable {
                 batch.shader = shaderForActors
                 batch.color = Color.WHITE
                 moveCameraToWorldCoord()
+                actorsRenderFarBehind?.forEach { it.drawBody(frameDelta, batch) }
                 actorsRenderBehind?.forEach { it.drawBody(frameDelta, batch) }
                 particlesContainer?.forEach { it.drawBody(frameDelta, batch) }
             }
@@ -523,6 +528,7 @@ object IngameRenderer : Disposable {
                 batch.shader = shaderForActors
                 batch.color = Color.WHITE
                 moveCameraToWorldCoord()
+                actorsRenderFarBehind?.forEach { it.drawEmissive(frameDelta, batch) }
                 actorsRenderBehind?.forEach { it.drawEmissive(frameDelta, batch) }
                 particlesContainer?.forEach { it.drawEmissive(frameDelta, batch) }
             }
@@ -628,6 +634,7 @@ object IngameRenderer : Disposable {
 
     private fun drawToA(
         frameDelta: Float,
+        actorsRenderFarBehind: List<ActorWithBody>?,
         actorsRenderBehind: List<ActorWithBody>?,
         actorsRenderMiddle: List<ActorWithBody>?,
         actorsRenderMidTop: List<ActorWithBody>?,
@@ -652,6 +659,7 @@ object IngameRenderer : Disposable {
                 batch.color = Color.WHITE
 
                 moveCameraToWorldCoord()
+                actorsRenderFarBehind?.forEach { it.drawGlow(frameDelta, batch) }
                 actorsRenderBehind?.forEach { it.drawGlow(frameDelta, batch) }
                 particlesContainer?.forEach { it.drawGlow(frameDelta, batch) }
             }

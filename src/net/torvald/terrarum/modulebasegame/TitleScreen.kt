@@ -372,6 +372,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 listOf(),
                 listOf(),
                 listOf(),
+                listOf(),
                 particles,
                 uiContainer = uiContainer
             )

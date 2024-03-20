@@ -90,6 +90,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX, true)
 
     // these are required because actors always change their position
+    private var visibleActorsRenderFarBehind: ArrayList<ActorWithBody> = ArrayList(1)
     private var visibleActorsRenderBehind: ArrayList<ActorWithBody> = ArrayList(1)
     private var visibleActorsRenderMiddle: ArrayList<ActorWithBody> = ArrayList(1)
     private var visibleActorsRenderMidTop: ArrayList<ActorWithBody> = ArrayList(1)
@@ -1094,6 +1095,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             frameDelta,
             paused,
             screenZoom,
+            visibleActorsRenderFarBehind,
             visibleActorsRenderBehind,
             visibleActorsRenderMiddle,
             visibleActorsRenderMidTop,
@@ -1261,7 +1263,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                         wireActor.renderOrder = Actor.RenderOrder.OVERLAY
                     }
                     else {
-                        wireActor.renderOrder = Actor.RenderOrder.BEHIND
+                        wireActor.renderOrder = Actor.RenderOrder.FAR_BEHIND
                     }
 
                     wireActor.isUpdate = true
@@ -1312,6 +1314,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
     private fun filterVisibleActors() {
+        visibleActorsRenderFarBehind.clear()
         visibleActorsRenderBehind.clear()
         visibleActorsRenderMiddle.clear()
         visibleActorsRenderMidTop.clear()
@@ -1511,6 +1514,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private fun actorToRenderQueue(actor: ActorWithBody): ArrayList<ActorWithBody> {
         return when (actor.renderOrder) {
+            Actor.RenderOrder.FAR_BEHIND -> visibleActorsRenderFarBehind
             Actor.RenderOrder.BEHIND -> visibleActorsRenderBehind
             Actor.RenderOrder.MIDDLE -> visibleActorsRenderMiddle
             Actor.RenderOrder.MIDTOP -> visibleActorsRenderMidTop
@@ -1772,6 +1776,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
     override fun dispose() {
+        visibleActorsRenderFarBehind.forEach { it.dispose() }
         visibleActorsRenderBehind.forEach { it.dispose() }
         visibleActorsRenderMiddle.forEach { it.dispose() }
         visibleActorsRenderMidTop.forEach { it.dispose() }
