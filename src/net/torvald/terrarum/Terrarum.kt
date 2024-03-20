@@ -477,7 +477,8 @@ fun blendMul(batch: SpriteBatch) {
 
 fun blendAlphaMask(batch: SpriteBatch) {
     batch.enableBlending()
-    batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
+//    batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
+    batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_SRC_COLOR)
 }
 
 /**

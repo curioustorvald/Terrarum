@@ -1863,6 +1863,23 @@ open class ActorWithBody : Actor {
         }
     }
 
+    fun drawTextureInGoodPosition(frameDelta: Float, texture: TextureRegion, batch: SpriteBatch, forcedColourFilter: Color? = null) {
+        if (world == null) return
+
+        val offsetX = 0f
+        val offsetY = 0f
+
+        val posX = hitbox.startX.plus(PHYS_EPSILON_DIST).toFloat()
+        val posY = hitbox.startY.plus(PHYS_EPSILON_DIST).toFloat()
+
+        drawBodyInGoodPosition(posX, posY) { x, y ->
+            val oldCol = batch.color.cpy()
+            batch.color = if (forcedColourFilter != null) forcedColourFilter else Color.WHITE
+            batch.draw(texture, x + offsetX, y + offsetY)
+            batch.color = oldCol
+        }
+    }
+
     override fun onActorValueChange(key: String, value: Any?) {
         // do nothing
     }

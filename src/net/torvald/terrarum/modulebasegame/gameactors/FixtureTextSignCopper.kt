@@ -1,13 +1,20 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.*
@@ -69,7 +76,7 @@ class FixtureTextSignCopper : Electric {
             2
         )
         setEmitterAndSink()
-        setSprites(panelCount)
+        setSprites(panelCount, text)
         updateSignal()
     }
     private fun setEmitterAndSink() {
@@ -85,13 +92,16 @@ class FixtureTextSignCopper : Electric {
         CommonResourcePool.loadAll()
     }
 
-    @Transient private var textOverlay: SheetSpriteAnimation? = null
-    @Transient private var textOverlayEmissive: SheetSpriteAnimation? = null
+    @Transient private var textLit: TextureRegion? = null
+    @Transient private var textUnlit: TextureRegion? = null
+    @Transient private var textLitEmsv: TextureRegion? = null
+    @Transient private var textUnlitEmsv: TextureRegion? = null
+
 
     /**
      * This only constructs the base panel
      */
-    private fun setSprites(panelCount: Int) {
+    private fun setSprites(panelCount: Int, text: String) {
         val panelCount = panelCount.coerceAtLeast(2)
         val pixmap = CommonResourcePool.getAs<Pixmap>("pixmap:copper_sign")
 
@@ -100,10 +110,15 @@ class FixtureTextSignCopper : Electric {
         val ROW0 = 0
         val ROW1 = H
 
+        // construct the sprite
+
         val pixmapSprite = Pixmap(W * panelCount, H, Pixmap.Format.RGBA8888)
         val pixmapSpriteEmsv = Pixmap(W * panelCount, H, Pixmap.Format.RGBA8888)
-        val pixmapOverlay = Pixmap(W * panelCount, H, Pixmap.Format.RGBA8888)
-        val pixmapOverlayEmsv = Pixmap(W * panelCount, H, Pixmap.Format.RGBA8888)
+
+        val pixmapOverlay = Pixmap(W * panelCount, H / 2, Pixmap.Format.RGBA8888)
+        val pixmapOverlayUnlit = Pixmap(W * panelCount, H / 2, Pixmap.Format.RGBA8888)
+        val pixmapOverlayEmsv = Pixmap(W * panelCount, H / 2, Pixmap.Format.RGBA8888)
+        val pixmapOverlayUnlitEmsv = Pixmap(W * panelCount, H / 2, Pixmap.Format.RGBA8888)
 
         pixmapSprite.drawPixmap(pixmap, 0, 0, 0, ROW0, W, H)
         pixmapSprite.drawPixmap(pixmap, W * (panelCount - 1), 0, 32, ROW0, W, H)
@@ -115,10 +130,48 @@ class FixtureTextSignCopper : Electric {
         }
 
         for (tiles in 0 until panelCount) {
-            pixmapOverlay.drawPixmap(pixmap, W * tiles, 0, 48, ROW0, W, H)
-            pixmapOverlayEmsv.drawPixmap(pixmap, W * tiles, 0, 48, ROW1, W, H)
+            pixmapOverlay.drawPixmap(pixmap, W * tiles, 0, 48, 0, W, H)
+            pixmapOverlayUnlit.drawPixmap(pixmap, W * tiles, 0, 48, 32, W, H)
+            pixmapOverlayEmsv.drawPixmap(pixmap, W * tiles, 0, 48, 64, W, H)
+            pixmapOverlayUnlitEmsv.drawPixmap(pixmap, W * tiles, 0, 48, 96, W, H)
         }
 
+        // construct the text FBO
+        val fboTextLit = FrameBuffer(Pixmap.Format.RGBA8888, W * panelCount, H / 2, false)
+        val fboTextUnlit = FrameBuffer(Pixmap.Format.RGBA8888, W * panelCount, H / 2, false)
+        val fboTextLitEmsv = FrameBuffer(Pixmap.Format.RGBA8888, W * panelCount, H / 2, false)
+        val fboTextUnlitEmsv = FrameBuffer(Pixmap.Format.RGBA8888, W * panelCount, H / 2, false)
+
+        val fbo = listOf(fboTextLit, fboTextUnlit, fboTextLitEmsv, fboTextUnlitEmsv)
+        val overlays = listOf(pixmapOverlay, pixmapOverlayUnlit, pixmapOverlayEmsv, pixmapOverlayUnlitEmsv).map { Texture(it) }
+        val batch = SpriteBatch()
+        val camera = OrthographicCamera(fboTextLit.width.toFloat(), fboTextLit.height.toFloat())
+        fbo.forEachIndexed { index, it ->
+            it.inAction(camera, batch) {
+
+                gdxClearAndEnableBlend(Color.CLEAR)
+
+                batch.color = Color.WHITE
+                batch.inUse { _ ->
+                    blendNormalStraightAlpha(batch)
+                    val tw = App.fontGame.getWidth(text)
+                    App.fontGame.draw(batch, text, 0 + (it.width - tw) / 2, 3)
+
+
+                    blendAlphaMask(batch)
+                    batch.draw(overlays[index], 0f, 0f)
+                }
+
+            }
+        }
+
+        textLit = TextureRegion(fboTextLit.colorBufferTexture)
+        textUnlit = TextureRegion(fboTextUnlit.colorBufferTexture)
+        textLitEmsv = TextureRegion(fboTextLitEmsv.colorBufferTexture)
+        textUnlitEmsv = TextureRegion(fboTextUnlitEmsv.colorBufferTexture)
+
+
+        // make sprite out of the constructed pixmaps
         makeNewSprite(TextureRegionPack(Texture(pixmapSprite), W * panelCount, H / 2)).let {
             it.setRowsAndFrames(2, 1)
             it.delays = FloatArray(2) { Float.POSITIVE_INFINITY }
@@ -128,31 +181,50 @@ class FixtureTextSignCopper : Electric {
             it.delays = FloatArray(2) { Float.POSITIVE_INFINITY }
         }
 
-        textOverlay = SheetSpriteAnimation(this).also {
-            it.setSpriteImage(TextureRegionPack(Texture(pixmapOverlay), W, H / 2))
-            it.setRowsAndFrames(2, 1)
-        }
-        textOverlayEmissive = SheetSpriteAnimation(this).also {
-            it.setSpriteImage(TextureRegionPack(Texture(pixmapOverlayEmsv), W, H / 2))
-            it.setRowsAndFrames(2, 1)
-        }
-
-
+        // clean up
         pixmapSprite.dispose()
         pixmapSpriteEmsv.dispose()
         pixmapOverlay.dispose()
+        pixmapOverlayUnlit.dispose()
         pixmapOverlayEmsv.dispose()
+        pixmapOverlayUnlitEmsv.dispose()
+        overlays.forEach { it.dispose() }
     }
 
 
     @Transient var lit = true
 
     override fun drawEmissive(frameDelta: Float, batch: SpriteBatch) {
-        super.drawEmissive(frameDelta, batch)
+        if (isVisible && spriteEmissive != null) {
+            blendNormalStraightAlpha(batch)
+            drawSpriteInGoodPosition(frameDelta, spriteEmissive!!, batch)
+            drawTextureInGoodPosition(frameDelta, if (lit) textLitEmsv!! else textUnlitEmsv!!, batch)
+        }
     }
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
-        super.drawBody(frameDelta, batch)
+        if (isVisible && sprite != null) {
+            drawSpriteInGoodPosition(frameDelta, sprite!!, batch)
+            drawTextureInGoodPosition(frameDelta, if (lit) textLit!! else textUnlit!!, batch)
+        }
+
+
+        // debug display of hIntTilewiseHitbox
+        if (KeyToggler.isOn(Input.Keys.F9)) {
+            val blockMark = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
+
+            for (y in 0..intTilewiseHitbox.height.toInt() + 1) {
+                batch.color = if (y == intTilewiseHitbox.height.toInt() + 1) HITBOX_COLOURS1 else HITBOX_COLOURS0
+                for (x in 0..intTilewiseHitbox.width.toInt()) {
+                    batch.draw(blockMark,
+                        (intTilewiseHitbox.startX.toFloat() + x) * TerrarumAppConfiguration.TILE_SIZEF,
+                        (intTilewiseHitbox.startY.toFloat() + y) * TerrarumAppConfiguration.TILE_SIZEF
+                    )
+                }
+            }
+
+            batch.color = Color.WHITE
+        }
     }
 
     override fun updateSignal() {
@@ -160,13 +232,16 @@ class FixtureTextSignCopper : Electric {
 
         (sprite as? SheetSpriteAnimation)?.currentRow = 1 - lit.toInt()
         (spriteEmissive as? SheetSpriteAnimation)?.currentRow = 1 - lit.toInt()
-        textOverlay?.currentRow = 1 - lit.toInt()
-        textOverlayEmissive?.currentRow = 1 - lit.toInt()
     }
 
     override fun dispose() {
-        super.dispose()
-        if (textOverlay != null) App.disposables.add(textOverlay)
-        if (textOverlayEmissive != null) App.disposables.add(textOverlayEmissive)
+        tooltipShowing.remove(tooltipHash)
+        sprite?.dispose()
+        spriteGlow?.dispose()
+        spriteEmissive?.dispose()
+        textLit?.texture?.dispose()
+        textUnlit?.texture?.dispose()
+        textLitEmsv?.texture?.dispose()
+        textUnlitEmsv?.texture?.dispose()
     }
 }
