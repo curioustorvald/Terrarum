@@ -7,7 +7,6 @@ object Item {
 
     const val TREE_STICK = "item@basegame:18"
 
-    const val TREE_SEED_OAK = "item@basegame:160"
-    const val TREE_LOGS_OAK = "item@basegame:168"
+    const val COPPER_SIGN = "item@basegame:33280"
 
 }

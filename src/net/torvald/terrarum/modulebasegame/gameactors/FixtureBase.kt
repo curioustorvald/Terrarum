@@ -6,6 +6,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
@@ -461,6 +462,14 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
                 TextureRegionPack(ModMgr.getGdxFile(module, path), tileW, tileH)
             } as TextureRegionPack)
         }
+    }
+
+    /**
+     * For some customisable fixtures, they must create new dynamicItem out of their static "template",
+     * register the new dynamicID to the ItemCodex, then return the dynamicID.
+     */
+    open fun itemise(): ItemID {
+        return ItemCodex.fixtureToItemID(this)
     }
 }
 

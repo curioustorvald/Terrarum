@@ -1693,7 +1693,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         // pickup a fixture
         if (fixture != null) {
-            val fixtureItem = ItemCodex.fixtureToItemID(fixture)
+            val fixtureItem = fixture.itemise()
             printdbg(this, "Fixture pickup at F${WORLD_UPDATE_TIMER}: ${fixture.javaClass.canonicalName} -> $fixtureItem")
             // 0. hide tooltips
             setTooltipMessage(null)

@@ -211,12 +211,12 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     @Transient var tags = HashSet<String>()
 
     /**
-     * Tags added/removed by dynamic items
+     * Tags added/removed by dynamic items (e.g. enchanting)
      */
     var modifiers = HashSet<String>()
 
     /**
-     * Mainly intended to be used by third-party modules
+     * Used to hold extra data. Keys are case-insensitive and gets converted to lowercase.
      */
     open val extra = Codex()
 
@@ -368,7 +368,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         @JvmStatic val MISC = "misc"
     }
 
-    override public fun clone(): GameItem {
+    public override fun clone(): GameItem {
         val clonedItem = super.clone()
         // properly clone ItemValue
         (clonedItem as GameItem).itemProperties = this.itemProperties.clone()
@@ -376,8 +376,17 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         return clonedItem
     }
 
+    fun makeDynamic(inventory: ActorInventory): GameItem {
+        return this.clone().also {
+            it.generateUniqueDynamicID(inventory)
+            it.stackable = false
+        }
+    }
 
-    fun generateUniqueDynamicID(inventory: ActorInventory): GameItem {
+
+
+
+    private fun generateUniqueDynamicID(inventory: ActorInventory): GameItem {
         dynamicID = "$PREFIX_DYNAMICITEM:${Companion.generateUniqueDynamicID(inventory)}"
         ItemCodex.registerNewDynamicItem(dynamicID, this)
         return this
@@ -395,7 +404,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         fun generateUniqueDynamicID(inventory: ActorInventory): Int {
             var ret: Int
             do {
-                ret = (1..2147483647).random()
+                ret = (1..999999999).random()
             } while (inventory.contains("$PREFIX_DYNAMICITEM:$ret"))
 
             return ret

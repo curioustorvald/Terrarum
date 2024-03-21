@@ -115,10 +115,8 @@ class ActorInventory() : FixtureInventory() {
                 remove(item, 1)
 
 
-                newItem = item.clone()
-                newItem.generateUniqueDynamicID(this)
+                newItem = item.makeDynamic(this)
 
-                newItem.stackable = false
                 add(newItem)
                 itemEquipped[newItem.equipPosition] = newItem.dynamicID //invSearchByDynamicID(newItem.dynamicID)!!.item // will test if some sketchy code is written. Test fail: kotlinNullpointerException
 

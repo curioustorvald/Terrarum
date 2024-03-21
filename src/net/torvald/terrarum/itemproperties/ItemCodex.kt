@@ -84,6 +84,8 @@ class ItemCodex {
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_24") // copper pickaxe
 
     /**
+     * Unused IDs are purged when the game saves, as only the active entries are written to the savegame.
+     *
      * @param: dynamicID string of "dyn:<random id>"
      */
     fun registerNewDynamicItem(dynamicID: ItemID, item: GameItem) {

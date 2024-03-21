@@ -12,10 +12,15 @@ import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.itemproperties.Item
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameitems.ItemTextSignCopper
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.unicode.TIMES
 import org.dyn4j.geometry.Vector2
 import java.util.*
 
@@ -51,6 +56,19 @@ class FixtureTextSignCopper : Electric {
         this.text = text
         this.panelCount = panelCount
         reload()
+    }
+
+    fun _itemise(actor: ActorHumanoid): GameItem {
+        return ItemTextSignCopper(Item.COPPER_SIGN).makeDynamic(actor.inventory).also {
+            it.extra["signContent"] = text
+            it.extra["signPanelCount"] = panelCount
+            it.nameSecondary = "[$panelCount${TIMES}2] $text"
+        }
+    }
+
+    override fun itemise(): ItemID {
+        val item = _itemise(INGAME.actorNowPlaying!!)
+        return item.dynamicID
     }
 
     override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawn(posX, posY, installersUUID, panelCount.coerceAtLeast(2), 2)

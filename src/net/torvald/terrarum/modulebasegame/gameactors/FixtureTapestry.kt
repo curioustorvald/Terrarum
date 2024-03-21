@@ -66,10 +66,10 @@ internal class FixtureTapestry : FixtureBase {
 
         // draw canvas and frame texture over the pixmap
         val tileFilename = "${frameBlock.replace(':','-')}"
-        val frame = CommonResourcePool.getOrPut("tapestries-common-frame_$tileFilename.tga") {
+        val frame = CommonResourcePool.getOrPut("pixmap:tapestries-common-frame_$tileFilename.tga") {
             Pixmap(ModMgr.getGdxFilesFromEveryMod("tapestries/common/frame_$tileFilename.tga").last().second)
         } as Pixmap
-        val canvas = CommonResourcePool.getOrPut("tapestries-common-canvas.tga") {
+        val canvas = CommonResourcePool.getOrPut("pixmap:tapestries-common-canvas.tga") {
             Pixmap(ModMgr.getGdxFilesFromEveryMod("tapestries/common/canvas.tga").last().second)
         } as Pixmap
 

@@ -14,6 +14,8 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureTapestry
  */
 class ItemTapestry(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureTapestry") {
 
+    constructor() : this("") // item that can be dynamic needs no-arg constructor, as the class gets serialised into the savegame under dynamicItemInventory.[dynamicID]
+
     override var dynamicID: ItemID = originalID
     override var baseMass = 6.0
     override val canBeDynamic = false
@@ -25,8 +27,9 @@ class ItemTapestry(originalID: ItemID) : FixtureItemBase(originalID, "net.torval
 
     @Transient override val makeFixture: () -> FixtureBase = {
         FixtureTapestry(
-                Gdx.files.internal("assets/monkey_island").readBytes(),
-                Block.PLANK_NORMAL
+            // TODO use extra["fileRef"] (string) and extra["framingMaterial"] (string)
+            Gdx.files.internal("assets/monkey_island").readBytes(),
+            Block.PLANK_NORMAL
         )
     }
 
