@@ -894,7 +894,7 @@ open class ActorWithBody : Actor {
                         debug1("translate x by $t")
                     }
                     /* 4, 14 */ COLLIDING_RIGHT, COLLIDING_RIGHT or COLLIDING_UD -> {
-                        val t = -newHitbox.endX.modTileDelta()
+                        val t = -newHitbox.endX.modTileDelta() - PHYS_EPSILON_DIST // THE cheapest way to resolve right-sided phys bug
                         newHitbox.translatePosX(t); bounceX = true
                         debug1("translate x by $t")
                     }
@@ -979,7 +979,8 @@ open class ActorWithBody : Actor {
                         debug1("offendingTileWorldY=$offendingTileWorldY, offendingHitboxPointY=$offendingHitboxPointY")
 
                         val displacementAbs = Vector2(
-                            (offendingTileWorldX - offendingHitboxPointX).abs(),
+                            (offendingTileWorldX - offendingHitboxPointX).abs() +
+                                    if (selfCollisionStatus and COLLIDING_RIGHT != 0) PHYS_EPSILON_DIST else 0.0, // THE cheapest way to resolve right-sided phys bug
                             (offendingTileWorldY - offendingHitboxPointY).abs()
                         )
 
