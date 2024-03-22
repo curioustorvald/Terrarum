@@ -2,10 +2,14 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
@@ -24,9 +28,10 @@ class UIEngravingTextSign : UICanvas(
     toggleButtonLiteral = "control_gamepad_start"
 ) {
 
+    private var panelZoom = 4f
     init {
         CommonResourcePool.addToLoadingList("spritesheet:copper_sign") {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/text_sign_glass_copper.tga"), TILE_SIZE, TILE_SIZE)
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/text_sign_glass_copper.tga"), TILE_SIZE, 2*TILE_SIZE)
         }
         CommonResourcePool.loadAll()
     }
@@ -58,6 +63,50 @@ class UIEngravingTextSign : UICanvas(
     private val COPPER_BULB = "item@basegame:35"
     private val ROCK_TILE = Block.STONE_TILE_WHITE
     private val GLASS = Block.GLASS_CRUDE
+
+
+    private val backdropColour = Color(0xffffff_c8.toInt())
+
+    private var fboText = FrameBuffer(Pixmap.Format.RGBA8888, 1, 1, false)
+    private var fboBatch = SpriteBatch()
+    private var fboCamera = OrthographicCamera(1f, 1f)
+
+    private fun updatePanelText(text: String, panelCount: Int) {
+        fboText.dispose()
+        fboText = FrameBuffer(Pixmap.Format.RGBA8888, panelCount*TILE_SIZE, 2*TILE_SIZE, false)
+        fboText.colorBufferTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        fboCamera.setToOrtho(true, panelCount*TILE_SIZEF, 2*TILE_SIZEF)
+
+        fboText.inAction(fboCamera, fboBatch) {
+            gdxClearAndEnableBlend(Color.CLEAR)
+            fboBatch.color = Color.WHITE
+            fboBatch.inUse { batch ->
+                blendNormalStraightAlpha(batch)
+                val tw = App.fontGame.getWidth(text)
+                App.fontGame.draw(batch, text, 0 + (it.width - tw) / 2, 3)
+
+
+                blendAlphaMask(batch)
+                for (p in 0 until panelCount) {
+                    batch.draw(signSheet.get(3, 0), TILE_SIZEF * p, 0f)
+                }
+            }
+        }
+    }
+
+    private fun drawPanels(batch: SpriteBatch, xStart: Float, yStart: Float, panelCount: Int) {
+        blendNormalStraightAlpha(batch)
+
+        // panels
+        batch.color = backdropColour
+        for (p in 0 until panelCount) {
+            val sprite = signSheet.get(if (p == 0) 0 else if (p == panelCount - 1) 2 else 1, 0)
+            batch.draw(sprite, xStart + p * sprite.regionWidth * panelZoom, yStart, sprite.regionWidth * panelZoom, sprite.regionHeight * panelZoom)
+        }
+
+        // text
+        batch.draw(fboText.colorBufferTexture, xStart, yStart, fboText.width * panelZoom, fboText.height * panelZoom)
+    }
 
     private fun setIngredient(num: Int) {
         ingredients.clear()
@@ -135,7 +184,11 @@ class UIEngravingTextSign : UICanvas(
         addUIitem(goButton)
     }
 
+    private var panelCount = panelCountSpinner.value.toInt()
     override fun updateImpl(delta: Float) {
+        panelCount = panelCountSpinner.value.toInt()
+        updatePanelText("Hello, world!", panelCount)
+
         uiItems.forEach { it.update(delta) }
     }
 
@@ -150,6 +203,9 @@ class UIEngravingTextSign : UICanvas(
 
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         UIInventoryFull.drawBackground(batch, opacity)
+
+        // paint preview
+        drawPanels(batch, (width - panelCount * panelZoom * TILE_SIZE).toInt().div(2).toFloat(), height / 4f - 8, panelCount)
 
         // paint UI elements
         uiItems.forEach { it.render(frameDelta, batch, camera) }
@@ -168,7 +224,8 @@ class UIEngravingTextSign : UICanvas(
     }
 
     override fun dispose() {
-
+        fboText.tryDispose()
+        fboBatch.tryDispose()
     }
 
 
