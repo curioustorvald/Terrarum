@@ -59,9 +59,9 @@ class UIEngravingTextSign : UICanvas(
     private val inputWidth = 350
     private val spinnerWidth = ControlPanelCommon.CONFIG_SPINNER_WIDTH
     private val ingredientsWidth = UIItemInventoryElemSimple.height * 3 + 16
-    private val inputX = drawX + internalWidth - inputWidth + 5
+    private val inputX = drawX + internalWidth - inputWidth
 
-    private val textInput = UIItemTextLineInput(this, inputX, row0, inputWidth).also {
+    private val textInput = UIItemTextLineInput(this, inputX - 1, row0, inputWidth).also {
         it.textCommitListener = { text ->
             val textLen = App.fontGame.getWidth(text) + 4
             val panelCountMin = (textLen / TILE_SIZEF).ceilToInt()
@@ -164,7 +164,14 @@ class UIEngravingTextSign : UICanvas(
         it.isCompactMode = true
     }
 
-    private val panelCountSpinner = UIItemSpinner(this, inputX + inputWidth - ingredientsWidth, row2 - 1, 2, 2, 32, 1, spinnerWidth, numberToTextFunction = { "${it.toDouble().roundToInt()}" }).also {
+    private val panelCountSpinner = UIItemSpinner(
+        this,
+        inputX + inputWidth - ingredientsWidth + 19,
+        row2 - 1,
+        2, 2, 32, 1,
+        spinnerWidth,
+        numberToTextFunction = { "${it.toDouble().roundToInt()}" }
+    ).also {
         it.selectionChangeListener = { num0 ->
             val num = num0.toInt()
             setIngredient(num)
