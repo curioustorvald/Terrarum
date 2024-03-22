@@ -18,9 +18,9 @@ class UIItemSpinner(
     parentUI: UICanvas,
     initialX: Int, initialY: Int,
     private var initialValue: Number,
-    val min: Number,
-    val max: Number,
-    val step: Number,
+    var min: Number,
+    var max: Number,
+    var step: Number,
     override val width: Int,
     private val drawBorder: Boolean = true,
     private val numberToTextFunction: (Number) -> String = { "$it" }
@@ -86,6 +86,7 @@ class UIItemSpinner(
     fun changeValueBy(diff: Int) {
         currentIndex = (currentIndex + diff).coerceIn(values.indices)
         value = values[currentIndex]
+        fboUpdateLatch = true
     }
 
     override fun update(delta: Float) {

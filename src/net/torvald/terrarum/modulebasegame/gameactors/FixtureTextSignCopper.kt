@@ -173,7 +173,7 @@ class FixtureTextSignCopper : Electric {
                 batch.inUse { _ ->
                     blendNormalStraightAlpha(batch)
                     val tw = App.fontGame.getWidth(text)
-                    App.fontGame.draw(batch, text, 0 + (it.width - tw) / 2, 3)
+                    App.fontGame.draw(batch, text, 1 + (it.width - tw) / 2, 3)
 
 
                     blendAlphaMask(batch)

@@ -18,7 +18,7 @@ class MakeSign : ConsoleCommand {
         }
 
         val text = args[1]
-        val textLen = App.fontGame.getWidth(text)
+        val textLen = App.fontGame.getWidth(text) + 4
         val panelCount = (args.getOrNull(2)?.toInt() ?: (textLen / TILE_SIZEF).ceilToInt()).coerceAtLeast(2)
 
         val actorInventory = INGAME.actorNowPlaying!!.inventory

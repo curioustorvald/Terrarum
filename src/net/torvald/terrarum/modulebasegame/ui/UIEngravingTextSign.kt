@@ -58,7 +58,17 @@ class UIEngravingTextSign : UICanvas(
     private val ingredientsWidth = UIItemInventoryElemSimple.height * 3 + 16
     private val inputX = drawX + internalWidth - inputWidth + 5
 
-    private val textInput = UIItemTextLineInput(this, inputX, row0, inputWidth)
+    private val textInput = UIItemTextLineInput(this, inputX, row0, inputWidth).also {
+        it.textCommitListener = { text ->
+            val textLen = App.fontGame.getWidth(text) + 4
+            val panelCountMin = (textLen / TILE_SIZEF).ceilToInt()
+
+            updateMinimumLen(panelCountMin)
+            panelCount = panelCountSpinner.value.toInt()
+
+            updatePanelText(text, panelCount)
+        }
+    }
 
     private val COPPER_BULB = "item@basegame:35"
     private val ROCK_TILE = Block.STONE_TILE_WHITE
@@ -70,6 +80,13 @@ class UIEngravingTextSign : UICanvas(
     private var fboText = FrameBuffer(Pixmap.Format.RGBA8888, 1, 1, false)
     private var fboBatch = SpriteBatch()
     private var fboCamera = OrthographicCamera(1f, 1f)
+
+    private fun updateMinimumLen(mlen0: Int) {
+        val mlen = mlen0.coerceAtLeast(2).toDouble()
+        val delta = maxOf(panelCount.toDouble(), mlen) - panelCount.toDouble()
+        panelCountSpinner.changeValueBy(delta.toInt())
+        setIngredient(panelCountSpinner.value.toInt())
+    }
 
     private fun updatePanelText(text: String, panelCount: Int) {
         fboText.dispose()
@@ -105,7 +122,7 @@ class UIEngravingTextSign : UICanvas(
         }
 
         // text
-        batch.draw(fboText.colorBufferTexture, xStart, yStart, fboText.width * panelZoom, fboText.height * panelZoom)
+        batch.draw(fboText.colorBufferTexture, xStart + panelZoom, yStart, fboText.width * panelZoom, fboText.height * panelZoom)
     }
 
     private fun setIngredient(num: Int) {
@@ -187,7 +204,6 @@ class UIEngravingTextSign : UICanvas(
     private var panelCount = panelCountSpinner.value.toInt()
     override fun updateImpl(delta: Float) {
         panelCount = panelCountSpinner.value.toInt()
-        updatePanelText("Hello, world!", panelCount)
 
         uiItems.forEach { it.update(delta) }
     }
