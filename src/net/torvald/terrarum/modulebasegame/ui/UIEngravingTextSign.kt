@@ -103,7 +103,7 @@ class UIEngravingTextSign : UICanvas(
             fboBatch.inUse { batch ->
                 blendNormalStraightAlpha(batch)
                 val tw = App.fontGame.getWidth(text)
-                App.fontGame.draw(batch, text, 0 + (it.width - tw) / 2, 3)
+                App.fontGame.draw(batch, text, 1 + (it.width - tw) / 2, 2)
 
 
                 blendAlphaMask(batch)
@@ -125,7 +125,7 @@ class UIEngravingTextSign : UICanvas(
         }
 
         // text
-        batch.draw(fboText.colorBufferTexture, xStart + panelZoom, yStart, fboText.width * panelZoom, fboText.height * panelZoom)
+        batch.draw(fboText.colorBufferTexture, xStart, yStart, fboText.width * panelZoom, fboText.height * panelZoom)
     }
 
     private fun setIngredient(num: Int) {
