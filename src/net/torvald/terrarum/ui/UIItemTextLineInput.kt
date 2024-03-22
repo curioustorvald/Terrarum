@@ -1,7 +1,6 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
@@ -194,7 +193,7 @@ class UIItemTextLineInput(
         cursorOn = true
     }
 
-    private fun moveCursorBack(delta: Int) {
+    private fun __moveCursorBackward(delta: Int) {
         cursorDrawX -= delta
         if (cursorDrawX < 0) {
             val stride = -cursorDrawX + min(256, fbo.width * 40 / 100) // + lookbehind term
@@ -203,12 +202,15 @@ class UIItemTextLineInput(
         }
         // make sure to not scroll past the line head
         if (cursorDrawScroll < 0) {
-            cursorDrawX += cursorDrawScroll
+            cursorDrawX = 0
             cursorDrawScroll = 0
+        }
+        else if (cursorDrawScroll == 0 && cursorDrawX < 0) {
+            cursorDrawX = 0
         }
     }
 
-    private fun moveCursorForward(delta: Int) {
+    private fun __moveCursorForward(delta: Int) {
         cursorDrawX += delta
         if (cursorDrawX > fbo.width) {
             val stride = cursorDrawX - fbo.width
@@ -217,11 +219,16 @@ class UIItemTextLineInput(
         }
     }
 
+    private fun moveCursorBy(delta: Int) {
+        if (delta > 0) __moveCursorForward(delta)
+        else if (delta < 0) __moveCursorBackward(-delta)
+    }
+
     /*private fun moveCursorToEnd(stride: Int) {
         try {
             cursorX += stride
             currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-            moveCursorForward(currentTextLenPx - oldTextLenPx)
+            moveCursorBy(currentTextLenPx - oldTextLenPx)
             oldTextLenPx = currentTextLenPx
         }
         catch (e: Throwable) {}
@@ -241,7 +248,7 @@ class UIItemTextLineInput(
             }
 
             currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-            moveCursorBack(oldTextLenPx - currentTextLenPx)
+            moveCursorBy(currentTextLenPx - oldTextLenPx)
             oldTextLenPx = currentTextLenPx
         }
     }
@@ -300,7 +307,7 @@ class UIItemTextLineInput(
                                             textbuf.addAll(cursorX, codepoints)
                                             cursorX += codepoints.size
                                             currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                                            moveCursorForward(currentTextLenPx - oldTextLenPx)
+                                            moveCursorBy(currentTextLenPx - oldTextLenPx)
                                             oldTextLenPx = currentTextLenPx
                                         }
                                     }
@@ -322,7 +329,7 @@ class UIItemTextLineInput(
                             if (cursorX > 0) {
                                 cursorX -= 1
                                 currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                                moveCursorBack(oldTextLenPx - currentTextLenPx)
+                                moveCursorBy(currentTextLenPx - oldTextLenPx)
                                 oldTextLenPx = currentTextLenPx
                             }
                         }
@@ -332,12 +339,13 @@ class UIItemTextLineInput(
                             if (cursorX < textbuf.size) {
                                 cursorX += 1
                                 currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                                moveCursorForward(currentTextLenPx - oldTextLenPx)
+                                moveCursorBy(currentTextLenPx - oldTextLenPx)
                                 oldTextLenPx = currentTextLenPx
                             }
                         }
                         else if (keycodes.containsSome(Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER)) {
                             endComposing()
+                            oldTextLenPx = 0
 
     //                        println("END COMPOSING!!")
                         }
@@ -380,7 +388,7 @@ class UIItemTextLineInput(
                                 textbuf.addAll(cursorX, codepoints)
                                 cursorX += codepoints.size
                                 currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                                moveCursorForward(currentTextLenPx - oldTextLenPx)
+                                moveCursorBy(currentTextLenPx - oldTextLenPx)
                                 oldTextLenPx = currentTextLenPx
                             }
                         }
@@ -505,7 +513,7 @@ class UIItemTextLineInput(
         textbuf.addAll(actuallyInserted)
         cursorX += codepoints.size
         currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, minOf(cursorX, textbuf.size))))
-        moveCursorForward(currentTextLenPx - oldTextLenPx)
+        moveCursorBy(currentTextLenPx - oldTextLenPx)
         oldTextLenPx = currentTextLenPx
 
         fboUpdateLatch = true
@@ -602,6 +610,7 @@ class UIItemTextLineInput(
 
         // draw text cursor
         val cursorXOnScreen = inputPosX + cursorDrawX + 2 + textDrawOffset
+//        printdbg(this, "inputPosX=$inputPosX, cursorDrawX=$cursorDrawX, cursorDrawScroll=$cursorDrawScroll")
         if (isEnabled && cursorOn) {
             val baseCol = if (maxLen.exceeds(textbuf, listOf(32))) TEXTINPUT_COL_TEXT_NOMORE else TEXTINPUT_COL_TEXT
 
@@ -695,8 +704,8 @@ class UIItemTextLineInput(
         resetIME()
         textbuf.clear()
         cursorX = 0
-        cursorDrawScroll = 0
         cursorDrawX = 0
+        cursorDrawScroll = 0
     }
     fun setText(s: String) {
         clearText()
@@ -707,7 +716,7 @@ class UIItemTextLineInput(
         textbuf.addAll(codepoints)
         cursorX += codepoints.size
         currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-        moveCursorForward(currentTextLenPx - oldTextLenPx)
+        moveCursorBy(currentTextLenPx - oldTextLenPx)
         oldTextLenPx = currentTextLenPx
     }
     override fun dispose() {
