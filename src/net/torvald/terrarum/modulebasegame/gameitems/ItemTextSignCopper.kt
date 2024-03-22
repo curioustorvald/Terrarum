@@ -30,6 +30,10 @@ class ItemTextSignCopper(originalID: ItemID) : FixtureItemBase(originalID, "net.
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_COPPER_SIGN"
 
+    init {
+        stackable = false
+    }
+
     @Transient override val makeFixture: () -> FixtureBase = {
         FixtureTextSignCopper(
             extra.getAsString("signContent") ?: "",

@@ -49,7 +49,12 @@
       [1, 12, "$WOOD", 5, "item@basegame:113"] /* 12 wood, 5 iron */
     ]
   },
-
+  "item@basegame:53": { /* engraving workbench */
+    "workbench": "basiccrafting",
+    "ingredients": [
+      [1, 12, "$WOOD", 8, "item@basegame:113"] /* 12 wood, 8 iron */
+    ]
+  },
 
 
   "item@basegame:256": { /* oak door */
