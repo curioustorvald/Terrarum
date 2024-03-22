@@ -6,6 +6,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.UICrafting
+import net.torvald.terrarum.modulebasegame.ui.UIEngravingTextSign
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -53,6 +54,32 @@ class FixtureElectricWorkbench : FixtureBase, CraftingStation {
 
         makeNewSprite(TextureRegionPack(itemImage.texture, 32, 32)).let {
             it.setRowsAndFrames(2,1)
+        }
+
+        actorValue[AVKey.BASEMASS] = 40.0
+    }
+
+}
+
+/**
+ * Created by minjaesong on 2024-03-22.
+ */
+class FixtureEngravingWorkbench : FixtureBase, CraftingStation {
+
+    @Transient override val tags = listOf("engraving")
+
+    constructor() : super(
+        BlockBox(BlockBox.NO_COLLISION, 2, 2),
+        nameFun = { Lang["ITEM_ENGRAVING_WORKBENCH"] },
+        mainUI = UIEngravingTextSign()
+    ) {
+        val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/engraving_workbench.tga")
+
+        density = BlockCodex[Block.PLANK_NORMAL].density.toDouble()
+        setHitboxDimension(itemImage.texture.width, itemImage.texture.height, 0, 0)
+
+        makeNewSprite(TextureRegionPack(itemImage.texture, 32, 32)).let {
+            it.setRowsAndFrames(1,1)
         }
 
         actorValue[AVKey.BASEMASS] = 40.0

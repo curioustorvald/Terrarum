@@ -312,6 +312,8 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
 
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        UIInventoryFull.drawBackground(batch, opacity)
+
         val clickedOn = clickedOnState.get() / SLOT_INDEX_STRIDE
 
 

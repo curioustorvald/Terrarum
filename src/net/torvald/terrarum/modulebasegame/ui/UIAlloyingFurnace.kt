@@ -325,6 +325,8 @@ class UIAlloyingFurnace(val smelter: FixtureAlloyingFurnace) : UICanvas(
 
 
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        UIInventoryFull.drawBackground(batch, opacity)
+
         val clickedOn = clickedOnState.get() / SmelterGuiEventBuilder.SLOT_INDEX_STRIDE
 
 

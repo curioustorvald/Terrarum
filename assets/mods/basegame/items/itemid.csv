@@ -51,6 +51,7 @@ id;classname;tags
 50;net.torvald.terrarum.modulebasegame.gameitems.ItemSolderingWire;
 51;net.torvald.terrarum.modulebasegame.gameitems.ItemElectricWorkbench;FIXTURE,CRAFTING
 52;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalSevenSeg;FIXTURE,SIGNAL
+53;net.torvald.terrarum.modulebasegame.gameitems.ItemEngravingWorkbench;FIXTURE,CRAFTING
 
 # ingots
 112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper;INGOT

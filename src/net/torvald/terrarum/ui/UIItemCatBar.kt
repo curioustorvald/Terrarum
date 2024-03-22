@@ -314,7 +314,7 @@ class UIItemCatBar(
 
     }
 
-    private val labelCol = Color(0xe0e0e0ff.toInt())
+    private val labelCol = Color(0xe8e8e8ff.toInt())
 
 
 
