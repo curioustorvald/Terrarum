@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
@@ -7,16 +8,18 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.itemproperties.Item
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
+import net.torvald.terrarum.modulebasegame.gameitems.ItemTextSignCopper
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.unicode.TIMES
 import net.torvald.unicode.getKeycapPC
 import kotlin.math.roundToInt
 
@@ -170,13 +173,29 @@ class UIEngravingTextSign : UICanvas(
     }
 
 
-    private val goButton = UIItemTextButton(this,
-        { Lang["GAME_ACTION_CRAFT"] }, (width - goButtonWidth) / 2, row3, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+    private val resetButton = UIItemTextButton(this,
+        { Lang["MENU_LABEL_RESET"] }, width / 2 - 24 - goButtonWidth, row3, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
 
         it.clickOnceListener = { _, _ ->
+            resetUI()
+        }
+    }
 
+    private val goButton = UIItemTextButton(this,
+        { Lang["GAME_ACTION_CRAFT"] }, width / 2 + 24, row3, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
 
+        it.clickOnceListener = { _, _ ->
+            val actorInventory = getPlayerInventory()
+            val text = textInput.getText()
+            val item = ItemTextSignCopper(Item.COPPER_SIGN).makeDynamic(actorInventory).also {
+                it.extra["signContent"] = text
+                it.extra["signPanelCount"] = panelCount
+                it.nameSecondary = "[$panelCount${TIMES}2] $text"
+            }
 
+            actorInventory.add(item)
+
+            resetUI()
         }
     }
 
@@ -199,6 +218,7 @@ class UIEngravingTextSign : UICanvas(
         addUIitem(panelCountSpinner)
         addUIitem(ingredientsPanel)
         addUIitem(goButton)
+        addUIitem(resetButton)
     }
 
     private var panelCount = panelCountSpinner.value.toInt()

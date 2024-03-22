@@ -70,7 +70,10 @@ fun getKeycapPC(c: Char) = when (c.uppercaseChar()) {
     in ' '..'_' -> (0xE000 + c.code - 32).toChar()
     else -> throw IllegalArgumentException("Not in range: ${c.code - 32}")
 }
-fun getKeycapPC(keycode: Int) = getKeycapPC(com.badlogic.gdx.Input.Keys.toString(keycode)[0])
+fun getKeycapPC(keycode: Int) =
+    if (keycode == com.badlogic.gdx.Input.Keys.ESCAPE)
+        "\uE09E\uE09F"
+    else getKeycapPC(com.badlogic.gdx.Input.Keys.toString(keycode)[0])
 fun getMouseButton(button: Int) = when (button) {
     0 -> KEYCAP_LEFT_MOUSE
     1 -> KEYCAP_RIGHT_MOUSE
