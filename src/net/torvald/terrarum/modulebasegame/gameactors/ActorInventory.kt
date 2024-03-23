@@ -145,9 +145,9 @@ class ActorInventory() : FixtureInventory() {
             if (newItem.durability <= 0) {
                 remove(newItem, 1)
 
-                // auto pull the same item if the player has one
+                // auto reload the same item if the player has one, tool only
                 (actor as Pocketed).inventory.let { inv ->
-                    inv.itemList.filter { ItemCodex[it.itm]?.originalID == newItem.originalID }.firstOrNull()?.let { (itm, qty) ->
+                    inv.itemList.filter { ItemCodex[it.itm]?.originalID == newItem.originalID && ItemCodex[it.itm]?.hasTag("TOOL") == true }.firstOrNull()?.let { (itm, qty) ->
                         printdbg(this, "AutoEquip item $itm")
 
                         actor.equipItem(itm)
