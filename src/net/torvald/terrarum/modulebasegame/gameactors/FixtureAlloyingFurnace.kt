@@ -319,13 +319,14 @@ class FixtureAlloyingFurnace : FixtureBase {
             progress += temperature
 
             if (progress >= FixtureSmelterBasic.CALORIES_PER_ROASTING) {
+                val moq = smeltingProduct.moq
                 val smeltingProduct = smeltingProduct.item
 
                 // check if the item even exists
                 if (ItemCodex[smeltingProduct] == null) throw NullPointerException("No item prop for $smeltingProduct")
 
                 if (productItem == null)
-                    productItem = InventoryPair(smeltingProduct, 1L)
+                    productItem = InventoryPair(smeltingProduct, moq)
                 else
                     productItemStatus.changeCount(1)
 

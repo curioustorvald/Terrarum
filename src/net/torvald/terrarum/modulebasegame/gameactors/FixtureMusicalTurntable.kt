@@ -166,6 +166,8 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
         super.reload()
         // cannot resume playback, just stop the music
         musicNowPlaying = null
+        // update sprite
+        (sprite as SheetSpriteAnimation).currentRow = (disc == null).toInt()
     }
 
     override fun dispose() {

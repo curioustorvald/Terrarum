@@ -2,26 +2,26 @@
   /* as for the plus operator, the itemIDs must be sorted lexicographically and first word should come left */
   "item@basegame:112+item@basegame:116": { /* copper + tin -> bronze */
     "difficulty": 1.0,
-    "product": [1, "item@basegame:176"]
+    "product": [2, "item@basegame:176"]
   },
   "item@basegame:112+item@basegame:115": { /* copper + zinc -> brass */
     "difficulty": 1.0,
-    "product": [1, "item@basegame:177"]
+    "product": [2, "item@basegame:177"]
   },
   "item@basegame:117+item@basegame:118": { /* gold + silver -> electrum */
     "difficulty": 1.0,
-    "product": [1, "item@basegame:178"]
+    "product": [2, "item@basegame:178"]
   },
   "item@basegame:112+item@basegame:118": { /* copper + silver -> silver billon */
     "difficulty": 1.0,
-    "product": [1, "item@basegame:179"]
+    "product": [2, "item@basegame:179"]
   },
   "item@basegame:112+item@basegame:117": { /* copper + gold -> rose gold */
     "difficulty": 1.0,
-    "product": [1, "item@basegame:180"]
+    "product": [2, "item@basegame:180"]
   },
   "item@basegame:116+item@basegame:119": { /* tin + lead -> solder */
     "difficulty": 1.0,
-    "product": [1, "item@basegame:181"]
+    "product": [2, "item@basegame:181"]
   }
 }
