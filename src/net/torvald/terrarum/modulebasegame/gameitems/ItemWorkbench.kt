@@ -30,7 +30,7 @@ class ItemElectricWorkbench(originalID: ItemID) : FixtureItemBase(originalID, "n
     override val canBeDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
-        get() = getItemImageFromSheet("basegame", "sprites/fixtures/electric_workbench.tga", 32, 32, 0, 1)
+        get() = getItemImageFromSheet("basegame", "sprites/fixtures/electric_workbench.tga", 32, 32, 0, 0)
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_ELECTRIC_WORKBENCH"
