@@ -76,7 +76,7 @@ basegame
     // Commit counts up to the Release 0.3.3: 3020
     // Commit counts up to the Release 0.4.0: 3631
     // Commit counts up to the Release 0.4.1: 3678
-    // Commit counts up to the Release 0.4.2: 3761
+    // Commit counts up to the Release 0.4.2: 3762
 
     val DEV_CYCLE: Map<String, Long> = mapOf(
         "Alpha" to 0x0000_000004_000000,
@@ -93,9 +93,9 @@ basegame
     private val DEV_CYCLE_LIST_SORTED = DEV_CYCLE.toList().sortedBy { it.second }
     val CURRENT_DEV_CYCLE: String? = DEV_CYCLE_LIST_SORTED.map { it.first to VERSION_RAW - it.second }.firstOrNull { it.second >= 0L }?.first
 
-    val VERSION_SNAPSHOT = Snapshot(0) // for normal dev
+//    val VERSION_SNAPSHOT = Snapshot(0) // for normal dev
 //    val VERSION_SNAPSHOT = ForcedSnapshot("24w07d") // for snapshot release
-//    val VERSION_SNAPSHOT = null // for the release
+    val VERSION_SNAPSHOT = null // for the release
 
     const val VERSION_TAG: String = ""
 
