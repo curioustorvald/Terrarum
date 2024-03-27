@@ -76,6 +76,7 @@ basegame
     // Commit counts up to the Release 0.3.3: 3020
     // Commit counts up to the Release 0.4.0: 3631
     // Commit counts up to the Release 0.4.1: 3678
+    // Commit counts up to the Release 0.4.2: 3761
 
     val DEV_CYCLE: Map<String, Long> = mapOf(
         "Alpha" to 0x0000_000004_000000,
