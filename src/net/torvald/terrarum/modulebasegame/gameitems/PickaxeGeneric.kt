@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.audio.MusicContainer
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -222,31 +223,44 @@ object PickaxeCore {
     const val TOOL_DURABILITY_BASE = 350 // of iron pick
 
     fun showOresTooltip(actor: ActorWithBody, tool: GameItem, mx: Int, my: Int): Unit {
-        if (App.getConfigBoolean("basegame:showpickaxetooltip")) {
 
-            val overlayUIopen = (INGAME as? TerrarumIngame)?.uiBlur?.isVisible ?: false
-            var tooltipSet = false
+        val overlayUIopen = (INGAME as? TerrarumIngame)?.uiBlur?.isVisible ?: false
+        var tooltipSet = false
 
-            mouseInInteractableRangeTools(actor, tool) {
-                val tileUnderCursor = INGAME.world.getTileFromOre(mx, my).item
-                val playerCodex = (actor.actorValue.getAsString(AVKey.ORE_DICT) ?: "").split(',').filter { it.isNotBlank() }
+        val tooltipWasShown = tooltipShowing[hash] ?: false
 
+        mouseInInteractableRangeTools(actor, tool) {
+            val tileUnderCursor = INGAME.world.getTileFromOre(mx, my).item
+            val playerCodex = (actor.actorValue.getAsString(AVKey.ORE_DICT) ?: "").split(',').filter { it.isNotBlank() }
 
-                if (tileUnderCursor != Block.AIR && !overlayUIopen) {
-                    val itemForOre = OreCodex[tileUnderCursor].item
-                    val tileName = if (playerCodex.binarySearch(itemForOre) >= 0)
-                        Lang[ItemCodex[itemForOre]!!.originalName]
-                    else "???"
+            if (tileUnderCursor != Block.AIR && !overlayUIopen) {
+                val itemForOre = OreCodex[tileUnderCursor].item
+                val tileName = if (playerCodex.binarySearch(itemForOre) >= 0)
+                    Lang[ItemCodex[itemForOre]!!.originalName]
+                else "???"
+                if (App.getConfigBoolean("basegame:showpickaxetooltip")) {
                     INGAME.setTooltipMessage(tileName)
                     tooltipShowing[hash] = true
-                    tooltipSet = true
                 }
-
-                true // just a placeholder
+                tooltipSet = true
             }
 
-            if (!tooltipSet) tooltipShowing[hash] = false
+            // play sound cue
+            if (!tooltipWasShown && tooltipSet) {
+                actor.startAudio(soundCue, 0.7) // TODO play on the GUI track
+            }
+
+            true // just a placeholder
         }
+
+        if (App.getConfigBoolean("basegame:showpickaxetooltip") && !tooltipSet) tooltipShowing[hash] = false
+    }
+
+    private val soundCue = MusicContainer(
+        "pickaxe_sound_cue",
+        ModMgr.getFile("basegame", "audio/effects/accessibility/pickaxe_valuable.ogg"),
+    ).also {
+        App.disposables.add(it)
     }
 }
 

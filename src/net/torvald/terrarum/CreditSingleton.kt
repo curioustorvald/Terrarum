@@ -337,6 +337,9 @@ Sound from <https://freesound.org/people/richwise>
 ℗ 2012, 2015 j1987 and ScouseMouseJB
 Sound from <https://freesound.org/people/j1987> and <https://freesound.org/people/ScouseMouseJB>
 
+    - effects/accessibility/pickaxe_valuable.ogg
+℗ 2009 Benboncan
+Sound from <https://freesound.org/people/Benboncan/>
 
 
 $BULLET Impulse Responses:
