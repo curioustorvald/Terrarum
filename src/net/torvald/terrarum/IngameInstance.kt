@@ -5,6 +5,8 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.audio.MusicContainer
+import net.torvald.terrarum.audio.dsp.BinoPan
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -440,6 +442,16 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
 
     open fun saveTheGame(onSuccessful: () -> Unit, onError: (Throwable) -> Unit) {
         loadedTime_t = App.getTIME_T()
+    }
+
+    open fun playGUIsound(sound: MusicContainer, volume: Double = 1.0, pan: Float = 0f) {
+        App.audioMixer.guiTrack.let {
+            it.currentTrack = sound
+            it.maxVolumeFun= { volume }
+            it.volume = volume
+            it.playRequested.set(true)
+            it.getFilter<BinoPan>().pan = pan
+        }
     }
 
     /**

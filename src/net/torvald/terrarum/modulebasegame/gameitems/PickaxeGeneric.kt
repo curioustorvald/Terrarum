@@ -2,9 +2,11 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.jme3.math.FastMath.pow
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.audio.MixerTrackProcessor
 import net.torvald.terrarum.audio.MusicContainer
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
@@ -246,8 +248,14 @@ object PickaxeCore {
             }
 
             // play sound cue
+            val mvec = Vector2(Terrarum.mouseX, Terrarum.mouseY)
+            val dist = distBetween(actor, mvec)
+            val relX = relativeXposition(actor, mvec)
+            val distFallOff = 1.3 * 128.0
+            val pan = 1.3 * relX / distFallOff
+            val vol = MixerTrackProcessor.getVolFun(dist / distFallOff).coerceAtLeast(0.0)
             if (!tooltipWasShown && tooltipSet) {
-                actor.startAudio(soundCue, 0.7) // TODO play on the GUI track
+                INGAME.playGUIsound(soundCue, 0.25 * vol, pan.toFloat())
             }
 
             true // just a placeholder

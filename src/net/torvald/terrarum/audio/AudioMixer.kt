@@ -226,9 +226,11 @@ class AudioMixer : Disposable {
     init {
         // initialise audio paths //
 
-        listOf(musicTrack, ambientTrack1, ambientTrack2, ambientTrack3, ambientTrack4).forEach {
+        listOf(musicTrack, ambientTrack1, ambientTrack2, ambientTrack3, ambientTrack4, guiTrack).forEach {
             it.filters[0] = Gain(1f)
         }
+
+        guiTrack.filters[0] = BinoPan(0f)
 
         masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer
@@ -369,7 +371,7 @@ class AudioMixer : Disposable {
             it.getFilter<Gain>().gain = ambientVolume.toFloat()
         }
         sfxSumBus.volume = sfxVolume
-        guiTrack.volume = guiVolume
+        guiTrack.getFilter<Gain>().gain = guiVolume.toFloat()
 
 
         // process fades

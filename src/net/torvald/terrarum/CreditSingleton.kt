@@ -335,7 +335,7 @@ Sound from <https://freesound.org/people/richwise>
     - effects/explosion/fuse.ogg
     - effects/explosion/fuse_continue.ogg
 ℗ 2012, 2015 j1987 and ScouseMouseJB
-Sound from <https://freesound.org/people/j1987> and <https://freesound.org/people/ScouseMouseJB>
+Remixed sound from <https://freesound.org/people/j1987> and <https://freesound.org/people/ScouseMouseJB>
 
     - effects/accessibility/pickaxe_valuable.ogg
 ℗ 2009 Benboncan
