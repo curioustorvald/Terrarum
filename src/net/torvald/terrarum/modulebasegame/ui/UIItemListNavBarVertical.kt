@@ -23,6 +23,7 @@ class UIItemListNavBarVertical(
     var extraDrawOpOnBottom: (UIItemListNavBarVertical, SpriteBatch) -> Unit = { _,_ -> }
 ) : UIItem(parentUI, initialX, initialY) {
 
+    override var suppressHaptic = true
     override val width = UIItemListNavBarVertical.WIDTH
 
     override val mouseUp: Boolean

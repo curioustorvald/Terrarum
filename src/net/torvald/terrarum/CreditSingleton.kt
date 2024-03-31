@@ -341,6 +341,10 @@ Remixed sound from <https://freesound.org/people/j1987> and <https://freesound.o
 ℗ 2009 Benboncan
 Sound from <https://freesound.org/people/Benboncan/>
 
+    - effects/haptic_*.ogg
+℗ 2024 CuriousTorvald
+My own recordings
+
 
 $BULLET Impulse Responses:
 

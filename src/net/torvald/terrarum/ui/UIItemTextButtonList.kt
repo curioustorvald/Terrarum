@@ -1,11 +1,11 @@
 package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticPushedDown
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -86,22 +86,22 @@ class UIItemTextButtonList(
 
 //        if (!kinematic) {
             UIItemTextButton(
-                    parentUI, if (readFromLang) ld1 else ld0,
-                    initialX = posX,
-                    initialY = posY + vertOff,
-                    width = width,
-                    activeCol = activeCol,
-                    activeBackCol = activeBackCol,
-                    activeBackBlendMode = activeBackBlendMode,
-                    highlightCol = highlightCol,
-                    highlightBackCol = highlightBackCol,
-                    highlightBackBlendMode = highlightBackBlendMode,
-                    inactiveCol = inactiveCol,
-                    paddingLeft = pregap,
-                    paddingRight = postgap,
-                    alignment = alignment,
-                    hitboxSize = itemHitboxSize,
-                    tags = tagsCollection[i]
+                parentUI, if (readFromLang) ld1 else ld0,
+                initialX = posX,
+                initialY = posY + vertOff,
+                width = width,
+                activeCol = activeCol,
+                activeBackCol = activeBackCol,
+                activeBackBlendMode = activeBackBlendMode,
+                highlightCol = highlightCol,
+                highlightBackCol = highlightBackCol,
+                highlightBackBlendMode = highlightBackBlendMode,
+                inactiveCol = inactiveCol,
+                paddingLeft = pregap,
+                paddingRight = postgap,
+                alignment = alignment,
+                hitboxSize = itemHitboxSize,
+                tags = tagsCollection[i],
             )
 //        }
 //        else {
@@ -211,6 +211,7 @@ class UIItemTextButtonList(
 //                }
 
                 selectionChangeListener?.invoke(oldIndex, index)
+                playHapticPushedDown()
             }
             btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
         }

@@ -255,7 +255,7 @@ object PickaxeCore {
             val pan = 1.3 * relX / distFallOff
             val vol = MixerTrackProcessor.getVolFun(dist / distFallOff).coerceAtLeast(0.0)
             if (!tooltipWasShown && tooltipSet) {
-                INGAME.playGUIsound(soundCue, 0.25 * vol, pan.toFloat())
+                App.playGUIsound(soundCue, 0.18 * vol, pan.toFloat())
             }
 
             true // just a placeholder

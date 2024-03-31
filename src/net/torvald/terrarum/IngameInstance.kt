@@ -444,16 +444,6 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         loadedTime_t = App.getTIME_T()
     }
 
-    open fun playGUIsound(sound: MusicContainer, volume: Double = 1.0, pan: Float = 0f) {
-        App.audioMixer.guiTrack.let {
-            it.currentTrack = sound
-            it.maxVolumeFun= { volume }
-            it.volume = volume
-            it.playRequested.set(true)
-            it.getFilter<BinoPan>().pan = pan
-        }
-    }
-
     /**
      * Copies most recent `save` to `save.1`, leaving `save` for overwriting, previous `save.1` will be copied to `save.2`
      */

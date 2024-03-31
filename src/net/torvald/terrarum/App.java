@@ -2,6 +2,7 @@ package net.torvald.terrarum;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.AudioDevice;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.TerrarumLwjgl3Application;
 import com.badlogic.gdx.controllers.Controllers;
@@ -17,6 +18,8 @@ import kotlin.jvm.functions.Function0;
 import kotlin.text.Charsets;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.audio.AudioMixer;
+import net.torvald.terrarum.audio.MusicContainer;
+import net.torvald.terrarum.audio.dsp.BinoPan;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
@@ -551,6 +554,9 @@ public class App implements ApplicationListener {
 
         CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_take_a_break.tga")));
         CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bop", () -> new MusicContainer("haptic_bop", Gdx.files.internal("./assets/audio/effects/haptic_bop.ogg").file(), false, (Music m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bup", () -> new MusicContainer("haptic_bup", Gdx.files.internal("./assets/audio/effects/haptic_bup.ogg").file(), false, (Music m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bip", () -> new MusicContainer("haptic_bip", Gdx.files.internal("./assets/audio/effects/haptic_bip.ogg").file(), false, (Music m) -> { highPrioritySoundPlaying = false; return null; }));
         // make loading list
         CommonResourcePool.INSTANCE.loadAll();
 
@@ -1959,4 +1965,35 @@ public class App implements ApplicationListener {
             setConfig("autosaveinterval", 5 * 60000);
         }
     }
+
+
+    private static boolean highPrioritySoundPlaying = false;
+
+    public static void playGUIsound(MusicContainer sound, double volume, float pan) {
+        if (!highPrioritySoundPlaying) {
+            var it = audioMixer.getGuiTrack();
+            it.stop();
+            it.setCurrentTrack(sound);
+            it.setMaxVolumeFun(() -> volume);
+            it.setVolume(volume);
+            ((BinoPan) Arrays.stream(it.getFilters()).findFirst().get()).setPan(pan);
+            it.play();
+        }
+    }
+    public static void playGUIsound(MusicContainer sound, double volume) { playGUIsound(sound, volume, 0.0f); }
+    public static void playGUIsound(MusicContainer sound) { playGUIsound(sound, 1.0, 0.0f); }
+
+    public static void playGUIsoundHigh(MusicContainer sound, double volume, float pan) {
+        // TODO when a sound is played thru this function, other sound play calls thru playGUIsound are ignored until this sound finishes playing
+        var it = audioMixer.getGuiTrack();
+        highPrioritySoundPlaying = true;
+        it.stop();
+        it.setCurrentTrack(sound);
+        it.setMaxVolumeFun(() -> volume);
+        it.setVolume(volume);
+        ((BinoPan) Arrays.stream(it.getFilters()).findFirst().get()).setPan(pan);
+        it.play();
+    }
+    public static void playGUIsoundHigh(MusicContainer sound, double volume) { playGUIsoundHigh(sound, volume, 0.0f); }
+    public static void playGUIsoundHigh(MusicContainer sound) { playGUIsoundHigh(sound, 1.0, 0.0f); }
 }

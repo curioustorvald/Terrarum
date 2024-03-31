@@ -51,6 +51,8 @@ open class UIItemImageButton(
         val imageDrawHeight: Int = image.regionHeight,
 ) : UIItem(parent, initialX, initialY) {
 
+    override var suppressHaptic = false
+
     var highlighted = false
     var extraDrawOp: (UIItem, SpriteBatch) -> Unit = { _,_ -> }
 

@@ -10,6 +10,8 @@ import com.ibm.icu.text.Normalizer2
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gamecontroller.*
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticCursorHovered
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticPushedDown
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.unicode.toJavaString
@@ -433,6 +435,8 @@ class UIItemTextLineInput(
         }
     }
 
+    private var oldButtonStatus: Int? = null
+
     override fun update(delta: Float) {
         if (mouseoverUpdateLatch) {
             super.update(delta)
@@ -443,7 +447,10 @@ class UIItemTextLineInput(
                 isEnabled = mouseUp
 
                 if (oldEnabled && !isEnabled) TerrarumGlobalState.HAS_KEYBOARD_INPUT_FOCUS.unset()
-                if (!oldEnabled && isEnabled) TerrarumGlobalState.HAS_KEYBOARD_INPUT_FOCUS.set()
+                if (!oldEnabled && isEnabled) {
+                    TerrarumGlobalState.HAS_KEYBOARD_INPUT_FOCUS.set()
+                    playHapticPushedDown()
+                }
             }
 
             if (App.getConfigString("inputmethod") == "none") imeOn = false
@@ -468,6 +475,23 @@ class UIItemTextLineInput(
             }
 
             imeOn = KeyToggler.isOn(ControlPresets.getKey("control_key_toggleime"))
+
+
+            val buttonStatus = if (mouseUpOnIMEButton)
+                0
+            else if (mouseUpOnPasteButton)
+                2
+            else if (mouseUpOnTextArea)
+                1
+            else
+                null
+
+
+            if (buttonStatus != null && buttonStatus != oldButtonStatus)
+                playHapticCursorHovered()
+
+
+            oldButtonStatus = buttonStatus
         }
     }
 

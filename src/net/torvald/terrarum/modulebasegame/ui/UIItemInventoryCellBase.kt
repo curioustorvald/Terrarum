@@ -35,8 +35,15 @@ abstract class UIItemInventoryCellBase(
     var colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme,
     var showTooltip: Boolean = true,
 ) : UIItem(parentUI, initialX, initialY) {
-    abstract override fun update(delta: Float)
+
+    override fun update(delta: Float) {
+        suppressHaptic = (item == null)
+        super.update(delta)
+    }
+
     abstract override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera)
+
+    override var suppressHaptic = false
 
     protected val tooltipHash = System.nanoTime()
 

@@ -6,6 +6,8 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ceilToInt
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticCursorHovered
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticPushedDown
 import kotlin.math.absoluteValue
 
 /**
@@ -25,6 +27,8 @@ class UIItemSpinner(
     private val drawBorder: Boolean = true,
     private val numberToTextFunction: (Number) -> String = { "$it" }
 ) : UIItem(parentUI, initialX, initialY) {
+
+    override var suppressHaptic = false
 
     // to alleviate floating point errors adding up as the spinner is being used
     private val values = DoubleArray(1 + ((max.toDouble() - min.toDouble()).div(step.toDouble())).ceilToInt()) {
@@ -89,6 +93,8 @@ class UIItemSpinner(
         fboUpdateLatch = true
     }
 
+    private var oldMouseOnButton = 0
+
     override fun update(delta: Float) {
         super.update(delta)
 
@@ -106,7 +112,14 @@ class UIItemSpinner(
             changeValueBy((mouseOnButton * 2) - 3)
             fboUpdateLatch = true
             selectionChangeListener(value)
+            playHapticPushedDown()
         }
+
+        if (mouseOnButton > 0 && mouseOnButton != oldMouseOnButton) {
+            playHapticCursorHovered()
+        }
+
+        oldMouseOnButton = mouseOnButton
     }
 
     private var textCache = ""
@@ -199,6 +212,7 @@ class UIItemSpinner(
 
             selectionChangeListener(value)
             fboUpdateLatch = true
+            playHapticPushedDown()
             return true
         }
         else {

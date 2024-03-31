@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticCursorHovered
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticPushedDown
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 
 /**
@@ -71,6 +73,9 @@ class UIItemTextSelector(
         fboUpdateLatch = true
     }
 
+    private var oldMouseOnButton = 0
+    private var oldMouseOnPaletteItem: Int? = null
+
     override fun update(delta: Float) {
         super.update(delta)
 
@@ -99,7 +104,7 @@ class UIItemTextSelector(
 
 
         mouseLatch.latch {
-            if (paletteShowing && mouseOnPaletteItem != null ) {
+            if (paletteShowing && mouseOnPaletteItem != null) {
                 selection = mouseOnPaletteItem!!
                 fboUpdateLatch = true
                 selectionChangeListener(selection)
@@ -125,7 +130,22 @@ class UIItemTextSelector(
             else {
                 paletteShowing = false
             }
+
+            if (mouseOnButton > 0 && (clickToShowPalette || mouseOnButton != 3)) {
+                playHapticPushedDown()
+            }
         }
+
+        if (mouseOnButton > 0 && mouseOnButton != oldMouseOnButton) {
+            if (drawBorder || mouseOnButton != 2)
+                playHapticCursorHovered()
+        }
+        else if (mouseOnPaletteItem != null && mouseOnPaletteItem != oldMouseOnPaletteItem) {
+            playHapticCursorHovered()
+        }
+
+        oldMouseOnButton = mouseOnButton
+        oldMouseOnPaletteItem = mouseOnPaletteItem
     }
 
     private val leftIcon = if (useSpinnerButtons) labels.get(9,2) else labels.get(16,0)
@@ -255,6 +275,7 @@ class UIItemTextSelector(
 
             selectionChangeListener(selection)
             fboUpdateLatch = true
+            playHapticPushedDown()
             return true
         }
         else {

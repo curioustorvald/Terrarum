@@ -41,6 +41,8 @@ class UIItemInventoryElemWide(
     var showItemCount: Boolean = true,
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, wheelFun, extraInfo, highlightEquippedItem, colourTheme) {
 
+    override var suppressHaptic = false
+
     companion object {
         val height = 48
         val UNIQUE_ITEM_HAS_NO_AMOUNT = -1L
@@ -64,11 +66,6 @@ class UIItemInventoryElemWide(
 
 
     private val durabilityBarOffY = 35
-
-
-
-    override fun update(delta: Float) {
-    }
 
     private var highlightToMainCol = false
     private var highlightToSubCol = false

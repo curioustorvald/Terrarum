@@ -51,6 +51,8 @@ open class UIItemInventoryItemGrid(
     private val colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme
 ) : UIItem(parentUI, initialX, initialY) {
 
+    override var suppressHaptic = true
+
     // deal with the moving position
     //override var oldPosX = posX
     //override var oldPosY = posY

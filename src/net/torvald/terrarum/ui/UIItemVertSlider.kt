@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticPushedDown
 import kotlin.math.roundToInt
 
 /**
@@ -22,6 +23,8 @@ class UIItemVertSlider(
     private val backgroundTexture: TextureRegion? = null,
     private val disposeTexture: Boolean = false
 ) : UIItem(parentUI, initialX, initialY) {
+
+    override var suppressHaptic = false
 
     companion object {
         const val WIDTH = 16
@@ -49,6 +52,7 @@ class UIItemVertSlider(
 
         // update handle position and value
         if (mouseUp && Terrarum.mouseDown || mouseLatched) {
+            if (!mouseLatched) playHapticPushedDown()
             mouseLatched = true
             handlePos = (itemRelativeMouseY - handleHeight/2.0).coerceIn(0.0, handleTravelDist.toDouble())
             value = interpolateLinear(handlePos / handleTravelDist, min, max)

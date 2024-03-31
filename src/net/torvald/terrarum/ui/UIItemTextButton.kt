@@ -51,6 +51,8 @@ open class UIItemTextButton(
         val tags: Array<String> = arrayOf("")
 ) : UIItem(parentUI, initialX, initialY) {
 
+    override var suppressHaptic = false
+
     companion object {
         val font = App.fontGame
         val height = 24

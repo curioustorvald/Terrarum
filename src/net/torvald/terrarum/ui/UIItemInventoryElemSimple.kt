@@ -41,7 +41,9 @@ class UIItemInventoryElemSimple(
     var emptyCellIconColour: Color = Color(0xdddddd7f.toInt()),
     val updateOnNull: Boolean = false,
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, wheelFun, extraInfo, highlightEquippedItem, colourTheme) {
-    
+
+    override var suppressHaptic = false
+
     companion object {
         val height = UIItemInventoryElemWide.height
     }
@@ -59,9 +61,6 @@ class UIItemInventoryElemSimple(
 
     private val emptyCellIconOffsetX = (this.height - (emptyCellIcon?.regionWidth ?: 0)).div(2).toFloat()
     private val emptyCellIconOffsetY = (this.height - (emptyCellIcon?.regionHeight ?: 0)).div(2).toFloat()
-
-    override fun update(delta: Float) {
-    }
 
     private var highlightToMainCol = false
     private var highlightToSubCol = false

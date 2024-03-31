@@ -496,6 +496,8 @@ class UIItemPlayerCells(
     val playerUUID: UUID,
 ) : UIItem(parent, initialX, initialY) {
 
+    override var suppressHaptic = false
+
     override val width = SAVE_CELL_WIDTH
     override val height = SAVE_CELL_HEIGHT
 
@@ -766,6 +768,7 @@ class UIItemWorldCells(
         initialY: Int,
         val skimmer: DiskSkimmer) : UIItem(parent, initialX, initialY) {
 
+    override var suppressHaptic = false
 
     private val metaFile: EntryFile?
     private val saveName: String

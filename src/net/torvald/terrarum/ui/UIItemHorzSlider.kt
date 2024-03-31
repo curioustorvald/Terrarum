@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticCursorHovered
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticPushedDown
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -32,6 +34,8 @@ class UIItemHorzSlider(
     private val disposeTexture: Boolean = false
 ) : UIItem(parentUI, initialX, initialY) {
 
+    override var suppressHaptic = false
+
     override val height = 24
     private var mouseOnHandle = false
 
@@ -50,6 +54,7 @@ class UIItemHorzSlider(
 
         // update handle position and value
         if (mouseUp && Terrarum.mouseDown || mouseLatched) {
+            if (!mouseLatched) playHapticPushedDown()
             mouseLatched = true
             handlePos = (itemRelativeMouseX - handleWidth/2.0).coerceIn(0.0, handleTravelDist.toDouble())
             value = interpolateLinear(handlePos / handleTravelDist, min, max)

@@ -24,6 +24,7 @@ class UIItemToggleButton(
     private var status: Boolean = false,
 ) : UIItem(parent, initialX, initialY) {
 
+    override var suppressHaptic = false
 
     init {
         CommonResourcePool.addToLoadingList("gui_toggler_icons") {

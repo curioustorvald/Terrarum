@@ -3,7 +3,10 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticPushedDown
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticCursorHovered
 
 
 /**
@@ -141,15 +144,20 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
      */
     open var isActive = true
 
+    private var oldMouseUp = false
+
+    open var suppressHaptic = true
 
     override fun update(delta: Float) {
         if (parentUI.isVisible) {
             if (isActive) {
+                val mU = mouseUp
+
                 updateListener.invoke(delta)
 
                 mouseOverCall?.update(delta)
 
-                if (mouseUp) {
+                if (mU) {
                     if (mouseOverCall?.isVisible == true) {
                         mouseOverCall?.setAsOpen()
                     }
@@ -168,7 +176,17 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                     }
                 }
 
+                if (!oldMouseUp && mU && !suppressHaptic)
+                    playHapticCursorHovered()
+
+                oldMouseUp = mU
             }
+            else {
+                oldMouseUp = false
+            }
+        }
+        else {
+            oldMouseUp = false
         }
     }
 
@@ -233,6 +251,8 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
             if (!clickOnceListenerFired && mouseUp && button == App.getConfigInt("config_mouseprimary")) {
                 clickOnceListener.invoke(itemRelativeMouseX, itemRelativeMouseY)
+                if (!suppressHaptic)
+                    playHapticPushedDown()
                 actionDone = true
             }
         }
@@ -261,4 +281,13 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
     abstract override fun dispose()
 
+}
+
+object UIItemAccessibilityUtil {
+    fun playHapticCursorHovered() {
+        App.playGUIsound(CommonResourcePool.getAs("sound:haptic_bup"), 0.1666666)
+    }
+    fun playHapticPushedDown() {
+        App.playGUIsoundHigh(CommonResourcePool.getAs("sound:haptic_bip"), 0.5)
+    }
 }
