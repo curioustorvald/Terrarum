@@ -284,6 +284,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 }
 
 object UIItemAccessibilityUtil {
+    // TODO have multiple bop instances (num of copies equal to guiTracks), then play the track with its index according to getFreeGuiTrack()
     fun playHapticCursorHovered() {
         App.playGUIsound(CommonResourcePool.getAs("sound:haptic_bup"), 0.1666666)
     }

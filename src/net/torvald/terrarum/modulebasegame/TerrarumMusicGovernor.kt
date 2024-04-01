@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
@@ -148,7 +147,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
                 MusicContainer(
                     fileHandle.nameWithoutExtension().replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
                     fileHandle.file(),
-                    loop = true,
+                    looping = true,
                 )
             }
             catch (e: GdxRuntimeException) {

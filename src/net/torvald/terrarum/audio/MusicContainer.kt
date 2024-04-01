@@ -12,28 +12,32 @@ import com.jcraft.jorbis.VorbisFile
 import javazoom.jl.decoder.Bitstream
 import net.torvald.reflection.extortField
 import net.torvald.reflection.forceInvoke
-import net.torvald.terrarum.App
-import net.torvald.terrarum.tryDispose
+import net.torvald.unsafe.UnsafeHelper
+import net.torvald.unsafe.UnsafePtr
 import java.io.File
 import java.io.FileInputStream
 import javax.sound.sampled.AudioSystem
 
 data class MusicContainer(
+    val toRAM: Boolean = false,
     val name: String,
     val file: File,
-    val loop: Boolean = false,
+    val looping: Boolean = false,
     internal var songFinishedHook: (Music) -> Unit = {}
 ): Disposable {
     val samplingRate: Int
     val codec: String
 
-    var samplesRead = 0L; internal set
+    var samplesReadCount = 0L; internal set
     val samplesTotal: Long
 
-    val gdxMusic = Gdx.audio.newMusic(FileHandle(file))
+    private val gdxMusic: Music = Gdx.audio.newMusic(FileHandle(file))
+
+    private var soundBuf: UnsafePtr? = null; private set
+
 
     init {
-        gdxMusic.isLooping = loop
+        gdxMusic.isLooping = looping
 
         gdxMusic.setOnCompletionListener(songFinishedHook)
 
@@ -82,6 +86,45 @@ data class MusicContainer(
             else -> Long.MAX_VALUE
         }
 
+
+        if (toRAM) {
+            if (samplesTotal == Long.MAX_VALUE) throw IllegalStateException("Could not read sample count")
+
+            val readSize = 8192
+            var readCount = 0L
+            val readBuf = ByteArray(readSize)
+
+            soundBuf = UnsafeHelper.allocate(4L * samplesTotal)
+
+            while (readCount < samplesTotal) {
+                val read = gdxMusic.forceInvoke<Int>("read", arrayOf(readBuf))!!.toLong()
+
+                UnsafeHelper.memcpyRaw(readBuf, UnsafeHelper.getArrayOffset(readBuf), null, soundBuf!!.ptr + readCount, read)
+
+                readCount += read
+            }
+        }
+    }
+
+    fun readBytes(buffer: ByteArray): Int {
+        if (soundBuf == null) {
+            val bytesRead = gdxMusic.forceInvoke<Int>("read", arrayOf(buffer)) ?: 0
+            samplesReadCount += bytesRead / 4
+            return bytesRead
+        }
+        else {
+            val bytesToRead = minOf(buffer.size.toLong(), 4 * (samplesTotal - samplesReadCount))
+
+            UnsafeHelper.memcpyRaw(null, soundBuf!!.ptr, buffer, UnsafeHelper.getArrayOffset(buffer), bytesToRead)
+
+            samplesReadCount += bytesToRead / 4
+            return bytesToRead.toInt()
+        }
+    }
+
+    fun reset() {
+        samplesReadCount = 0L
+        gdxMusic.forceInvoke<Int>("reset", arrayOf())
     }
 
     private fun getWavFileSampleCount(file: File): Long {
@@ -133,14 +176,10 @@ data class MusicContainer(
 
     override fun toString() = if (name.isEmpty()) file.nameWithoutExtension else name
 
-    fun reset() {
-        samplesRead = 0L
-        gdxMusic.forceInvoke<Int>("reset", arrayOf())
-    }
-
     override fun equals(other: Any?) = this.file.path == (other as MusicContainer).file.path
 
     override fun dispose() {
         gdxMusic.dispose()
+        soundBuf?.destroy()
     }
 }

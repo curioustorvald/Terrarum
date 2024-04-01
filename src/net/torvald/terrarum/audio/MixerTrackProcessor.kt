@@ -1,6 +1,5 @@
 package net.torvald.terrarum.audio
 
-import com.badlogic.gdx.utils.Queue
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.*
 import net.torvald.terrarum.audio.AudioMixer.Companion.DS_FLTIDX_LOW
@@ -102,7 +101,7 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                 bytesRead += read0(buffer, bytesRead)
             }
             // if isLooping=true, do gapless sampleRead but reads from itself
-            else if (track.currentTrack?.gdxMusic?.isLooping == true && bytesRead < buffer.size) {
+            else if (track.currentTrack?.looping == true && bytesRead < buffer.size) {
                 track.currentTrack?.reset()
 
                 bytesRead += read0(buffer, bytesRead)

@@ -66,7 +66,7 @@ class AudioMixer : Disposable {
         else if (it == 9) "\u00D9Open\u00D9" // convolution1
         else if (it == 10) "\u00D9Cave\u00D9" // convolution2
         else if (it == 11) "\u00F0 \u00DA \u00F0" // fade
-        else "Trk${it+1}", trackType = if (it >= 7 || it == 3) TrackType.BUS else TrackType.STATIC_SOURCE, maxVolumeFun = {
+        else "Trk${it+1}", trackType = if (it >= 6 || it == 3) TrackType.BUS else TrackType.STATIC_SOURCE, maxVolumeFun = {
             when (it) {
                 0 -> { musicVolume }
                 4 -> { ambientVolume }
@@ -115,9 +115,28 @@ class AudioMixer : Disposable {
         ambientTrack1, ambientTrack2, ambientTrack3, ambientTrack4
     )
 
+    val guiTracks = Array(4) { TerrarumAudioMixerTrack("GUI${it+1}", TrackType.STATIC_SOURCE) }
+
     var processing = false
 
     var actorNowPlaying = Terrarum.ingame?.actorNowPlaying; private set
+
+    fun getFreeGuiTrackNoMatterWhat(): TerrarumAudioMixerTrack {
+        synchronized(this) {
+            val it = getFreeGuiTrack() ?: guiTracks.minBy { it.playStartedTime }.also { it.checkedOutTime = System.nanoTime() }
+            println("GuiTrack ${it.name}")
+            return it
+        }
+    }
+
+    fun getFreeGuiTrack(): TerrarumAudioMixerTrack? {
+        synchronized(this) {
+            return guiTracks.minByOrNull { maxOf(it.checkedOutTime, it.playStartedTime) }
+                .also {
+                    it?.checkedOutTime = System.nanoTime()
+                }
+        }
+    }
 
     /**
      * Return oldest dynamic track, even if the track is currently playing
@@ -164,6 +183,12 @@ class AudioMixer : Disposable {
 
             // process
             dynamicTracks.forEach {
+                if (!it.processor.paused) {
+                    try { it.processor.run() }
+                    catch (e: Throwable) { e.printStackTrace() }
+                }
+            }
+            guiTracks.forEach {
                 if (!it.processor.paused) {
                     try { it.processor.run() }
                     catch (e: Throwable) { e.printStackTrace() }
@@ -230,7 +255,10 @@ class AudioMixer : Disposable {
             it.filters[0] = Gain(1f)
         }
 
-        guiTrack.filters[1] = BinoPan(0f)
+        guiTracks.forEach {
+            guiTrack.addSidechainInput(it, 1.0)
+            it.filters[0] = BinoPan(0f)
+        }
 
         masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer
@@ -285,6 +313,7 @@ class AudioMixer : Disposable {
         /*parallelProcessingSchedule =
             arrayOf(musicTrack, ambientTrack, guiTrack).sliceEvenly(THREAD_COUNT / 2).toTypedArray() +
             dynamicTracks.sliceEvenly(THREAD_COUNT / 2).toTypedArray() +
+            guiTracks +
             arrayOf(sfxSumBus, sumBus, convolveBusOpen, convolveBusCave).sliceEvenly(THREAD_COUNT / 2).toTypedArray() +
             arrayOf(fadeBus) +
             arrayOf(masterTrack)*/
@@ -552,6 +581,7 @@ class AudioMixer : Disposable {
     fun reset() {
         ambientStopped = true
         dynamicTracks.forEach { it.stop() }
+        guiTracks.forEach { it.stop() }
         tracks.filter { it.trackType == TrackType.STATIC_SOURCE }.forEach { it.stop() }
         tracks.forEach {
             it.processor.purgeBuffer()
@@ -574,6 +604,7 @@ class AudioMixer : Disposable {
 //        feedingThread.join()
         tracks.forEach { it.tryDispose() }
         dynamicTracks.forEach { it.tryDispose() }
+        guiTracks.forEach { it.tryDispose() }
         masterTrack.tryDispose()
     }
 }
