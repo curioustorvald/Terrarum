@@ -230,7 +230,7 @@ class AudioMixer : Disposable {
             it.filters[0] = Gain(1f)
         }
 
-        guiTrack.filters[0] = BinoPan(0f)
+        guiTrack.filters[1] = BinoPan(0f)
 
         masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer

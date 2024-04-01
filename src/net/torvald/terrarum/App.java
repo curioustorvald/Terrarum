@@ -1976,7 +1976,7 @@ public class App implements ApplicationListener {
             it.setCurrentTrack(sound);
             it.setMaxVolumeFun(() -> volume);
             it.setVolume(volume);
-            ((BinoPan) Arrays.stream(it.getFilters()).findFirst().get()).setPan(pan);
+            ((BinoPan) it.getFilters()[1]).setPan(pan);
             it.play();
         }
     }
@@ -1991,7 +1991,7 @@ public class App implements ApplicationListener {
         it.setCurrentTrack(sound);
         it.setMaxVolumeFun(() -> volume);
         it.setVolume(volume);
-        ((BinoPan) Arrays.stream(it.getFilters()).findFirst().get()).setPan(pan);
+        ((BinoPan) it.getFilters()[1]).setPan(pan);
         it.play();
     }
     public static void playGUIsoundHigh(MusicContainer sound, double volume) { playGUIsoundHigh(sound, volume, 0.0f); }

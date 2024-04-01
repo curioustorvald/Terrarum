@@ -307,6 +307,8 @@ private class UIItemKeycap(
         val homerow: Boolean = false
 ) : UIItem(parent, initialX, initialY) {
 
+    override var suppressHaptic = false
+
     init {
         if (parent is UIKeyboardControlPanel ) {
             this.posX = initialX + parent.kbx
