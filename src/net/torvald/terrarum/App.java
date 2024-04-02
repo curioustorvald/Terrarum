@@ -1971,7 +1971,7 @@ public class App implements ApplicationListener {
 
     public static void playGUIsound(MusicContainer sound, double volume, float pan) {
         if (!highPrioritySoundPlaying) {
-            var it = audioMixer.getFreeGuiTrackNoMatterWhat();
+            var it = audioMixer.getFreeGuiTrack();
             if (it != null) {
                 it.stop();
                 it.setCurrentTrack(sound);

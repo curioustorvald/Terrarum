@@ -29,7 +29,7 @@ data class MusicContainer(
     val codec: String
 
     var samplesReadCount = 0L; internal set
-    val samplesTotal: Long
+    var samplesTotal: Long
 
     private val gdxMusic: Music = Gdx.audio.newMusic(FileHandle(file))
 
@@ -184,5 +184,23 @@ data class MusicContainer(
     override fun dispose() {
         gdxMusic.dispose()
         soundBuf?.destroy()
+    }
+
+    fun makeCopy(): MusicContainer {
+        val new = MusicContainer(name, file, looping, false, songFinishedHook)
+
+        synchronized(this) {
+            if (this.toRAM) {
+                // perform unsafe memcpy
+                new.soundBuf = UnsafeHelper.allocate(this.soundBuf!!.size)
+                UnsafeHelper.memcpy(this.soundBuf!!, 0L, new.soundBuf!!, 0L, new.soundBuf!!.size)
+
+                // set toRAM flag
+                val toRamField = new.javaClass.getDeclaredField("toRAM")
+                UnsafeHelper.unsafe.putBoolean(new, UnsafeHelper.unsafe.objectFieldOffset(toRamField), true)
+            }
+        }
+
+        return new
     }
 }

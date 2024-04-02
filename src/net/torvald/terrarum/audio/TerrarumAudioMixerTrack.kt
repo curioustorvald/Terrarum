@@ -43,7 +43,14 @@ class TerrarumAudioMixerTrack(
     }
 
     var currentTrack: MusicContainer? = null
+        set(value) {
+            field = musicCache.getOrPut(value)
+        }
+
     var nextTrack: MusicContainer? = null
+        set(value) {
+            field = musicCache.getOrPut(value)
+        }
 
     var volume: TrackVolume = 1.0
         get() = field
@@ -66,11 +73,14 @@ class TerrarumAudioMixerTrack(
     var playStartedTime = 0L; internal set
     var checkedOutTime = 0L; internal set
 
+    private var musicCache = MusicCache(name)
+
     fun copyStatusTo(other: TerrarumAudioMixerTrack) {
         other.pullNextTrack = this.pullNextTrack
         other.currentTrack = this.currentTrack
         other.nextTrack = this.nextTrack
         other.volume = this.volume
+        other.musicCache = this.musicCache
         other.trackingTarget = this.trackingTarget
         other.streamPlaying.set(this.streamPlaying.get())
         other.playStartedTime = this.playStartedTime
@@ -156,6 +166,7 @@ class TerrarumAudioMixerTrack(
         processor.stop()
         processorThread.join()*/
         adev?.dispose()
+        musicCache.dispose()
     }
 
     override fun equals(other: Any?) = this.hash == (other as TerrarumAudioMixerTrack).hash

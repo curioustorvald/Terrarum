@@ -1,6 +1,5 @@
 package net.torvald.terrarum.audio
 
-import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.*
 import net.torvald.terrarum.audio.AudioMixer.Companion.DS_FLTIDX_LOW
 import net.torvald.terrarum.audio.AudioMixer.Companion.DS_FLTIDX_PAN
@@ -13,7 +12,9 @@ import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.GAME_TO_SI_VELO
 import org.dyn4j.geometry.Vector2
-import kotlin.math.*
+import kotlin.math.absoluteValue
+import kotlin.math.cosh
+import kotlin.math.sqrt
 
 /**
  * Created by minjaesong on 2023-11-17.
