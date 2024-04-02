@@ -44,12 +44,18 @@ class TerrarumAudioMixerTrack(
 
     var currentTrack: MusicContainer? = null
         set(value) {
-            field = musicCache.getOrPut(value)
+            field = if (value == null)
+                null
+            else
+                musicCache.getOrPut(value)
         }
 
     var nextTrack: MusicContainer? = null
         set(value) {
-            field = musicCache.getOrPut(value)
+            field = if (value == null)
+                null
+            else
+                musicCache.getOrPut(value)
         }
 
     var volume: TrackVolume = 1.0

@@ -1250,6 +1250,8 @@ public class App implements ApplicationListener {
     }
 
     public static void reloadAudioProcessor(int bufferSize) {
+        printdbg("App", "Reloading audio precessor with buffer size of" + bufferSize);
+
         // copy music tracks
         var oldDynamicTracks = audioMixer.getDynamicTracks();
         var oldStaticTracks = audioMixer.getTracks();
@@ -1305,6 +1307,8 @@ public class App implements ApplicationListener {
             }
         }
 
+
+        printdbg("App", "Audio precessor reloaded with buffer size of" + bufferSize);
     }
 
 
@@ -1986,7 +1990,6 @@ public class App implements ApplicationListener {
     public static void playGUIsound(MusicContainer sound) { playGUIsound(sound, 1.0, 0.0f); }
 
     public static void playGUIsoundHigh(MusicContainer sound, double volume, float pan) {
-        // TODO when a sound is played thru this function, other sound play calls thru playGUIsound are ignored until this sound finishes playing
         var it = audioMixer.getFreeGuiTrackNoMatterWhat();
         highPrioritySoundPlaying = true;
         it.stop();

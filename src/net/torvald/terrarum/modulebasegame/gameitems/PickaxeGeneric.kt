@@ -267,7 +267,7 @@ object PickaxeCore {
     private val soundCue = MusicContainer(
         "pickaxe_sound_cue",
         ModMgr.getFile("basegame", "audio/effects/accessibility/pickaxe_valuable.ogg"),
-        toRAM = true
+        toRAM = false
     ).also {
         App.disposables.add(it)
     }

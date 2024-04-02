@@ -210,7 +210,9 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                     allocateStreamBuf(track)
                 }
 
-                streamBuf!!.fetchBytes()
+                if (track.currentTrack == null) throw IllegalStateException("Track ${track.name} is playing but also has null music track")
+
+                streamBuf?.fetchBytes() ?: throw NullPointerException("Null StreamBuf for ${track.name}")
             }
 
             var samplesL1: FloatArray
