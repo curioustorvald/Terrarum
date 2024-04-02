@@ -51,7 +51,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
                     printdbg(this, "MusicTitle: ${muscon.name}")
 
                     muscon.songFinishedHook =  {
-                        if (it == App.audioMixer.musicTrack.currentTrack?.gdxMusic) {
+                        if (App.audioMixer.musicTrack.currentTrack == it) {
                             stopMusic(this, true, getRandomMusicInterval())
                         }
                     }
@@ -79,7 +79,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
             stopMusic0(App.audioMixer.musicTrack.currentTrack)
         }
 
-        songs.forEach { it.gdxMusic.tryDispose() }
+        songs.forEach { it.tryDispose() }
         registerSongsFromDir(musicDir, fileToName)
 
         this.shuffled = shuffled
@@ -174,13 +174,13 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
     init {
         songs.forEach {
-            App.disposables.add(it.gdxMusic)
+            App.disposables.add(it)
         }
         ambients.forEach { (k, v) ->
             printdbg(this, "Ambients: $k -> $v")
 
             v.forEach {
-                App.disposables.add(it.gdxMusic)
+                App.disposables.add(it)
             }
         }
     }

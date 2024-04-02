@@ -217,7 +217,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
     }*/
 
     open @Event fun onAudioInterrupt(music: MusicContainer) {
-        music.songFinishedHook(music.gdxMusic)
+        music.songFinishedHook(music)
     }
 
     abstract fun dispose()

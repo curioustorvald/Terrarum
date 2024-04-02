@@ -34,17 +34,17 @@ open class ActorPrimedBomb(
     private var explosionCalled = false
 
     @Transient private val boomSound = MusicContainer(
-        "boom", ModMgr.getFile("basegame", "audio/effects/explosion/bang_bomb.ogg")
+        "boom", ModMgr.getFile("basegame", "audio/effects/explosion/bang_bomb.ogg"), toRAM = true
     ) {
         this.flagDespawn()
     }
     @Transient private val fuseSound = MusicContainer(
-        "fuse", ModMgr.getFile("basegame", "audio/effects/explosion/fuse.ogg")
+        "fuse", ModMgr.getFile("basegame", "audio/effects/explosion/fuse.ogg"), toRAM = true
     ) {
         this.flagDespawn()
     }
     @Transient private val fuseSoundCont = MusicContainer(
-        "fuse_continue", ModMgr.getFile("basegame", "audio/effects/explosion/fuse_continue.ogg")
+        "fuse_continue", ModMgr.getFile("basegame", "audio/effects/explosion/fuse_continue.ogg"), toRAM = true
     ) {
         this.flagDespawn()
     }

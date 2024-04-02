@@ -554,9 +554,9 @@ public class App implements ApplicationListener {
 
         CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_take_a_break.tga")));
         CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bop", () -> new MusicContainer(true, "haptic_bop", Gdx.files.internal("./assets/audio/effects/haptic_bop.ogg").file(), false, (Music m) -> { return null; }));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bup", () -> new MusicContainer(true, "haptic_bup", Gdx.files.internal("./assets/audio/effects/haptic_bup.ogg").file(), false, (Music m) -> { return null; }));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bip", () -> new MusicContainer(true, "haptic_bip", Gdx.files.internal("./assets/audio/effects/haptic_bip.ogg").file(), false, (Music m) -> { highPrioritySoundPlaying = false; return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bop", () -> new MusicContainer("haptic_bop", Gdx.files.internal("./assets/audio/effects/haptic_bop.ogg").file(), false, true, (MusicContainer m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bup", () -> new MusicContainer("haptic_bup", Gdx.files.internal("./assets/audio/effects/haptic_bup.ogg").file(), false, true, (MusicContainer m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bip", () -> new MusicContainer("haptic_bip", Gdx.files.internal("./assets/audio/effects/haptic_bip.ogg").file(), false, true, (MusicContainer m) -> { highPrioritySoundPlaying = false; return null; }));
         // make loading list
         CommonResourcePool.INSTANCE.loadAll();
 

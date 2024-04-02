@@ -49,7 +49,6 @@ class TerrarumAudioMixerTrack(
         get() = field
         set(value) {
             field = value
-            currentTrack?.gdxMusic?.volume = volume.toFloat()
         }
 
     val maxVolume: Double
@@ -182,7 +181,7 @@ class TerrarumAudioMixerTrack(
     }
 
     fun fireSongFinishHook() {
-        currentTrack?.songFinishedHook?.invoke(currentTrack!!.gdxMusic)
+        currentTrack?.songFinishedHook?.invoke(currentTrack!!)
     }
 
 

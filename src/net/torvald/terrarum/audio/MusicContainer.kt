@@ -19,11 +19,11 @@ import java.io.FileInputStream
 import javax.sound.sampled.AudioSystem
 
 data class MusicContainer(
-    val toRAM: Boolean = false,
     val name: String,
     val file: File,
     val looping: Boolean = false,
-    internal var songFinishedHook: (Music) -> Unit = {}
+    val toRAM: Boolean = false,
+    internal var songFinishedHook: (MusicContainer) -> Unit = {}
 ): Disposable {
     val samplingRate: Int
     val codec: String
@@ -35,11 +35,12 @@ data class MusicContainer(
 
     private var soundBuf: UnsafePtr? = null; private set
 
+    private val hash = System.nanoTime()
 
     init {
         gdxMusic.isLooping = looping
 
-        gdxMusic.setOnCompletionListener(songFinishedHook)
+//        gdxMusic.setOnCompletionListener(songFinishedHook)
 
         samplingRate = when (gdxMusic) {
             is Wav.Music -> {
@@ -114,8 +115,9 @@ data class MusicContainer(
         }
         else {
             val bytesToRead = minOf(buffer.size.toLong(), 4 * (samplesTotal - samplesReadCount))
+            if (bytesToRead <= 0) return bytesToRead.toInt()
 
-            UnsafeHelper.memcpyRaw(null, soundBuf!!.ptr, buffer, UnsafeHelper.getArrayOffset(buffer), bytesToRead)
+            UnsafeHelper.memcpyRaw(null, soundBuf!!.ptr + samplesReadCount * 4, buffer, UnsafeHelper.getArrayOffset(buffer), bytesToRead)
 
             samplesReadCount += bytesToRead / 4
             return bytesToRead.toInt()
@@ -177,6 +179,7 @@ data class MusicContainer(
     override fun toString() = if (name.isEmpty()) file.nameWithoutExtension else name
 
     override fun equals(other: Any?) = this.file.path == (other as MusicContainer).file.path
+    fun equalInstance(other: Any?) = this.file.path == (other as MusicContainer).file.path && this.hash == (other as MusicContainer).hash
 
     override fun dispose() {
         gdxMusic.dispose()

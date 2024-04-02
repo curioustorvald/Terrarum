@@ -130,7 +130,7 @@ class FixtureJukebox : Electric, PlaysMusic {
             musicNowPlaying = MusicContainer(title, musicFile.file()) {
                 unloadEffector(musicNowPlaying)
                 discCurrentlyPlaying = null
-                musicNowPlaying?.gdxMusic?.tryDispose()
+                musicNowPlaying?.tryDispose()
                 musicNowPlaying = null
 
                 printdbg(this, "Stop music $title - $artist")

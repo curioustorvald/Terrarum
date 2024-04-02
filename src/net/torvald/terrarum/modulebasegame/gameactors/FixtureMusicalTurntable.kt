@@ -115,7 +115,7 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
 
             musicNowPlaying = MusicContainer(title, musicFile.file()) {
                 unloadEffector(musicNowPlaying)
-                musicNowPlaying?.gdxMusic?.tryDispose()
+                musicNowPlaying?.tryDispose()
                 musicNowPlaying = null
 
                 App.printdbg(this, "Stop music $title - $artist")
