@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticCursorHovered
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticNudge
 import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticPushedDown
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -47,6 +48,8 @@ class UIItemHorzSlider(
 
     private var mouseLatched = false // trust me this one needs its own binary latch
 
+    private var oldValue = initialValue
+
     override fun update(delta: Float) {
         super.update(delta)
 
@@ -54,16 +57,22 @@ class UIItemHorzSlider(
 
         // update handle position and value
         if (mouseUp && Terrarum.mouseDown || mouseLatched) {
-            if (!mouseLatched) playHapticPushedDown()
             mouseLatched = true
             handlePos = (itemRelativeMouseX - handleWidth/2.0).coerceIn(0.0, handleTravelDist.toDouble())
             value = interpolateLinear(handlePos / handleTravelDist, min, max)
             selectionChangeListener(value)
+            if (oldValue != value && (value == min || value == max)) {
+                playHapticNudge()
+            }
         }
 
         if (!Terrarum.mouseDown) {
             mouseLatched = false
         }
+
+        suppressHaptic = mouseLatched
+
+        oldValue = value
     }
 
     val troughBorderCol: Color; get() = if (mouseUp || mouseLatched) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_INACTIVE

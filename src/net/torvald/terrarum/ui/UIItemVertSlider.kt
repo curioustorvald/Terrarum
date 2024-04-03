@@ -4,8 +4,12 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blendNormalStraightAlpha
+import net.torvald.terrarum.interpolateLinear
+import net.torvald.terrarum.tryDispose
+import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticNudge
 import net.torvald.terrarum.ui.UIItemAccessibilityUtil.playHapticPushedDown
 import kotlin.math.roundToInt
 
@@ -41,9 +45,7 @@ class UIItemVertSlider(
 
     private var mouseLatched = false // trust me this one needs its own binary latch
 
-    init {
-        printdbg(this, "slider max=$max")
-    }
+    private var oldValue = initialValue
 
     override fun update(delta: Float) {
         super.update(delta)
@@ -52,16 +54,22 @@ class UIItemVertSlider(
 
         // update handle position and value
         if (mouseUp && Terrarum.mouseDown || mouseLatched) {
-            if (!mouseLatched) playHapticPushedDown()
             mouseLatched = true
             handlePos = (itemRelativeMouseY - handleHeight/2.0).coerceIn(0.0, handleTravelDist.toDouble())
             value = interpolateLinear(handlePos / handleTravelDist, min, max)
             selectionChangeListener(value)
+            if (oldValue != value && (value == min || value == max)) {
+                playHapticNudge()
+            }
         }
 
         if (!Terrarum.mouseDown) {
             mouseLatched = false
         }
+
+        suppressHaptic = mouseLatched
+
+        oldValue = value
     }
 
     val troughBorderCol: Color; get() = if (mouseUp || mouseLatched) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_INACTIVE
