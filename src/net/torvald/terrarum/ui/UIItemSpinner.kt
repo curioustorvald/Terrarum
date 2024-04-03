@@ -112,7 +112,7 @@ class UIItemSpinner(
             changeValueBy((mouseOnButton * 2) - 3)
             fboUpdateLatch = true
             selectionChangeListener(value)
-            playHapticPushedDown()
+//            playHapticPushedDown() // changeValueBy() will play the sound
         }
 
         if (mouseOnButton > 0 && mouseOnButton != oldMouseOnButton) {
