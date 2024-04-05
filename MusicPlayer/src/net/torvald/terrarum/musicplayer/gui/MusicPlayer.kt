@@ -376,7 +376,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                                 App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f)
                                 App.audioMixer.musicTrack.nextTrack = null
                                 ingame.musicGovernor.stopMusic(this)
-                                thisMusic?.let { ingame.musicGovernor.queueMusicToPlayNext(it) }
+                                if (thisMusic is MusicContainer) thisMusic.let { ingame.musicGovernor.queueMusicToPlayNext(it) }
                                 iHitTheStopButton = true
                             }
                             else if (!shouldPlayerBeDisabled) {
@@ -472,7 +472,7 @@ class MusicPlayer(private val ingame: TerrarumIngame) : UICanvas() {
                                 iHitTheStopButton = false
                                 stopRequested = false
                             }
-                            resetPlaylistScroll(App.audioMixer.musicTrack.nextTrack)
+                            resetPlaylistScroll(App.audioMixer.musicTrack.nextTrack as? MusicContainer)
                         }
                     }
                 }

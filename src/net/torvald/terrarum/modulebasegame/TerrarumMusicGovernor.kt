@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.audio.AudioBank
 import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.MusicContainer
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
@@ -199,17 +200,15 @@ class TerrarumMusicGovernor : MusicGovernor() {
     var playCaller: Any? = null; private set
     var stopCallTime: Long? = null; private set
 
-    private fun stopMusic0(song: MusicContainer?, callStopMusicHook: Boolean = true, customPauseLen: Float? = null) {
+    private fun stopMusic0(song: AudioBank?, callStopMusicHook: Boolean = true, customPauseLen: Float? = null) {
         musicState = if (customPauseLen == Float.POSITIVE_INFINITY) STATE_INIT else STATE_INTERMISSION
 //        printdbg(this, "stopMusic1 customLen=$customPauseLen, stateNow: $musicState, called by")
 //        printStackTrace(this)
         intermissionAkku = 0f
         intermissionLength = customPauseLen ?: getRandomMusicInterval()
         musicFired = false
-        if (callStopMusicHook && musicStopHooks.isNotEmpty()) musicStopHooks.forEach {
-            if (song != null) {
-                it(song)
-            }
+        if (callStopMusicHook && musicStopHooks.isNotEmpty() && song is MusicContainer) musicStopHooks.forEach {
+            it(song)
         }
 //        printdbg(this, "StopMusic Intermission: $intermissionLength seconds")
     }

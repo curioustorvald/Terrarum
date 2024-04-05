@@ -664,7 +664,7 @@ class BasicDebugInfoWindow : UICanvas() {
                     if (it.length > 7) it.replace(" ", "").let { it.substring(0 until minOf(it.length, 7)) }
                     else it
                 },
-                "C:${track.currentTrack?.codec ?: ""}",
+                //"C:${track.currentTrack?.codec ?: ""}",
                 "R:${track.currentTrack?.samplingRate ?: ""}",
             ).forEachIndexed { i, s ->
                 // gauge background
@@ -673,7 +673,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
                 // fill the song title line with a progress bar
                 if (i == 0 && track.currentTrack != null) {
-                    val perc = (track.currentTrack!!.samplesReadCount.toFloat() / track.currentTrack!!.samplesTotal).coerceAtMost(1f)
+                    val perc = (track.currentTrack!!.currentPositionInSamples().toFloat() / track.currentTrack!!.totalSizeInSamples).coerceAtMost(1f)
                     batch.color = COL_PROGRESS_GRAD2
                     Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, STRIP_W * perc, 14f)
                     batch.color = COL_PROGRESS_GRAD

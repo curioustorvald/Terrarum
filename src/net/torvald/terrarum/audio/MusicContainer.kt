@@ -7,40 +7,50 @@ import com.badlogic.gdx.backends.lwjgl3.audio.Ogg
 import com.badlogic.gdx.backends.lwjgl3.audio.OggInputStream
 import com.badlogic.gdx.backends.lwjgl3.audio.Wav
 import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.utils.Disposable
 import com.jcraft.jorbis.VorbisFile
 import javazoom.jl.decoder.Bitstream
 import net.torvald.reflection.extortField
 import net.torvald.reflection.forceInvoke
+import net.torvald.terrarum.App.printdbg
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.unsafe.UnsafePtr
 import java.io.File
 import java.io.FileInputStream
 import javax.sound.sampled.AudioSystem
 
-data class MusicContainer(
-    val name: String,
+class MusicContainer(
+    override val name: String,
     val file: File,
     val looping: Boolean = false,
     val toRAM: Boolean = false,
-    internal var songFinishedHook: (MusicContainer) -> Unit = {}
-): Disposable {
-    val samplingRate: Int
+    override var songFinishedHook: (AudioBank) -> Unit = {}
+): AudioBank() {
+    override val samplingRate: Int
+    override val channels: Int
     val codec: String
 
     var samplesReadCount = 0L; internal set
-    var samplesTotal: Long
+    override val totalSizeInSamples: Long
+    private val totalSizeInBytes: Long
 
     private val gdxMusic: Music = Gdx.audio.newMusic(FileHandle(file))
 
     private var soundBuf: UnsafePtr? = null; private set
 
-    private val hash = System.nanoTime()
-
+    private val bytesPerSample: Int
+    
     init {
         gdxMusic.isLooping = looping
 
 //        gdxMusic.setOnCompletionListener(songFinishedHook)
+
+        channels = when (gdxMusic) {
+            is Wav.Music -> gdxMusic.extortField<Wav.WavInputStream>("input")!!.channels
+            is Ogg.Music -> gdxMusic.extortField<OggInputStream>("input")!!.channels
+            else -> 2
+        }
+        
+        bytesPerSample = 2 * channels
 
         samplingRate = when (gdxMusic) {
             is Wav.Music -> {
@@ -80,54 +90,146 @@ data class MusicContainer(
             if (it.last() == "Music") it.dropLast(1).last() else it.last()
         }
 
-        samplesTotal = when (gdxMusic) {
+        totalSizeInSamples = when (gdxMusic) {
             is Wav.Music -> getWavFileSampleCount(file)
             is Ogg.Music -> getOggFileSampleCount(file)
             is Mp3.Music -> getMp3FileSampleCount(file)
             else -> Long.MAX_VALUE
         }
+        totalSizeInBytes = totalSizeInSamples * 2 * channels
 
 
         if (toRAM) {
-            if (samplesTotal == Long.MAX_VALUE) throw IllegalStateException("Could not read sample count")
+            if (totalSizeInSamples == Long.MAX_VALUE) throw IllegalStateException("Could not read sample count")
 
             val readSize = 8192
             var readCount = 0L
             val readBuf = ByteArray(readSize)
 
-            soundBuf = UnsafeHelper.allocate(4L * samplesTotal)
+            soundBuf = UnsafeHelper.allocate(totalSizeInBytes)
 
-            while (readCount < samplesTotal) {
-                val read = gdxMusic.forceInvoke<Int>("read", arrayOf(readBuf))!!.toLong()
+            while (readCount < totalSizeInBytes) {
+                gdxMusic.forceInvoke<Int>("read", arrayOf(readBuf))!!.toLong() // its return value will be useless for looping=true
+                val read = minOf(readSize.toLong(), (totalSizeInBytes - readCount))
 
                 UnsafeHelper.memcpyRaw(readBuf, UnsafeHelper.getArrayOffset(readBuf), null, soundBuf!!.ptr + readCount, read)
 
                 readCount += read
+
+//                printdbg(this, "read $readCount/$totalSizeInBytes bytes (${readCount/(2*channels)}/$totalSizeInSamples samples)")
             }
         }
     }
 
-    fun readBytes(buffer: ByteArray): Int {
+    private fun read0(buffer: ByteArray, bytesRead: Int): Int {
+        val tmpBuf = ByteArray(buffer.size - bytesRead)
+        val newRead = readBytes(tmpBuf)
+
+        System.arraycopy(tmpBuf, 0, buffer, bytesRead, tmpBuf.size)
+
+        return newRead
+    }
+
+    override fun readBytes(buffer: ByteArray): Int {
         if (soundBuf == null) {
             val bytesRead = gdxMusic.forceInvoke<Int>("read", arrayOf(buffer)) ?: 0
-            samplesReadCount += bytesRead / 4
+            samplesReadCount += bytesRead / bytesPerSample
+
+            if (looping && bytesRead < buffer.size) {
+                reset()
+
+                val remainder = buffer.size - bytesRead
+
+                val fullCopyCounts = remainder / totalSizeInBytes
+                val partialCopyCountsInBytes = (remainder % totalSizeInBytes).toInt()
+
+                var start = UnsafeHelper.getArrayOffset(buffer).toInt() + bytesRead
+
+                val fullbuf = ByteArray(totalSizeInBytes.toInt())
+                // make full block copies
+                for (i in 0 until fullCopyCounts) {
+                    gdxMusic.forceInvoke<Int>("read", arrayOf(fullbuf))
+                    reset()
+
+                    System.arraycopy(fullbuf, 0, buffer, start, fullbuf.size)
+
+                    start += totalSizeInBytes.toInt()
+                }
+
+                // copy the remainders from the start of the samples
+                val partialBuf = ByteArray(partialCopyCountsInBytes)
+                gdxMusic.forceInvoke<Int>("read", arrayOf(partialBuf))
+                System.arraycopy(partialBuf, 0, buffer, start, partialCopyCountsInBytes)
+
+                samplesReadCount += partialCopyCountsInBytes / bytesPerSample
+            }
+
             return bytesRead
         }
         else {
-            val bytesToRead = minOf(buffer.size.toLong(), 4 * (samplesTotal - samplesReadCount))
-            if (bytesToRead <= 0) return bytesToRead.toInt()
+            val bytesToRead = minOf(buffer.size.toLong(), 2 * channels * (totalSizeInSamples - samplesReadCount))
 
-            UnsafeHelper.memcpyRaw(null, soundBuf!!.ptr + samplesReadCount * 4, buffer, UnsafeHelper.getArrayOffset(buffer), bytesToRead)
+            if (!looping && bytesToRead <= 0) return bytesToRead.toInt()
+//            if (looping) printdbg(this, "toRAM music loop (bytes cursor: $samplesReadCount/$totalSizeInSamples, bytesToRead=$bytesToRead, buffer.size=${buffer.size})")
 
-            samplesReadCount += bytesToRead / 4
+            UnsafeHelper.memcpyRaw(
+                null,
+                soundBuf!!.ptr + samplesReadCount * bytesPerSample,
+                buffer,
+                UnsafeHelper.getArrayOffset(buffer),
+                bytesToRead
+            )
+
+            samplesReadCount += bytesToRead / bytesPerSample
+
+
+            // reached the end of the "tape"
+            if (looping && bytesToRead < buffer.size) {
+
+                val remainder = buffer.size - bytesToRead
+
+                val fullCopyCounts = remainder / totalSizeInBytes
+                val partialCopyCountsInBytes = remainder % totalSizeInBytes
+
+                var start = UnsafeHelper.getArrayOffset(buffer) + bytesToRead
+
+                // make full block copies
+                for (i in 0 until fullCopyCounts) {
+                    UnsafeHelper.memcpyRaw(
+                        null,
+                        soundBuf!!.ptr,
+                        buffer,
+                        start,
+                        totalSizeInBytes
+                    )
+
+                    start += totalSizeInBytes
+                }
+
+                // copy the remainders from the start of the "tape"
+                UnsafeHelper.memcpyRaw(
+                    null,
+                    soundBuf!!.ptr,
+                    buffer,
+                    start,
+                    partialCopyCountsInBytes
+                )
+
+                samplesReadCount = partialCopyCountsInBytes / bytesPerSample
+            }
+
+            if (looping) return buffer.size
+
             return bytesToRead.toInt()
         }
     }
 
-    fun reset() {
+    override fun reset() {
         samplesReadCount = 0L
         gdxMusic.forceInvoke<Int>("reset", arrayOf())
     }
+
+    override fun currentPositionInSamples() = samplesReadCount
 
     private fun getWavFileSampleCount(file: File): Long {
         return try {
@@ -186,7 +288,7 @@ data class MusicContainer(
         soundBuf?.destroy()
     }
 
-    fun makeCopy(): MusicContainer {
+    override fun makeCopy(): AudioBank {
         val new = MusicContainer(name, file, looping, false, songFinishedHook)
 
         synchronized(this) {

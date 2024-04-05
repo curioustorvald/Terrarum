@@ -17,6 +17,7 @@ import com.github.strikerx3.jxinput.XInputDevice;
 import kotlin.jvm.functions.Function0;
 import kotlin.text.Charsets;
 import net.torvald.getcpuname.GetCpuName;
+import net.torvald.terrarum.audio.AudioBank;
 import net.torvald.terrarum.audio.AudioMixer;
 import net.torvald.terrarum.audio.MusicContainer;
 import net.torvald.terrarum.audio.dsp.BinoPan;
@@ -554,11 +555,11 @@ public class App implements ApplicationListener {
 
         CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_take_a_break.tga")));
         CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bup", () -> new MusicContainer("haptic_bup", Gdx.files.internal("./assets/audio/effects/haptic_bup.ogg").file(), false, true, (MusicContainer m) -> { return null; }));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bap", () -> new MusicContainer("haptic_bap", Gdx.files.internal("./assets/audio/effects/haptic_bap.ogg").file(), false, true, (MusicContainer m) -> { return null; }));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bop", () -> new MusicContainer("haptic_bop", Gdx.files.internal("./assets/audio/effects/haptic_bop.ogg").file(), false, true, (MusicContainer m) -> { return null; }));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bep", () -> new MusicContainer("haptic_bep", Gdx.files.internal("./assets/audio/effects/haptic_bep.ogg").file(), false, true, (MusicContainer m) -> { return null; }));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bip", () -> new MusicContainer("haptic_bip", Gdx.files.internal("./assets/audio/effects/haptic_bip.ogg").file(), false, true, (MusicContainer m) -> { highPrioritySoundPlaying = false; return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bup", () -> new MusicContainer("haptic_bup", Gdx.files.internal("./assets/audio/effects/haptic_bup.ogg").file(), false, true, (AudioBank m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bap", () -> new MusicContainer("haptic_bap", Gdx.files.internal("./assets/audio/effects/haptic_bap.ogg").file(), false, true, (AudioBank m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bop", () -> new MusicContainer("haptic_bop", Gdx.files.internal("./assets/audio/effects/haptic_bop.ogg").file(), false, true, (AudioBank m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bep", () -> new MusicContainer("haptic_bep", Gdx.files.internal("./assets/audio/effects/haptic_bep.ogg").file(), false, true, (AudioBank m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bip", () -> new MusicContainer("haptic_bip", Gdx.files.internal("./assets/audio/effects/haptic_bip.ogg").file(), false, true, (AudioBank m) -> { highPrioritySoundPlaying = false; return null; }));
         // make loading list
         CommonResourcePool.INSTANCE.loadAll();
 

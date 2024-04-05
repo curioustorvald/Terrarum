@@ -485,7 +485,7 @@ class AudioMixer : Disposable {
 
     private var ambientStopped = true
 
-    fun startMusic(song: MusicContainer) {
+    fun startMusic(song: AudioBank) {
         if (musicTrack.isPlaying) {
             requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
         }
@@ -496,7 +496,7 @@ class AudioMixer : Disposable {
         requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
     }
 
-    fun startAmb(song: MusicContainer) {
+    fun startAmb(song: AudioBank) {
         val ambientTrack = if (!ambientTrack1.streamPlaying.get())
             ambientTrack1
         else if (!ambientTrack2.streamPlaying.get())
@@ -513,7 +513,7 @@ class AudioMixer : Disposable {
         // fade will be processed by the update()
     }
 
-    fun startAmb1(song: MusicContainer) {
+    fun startAmb1(song: AudioBank) {
         if (ambientTrack1.isPlaying == true) {
             requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
         }
@@ -521,7 +521,7 @@ class AudioMixer : Disposable {
         // fade will be processed by the update()
     }
 
-    fun startAmb2(song: MusicContainer) {
+    fun startAmb2(song: AudioBank) {
         if (ambientTrack2.isPlaying == true) {
             requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
         }

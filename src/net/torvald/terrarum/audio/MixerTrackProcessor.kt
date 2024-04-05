@@ -98,12 +98,6 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
 
                 bytesRead += read0(buffer, bytesRead)
             }
-            // if isLooping=true, do gapless sampleRead but reads from itself
-            else if (track.currentTrack?.looping == true && bytesRead < buffer.size) {
-                track.currentTrack?.reset()
-
-                bytesRead += read0(buffer, bytesRead)
-            }
 
             bytesRead
         }, { purgeStreamBuf() }).also {

@@ -5,9 +5,9 @@ import net.torvald.terrarum.tryDispose
 
 class MusicCache(val trackName: String) : Disposable {
 
-    private val cache = HashMap<String, MusicContainer>()
+    private val cache = HashMap<String, AudioBank>()
 
-    fun getOrPut(music: MusicContainer?): MusicContainer? {
+    fun getOrPut(music: AudioBank?): AudioBank? {
         if (music != null)
             return cache.getOrPut(music.name) { music.makeCopy() }
         return null

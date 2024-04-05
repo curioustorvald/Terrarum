@@ -42,7 +42,7 @@ class TerrarumAudioMixerTrack(
         acc or (c shl (5*i))
     }
 
-    var currentTrack: MusicContainer? = null
+    var currentTrack: AudioBank? = null
         set(value) {
             field = if (value == null)
                 null
@@ -50,7 +50,7 @@ class TerrarumAudioMixerTrack(
                 musicCache.getOrPut(value)
         }
 
-    var nextTrack: MusicContainer? = null
+    var nextTrack: AudioBank? = null
         set(value) {
             field = if (value == null)
                 null

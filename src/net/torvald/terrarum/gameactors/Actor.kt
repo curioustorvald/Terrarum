@@ -6,6 +6,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.audio.AudioBank
 import net.torvald.terrarum.audio.MusicContainer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.TrackVolume
@@ -216,7 +217,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
     }*/
 
-    open @Event fun onAudioInterrupt(music: MusicContainer) {
+    open @Event fun onAudioInterrupt(music: AudioBank) {
         music.songFinishedHook(music)
     }
 
