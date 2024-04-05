@@ -143,7 +143,7 @@ class MusicContainer(
                 val fullCopyCounts = remainder / totalSizeInBytes
                 val partialCopyCountsInBytes = (remainder % totalSizeInBytes).toInt()
 
-                var start = UnsafeHelper.getArrayOffset(buffer).toInt() + bytesRead
+                var start = bytesRead
 
                 val fullbuf = ByteArray(totalSizeInBytes.toInt())
                 // make full block copies
