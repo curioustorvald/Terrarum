@@ -145,15 +145,17 @@ class MusicContainer(
 
                 var start = bytesRead
 
-                val fullbuf = ByteArray(totalSizeInBytes.toInt())
                 // make full block copies
-                for (i in 0 until fullCopyCounts) {
+                if (fullCopyCounts > 0) {
+                    val fullbuf = ByteArray(totalSizeInBytes.toInt())
+                    // only read ONCE, you silly
                     gdxMusic.forceInvoke<Int>("read", arrayOf(fullbuf))
                     reset()
 
-                    System.arraycopy(fullbuf, 0, buffer, start, fullbuf.size)
-
-                    start += totalSizeInBytes.toInt()
+                    for (i in 0 until fullCopyCounts) {
+                        System.arraycopy(fullbuf, 0, buffer, start, fullbuf.size)
+                        start += totalSizeInBytes.toInt()
+                    }
                 }
 
                 // copy the remainders from the start of the samples
