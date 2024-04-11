@@ -88,29 +88,33 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
 
     private fun allocateStreamBuf(track: TerrarumAudioMixerTrack) {
         printdbg("Allocating a StreamBuf with rate ${track.currentTrack!!.samplingRate}")
-        streamBuf = AudioProcessBuf(track.currentTrack!!.samplingRate, { buffer ->
-            var bytesRead = track.currentTrack?.readBytes(buffer) ?: 0
+        streamBuf = AudioProcessBuf(track.currentTrack!!.samplingRate, { bufL, bufR ->
+            var samplesRead = track.currentTrack?.readSamples(bufL, bufR) ?: 0
 
             // do gapless fetch if there is space in the buffer
-            if (track.doGaplessPlayback && bytesRead < buffer.size) {
+            if (track.doGaplessPlayback && samplesRead < bufL.size) {
                 track.currentTrack?.reset()
                 track.pullNextTrack()
 
-                bytesRead += read0(buffer, bytesRead)
+                samplesRead += read00(bufL, bufR, samplesRead)
             }
 
-            bytesRead
+            samplesRead
         }, { purgeStreamBuf() }).also {
 //            it.jitterMode = jitterMode
 //            it.jitterIntensity = jitterIntensity
         }
     }
 
-    private fun read0(buffer: ByteArray, bytesRead: Int): Int {
-        val tmpBuf = ByteArray(buffer.size - bytesRead)
-        val newRead = track.currentTrack?.readBytes(tmpBuf) ?: 0
+    private fun read00(bufL: FloatArray, bufR: FloatArray, samplesRead: Int): Int {
+        val bufSize = bufL.size - samplesRead
+        val tmpBufL = FloatArray(bufSize)
+        val tmpBufR = FloatArray(bufSize)
 
-        System.arraycopy(tmpBuf, 0, buffer, bytesRead, tmpBuf.size)
+        val newRead = track.currentTrack?.readSamples(tmpBufL, tmpBufR) ?: 0
+
+        System.arraycopy(tmpBufL, 0, bufL, samplesRead, tmpBufL.size)
+        System.arraycopy(tmpBufR, 0, bufR, samplesRead, tmpBufR.size)
 
         return newRead
     }

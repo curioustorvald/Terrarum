@@ -25,7 +25,7 @@ abstract class AudioBank : Disposable {
     abstract val totalSizeInSamples: Long
     abstract fun currentPositionInSamples(): Long
 
-    abstract fun readBytes(buffer: ByteArray): Int
+    abstract fun readSamples(bufferL: FloatArray, bufferR: FloatArray): Int
     abstract fun reset()
 
     abstract val songFinishedHook: (AudioBank) -> Unit

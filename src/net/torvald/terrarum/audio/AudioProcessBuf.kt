@@ -25,7 +25,7 @@ private data class Frac(var nom: Int, val denom: Int) {
  *
  * Created by minjaesong on 2023-11-17.
  */
-class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) -> Int?, val onAudioFinished: () -> Unit) {
+class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (FloatArray, FloatArray) -> Int?, val onAudioFinished: () -> Unit) {
 
     var pitch: Float = 1f
     var playbackSpeed = 1f
@@ -144,7 +144,8 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
     private val fmidR = FloatArray((fetchSize * 2 + 1.0).toInt())
     private val foutL = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
     private val foutR = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
-    private val readBuf = ByteArray(fetchSize * 4)
+    private val readBufL = FloatArray(fetchSize)
+    private val readBufR = FloatArray(fetchSize)
 
     init {
 //        printdbg(this, "App.audioMixerBufferSize=${App.audioBufferSize}")
@@ -160,28 +161,26 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
         val readCount = if (samplesInBuf < App.audioBufferSize) fetchSize else 0
         val writeCount = (readCount / q).roundToInt()
 
-        fun getFromReadBuf(i: Int, bytesRead: Int) = if (i < bytesRead) readBuf[i].toUint() else 0
+        fun getFromReadBufL(index: Int, samplesRead: Int) = if (index < samplesRead) readBufL[index] else 0f
+        fun getFromReadBufR(index: Int, samplesRead: Int) = if (index < samplesRead) readBufR[index] else 0f
 
         if (readCount > 0) {
             try {
                 shift(finL, readCount)
                 shift(finR, readCount)
 
-                val bytesRead = audioReadFun(readBuf)
+                val samplesRead = audioReadFun(readBufL, readBufR)
 //                printdbg(this, "Reading audio $readCount samples, got ${bytesRead?.div(4)} samples")
 
-                if (bytesRead == null || bytesRead <= 0) {
+                if (samplesRead == null || samplesRead <= 0) {
 //                    printdbg(this, "Music finished; bytesRead = $bytesRead")
 
                     onAudioFinished()
                 }
                 else {
                     for (c in 0 until readCount) {
-                        val sl = (getFromReadBuf(4 * c + 0, bytesRead) or getFromReadBuf(4 * c + 1, bytesRead).shl(8)).toShort()
-                        val sr = (getFromReadBuf(4 * c + 2, bytesRead) or getFromReadBuf(4 * c + 3, bytesRead).shl(8)).toShort()
-
-                        val fl = sl / 32767f
-                        val fr = sr / 32767f
+                        val fl = getFromReadBufL(c, samplesRead)
+                        val fr = getFromReadBufR(c, samplesRead)
 
                         finL[2 * PADSIZE + c] = fl
                         finR[2 * PADSIZE + c] = fr
@@ -217,6 +216,7 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (ByteArray) 
 //        printdbg(this, "phase = $fPhaseL")
     }
 
+    // return the copy of the foutL/R
     fun getLR(): Pair<FloatArray, FloatArray> {
         val samplesInBuf = validSamplesInBuf
 

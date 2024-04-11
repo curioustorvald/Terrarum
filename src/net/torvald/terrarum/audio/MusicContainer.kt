@@ -12,6 +12,7 @@ import javazoom.jl.decoder.Bitstream
 import net.torvald.reflection.extortField
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.unsafe.UnsafePtr
 import java.io.File
@@ -121,16 +122,38 @@ class MusicContainer(
         }
     }
 
-    private fun read0(buffer: ByteArray, bytesRead: Int): Int {
-        val tmpBuf = ByteArray(buffer.size - bytesRead)
-        val newRead = readBytes(tmpBuf)
+    override fun readSamples(bufferL: FloatArray, bufferR: FloatArray): Int {
+        assert(bufferL.size == bufferR.size)
 
-        System.arraycopy(tmpBuf, 0, buffer, bytesRead, tmpBuf.size)
+        val byteSize = bufferL.size * bytesPerSample
+        val bytesBuf = ByteArray(byteSize)
+        val bytesRead = readBytes(bytesBuf)
+        val samplesRead = bytesRead / bytesPerSample
 
-        return newRead
+        if (channels == 2) {
+            for (i in 0 until samplesRead) {
+                val sl = (bytesBuf[i * 4 + 0].toUint() or bytesBuf[i * 4 + 1].toUint().shl(8)).toShort()
+                val sr = (bytesBuf[i * 4 + 2].toUint() or bytesBuf[i * 4 + 3].toUint().shl(8)).toShort()
+                val fl = sl / 32767f
+                val fr = sr / 32767f
+                bufferL[i] = fl
+                bufferR[i] = fr
+            }
+        }
+        else if (channels == 1) {
+            for (i in 0 until samplesRead) {
+                val s = (bytesBuf[i * 2 + 0].toUint() or bytesBuf[i * 2 + 1].toUint().shl(8)).toShort()
+                val f = s / 32767f
+                bufferL[i] = f
+                bufferR[i] = f
+            }
+        }
+        else throw IllegalStateException("Unsupported channel count: $channels")
+
+        return samplesRead
     }
 
-    override fun readBytes(buffer: ByteArray): Int {
+    private fun readBytes(buffer: ByteArray): Int {
         if (soundBuf == null) {
             val bytesRead = gdxMusic.forceInvoke<Int>("read", arrayOf(buffer)) ?: 0
             samplesReadCount += bytesRead / bytesPerSample
