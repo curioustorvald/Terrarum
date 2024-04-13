@@ -1,11 +1,10 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.Gdx
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.audio.AudioMixer
-import net.torvald.terrarum.audio.MusicContainer
+import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
@@ -16,7 +15,6 @@ import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.modulebasegame.gameitems.MusicDiscHelper
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
-import net.torvald.terrarum.ui.MouseLatch
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
@@ -75,7 +73,7 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
                     INGAME.actorNowPlaying!!.inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)
                 val itemProp = ItemCodex[itemOnGrip]
 
-                if (itemProp?.hasAllTagOf("MUSIC", "PHONO") == true) {
+                if (itemProp?.hasAllTagsOf("MUSIC", "PHONO") == true) {
                     disc = itemOnGrip
                     INGAME.actorNowPlaying!!.removeItem(itemOnGrip!!)
                     playDisc()

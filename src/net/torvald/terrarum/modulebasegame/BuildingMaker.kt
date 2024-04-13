@@ -391,7 +391,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         BlockPropUtil.dynamicLumFuncTickClock()
         WeatherMixer.update(delta, actorNowPlaying, gameWorld)
-        if (WORLD_UPDATE_TIMER % 2 == 1) {
+        if (WORLD_UPDATE_TIMER % 2 == 1L) {
             fillUpWiresBuffer()
         }
 

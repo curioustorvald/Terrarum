@@ -6,7 +6,8 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioBank
 import net.torvald.terrarum.audio.AudioMixer
-import net.torvald.terrarum.audio.MusicContainer
+import net.torvald.terrarum.audio.audiobank.MusicContainer
+
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import java.io.File
 

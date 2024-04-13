@@ -948,12 +948,12 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             }
             // fill up visibleActorsRenderFront for wires but not on every update
             measureDebugTime("Ingame.FillUpWiresBuffer*") {
-                if (WORLD_UPDATE_TIMER % 2 == 1) {
+                if (WORLD_UPDATE_TIMER % 2 == 1L) {
                     fillUpWiresBuffer()
                 }
             }
             measureDebugTime("Ingame.FillUpWirePortsView*") {
-                if (WORLD_UPDATE_TIMER % 2 == 0) {
+                if (WORLD_UPDATE_TIMER % 2 == 0L) {
                     val fixtures = INGAME.actorContainerActive.filterIsInstance<Electric>()
                     fillUpWirePortsView(fixtures)
                 }
@@ -978,7 +978,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
 
-            actorNowPlaying?.let { if (WORLD_UPDATE_TIMER % 4 == 1) updateWorldGenerator(actorNowPlaying!!) }
+            actorNowPlaying?.let { if (WORLD_UPDATE_TIMER % 4 == 1L) updateWorldGenerator(actorNowPlaying!!) }
 
 
 
@@ -1646,7 +1646,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val punchSize = getPunchSize(actor)
         val punchBlockSize = punchSize.div(TILE_SIZED).floorToInt()
 
-        val mouseUnderPunchableTree = BlockCodex[world.getTileFromTerrain(mtx, mty)].hasAnyTagOf("LEAVES", "TREESMALL")
+        val mouseUnderPunchableTree = BlockCodex[world.getTileFromTerrain(mtx, mty)].hasAnyTagsOf("LEAVES", "TREESMALL")
 
 
         // punch a small tree/shrub

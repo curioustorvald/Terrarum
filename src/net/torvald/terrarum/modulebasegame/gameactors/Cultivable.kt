@@ -1,13 +1,9 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.terrarum.modulebasegame.worldgenerator.Treegen
@@ -76,7 +72,7 @@ open class SaplingBase(val species: Int) : Cultivable(72000) {
 
         // check for soil
         val groundTile = INGAME.world.getTileFromTerrain(intTilewiseHitbox.startX.toInt(), intTilewiseHitbox.endY.toInt() + 1)
-        if (BlockCodex[groundTile].hasNoTagOf("CULTIVABLE")) {
+        if (BlockCodex[groundTile].hasNoTagsOf("CULTIVABLE")) {
             despawnHook = {
                 printdbg(this, "Sapling despawn!")
                 PickaxeCore.dropItem("item@basegame:${160 + species}", intTilewiseHitbox.canonicalX.toInt(), intTilewiseHitbox.canonicalY.toInt())
@@ -96,7 +92,7 @@ open class SaplingBase(val species: Int) : Cultivable(72000) {
     }
     private var treeHasBeenGrown = false
     override fun tryToSpawnMaturePlant() {
-        if (INGAME.WORLD_UPDATE_TIMER % 3 == 2) {
+        if (INGAME.WORLD_UPDATE_TIMER % 3 == 2L) {
             val size = if (Math.random() < 0.1) 2 else 1
             val result = Treegen.plantTree(INGAME.world, intTilewiseHitbox.startX.toInt(), intTilewiseHitbox.endY.toInt() + 1, species, size)
 

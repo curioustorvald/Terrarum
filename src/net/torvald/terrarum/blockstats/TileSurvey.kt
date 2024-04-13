@@ -48,7 +48,7 @@ object TileSurvey {
 
         proposals.forEach { (_, proposal) ->
 
-            if (INGAME.WORLD_UPDATE_TIMER % proposal.temporalGranularity == 0) {
+            if (INGAME.WORLD_UPDATE_TIMER % proposal.temporalGranularity == 0L) {
                 val for_x_start = floor(player.intTilewiseHitbox.centeredX - proposal.width / 2.0).toInt()
                 val for_y_start = floor(player.intTilewiseHitbox.centeredY - proposal.height / 2.0).toInt()
                 val for_x_end = ceil(player.intTilewiseHitbox.centeredX + proposal.width / 2.0).toInt()

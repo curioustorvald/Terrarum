@@ -174,7 +174,7 @@ object TerrarumPostProcessor : Disposable {
                 }
 
                 if (KeyToggler.isOn(Input.Keys.F2)) {
-                    if (INGAME.WORLD_UPDATE_TIMER % 64 == 42) {
+                    if (INGAME.WORLD_UPDATE_TIMER % 64 == 42L) {
                         // we're going to assume the data are normally distributed
                         deltatBenchStr = if (INGAME.deltaTeeBenchmarks.elemCount < INGAME.deltaTeeBenchmarks.size) {
                             "ΔF: Gathering data (${INGAME.deltaTeeBenchmarks.elemCount}/${INGAME.deltaTeeBenchmarks.size})"

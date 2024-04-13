@@ -3,7 +3,6 @@ package net.torvald.terrarum.modulebasegame
 import com.badlogic.gdx.utils.Queue
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
@@ -16,7 +15,6 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRang
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameitems.AxeCore
 import org.dyn4j.geometry.Vector2
-import java.lang.Math.pow
 import kotlin.math.cosh
 import kotlin.math.min
 import kotlin.math.pow
@@ -154,7 +152,7 @@ object WorldSimulator {
             val ry = rng.nextInt(updateYFrom, updateYTo + 1)
             val tile = world.getTileFromTerrain(rx, ry)
             // if the dirt tile has a grass and an air tile nearby, put grass to it
-            if (BlockCodex[tile].hasAllTagOf("TREE", "LEAVES")) {
+            if (BlockCodex[tile].hasAllTagsOf("TREE", "LEAVES")) {
                 val nearby8 = getNearbyTiles8(rx, ry)
                 val nearbyCount = nearby8.count { BlockCodex[it].hasTag("TREE") }
 

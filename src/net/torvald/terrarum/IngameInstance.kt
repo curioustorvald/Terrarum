@@ -5,7 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.audio.MusicContainer
+import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.audio.dsp.BinoPan
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
@@ -46,7 +46,7 @@ import kotlin.math.min
  */
 open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boolean = false) : TerrarumGamescreen {
 
-    var WORLD_UPDATE_TIMER = Random().nextInt(1020) + 1; protected set
+    var WORLD_UPDATE_TIMER = Random().nextInt(1020) + 1L; protected set
 
     open protected val actorMBRConverter = object : MBRConverter<ActorWithBody> {
         override fun getDimensions(): Int = 2

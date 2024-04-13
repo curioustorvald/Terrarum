@@ -2,10 +2,10 @@ package net.torvald.terrarum.weather
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.JsonValue
 import com.jme3.math.FastMath
 import net.torvald.terrarum.GdxColorMap
+import net.torvald.terrarum.TaggedProp
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.absoluteValue
 
@@ -21,7 +21,7 @@ data class BaseModularWeather(
     val json: JsonValue,
     var skyboxGradColourMap: GdxColorMap, // row 0: skybox grad top, row 1: skybox grad bottom, row 2: sunlight (RGBA)
     val daylightClut: GdxColorMap,
-    val classification: String,
+    val tags: List<String>,
     val cloudChance: Float,
     val windSpeed: Float,
     val windSpeedVariance: Float,
@@ -33,7 +33,7 @@ data class BaseModularWeather(
 
     val mixFrom: String? = null,
     val mixPercentage: Double? = null,
-) {
+) : TaggedProp {
 
 
     /**
@@ -60,6 +60,10 @@ data class BaseModularWeather(
 
         return Vector2(gx, gy)
     }
+
+
+    override fun hasTag(s: String) = tags.contains(s)
+
 }
 
 data class CloudProps(

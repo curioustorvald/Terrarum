@@ -35,6 +35,7 @@ import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINotControllable
+import net.torvald.terrarum.weather.WeatherCodex
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import net.torvald.unsafe.UnsafeHelper
@@ -83,6 +84,7 @@ object Terrarum : Disposable {
     var fluidCodex = FluidCodex(); internal set
     var oreCodex = OreCodex(); internal set
     var audioCodex = AudioCodex(); internal set
+    var weatherCodex = WeatherCodex(); internal set
 
 
     //////////////////////////////
@@ -829,6 +831,8 @@ val FluidCodex: FluidCodex
     get() = Terrarum.fluidCodex
 val OreCodex: OreCodex
     get() = Terrarum.oreCodex
+val WeatherCodex: WeatherCodex
+    get() = Terrarum.weatherCodex
 
 class Codex : KVHashMap() {
 

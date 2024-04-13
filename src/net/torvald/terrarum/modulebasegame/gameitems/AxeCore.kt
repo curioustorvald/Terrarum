@@ -69,7 +69,7 @@ object AxeCore {
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
-                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toInt()) {
+                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toLong()) {
                     PickaxeCore.makeNoiseTileTouching(actor, tile)
                 }
 
@@ -95,7 +95,7 @@ object AxeCore {
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
-                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toInt()) {
+                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toLong()) {
                     PickaxeCore.makeNoiseTileTouching(actor, tile)
                 }
 
@@ -121,13 +121,13 @@ object AxeCore {
                 usageStatus = usageStatus or true
             }
             // check if tile under mouse is a tree
-            else if (tileprop.hasAllTag(listOf("TREE", "TREETRUNK") + additionalCheckTags)) {
+            else if (tileprop.hasAllTags(listOf("TREE", "TREETRUNK") + additionalCheckTags)) {
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
                 val isLargeTree = tileprop.hasTag("TREELARGE")
                 val axePowerMult = if (isLargeTree) 0.5f else 1f
 
-                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toInt()) {
+                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toLong()) {
                     PickaxeCore.makeNoiseTileTouching(actor, tile)
                 }
 
@@ -144,8 +144,8 @@ object AxeCore {
                         val tileThereR = INGAME.world.getTileFromTerrain(x+1, y - upCtr)
                         val propThereL = BlockCodex[tileThereL]
                         val propThereR = BlockCodex[tileThereR]
-                        val treeTrunkXoff = if (propThereL.hasAllTagOf("TREELARGE", "TREETRUNK")) -1
-                        else if (propThereR.hasAllTagOf("TREELARGE", "TREETRUNK")) 1
+                        val treeTrunkXoff = if (propThereL.hasAllTagsOf("TREELARGE", "TREETRUNK")) -1
+                        else if (propThereR.hasAllTagsOf("TREELARGE", "TREETRUNK")) 1
                         else 0
 
                         if (treeTrunkXoff != 0) {
@@ -162,7 +162,7 @@ object AxeCore {
                             val tileHere = INGAME.world.getTileFromTerrain(x, y - upCtr)
                             val propHere = BlockCodex[tileHere]
 
-                            if (propHere.hasAllTagOf("TREELARGE", "TREETRUNK")) {
+                            if (propHere.hasAllTagsOf("TREELARGE", "TREETRUNK")) {
                                 INGAME.world.setTileTerrain(x, y - upCtr, Block.AIR, false)
                                 PickaxeCore.dropItem(propHere.drop, x, y - upCtr)
                                 PickaxeCore.makeDust(tile, x, y - upCtr, 2 + Math.random().roundToInt())

@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
+import net.torvald.terrarum.weather.WeatherMixer
 
 /**
  * The entry point for the module "Basegame"
@@ -36,6 +37,11 @@ class EntryPoint : ModuleEntryPoint() {
         ModMgr.GameLanguageLoader.invoke(moduleName)
         ModMgr.GameCraftingRecipeLoader.invoke(moduleName)
         ModMgr.GameAudioLoader.invoke(moduleName)
+        ModMgr.GameWeatherLoader.invoke(moduleName)
+
+        WeatherCodex.weatherById["titlescreen"] =
+            WeatherCodex.getById("generic01")?.copy(identifier = "titlescreen", windSpeed = 1f) ?: WeatherMixer.DEFAULT_WEATHER
+
 
         if (App.IS_DEVELOPMENT_BUILD) {
             println("[EntryPoint] Crafting Recipes: ")

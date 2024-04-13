@@ -19,7 +19,7 @@ import kotlin.text.Charsets;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.audio.AudioBank;
 import net.torvald.terrarum.audio.AudioMixer;
-import net.torvald.terrarum.audio.MusicContainer;
+import net.torvald.terrarum.audio.audiobank.MusicContainer;
 import net.torvald.terrarum.audio.dsp.BinoPan;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
@@ -239,7 +239,7 @@ public class App implements ApplicationListener {
     /**
      * For the events depends on rendering frame (e.g. flicker on post-hit invincibility)
      */
-    public static int GLOBAL_RENDER_TIMER = new Random().nextInt(1020) + 1;
+    public static long GLOBAL_RENDER_TIMER = new Random().nextInt(1020) + 1L;
 
 
     public static DebugTimers debugTimers = new DebugTimers();
@@ -745,7 +745,7 @@ public class App implements ApplicationListener {
     }
 
     public static Texture getCurrentDitherTex() {
-        int hash = 31 + GLOBAL_RENDER_TIMER + 0x165667B1 + GLOBAL_RENDER_TIMER * 0xC2B2AE3D;
+        int hash = (int) (31 + GLOBAL_RENDER_TIMER + 0x165667B1 + GLOBAL_RENDER_TIMER * 0xC2B2AE3D);
         hash = Integer.rotateLeft(hash, 17) * 0x27D4EB2F;
         hash ^= hash >>> 15;
         hash *= 0x85EBCA77;

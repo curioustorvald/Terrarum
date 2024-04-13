@@ -68,7 +68,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 
 
         // update the ghost sparingly
-        if (INGAME.WORLD_UPDATE_TIMER % 2 == 0) {
+        if (INGAME.WORLD_UPDATE_TIMER % 2 == 0L) {
             (INGAME as TerrarumIngame).blockMarkingActor.let {
                 val item = ghostItem.get()
 

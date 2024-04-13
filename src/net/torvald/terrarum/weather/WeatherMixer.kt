@@ -59,7 +59,7 @@ internal object WeatherMixer : RNGConsumer {
         JsonValue(JsonValue.ValueType.`object`),
         GdxColorMap(1, 3, Color(0x55aaffff), Color(0xaaffffff.toInt()), Color.WHITE),
         GdxColorMap(2, 2, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE),
-        "default",
+        listOf("default"),
         0f,
         0f,
         0f,
@@ -73,9 +73,6 @@ internal object WeatherMixer : RNGConsumer {
     override val RNG = HQRNG()
 
     var globalLightOverridden = false
-
-    val weatherDB: HashMap<String, ArrayList<BaseModularWeather>> // search by classification
-    val weatherDict: HashMap<String, BaseModularWeather> // search by identifier
 
     private var forceWindVec: Vector3? = null
 
@@ -151,37 +148,6 @@ internal object WeatherMixer : RNGConsumer {
         windVector = Vector3(-0.98f, 0f, 0.21f)
 
         oldCamPos.set(WorldCamera.camVector)
-    }
-
-    init {
-        weatherDB = HashMap<String, ArrayList<BaseModularWeather>>()
-        weatherDict = HashMap<String, BaseModularWeather>()
-
-
-        // read weather descriptions from assets/weather (modular weather)
-        val weatherRawValidList = ArrayList<Pair<String, File>>()
-        val weatherRawsDir = ModMgr.getFilesFromEveryMod("weathers")
-        weatherRawsDir.forEach { (modname, parentdir) ->
-            printdbg(this, "Scanning dir $parentdir")
-            parentdir.listFiles(FileFilter { !it.isDirectory && it.name.endsWith(".json") })?.forEach {
-                weatherRawValidList.add(modname to it)
-                printdbg(this, "Registering weather '$it' from module $modname")
-            }
-        }
-        // --> read from directory and store file that looks like RAW
-        for ((modname, raw) in weatherRawValidList) {
-            val weather = readFromJson(modname, raw)
-
-            weatherDict[weather.identifier] = weather
-
-            // if List for the classification does not exist, make one
-            if (!weatherDB.containsKey(weather.classification))
-                weatherDB.put(weather.classification, ArrayList())
-
-            weatherDB[weather.classification]!!.add(weather)
-        }
-
-        weatherDict["titlescreen"] = weatherDB[WEATHER_GENERIC]?.get(0)?.copy(identifier = "titlescreen", windSpeed = 1f) ?: DEFAULT_WEATHER
     }
 
     /**
@@ -527,7 +493,7 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     internal fun titleScreenInitWeather(weatherbox: Weatherbox) {
-        weatherbox.initWith(weatherDict["titlescreen"]!!, Long.MAX_VALUE)
+        weatherbox.initWith(WeatherCodex.getById("titlescreen")!!, Long.MAX_VALUE)
         forceWindVec = Vector3(
             -0.98f,
             0f,
@@ -923,72 +889,7 @@ internal object WeatherMixer : RNGConsumer {
         return lerp(x, c1.linearise(), c2.linearise()).unlinearise()
     }
 
-    fun getWeatherList(classification: String) = weatherDB[classification]!!
-    fun getRandomWeather(classification: String) =
-            getWeatherList(classification)[RNG.nextInt(getWeatherList(classification).size)]
-
-    fun readFromJson(modname: String, file: File): BaseModularWeather = readFromJson(modname, file.path)
-
-    fun readFromJson(modname: String, path: String): BaseModularWeather {
-        /* JSON structure:
-{
-  "skyboxGradColourMap": "colourmap/sky_colour.tga", // string (path to image) for dynamic. Image must be RGBA8888 or RGB888
-  "extraImages": [
-      // if any, it will be like:
-      sun01.tga,
-      clouds01.tga,
-      clouds02.tga,
-      auroraBlueViolet.tga
-  ]
-}
-         */
-        val pathToImage = "weathers"
-
-        val JSON = JsonFetcher(path)
-
-        val skyboxInJson = JSON.getString("skyboxGradColourMap")
-        val lightbox = JSON.getString("daylightClut")
-
-        val cloudsMap = ArrayList<CloudProps>()
-        val clouds = JSON["clouds"]
-        clouds.forEachSiblings { name, json ->
-            cloudsMap.add(CloudProps(
-                name,
-                TextureRegionPack(ModMgr.getGdxFile(modname, "$pathToImage/${json.getString("filename")}"), json.getInt("tw"), json.getInt("th")),
-                json.getFloat("probability"),
-                json.getFloat("baseScale"),
-                json.getFloat("scaleVariance"),
-                json.getFloat("altLow"),
-                json.getFloat("altHigh"),
-            ))
-        }
-        cloudsMap.sortBy { it.probability }
-
-
-
-        return BaseModularWeather(
-            identifier = JSON.getString("identifier"),
-            json = JSON,
-            skyboxGradColourMap = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${skyboxInJson}")),
-            daylightClut = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${lightbox}")),
-            classification = JSON.getString("classification"),
-            cloudChance = JSON.getFloat("cloudChance"),
-            windSpeed = JSON.getFloat("windSpeed"),
-            windSpeedVariance = JSON.getFloat("windSpeedVariance"),
-            windSpeedDamping = JSON.getFloat("windSpeedDamping"),
-            cloudGamma = JSON["cloudGamma"].asFloatArray().let { Vector2(it[0], it[1]) },
-            cloudGammaVariance = JSON["cloudGammaVariance"].asFloatArray().let { Vector2(it[0], it[1]) },
-            clouds = cloudsMap,
-            shaderVibrancy = JSON["shaderVibrancy"].asFloatArray()
-        )
-    }
-
     fun dispose() {
-        weatherDB.values.forEach { list ->
-            list.forEach { weather ->
-                weather.clouds.forEach { it.spriteSheet.dispose() }
-            }
-        }
         starmapTex.texture.dispose()
         shaderAstrum.dispose()
         shaderClouds.dispose()

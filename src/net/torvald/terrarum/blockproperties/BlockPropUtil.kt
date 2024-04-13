@@ -108,7 +108,7 @@ object BlockPropUtil {
         return when (prop.dynamicLuminosityFunction) {
             1    -> getTorchFlicker(prop)
             2    -> (INGAME.world).globalLight.cpy() // current global light
-            3    -> WeatherMixer.getGlobalLightOfTimeOfNoon(WeatherMixer.weatherDict["generic01"]!!).cpy() // daylight at noon
+            3    -> WeatherMixer.getGlobalLightOfTimeOfNoon(WeatherCodex.getById("generic01")!!).cpy() // daylight at noon
             4    -> getSlowBreath(prop)
             5    -> getPulsate(prop)
             else -> prop.baseLumCol

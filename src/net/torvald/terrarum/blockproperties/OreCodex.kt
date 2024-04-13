@@ -1,6 +1,7 @@
 package net.torvald.terrarum.blockproperties
 
 import net.torvald.terrarum.App
+import net.torvald.terrarum.TaggedProp
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.utils.CSVFetcher
 import org.apache.commons.csv.CSVRecord
@@ -78,11 +79,11 @@ class OreCodex {
 }
 
 
-class OreProp {
+class OreProp : TaggedProp {
     var id: String = ""
     var item: ItemID = ""
     var tags = HashSet<String>()
 
-    fun hasTag(s: String) = tags.contains(s)
+    override fun hasTag(s: String) = tags.contains(s)
 
 }

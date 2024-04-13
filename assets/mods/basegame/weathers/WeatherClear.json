@@ -1,20 +1,15 @@
 {
-  "identifier": "generic02",
+  "identifier": "clear01",
   "skyboxGradColourMap": "generic_skybox.tga",
   "daylightClut": "clut_daylight.tga",
-  "tags": "generic2",
-  "cloudChance": 150,
-  "cloudGamma": [0.9, 2.4],
+  "tags": "generic,clear",
+  "cloudChance": 12,
+  "cloudGamma": [1.2, 2.4],
   "cloudGammaVariance": [0.111, 0.0],
   "windSpeed": 0.35,
   "windSpeedVariance": 0.4,
   "windSpeedDamping": 0.5,
   "clouds": {
-    "cumulonimbus": {
-      "filename": "cloud_large.png", "tw": 2048, "th": 1024, "probability": 0.02,
-      "baseScale": 4.0, "scaleVariance": 0.3333333,
-      "altLow": 1080, "altHigh": 1120
-    },
     "cumulus": {
       "filename": "cloud_normal.png", "tw": 1024, "th": 512, "probability": 0.05,
       "baseScale": 2.0, "scaleVariance": 0.6,
@@ -26,7 +21,6 @@
       "altLow": 2600, "altHigh": 4800
     }
   },
-  "atmoTurbidity": 3.5,
-  "shaderVibrancy": [1.0, 1.0],
-  "__comment__": "Make a texture for altocumulus so that this weather can be realised with less than 1000 sprites"
+  "atmoTurbidity": 3.2,
+  "shaderVibrancy": [1.0, 1.0]
 }

@@ -29,6 +29,7 @@ import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.terrarum.weather.WeatherCodex
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.csv.CSVFormat
@@ -790,6 +791,20 @@ object ModMgr {
                 if (getGdxFile(module, it).let { it.exists() && it.isDirectory }) {
                     getGdxFiles(module, it).forEach { file -> loadAudio("${it.substringAfter("audio/")}.${file.name()}", file) }
                 }
+            }
+        }
+    }
+
+    object GameWeatherLoader {
+        val weatherPath = "weathers/"
+
+        init {
+            Terrarum.weatherCodex = WeatherCodex()
+        }
+
+        @JvmStatic operator fun invoke(module: String) {
+            getFiles(module, weatherPath).filter { it.isFile && it.name.lowercase().endsWith(".json") }.forEach {
+                Terrarum.weatherCodex.readFromJson(module, it)
             }
         }
     }

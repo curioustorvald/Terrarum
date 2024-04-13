@@ -25,7 +25,7 @@ typealias ItemID = String
  *
  * Created by minjaesong on 2016-01-16.
  */
-abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneable {
+abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneable, TaggedProp {
 
     constructor() : this("-uninitialised-")
 
@@ -392,10 +392,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         return this
     }
 
-    fun hasTag(s: String) = tags.contains(s)
-    fun hasAllTags(s: List<String>) = tags.containsAll(s)
-    fun hasAllTagOf(vararg s: String) = s.all { hasTag(it) }
-
+    override fun hasTag(s: String) = tags.contains(s)
 
     companion object {
 

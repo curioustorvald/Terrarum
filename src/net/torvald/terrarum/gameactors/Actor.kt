@@ -7,7 +7,7 @@ import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.audio.AudioBank
-import net.torvald.terrarum.audio.MusicContainer
+import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.TrackVolume
 import net.torvald.terrarum.audio.dsp.NullFilter

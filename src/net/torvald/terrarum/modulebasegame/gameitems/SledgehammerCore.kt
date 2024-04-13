@@ -82,7 +82,7 @@ object SledgehammerCore {
             val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
             val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
-            if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toInt()) {
+            if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toLong()) {
                 PickaxeCore.makeNoiseTileTouching(actor, wall)
             }
 

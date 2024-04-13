@@ -3,6 +3,7 @@ package net.torvald.terrarum.weather
 import com.badlogic.gdx.math.Vector2
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.WeatherCodex
 import net.torvald.terrarum.floorToInt
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
@@ -64,9 +65,9 @@ class Weatherbox {
 
     private fun pickNextWeather(): WeatherSchedule {
         // temporary setup for the release
-        val newName = if (takeUniformRand(0f..1f) < 0.5f) "generic01" else "generic02"
+        val newWeather = WeatherCodex.getRandom()
         val newDuration = takeTriangularRand(3600f..10800f).roundToLong()
-        return WeatherSchedule(WeatherMixer.weatherDict[newName]!!, newDuration)
+        return WeatherSchedule(newWeather, newDuration)
     }
 
     fun update(world: GameWorld) {

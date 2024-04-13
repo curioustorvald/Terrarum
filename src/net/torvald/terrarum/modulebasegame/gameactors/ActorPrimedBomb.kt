@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import net.torvald.spriteanimation.SingleImageSprite
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
-import net.torvald.terrarum.audio.MusicContainer
+import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.audio.decibelsToFullscale
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties

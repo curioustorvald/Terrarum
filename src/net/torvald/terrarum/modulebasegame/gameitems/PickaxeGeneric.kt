@@ -2,12 +2,11 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.jme3.math.FastMath.pow
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.MixerTrackProcessor
-import net.torvald.terrarum.audio.MusicContainer
+import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -84,7 +83,7 @@ object PickaxeCore {
             }
             // return false for punchable trees
             // non-punchable trees (= "log" tile placed by log item) must be mineable in order to make them useful as decor tiles
-            if (BlockCodex[tile].hasAllTagOf("TREE", "TREETRUNK", "TREESMALL")) {
+            if (BlockCodex[tile].hasAllTagsOf("TREE", "TREETRUNK", "TREESMALL")) {
                 usageStatus = usageStatus or false
                 continue
             }
@@ -93,7 +92,7 @@ object PickaxeCore {
             val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
             val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
-            if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toInt()) {
+            if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toLong()) {
                 makeNoiseTileTouching(actor, tile)
             }
 

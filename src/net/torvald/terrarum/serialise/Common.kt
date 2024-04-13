@@ -8,8 +8,7 @@ import io.airlift.compress.snappy.SnappyFramedOutputStream
 import io.airlift.compress.zstd.ZstdInputStream
 import io.airlift.compress.zstd.ZstdOutputStream
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.App
-import net.torvald.terrarum.TerrarumAppConfiguration
+import net.torvald.terrarum.*
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
@@ -18,12 +17,9 @@ import net.torvald.terrarum.savegame.ByteArray64
 import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
-import net.torvald.terrarum.toHex
 import net.torvald.terrarum.utils.*
-import net.torvald.terrarum.weather.BaseModularWeather
-import net.torvald.terrarum.weather.WeatherDirBox
+import net.torvald.terrarum.weather.*
 import net.torvald.terrarum.weather.WeatherMixer
-import net.torvald.terrarum.weather.WeatherStateBox
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.File
 import java.io.InputStream
@@ -269,7 +265,7 @@ object Common {
                 }
 
                 override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): BaseModularWeather {
-                    return WeatherMixer.weatherDict[jsonData.asString()]!!
+                    return WeatherCodex.getById(jsonData.asString())!!
                 }
             })
             // Fill
