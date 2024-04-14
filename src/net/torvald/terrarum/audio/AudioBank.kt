@@ -18,6 +18,9 @@ abstract class AudioBank : Disposable {
     abstract val totalSizeInSamples: Long
     abstract fun currentPositionInSamples(): Long
 
+    open fun sendMessage(msg: String) {}
+    open fun sendMessage(bits: Long) {}
+
     abstract fun readSamples(bufferL: FloatArray, bufferR: FloatArray): Int
     abstract fun reset()
 

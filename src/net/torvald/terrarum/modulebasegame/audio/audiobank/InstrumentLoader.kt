@@ -24,6 +24,8 @@ object InstrumentLoader {
      * Will read the sample and create 61 copies of them. Rendered samples will be stored on the CommonResourcePool
      * with the naming rule of `"${idBase}_${noteNumber}"`, with format of Pair<FloatArray, FloatArray>
      *
+     * The sample must be in two channels, 48 kHz sampling rate.
+     *
      * If `isDualMono` option is set, two values of a pair will point to the same FloatArray.
      *
      * @param idBase Base ID string
@@ -77,10 +79,11 @@ object InstrumentLoader {
     }
 
     private val TAPS = 8
+    private val RESAMPLE_RATE = 1.0// 122880.0 / 48000.0
 
     private fun resample(input: FloatArray, output: FloatArray, rate: Double) {
         for (sampleIdx in 0 until output.size) {
-            val t = sampleIdx.toDouble() * rate
+            val t = sampleIdx.toDouble() * rate * RESAMPLE_RATE
             val leftBound = maxOf(0, (t - TAPS + 1).floorToInt())
             val rightBound = minOf(input.size - 1, (t + TAPS).ceilToInt())
 
