@@ -14,6 +14,9 @@ import java.io.File
  */
 object AudioHelper {
 
+    /**
+     * The audio must be in stereo (two channels)
+     */
     fun getIR(module: String, path: String): Array<ComplexArray> {
         val id = "convolution$$module.$path"
 
@@ -66,6 +69,9 @@ object AudioHelper {
         return Array(2) { FFT.fft(conv[it]) }
     }
 
+    /**
+     * The audio must be in stereo
+     */
     fun getAudioInSamples(module: String, path: String): Array<FloatArray> {
         val id = "audiosamplesf32$$module.$path"
 

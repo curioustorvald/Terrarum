@@ -512,7 +512,7 @@ public class App implements ApplicationListener {
                 );
                 var loadOrder = loadOrderCSVparser.getRecords();
 
-                if (loadOrder.size() > 0) {
+                if (!loadOrder.isEmpty()) {
                     var modname = loadOrder.get(0).get(0);
 
                     var textureFile = Gdx.files.internal("assets/mods/"+modname+"/splashback.png");
@@ -531,8 +531,8 @@ public class App implements ApplicationListener {
 
             }
             finally {
-                try {loadOrderCSVparser.close();}
-                catch (IOException e) {}
+                try { loadOrderCSVparser.close(); }
+                catch (IOException | NullPointerException e) {}
             }
         }
 
@@ -740,12 +740,15 @@ public class App implements ApplicationListener {
             FrameBufferManager.end();
             screenshotRequested = false;
 
-            Terrarum.INSTANCE.getIngame().sendNotification(msg);
+
+            var ingame = Terrarum.INSTANCE.getIngame();
+            if (ingame != null) ingame.sendNotification(msg);
         }
     }
 
     public static Texture getCurrentDitherTex() {
-        int hash = (int) (31 + GLOBAL_RENDER_TIMER + 0x165667B1 + GLOBAL_RENDER_TIMER * 0xC2B2AE3D);
+        var T = (int) GLOBAL_RENDER_TIMER;
+        int hash = 31 + T + 0x165667B1 + T * 0xC2B2AE3D;
         hash = Integer.rotateLeft(hash, 17) * 0x27D4EB2F;
         hash ^= hash >>> 15;
         hash *= 0x85EBCA77;
@@ -1102,12 +1105,7 @@ public class App implements ApplicationListener {
             }
 
             // nullify if not actually connected
-            try {
-                if (!((XinputControllerAdapter) gamepad).getC().isConnected()) {
-                    gamepad = null;
-                }
-            }
-            catch (NullPointerException notQuiteWindows) {
+            if (gamepad != null && !((XinputControllerAdapter) gamepad).getC().isConnected()) {
                 gamepad = null;
             }
         }
@@ -1946,7 +1944,7 @@ public class App implements ApplicationListener {
     public static void addDebugTime(String target, String... targets) {
         long l = 0L;
         for (String s : targets) {
-            l += ((long) debugTimers.get(s));
+            l += debugTimers.get(s);
         }
         debugTimers.put(target, l);
     }

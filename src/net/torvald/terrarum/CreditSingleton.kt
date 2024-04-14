@@ -343,7 +343,11 @@ Sound from <https://freesound.org/people/Benboncan/>
 
     - effects/haptic_*.ogg
 ℗ 2024 CuriousTorvald
-My own recordings
+Sound from <https://freesound.org/people/CuriousTorvald/>
+
+    - effects/notes/spieluhr.ogg
+℗ 2013 Ubikphonik
+Sound from <https://freesound.org/people/UbikPhonik/>
 
 
 $BULLET Impulse Responses:
