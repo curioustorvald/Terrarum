@@ -53,80 +53,84 @@ class FixtureMechanicalTines : Electric {
     }
 
     @Transient private var testRollCursor = 0
-    @Transient private val TICK_DIVISOR = 12
 
     override fun updateSignal() {
         // TODO update using network port
 
 
         if (isSignalHigh(0, 1)) {
-            if (INGAME.WORLD_UPDATE_TIMER % TICK_DIVISOR == 0L) {
-                audioBank.sendMessage(testNotes[testRollCursor])
-                testRollCursor = (testRollCursor + 1) % testNotes.size
-            }
+            // advance every tick
+            audioBank.sendMessage(testNotes[testRollCursor])
+            testRollCursor = (testRollCursor + 1) % testNotes.size
         }
     }
 
 
 
     companion object {
-        @Transient val testNotes =
-            prel(24,28,31,36,40) +
-                    prel(24,26,33,38,41) +
-                    prel(23,26,31,38,41) +
-                    prel(24,28,31,36,40) +
-                    prel(24,28,33,40,45) +
-                    prel(24,26,30,33,38) +
-                    prel(23,26,31,38,43) +
-                    prel(23,24,28,31,36) +
-                    prel(21,24,28,31,36) +
-                    prel(14,21,26,30,36) +
-                    prel(19,23,26,31,35) +
-                    prel(19,22,28,31,37) +
-                    prel(17,21,26,33,38) +
-                    prel(17,20,26,29,35) +
-                    prel(16,19,24,31,36) +
-                    prel(16,17,21,24,29) +
-                    prel(14,17,21,24,29) +
-                    prel( 7,14,19,23,29) +
-                    prel(12,16,19,24,28) +
-                    prel(12,19,22,24,28) +
-                    prel( 5,17,21,24,28) +
-                    prel( 6,12,21,24,27) +
-                    prel( 8,17,23,24,26) +
-                    prel( 7,17,19,23,26) +
-                    prel( 7,16,19,24,28) +
-                    prel( 7,14,19,24,29) +
-                    prel( 7,14,19,23,29) +
-                    prel( 7,15,21,24,30) +
-                    prel( 7,16,19,24,31) +
-                    prel( 7,14,19,24,29) +
-                    prel( 7,14,19,23,29) +
-                    prel( 0,12,19,22,28) +
-                    end1( 0,12,17,21,24,29,21,17,14) +
-                    end2( 0,11,31,35,38,41,26,29,28) +
-                    end3( 0,12,28,31,36)
+        @Transient private val TICK_DIVISOR = 10
+
+        @Transient val testNotes = List(16*TICK_DIVISOR) { 0L } +
+                prel(24,28,31,36,40) +
+                prel(24,26,33,38,41) +
+                prel(23,26,31,38,41) +
+                prel(24,28,31,36,40) +
+                prel(24,28,33,40,45) +
+                prel(24,26,30,33,38) +
+                prel(23,26,31,38,43) +
+                prel(23,24,28,31,36) +
+                prel(21,24,28,31,36) +
+                prel(14,21,26,30,36) +
+                prel(19,23,26,31,35) +
+                prel(19,22,28,31,37) +
+                prel(17,21,26,33,38) +
+                prel(17,20,26,29,35) +
+                prel(16,19,24,31,36) +
+                prel(16,17,21,24,29) +
+                prel(14,17,21,24,29) +
+                prel( 7,14,19,23,29) +
+                prel(12,16,19,24,28) +
+                prel(12,19,22,24,28) +
+                prel( 5,17,21,24,28) +
+                prel( 6,12,21,24,27) +
+                prel( 8,17,23,24,26) +
+                prel( 7,17,19,23,26) +
+                prel( 7,16,19,24,28) +
+                prel( 7,14,19,24,29) +
+                prel( 7,14,19,23,29) +
+                prel( 7,15,21,24,30) +
+                prel( 7,16,19,24,31) +
+                prel( 7,14,19,24,29) +
+                prel( 7,14,19,23,29) +
+                prel( 0,12,19,22,28) +
+                end1( 0,12,17,21,24,29,21,17,14) +
+                end2( 0,11,31,35,38,41,26,29,28) +
+                end3( 0,12,28,31,36) + List(16*TICK_DIVISOR - 5) { 0L }
 
         private fun prel(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int): List<Long> {
-            return listOf(
+            return toPianoRoll(
                 1L shl n1, 1L shl n2, 1L shl n3, 1L shl n4, 1L shl n5, 1L shl n3, 1L shl n4, 1L shl n5,
                 1L shl n1, 1L shl n2, 1L shl n3, 1L shl n4, 1L shl n5, 1L shl n3, 1L shl n4, 1L shl n5)
         }
 
         private fun end1(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int, n6: Int, n7: Int, n8: Int, n9: Int): List<Long> {
-            return listOf(
+            return toPianoRoll(
                 1L shl n1, 1L shl n2, 1L shl n3, 1L shl n4, 1L shl n5, 1L shl n6, 1L shl n5, 1L shl n4,
                 1L shl n5, 1L shl n7, 1L shl n8, 1L shl n7, 1L shl n8, 1L shl n9, 1L shl n8, 1L shl n9)
         }
 
         private fun end2(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int, n6: Int, n7: Int, n8: Int, n9: Int): List<Long> {
-            return listOf(
+            return toPianoRoll(
                 1L shl n1, 1L shl n2, 1L shl n3, 1L shl n4, 1L shl n5, 1L shl n6, 1L shl n5, 1L shl n4,
                 1L shl n5, 1L shl n4, 1L shl n3, 1L shl n4, 1L shl n7, 1L shl n8, 1L shl n9, 1L shl n7)
         }
 
         private fun end3(vararg ns: Int): List<Long> {
-            return listOf(ns.map { 1L shl it }.fold(0L) { acc, note -> acc or note }) + List(15) { 0L }
+            return ns.map { 1L shl it } // arpeggiate
+        }
+
+        private fun toPianoRoll(vararg notes: Long) = List<Long>(notes.size * TICK_DIVISOR) {
+            if (it % TICK_DIVISOR == 0) notes[it / TICK_DIVISOR] else 0
         }
     }
 }

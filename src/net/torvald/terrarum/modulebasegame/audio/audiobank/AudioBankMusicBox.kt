@@ -12,8 +12,7 @@ class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {})
 
     override val notCopyable = true
 
-    // TODO don't store samples (1MB each!), store numbers instead and synthesize on readSamples()
-    internal data class Msg(val tick: Long, val samplesL: FloatArray, val samplesR: FloatArray, var samplesDispatched: Int = 0) { // in many cases, samplesL and samplesR will point to the same object
+    internal data class Msg(val tick: Long, val notes: IntArray, val maxlen: Int, var samplesDispatched: Int = 0) { // in many cases, samplesL and samplesR will point to the same object
         override fun toString(): String {
             return "Msg(tick=$tick, samplesDispatched=$samplesDispatched)"
         }
@@ -59,19 +58,11 @@ class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {})
     private fun queue(tick: Long, noteBits: Long) {
         if (noteBits == 0L) return
 
-        val notes = findSetBits(noteBits)
-
-        val buf = FloatArray(getSample(0).first.size)
-
-        // combine all those samples
-        notes.forEach { note ->
-            getSample(note).first.forEachIndexed { index, fl ->
-                buf[index] += fl
-            }
-        }
+        val notes = findSetBits(noteBits).toIntArray()
+        val maxlen = getSample(notes.first()).first.size
 
         // actually queue it
-        val msg = Msg(tick, buf, buf)
+        val msg = Msg(tick, notes, maxlen)
         messageQueue.add(messageQueue.size, msg)
     }
 
@@ -87,9 +78,15 @@ class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {})
         // only copy over the past and current messages
         messageQueue.filter { it.tick <= tickCount }.forEach {
             // copy over the samples
-            for (i in 0 until minOf(bufferSize, it.samplesL.size - it.samplesDispatched)) {
-                bufferL[i] += it.samplesL[i + it.samplesDispatched]
-                bufferR[i] += it.samplesR[i + it.samplesDispatched]
+            it.notes.forEach { note ->
+                val noteSamples = getSample(note)
+                val start = it.samplesDispatched
+                val end = minOf(start + bufferSize, noteSamples.first.size)
+
+                for (i in start until end) {
+                    bufferL[i - start] += noteSamples.first[i]
+                    bufferR[i - start] += noteSamples.second[i]
+                }
             }
 
             it.samplesDispatched += bufferSize
@@ -99,15 +96,13 @@ class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {})
         var rc = 0
         while (rc < messageQueue.size) {
             val it = messageQueue[rc]
-            if (it.samplesDispatched >= it.samplesL.size) {
+            if (it.samplesDispatched >= it.maxlen) {
                 messageQueue.removeAt(rc)
                 rc -= 1
             }
 
             rc += 1
         }
-
-        printdbg(this, "Queuelen: ${messageQueue.size}")
 
         return bufferSize
     }
