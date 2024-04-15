@@ -108,29 +108,45 @@ class FixtureMechanicalTines : Electric {
                 end3( 0,12,28,31,36) + List(16*TICK_DIVISOR - 5) { 0L }
 
         private fun prel(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int): List<Long> {
-            return toPianoRoll(
+            return toPianoRoll2(
                 1L shl n1, 1L shl n2, 1L shl n3, 1L shl n4, 1L shl n5, 1L shl n3, 1L shl n4, 1L shl n5,
                 1L shl n1, 1L shl n2, 1L shl n3, 1L shl n4, 1L shl n5, 1L shl n3, 1L shl n4, 1L shl n5)
         }
 
         private fun end1(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int, n6: Int, n7: Int, n8: Int, n9: Int): List<Long> {
-            return toPianoRoll(
+            return toPianoRoll2(
                 1L shl n1, 1L shl n2, 1L shl n3, 1L shl n4, 1L shl n5, 1L shl n6, 1L shl n5, 1L shl n4,
                 1L shl n5, 1L shl n7, 1L shl n8, 1L shl n7, 1L shl n8, 1L shl n9, 1L shl n8, 1L shl n9)
         }
 
         private fun end2(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int, n6: Int, n7: Int, n8: Int, n9: Int): List<Long> {
             return toPianoRoll(
-                1L shl n1, 1L shl n2, 1L shl n3, 1L shl n4, 1L shl n5, 1L shl n6, 1L shl n5, 1L shl n4,
-                1L shl n5, 1L shl n4, 1L shl n3, 1L shl n4, 1L shl n7, 1L shl n8, 1L shl n9, 1L shl n7)
+                1L shl n1 to TICK_DIVISOR, 1L shl n2 to TICK_DIVISOR+1, 1L shl n3 to TICK_DIVISOR+1, 1L shl n4 to TICK_DIVISOR+1,
+                1L shl n5 to TICK_DIVISOR+1, 1L shl n6 to TICK_DIVISOR+2, 1L shl n5 to TICK_DIVISOR+2, 1L shl n4 to TICK_DIVISOR+2,
+                1L shl n5 to TICK_DIVISOR+3, 1L shl n4 to TICK_DIVISOR+3, 1L shl n3 to TICK_DIVISOR+4, 1L shl n4 to TICK_DIVISOR+4,
+                1L shl n7 to TICK_DIVISOR+6, 1L shl n8 to TICK_DIVISOR+8, 1L shl n9 to TICK_DIVISOR+16, 1L shl n7 to TICK_DIVISOR+32)
         }
 
         private fun end3(vararg ns: Int): List<Long> {
             return ns.map { 1L shl it } // arpeggiate
         }
 
+        private fun toPianoRoll(vararg noteAndLen: Pair<Long, Int>): List<Long> {
+            val ret = MutableList<Long>(noteAndLen.sumOf { it.second }) { 0 }
+            var c = 0
+            noteAndLen.forEach { (note, len) ->
+                ret[c] = note
+                c += len
+            }
+            return ret
+        }
+
         private fun toPianoRoll(vararg notes: Long) = List<Long>(notes.size * TICK_DIVISOR) {
             if (it % TICK_DIVISOR == 0) notes[it / TICK_DIVISOR] else 0
         }
+
+        private fun toPianoRoll2(vararg notes: Long) = List<Long>(notes.size * TICK_DIVISOR) {
+            if (it % TICK_DIVISOR == 0) notes[it / TICK_DIVISOR] else 0
+        }.let { it.subList(0, 1) + List<Long>(3) { 0L } + it.subList(1, it.size) }
     }
 }
