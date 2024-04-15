@@ -7,6 +7,8 @@ import com.badlogic.gdx.utils.Disposable
  */
 abstract class AudioBank : Disposable {
 
+    open val notCopyable: Boolean = false
+
     protected val hash = System.nanoTime()
 
     abstract fun makeCopy(): AudioBank

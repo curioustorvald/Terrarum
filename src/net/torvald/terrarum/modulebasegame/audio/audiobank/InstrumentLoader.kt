@@ -6,8 +6,12 @@ import net.torvald.terrarum.audio.AudioProcessBuf
 import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.floorToInt
+import org.dyn4j.Epsilon
 import java.lang.Math.pow
+import kotlin.math.PI
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
+import kotlin.math.sin
 
 /**
  * Creates 61-note (C1 to C5) pack of samples from a single file. Tuning system is 12-note Equal Temperament.
@@ -17,7 +21,7 @@ import kotlin.math.roundToInt
 object InstrumentLoader {
 
     // 0 is C0
-    private fun getStretch(noteNum: Int) = pow(2.0, (noteNum - 29) / 12.0)
+    private fun getRate(noteNum: Int) = pow(2.0, noteNum / 12.0)
 
 
     /**
@@ -51,8 +55,8 @@ object InstrumentLoader {
 
         for (j in 0 until 61) {
             val i = j - initialNote
-            val rate = getStretch(i)
-            val sampleCount = (masterFile.totalSizeInSamples * rate).roundToInt()
+            val rate = getRate(i)
+            val sampleCount = (masterFile.totalSizeInSamples * (1.0 / rate)).roundToInt()
 
             val samplesL = FloatArray(sampleCount)
             val samplesR = if (isDualMono) samplesL else FloatArray(sampleCount)
@@ -92,13 +96,23 @@ object InstrumentLoader {
             var weightedSum = 0.0
 
             for (j in leftBound..rightBound) {
-                val w = AudioProcessBuf.L(t - j.toDouble())
+                val w = L(t - j.toDouble())
                 akkuL += input[j] * w
                 weightedSum += w
             }
 
             output[sampleIdx] = (akkuL / weightedSum).toFloat()
         }
+    }
+
+
+    fun L(x: Double): Double {
+        return if (x.absoluteValue < Epsilon.E)
+                1.0
+            else if (-TAPS <= x && x < TAPS)
+                (TAPS * sin(PI * x) * sin(PI * x / TAPS)) / (PI * PI * x * x)
+            else
+                0.0
     }
 
 }

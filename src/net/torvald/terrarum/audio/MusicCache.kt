@@ -8,8 +8,10 @@ class MusicCache(val trackName: String) : Disposable {
     private val cache = HashMap<String, AudioBank>()
 
     fun getOrPut(music: AudioBank?): AudioBank? {
-        if (music != null)
+        if (music != null && !music.notCopyable)
             return cache.getOrPut(music.name) { music.makeCopy() }
+        else if (music != null)
+            return music
         return null
     }
 

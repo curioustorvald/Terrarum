@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.audio.audiobank
 
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.audio.AudioBank
 
@@ -9,14 +10,21 @@ import net.torvald.terrarum.audio.AudioBank
  */
 class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {}) : AudioBank() {
 
-    private data class Msg(val tick: Long, val samplesL: FloatArray, val samplesR: FloatArray, var samplesDispatched: Int = 0) // in many cases, samplesL and samplesR will point to the same object
+    override val notCopyable = true
+
+    // TODO don't store samples (1MB each!), store numbers instead and synthesize on readSamples()
+    internal data class Msg(val tick: Long, val samplesL: FloatArray, val samplesR: FloatArray, var samplesDispatched: Int = 0) { // in many cases, samplesL and samplesR will point to the same object
+        override fun toString(): String {
+            return "Msg(tick=$tick, samplesDispatched=$samplesDispatched)"
+        }
+    }
 
     override val name = "spieluhr"
     override val samplingRate = 48000 // 122880 // use 122880 to make each tick is 2048 samples
     override val channels = 1
 
     private val getSample = // usage: getSample(noteNum 0..60)
-        InstrumentLoader.load("spieluhr", "basegame", "audio/effects/notes/spieluhr.ogg", 29)
+        InstrumentLoader.load("spieluhr", "basegame", "audio/effects/notes/spieluhr.ogg", 41)
 
     private val SAMPLES_PER_TICK = samplingRate / App.TICK_SPEED // should be 800 on default setting
 
@@ -34,16 +42,26 @@ class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {})
         return result
     }
 
+    init {
+        printdbg(this, "Note 0 length: ${getSample(0).first.size}")
+        printdbg(this, "Note 12 length: ${getSample(12).first.size}")
+        printdbg(this, "Note 24 length: ${getSample(24).first.size}")
+        printdbg(this, "Note 48 length: ${getSample(48).first.size}")
+    }
+
     /**
      * Queues the notes such that they are played on the next tick
      */
     override fun sendMessage(noteBits: Long) {
+        queue(INGAME.WORLD_UPDATE_TIMER + 1, noteBits)
+    }
+
+    private fun queue(tick: Long, noteBits: Long) {
         if (noteBits == 0L) return
 
-        val tick = INGAME.WORLD_UPDATE_TIMER + 1
         val notes = findSetBits(noteBits)
 
-        val buf = FloatArray(getSample(notes.first()).first.size)
+        val buf = FloatArray(getSample(0).first.size)
 
         // combine all those samples
         notes.forEach { note ->
@@ -53,7 +71,8 @@ class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {})
         }
 
         // actually queue it
-        messageQueue.add(Msg(tick, buf, buf))
+        val msg = Msg(tick, buf, buf)
+        messageQueue.add(messageQueue.size, msg)
     }
 
     override fun currentPositionInSamples() = 0L
@@ -61,6 +80,9 @@ class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {})
     override fun readSamples(bufferL: FloatArray, bufferR: FloatArray): Int {
         val tickCount = INGAME.WORLD_UPDATE_TIMER
         val bufferSize = bufferL.size
+
+        bufferL.fill(0f)
+        bufferR.fill(0f)
 
         // only copy over the past and current messages
         messageQueue.filter { it.tick <= tickCount }.forEach {
@@ -73,44 +95,33 @@ class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {})
             it.samplesDispatched += bufferSize
         }
 
-
         // dequeue the finished messages
-        val messagesToKill = ArrayList<Msg>(messageQueue.filter { it.samplesDispatched >= it.samplesL.size })
-        if (messagesToKill.isNotEmpty()) messagesToKill.forEach {
-            messageQueue.remove(it)
+        var rc = 0
+        while (rc < messageQueue.size) {
+            val it = messageQueue[rc]
+            if (it.samplesDispatched >= it.samplesL.size) {
+                messageQueue.removeAt(rc)
+                rc -= 1
+            }
+
+            rc += 1
         }
+
+        printdbg(this, "Queuelen: ${messageQueue.size}")
 
         return bufferSize
     }
 
     override fun reset() {
-        TODO("Not yet implemented")
+        messageQueue.clear()
     }
 
     override fun makeCopy(): AudioBank {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException()
     }
 
     override fun dispose() {
-        TODO("Not yet implemented")
     }
 
-    private fun prel(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int): List<Int> {
-        return listOf(
-            n1, n2, n3, n4, n5, n3, n4, n5,
-            n1, n2, n3, n4, n5, n3, n4, n5
-        )
-    }
-
-    private val testNotes = prel(0,0,0,0,0)+
-            prel(24,28,31,36,40) +
-            prel(24, 26,33,28,41) +
-            prel(23,26,31,38,41) +
-            prel(24,28,31,36,40) +
-            prel(24,28,33,40,45) +
-            prel(24,26,30,33,38) +
-            prel(23,26,31,38,43) +
-            prel(23,24,28,31,36) +
-            prel(21,24,28,31,36)
 
 }

@@ -37,3 +37,21 @@ class ItemMusicalTurntable(originalID: ItemID) : FixtureItemBase(originalID, "ne
     override var originalName = "ITEM_TURNTABLE"
 
 }
+
+
+/**
+ * Created by minjaesong on 2024-04-15.
+ */
+class ItemMechanicalTines(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureMechanicalTines") {
+
+
+    override var baseMass = 20.0
+    override val canBeDynamic = false
+    override val materialId = ""
+    override val itemImage: TextureRegion
+        get() = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/mechanical_tines.tga")
+
+    override var baseToolSize: Double? = baseMass
+    override var originalName = "ITEM_MECHANICAL_TINES"
+
+}
