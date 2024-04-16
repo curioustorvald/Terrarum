@@ -7,6 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.drawBodyInGoodPosition
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -76,30 +77,29 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, var despawnUponCollision
     }
 
     open fun drawBody(frameDelta: Float, batch: SpriteBatch) {
-        if (!flagDespawn) {
-            batch.color = drawColour
-            drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
-                batch.draw(body, x, y, hitbox.width.toFloat(), hitbox.height.toFloat())
-            }
-        }
+        defaultDrawFun(frameDelta, batch) { x, y -> batch.draw(body, x, y, hitbox.width.toFloat(), hitbox.height.toFloat()) }
     }
 
     open fun drawGlow(frameDelta: Float, batch: SpriteBatch) {
-        if (!flagDespawn && glow != null) {
-            batch.color = drawColour
-            drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
-                batch.draw(glow, x, y, hitbox.width.toFloat(), hitbox.height.toFloat())
-            }
-        }
+        if (glow != null)
+            defaultDrawFun(frameDelta, batch) { x, y -> batch.draw(glow, x, y, hitbox.width.toFloat(), hitbox.height.toFloat()) }
     }
 
     open fun drawEmissive(frameDelta: Float, batch: SpriteBatch) {
-        if (!flagDespawn && emissive != null) {
+        if (emissive != null)
+            defaultDrawFun(frameDelta, batch) { x, y -> batch.draw(emissive, x, y, hitbox.width.toFloat(), hitbox.height.toFloat()) }
+    }
+
+    fun defaultDrawFun(frameDelta: Float, batch: SpriteBatch, drawJob: (x: Float, y: Float) -> Unit) {
+        val oldColour = batch.color.cpy()
+        if (!flagDespawn) {
+            batch.shader = IngameRenderer.shaderBayerAlpha
             batch.color = drawColour
             drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
-                batch.draw(emissive, x, y, hitbox.width.toFloat(), hitbox.height.toFloat())
+                drawJob(x, y)
             }
         }
+        batch.color = oldColour
     }
 
     open fun dispose() {

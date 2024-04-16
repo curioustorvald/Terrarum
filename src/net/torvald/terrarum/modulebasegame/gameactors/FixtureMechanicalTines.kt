@@ -141,18 +141,18 @@ class FixtureMechanicalTines : Electric {
 
         private fun prel(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int): List<Long> {
             return toPianoRoll(
-                1L shl n1 to TICK_DIVISOR+2, 1L shl n2 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR,
+                1L shl n1 to TICK_DIVISOR+2, 1L shl n2 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR-1,
                 1L shl n5 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR, 1L shl n5 to TICK_DIVISOR,
-                1L shl n1 to TICK_DIVISOR, 1L shl n2 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR,
-                1L shl n5 to TICK_DIVISOR-1, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR, 1L shl n5 to TICK_DIVISOR)
+                1L shl n1 to TICK_DIVISOR, 1L shl n2 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR-1,
+                1L shl n5 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR, 1L shl n5 to TICK_DIVISOR)
         }
 
         private fun end1(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int, n6: Int, n7: Int, n8: Int, n9: Int): List<Long> {
             return toPianoRoll(
-                1L shl n1 to TICK_DIVISOR+2, 1L shl n2 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR,
+                1L shl n1 to TICK_DIVISOR+2, 1L shl n2 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR-1,
                 1L shl n5 to TICK_DIVISOR, 1L shl n6 to TICK_DIVISOR, 1L shl n5 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR,
-                1L shl n5 to TICK_DIVISOR, 1L shl n7 to TICK_DIVISOR, 1L shl n8 to TICK_DIVISOR, 1L shl n7 to TICK_DIVISOR,
-                1L shl n8 to TICK_DIVISOR-1, 1L shl n9 to TICK_DIVISOR, 1L shl n8 to TICK_DIVISOR, 1L shl n9 to TICK_DIVISOR)
+                1L shl n5 to TICK_DIVISOR, 1L shl n7 to TICK_DIVISOR, 1L shl n8 to TICK_DIVISOR, 1L shl n7 to TICK_DIVISOR-1,
+                1L shl n8 to TICK_DIVISOR, 1L shl n9 to TICK_DIVISOR, 1L shl n8 to TICK_DIVISOR, 1L shl n9 to TICK_DIVISOR)
         }
 
         private fun end2(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int, n6: Int, n7: Int, n8: Int, n9: Int): List<Long> {
@@ -204,7 +204,7 @@ object ParticleMusicalNoteFactory {
     private val noteColours = (0..60).map {
         val hue = it / 60f * 270f
         val saturation = 100f
-        val lightness = 80f
+        val lightness = 70f
         val (r, g, b) = HUSLColorConverter.hsluvToRgb(floatArrayOf(hue, saturation, lightness))
         Color(r, g, b, 1f)
     }
@@ -214,13 +214,7 @@ object ParticleMusicalNoteFactory {
     }
 
     fun makeRandomParticle(note: Int, pos: Vector2): ParticleVanishingTexture {
-        val it = object : ParticleVanishingTexture(tex.get(rng.nextInt(3), rng.nextInt(2)), pos.x, pos.y, false) {
-            override fun update(delta: Float) {
-                super.update(delta)
-
-                drawColour.a = ((lifetimeMax - lifetimeCounter) / lifetimeMax).pow(1f / 2.2f).coerceIn(0f, 1f)
-            }
-        }
+        val it = ParticleVanishingTexture(tex.get(rng.nextInt(3), rng.nextInt(2)), pos.x, pos.y, false)
 
         // set flying velocity
         val direction = angles[note]
