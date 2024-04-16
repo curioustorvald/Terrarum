@@ -1,14 +1,24 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.graphics.Color
+import com.jme3.math.FastMath
+import net.torvald.colourutil.HUSLColorConverter
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameparticles.ParticleVanishingTexture
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.audio.audiobank.AudioBankMusicBox
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import org.dyn4j.geometry.Vector2
+import kotlin.math.pow
 
 /**
  * Created by minjaesong on 2024-04-15.
@@ -60,12 +70,34 @@ class FixtureMechanicalTines : Electric {
 
         if (isSignalHigh(0, 1)) {
             // advance every tick
-            audioBank.sendMessage(testNotes[testRollCursor])
+            testNotes[testRollCursor].let {
+                audioBank.sendMessage(it)
+                spewParticles(it)
+            }
             testRollCursor = (testRollCursor + 1) % testNotes.size
         }
     }
 
+    private fun spewParticles(noteBits: Long) {
+        if (noteBits == 0L) return
+        val notes = findSetBits(noteBits)
+        notes.forEach {
+            val particle = ParticleMusicalNoteFactory.makeRandomParticle(it, this.hitbox.canonVec)
+            (INGAME as TerrarumIngame).addParticle(particle)
+        }
+    }
 
+
+
+    private fun findSetBits(num: Long): List<Int> {
+        val result = mutableListOf<Int>()
+        for (i in 0 until 61) {
+            if (num and (1L shl i) != 0L) {
+                result.add(i)
+            }
+        }
+        return result
+    }
 
     companion object {
         @Transient private val TICK_DIVISOR = 10
@@ -108,23 +140,27 @@ class FixtureMechanicalTines : Electric {
                 end3( 0,12,28,31,36) + List(16*TICK_DIVISOR - 5) { 0L }
 
         private fun prel(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int): List<Long> {
-            return toPianoRoll2(
-                1L shl n1, 1L shl n2, 1L shl n3, 1L shl n4, 1L shl n5, 1L shl n3, 1L shl n4, 1L shl n5,
-                1L shl n1, 1L shl n2, 1L shl n3, 1L shl n4, 1L shl n5, 1L shl n3, 1L shl n4, 1L shl n5)
+            return toPianoRoll(
+                1L shl n1 to TICK_DIVISOR+2, 1L shl n2 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR,
+                1L shl n5 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR, 1L shl n5 to TICK_DIVISOR,
+                1L shl n1 to TICK_DIVISOR, 1L shl n2 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR,
+                1L shl n5 to TICK_DIVISOR-1, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR, 1L shl n5 to TICK_DIVISOR)
         }
 
         private fun end1(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int, n6: Int, n7: Int, n8: Int, n9: Int): List<Long> {
-            return toPianoRoll2(
-                1L shl n1, 1L shl n2, 1L shl n3, 1L shl n4, 1L shl n5, 1L shl n6, 1L shl n5, 1L shl n4,
-                1L shl n5, 1L shl n7, 1L shl n8, 1L shl n7, 1L shl n8, 1L shl n9, 1L shl n8, 1L shl n9)
+            return toPianoRoll(
+                1L shl n1 to TICK_DIVISOR+2, 1L shl n2 to TICK_DIVISOR, 1L shl n3 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR,
+                1L shl n5 to TICK_DIVISOR, 1L shl n6 to TICK_DIVISOR, 1L shl n5 to TICK_DIVISOR, 1L shl n4 to TICK_DIVISOR,
+                1L shl n5 to TICK_DIVISOR, 1L shl n7 to TICK_DIVISOR, 1L shl n8 to TICK_DIVISOR, 1L shl n7 to TICK_DIVISOR,
+                1L shl n8 to TICK_DIVISOR-1, 1L shl n9 to TICK_DIVISOR, 1L shl n8 to TICK_DIVISOR, 1L shl n9 to TICK_DIVISOR)
         }
 
         private fun end2(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int, n6: Int, n7: Int, n8: Int, n9: Int): List<Long> {
             return toPianoRoll(
-                1L shl n1 to TICK_DIVISOR, 1L shl n2 to TICK_DIVISOR+1, 1L shl n3 to TICK_DIVISOR+1, 1L shl n4 to TICK_DIVISOR+1,
+                1L shl n1 to TICK_DIVISOR+2, 1L shl n2 to TICK_DIVISOR+1, 1L shl n3 to TICK_DIVISOR+1, 1L shl n4 to TICK_DIVISOR+1,
                 1L shl n5 to TICK_DIVISOR+1, 1L shl n6 to TICK_DIVISOR+2, 1L shl n5 to TICK_DIVISOR+2, 1L shl n4 to TICK_DIVISOR+2,
                 1L shl n5 to TICK_DIVISOR+3, 1L shl n4 to TICK_DIVISOR+3, 1L shl n3 to TICK_DIVISOR+4, 1L shl n4 to TICK_DIVISOR+4,
-                1L shl n7 to TICK_DIVISOR+6, 1L shl n8 to TICK_DIVISOR+8, 1L shl n9 to TICK_DIVISOR+16, 1L shl n7 to TICK_DIVISOR+32)
+                1L shl n7 to TICK_DIVISOR+6, 1L shl n8 to TICK_DIVISOR+8, 1L shl n9 to TICK_DIVISOR+12, 1L shl n7 to TICK_DIVISOR+24)
         }
 
         private fun end3(vararg ns: Int): List<Long> {
@@ -145,8 +181,57 @@ class FixtureMechanicalTines : Electric {
             if (it % TICK_DIVISOR == 0) notes[it / TICK_DIVISOR] else 0
         }
 
-        private fun toPianoRoll2(vararg notes: Long) = List<Long>(notes.size * TICK_DIVISOR) {
-            if (it % TICK_DIVISOR == 0) notes[it / TICK_DIVISOR] else 0
-        }.let { it.subList(0, 1) + List<Long>(3) { 0L } + it.subList(1, it.size) }
+    }
+}
+
+object ParticleMusicalNoteFactory {
+
+    init {
+        CommonResourcePool.addToLoadingList("basegame-particles-musical_note") {
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/musical_note.tga"), 8, 8)
+        }
+        CommonResourcePool.loadAll()
+    }
+
+    private val tex = CommonResourcePool.getAsTextureRegionPack("basegame-particles-musical_note")
+    private val rng = HQRNG()
+
+    private const val HALF_PI = 1.5707963267948966
+
+    private const val ANGLE_LEFTMOST = -(HALF_PI - 1.0)
+    private const val ANGLE_RIGHTMOST = -(HALF_PI + 1.0)
+
+    private val noteColours = (0..60).map {
+        val hue = it / 60f * 270f
+        val saturation = 100f
+        val lightness = 80f
+        val (r, g, b) = HUSLColorConverter.hsluvToRgb(floatArrayOf(hue, saturation, lightness))
+        Color(r, g, b, 1f)
+    }
+
+    private val angles = (0..60).map {
+        FastMath.interpolateLinear(it / 60.0, ANGLE_RIGHTMOST, ANGLE_LEFTMOST)
+    }
+
+    fun makeRandomParticle(note: Int, pos: Vector2): ParticleVanishingTexture {
+        val it = object : ParticleVanishingTexture(tex.get(rng.nextInt(3), rng.nextInt(2)), pos.x, pos.y, false) {
+            override fun update(delta: Float) {
+                super.update(delta)
+
+                drawColour.a = ((lifetimeMax - lifetimeCounter) / lifetimeMax).pow(1f / 2.2f).coerceIn(0f, 1f)
+            }
+        }
+
+        // set flying velocity
+        val direction = angles[note]
+        val magnitude = rng.nextTriangularBal() * 0.2 + 1.0
+
+        it.velocity.set(Vector2.create(magnitude, direction))
+
+        // set particle colour
+        it.drawColour.set(noteColours[note])
+
+
+        return it
     }
 }
