@@ -94,6 +94,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, var despawnUponCollision
         val oldColour = batch.color.cpy()
         if (!flagDespawn) {
             batch.shader = IngameRenderer.shaderBayerAlpha
+            batch.shader.setUniformi("frame", App.GLOBAL_RENDER_TIMER.toInt() % 16)
             batch.color = drawColour
             drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
                 drawJob(x, y)
