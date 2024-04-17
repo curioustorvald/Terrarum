@@ -2,7 +2,11 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
+import com.jme3.math.FastMath.DEG_TO_RAD
 import net.torvald.colourutil.HUSLColorConverter
+import net.torvald.colourutil.OKHsv
+import net.torvald.colourutil.toColor
+import net.torvald.colourutil.tosRGB
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
@@ -202,11 +206,10 @@ object ParticleMusicalNoteFactory {
     private const val ANGLE_RIGHTMOST = -(HALF_PI + 1.0)
 
     private val noteColours = (0..60).map {
-        val hue = it / 60f * 270f
-        val saturation = 100f
-        val lightness = 70f
-        val (r, g, b) = HUSLColorConverter.hsluvToRgb(floatArrayOf(hue, saturation, lightness))
-        Color(r, g, b, 1f)
+        val h = (it / 60f * 360f) * DEG_TO_RAD
+        val s = 0.75f
+        val v = 1f
+        OKHsv(h, s, v).tosRGB().toColor()
     }
 
     private val angles = (0..60).map {

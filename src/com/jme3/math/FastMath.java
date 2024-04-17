@@ -597,6 +597,10 @@ final public class FastMath {
         return (float) Math.sqrt(fValue);
     }
 
+    public static float cbrt(float fValue) {
+        return (float) Math.cbrt(fValue);
+    }
+
     /**
      * Returns the tangent of a value.  If USE_FAST_TRIG is enabled, an approximate value
      * is returned.  Otherwise, a direct value is used.

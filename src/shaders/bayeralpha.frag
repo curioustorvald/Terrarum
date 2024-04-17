@@ -43,6 +43,7 @@ void main() {
     vec2 entry = mod(gl_FragCoord.xy + entryOffset, vec2(bayerSize, bayerSize));
 
 
+//    float alpha = nearestAlpha((inColor.a * 16.0 / 15.0) + (bayer[int(entry.y) * int(bayerSize) + int(entry.x)] / bayerDivider - 0.5));
     float alpha = nearestAlpha((inColor.a * 16.0 / 15.0) + (bayer[int(entry.y) * int(bayerSize) + int(entry.x)] / bayerDivider - 0.5));
 
     fragColor = vec4(inColor.rgb, alpha);

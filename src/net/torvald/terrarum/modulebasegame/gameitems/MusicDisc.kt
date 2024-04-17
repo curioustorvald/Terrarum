@@ -6,14 +6,10 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.colourutil.HUSLColorConverter
-import net.torvald.colourutil.OKLCh
 import net.torvald.random.HQRNG
-import net.torvald.random.XXHash32
 import net.torvald.random.XXHash64
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.savegame.toHex
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.toRGBA
 import net.torvald.unicode.EMDASH
