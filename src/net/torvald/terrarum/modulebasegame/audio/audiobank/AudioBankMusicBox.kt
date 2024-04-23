@@ -76,7 +76,8 @@ class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {})
         bufferR.fill(0f)
 
         // only copy over the past and current messages
-        messageQueue.filter { it.tick <= tickCount }.forEach {
+        // use cloned version of queue to prevent concurrent modification exception
+        messageQueue.toMutableList().filter { it.tick <= tickCount }.forEach {
             // copy over the samples
             it.notes.forEach { note ->
                 val noteSamples = getSample(note)

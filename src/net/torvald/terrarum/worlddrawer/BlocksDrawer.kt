@@ -713,7 +713,7 @@ internal object BlocksDrawer {
     }
 
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
-    private val occlusionIntensity = 0.22222222f // too low value and dark-coloured walls won't darken enough
+    private val occlusionIntensity = 0.5f//0.22222222f // too low value and dark-coloured walls won't darken enough
 
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)

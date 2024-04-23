@@ -1,4 +1,4 @@
-<btex cover="hardcover" inner="standard" papersize="standard">
+<btexdoc cover="hardcover" inner="standard" papersize="standard">
 <cover>
     <title>The Way to Mastery of Lorem Ipsum<br />Or, How To Write and Publish a Book</title>
     <author>Terran Publishing</author>
@@ -46,4 +46,4 @@
     <p>Typewriter and Printout are considered not bound and readers will only see one page at a time, while Hardcover is considered bound and two pages are presented to the readers.</p>
 
 </manuscript>
-</btex>
+</btexdoc>

@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame
 
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.modulebasegame.audio.audiobank.InstrumentLoader
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
 import net.torvald.terrarum.weather.WeatherMixer
 
@@ -42,6 +43,9 @@ class EntryPoint : ModuleEntryPoint() {
         WeatherCodex.weatherById["titlescreen"] =
             WeatherCodex.getById("generic01")?.copy(identifier = "titlescreen", windSpeed = 1f) ?: WeatherMixer.DEFAULT_WEATHER
 
+        // load virtual instruments
+        printdbg(this, "Loading virtual instrument 'spieluhr@41'")
+        InstrumentLoader.load("spieluhr", "basegame", "audio/effects/notes/spieluhr.ogg", 41)
 
         if (App.IS_DEVELOPMENT_BUILD) {
             println("[EntryPoint] Crafting Recipes: ")

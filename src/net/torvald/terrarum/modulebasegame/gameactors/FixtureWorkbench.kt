@@ -7,6 +7,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.UICrafting
 import net.torvald.terrarum.modulebasegame.ui.UIEngravingTextSign
+import net.torvald.terrarum.modulebasegame.ui.UIMusicalWorkbench
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -85,4 +86,29 @@ class FixtureEngravingWorkbench : FixtureBase, CraftingStation {
         actorValue[AVKey.BASEMASS] = 40.0
     }
 
+}
+
+/**
+ * Created by minjaesong on 2024-04-22.
+ */
+class FixtureMusicalWorkbench : FixtureBase, CraftingStation {
+
+    @Transient override val tags = listOf("musicbox")
+
+    constructor() : super(
+        BlockBox(BlockBox.NO_COLLISION, 2, 2),
+        nameFun = { Lang["ITEM_MUSICAL_WORKBENCH"] },
+        mainUI = UIMusicalWorkbench()
+    ) {
+        val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/musical_workbench.tga")
+
+        density = BlockCodex[Block.PLANK_NORMAL].density.toDouble()
+        setHitboxDimension(itemImage.texture.width, itemImage.texture.height, 0, 0)
+
+        makeNewSprite(TextureRegionPack(itemImage.texture, 32, 32)).let {
+            it.setRowsAndFrames(1,1)
+        }
+
+        actorValue[AVKey.BASEMASS] = 40.0
+    }
 }

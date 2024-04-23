@@ -1,4 +1,4 @@
-<btex def="examination">
+<btexdoc def="examination">
 <blocklut>
     <pair key="0" value="basegame:0" />
     <pair key="1" value="basegame:32" />
@@ -54,4 +54,4 @@
     <p>Examination is a special format of the “book” that operates on the same book system.</p>
 
 </manuscript>
-</btex>
+</btexdoc>

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.tests
 
+import net.torvald.btex.BTeXParser
 import org.xml.sax.Attributes
 import org.xml.sax.HandlerBase
 import org.xml.sax.helpers.DefaultHandler
@@ -16,7 +17,7 @@ fun main() {
     val csiG = "\u001B[32m"
     val csi0 = "\u001B[m"
 
-    val tex = """<btex cover="hardcover" inner="standard" papersize="standard">
+    val tex = """<btexdoc cover="hardcover" inner="standard" papersize="standard">
 <cover>
     <title>The Way to Mastery of Lorem Ipsum<br />Or, How To Write and Publish a Book</title>
     <author>Terran Publishing</author>
@@ -55,11 +56,11 @@ fun main() {
 
     <chapter>Writing Book using Computer</chapter>
 
-    <p>Writing book using a computer requires a use of the Book Typesetting Engine Extended, or <BTeX /></p>
+    <p>Writing book using a computer requires a use of the Book Typesetting Engine Extended, or <btex /></p>
 
     <section>Full Control of the Shape</section>
 
-    <p>With <BTeX /> you can fully control how your publishing would look like, from a pile of papers that
+    <p>With <btex /> you can fully control how your publishing would look like, from a pile of papers that
     look like they have been typed out using typewriter, a pile of papers but a fully-featured printouts that
     have illustrations in it, to a fully-featured hardcover book.</p>
 
@@ -70,31 +71,10 @@ fun main() {
     while Hardcover is considered bound and two pages are presented to the readers.</p>
 
 </manuscript>
-</btex>
+</btexdoc>
 
 
 """
 
-    val parser = SAXParserFactory.newDefaultInstance().newSAXParser()
-    val stream: InputStream = ByteArrayInputStream(tex.encodeToByteArray())
-    val hb = object : DefaultHandler() {
-        override fun startElement(uri: String, localName: String, qName: String, attributes: Attributes) {
-            println(" $csiG$qName$csi0 ${(0 until attributes.length).map { "${attributes.getQName(it)}=${attributes.getValue(it)}" }}")
-        }
-
-        override fun endElement(uri: String, localName: String, qName: String) {
-            println("$csiG/$qName$csi0")
-        }
-
-        override fun characters(ch: CharArray, start: Int, length: Int) {
-            val str = String(ch.sliceArray(start until start+length)).replace('\n',' ').replace(Regex(" +"), " ").trim()
-            if (str.isNotBlank()) {
-                println("$str|")
-            }
-        }
-
-
-
-    }
-    parser.parse(stream, hb)
+    val doku = BTeXParser(tex)
 }

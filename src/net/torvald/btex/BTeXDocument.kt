@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarumsansbitmap.MovableType
 
 /**
  * Created by minjaesong on 2023-10-28.
@@ -17,7 +18,9 @@ class BTeXDocument {
     var papersize = "standard"
 
     var pageWidth = 420
-    var pageHeight = 25 * 24
+    var lineHeight = 24
+    var pageLines = 25
+    var pageHeight = pageLines * lineHeight
 
     companion object {
         val DEFAULT_PAGE_BACK = Color(0xe1e1d7ff.toInt())
@@ -61,13 +64,18 @@ class BTeXPage(
     }
 }
 
+data class MovableTypeDrawCall(val movableType: MovableType, val rowStart: Int, val rowEnd: Int) {
+    fun draw(batch: SpriteBatch, x: Float, y: Float) {
+        movableType.draw(batch, x, y, rowStart, rowEnd)
+    }
+}
+
 class BTeXDrawCall(
     val posX: Int,
     val posY: Int,
     val theme: String,
     val colour: Color,
-    val font: BitmapFont,
-    val text: String? = null,
+    val text: MovableTypeDrawCall? = null,
     val texture: TextureRegion? = null,
 ) {
 
@@ -82,7 +90,7 @@ class BTeXDrawCall(
         batch.color = colour
 
         if (text != null && texture == null) {
-            font.draw(batch, text, px, py)
+            text.draw(batch, px, py)
         }
         else if (text == null && texture != null) {
             batch.draw(texture, px, py)

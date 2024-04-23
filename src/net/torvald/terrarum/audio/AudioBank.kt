@@ -7,6 +7,10 @@ import com.badlogic.gdx.utils.Disposable
  */
 abstract class AudioBank : Disposable {
 
+    /**
+     * If the audio bank is a virtual instrument, set this property to `true`; if the audio bank reads audio
+     * sample directly from the disk, set it to `false`
+     */
     open val notCopyable: Boolean = false
 
     protected val hash = System.nanoTime()
