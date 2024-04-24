@@ -1,10 +1,8 @@
 package net.torvald.terrarum.btex
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.App
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.MovableType
 
@@ -18,9 +16,9 @@ class BTeXDocument {
     var papersize = "standard"
 
     var pageWidth = 420
-    var lineHeight = 24
+    var lineHeightInPx = 24
     var pageLines = 25
-    var pageHeight = pageLines * lineHeight
+    var pageHeight = pageLines * lineHeightInPx
 
     companion object {
         val DEFAULT_PAGE_BACK = Color(0xe1e1d7ff.toInt())
@@ -29,14 +27,26 @@ class BTeXDocument {
 
     private val pages = ArrayList<BTeXPage>()
 
+    val currentPage: Int
+        get() = pages.size - 1
 
+    var currentLine: Int = 0
+        private set
 
     fun addNewPage(back: Color = DEFAULT_PAGE_BACK) {
         pages.add(BTeXPage(back, pageWidth, pageHeight))
+        currentLine = 0
     }
 
+    /**
+     * Appends draw call to the list. The draw call must be prepared manually so that they would not overflow.
+     * Use `addNewPage` to append the overflowing text to the next page.
+     *
+     * `currentLine` *will* be updated automatically.
+     */
     fun appendDrawCall(drawCall: BTeXDrawCall) {
         pages.last().appendDrawCall(drawCall)
+        currentLine += drawCall.lineCount
     }
 
     fun render(frameDelta: Float, batch: SpriteBatch, page: Int, x: Int, y: Int) {
@@ -64,20 +74,36 @@ class BTeXPage(
     }
 }
 
-data class MovableTypeDrawCall(val movableType: MovableType, val rowStart: Int, val rowEnd: Int) {
-    fun draw(batch: SpriteBatch, x: Float, y: Float) {
+interface BTeXTextDrawCall {
+    val rowStart: Int
+    val rowEnd: Int
+    fun draw(batch: SpriteBatch, x: Float, y: Float)
+}
+
+data class MovableTypeDrawCall(val movableType: MovableType, override val rowStart: Int, override val rowEnd: Int): BTeXTextDrawCall {
+    override fun draw(batch: SpriteBatch, x: Float, y: Float) {
         movableType.draw(batch, x, y, rowStart, rowEnd)
     }
 }
 
+/*data class RaggedLeftDrawCall(val raggedType: RaggedType, override val rowStart: Int, override val rowEnd: Int): BTeXTextDrawCall {
+    override fun draw(batch: SpriteBatch, x: Float, y: Float) {
+        raggedType.draw(batch, x, y, rowStart, rowEnd)
+    }
+}*/
+
 class BTeXDrawCall(
-    val posX: Int,
-    val posY: Int,
+    val posX: Int, // position relative to the page start (excluding page margin)
+    val posY: Int, // position relative to the page start (excluding page margin)
     val theme: String,
     val colour: Color,
-    val text: MovableTypeDrawCall? = null,
+    val text: BTeXTextDrawCall? = null,
     val texture: TextureRegion? = null,
 ) {
+
+    init {
+        if (text != null && texture != null) throw IllegalArgumentException("Text and Texture are both non-null")
+    }
 
     fun draw(batch: SpriteBatch, x: Int, y: Int) {
         val px = (posX + x).toFloat()
@@ -97,5 +123,10 @@ class BTeXDrawCall(
         }
         else throw Error("Text and Texture are both non-null")
     }
+
+    internal val lineCount = if (text != null)
+        text.rowEnd - text.rowStart
+    else
+        TODO()
 
 }
