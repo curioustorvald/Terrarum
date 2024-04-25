@@ -54,8 +54,8 @@
     <section>Full Control of the Shape</section>
 
     <p><index id="btex language" />With <btex /> you can fully control how your publishing would look like,
-        from a pile of papers that look like they have been typed out using typewriter, a pile of papers but a
-        fully-featured printouts that have illustrations in it, to a true hardcover book.</p>
+        from a pile of papers that look like they have been typed out using typewriter, a pile of printouts
+        that have pictures in it, to a true hardcover book.</p>
 
     <p><index id="cover" />This style is controlled using the <code>cover</code> attribute on the root tag,
         with following values: <code>typewriter</code>, <code>printout</code> and <code>hardcover</code>.</p>

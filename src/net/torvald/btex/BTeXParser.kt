@@ -407,10 +407,12 @@ object BTeXParser {
         )
 
         private val pageWidthMap = hashMapOf(
-            "standard" to 480
+            "standard" to 480,
+            "examination" to 640,
         )
         private val pageHeightMap = hashMapOf(
-            "standard" to 20
+            "standard" to 25,
+            "examination" to 18,
         )
 
 
@@ -522,6 +524,9 @@ object BTeXParser {
         fun closeElemEDITION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) = closeElemP(handler, doc, theTag, uri, siblingIndex)
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            // if current line is the last line, proceed to the next page
+            if (doc.currentLine == doc.pageLines - 1) doc.addNewPage()
+
             val indent = 16
             val thePar = "\n" + handler.paragraphBuffer.toString().trim()
             typesetParagraphs(thePar, handler, doc.textWidth - indent).also {
@@ -541,6 +546,9 @@ object BTeXParser {
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemSECTION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            // if current line is the last line, proceed to the next page
+            if (doc.currentLine == doc.pageLines - 1) doc.addNewPage()
+
             val indent = 8
             val thePar = "\n" + handler.paragraphBuffer.toString().trim()
             typesetParagraphs(thePar, handler, doc.textWidth - indent).also {

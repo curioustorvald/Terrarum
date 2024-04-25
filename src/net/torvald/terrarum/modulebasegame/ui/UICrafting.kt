@@ -67,7 +67,7 @@ class UICrafting(val full: UIInventoryFull?) : UICanvas(
             UIInventoryFull.drawBackground(batch, opacity)
         }
 
-        uiItems.forEach { it.render(frameDelta, batch, camera) }
+//        uiItems.forEach { it.render(frameDelta, batch, camera) }
     }
 
     override fun dispose() {

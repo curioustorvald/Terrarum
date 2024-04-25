@@ -83,8 +83,8 @@ class BTeXTest : ApplicationAdapter() {
     <section>Full Control of the Shape</section>
 
     <p><index id="btex language" />With <btex /> you can fully control how your publishing would look like,
-        from a pile of papers that look like they have been typed out using typewriter, a pile of papers but a
-        fully-featured printouts that have illustrations in it, to a true hardcover book.</p>
+        from a pile of papers that look like they have been typed out using typewriter, a pile of printouts 
+        that have pictures in it, to a true hardcover book.</p>
 
     <p><index id="cover" />This style is controlled using the <code>cover</code> attribute on the root tag,
         with following values: <code>typewriter</code>, <code>printout</code> and <code>hardcover</code>.</p>
@@ -114,7 +114,7 @@ class BTeXTest : ApplicationAdapter() {
         camera.update()
         batch.projectionMatrix = camera.combined
 
-        bg = TextureRegion(Texture(Gdx.files.internal("test_assets/Screenshot-1714034883660.png")))
+        bg = TextureRegion(Texture(Gdx.files.internal("test_assets/real_bg_with_guides.png")))
 
         document = BTeXParser.invoke(tex)
     }
@@ -127,7 +127,7 @@ class BTeXTest : ApplicationAdapter() {
         gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
         val drawX = (1280 - (pageGap + document.pageWidth*2)) / 2
-        val drawY = 100
+        val drawY = 24
 
         batch.inUse {
             batch.color = Color.WHITE

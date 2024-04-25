@@ -18,7 +18,7 @@ class BTeXDocument {
 
     var textWidth = 480
     var lineHeightInPx = 24
-    var pageLines = 20
+    var pageLines = 25
     var textHeight = pageLines * lineHeightInPx
 
     val pageMarginH = 15
