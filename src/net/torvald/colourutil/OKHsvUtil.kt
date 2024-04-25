@@ -44,6 +44,10 @@ import kotlin.math.min
 data class OKHsv(var h: Float, var s: Float, var v: Float)
 data class OKHsl(var h: Float, var s: Float, var l: Float)
 data class OKLab(var L: Float, var a: Float, var b: Float)
+data class OKLch(var H: Float, var C: Float, var L: Float)
+
+fun OKLch.toOKLab() = OKLab(L, C * cos(H), C * sin(H))
+fun OKLch.tosRGB() = this.toOKLab().toLinearRGB().unLinearise()
 
 object OKHsvUtil {
     internal data class LC(var L: Float, var C: Float)

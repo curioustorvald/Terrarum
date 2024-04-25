@@ -30,8 +30,8 @@ class BTeXDocument {
         get() = 2 * pageMarginV + textHeight
 
     companion object {
-        val DEFAULT_PAGE_BACK = Color(0xe1e1d7ff.toInt())
-        val DEFAULT_PAGE_FORE = Color(0x131311ff)
+        val DEFAULT_PAGE_BACK = Color(0xe0dfdb_ff.toInt())
+        val DEFAULT_PAGE_FORE = Color(0x151110ff)
     }
 
     private val pages = ArrayList<BTeXPage>()

@@ -28,7 +28,7 @@ class BTeXTest : ApplicationAdapter() {
     val csi0 = "\u001B[m"
 
     val tex = """<btexdoc cover="hardcover" inner="standard" papersize="standard">
-<cover>
+<cover hue="160">
     <title>The Way to Mastery of Lorem Ipsum<br />Or, How To Write and Publish a Book</title>
     <author>Terran Publishing</author>
     <edition>Test Edition</edition>

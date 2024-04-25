@@ -2,9 +2,12 @@ package net.torvald.btex
 
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.jme3.math.FastMath.DEG_TO_RAD
+import net.torvald.colourutil.OKLch
+import net.torvald.colourutil.tosRGB
 import net.torvald.terrarum.App
 import net.torvald.terrarum.btex.BTeXDocument
+import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_PAGE_FORE
 import net.torvald.terrarum.btex.BTeXDrawCall
 import net.torvald.terrarum.btex.MovableTypeDrawCall
 import net.torvald.terrarum.gameitems.ItemID
@@ -14,8 +17,9 @@ import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.helpers.DefaultHandler
-import java.io.*
-import java.util.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.StringReader
 import javax.xml.parsers.SAXParserFactory
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
@@ -47,7 +51,7 @@ object BTeXParser {
     }
 
     internal class BTeXHandler(val doc: BTeXDocument) : DefaultHandler() {
-        private val DEFAULT_FONTCOL = Color(0x222222ff)
+        private val DEFAULT_FONTCOL = DEFAULT_PAGE_FORE
         private val LINE_HEIGHT = doc.lineHeightInPx
 
         private var cover = ""
@@ -472,7 +476,10 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCOVER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
-            doc.addNewPage(Color(0x6f4a45ff))
+            val hue = (attribs["hue"]?.toFloatOrNull() ?: 28f) * DEG_TO_RAD
+            val coverCol = OKLch(hue, 0.05f, 0.36f)
+            val (r, g, b) = coverCol.tosRGB()
+            doc.addNewPage(Color(r, g, b, 1f))
             handler.spanColour = "white"
         }
 
