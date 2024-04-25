@@ -55,9 +55,9 @@ object BTeXParser {
 
         private var btexOpened = false
 
-        private var pageWidth = doc.pageWidth
+        private var pageWidth = doc.textWidth
         private var pageLines = doc.pageLines
-        private var pageHeight = doc.pageHeight
+        private var pageHeight = doc.textHeight
 
         private val blockLut = HashMap<String, ItemID>()
 
@@ -396,10 +396,10 @@ object BTeXParser {
         )
 
         private val pageWidthMap = hashMapOf(
-            "standard" to 420
+            "standard" to 450
         )
         private val pageHeightMap = hashMapOf(
-            "standard" to 25
+            "standard" to 24
         )
 
 
@@ -421,8 +421,8 @@ object BTeXParser {
                 handler.pageLines = pageHeightMap[papersize]!!
                 handler.pageHeight = pageLines * LINE_HEIGHT
 
-                doc.pageWidth = pageWidth
-                doc.pageHeight = pageHeight
+                doc.textWidth = pageWidth
+                doc.textHeight = pageHeight
             }
 
             handler.btexOpened = true
@@ -460,6 +460,7 @@ object BTeXParser {
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCOVER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>) {
             doc.addNewPage(Color(0x6f4a45ff))
+            handler.spanColour = "white"
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -478,38 +479,62 @@ object BTeXParser {
 
 
 
-            @OpenTag // reflective access is impossible with 'private'
+        @OpenTag // reflective access is impossible with 'private'
         fun processElemBR(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.append("\n")
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemNEWPAGE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>) {
+            doc.addNewPage()
+        }
 
+        @CloseTag // reflective access is impossible with 'private'
+        fun closeElemFULLPAGEBOX(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String) {
+            doc.addNewPage()
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemP(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>) {
         }
 
+        @CloseTag
+        fun closeElemCOVER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String) {
+            handler.spanColour = null
+        }
+
+        @CloseTag // reflective access is impossible with 'private'
+        fun closeElemTITLE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String) = closeElemP(handler, doc, theTag, uri)
+        @CloseTag // reflective access is impossible with 'private'
+        fun closeElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String) = closeElemP(handler, doc, theTag, uri)
+        @CloseTag // reflective access is impossible with 'private'
+        fun closeElemEDITION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String) = closeElemP(handler, doc, theTag, uri)
+        @CloseTag // reflective access is impossible with 'private'
+        fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String) = closeElemP(handler, doc, theTag, uri)
+        @CloseTag // reflective access is impossible with 'private'
+        fun closeElemSECTION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String) = closeElemP(handler, doc, theTag, uri)
+
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemP(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String) {
-            printdbg("Par: ${handler.paragraphBuffer}")
+            val thePar = handler.paragraphBuffer.toString().trim() + "\n"
+            printdbg("Par: '$thePar'")
 
             val font = getFont()
-            val slugs = MovableType(font, handler.paragraphBuffer.toString(), doc.pageWidth)
+            val slugs = MovableType(font, thePar, doc.textWidth)
 
 
             var remainder = doc.pageLines - doc.currentLine
             var slugHeight = slugs.height
             var linesOut = 0
 
+            printdbg("Page: ${doc.currentPage+1}, Line: ${doc.currentLine}")
+
             if (slugHeight > remainder) {
                 val subset = linesOut to linesOut + remainder
 
                 val drawCall = BTeXDrawCall(
                     0,
-                    remainder * doc.pageLines,
+                    doc.currentLine * doc.lineHeightInPx,
                     handler.currentTheme,
                     handler.getSpanColour(),
                     MovableTypeDrawCall(slugs, subset.first, subset.second)
@@ -530,7 +555,7 @@ object BTeXParser {
 
                 val drawCall = BTeXDrawCall(
                     0,
-                    0,
+                    doc.currentLine * doc.lineHeightInPx,
                     handler.currentTheme,
                     handler.getSpanColour(),
                     MovableTypeDrawCall(slugs, subset.first, subset.second)

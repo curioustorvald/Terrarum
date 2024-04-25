@@ -15,10 +15,18 @@ class BTeXDocument {
     var inner = "standard"
     var papersize = "standard"
 
-    var pageWidth = 420
+    var textWidth = 450
     var lineHeightInPx = 24
-    var pageLines = 25
-    var pageHeight = pageLines * lineHeightInPx
+    var pageLines = 24
+    var textHeight = pageLines * lineHeightInPx
+
+    val pageMarginH = 15
+    val pageMarginV = 12
+
+    val pageWidth: Int
+        get() = 2 * pageMarginH + textWidth
+    val pageHeight: Int
+        get() = 2 * pageMarginV + textHeight
 
     companion object {
         val DEFAULT_PAGE_BACK = Color(0xe1e1d7ff.toInt())
@@ -30,8 +38,10 @@ class BTeXDocument {
     val currentPage: Int
         get() = pages.size - 1
 
+    val pageIndices: IntRange
+        get() = pages.indices
+
     var currentLine: Int = 0
-        private set
 
     fun addNewPage(back: Color = DEFAULT_PAGE_BACK) {
         pages.add(BTeXPage(back, pageWidth, pageHeight))
@@ -50,7 +60,7 @@ class BTeXDocument {
     }
 
     fun render(frameDelta: Float, batch: SpriteBatch, page: Int, x: Int, y: Int) {
-        pages[page].render(frameDelta, batch, x, y)
+        pages[page].render(frameDelta, batch, x, y, pageMarginH, pageMarginV)
     }
 }
 
@@ -65,11 +75,11 @@ class BTeXPage(
         drawCalls.add(drawCall)
     }
 
-    fun render(frameDelta: Float, batch: SpriteBatch, x: Int, y: Int) {
+    fun render(frameDelta: Float, batch: SpriteBatch, x: Int, y: Int, marginH: Int, marginV: Int) {
         batch.color = back
         Toolkit.fillArea(batch, x, y, width, height)
         drawCalls.forEach {
-            it.draw(batch, x, y)
+            it.draw(batch, x + marginH, y + marginV)
         }
     }
 }

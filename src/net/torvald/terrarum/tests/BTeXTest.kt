@@ -1,11 +1,18 @@
 package net.torvald.terrarum.tests
 
 import com.badlogic.gdx.ApplicationAdapter
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import net.torvald.btex.BTeXParser
+import net.torvald.terrarum.FlippingSpriteBatch
 import net.torvald.terrarum.btex.BTeXDocument
+import net.torvald.terrarum.ceilToInt
+import net.torvald.terrarum.gdxClearAndEnableBlend
+import net.torvald.terrarum.inUse
 
 
 /**
@@ -41,11 +48,11 @@ class BTeXTest : ApplicationAdapter() {
 
     <newpage />
 
-    <fullpagebox>
+    <!--<fullpagebox>
         <p><span colour="grey">
             this page is intentionally left blank
         </span></p>
-    </fullpagebox>
+    </fullpagebox>-->
 
     
     
@@ -90,11 +97,38 @@ class BTeXTest : ApplicationAdapter() {
 """
 
     private lateinit var document: BTeXDocument
+    private lateinit var batch: FlippingSpriteBatch
+    private lateinit var camera: OrthographicCamera
 
     override fun create() {
+        batch = FlippingSpriteBatch(1000)
+        camera = OrthographicCamera(1280f, 720f)
+        camera.setToOrtho(true) // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin
+        camera.update()
+        batch.projectionMatrix = camera.combined
+
         document = BTeXParser.invoke(tex)
     }
 
+    private var scroll = 0
+
+
+    override fun render() {
+        gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
+
+        batch.inUse {
+            if (scroll - 1 in document.pageIndices)
+                document.render(0f, batch, scroll - 1, 12, 12)
+            if (scroll in document.pageIndices)
+                document.render(0f, batch, scroll, 12 + (6 + document.pageWidth), 12)
+        }
+
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT))
+            scroll = (scroll - 2).coerceAtLeast(0)
+        else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT))
+            scroll = (scroll + 2).coerceAtMost(document.pageIndices.endInclusive.toFloat().div(2f).ceilToInt().times(2))
+    }
 
 
 }
