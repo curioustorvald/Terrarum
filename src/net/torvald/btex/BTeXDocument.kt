@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.MovableType
+import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 
 /**
  * Created by minjaesong on 2023-10-28.
@@ -15,9 +16,9 @@ class BTeXDocument {
     var inner = "standard"
     var papersize = "standard"
 
-    var textWidth = 450
+    var textWidth = 480
     var lineHeightInPx = 24
-    var pageLines = 24
+    var pageLines = 20
     var textHeight = pageLines * lineHeightInPx
 
     val pageMarginH = 15
@@ -37,6 +38,9 @@ class BTeXDocument {
 
     val currentPage: Int
         get() = pages.size - 1
+
+    val currentPageObj: BTeXPage
+        get() = pages[currentPage]
 
     val pageIndices: IntRange
         get() = pages.indices
@@ -72,7 +76,7 @@ class BTeXPage(
     private val drawCalls = ArrayList<BTeXDrawCall>()
 
     fun appendDrawCall(drawCall: BTeXDrawCall) {
-        drawCalls.add(drawCall)
+        if (drawCall.isNotBlank()) drawCalls.add(drawCall)
     }
 
     fun render(frameDelta: Float, batch: SpriteBatch, x: Int, y: Int, marginH: Int, marginV: Int) {
@@ -82,6 +86,9 @@ class BTeXPage(
             it.draw(batch, x + marginH, y + marginV)
         }
     }
+
+    fun isEmpty() = drawCalls.isEmpty()
+    fun isNotEmpty() = drawCalls.isNotEmpty()
 }
 
 interface BTeXTextDrawCall {
@@ -103,8 +110,8 @@ data class MovableTypeDrawCall(val movableType: MovableType, override val rowSta
 }*/
 
 class BTeXDrawCall(
-    val posX: Int, // position relative to the page start (excluding page margin)
-    val posY: Int, // position relative to the page start (excluding page margin)
+    var posX: Int, // position relative to the page start (excluding page margin)
+    var posY: Int, // position relative to the page start (excluding page margin)
     val theme: String,
     val colour: Color,
     val text: BTeXTextDrawCall? = null,
@@ -132,11 +139,25 @@ class BTeXDrawCall(
             batch.draw(texture, px, py)
         }
         else throw Error("Text and Texture are both non-null")
+
+        extraDrawFun(batch, px, py)
     }
 
+    fun isNotBlank(): Boolean {
+        if (text == null && texture == null) return false
+        if (text is MovableTypeDrawCall && text.movableType.inputText.isBlank()) return false
+//        if (text is RaggedLeftDrawCall && text.raggedType.inputText.isBlank()) return false
+        return true
+    }
+
+    internal var extraDrawFun: (SpriteBatch, Float, Float) -> Unit = { _,_,_ ->}
     internal val lineCount = if (text != null)
         text.rowEnd - text.rowStart
     else
         TODO()
 
+    companion object {
+        private fun CodepointSequence.isBlank() = this.all { whitespaces.contains(it) }
+        private val whitespaces = (listOf(0x00, 0x20, 0x3000, 0xA0, 0xAD) + (0x2000..0x200F) + (0x202A..0x202F) + (0x205F..0x206F) + (0xFFFE0..0xFFFFF)).toHashSet()
+    }
 }

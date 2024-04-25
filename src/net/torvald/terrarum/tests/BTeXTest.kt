@@ -5,7 +5,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import net.torvald.btex.BTeXParser
 import net.torvald.terrarum.FlippingSpriteBatch
@@ -34,9 +37,9 @@ class BTeXTest : ApplicationAdapter() {
 <toc><tableofcontents /></toc>
 
 <manuscript>
-    
-    
-    
+
+
+
     <chapter>What Is a Book</chapter>
 
     <p>This example book is designed to give you the example of the Book Language.</p>
@@ -44,49 +47,49 @@ class BTeXTest : ApplicationAdapter() {
     <section>What Really Is a Book</section>
 
     <p>A book is a collection of texts printed in a special way that allows them to be read easily, with
-        enumerable pages and insertion of other helpful resources, such as illustrations and hyperlinks.</p>
+        enumerable pages and insertion of other helpful resources, such as illustrations and <a href="btex language">hyperlinks</a>.</p>
 
     <newpage />
 
-    <!--<fullpagebox>
+    <fullpagebox>
         <p><span colour="grey">
             this page is intentionally left blank
         </span></p>
-    </fullpagebox>-->
+    </fullpagebox>
 
-    
-    
-    
+
+
+
     <chapter>Writing Book Using Pen and Papers</chapter>
 
     <p><index id="pen and paper" />If you open a book on a writing table, you will be welcomed with a
-        toolbar used to put other book elements, such as chapters, sections.</p>
+        toolbar used to put other book elements, such as chapters and sections.</p>
 
-    
-    
-    
-    <chapter>Writing Book Using Typewriter</chapter>
 
-    <p><index id="typewriter" />Typewriters can only write single style of font, therefore chapters and
+
+
+    <chapter>Writing Book Using a Typewriter</chapter>
+
+    <p><index id="typewriter" />Typewriters can only write in a single style of font, chapters and
         sections are not available.</p>
 
-    
-    
-    
-    <chapter>Writing Book using Computer</chapter>
 
-    <p>Writing book using a computer requires a use of the Book Typesetting Engine Extended, or <btex /></p>
+
+
+    <chapter>Writing Book Using a Computer</chapter>
+
+    <p>Writing book using a computer requires the use of the Book Typesetting Engine Extended, or <btex />.</p>
 
     <section>Full Control of the Shape</section>
 
     <p><index id="btex language" />With <btex /> you can fully control how your publishing would look like,
         from a pile of papers that look like they have been typed out using typewriter, a pile of papers but a
-        fully-featured printouts that have illustrations in it, to a fully-featured hardcover book.</p>
+        fully-featured printouts that have illustrations in it, to a true hardcover book.</p>
 
     <p><index id="cover" />This style is controlled using the <code>cover</code> attribute on the root tag,
-        with following values: <code>typewriter</code>, <code>printout</code>, <code>hardcover</code></p>
+        with following values: <code>typewriter</code>, <code>printout</code> and <code>hardcover</code>.</p>
 
-    <p>Typewriter and Printout are considered not bound and readers will only see one page at a time,
+    <p>Typewriter and Printout are considered not-bound and readers will only see one page at a time,
         while Hardcover is considered bound and two pages are presented to the readers.</p>
 
 </manuscript>
@@ -94,11 +97,15 @@ class BTeXTest : ApplicationAdapter() {
 <indexpage><tableofindices /></indexpage>
 </btexdoc>
 
+
+
 """
 
     private lateinit var document: BTeXDocument
     private lateinit var batch: FlippingSpriteBatch
     private lateinit var camera: OrthographicCamera
+
+    private lateinit var bg: TextureRegion
 
     override fun create() {
         batch = FlippingSpriteBatch(1000)
@@ -107,20 +114,29 @@ class BTeXTest : ApplicationAdapter() {
         camera.update()
         batch.projectionMatrix = camera.combined
 
+        bg = TextureRegion(Texture(Gdx.files.internal("test_assets/Screenshot-1714034883660.png")))
+
         document = BTeXParser.invoke(tex)
     }
 
     private var scroll = 0
 
+    val pageGap = 6
 
     override fun render() {
         gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
+        val drawX = (1280 - (pageGap + document.pageWidth*2)) / 2
+        val drawY = 100
+
         batch.inUse {
+            batch.color = Color.WHITE
+            batch.draw(bg, 0f, 0f)
+
             if (scroll - 1 in document.pageIndices)
-                document.render(0f, batch, scroll - 1, 12, 12)
+                document.render(0f, batch, scroll - 1, drawX, drawY)
             if (scroll in document.pageIndices)
-                document.render(0f, batch, scroll, 12 + (6 + document.pageWidth), 12)
+                document.render(0f, batch, scroll, drawX + (6 + document.pageWidth), drawY)
         }
 
 

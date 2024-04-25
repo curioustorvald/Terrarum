@@ -18,7 +18,7 @@
     <section>What Really Is a Book</section>
 
     <p>A book is a collection of texts printed in a special way that allows them to be read easily, with
-        enumerable pages and insertion of other helpful resources, such as illustrations and hyperlinks.</p>
+        enumerable pages and insertion of other helpful resources, such as illustrations and <a href="btex language">hyperlinks</a>.</p>
 
     <newpage />
 
@@ -34,33 +34,33 @@
     <chapter>Writing Book Using Pen and Papers</chapter>
 
     <p><index id="pen and paper" />If you open a book on a writing table, you will be welcomed with a
-        toolbar used to put other book elements, such as chapters, sections.</p>
+        toolbar used to put other book elements, such as chapters and sections.</p>
 
 
 
 
-    <chapter>Writing Book Using Typewriter</chapter>
+    <chapter>Writing Book Using a Typewriter</chapter>
 
-    <p><index id="typewriter" />Typewriters can only write single style of font, therefore chapters and
+    <p><index id="typewriter" />Typewriters can only write in a single style of font, chapters and
         sections are not available.</p>
 
 
 
 
-    <chapter>Writing Book using Computer</chapter>
+    <chapter>Writing Book Using a Computer</chapter>
 
-    <p>Writing book using a computer requires a use of the Book Typesetting Engine Extended, or <btex /></p>
+    <p>Writing book using a computer requires the use of the Book Typesetting Engine Extended, or <btex />.</p>
 
     <section>Full Control of the Shape</section>
 
     <p><index id="btex language" />With <btex /> you can fully control how your publishing would look like,
         from a pile of papers that look like they have been typed out using typewriter, a pile of papers but a
-        fully-featured printouts that have illustrations in it, to a fully-featured hardcover book.</p>
+        fully-featured printouts that have illustrations in it, to a true hardcover book.</p>
 
     <p><index id="cover" />This style is controlled using the <code>cover</code> attribute on the root tag,
-        with following values: <code>typewriter</code>, <code>printout</code>, <code>hardcover</code></p>
+        with following values: <code>typewriter</code>, <code>printout</code> and <code>hardcover</code>.</p>
 
-    <p>Typewriter and Printout are considered not bound and readers will only see one page at a time,
+    <p>Typewriter and Printout are considered not-bound and readers will only see one page at a time,
         while Hardcover is considered bound and two pages are presented to the readers.</p>
 
 </manuscript>
