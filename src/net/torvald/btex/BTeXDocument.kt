@@ -34,7 +34,7 @@ class BTeXDocument {
         val DEFAULT_PAGE_FORE = Color(0x151110ff)
     }
 
-    private val pages = ArrayList<BTeXPage>()
+    internal val pages = ArrayList<BTeXPage>()
 
     val currentPage: Int
         get() = pages.size - 1
@@ -45,11 +45,16 @@ class BTeXDocument {
     val pageIndices: IntRange
         get() = pages.indices
 
-    var currentLine: Int = 0
+    val linesOnPage = ArrayList<Int>()
 
     fun addNewPage(back: Color = DEFAULT_PAGE_BACK) {
         pages.add(BTeXPage(back, pageWidth, pageHeight))
-        currentLine = 0
+        linesOnPage.add(0)
+    }
+
+    fun addNewPageAt(index: Int, back: Color = DEFAULT_PAGE_BACK) {
+        pages.add(index, BTeXPage(back, pageWidth, pageHeight))
+        linesOnPage.add(index, 0)
     }
 
     /**
@@ -60,7 +65,15 @@ class BTeXDocument {
      */
     fun appendDrawCall(drawCall: BTeXDrawCall) {
         pages.last().appendDrawCall(drawCall)
-        currentLine += drawCall.lineCount
+
+        linesOnPage[linesOnPage.lastIndex] += drawCall.lineCount
+    }
+
+    fun appendDrawCall(page: BTeXPage, drawCall: BTeXDrawCall) {
+        page.appendDrawCall(drawCall)
+
+        val pagenum = pages.indexOf(page)
+        linesOnPage[pagenum] += drawCall.lineCount
     }
 
     fun render(frameDelta: Float, batch: SpriteBatch, page: Int, x: Int, y: Int) {

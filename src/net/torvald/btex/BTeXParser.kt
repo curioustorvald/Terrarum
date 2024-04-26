@@ -89,9 +89,11 @@ object BTeXParser {
         private var lastTagAtDepth = Array(24) { "" }
         private var pTagCntAtDepth = IntArray(24)
 
+        private data class CptSectInfo(val type: String, var name: String, var pagenum: Int)
+
         private val indexMap = HashMap<String, Int>() // id to pagenum
-        private val cptSectMap = ArrayList<Triple<String, String, Int>>() // type ("chapter", "section"), name, pagenum in zero-based index
-        private var tocPage: BTeXPage? = null
+        private val cptSectMap = ArrayList<CptSectInfo>()
+        private var tocPage: Int? = null
 
         init {
             BTeXHandler::class.declaredFunctions.filter { it.findAnnotation<OpenTag>() != null }.forEach {
@@ -524,10 +526,7 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTABLEOFCONTENTS(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
-            tocPage = doc.currentPageObj
-
-            handler.paragraphBuffer.clear()
-            typesetParagraphs("// TODO", handler)
+            tocPage = doc.currentPage
             handler.paragraphBuffer.clear()
         }
 
@@ -536,14 +535,11 @@ object BTeXParser {
             handler.paragraphBuffer.clear()
 
             // prepare contents
-            val par = ArrayList<String>()
             val pageWidth = doc.textWidth
 
             indexMap.keys.toList().sorted().forEach { key ->
                 val pageNum = indexMap[key]!!.plus(1).toString()
                 val pageNumWidth = getFont().getWidth(pageNum)
-
-                println("pageWidth=$pageWidth, pageNum=$pageNum, pageNumWidth=$pageNumWidth")
 
                 typesetParagraphs(key, handler).let {
                     it.last().let { call ->
@@ -576,6 +572,52 @@ object BTeXParser {
         @CloseTag
         fun closeElemMANUSCRIPT(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
             // if tocPage != null, estimate TOC page size, renumber indexMap and cptSectMap if needed, then typeset the toc
+            if (tocPage != null) {
+                // TODO estimate the number of TOC pages
+                var tocSizeInPages = 1
+
+                // TODO //
+
+
+                // renumber things
+                if (tocSizeInPages > 1) {
+                    val pageDelta = tocSizeInPages - 1
+                    indexMap.keys.forEach {
+                        indexMap[it] = indexMap[it]!! + pageDelta
+                    }
+                    cptSectMap.forEach {
+                        it.pagenum += pageDelta
+                    }
+
+                    // insert new pages
+                    repeat(pageDelta) {
+                        doc.addNewPageAt(tocPage!! + 1)
+                    }
+                }
+
+                cptSectMap.forEach { (type, name, pg) ->
+                    val pageNum = pg.plus(1).toString()
+                    val pageNumWidth = getFont().getWidth(pageNum)
+
+                    val key = if (type == "section") "\u3000$name" else name
+                    typesetParagraphs(key, handler, startingPage = tocPage!!).let {
+                        it.last().let { call ->
+                            call.extraDrawFun = { batch, x, y ->
+                                val font = getFont()
+                                val dotGap = 10
+
+                                var dotCursor = (x + call.width + dotGap/2).div(dotGap).ceilToFloat() * dotGap
+                                while (dotCursor < x + pageWidth - pageNumWidth - dotGap/2) {
+                                    font.draw(batch, "·", dotCursor, y)
+                                    dotCursor += dotGap
+                                }
+
+                                font.draw(batch, pageNum, x + pageWidth - pageNumWidth.toFloat(), y)
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -655,19 +697,19 @@ object BTeXParser {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetChapterHeading(thePar, handler, 16)
 
-            cptSectMap.add(Triple("chapter", thePar, doc.currentPage))
+            cptSectMap.add(CptSectInfo("chapter", thePar, doc.currentPage))
 
             handler.paragraphBuffer.clear()
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemSECTION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
             // if current line is the last line, proceed to the next page
-            if (doc.currentLine == doc.pageLines - 1) doc.addNewPage()
+            if (doc.linesOnPage.last() == doc.pageLines - 1) doc.addNewPage()
 
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetSectionHeading(thePar, handler, 8)
 
-            cptSectMap.add(Triple("section", thePar, doc.currentPage))
+            cptSectMap.add(CptSectInfo("section", thePar, doc.currentPage))
 
             handler.paragraphBuffer.clear()
         }
@@ -711,13 +753,14 @@ object BTeXParser {
             }
         }
 
-        private fun typesetParagraphs(thePar: String, handler: BTeXHandler, width: Int = doc.textWidth): List<BTeXDrawCall> {
+        private fun typesetParagraphs(thePar: String, handler: BTeXHandler, width: Int = doc.textWidth, startingPage: Int = doc.currentPage): List<BTeXDrawCall> {
             val font = getFont()
             val slugs = MovableType(font, thePar, width)
+            var pageNum = startingPage
 
             val drawCalls = ArrayList<BTeXDrawCall>()
 
-            var remainder = doc.pageLines - doc.currentLine
+            var remainder = doc.pageLines - doc.linesOnPage.last()
             var slugHeight = slugs.height
             var linesOut = 0
 
@@ -728,18 +771,18 @@ object BTeXParser {
 
                 val drawCall = BTeXDrawCall(
                     0,
-                    doc.currentLine * doc.lineHeightInPx,
+                    doc.linesOnPage[pageNum] * doc.lineHeightInPx,
                     handler.currentTheme,
                     handler.getSpanColour(),
                     MovableTypeDrawCall(slugs, subset.first, subset.second)
                 )
 
-                doc.appendDrawCall(drawCall); drawCalls.add(drawCall)
+                doc.appendDrawCall(doc.pages[pageNum], drawCall); drawCalls.add(drawCall)
 
                 linesOut += remainder
                 slugHeight -= remainder
 
-                doc.addNewPage()
+                doc.addNewPage(); pageNum += 1
             }
 
             while (slugHeight > 0) {
@@ -749,24 +792,24 @@ object BTeXParser {
 
                 val drawCall = BTeXDrawCall(
                     0,
-                    doc.currentLine * doc.lineHeightInPx,
+                    doc.linesOnPage[pageNum] * doc.lineHeightInPx,
                     handler.currentTheme,
                     handler.getSpanColour(),
                     MovableTypeDrawCall(slugs, subset.first, subset.second)
                 )
 
-                doc.appendDrawCall(drawCall); drawCalls.add(drawCall)
+                doc.appendDrawCall(doc.pages[pageNum], drawCall); drawCalls.add(drawCall)
 
                 linesOut += remainder
                 slugHeight -= remainder
 
                 if (remainder == doc.pageLines) {
-                    doc.addNewPage()
+                    doc.addNewPage(); pageNum += 1
                 }
             }
 
             // if typesetting the paragraph leaves the first line of new page empty, move the "row cursor" back up
-            if (doc.currentLine == 1 && doc.currentPageObj.isEmpty()) doc.currentLine = 0 // '\n' adds empty draw call to the page, which makes isEmpty() to return false
+            if (doc.linesOnPage[pageNum] == 1 && doc.pages[pageNum].isEmpty()) doc.linesOnPage[pageNum] = 0 // '\n' adds empty draw call to the page, which makes isEmpty() to return false
 
             return drawCalls
         }
