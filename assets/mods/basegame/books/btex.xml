@@ -31,7 +31,7 @@
 
 
 
-    <chapter>Writing Book Using Pen and Papers</chapter>
+    <chapter>Writing a Book Using Pen and Papers</chapter>
 
     <p><index id="pen and paper" />If you open a book on a writing table, you will be welcomed with a
         toolbar used to put other book elements, such as chapters and sections.</p>
@@ -39,7 +39,7 @@
 
 
 
-    <chapter>Writing Book Using a Typewriter</chapter>
+    <chapter>Writing a Book Using a Typewriter</chapter>
 
     <p><index id="typewriter" />Typewriters can only write in a single style of font, chapters and
         sections are not available.</p>
@@ -47,7 +47,7 @@
 
 
 
-    <chapter>Writing Book Using a Computer</chapter>
+    <chapter>Writing a Book Using a Computer</chapter>
 
     <p>Writing book using a computer requires the use of the Book Typesetting Engine Extended, or <btex />.</p>
 

@@ -49,6 +49,10 @@ class BTeXTest : ApplicationAdapter() {
     <p>A book is a collection of texts printed in a special way that allows them to be read easily, with
         enumerable pages and insertion of other helpful resources, such as illustrations and <a href="btex language">hyperlinks</a>.</p>
 
+    <section alt="Recursion">BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB RangeError: stack size exceeded</section>
+    
+    <p>Noice.</p>
+
     <newpage />
 
     <fullpagebox>
@@ -58,7 +62,7 @@ class BTeXTest : ApplicationAdapter() {
 
 
 
-    <chapter>Writing Book Using Pen and Papers</chapter>
+    <chapter>Writing a Book Using Pen and Papers</chapter>
 
     <p><index id="pen and paper" />If you open a book on a writing table, you will be welcomed with a
         toolbar used to put other book elements, such as chapters and sections.</p>
@@ -66,7 +70,7 @@ class BTeXTest : ApplicationAdapter() {
 
 
 
-    <chapter>Writing Book Using a Typewriter</chapter>
+    <chapter>Writing a Book Using a Typewriter</chapter>
 
     <p><index id="typewriter" />Typewriters can only write in a single style of font, chapters and
         sections are not available.</p>
@@ -74,7 +78,7 @@ class BTeXTest : ApplicationAdapter() {
 
 
 
-    <chapter>Writing Book Using a Computer</chapter>
+    <chapter>Writing a Book Using a Computer</chapter>
 
     <p>Writing book using a computer requires the use of the Book Typesetting Engine Extended, or <btex />.</p>
 
