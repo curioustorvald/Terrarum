@@ -73,7 +73,7 @@ class BTeXPage(
     val width: Int,
     val height: Int,
 ) {
-    private val drawCalls = ArrayList<BTeXDrawCall>()
+    internal val drawCalls = ArrayList<BTeXDrawCall>()
 
     fun appendDrawCall(drawCall: BTeXDrawCall) {
         if (drawCall.isNotBlank()) drawCalls.add(drawCall)
@@ -150,7 +150,16 @@ class BTeXDrawCall(
         return true
     }
 
-    internal var extraDrawFun: (SpriteBatch, Float, Float) -> Unit = { _,_,_ ->}
+    internal val width: Int
+        get() = if (text != null)
+            if (text is MovableTypeDrawCall)
+                text.movableType.width
+            else
+                TODO()
+        else
+            texture!!.regionWidth
+
+    internal var extraDrawFun: (SpriteBatch, Float, Float) -> Unit = { _, _, _ ->}
     internal val lineCount = if (text != null)
         text.rowEnd - text.rowStart
     else

@@ -34,7 +34,7 @@ class BTeXTest : ApplicationAdapter() {
     <edition>Test Edition</edition>
 </cover>
 
-<toc><tableofcontents /></toc>
+<tocpage><tableofcontents /></tocpage>
 
 <manuscript>
 
@@ -52,9 +52,7 @@ class BTeXTest : ApplicationAdapter() {
     <newpage />
 
     <fullpagebox>
-        <p><span colour="grey">
-            this page is intentionally left blank
-        </span></p>
+        <p>text <emph>emph</emph> and <itemname>item</itemname> on <targetname>target</targetname></p>
     </fullpagebox>
 
 

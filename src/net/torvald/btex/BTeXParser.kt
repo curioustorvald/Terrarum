@@ -9,11 +9,15 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.btex.BTeXDocument
 import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_PAGE_FORE
 import net.torvald.terrarum.btex.BTeXDrawCall
+import net.torvald.terrarum.btex.BTeXPage
 import net.torvald.terrarum.btex.MovableTypeDrawCall
+import net.torvald.terrarum.ceilToFloat
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.MovableType
+import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
+import net.torvald.unicode.toUTF8Bytes
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.helpers.DefaultHandler
@@ -21,6 +25,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.StringReader
 import javax.xml.parsers.SAXParserFactory
+import kotlin.math.absoluteValue
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotation
@@ -84,14 +89,18 @@ object BTeXParser {
         private var lastTagAtDepth = Array(24) { "" }
         private var pTagCntAtDepth = IntArray(24)
 
+        private val indexMap = HashMap<String, Int>() // id to pagenum
+        private val cptSectMap = ArrayList<Triple<String, String, Int>>() // type ("chapter", "section"), name, pagenum in zero-based index
+        private var tocPage: BTeXPage? = null
+
         init {
             BTeXHandler::class.declaredFunctions.filter { it.findAnnotation<OpenTag>() != null }.forEach {
-                println("Tag opener: ${it.name}")
+//                println("Tag opener: ${it.name}")
                 elemOpeners[it.name] = it
             }
 
             BTeXHandler::class.declaredFunctions.filter { it.findAnnotation<CloseTag>() != null }.forEach {
-                println("Tag closer: ${it.name}")
+//                println("Tag closer: ${it.name}")
                 elemClosers[it.name] = it
             }
         }
@@ -419,6 +428,11 @@ object BTeXParser {
             "examination" to 18,
         )
 
+        private val ccEmph = TerrarumSansBitmap.toColorCode(0xfd44)
+        private val ccItemName = TerrarumSansBitmap.toColorCode(0xf37d)
+        private val ccTargetName = TerrarumSansBitmap.toColorCode(0xf3c4)
+        private val ccReset = TerrarumSansBitmap.toColorCode(0)
+
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemBTEXDOC(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
@@ -458,16 +472,29 @@ object BTeXParser {
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemSPAN(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
-            attribs["span"]?.let {
-                spanColour = it
-            }
+        fun processElemEMPH(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            handler.paragraphBuffer.append(ccEmph)
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemTABLEOFCONTENTS(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
-            // TODO add post-parsing hook to the handler
+        fun processElemITEMNAME(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            handler.paragraphBuffer.append(ccItemName)
         }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemTARGETNAME(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            handler.paragraphBuffer.append(ccTargetName)
+        }
+
+        @CloseTag
+        fun closeElemTARGETNAME(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) = closeElemEMPH(handler, doc, theTag, uri, siblingIndex)
+        @CloseTag
+        fun closeElemITEMNAME(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) = closeElemEMPH(handler, doc, theTag, uri, siblingIndex)
+        @CloseTag
+        fun closeElemEMPH(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            handler.paragraphBuffer.append(ccReset)
+        }
+
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemBTEX(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
@@ -484,13 +511,82 @@ object BTeXParser {
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemTOC(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemTOCPAGE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
             doc.addNewPage()
+            typesetChapterHeading("Table of Contents", handler, 16)
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemINDEXPAGE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            doc.addNewPage()
+            typesetChapterHeading("Index", handler, 16)
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemTABLEOFCONTENTS(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            tocPage = doc.currentPageObj
+
+            handler.paragraphBuffer.clear()
+            typesetParagraphs("// TODO", handler)
+            handler.paragraphBuffer.clear()
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemTABLEOFINDICES(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            handler.paragraphBuffer.clear()
+
+            // prepare contents
+            val par = ArrayList<String>()
+            val pageWidth = doc.textWidth
+
+            indexMap.keys.toList().sorted().forEach { key ->
+                val pageNum = indexMap[key]!!.plus(1).toString()
+                val pageNumWidth = getFont().getWidth(pageNum)
+
+                println("pageWidth=$pageWidth, pageNum=$pageNum, pageNumWidth=$pageNumWidth")
+
+                typesetParagraphs(key, handler).let {
+                    it.last().let { call ->
+                        call.extraDrawFun = { batch, x, y ->
+                            val font = getFont()
+                            val dotGap = 10
+
+                            var dotCursor = (x + call.width + dotGap/2).div(dotGap).ceilToFloat() * dotGap
+                            while (dotCursor < x + pageWidth - pageNumWidth - dotGap/2) {
+                                font.draw(batch, "·", dotCursor, y)
+                                dotCursor += dotGap
+                            }
+
+                            font.draw(batch, pageNum, x + pageWidth - pageNumWidth.toFloat(), y)
+                        }
+                    }
+                }
+            }
+        }
+
+        @CloseTag
+        fun closeElemTABLEOFINDICES(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemMANUSCRIPT(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
             doc.addNewPage()
+        }
+
+        @CloseTag
+        fun closeElemMANUSCRIPT(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            // if tocPage != null, estimate TOC page size, renumber indexMap and cptSectMap if needed, then typeset the toc
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemINDEX(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            attribs["id"]?.let {
+                indexMap[it] = doc.currentPage
+            }
         }
 
 
@@ -511,6 +607,28 @@ object BTeXParser {
 
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemFULLPAGEBOX(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            doc.currentPageObj.let { page ->
+                val yStart = page.drawCalls.minOf { it.posY }
+                val yEnd = page.drawCalls.maxOf { it.posY + it.lineCount * doc.lineHeightInPx }
+                val pageHeight = doc.textHeight
+
+                val newYpos = (pageHeight - (yEnd - yStart)) / 2
+                val yDelta = newYpos - yStart
+
+                val xStart = page.drawCalls.minOf { it.posX }
+                val xEnd = page.drawCalls.maxOf { it.posX + it.width }
+                val pageWidth = doc.textWidth
+
+                val newXpos = (pageWidth - (xEnd - xStart)) / 2
+                val xDelta = newXpos - xStart
+
+                page.drawCalls.forEach {
+                    it.posX += xDelta
+                    it.posY += yDelta
+                }
+
+            }
+
             doc.addNewPage()
         }
 
@@ -531,12 +649,44 @@ object BTeXParser {
         fun closeElemEDITION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) = closeElemP(handler, doc, theTag, uri, siblingIndex)
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            // insert new page for second+ chapters
+            if (siblingIndex > 0) doc.addNewPage()
+
+            val thePar = handler.paragraphBuffer.toString().trim()
+            typesetChapterHeading(thePar, handler, 16)
+
+            cptSectMap.add(Triple("chapter", thePar, doc.currentPage))
+
+            handler.paragraphBuffer.clear()
+        }
+        @CloseTag // reflective access is impossible with 'private'
+        fun closeElemSECTION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
             // if current line is the last line, proceed to the next page
             if (doc.currentLine == doc.pageLines - 1) doc.addNewPage()
 
-            val indent = 16
-            val thePar = "\n" + handler.paragraphBuffer.toString().trim()
-            typesetParagraphs(thePar, handler, doc.textWidth - indent).also {
+            val thePar = handler.paragraphBuffer.toString().trim()
+            typesetSectionHeading(thePar, handler, 8)
+
+            cptSectMap.add(Triple("section", thePar, doc.currentPage))
+
+            handler.paragraphBuffer.clear()
+        }
+
+        @CloseTag // reflective access is impossible with 'private'
+        fun closeElemP(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            val thePar = (if (siblingIndex > 1) "\u3000" else "") + handler.paragraphBuffer.toString().trim() // indent the strictly non-first pars
+            typesetParagraphs(thePar, handler)
+            handler.paragraphBuffer.clear()
+        }
+
+        @CloseTag // reflective access is impossible with 'private'
+        fun closeElemSPAN(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            spanColour = null
+        }
+
+
+        private fun typesetChapterHeading(thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
+            typesetParagraphs("\n"+thePar, handler, width - indent).also {
                 // add indents and adjust text y pos
                 it.forEach {
                     it.posX += indent
@@ -549,38 +699,17 @@ object BTeXParser {
                     }
                 }
             }
-            handler.paragraphBuffer.clear()
         }
-        @CloseTag // reflective access is impossible with 'private'
-        fun closeElemSECTION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
-            // if current line is the last line, proceed to the next page
-            if (doc.currentLine == doc.pageLines - 1) doc.addNewPage()
 
-            val indent = 8
-            val thePar = "\n" + handler.paragraphBuffer.toString().trim()
-            typesetParagraphs(thePar, handler, doc.textWidth - indent).also {
+        private fun typesetSectionHeading(thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
+            typesetParagraphs("\n"+thePar, handler, width - indent).also {
                 // add indents and adjust text y pos
                 it.forEach {
                     it.posX += indent
                     it.posY -= doc.lineHeightInPx / 2
                 }
             }
-            handler.paragraphBuffer.clear()
         }
-
-        @CloseTag // reflective access is impossible with 'private'
-        fun closeElemP(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
-            val thePar = (if (siblingIndex > 1) "\u3000" else "") + handler.paragraphBuffer.toString().trim() // indent the strictly non-first pars
-            typesetParagraphs(thePar, handler)
-            handler.paragraphBuffer.clear()
-        }
-
-
-        @CloseTag // reflective access is impossible with 'private'
-        fun closeElemSPAN(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
-            spanColour = null
-        }
-
 
         private fun typesetParagraphs(thePar: String, handler: BTeXHandler, width: Int = doc.textWidth): List<BTeXDrawCall> {
             val font = getFont()
@@ -592,7 +721,7 @@ object BTeXParser {
             var slugHeight = slugs.height
             var linesOut = 0
 
-            printdbg("Page: ${doc.currentPage+1}, Line: ${doc.currentLine}")
+//            printdbg("Page: ${doc.currentPage+1}, Line: ${doc.currentLine}")
 
             if (slugHeight > remainder) {
                 val subset = linesOut to linesOut + remainder
@@ -640,6 +769,45 @@ object BTeXParser {
             if (doc.currentLine == 1 && doc.currentPageObj.isEmpty()) doc.currentLine = 0 // '\n' adds empty draw call to the page, which makes isEmpty() to return false
 
             return drawCalls
+        }
+
+
+        companion object {
+            private const val ZWSP = 0x200B
+            private const val SHY = 0xAD
+            private const val NBSP = 0xA0
+            private const val GLUE_POSITIVE_ONE = 0xFFFF0
+            private const val GLUE_POSITIVE_SIXTEEN = 0xFFFFF
+            private const val GLUE_NEGATIVE_ONE = 0xFFFE0
+            private const val GLUE_NEGATIVE_SIXTEEN = 0xFFFEF
+
+            fun glueToString(glue: Int): String {
+                val tokens = CodepointSequence()
+
+                if (glue == 0)
+                    tokens.add(ZWSP)
+                else if (glue.absoluteValue <= 16)
+                    if (glue > 0)
+                        tokens.add(GLUE_POSITIVE_ONE + (glue - 1))
+                    else
+                        tokens.add(GLUE_NEGATIVE_ONE + (glue.absoluteValue - 1))
+                else {
+                    val fullGlues = glue.absoluteValue / 16
+                    val smallGlues = glue.absoluteValue % 16
+                    if (glue > 0)
+                        tokens.addAll(
+                            List(fullGlues) { GLUE_POSITIVE_SIXTEEN } +
+                                    listOf(GLUE_POSITIVE_ONE + (smallGlues - 1))
+                        )
+                    else
+                        tokens.addAll(
+                            List(fullGlues) { GLUE_NEGATIVE_SIXTEEN } +
+                                    listOf(GLUE_NEGATIVE_ONE + (smallGlues - 1))
+                        )
+                }
+
+                return tokens.toUTF8Bytes().toString(Charsets.UTF_8)
+            }
         }
 
     }
