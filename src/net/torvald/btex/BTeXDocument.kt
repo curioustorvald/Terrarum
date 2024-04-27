@@ -128,7 +128,7 @@ class BTeXDrawCall(
     var posX: Int, // position relative to the page start (excluding page margin)
     var posY: Int, // position relative to the page start (excluding page margin)
     val theme: String,
-    val colour: Color,
+    var colour: Color,
     val text: BTeXTextDrawCall? = null,
     val texture: TextureRegion? = null,
 ) {

@@ -12,7 +12,9 @@ import net.torvald.terrarum.btex.BTeXDrawCall
 import net.torvald.terrarum.btex.MovableTypeDrawCall
 import net.torvald.terrarum.ceilToFloat
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.toHex
 import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarum.worlddrawer.toRGBA
 import net.torvald.terrarumsansbitmap.MovableType
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
@@ -77,9 +79,6 @@ object BTeXParser {
         private var spanColour: String? = null
 
 
-        private var typeX = 0
-        private var typeY = 0
-
         private val elemOpeners: HashMap<String, KFunction<*>> = HashMap()
         private val elemClosers: HashMap<String, KFunction<*>> = HashMap()
 
@@ -96,6 +95,8 @@ object BTeXParser {
         private val indexMap = HashMap<String, Int>() // id to pagenum
         private val cptSectMap = ArrayList<CptSectInfo>()
         private var tocPage: Int? = null
+
+        private var hasCover = false
 
         init {
             BTeXHandler::class.declaredFunctions.filter { it.findAnnotation<OpenTag>() != null }.forEach {
@@ -187,32 +188,43 @@ object BTeXParser {
 //            printdbg("  End element \t($popped)")
         }
 
+        private var oldSpanColour: String? = null
+
         override fun characters(ch: CharArray, start: Int, length: Int) {
             val str =
                 String(ch.sliceArray(start until start + length)).replace('\n', ' ').replace(Regex(" +"), " ")//.trim()
 
             if (str.isNotEmpty()) {
-//                printdbg("Characters \t\"$str\"")
-                paragraphBuffer.append(str)
+//                printdbg("Characters [col:${spanColour}] \t\"$str\"")
+
+                if (spanColour != oldSpanColour || spanColour != null) {
+                    val col = getSpanColourOrNull().toInternalColourCodeStr()
+
+                    if (spanColour != null && paragraphBuffer.last() == '\u000E') {
+                        paragraphBuffer.deleteAt(paragraphBuffer.lastIndex)
+                    }
+
+                    paragraphBuffer.append(col)
+                    paragraphBuffer.append(str.replace(" ", " $col"))
+                }
+                else {
+                    paragraphBuffer.append(str)
+                }
+
+                oldSpanColour = spanColour
             }
         }
 
-        private fun advanceCursorPre(w: Int, h: Int) {
-            if (typeX + w > pageWidth) {
-                typeY += LINE_HEIGHT
-                typeX = 0
-            }
+        private fun Color?.toInternalColourCodeStr(): String {
+            return if (this == null) "\u000E"
+            else {
+                val rgba = this.toRGBA()
+                val r = rgba.ushr(24).and(255) + 0xF800
+                val g = rgba.ushr(16).and(255) + 0xF800
+                val b = rgba.ushr(8).and(255) + 0xF800
 
-            if (typeY + h > pageHeight) {
-                typeX = 0
-                typeY = 0
-                doc.addNewPage()
+                return "\u000F" + Char(r) + Char(g) + Char(b)
             }
-        }
-
-        private fun advanceCursorPost(w: Int, h: Int) {
-            typeX += w
-            typeY += h
         }
 
         private lateinit var testFont: TerrarumSansBitmap
@@ -246,6 +258,8 @@ object BTeXParser {
 
         private val hexColRegexRGBshort = Regex("#[0-9a-fA-F]{3,3}")
         private val hexColRegexRGB = Regex("#[0-9a-fA-F]{6,6}")
+
+        private fun getSpanColourOrNull() = if (spanColour == null) null else getSpanColour()
 
         private fun getSpanColour(): Color = if (spanColour == null) DEFAULT_FONTCOL
         else if (spanColour!!.matches(hexColRegexRGB)) {
@@ -451,10 +465,10 @@ object BTeXParser {
             "examination" to 18,
         )
 
-        private val ccEmph = TerrarumSansBitmap.toColorCode(0xfd44)
-        private val ccItemName = TerrarumSansBitmap.toColorCode(0xf37d)
-        private val ccTargetName = TerrarumSansBitmap.toColorCode(0xf3c4)
-        private val ccReset = TerrarumSansBitmap.toColorCode(0)
+        private val ccEmph = "#C11"// TerrarumSansBitmap.toColorCode(0xfd44)
+        private val ccItemName = "#14C" // TerrarumSansBitmap.toColorCode(0xf37d)
+        private val ccTargetName = "#170" // TerrarumSansBitmap.toColorCode(0xf3c4)
+//        private val ccReset = TerrarumSansBitmap.toColorCode(0)
 
 
         @OpenTag // reflective access is impossible with 'private'
@@ -496,17 +510,22 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemEMPH(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
-            handler.paragraphBuffer.append(ccEmph)
+            handler.spanColour = ccEmph
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemITEMNAME(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
-            handler.paragraphBuffer.append(ccItemName)
+            handler.spanColour = ccItemName
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTARGETNAME(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
-            handler.paragraphBuffer.append(ccTargetName)
+            handler.spanColour = ccTargetName
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemSPAN(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            handler.spanColour = attribs["colour"] ?: attribs["color"]
         }
 
         @CloseTag
@@ -515,7 +534,7 @@ object BTeXParser {
         fun closeElemITEMNAME(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) = closeElemEMPH(handler, doc, theTag, uri, siblingIndex)
         @CloseTag
         fun closeElemEMPH(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
-            handler.paragraphBuffer.append(ccReset)
+            handler.spanColour = null
         }
 
 
@@ -526,11 +545,12 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCOVER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            hasCover = true
             val hue = (attribs["hue"]?.toFloatOrNull() ?: 28f) * DEG_TO_RAD
             val coverCol = OKLch(hue, 0.05f, 0.36f)
             val (r, g, b) = coverCol.tosRGB()
             doc.addNewPage(Color(r, g, b, 1f))
-            handler.spanColour = "white"
+//            handler.spanColour = "white"
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -673,6 +693,12 @@ object BTeXParser {
         @CloseTag
         fun closeElemCOVER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
             handler.spanColour = null
+
+            if (hasCover) {
+                doc.pages[0].drawCalls.forEach {
+                    it.colour = Color.WHITE
+                }
+            }
         }
 
         @CloseTag // reflective access is impossible with 'private'
@@ -697,11 +723,17 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
-            cptSectStack.add(CptSect("chapter", attribs["alt"], doc.currentPage))
+            if (attribs["hide"] == null)
+                cptSectStack.add(CptSect("chapter", attribs["alt"], doc.currentPage))
+            else
+                cptSectStack.add(CptSect("chapter-hidden", attribs["alt"], doc.currentPage))
         }
         @OpenTag // reflective access is impossible with 'private'
         fun processElemSECTION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
-            cptSectStack.add(CptSect("section", attribs["alt"], doc.currentPage))
+            if (attribs["hide"] == null)
+                cptSectStack.add(CptSect("section", attribs["alt"], doc.currentPage))
+            else
+                cptSectStack.add(CptSect("section-hidden", attribs["alt"], doc.currentPage))
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
@@ -712,7 +744,8 @@ object BTeXParser {
             typesetChapterHeading(thePar, handler, 16)
 
             val cptSectInfo = cptSectStack.removeLast()
-            cptSectMap.add(CptSectInfo("chapter", cptSectInfo.alt ?: thePar, cptSectInfo.pagenum))
+            if (!cptSectInfo.type.endsWith("-hidden"))
+                cptSectMap.add(CptSectInfo("chapter", cptSectInfo.alt ?: thePar, cptSectInfo.pagenum))
 
             handler.paragraphBuffer.clear()
         }
@@ -725,7 +758,8 @@ object BTeXParser {
             typesetSectionHeading(thePar, handler, 8)
 
             val cptSectInfo = cptSectStack.removeLast()
-            cptSectMap.add(CptSectInfo("section", cptSectInfo.alt ?: thePar, cptSectInfo.pagenum))
+            if (!cptSectInfo.type.endsWith("-hidden"))
+                cptSectMap.add(CptSectInfo("section", cptSectInfo.alt ?: thePar, cptSectInfo.pagenum))
 
             handler.paragraphBuffer.clear()
         }
@@ -863,10 +897,62 @@ object BTeXParser {
                 }
             }
 
+            // apply internal colour codes
+            // grammar:
+            //   <SI> [0-9A-F]{6,6} : apply colour code
+            //   <SO> : remove colour code
+            drawCalls.forEach {
+                if (it.text != null && it.text is MovableTypeDrawCall) {
+                    it.text.movableType.typesettedSlugs.forEach { slug -> slug.forEach { block ->
+                        val blockText = block.block.text
+
+//                        println(blockText.toReadable())
+
+                        if (blockText.startsWithColourCode()) {
+                            block.colour = blockText.getCCorNull()
+                        }
+                    } }
+                }
+            }
+
             // if typesetting the paragraph leaves the first line of new page empty, move the "row cursor" back up
             if (doc.linesPrintedOnPage[pageNum] == 1 && doc.pages[pageNum].isEmpty()) doc.linesPrintedOnPage[pageNum] = 0 // '\n' adds empty draw call to the page, which makes isEmpty() to return false
 
             return drawCalls
+        }
+
+        /*private fun CodepointSequence.toReadable() = this.joinToString("") {
+            if (it in 0x00..0x1f)
+                "${(0x2400 + it).toChar()}"
+            else if (it == 0x20)
+                "\u2423"
+            else if (it == NBSP)
+                "{NBSP}"
+            else if (it == SHY)
+                "{SHY}"
+            else if (it == ZWSP)
+                "{ZWSP}"
+            else if (it >= 0xF0000)
+                it.toHex() + " "
+            else
+                Character.toString(it.toChar())
+        }*/
+
+        private fun CodepointSequence.startsWithColourCode() = (this.size > 5 &&
+                this[1] == 0x0F &&
+                (this[2] in 0xF800..0xF8FF) &&
+                (this[3] in 0xF800..0xF8FF) &&
+                (this[4] in 0xF800..0xF8FF)) ||
+                (this.size > 3 && this[0] == 0x0E)
+
+        private fun CodepointSequence.getCCorNull(): Color? {
+            if (this[1] == 0x0F) {
+                val r = this[2] - 0xF800
+                val g = this[3] - 0xF800
+                val b = this[4] - 0xF800
+                return Color(r / 255f, g / 255f, b / 255f, 1f)
+            }
+            else return null
         }
 
         private fun typesetTOCline(name: String, pageNum: Int, handler: BTeXHandler, indentation: Int = 0, pageToWrite: Int? = null) {

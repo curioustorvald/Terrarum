@@ -44,7 +44,7 @@ class BTeXTest : ApplicationAdapter() {
 
     <p>This example book is designed to give you the example of the Book Language.</p>
 
-    <section>What Really Is a Book</section>
+    <section hide="1">What Really Is a Book</section>
 
     <p>A book is a collection of texts printed in a special way that allows them to be read easily, with
         enumerable pages and insertion of other helpful resources, such as illustrations and <a href="btex language">hyperlinks</a>.</p>
@@ -56,7 +56,7 @@ class BTeXTest : ApplicationAdapter() {
     <newpage />
 
     <fullpagebox>
-        <p>text <emph>emph</emph> and <itemname>􏃯item􀀀</itemname> on <targetname>target</targetname></p>
+        <p>text <emph>emph</emph> and <itemname>item</itemname> on <targetname>target</targetname></p>
     </fullpagebox>
 
 
