@@ -28,7 +28,7 @@ class BTeXTest : ApplicationAdapter() {
     val csi0 = "\u001B[m"
 
     val tex = """<btexdoc cover="hardcover" inner="standard" papersize="standard">
-<cover hue="160">
+<cover hue="230">
     <title>The Way to Mastery of Lorem Ipsum<br />Or, How To Write and Publish a Book</title>
     <author>Terran Publishing</author>
     <edition>Test Edition</edition>
@@ -56,7 +56,7 @@ class BTeXTest : ApplicationAdapter() {
     <newpage />
 
     <fullpagebox>
-        <p>text <emph>emph</emph> and <itemname>item</itemname> on <targetname>target</targetname></p>
+        <p>text <emph>emph</emph> and <itemname>􏃯item􀀀</itemname> on <targetname>target</targetname></p>
     </fullpagebox>
 
 

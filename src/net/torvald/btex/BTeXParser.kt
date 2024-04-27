@@ -536,6 +536,7 @@ object BTeXParser {
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTOCPAGE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
             doc.addNewPage()
+            doc.addNewPage() // toc: openright
             typesetChapterHeading("Table of Contents", handler, 16)
         }
 
@@ -574,6 +575,20 @@ object BTeXParser {
 
         @CloseTag
         fun closeElemMANUSCRIPT(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            // setup pages such that:
+            // toc: openright (done on processElemTOCPAGE)
+            // first chapter: openright
+            // second+ chapter: openany
+            if (cptSectMap.isNotEmpty() && cptSectMap.first().pagenum % 2 == 1) {
+                doc.addNewPageAt(cptSectMap.first().pagenum)
+                cptSectMap.forEach { it.pagenum += 1 }
+            }
+            else {
+                doc.addNewPageAt(cptSectMap.first().pagenum)
+                doc.addNewPageAt(cptSectMap.first().pagenum)
+                cptSectMap.forEach { it.pagenum += 2 }
+            }
+
             // if tocPage != null, estimate TOC page size, renumber indexMap and cptSectMap if needed, then typeset the toc
             if (tocPage != null) {
                 // TODO estimate the number of TOC pages
@@ -585,9 +600,8 @@ object BTeXParser {
                     indexMap.keys.forEach {
                         indexMap[it] = indexMap[it]!! + pageDelta
                     }
-                    cptSectMap.forEach {
-                        it.pagenum += pageDelta
-                    }
+
+                    cptSectMap.forEach { it.pagenum += pageDelta }
 
                     // insert new pages
                     repeat(pageDelta) {
@@ -730,14 +744,21 @@ object BTeXParser {
             spanColour = null
         }
 
+
+
+
         private fun typesetBookTitle(thePar: String, handler: BTeXHandler) {
             val label = "\n" + thePar
-            typesetParagraphs(getTitleFont(), label, handler, doc.textWidth / 2).also {
+            typesetParagraphs(getTitleFont(), label, handler, (doc.textWidth - 16) / 2).also {
                 val addedLines = it.sumOf { it.lineCount }
                 doc.linesPrintedOnPage[doc.currentPage] += addedLines + 2
 
+                it.forEach {
+                    it.posX += 8
+                }
+
                 it.last().extraDrawFun = { batch, x, y ->
-                    val px = x + 8
+                    val px = x
                     val py = y + doc.lineHeightInPx * (2 * addedLines) + 11
                     val pw = doc.textWidth - 16f
                     Toolkit.fillArea(batch, px, py, pw, 2f)
@@ -872,9 +893,9 @@ object BTeXParser {
                         }*/
                         else call.width
 
-                        var dotCursor = (x + textWidth + dotGap/2).div(dotGap).ceilToFloat() * dotGap
-                        while (dotCursor < x + typeWidth - pageNumWidth - dotGap/2) {
-                            font.draw(batch, "·", dotCursor, y)
+                        var dotCursor = (x + textWidth).div(dotGap).ceilToFloat() * dotGap
+                        while (dotCursor < x + typeWidth - pageNumWidth - dotGap*1.5f) {
+                            font.draw(batch, "·", dotCursor + dotGap/2, y)
                             dotCursor += dotGap
                         }
 
