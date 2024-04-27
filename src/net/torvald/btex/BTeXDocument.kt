@@ -33,7 +33,7 @@ class BTeXDocument {
 
     companion object {
         val DEFAULT_PAGE_BACK = Color(0xe0dfdb_ff.toInt())
-        val DEFAULT_PAGE_FORE = Color(0x151110ff)
+        val DEFAULT_PAGE_FORE = Color(0x0a0706_ff)
     }
 
     internal val pages = ArrayList<BTeXPage>()
@@ -143,6 +143,7 @@ class BTeXDrawCall(
 
         if (theme == "code") {
             // todo draw code background
+            println("code themed")
         }
 
         batch.color = colour

@@ -231,7 +231,7 @@ object BTeXParser {
         private lateinit var titleFont: TerrarumSansBitmap
         private lateinit var subtitleFont: TerrarumSansBitmap
 
-        private val bodyTextShadowAlpha = 0.35f
+        private val bodyTextShadowAlpha = 0.36f
 
         private fun getFont() = when (cover) {
             "typewriter" -> TODO()
@@ -509,6 +509,21 @@ object BTeXParser {
         }
 
         @OpenTag // reflective access is impossible with 'private'
+        fun processElemTITLE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            handler.paragraphBuffer.clear()
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            handler.paragraphBuffer.clear()
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemEDITION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            handler.paragraphBuffer.clear()
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
         fun processElemEMPH(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
             handler.spanColour = ccEmph
         }
@@ -688,6 +703,7 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemP(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            handler.paragraphBuffer.clear()
         }
 
         @CloseTag
@@ -723,6 +739,8 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            handler.paragraphBuffer.clear()
+
             if (attribs["hide"] == null)
                 cptSectStack.add(CptSect("chapter", attribs["alt"], doc.currentPage))
             else
@@ -730,6 +748,8 @@ object BTeXParser {
         }
         @OpenTag // reflective access is impossible with 'private'
         fun processElemSECTION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+            handler.paragraphBuffer.clear()
+
             if (attribs["hide"] == null)
                 cptSectStack.add(CptSect("section", attribs["alt"], doc.currentPage))
             else
@@ -793,9 +813,12 @@ object BTeXParser {
 
                 it.last().extraDrawFun = { batch, x, y ->
                     val px = x
-                    val py = y + doc.lineHeightInPx * (2 * addedLines) + 11
+                    val py = y + doc.lineHeightInPx * (2 * addedLines) + 8 + 11
                     val pw = doc.textWidth - 16f
-                    Toolkit.fillArea(batch, px, py, pw, 2f)
+                    batch.color = Color(1f,1f,1f,.5f)
+                    Toolkit.fillArea(batch, px, py, pw+1, 2f)
+                    batch.color = Color.WHITE
+                    Toolkit.fillArea(batch, px, py, pw, 1f)
                 }
             }
         }
@@ -914,6 +937,7 @@ object BTeXParser {
                     } }
                 }
             }
+//            println("---------------------------")
 
             // if typesetting the paragraph leaves the first line of new page empty, move the "row cursor" back up
             if (doc.linesPrintedOnPage[pageNum] == 1 && doc.pages[pageNum].isEmpty()) doc.linesPrintedOnPage[pageNum] = 0 // '\n' adds empty draw call to the page, which makes isEmpty() to return false
@@ -921,7 +945,7 @@ object BTeXParser {
             return drawCalls
         }
 
-        /*private fun CodepointSequence.toReadable() = this.joinToString("") {
+        private fun CodepointSequence.toReadable() = this.joinToString("") {
             if (it in 0x00..0x1f)
                 "${(0x2400 + it).toChar()}"
             else if (it == 0x20)
@@ -936,7 +960,7 @@ object BTeXParser {
                 it.toHex() + " "
             else
                 Character.toString(it.toChar())
-        }*/
+        }
 
         private fun CodepointSequence.startsWithColourCode() = (this.size > 5 &&
                 this[1] == 0x0F &&
