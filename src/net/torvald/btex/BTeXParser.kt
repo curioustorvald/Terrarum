@@ -216,13 +216,32 @@ object BTeXParser {
         }
 
         private lateinit var testFont: TerrarumSansBitmap
+        private lateinit var titleFont: TerrarumSansBitmap
+        private lateinit var subtitleFont: TerrarumSansBitmap
+
+        private val bodyTextShadowAlpha = 0.35f
 
         private fun getFont() = when (cover) {
             "typewriter" -> TODO()
-            else -> App.fontGame ?: let {
-                if (!::testFont.isInitialized) testFont = TerrarumSansBitmap(App.FONT_DIR)
+            else -> {
+                if (!::testFont.isInitialized) testFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha)
                 testFont
             }
+        }
+
+        private fun getTitleFont(): TerrarumSansBitmap {
+            if (!::titleFont.isInitialized) titleFont = TerrarumSansBitmap(App.FONT_DIR).also {
+                it.interchar = 1
+                it.scale = 2
+            }
+            return titleFont
+        }
+
+        private fun getSubtitleFont(): TerrarumSansBitmap {
+            if (!::subtitleFont.isInitialized) subtitleFont = TerrarumSansBitmap(App.FONT_DIR).also {
+                it.interchar = 1
+            }
+            return subtitleFont
         }
 
         private val hexColRegexRGBshort = Regex("#[0-9a-fA-F]{3,3}")
@@ -643,11 +662,23 @@ object BTeXParser {
         }
 
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemTITLE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) = closeElemP(handler, doc, theTag, uri, siblingIndex)
+        fun closeElemTITLE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            val thePar = handler.paragraphBuffer.toString().trim()
+            typesetBookTitle(thePar, handler)
+            handler.paragraphBuffer.clear()
+        }
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) = closeElemP(handler, doc, theTag, uri, siblingIndex)
+        fun closeElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            val thePar = handler.paragraphBuffer.toString().trim()
+            typesetBookAuthor(thePar, handler)
+            handler.paragraphBuffer.clear()
+        }
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemEDITION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) = closeElemP(handler, doc, theTag, uri, siblingIndex)
+        fun closeElemEDITION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+            val thePar = handler.paragraphBuffer.toString().trim()
+            typesetBookAuthor(thePar, handler)
+            handler.paragraphBuffer.clear()
+        }
 
 
         @OpenTag // reflective access is impossible with 'private'
@@ -699,6 +730,28 @@ object BTeXParser {
             spanColour = null
         }
 
+        private fun typesetBookTitle(thePar: String, handler: BTeXHandler) {
+            val label = "\n" + thePar
+            typesetParagraphs(getTitleFont(), label, handler, doc.textWidth / 2).also {
+                val addedLines = it.sumOf { it.lineCount }
+                doc.linesPrintedOnPage[doc.currentPage] += addedLines + 2
+
+                it.last().extraDrawFun = { batch, x, y ->
+                    val px = x + 8
+                    val py = y + doc.lineHeightInPx * (2 * addedLines) + 11
+                    val pw = doc.textWidth - 16f
+                    Toolkit.fillArea(batch, px, py, pw, 2f)
+                }
+            }
+        }
+
+        private fun typesetBookAuthor(thePar: String, handler: BTeXHandler) {
+            typesetParagraphs(getSubtitleFont(), thePar, handler, doc.textWidth - 16).also {
+                it.forEach {
+                    it.posX += 8
+                }
+            }
+        }
 
         private fun typesetChapterHeading(thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
             typesetParagraphs("\n"+thePar, handler, width - indent).also {
@@ -710,6 +763,11 @@ object BTeXParser {
                 // add ornamental column on the left
                 it.forEach {
                     it.extraDrawFun = { batch, x, y ->
+                        val oldCol = batch.color.cpy()
+                        val otherCol = batch.color.cpy().also { it.a *= bodyTextShadowAlpha }
+                        batch.color = otherCol
+                        Toolkit.fillArea(batch, x - (indent - 2), y + doc.lineHeightInPx, 7f, 1 + (it.lineCount - 1).coerceAtLeast(1) * doc.lineHeightInPx.toFloat())
+                        batch.color = oldCol
                         Toolkit.fillArea(batch, x - (indent - 2), y + doc.lineHeightInPx, 6f, (it.lineCount - 1).coerceAtLeast(1) * doc.lineHeightInPx.toFloat())
                     }
                 }
@@ -727,7 +785,10 @@ object BTeXParser {
         }
 
         private fun typesetParagraphs(thePar: String, handler: BTeXHandler, width: Int = doc.textWidth, startingPage: Int = doc.currentPage): List<BTeXDrawCall> {
-            val font = getFont()
+            return typesetParagraphs(getFont(), thePar, handler, width, startingPage)
+        }
+
+        private fun typesetParagraphs(font: TerrarumSansBitmap, thePar: String, handler: BTeXHandler, width: Int = doc.textWidth, startingPage: Int = doc.currentPage): List<BTeXDrawCall> {
             val slugs = MovableType(font, thePar, width)
             var pageNum = startingPage
 
