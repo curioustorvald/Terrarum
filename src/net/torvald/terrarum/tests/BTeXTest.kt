@@ -63,7 +63,7 @@ class BTeXTest : ApplicationAdapter() {
         }
 
         measureTimeMillis {
-            document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".book")}"))
+            document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btexbin")}"))
         }.also {
             println("Time spent on serialisation [ms]: $it")
         }

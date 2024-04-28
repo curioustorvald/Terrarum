@@ -13,3 +13,4 @@
 
 *.tga binary diff=hex
 *.kra binary diff=hex
+*.btexbin binary diff=hex
