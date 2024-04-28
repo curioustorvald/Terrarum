@@ -7,6 +7,7 @@ import net.torvald.colourutil.OKLch
 import net.torvald.colourutil.tosRGB
 import net.torvald.terrarum.App
 import net.torvald.terrarum.btex.BTeXDocument
+import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_ORNAMENTS_COL
 import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_PAGE_FORE
 import net.torvald.terrarum.btex.BTeXDrawCall
 import net.torvald.terrarum.btex.MovableTypeDrawCall
@@ -88,7 +89,7 @@ object BTeXParser {
         private var lastTagAtDepth = Array(24) { "" }
         private var pTagCntAtDepth = IntArray(24)
 
-        private data class CptSect(val type: String, var alt: String?, var pagenum: Int)
+        private data class CptSect(val type: String, var alt: String?)
         private data class CptSectInfo(val type: String, var name: String, var pagenum: Int)
 
         private val cptSectStack = ArrayList<CptSect>()
@@ -465,7 +466,7 @@ object BTeXParser {
             "examination" to 640,
         )
         private val pageHeightMap = hashMapOf(
-            "standard" to 25,
+            "standard" to 24,
             "examination" to 18,
         )
 
@@ -575,13 +576,15 @@ object BTeXParser {
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTOCPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             doc.addNewPage() // toc: openright
-            typesetChapterHeading("Table of Contents", handler, 16)
+            val header = attribs["title"] ?: "Table of Contents"
+            typesetChapterHeading(header, handler, 16)
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemINDEXPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             doc.addNewPage()
-            typesetChapterHeading("Index", handler, 16)
+            val header = attribs["title"] ?: "Index"
+            typesetChapterHeading(header, handler, 16)
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -657,7 +660,7 @@ object BTeXParser {
         @OpenTag // reflective access is impossible with 'private'
         fun processElemINDEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             attribs["id"]?.let {
-                indexMap[it] = doc.currentPage
+                indexMap[it] = doc.currentPage + 1
             }
         }
 
@@ -761,18 +764,18 @@ object BTeXParser {
             handler.paragraphBuffer.clear()
 
             if (attribs["hide"] == null)
-                cptSectStack.add(CptSect("chapter", attribs["alt"], doc.currentPage))
+                cptSectStack.add(CptSect("chapter", attribs["alt"]))
             else
-                cptSectStack.add(CptSect("chapter-hidden", attribs["alt"], doc.currentPage))
+                cptSectStack.add(CptSect("chapter-hidden", attribs["alt"]))
         }
         @OpenTag // reflective access is impossible with 'private'
         fun processElemSECTION(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.clear()
 
             if (attribs["hide"] == null)
-                cptSectStack.add(CptSect("section", attribs["alt"], doc.currentPage))
+                cptSectStack.add(CptSect("section", attribs["alt"]))
             else
-                cptSectStack.add(CptSect("section-hidden", attribs["alt"], doc.currentPage))
+                cptSectStack.add(CptSect("section-hidden", attribs["alt"]))
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
@@ -784,7 +787,7 @@ object BTeXParser {
 
             val cptSectInfo = cptSectStack.removeLast()
             if (!cptSectInfo.type.endsWith("-hidden"))
-                cptSectMap.add(CptSectInfo("chapter", cptSectInfo.alt ?: thePar, cptSectInfo.pagenum))
+                cptSectMap.add(CptSectInfo("chapter", cptSectInfo.alt ?: thePar, doc.currentPage))
 
             handler.paragraphBuffer.clear()
         }
@@ -798,7 +801,7 @@ object BTeXParser {
 
             val cptSectInfo = cptSectStack.removeLast()
             if (!cptSectInfo.type.endsWith("-hidden"))
-                cptSectMap.add(CptSectInfo("section", cptSectInfo.alt ?: thePar, cptSectInfo.pagenum))
+                cptSectMap.add(CptSectInfo("section", cptSectInfo.alt ?: thePar, doc.currentPage))
 
             handler.paragraphBuffer.clear()
         }
@@ -828,6 +831,7 @@ object BTeXParser {
         @CloseTag
         fun closeElemBTEXDOC(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // make sure the last pair ends with paper and end-cover
+            doc.endOfPageStart = doc.currentPage + 1
             if (doc.pages.size % 2 == 1) doc.addNewPage()
             doc.addNewPage()
         }
@@ -884,11 +888,11 @@ object BTeXParser {
                 it.forEach {
                     it.extraDrawFun = { batch, x, y ->
                         val oldCol = batch.color.cpy()
-                        val otherCol = batch.color.cpy().also { it.a *= bodyTextShadowAlpha }
-                        batch.color = otherCol
+                        batch.color = DEFAULT_ORNAMENTS_COL.cpy().also { it.a *= bodyTextShadowAlpha }
                         Toolkit.fillArea(batch, x - (indent - 2), y + doc.lineHeightInPx, 7f, 1 + (it.lineCount - 1).coerceAtLeast(1) * doc.lineHeightInPx.toFloat())
-                        batch.color = oldCol
+                        batch.color = DEFAULT_ORNAMENTS_COL
                         Toolkit.fillArea(batch, x - (indent - 2), y + doc.lineHeightInPx, 6f, (it.lineCount - 1).coerceAtLeast(1) * doc.lineHeightInPx.toFloat())
+                        batch.color = oldCol
                     }
                 }
             }

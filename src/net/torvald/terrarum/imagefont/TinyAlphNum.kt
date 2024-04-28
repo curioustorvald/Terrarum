@@ -39,7 +39,7 @@ object TinyAlphNum : BitmapFont() {
     override fun draw(batch: Batch, text: CharSequence, x: Float, y: Float): GlyphLayout? {
         val originalColour = batch.color.cpy()
         colMain = batch.color.cpy()
-        colShadow = colMain.cpy().mul(0.5f, 0.5f, 0.5f, 1f)
+        colShadow = colMain.cpy().mul(1f, 1f, 1f, 0.5f)
 
         val x = x.roundToFloat()
         val y = y.roundToFloat()

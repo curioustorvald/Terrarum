@@ -3,8 +3,7 @@ package net.torvald.terrarum.btex
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.blendNormalPremultAlpha
-import net.torvald.terrarum.blendNormalStraightAlpha
+import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.MovableType
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
@@ -20,7 +19,7 @@ class BTeXDocument {
 
     var textWidth = 480
     var lineHeightInPx = 24
-    var pageLines = 25
+    var pageLines = 24
     val textHeight: Int
         get() = pageLines * lineHeightInPx
 
@@ -30,11 +29,15 @@ class BTeXDocument {
     val pageDimensionWidth: Int
         get() = 2 * pageMarginH + textWidth
     val pageDimensionHeight: Int
-        get() = 2 * pageMarginV + textHeight
+        get() = 2 * pageMarginV + textHeight + pageLines // add a pagenum row
+
+    var endOfPageStart = 2147483647
+    var tocPageStart = 2
 
     companion object {
         val DEFAULT_PAGE_BACK = Color(0xe0dfdb_ff.toInt())
         val DEFAULT_PAGE_FORE = Color(0x0a0706_ff)
+        val DEFAULT_ORNAMENTS_COL = Color(0x3f3c3b_ff)
     }
 
     internal val pages = ArrayList<BTeXPage>()
@@ -49,6 +52,8 @@ class BTeXDocument {
         get() = pages.indices
 
     internal val linesPrintedOnPage = ArrayList<Int>()
+
+    @Transient private val fontNum = TinyAlphNum
 
     fun addNewPage(back: Color = DEFAULT_PAGE_BACK) {
         pages.add(BTeXPage(back, pageDimensionWidth, pageDimensionHeight))
@@ -81,6 +86,25 @@ class BTeXDocument {
 
     fun render(frameDelta: Float, batch: SpriteBatch, page: Int, x: Int, y: Int) {
         pages[page].render(frameDelta, batch, x, y, pageMarginH, pageMarginV)
+
+        // paint page number
+        val num = "${page+1}"
+        val numW = TinyAlphNum.getWidth(num)
+        val numX = if (context == "tome") {
+            if (page % 2 == 1)
+                x + pageMarginH
+            else
+                x + pageDimensionWidth - pageMarginH - numW
+        }
+        else {
+            x + (pageDimensionWidth - numW) / 2
+        }
+        val numY = y + pageDimensionHeight - 2*pageMarginV - 4
+
+        if (page == 0 && context != "tome" || page in tocPageStart until endOfPageStart) {
+            batch.color = DEFAULT_ORNAMENTS_COL
+            TinyAlphNum.draw(batch, num, numX.toFloat(), numY.toFloat())
+        }
     }
 }
 

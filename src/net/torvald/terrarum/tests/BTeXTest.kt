@@ -24,8 +24,8 @@ import net.torvald.terrarum.inUse
 class BTeXTest : ApplicationAdapter() {
 
 //    val filePath = "btex.xml"
-    val filePath = "literature/koKR/yisang_nalgae.xml"
-//    val filePath = "test.xml"
+    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
+//    val filePath = "literature/koKR/yisang_nalgae.xml"
 
 
     private lateinit var document: BTeXDocument
