@@ -16,7 +16,6 @@ import net.torvald.terrarum.btex.BTeXDocument
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gdxClearAndEnableBlend
 import net.torvald.terrarum.inUse
-import java.io.FileReader
 
 
 /**
@@ -26,6 +25,7 @@ class BTeXTest : ApplicationAdapter() {
 
 //    val filePath = "btex.xml"
     val filePath = "literature/koKR/yisang_nalgae.xml"
+//    val filePath = "test.xml"
 
 
     private lateinit var document: BTeXDocument
@@ -53,7 +53,7 @@ class BTeXTest : ApplicationAdapter() {
     override fun render() {
         gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
-        val drawX = (1280 - (pageGap + document.pageWidth*2)) / 2
+        val drawX = (1280 - (pageGap + document.pageDimensionWidth*2)) / 2
         val drawY = 24
 
         batch.inUse {
@@ -63,7 +63,7 @@ class BTeXTest : ApplicationAdapter() {
             if (scroll - 1 in document.pageIndices)
                 document.render(0f, batch, scroll - 1, drawX, drawY)
             if (scroll in document.pageIndices)
-                document.render(0f, batch, scroll, drawX + (6 + document.pageWidth), drawY)
+                document.render(0f, batch, scroll, drawX + (6 + document.pageDimensionWidth), drawY)
         }
 
 

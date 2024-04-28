@@ -21,14 +21,15 @@ class BTeXDocument {
     var textWidth = 480
     var lineHeightInPx = 24
     var pageLines = 25
-    var textHeight = pageLines * lineHeightInPx
+    val textHeight: Int
+        get() = pageLines * lineHeightInPx
 
     val pageMarginH = 15
     val pageMarginV = 12
 
-    val pageWidth: Int
+    val pageDimensionWidth: Int
         get() = 2 * pageMarginH + textWidth
-    val pageHeight: Int
+    val pageDimensionHeight: Int
         get() = 2 * pageMarginV + textHeight
 
     companion object {
@@ -50,12 +51,12 @@ class BTeXDocument {
     internal val linesPrintedOnPage = ArrayList<Int>()
 
     fun addNewPage(back: Color = DEFAULT_PAGE_BACK) {
-        pages.add(BTeXPage(back, pageWidth, pageHeight))
+        pages.add(BTeXPage(back, pageDimensionWidth, pageDimensionHeight))
         linesPrintedOnPage.add(0)
     }
 
     fun addNewPageAt(index: Int, back: Color = DEFAULT_PAGE_BACK) {
-        pages.add(index, BTeXPage(back, pageWidth, pageHeight))
+        pages.add(index, BTeXPage(back, pageDimensionWidth, pageDimensionHeight))
         linesPrintedOnPage.add(index, 0)
     }
 
@@ -109,13 +110,13 @@ class BTeXPage(
 
 interface BTeXTextDrawCall {
     val rowStart: Int
-    val rowEnd: Int
-    fun draw(batch: SpriteBatch, x: Float, y: Float)
+    val rows: Int
+    fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float)
 }
 
-data class MovableTypeDrawCall(val movableType: MovableType, override val rowStart: Int, override val rowEnd: Int): BTeXTextDrawCall {
-    override fun draw(batch: SpriteBatch, x: Float, y: Float) {
-        movableType.draw(batch, x, y, rowStart, rowEnd)
+data class MovableTypeDrawCall(val movableType: MovableType, override val rowStart: Int, override val rows: Int): BTeXTextDrawCall {
+    override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float) {
+        movableType.draw(batch, x, y, rowStart, minOf(rows, doc.pageLines))
     }
 }
 
@@ -126,6 +127,7 @@ data class MovableTypeDrawCall(val movableType: MovableType, override val rowSta
 }*/
 
 class BTeXDrawCall(
+    val doc: BTeXDocument,
     var posX: Int, // position relative to the page start (excluding page margin)
     var posY: Int, // position relative to the page start (excluding page margin)
     val theme: String,
@@ -150,7 +152,7 @@ class BTeXDrawCall(
         batch.color = colour
 
         if (text != null && texture == null) {
-            text.draw(batch, px, py)
+            text.draw(doc, batch, px, py)
         }
         else if (text == null && texture != null) {
             batch.draw(texture, px, py)
@@ -178,7 +180,7 @@ class BTeXDrawCall(
 
     internal var extraDrawFun: (SpriteBatch, Float, Float) -> Unit = { _, _, _ ->}
     internal val lineCount = if (text != null)
-        text.rowEnd - text.rowStart
+        text.rows
     else
         TODO()
 

@@ -1,0 +1,69 @@
+<btexdoc cover="hardcover" inner="standard" papersize="standard">
+<cover>
+    <title>The life and strange surprizing adventures of Robinson Crusoe, of York, mariner: who lived eight and twenty years all alone in an un-inhabited island on the coast of America, near the mouth of the great river of Oroonoque; having been cast on shore by shipwreck, wherein all the men perished but himself, with an account how he was at last as strangely deliver'd by pyrates</title>
+    <author>Daniel Defoe</author>
+    <edition>The Fourth Edition</edition>
+</cover>
+
+<tocpage><tableofcontents /></tocpage>
+
+<manuscript>
+
+
+
+    <chapter>What Is a Book</chapter>
+
+    <p>This example book is designed to give you the example of the Book Language.</p>
+
+    <section>What Really Is a Book</section>
+
+    <p>A book is a collection of texts printed in a special way that allows them to be read easily, with
+        enumerable pages and insertion of other helpful resources, such as illustrations and <a href="btex language">hyperlinks</a>.</p>
+
+    <newpage />
+
+    <!--<fullpagebox>
+        <p><span colour="grey">
+            this page is intentionally left blank
+        </span></p>
+    </fullpagebox>-->
+
+
+
+
+    <chapter>Writing a Book Using Pen and Papers</chapter>
+
+    <p><index id="pen and paper" />If you open a book on a writing table, you will be welcomed with a
+        toolbar used to put other book elements, such as chapters and sections.</p>
+
+
+
+
+    <chapter>Writing a Book Using a Typewriter</chapter>
+
+    <p><index id="typewriter" />Typewriters can only write in a single style of font, chapters and
+        sections are not available.</p>
+
+
+
+
+    <chapter>Writing a Book Using a Computer</chapter>
+
+    <p>Writing book using a computer requires the use of the Book Typesetting Engine Extended, or <btex />.</p>
+
+    <section>Full Control of the Shape</section>
+
+    <p><index id="btex language" />With <btex /> you can fully control how your publishing would look like,
+        from a pile of papers that look like they have been typed out using typewriter, a pile of printouts
+        that have pictures in it, to a true hardcover book.</p>
+
+    <p><index id="cover" />This style is controlled using the <code>cover</code> attribute on the root tag,
+        with following values: <code>typewriter</code>, <code>printout</code> and <code>hardcover</code>.</p>
+
+    <p>Typewriter and Printout are considered not-bound and readers will only see one page at a time,
+        while Hardcover is considered bound and two pages are presented to the readers.</p>
+
+</manuscript>
+
+<indexpage><tableofindices /></indexpage>
+</btexdoc>

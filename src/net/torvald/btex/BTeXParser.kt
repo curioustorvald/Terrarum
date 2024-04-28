@@ -67,9 +67,9 @@ object BTeXParser {
 
         private var btexOpened = false
 
-        private var pageWidth = doc.textWidth
-        private var pageLines = doc.pageLines
-        private var pageHeight = doc.textHeight
+//        private var pageWidth = doc.textWidth
+//        private var pageLines = doc.pageLines
+//        private var pageHeight = doc.textHeight
 
         private val blockLut = HashMap<String, ItemID>()
 
@@ -489,17 +489,12 @@ object BTeXParser {
                 handler.papersize = attribs["papersize"] ?: "standard"
 
                 //change the "default values" of the document
-                handler.pageWidth = pageWidthMap[papersize]!!
-                handler.pageLines = pageHeightMap[papersize]!!
-                handler.pageHeight = pageLines * LINE_HEIGHT
 
-                doc.textWidth = pageWidth
-                doc.textHeight = pageHeight
+                doc.textWidth = pageWidthMap[papersize]!!
+                doc.pageLines = pageHeightMap[papersize]!!
             }
 
             handler.btexOpened = true
-
-            printdbg("BTeX document: def=${handler.def}, cover=${handler.cover}, inner=${handler.inner}, papersize=${handler.papersize}, dim=${handler.pageWidth}x${handler.pageHeight} (${handler.pageLines} lines)")
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -514,6 +509,10 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            handler.paragraphBuffer.clear()
+        }
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemSUBTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.clear()
         }
 
@@ -738,6 +737,12 @@ object BTeXParser {
             handler.paragraphBuffer.clear()
         }
         @CloseTag // reflective access is impossible with 'private'
+        fun closeElemSUBTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
+            val thePar = handler.paragraphBuffer.toString().trim()
+            typesetBookEdition(thePar, handler)
+            handler.paragraphBuffer.clear()
+        }
+        @CloseTag // reflective access is impossible with 'private'
         fun closeElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookAuthor(thePar, handler)
@@ -746,7 +751,7 @@ object BTeXParser {
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemEDITION(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
-            typesetBookAuthor(thePar, handler)
+            typesetBookEdition(thePar, handler)
             handler.paragraphBuffer.clear()
         }
 
@@ -834,25 +839,33 @@ object BTeXParser {
             val label = "\n" + thePar
             typesetParagraphs(getTitleFont(), label, handler, (doc.textWidth - 16) / 2).also {
                 val addedLines = it.sumOf { it.lineCount }
-                doc.linesPrintedOnPage[doc.currentPage] += addedLines + 2
+                doc.linesPrintedOnPage[doc.currentPage] += addedLines
 
                 it.forEach {
                     it.posX += 8
                 }
+            }
+        }
 
+        private fun typesetBookAuthor(thePar: String, handler: BTeXHandler) {
+            typesetParagraphs(getSubtitleFont(), "\n\n" + thePar, handler, doc.textWidth - 16).also {
                 it.last().extraDrawFun = { batch, x, y ->
                     val px = x
-                    val py = y + doc.lineHeightInPx * (2 * addedLines) + 8 + 11
+                    val py = y + 23
                     val pw = doc.textWidth - 16f
                     batch.color = Color(1f,1f,1f,.5f)
                     Toolkit.fillArea(batch, px, py, pw+1, 2f)
                     batch.color = Color.WHITE
                     Toolkit.fillArea(batch, px, py, pw, 1f)
                 }
+
+                it.forEach {
+                    it.posX += 8
+                }
             }
         }
 
-        private fun typesetBookAuthor(thePar: String, handler: BTeXHandler) {
+        private fun typesetBookEdition(thePar: String, handler: BTeXHandler) {
             typesetParagraphs(getSubtitleFont(), thePar, handler, doc.textWidth - 16).also {
                 it.forEach {
                     it.posX += 8
@@ -908,9 +921,10 @@ object BTeXParser {
 //            printdbg("Page: ${doc.currentPage+1}, Line: ${doc.currentLine}")
 
             if (slugHeight > remainder) {
-                val subset = linesOut to linesOut + remainder
+                val subset = linesOut to remainder
 
                 val drawCall = BTeXDrawCall(
+                    doc,
                     0,
                     doc.linesPrintedOnPage[pageNum] * doc.lineHeightInPx,
                     handler.currentTheme,
@@ -929,9 +943,10 @@ object BTeXParser {
             while (slugHeight > 0) {
                 remainder = minOf(slugHeight, doc.pageLines)
 
-                val subset = linesOut to linesOut + remainder
+                val subset = linesOut to remainder
 
                 val drawCall = BTeXDrawCall(
+                    doc,
                     0,
                     doc.linesPrintedOnPage[pageNum] * doc.lineHeightInPx,
                     handler.currentTheme,
