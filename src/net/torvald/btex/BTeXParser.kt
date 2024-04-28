@@ -74,6 +74,7 @@ object BTeXParser {
         private val blockLut = HashMap<String, ItemID>()
 
         private val tagStack = ArrayList<String>() // index zero should be "btex"
+        private var tagHistory = ArrayList<String>()
 
         private var currentTheme = ""
         private var spanColour: String? = null
@@ -97,6 +98,7 @@ object BTeXParser {
         private var tocPage: Int? = null
 
         private var hasCover = false
+        private var coverCol: Color? = null
 
         init {
             BTeXHandler::class.declaredFunctions.filter { it.findAnnotation<OpenTag>() != null }.forEach {
@@ -147,6 +149,8 @@ object BTeXParser {
             lastTagAtDepth[tagStack.size] = theTag
 
             tagStack.add(theTag)
+            tagHistory.add(theTag)
+
 
             val attribs = HashMap<String, String>().also {
                 it.putAll((0 until attributes.length).map { attributes.getQName(it) to attributes.getValue(it) })
@@ -158,7 +162,7 @@ object BTeXParser {
                     System.err.println("Unknown tag: $theTag")
                 else {
                     try {
-                        it.call(this, this, doc, theTag, uri, attribs, pTagCntAtDepth[tagStack.size])
+                        it.call(this, this, doc, uri, attribs)
                     }
                     catch (e: Throwable) {
                         throw BTeXParsingException("processElem$theTag"+"\n"+e.stackTraceToString())
@@ -178,7 +182,7 @@ object BTeXParser {
 
             elemClosers["closeElem$theTag"].let {
                 try {
-                    it?.call(this, this, doc, theTag, uri, pTagCntAtDepth[tagStack.size])
+                    it?.call(this, this, doc, uri, pTagCntAtDepth[tagStack.size])
                 }
                 catch (e: Throwable) {
                     throw BTeXParsingException(e.stackTraceToString())
@@ -200,7 +204,7 @@ object BTeXParser {
                 if (spanColour != oldSpanColour || spanColour != null) {
                     val col = getSpanColourOrNull().toInternalColourCodeStr()
 
-                    if (spanColour != null && paragraphBuffer.last() == '\u000E') {
+                    if (spanColour != null && paragraphBuffer.isNotEmpty() && paragraphBuffer.last() == '\u000E') {
                         paragraphBuffer.deleteAt(paragraphBuffer.lastIndex)
                     }
 
@@ -472,7 +476,7 @@ object BTeXParser {
 
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemBTEXDOC(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemBTEXDOC(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             if (handler.btexOpened) {
                 throw BTeXParsingException("BTEXDOC tag has already opened")
             }
@@ -499,7 +503,7 @@ object BTeXParser {
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemPAIR(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemPAIR(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             if (tagStack.size == 3 && tagStack.getOrNull(1) == "blocklut") {
                 blockLut[attribs["key"]!!] = attribs["value"]!!
             }
@@ -509,86 +513,86 @@ object BTeXParser {
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemTITLE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.clear()
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.clear()
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemEDITION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemEDITION(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.clear()
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemEMPH(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemEMPH(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.spanColour = ccEmph
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemITEMNAME(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemITEMNAME(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.spanColour = ccItemName
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemTARGETNAME(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemTARGETNAME(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.spanColour = ccTargetName
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemSPAN(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemSPAN(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.spanColour = attribs["colour"] ?: attribs["color"]
         }
 
         @CloseTag
-        fun closeElemTARGETNAME(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) = closeElemEMPH(handler, doc, theTag, uri, siblingIndex)
+        fun closeElemTARGETNAME(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) = closeElemEMPH(handler, doc, uri, siblingIndex)
         @CloseTag
-        fun closeElemITEMNAME(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) = closeElemEMPH(handler, doc, theTag, uri, siblingIndex)
+        fun closeElemITEMNAME(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) = closeElemEMPH(handler, doc, uri, siblingIndex)
         @CloseTag
-        fun closeElemEMPH(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+        fun closeElemEMPH(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             handler.spanColour = null
         }
 
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemBTEX(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemBTEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.append("BTeX")
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemCOVER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemCOVER(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             hasCover = true
             val hue = (attribs["hue"]?.toFloatOrNull() ?: 28f) * DEG_TO_RAD
-            val coverCol = OKLch(hue, 0.05f, 0.36f)
-            val (r, g, b) = coverCol.tosRGB()
-            doc.addNewPage(Color(r, g, b, 1f))
+            val coverColLCH = OKLch(hue, 0.05f, 0.36f)
+            val (r, g, b) = coverColLCH.tosRGB()
+            coverCol = Color(r, g, b, 1f)
+            doc.addNewPage(coverCol!!)
 //            handler.spanColour = "white"
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemTOCPAGE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
-            doc.addNewPage()
+        fun processElemTOCPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             doc.addNewPage() // toc: openright
             typesetChapterHeading("Table of Contents", handler, 16)
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemINDEXPAGE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemINDEXPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             doc.addNewPage()
             typesetChapterHeading("Index", handler, 16)
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemTABLEOFCONTENTS(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemTABLEOFCONTENTS(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             tocPage = doc.currentPage
             handler.paragraphBuffer.clear()
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemTABLEOFINDICES(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemTABLEOFINDICES(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.clear()
 
             // prepare contents
@@ -600,16 +604,16 @@ object BTeXParser {
         }
 
         @CloseTag
-        fun closeElemTABLEOFINDICES(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+        fun closeElemTABLEOFINDICES(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemMANUSCRIPT(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemMANUSCRIPT(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             doc.addNewPage()
         }
 
         @CloseTag
-        fun closeElemMANUSCRIPT(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+        fun closeElemMANUSCRIPT(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // setup pages such that:
             // toc: openright (done on processElemTOCPAGE)
             // first chapter: openright
@@ -618,7 +622,7 @@ object BTeXParser {
                 doc.addNewPageAt(cptSectMap.first().pagenum)
                 cptSectMap.forEach { it.pagenum += 1 }
             }
-            else {
+            else if (cptSectMap.isNotEmpty()) {
                 doc.addNewPageAt(cptSectMap.first().pagenum)
                 doc.addNewPageAt(cptSectMap.first().pagenum)
                 cptSectMap.forEach { it.pagenum += 2 }
@@ -652,7 +656,7 @@ object BTeXParser {
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemINDEX(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemINDEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             attribs["id"]?.let {
                 indexMap[it] = doc.currentPage
             }
@@ -665,17 +669,17 @@ object BTeXParser {
 
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemBR(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemBR(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.append("\n")
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemNEWPAGE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemNEWPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             doc.addNewPage()
         }
 
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemFULLPAGEBOX(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+        fun closeElemFULLPAGEBOX(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             doc.currentPageObj.let { page ->
                 val yStart = page.drawCalls.minOf { it.posY }
                 val yEnd = page.drawCalls.maxOf { it.posY + it.lineCount * doc.lineHeightInPx }
@@ -702,35 +706,36 @@ object BTeXParser {
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemP(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemP(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.clear()
         }
 
         @CloseTag
-        fun closeElemCOVER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+        fun closeElemCOVER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             handler.spanColour = null
 
             if (hasCover) {
                 doc.pages[0].drawCalls.forEach {
                     it.colour = Color.WHITE
                 }
+                doc.addNewPage()
             }
         }
 
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemTITLE(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+        fun closeElemTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookTitle(thePar, handler)
             handler.paragraphBuffer.clear()
         }
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+        fun closeElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookAuthor(thePar, handler)
             handler.paragraphBuffer.clear()
         }
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemEDITION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+        fun closeElemEDITION(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookAuthor(thePar, handler)
             handler.paragraphBuffer.clear()
@@ -738,7 +743,7 @@ object BTeXParser {
 
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.clear()
 
             if (attribs["hide"] == null)
@@ -747,7 +752,7 @@ object BTeXParser {
                 cptSectStack.add(CptSect("chapter-hidden", attribs["alt"], doc.currentPage))
         }
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemSECTION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, attribs: HashMap<String, String>, siblingIndex: Int) {
+        fun processElemSECTION(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.clear()
 
             if (attribs["hide"] == null)
@@ -756,7 +761,7 @@ object BTeXParser {
                 cptSectStack.add(CptSect("section-hidden", attribs["alt"], doc.currentPage))
         }
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+        fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // insert new page for second+ chapters
             if (siblingIndex > 0) doc.addNewPage()
 
@@ -770,7 +775,7 @@ object BTeXParser {
             handler.paragraphBuffer.clear()
         }
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemSECTION(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+        fun closeElemSECTION(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // if current line is the last line, proceed to the next page
             if (doc.linesPrintedOnPage.last() == doc.pageLines - 1) doc.addNewPage()
 
@@ -787,15 +792,30 @@ object BTeXParser {
 
 
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemP(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
-            val thePar = (if (siblingIndex > 1) "\u3000" else "") + handler.paragraphBuffer.toString().trim() // indent the strictly non-first pars
-            typesetParagraphs(thePar, handler)
+        fun closeElemP(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
+            // if this P is a very first P without chapters, leave two lines before typesetting
+            val addVirtualChapter = (tagHistory.size > 2 && tagHistory[tagHistory.lastIndex - 1] == "MANUSCRIPT")
+            val thePar = handler.paragraphBuffer.toString().trim()
+
+            val text =
+                if (siblingIndex > 1) "\u3000$thePar"
+                else if (addVirtualChapter) "\n\n$thePar"
+                else thePar
+
+            typesetParagraphs(text, handler)
             handler.paragraphBuffer.clear()
         }
 
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemSPAN(handler: BTeXHandler, doc: BTeXDocument, theTag: String, uri: String, siblingIndex: Int) {
+        fun closeElemSPAN(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             spanColour = null
+        }
+
+        @CloseTag
+        fun closeElemBTEXDOC(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
+            // make sure the last pair ends with paper and end-cover
+            if (doc.pages.size % 2 == 1) doc.addNewPage()
+            doc.addNewPage()
         }
 
 

@@ -16,6 +16,7 @@ import net.torvald.terrarum.btex.BTeXDocument
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gdxClearAndEnableBlend
 import net.torvald.terrarum.inUse
+import java.io.FileReader
 
 
 /**
@@ -23,85 +24,9 @@ import net.torvald.terrarum.inUse
  */
 class BTeXTest : ApplicationAdapter() {
 
-    val csiR = "\u001B[31m"
-    val csiG = "\u001B[32m"
-    val csi0 = "\u001B[m"
+//    val filePath = "btex.xml"
+    val filePath = "literature/koKR/yisang_nalgae.xml"
 
-    val tex = """<btexdoc cover="hardcover" inner="standard" papersize="standard">
-<cover hue="230">
-    <title>The Way to Mastery of Lorem Ipsum<br />Or, How To Write and Publish a Book</title>
-    <author>Terran Publishing</author>
-    <edition>Test Edition</edition>
-</cover>
-
-<tocpage><tableofcontents /></tocpage>
-
-<manuscript>
-
-
-
-    <chapter>What Is a Book</chapter>
-
-    <p>This example book is designed to give you the example of the Book Language.</p>
-
-    <section hide="1">What Really Is a Book</section>
-
-    <p>A book is a collection of texts printed in a special way that allows them to be read easily, with
-        enumerable pages and insertion of other helpful resources, such as illustrations and <a href="btex language">hyperlinks</a>.</p>
-
-    <section alt="Recursion">BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB: Bad Recursion BRB RangeError: stack size exceeded</section>
-    
-    <p>Noice.</p>
-
-    <newpage />
-
-    <fullpagebox>
-        <p>text <emph>emph</emph> and <itemname>item</itemname> on <targetname>target</targetname></p>
-    </fullpagebox>
-
-
-
-
-    <chapter>Writing a Book Using Pen and Papers</chapter>
-
-    <p><index id="pen and paper" />If you open a book on a writing table, you will be welcomed with a
-        toolbar used to put other book elements, such as chapters and sections.</p>
-
-
-
-
-    <chapter>Writing a Book Using a Typewriter</chapter>
-
-    <p><index id="typewriter" />Typewriters can only write in a single style of font, chapters and
-        sections are not available.</p>
-
-
-
-
-    <chapter>Writing a Book Using a Computer</chapter>
-
-    <p>Writing book using a computer requires the use of the Book Typesetting Engine Extended, or <btex />.</p>
-
-    <section>Full Control of the Shape</section>
-
-    <p><index id="btex language" />With <btex /> you can fully control how your publishing would look like,
-        from a pile of papers that look like they have been typed out using typewriter, a pile of printouts 
-        that have pictures in it, to a true hardcover book.</p>
-
-    <p><index id="cover" />This style is controlled using the <code>cover</code> attribute on the root tag,
-        with following values: <code>typewriter</code>, <code>printout</code> and <code>hardcover</code>.</p>
-
-    <p>Typewriter and Printout are considered not-bound and readers will only see one page at a time,
-        while Hardcover is considered bound and two pages are presented to the readers.</p>
-
-</manuscript>
-
-<indexpage><tableofindices /></indexpage>
-</btexdoc>
-
-
-
-"""
 
     private lateinit var document: BTeXDocument
     private lateinit var batch: FlippingSpriteBatch
@@ -118,7 +43,7 @@ class BTeXTest : ApplicationAdapter() {
 
         bg = TextureRegion(Texture(Gdx.files.internal("test_assets/real_bg_with_guides.png")))
 
-        document = BTeXParser.invoke(tex)
+        document = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"))
     }
 
     private var scroll = 0

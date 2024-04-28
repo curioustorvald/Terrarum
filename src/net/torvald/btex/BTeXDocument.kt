@@ -95,8 +95,9 @@ class BTeXPage(
     }
 
     fun render(frameDelta: Float, batch: SpriteBatch, x: Int, y: Int, marginH: Int, marginV: Int) {
-        batch.color = back
+        batch.color = back.cpy().also { it.a = 0.93f }
         Toolkit.fillArea(batch, x, y, width, height)
+        batch.color = Color.WHITE
         drawCalls.forEach {
             it.draw(batch, x + marginH, y + marginV)
         }
