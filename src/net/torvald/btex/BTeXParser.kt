@@ -747,24 +747,32 @@ object BTeXParser {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookTitle(thePar, handler)
             handler.paragraphBuffer.clear()
+
+            doc.theTitle = thePar.replace("\n", " ")
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemSUBTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookEdition(thePar, handler)
             handler.paragraphBuffer.clear()
+
+            doc.theSubtitle = thePar.replace("\n", " ")
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookAuthor(thePar, handler)
             handler.paragraphBuffer.clear()
+
+            doc.theAuthor = thePar.replace("\n", " ")
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemEDITION(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookEdition(thePar, handler)
             handler.paragraphBuffer.clear()
+
+            doc.theEdition = thePar.replace("\n", " ")
         }
 
 

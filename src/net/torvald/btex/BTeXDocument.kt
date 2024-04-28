@@ -1,18 +1,25 @@
 package net.torvald.terrarum.btex
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.*
 import net.torvald.terrarum.imagefont.TinyAlphNum
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClusteredFormatDOM
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.Clustfile
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClustfileOutputStream
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.MovableType
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
+import java.io.File
+import java.util.zip.Deflater
 
 /**
  * Created by minjaesong on 2023-10-28.
@@ -22,6 +29,11 @@ class BTeXDocument : Disposable {
     var font = "default" // default or typewriter
     var inner = "standard"
     var papersize = "standard"
+
+    var theTitle = ""
+    var theSubtitle = ""
+    var theAuthor = ""
+    var theEdition = ""
 
     var textWidth = 480
     var lineHeightInPx = 24
@@ -44,11 +56,14 @@ class BTeXDocument : Disposable {
         val DEFAULT_PAGE_BACK = Color(0xe0dfdb_ff.toInt())
         val DEFAULT_PAGE_FORE = Color(0x0a0706_ff)
         val DEFAULT_ORNAMENTS_COL = Color(0x3f3c3b_ff)
+
+        private fun String.escape() = this.replace("\"", "\\\"")
     }
 
     internal val pages = ArrayList<BTeXPage>()
 
     private lateinit var pageTextures: ArrayList<TextureRegion>
+    private lateinit var pageFrameBuffers: ArrayList<FrameBuffer>
 
     val currentPage: Int
         get() = pages.size - 1
@@ -80,6 +95,7 @@ class BTeXDocument : Disposable {
         if (isFinalised) throw IllegalStateException("Page is already been finalised")
 
         pageTextures = ArrayList()
+        pageFrameBuffers = ArrayList()
 
         val camera = OrthographicCamera(pageDimensionWidth.toFloat(), pageDimensionHeight.toFloat())
         val batch = FlippingSpriteBatch()
@@ -101,6 +117,7 @@ class BTeXDocument : Disposable {
             }
 
             pageTextures.add(TextureRegion(fbo.colorBufferTexture))
+            pageFrameBuffers.add(fbo)
         }
         isFinalised = true
 
@@ -110,7 +127,52 @@ class BTeXDocument : Disposable {
     override fun dispose() {
         if (isFinalised) {
             pageTextures.forEach { it.texture.dispose() }
+            pageFrameBuffers.forEach { it.dispose() }
         }
+    }
+
+    fun serialise(archiveFile: File) {
+        if (!isFinalised) throw IllegalStateException("Document must be finalised before being serialised")
+
+        val diskFile = ClusteredFormatDOM.createNewArchive(archiveFile, Common.CHARSET, "", 0x7FFFF)
+        val DOM = ClusteredFormatDOM(diskFile)
+        val tempFile = Gdx.files.external("./.btex-export.png")
+
+        val json = """
+            {
+                "title":"${theTitle.escape()}",
+                "subtitle":"${theSubtitle.escape()}",
+                "author":"${theAuthor.escape()}",
+                "edition":"${theEdition.escape()}",
+                "pages":"${pageTextures.size}",
+                "context":"${context.escape()}",
+                "font":"${font.escape()}",
+                "inner":"${inner.escape()}",
+                "papersize":"${papersize.escape()}"
+            }
+        """.trimIndent()
+
+        Clustfile(DOM, "bibliography.json").also {
+            it.createNewFile()
+            it.writeBytes(json.encodeToByteArray())
+        }
+
+        pageFrameBuffers.forEachIndexed { index, fbo ->
+            val file = Clustfile(DOM, "$index.png").also {
+                it.createNewFile()
+            }
+
+            fbo.inAction(null, null) {
+                val pixmap = Pixmap.createFromFrameBuffer(0, 0, fbo.width, fbo.height)
+                PixmapIO.writePNG(tempFile, pixmap, Deflater.BEST_COMPRESSION, false)
+                val outstream = ClustfileOutputStream(file)
+                outstream.write(tempFile.readBytes())
+                outstream.flush(); outstream.close()
+            }
+        }
+
+        DOM.changeDiskCapacity(diskFile.length().div(4096f).ceilToInt())
+        tempFile.delete()
     }
 
     var isFinalised = false; private set

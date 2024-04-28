@@ -19,7 +19,6 @@ import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.utils.*
 import net.torvald.terrarum.weather.*
-import net.torvald.terrarum.weather.WeatherMixer
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.File
 import java.io.InputStream
@@ -470,7 +469,7 @@ object Common {
 
     fun bytesToZipdStr(byteIterator: Iterator<Byte>): String = enasciiToString(zip(byteIterator))
 
-    fun zip(ba: ByteArray64) = Common.zip(ba.iterator())
+    fun zip(ba: ByteArray64, format: String = App.getConfigString("savegamecomp")) = Common.zip(ba.iterator(), format)
 
     @Deprecated("New savegame standard should use Zstd")
     private fun zipG(byteIterator: Iterator<Byte>): ByteArray64 {
@@ -518,8 +517,8 @@ object Common {
         return bo.toByteArray64()
     }*/
 
-    fun zip(byteIterator: Iterator<Byte>): ByteArray64 {
-        return when (App.getConfigString("savegamecomp")) {
+    fun zip(byteIterator: Iterator<Byte>, format: String = App.getConfigString("savegamecomp")): ByteArray64 {
+        return when (format) {
             "snappy" -> zipS(byteIterator)
 //            "null" -> zipNull(byteIterator)
             else -> zipZ(byteIterator)

@@ -16,6 +16,7 @@ import net.torvald.terrarum.btex.BTeXDocument
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gdxClearAndEnableBlend
 import net.torvald.terrarum.inUse
+import java.io.File
 import kotlin.system.measureTimeMillis
 
 
@@ -24,8 +25,8 @@ import kotlin.system.measureTimeMillis
  */
 class BTeXTest : ApplicationAdapter() {
 
-//    val filePath = "btex.xml"
-    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
+    val filePath = "btex.xml"
+//    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
 //    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
 //    val filePath = "literature/koKR/yisang_nalgae.xml"
 
@@ -59,6 +60,12 @@ class BTeXTest : ApplicationAdapter() {
             documentHandler.dispose()
         }.also {
             println("Time spent on finalising [ms]: $it")
+        }
+
+        measureTimeMillis {
+            document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".book")}"))
+        }.also {
+            println("Time spent on serialisation [ms]: $it")
         }
     }
 

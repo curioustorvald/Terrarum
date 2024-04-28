@@ -1,6 +1,7 @@
 <btexdoc cover="hardcover" inner="standard" papersize="standard">
 <cover>
-    <title>The Way to Mastery of Lorem Ipsum<br />Or, How To Write and Publish a Book</title>
+    <title>The Way to Mastery of<br />Lorem Ipsum</title>
+    <subtitle>Or, How To Write and Publish a Book</subtitle>
     <author>Terran Publishing</author>
     <edition>Test Edition</edition>
 </cover>

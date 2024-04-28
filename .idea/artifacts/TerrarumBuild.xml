@@ -90,6 +90,7 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/gdx-platform-1.12.1-natives-arm64-v8a.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/gdx-platform-1.12.1-natives-desktop.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/gdx-platform-1.12.1-natives-x86_64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/TerranVirtualDisk.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
