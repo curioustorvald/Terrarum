@@ -14,6 +14,7 @@ import net.torvald.terrarum.btex.MovableTypeDrawCall
 import net.torvald.terrarum.ceilToFloat
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.toHex
+import net.torvald.terrarum.tryDispose
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.worlddrawer.toRGBA
 import net.torvald.terrarumsansbitmap.MovableType
@@ -42,22 +43,24 @@ object BTeXParser {
 
     operator fun invoke(file: FileHandle) = invoke(file.file())
 
-    operator fun invoke(file: File): BTeXDocument {
+    operator fun invoke(file: File): Pair<BTeXDocument, BTeXHandler> {
         val doc = BTeXDocument()
         val parser = SAXParserFactory.newDefaultInstance().newSAXParser()
         val stream = FileInputStream(file)
-        parser.parse(stream, BTeXHandler(doc))
-        return doc
+        val handler = BTeXHandler(doc)
+        parser.parse(stream, handler)
+        return doc to handler
     }
 
-    operator fun invoke(string: String): BTeXDocument {
+    operator fun invoke(string: String): Pair<BTeXDocument, BTeXHandler> {
         val doc = BTeXDocument()
         val parser = SAXParserFactory.newDefaultInstance().newSAXParser()
-        parser.parse(InputSource(StringReader(string)), BTeXHandler(doc))
-        return doc
+        val handler = BTeXHandler(doc)
+        parser.parse(InputSource(StringReader(string)), handler)
+        return doc to handler
     }
 
-    internal class BTeXHandler(val doc: BTeXDocument) : DefaultHandler() {
+    class BTeXHandler(val doc: BTeXDocument) : DefaultHandler() {
         private val DEFAULT_FONTCOL = DEFAULT_PAGE_FORE
         private val LINE_HEIGHT = doc.lineHeightInPx
 
@@ -101,6 +104,12 @@ object BTeXParser {
         private var hasCover = false
         private var coverCol: Color? = null
 
+        private lateinit var testFont: TerrarumSansBitmap
+        private lateinit var titleFont: TerrarumSansBitmap
+        private lateinit var subtitleFont: TerrarumSansBitmap
+
+        private val bodyTextShadowAlpha = 0.36f
+
         init {
             BTeXHandler::class.declaredFunctions.filter { it.findAnnotation<OpenTag>() != null }.forEach {
 //                println("Tag opener: ${it.name}")
@@ -111,6 +120,12 @@ object BTeXParser {
 //                println("Tag closer: ${it.name}")
                 elemClosers[it.name] = it
             }
+        }
+
+        fun dispose() {
+            if (::testFont.isInitialized) testFont.tryDispose()
+            if (::titleFont.isInitialized) titleFont.tryDispose()
+            if (::subtitleFont.isInitialized) subtitleFont.tryDispose()
         }
 
         private fun printdbg(message: String?) {
@@ -232,16 +247,10 @@ object BTeXParser {
             }
         }
 
-        private lateinit var testFont: TerrarumSansBitmap
-        private lateinit var titleFont: TerrarumSansBitmap
-        private lateinit var subtitleFont: TerrarumSansBitmap
-
-        private val bodyTextShadowAlpha = 0.36f
-
         private fun getFont() = when (cover) {
             "typewriter" -> TODO()
             else -> {
-                if (!::testFont.isInitialized) testFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha)
+                if (!::testFont.isInitialized) testFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha, textCacheSize = 65536)
                 testFont
             }
         }
@@ -841,7 +850,7 @@ object BTeXParser {
 
         private fun typesetBookTitle(thePar: String, handler: BTeXHandler) {
             val label = "\n" + thePar
-            typesetParagraphs(getTitleFont(), label, handler, (doc.textWidth - 16) / 2).also {
+            typesetParagraphs(getTitleFont(), label, handler, doc.textWidth - 16).also {
                 val addedLines = it.sumOf { it.lineCount }
                 doc.linesPrintedOnPage[doc.currentPage] += addedLines
 
