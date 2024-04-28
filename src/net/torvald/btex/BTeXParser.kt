@@ -711,6 +711,15 @@ object BTeXParser {
         }
 
         @CloseTag
+        fun closeElemANONBREAK(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
+            typesetParagraphs("――――――――――――", handler).also {it.first().let {
+                it.posX += (doc.textWidth - it.width) / 2
+            } }
+            doc.linesPrintedOnPage[doc.currentPage] = (doc.linesPrintedOnPage[doc.currentPage] - 1).coerceAtLeast(0)
+            handler.paragraphBuffer.clear()
+        }
+
+        @CloseTag
         fun closeElemCOVER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             handler.spanColour = null
 
@@ -794,12 +803,12 @@ object BTeXParser {
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemP(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // if this P is a very first P without chapters, leave two lines before typesetting
-            val addVirtualChapter = (tagHistory.size > 2 && tagHistory[tagHistory.lastIndex - 1] == "MANUSCRIPT")
+            val penultTag = tagHistory.getOrNull(tagHistory.lastIndex - 1)
             val thePar = handler.paragraphBuffer.toString().trim()
 
             val text =
-                if (siblingIndex > 1) "\u3000$thePar"
-                else if (addVirtualChapter) "\n\n$thePar"
+                if (siblingIndex > 1 && penultTag != "ANONBREAK" && penultTag != "BR") "\u3000$thePar"
+                else if (penultTag == "MANUSCRIPT") "\n\n$thePar"
                 else thePar
 
             typesetParagraphs(text, handler)
