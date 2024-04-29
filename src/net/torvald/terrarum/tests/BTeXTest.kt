@@ -25,8 +25,8 @@ import kotlin.system.measureTimeMillis
  */
 class BTeXTest : ApplicationAdapter() {
 
-    val filePath = "btex.xml"
-//    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
+//    val filePath = "btex.btexbin"
+    val filePath = "literature/en/daniel_defoe_robinson_crusoe.btexbin"
 //    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
 //    val filePath = "literature/koKR/yisang_nalgae.xml"
 
@@ -47,25 +47,36 @@ class BTeXTest : ApplicationAdapter() {
 
         bg = TextureRegion(Texture(Gdx.files.internal("test_assets/real_bg_with_guides.png")))
 
-        measureTimeMillis {
-            val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"))
-            document = f.first
-            documentHandler = f.second
-        }.also {
-            println("Time spent on typesetting [ms]: $it")
-        }
+        val isBookFinalised = filePath.endsWith(".btexbin")
 
-        measureTimeMillis {
-            document.finalise()
-            documentHandler.dispose()
-        }.also {
-            println("Time spent on finalising [ms]: $it")
-        }
+        if (!isBookFinalised) {
+            measureTimeMillis {
+                val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"))
+                document = f.first
+                documentHandler = f.second
+            }.also {
+                println("Time spent on typesetting [ms]: $it")
+            }
 
-        measureTimeMillis {
-            document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btexbin")}"))
-        }.also {
-            println("Time spent on serialisation [ms]: $it")
+            measureTimeMillis {
+                document.finalise()
+                documentHandler.dispose()
+            }.also {
+                println("Time spent on finalising [ms]: $it")
+            }
+
+            measureTimeMillis {
+                document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btexbin")}"))
+            }.also {
+                println("Time spent on serialisation [ms]: $it")
+            }
+        }
+        else {
+            measureTimeMillis {
+                document = BTeXDocument.fromFile(Gdx.files.internal("./assets/mods/basegame/books/$filePath"))
+            }.also {
+                println("Time spent on loading [ms]: $it")
+            }
         }
     }
 

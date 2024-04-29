@@ -1,10 +1,8 @@
 package net.torvald.terrarum.btex
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.PixmapIO
+import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -16,9 +14,11 @@ import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.Clustf
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClustfileOutputStream
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarumsansbitmap.MovableType
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import java.io.File
+import java.io.RandomAccessFile
 import java.util.zip.Deflater
 
 /**
@@ -36,7 +36,7 @@ class BTeXDocument : Disposable {
     var theEdition = ""
 
     var textWidth = 480
-    var lineHeightInPx = 24
+    val lineHeightInPx = 24
     var pageLines = 24
     val textHeight: Int
         get() = pageLines * lineHeightInPx
@@ -58,6 +58,60 @@ class BTeXDocument : Disposable {
         val DEFAULT_ORNAMENTS_COL = Color(0x3f3c3b_ff)
 
         private fun String.escape() = this.replace("\"", "\\\"")
+
+        fun fromFile(fileHandle: FileHandle) = fromFile(fileHandle.file())
+
+        fun fromFile(file: File): BTeXDocument {
+            val doc = BTeXDocument()
+
+            val ra = RandomAccessFile(file, "r")
+            val DOM = ClusteredFormatDOM(ra)
+
+            // get meta file
+            val meta = Clustfile(DOM, "/bibliography.json")
+            if (!meta.exists()) throw IllegalStateException("No bibliography.json found on the archive")
+            val metaReader = meta.readBytes().toString(Common.CHARSET).reader()
+            val metaJson = JsonFetcher.readFromJsonString(metaReader)
+
+            doc.theTitle = metaJson["title"].asString()
+            doc.theSubtitle = metaJson["subtitle"].asString()
+            doc.theAuthor = metaJson["author"].asString()
+            doc.theEdition = metaJson["edition"].asString()
+            val pageCount = metaJson["pages"].asInt()
+            doc.context = metaJson["context"].asString()
+            doc.font = metaJson["font"].asString()
+            doc.inner = metaJson["inner"].asString()
+            doc.papersize = metaJson["papersize"].asString()
+            doc.fromArchive = true
+            doc.pageTextures = ArrayList()
+
+
+            println("Title: ${doc.theTitle}")
+            println("Pages: $pageCount")
+
+            for (page in 0 until pageCount) {
+                Clustfile(DOM, "/${page}.png").also {
+                    if (!it.exists()) throw IllegalStateException("No file '${page}.png' on the archive")
+
+                    val tempFile = Gdx.files.external("./.btex-import.png") // must create new file descriptor for every page, or else every page will share a single file descriptor which cause problems
+                    it.exportFileTo(tempFile.file())
+                    val texture = TextureRegion(Texture(tempFile))
+                    doc.pageTextures.add(texture)
+
+                    if (page == 0) {
+                        doc.textWidth = texture.regionWidth - 2 * doc.pageMarginH
+                        doc.pageLines = (texture.regionHeight - 2 * doc.pageMarginH) / doc.lineHeightInPx
+
+                        println("Page dimension: (${texture.regionWidth}x${texture.regionHeight}) (${doc.pageDimensionWidth}x${doc.pageDimensionHeight})")
+                    }
+                    tempFile.delete() // deleting also affects file descriptor juggling
+                }
+            }
+
+            ra.close()
+
+            return doc
+        }
     }
 
     internal val pages = ArrayList<BTeXPage>()
@@ -72,7 +126,7 @@ class BTeXDocument : Disposable {
         get() = pages[currentPage]
 
     val pageIndices: IntRange
-        get() = pages.indices
+        get() = if (fromArchive) pageTextures.indices else pages.indices
 
     internal val linesPrintedOnPage = ArrayList<Int>()
 
@@ -92,6 +146,7 @@ class BTeXDocument : Disposable {
      * Must be called on a thread with GL context!
      */
     fun finalise() {
+        if (fromArchive) throw IllegalStateException("Document is loaded from the archive and thus cannot be finalised")
         if (isFinalised) throw IllegalStateException("Page is already been finalised")
 
         pageTextures = ArrayList()
@@ -100,7 +155,7 @@ class BTeXDocument : Disposable {
         val camera = OrthographicCamera(pageDimensionWidth.toFloat(), pageDimensionHeight.toFloat())
         val batch = FlippingSpriteBatch()
 
-        pages.forEach { page ->
+        pages.forEachIndexed { pageNum, page ->
             val fbo = FrameBuffer(Pixmap.Format.RGBA8888, pageDimensionWidth, pageDimensionHeight, false)
             fbo.inAction(null, null) {
 
@@ -113,6 +168,7 @@ class BTeXDocument : Disposable {
                 blendNormalStraightAlpha(batch)
                 batch.inUse {
                     page.render(0f, batch, 0, 0, pageMarginH, pageMarginV)
+                    printPageNumber(batch, pageNum, 0, 0)
                 }
             }
 
@@ -129,6 +185,9 @@ class BTeXDocument : Disposable {
             pageTextures.forEach { it.texture.dispose() }
             pageFrameBuffers.forEach { it.dispose() }
         }
+        else if (fromArchive) {
+            pageTextures.forEach { it.texture.dispose() }
+        }
     }
 
     fun serialise(archiveFile: File) {
@@ -136,7 +195,6 @@ class BTeXDocument : Disposable {
 
         val diskFile = ClusteredFormatDOM.createNewArchive(archiveFile, Common.CHARSET, "", 0x7FFFF)
         val DOM = ClusteredFormatDOM(diskFile)
-        val tempFile = Gdx.files.external("./.btex-export.png")
 
         val json = """
             {
@@ -164,18 +222,20 @@ class BTeXDocument : Disposable {
 
             fbo.inAction(null, null) {
                 val pixmap = Pixmap.createFromFrameBuffer(0, 0, fbo.width, fbo.height)
+                val tempFile = Gdx.files.external("./.btex-export.png")
                 PixmapIO.writePNG(tempFile, pixmap, Deflater.BEST_COMPRESSION, false)
                 val outstream = ClustfileOutputStream(file)
                 outstream.write(tempFile.readBytes())
                 outstream.flush(); outstream.close()
+                tempFile.delete()
             }
         }
 
         DOM.changeDiskCapacity(diskFile.length().div(4096f).ceilToInt())
-        tempFile.delete()
     }
 
     var isFinalised = false; private set
+    var fromArchive = false; private set
 
     /**
      * Appends draw call to the list. The draw call must be prepared manually so that they would not overflow.
@@ -199,13 +259,16 @@ class BTeXDocument : Disposable {
     fun render(frameDelta: Float, batch: SpriteBatch, page: Int, x: Int, y: Int) {
         batch.color = Color.WHITE
 
-        if (!isFinalised)
-            pages[page].render(frameDelta, batch, x, y, pageMarginH, pageMarginV)
-        else
+        if (isFinalised || fromArchive)
             batch.draw(pageTextures[page], x.toFloat(), y.toFloat())
+        else {
+            pages[page].render(frameDelta, batch, x, y, pageMarginH, pageMarginV)
+            printPageNumber(batch, page, x, y)
+        }
+    }
 
-        // paint page number
-        val num = "${page+1}"
+    private fun printPageNumber(batch: SpriteBatch, page: Int, x: Int, y: Int) {
+        val num = "${page + 1}"
         val numW = TinyAlphNum.getWidth(num)
         val numX = if (context == "tome") {
             if (page % 2 == 1)
@@ -216,7 +279,7 @@ class BTeXDocument : Disposable {
         else {
             x + (pageDimensionWidth - numW) / 2
         }
-        val numY = y + pageDimensionHeight - 2*pageMarginV - 4
+        val numY = y + pageDimensionHeight - 2 * pageMarginV - 4
 
         if (page == 0 && context != "tome" || page in tocPageStart until endOfPageStart) {
             batch.color = DEFAULT_ORNAMENTS_COL
