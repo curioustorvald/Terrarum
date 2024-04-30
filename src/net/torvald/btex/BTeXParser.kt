@@ -38,7 +38,7 @@ import kotlin.reflect.full.findAnnotation
  */
 object BTeXParser {
 
-    internal val textTags = hashSetOf("P", "TITLE", "AUTHOR", "EDITION", "CHAPTER", "SECTION")
+    internal val textTags = hashSetOf("P", "PBOX", "TITLE", "AUTHOR", "EDITION", "CHAPTER", "SECTION", "LI")
     internal val textDecorTags = hashSetOf("SPAN", "CODE")
 
     operator fun invoke(file: FileHandle) = invoke(file.file())
@@ -590,7 +590,7 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemINDEXPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            doc.addNewPage()
+            if (doc.currentPageObj.isNotEmpty()) doc.addNewPage()
             val header = attribs["title"] ?: "Index"
             typesetChapterHeading(header, handler, 16)
         }
@@ -725,7 +725,6 @@ object BTeXParser {
             typesetParagraphs("${ccDefault}――――――――――――", handler).also {it.first().let {
                 it.posX += (doc.textWidth - it.width) / 2
             } }
-            doc.linesPrintedOnPage[doc.currentPage] = (doc.linesPrintedOnPage[doc.currentPage] - 1).coerceAtLeast(0)
             handler.paragraphBuffer.clear()
         }
 
@@ -792,8 +791,9 @@ object BTeXParser {
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            // insert new page for second+ chapters
-            if (siblingIndex > 0) doc.addNewPage()
+            // if current line is the last line, proceed to the next page
+            if (doc.linesPrintedOnPage.last() >= doc.pageLines - 2) doc.addNewPage()
+
 
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetChapterHeading(thePar, handler, 16)
@@ -807,7 +807,7 @@ object BTeXParser {
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemSECTION(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // if current line is the last line, proceed to the next page
-            if (doc.linesPrintedOnPage.last() == doc.pageLines - 1) doc.addNewPage()
+            if (doc.linesPrintedOnPage.last() >= doc.pageLines - 1) doc.addNewPage()
 
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetSectionHeading(thePar, handler, 8)

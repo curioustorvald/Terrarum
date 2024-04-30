@@ -27,8 +27,8 @@ import kotlin.system.measureTimeMillis
 class BTeXTest : ApplicationAdapter() {
 
     val filePath = "btex.xml"
-//    val filePath = "literature/en/daniel_defoe_robinson_crusoe.btexbin"
-//    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.btexbin"
+//    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
+//    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
 //    val filePath = "literature/koKR/yisang_nalgae.btexbin"
 
 
