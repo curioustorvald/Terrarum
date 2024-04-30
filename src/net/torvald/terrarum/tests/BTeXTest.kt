@@ -16,6 +16,7 @@ import net.torvald.terrarum.btex.BTeXDocument
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gdxClearAndEnableBlend
 import net.torvald.terrarum.inUse
+import net.torvald.unicode.EMDASH
 import java.io.File
 import kotlin.system.measureTimeMillis
 
@@ -26,9 +27,9 @@ import kotlin.system.measureTimeMillis
 class BTeXTest : ApplicationAdapter() {
 
 //    val filePath = "btex.xml"
-    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
-//    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
-//    val filePath = "literature/koKR/yisang_nalgae.xml"
+    val filePath = "literature/en/daniel_defoe_robinson_crusoe.btexbin"
+//    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.btexbin"
+//    val filePath = "literature/koKR/yisang_nalgae.btexbin"
 
 
     private lateinit var document: BTeXDocument
@@ -58,18 +59,18 @@ class BTeXTest : ApplicationAdapter() {
                 println("Time spent on typesetting [ms]: $it")
             }
 
-            /*measureTimeMillis {
+            measureTimeMillis {
                 document.finalise()
                 documentHandler.dispose()
             }.also {
                 println("Time spent on finalising [ms]: $it")
-            }*/
+            }
 
-            /*measureTimeMillis {
+            measureTimeMillis {
                 document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btexbin")}"))
             }.also {
                 println("Time spent on serialisation [ms]: $it")
-            }*/
+            }
         }
         else {
             measureTimeMillis {
@@ -85,6 +86,8 @@ class BTeXTest : ApplicationAdapter() {
     val pageGap = 6
 
     override fun render() {
+        Gdx.graphics.setTitle("BTeXTest $EMDASH F: ${Gdx.graphics.framesPerSecond}")
+
         gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
         val drawX = (1280 - (pageGap + document.pageDimensionWidth*2)) / 2
