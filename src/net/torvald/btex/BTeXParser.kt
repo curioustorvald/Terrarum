@@ -10,7 +10,7 @@ import net.torvald.terrarum.btex.BTeXDocument
 import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_ORNAMENTS_COL
 import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_PAGE_FORE
 import net.torvald.terrarum.btex.BTeXDrawCall
-import net.torvald.terrarum.btex.MovableTypeDrawCall
+import net.torvald.terrarum.btex.TypesetDrawCall
 import net.torvald.terrarum.ceilToFloat
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.toHex
@@ -29,6 +29,7 @@ import java.io.FileInputStream
 import java.io.StringReader
 import javax.xml.parsers.SAXParserFactory
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotation
@@ -218,14 +219,20 @@ object BTeXParser {
 //                printdbg("Characters [col:${spanColour}] \t\"$str\"")
 
                 if (spanColour != oldSpanColour || spanColour != null) {
-                    val col = getSpanColourOrNull().toInternalColourCodeStr()
 
-                    if (spanColour != null && paragraphBuffer.isNotEmpty() && paragraphBuffer.last() == '\u000E') {
-                        paragraphBuffer.deleteAt(paragraphBuffer.lastIndex)
+                    val spanGdxCol = getSpanColourOrNull()
+
+                    if (spanGdxCol == null) {
+                        paragraphBuffer.append(TerrarumSansBitmap.noColorCode)
+                    }
+                    else {
+                        paragraphBuffer.append(TerrarumSansBitmap.toColorCode(
+                            spanGdxCol.r.times(15f).roundToInt(),
+                            spanGdxCol.g.times(15f).roundToInt(),
+                            spanGdxCol.b.times(15f).roundToInt()
+                        ))
                     }
 
-                    paragraphBuffer.append(col)
-                    paragraphBuffer.append(str.replace(" ", " $col"))
                 }
                 else {
                     paragraphBuffer.append(str)
@@ -235,7 +242,7 @@ object BTeXParser {
             }
         }
 
-        private fun Color?.toInternalColourCodeStr(): String {
+        /*private fun Color?.toInternalColourCodeStr(): String {
             return if (this == null) "\u000E"
             else {
                 val rgba = this.toRGBA()
@@ -245,7 +252,7 @@ object BTeXParser {
 
                 return "\u000F" + Char(r) + Char(g) + Char(b)
             }
-        }
+        }*/
 
         private fun getFont() = when (cover) {
             "typewriter" -> TODO()
@@ -482,7 +489,7 @@ object BTeXParser {
         private val ccEmph = "#C11"// TerrarumSansBitmap.toColorCode(0xfd44)
         private val ccItemName = "#14C" // TerrarumSansBitmap.toColorCode(0xf37d)
         private val ccTargetName = "#170" // TerrarumSansBitmap.toColorCode(0xf3c4)
-//        private val ccReset = TerrarumSansBitmap.toColorCode(0)
+//        private val ccReset = TerrarumSansBitmap.noColorCode
 
 
         @OpenTag // reflective access is impossible with 'private'
@@ -950,7 +957,7 @@ object BTeXParser {
                     doc.linesPrintedOnPage[pageNum] * doc.lineHeightInPx,
                     handler.currentTheme,
                     handler.getSpanColour(),
-                    MovableTypeDrawCall(slugs, subset.first, subset.second)
+                    TypesetDrawCall(slugs, subset.first, subset.second)
                 )
 
                 doc.appendDrawCall(doc.pages[pageNum], drawCall); drawCalls.add(drawCall)
@@ -972,7 +979,7 @@ object BTeXParser {
                     doc.linesPrintedOnPage[pageNum] * doc.lineHeightInPx,
                     handler.currentTheme,
                     handler.getSpanColour(),
-                    MovableTypeDrawCall(slugs, subset.first, subset.second)
+                    TypesetDrawCall(slugs, subset.first, subset.second)
                 )
 
                 doc.appendDrawCall(doc.pages[pageNum], drawCall); drawCalls.add(drawCall)
@@ -984,25 +991,6 @@ object BTeXParser {
                     doc.addNewPage(); pageNum += 1
                 }
             }
-
-            // apply internal colour codes
-            // grammar:
-            //   <SI> [0-9A-F]{6,6} : apply colour code
-            //   <SO> : remove colour code
-            drawCalls.forEach {
-                if (it.text != null && it.text is MovableTypeDrawCall) {
-                    it.text.movableType.typesettedSlugs.forEach { slug -> slug.forEach { block ->
-                        val blockText = block.block.text
-
-//                        println(blockText.toReadable())
-
-                        if (blockText.startsWithColourCode()) {
-                            block.colour = blockText.getCCorNull()
-                        }
-                    } }
-                }
-            }
-//            println("---------------------------")
 
             // if typesetting the paragraph leaves the first line of new page empty, move the "row cursor" back up
             if (doc.linesPrintedOnPage[pageNum] == 1 && doc.pages[pageNum].isEmpty()) doc.linesPrintedOnPage[pageNum] = 0 // '\n' adds empty draw call to the page, which makes isEmpty() to return false
@@ -1027,23 +1015,6 @@ object BTeXParser {
                 Character.toString(it.toChar())
         }
 
-        private fun CodepointSequence.startsWithColourCode() = (this.size > 5 &&
-                this[1] == 0x0F &&
-                (this[2] in 0xF800..0xF8FF) &&
-                (this[3] in 0xF800..0xF8FF) &&
-                (this[4] in 0xF800..0xF8FF)) ||
-                (this.size > 3 && this[0] == 0x0E)
-
-        private fun CodepointSequence.getCCorNull(): Color? {
-            if (this[1] == 0x0F) {
-                val r = this[2] - 0xF800
-                val g = this[3] - 0xF800
-                val b = this[4] - 0xF800
-                return Color(r / 255f, g / 255f, b / 255f, 1f)
-            }
-            else return null
-        }
-
         private fun typesetTOCline(name: String, pageNum: Int, handler: BTeXHandler, indentation: Int = 0, pageToWrite: Int? = null) {
             val pageNum = pageNum.plus(1).toString()
             val pageNumWidth = getFont().getWidth(pageNum)
@@ -1060,12 +1031,9 @@ object BTeXParser {
                         val dotGap = 10
                         val y = y + (call.lineCount - 1).coerceAtLeast(0) * doc.lineHeightInPx
 
-                        val textWidth = if (call.text is MovableTypeDrawCall) {
-                            call.text.movableType.typesettedSlugs.last().last().getEndPos()
+                        val textWidth = if (call.text is TypesetDrawCall) {
+                            font.getWidth(call.text.movableType.typesettedSlugs.last())
                         }
-                        /*else if (call.text is RaggedTypeDrawCall) {
-                            call.text.raggedType.typesettedSlugs.last().last().getEndPos()
-                        }*/
                         else call.width
 
                         var dotCursor = (x + textWidth).div(dotGap).ceilToFloat() * dotGap

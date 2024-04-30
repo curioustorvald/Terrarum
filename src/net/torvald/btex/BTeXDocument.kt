@@ -318,17 +318,11 @@ interface BTeXTextDrawCall {
     fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float)
 }
 
-data class MovableTypeDrawCall(val movableType: MovableType, override val rowStart: Int, override val rows: Int): BTeXTextDrawCall {
+data class TypesetDrawCall(val movableType: MovableType, override val rowStart: Int, override val rows: Int): BTeXTextDrawCall {
     override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float) {
         movableType.draw(batch, x, y, rowStart, minOf(rows, doc.pageLines))
     }
 }
-
-/*data class RaggedLeftDrawCall(val raggedType: RaggedType, override val rowStart: Int, override val rowEnd: Int): BTeXTextDrawCall {
-    override fun draw(batch: SpriteBatch, x: Float, y: Float) {
-        raggedType.draw(batch, x, y, rowStart, rowEnd)
-    }
-}*/
 
 class BTeXDrawCall(
     val doc: BTeXDocument,
@@ -368,14 +362,14 @@ class BTeXDrawCall(
 
     fun isNotBlank(): Boolean {
         if (text == null && texture == null) return false
-        if (text is MovableTypeDrawCall && text.movableType.inputText.isBlank()) return false
+        if (text is TypesetDrawCall && text.movableType.inputText.isBlank()) return false
 //        if (text is RaggedLeftDrawCall && text.raggedType.inputText.isBlank()) return false
         return true
     }
 
     internal val width: Int
         get() = if (text != null)
-            if (text is MovableTypeDrawCall)
+            if (text is TypesetDrawCall)
                 text.movableType.width
             else
                 TODO()

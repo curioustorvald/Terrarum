@@ -25,8 +25,8 @@ import kotlin.system.measureTimeMillis
  */
 class BTeXTest : ApplicationAdapter() {
 
-//    val filePath = "btex.btexbin"
-    val filePath = "literature/en/daniel_defoe_robinson_crusoe.btexbin"
+//    val filePath = "btex.xml"
+    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
 //    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
 //    val filePath = "literature/koKR/yisang_nalgae.xml"
 
@@ -58,18 +58,18 @@ class BTeXTest : ApplicationAdapter() {
                 println("Time spent on typesetting [ms]: $it")
             }
 
-            measureTimeMillis {
+            /*measureTimeMillis {
                 document.finalise()
                 documentHandler.dispose()
             }.also {
                 println("Time spent on finalising [ms]: $it")
-            }
+            }*/
 
-            measureTimeMillis {
+            /*measureTimeMillis {
                 document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btexbin")}"))
             }.also {
                 println("Time spent on serialisation [ms]: $it")
-            }
+            }*/
         }
         else {
             measureTimeMillis {
