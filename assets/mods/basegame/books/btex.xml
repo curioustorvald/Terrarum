@@ -23,11 +23,11 @@
 
     <newpage />
 
-    <!--<fullpagebox>
+    <fullpagebox>
         <p><span colour="grey">
             this page is intentionally left blank
         </span></p>
-    </fullpagebox>-->
+    </fullpagebox>
 
 
 

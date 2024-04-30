@@ -8,7 +8,6 @@ import net.torvald.colourutil.tosRGB
 import net.torvald.terrarum.App
 import net.torvald.terrarum.btex.BTeXDocument
 import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_ORNAMENTS_COL
-import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_PAGE_FORE
 import net.torvald.terrarum.btex.BTeXDrawCall
 import net.torvald.terrarum.btex.TypesetDrawCall
 import net.torvald.terrarum.ceilToFloat
@@ -62,9 +61,6 @@ object BTeXParser {
     }
 
     class BTeXHandler(val doc: BTeXDocument) : DefaultHandler() {
-        private val DEFAULT_FONTCOL = DEFAULT_PAGE_FORE
-        private val LINE_HEIGHT = doc.lineHeightInPx
-
         private var cover = ""
         private var inner = ""
         private var papersize = ""
@@ -216,14 +212,13 @@ object BTeXParser {
                 String(ch.sliceArray(start until start + length)).replace('\n', ' ').replace(Regex(" +"), " ")//.trim()
 
             if (str.isNotEmpty()) {
-//                printdbg("Characters [col:${spanColour}] \t\"$str\"")
-
                 if (spanColour != oldSpanColour || spanColour != null) {
+//                    printdbg("Characters [col:${spanColour}] \t\"$str\"")
 
                     val spanGdxCol = getSpanColourOrNull()
 
                     if (spanGdxCol == null) {
-                        paragraphBuffer.append(TerrarumSansBitmap.noColorCode)
+                        paragraphBuffer.append(ccDefault)
                     }
                     else {
                         paragraphBuffer.append(TerrarumSansBitmap.toColorCode(
@@ -234,9 +229,8 @@ object BTeXParser {
                     }
 
                 }
-                else {
-                    paragraphBuffer.append(str)
-                }
+
+                paragraphBuffer.append(str)
 
                 oldSpanColour = spanColour
             }
@@ -257,7 +251,7 @@ object BTeXParser {
         private fun getFont() = when (cover) {
             "typewriter" -> TODO()
             else -> {
-                if (!::testFont.isInitialized) testFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha, textCacheSize = 65536)
+                if (!::testFont.isInitialized) testFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha, textCacheSize = 4096)
                 testFont
             }
         }
@@ -282,7 +276,7 @@ object BTeXParser {
 
         private fun getSpanColourOrNull() = if (spanColour == null) null else getSpanColour()
 
-        private fun getSpanColour(): Color = if (spanColour == null) DEFAULT_FONTCOL
+        private fun getSpanColour(): Color = if (spanColour == null) Color.BLACK
         else if (spanColour!!.matches(hexColRegexRGB)) {
             val rs = spanColour!!.substring(1,3)
             val gs = spanColour!!.substring(3,5)
@@ -306,7 +300,7 @@ object BTeXParser {
             Color(r, g, b, 1f)
         }
         else
-            spanColourMap.getOrDefault(spanColour, DEFAULT_FONTCOL)
+            spanColourMap.getOrDefault(spanColour, Color.BLACK)
 
         // list of CSS named colours (list supports up to CSS Colors Level 4)
         private val spanColourMap = hashMapOf(
@@ -489,8 +483,6 @@ object BTeXParser {
         private val ccEmph = "#C11"// TerrarumSansBitmap.toColorCode(0xfd44)
         private val ccItemName = "#14C" // TerrarumSansBitmap.toColorCode(0xf37d)
         private val ccTargetName = "#170" // TerrarumSansBitmap.toColorCode(0xf3c4)
-//        private val ccReset = TerrarumSansBitmap.noColorCode
-
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemBTEXDOC(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
@@ -730,7 +722,7 @@ object BTeXParser {
 
         @CloseTag
         fun closeElemANONBREAK(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            typesetParagraphs("――――――――――――", handler).also {it.first().let {
+            typesetParagraphs("${ccDefault}――――――――――――", handler).also {it.first().let {
                 it.posX += (doc.textWidth - it.width) / 2
             } }
             doc.linesPrintedOnPage[doc.currentPage] = (doc.linesPrintedOnPage[doc.currentPage] - 1).coerceAtLeast(0)
@@ -742,9 +734,6 @@ object BTeXParser {
             handler.spanColour = null
 
             if (hasCover) {
-                doc.pages[0].drawCalls.forEach {
-                    it.colour = Color.WHITE
-                }
                 doc.addNewPage()
             }
         }
@@ -843,7 +832,7 @@ object BTeXParser {
                 else if (penultTag == "MANUSCRIPT") "\n\n$thePar"
                 else thePar
 
-            typesetParagraphs(text, handler)
+            typesetParagraphs(ccDefault + text, handler)
             handler.paragraphBuffer.clear()
         }
 
@@ -864,7 +853,7 @@ object BTeXParser {
 
 
         private fun typesetBookTitle(thePar: String, handler: BTeXHandler) {
-            val label = "\n" + thePar
+            val label = "\n${TerrarumSansBitmap.toColorCode(15, 15, 15)}" + thePar
             typesetParagraphs(getTitleFont(), label, handler, doc.textWidth - 16).also {
                 val addedLines = it.sumOf { it.lineCount }
                 doc.linesPrintedOnPage[doc.currentPage] += addedLines
@@ -876,7 +865,7 @@ object BTeXParser {
         }
 
         private fun typesetBookAuthor(thePar: String, handler: BTeXHandler) {
-            typesetParagraphs(getSubtitleFont(), "\n\n" + thePar, handler, doc.textWidth - 16).also {
+            typesetParagraphs(getSubtitleFont(), "\n\n${TerrarumSansBitmap.toColorCode(15, 15, 15)}" + thePar, handler, doc.textWidth - 16).also {
                 it.last().extraDrawFun = { batch, x, y ->
                     val px = x
                     val py = y + 23
@@ -894,7 +883,7 @@ object BTeXParser {
         }
 
         private fun typesetBookEdition(thePar: String, handler: BTeXHandler) {
-            typesetParagraphs(getSubtitleFont(), thePar, handler, doc.textWidth - 16).also {
+            typesetParagraphs(getSubtitleFont(), "${TerrarumSansBitmap.toColorCode(15, 15, 15)}" + thePar, handler, doc.textWidth - 16).also {
                 it.forEach {
                     it.posX += 8
                 }
@@ -902,7 +891,7 @@ object BTeXParser {
         }
 
         private fun typesetChapterHeading(thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
-            typesetParagraphs("\n"+thePar, handler, width - indent).also {
+            typesetParagraphs("\n$ccDefault"+thePar, handler, width - indent).also {
                 // add indents and adjust text y pos
                 it.forEach {
                     it.posX += indent
@@ -923,7 +912,7 @@ object BTeXParser {
         }
 
         private fun typesetSectionHeading(thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
-            typesetParagraphs("\n"+thePar, handler, width - indent).also {
+            typesetParagraphs("\n$ccDefault"+thePar, handler, width - indent).also {
                 // add indents and adjust text y pos
                 it.forEach {
                     it.posX += indent
@@ -956,7 +945,6 @@ object BTeXParser {
                     0,
                     doc.linesPrintedOnPage[pageNum] * doc.lineHeightInPx,
                     handler.currentTheme,
-                    handler.getSpanColour(),
                     TypesetDrawCall(slugs, subset.first, subset.second)
                 )
 
@@ -978,7 +966,6 @@ object BTeXParser {
                     0,
                     doc.linesPrintedOnPage[pageNum] * doc.lineHeightInPx,
                     handler.currentTheme,
-                    handler.getSpanColour(),
                     TypesetDrawCall(slugs, subset.first, subset.second)
                 )
 
@@ -1020,13 +1007,17 @@ object BTeXParser {
             val pageNumWidth = getFont().getWidth(pageNum)
             val typeWidth = doc.textWidth - indentation
 
-            typesetParagraphs(name, handler, typeWidth, pageToWrite ?: doc.currentPage).let {
+            typesetParagraphs(ccDefault + name, handler, typeWidth, pageToWrite ?: doc.currentPage).let {
                 it.forEach {
                     it.posX += indentation
                 }
 
                 it.last().let { call ->
                     call.extraDrawFun = { batch, x, y ->
+                        val oldCol = batch.color.cpy()
+
+                        batch.color = Color.BLACK
+
                         val font = getFont()
                         val dotGap = 10
                         val y = y + (call.lineCount - 1).coerceAtLeast(0) * doc.lineHeightInPx
@@ -1043,6 +1034,8 @@ object BTeXParser {
                         }
 
                         font.draw(batch, pageNum, x + typeWidth - pageNumWidth.toFloat(), y)
+
+                        batch.color = oldCol
                     }
                 }
             }
@@ -1050,6 +1043,8 @@ object BTeXParser {
 
 
         companion object {
+            val ccDefault = TerrarumSansBitmap.toColorCode(0,0,0)
+
             private const val ZWSP = 0x200B
             private const val SHY = 0xAD
             private const val NBSP = 0xA0

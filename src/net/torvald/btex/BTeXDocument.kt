@@ -54,7 +54,7 @@ class BTeXDocument : Disposable {
 
     companion object {
         val DEFAULT_PAGE_BACK = Color(0xe0dfdb_ff.toInt())
-        val DEFAULT_PAGE_FORE = Color(0x0a0706_ff)
+//        val DEFAULT_PAGE_FORE = Color(0x0a0706_ff)
         val DEFAULT_ORNAMENTS_COL = Color(0x3f3c3b_ff)
 
         private fun String.escape() = this.replace("\"", "\\\"")
@@ -329,7 +329,6 @@ class BTeXDrawCall(
     var posX: Int, // position relative to the page start (excluding page margin)
     var posY: Int, // position relative to the page start (excluding page margin)
     val theme: String,
-    var colour: Color,
     val text: BTeXTextDrawCall? = null,
     val texture: TextureRegion? = null,
 ) {
@@ -347,7 +346,7 @@ class BTeXDrawCall(
             println("code themed")
         }
 
-        batch.color = colour
+        batch.color = Color.WHITE
 
         if (text != null && texture == null) {
             text.draw(doc, batch, px, py)
