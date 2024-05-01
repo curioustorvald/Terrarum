@@ -90,7 +90,8 @@ object BTeXParser {
         private var pTagCntAtDepth = IntArray(24)
 
         private data class CptSect(val type: String, var alt: String?)
-        private data class CptSectInfo(val type: String, var name: String, var pagenum: Int)
+        private data class CptSectInfo(val type: String, var name: String, var pagenum: Int,
+                                       var partNum: Int?, var cptNum: Int?, var sectNum: Int?)
 
         private val cptSectStack = ArrayList<CptSect>()
 
@@ -585,14 +586,14 @@ object BTeXParser {
         fun processElemTOCPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             doc.addNewPage() // toc: openright
             val header = attribs["title"] ?: "Table of Contents"
-            typesetChapterHeading(header, handler, 16)
+            typesetChapterHeading(null, header, handler, 16)
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemINDEXPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             if (doc.currentPageObj.isNotEmpty()) doc.addNewPage()
             val header = attribs["title"] ?: "Index"
-            typesetChapterHeading(header, handler, 16)
+            typesetChapterHeading(null, header, handler, 16)
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -609,7 +610,7 @@ object BTeXParser {
             val pageWidth = doc.textWidth
 
             indexMap.keys.toList().sorted().forEach { key ->
-                typesetTOCline(key, indexMap[key]!!, handler)
+                typesetTOCline("", key, indexMap[key]!!, handler)
             }
         }
 
@@ -658,9 +659,17 @@ object BTeXParser {
                     }
                 }
 
-                cptSectMap.forEach { (type, name, pg) ->
+                cptSectMap.forEach { (type, name, pg, part, cpt, sect) ->
                     val indent = if (type == "subsection") 32 else if (type == "section") 16 else 0
-                    typesetTOCline(name, pg, handler, indent, tocPage)
+                    val heading = if (part == null && cpt == null && sect == null)
+                        ""
+                    else if (part != null && cpt == null && sect == null)
+                        "Part ${part.toRomanNum()}.\uDBBF\uDFF8"
+                    else
+                        listOfNotNull(cpt, sect).joinToString(".") + "\uDBBF\uDFF8" +
+                                (if (cpt != null && cpt < 10) "\uDBBF\uDFF8" else "")
+
+                    typesetTOCline("$heading", name, pg, handler, indent, tocPage)
                 }
             }
         }
@@ -772,6 +781,15 @@ object BTeXParser {
 
 
         @OpenTag // reflective access is impossible with 'private'
+        fun processElemPART(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            handler.paragraphBuffer.clear()
+
+            if (attribs["hide"] == null)
+                cptSectStack.add(CptSect("part", attribs["alt"]))
+            else
+                cptSectStack.add(CptSect("part-hidden", attribs["alt"]))
+        }
+        @OpenTag // reflective access is impossible with 'private'
         fun processElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.clear()
 
@@ -790,17 +808,34 @@ object BTeXParser {
                 cptSectStack.add(CptSect("section-hidden", attribs["alt"]))
         }
         @CloseTag // reflective access is impossible with 'private'
+        fun closeElemPART(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
+            // if the last page is not empty, create new oen
+            if (doc.currentPageObj.isNotEmpty()) doc.addNewPage()
+
+            val partOrder = cptSectMap.count { it.type.startsWith("part") } + 1
+            val thePar = handler.paragraphBuffer.toString().trim()
+            typesetPartHeading(partOrder, thePar, handler)
+
+            val cptSectInfo = cptSectStack.removeLast()
+            if (!cptSectInfo.type.endsWith("-hidden"))
+                cptSectMap.add(CptSectInfo("part", cptSectInfo.alt ?: thePar, doc.currentPage, partOrder, null, null))
+
+            handler.paragraphBuffer.clear()
+        }
+        @CloseTag // reflective access is impossible with 'private'
         fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // if current line is the last line, proceed to the next page
             if (doc.linesPrintedOnPage.last() >= doc.pageLines - 2) doc.addNewPage()
 
+            val partOrder = cptSectMap.count { it.type.startsWith("part") }
+            val cptOrder = cptSectMap.count { it.type.startsWith("chapter") } + 1
 
             val thePar = handler.paragraphBuffer.toString().trim()
-            typesetChapterHeading(thePar, handler, 16)
+            typesetChapterHeading(cptOrder, thePar, handler, 16)
 
             val cptSectInfo = cptSectStack.removeLast()
             if (!cptSectInfo.type.endsWith("-hidden"))
-                cptSectMap.add(CptSectInfo("chapter", cptSectInfo.alt ?: thePar, doc.currentPage))
+                cptSectMap.add(CptSectInfo("chapter", cptSectInfo.alt ?: thePar, doc.currentPage, partOrder, cptOrder, null))
 
             handler.paragraphBuffer.clear()
         }
@@ -809,12 +844,26 @@ object BTeXParser {
             // if current line is the last line, proceed to the next page
             if (doc.linesPrintedOnPage.last() >= doc.pageLines - 1) doc.addNewPage()
 
+            val partOrder = cptSectMap.count { it.type.startsWith("part") }
+            val cptOrder = cptSectMap.count { it.type.startsWith("chapter") }
+            var sectOrder = 1
+
+            var cnt = cptSectMap.size - 1
+            while (cnt >= 0) {
+                if (cptSectMap[cnt].type.startsWith("section")) {
+                    cnt += 1
+                    sectOrder += 1
+                }
+                else break
+            }
+
+
             val thePar = handler.paragraphBuffer.toString().trim()
-            typesetSectionHeading(thePar, handler, 8)
+            typesetSectionHeading(cptOrder, sectOrder, thePar, handler, 8)
 
             val cptSectInfo = cptSectStack.removeLast()
             if (!cptSectInfo.type.endsWith("-hidden"))
-                cptSectMap.add(CptSectInfo("section", cptSectInfo.alt ?: thePar, doc.currentPage))
+                cptSectMap.add(CptSectInfo("section", cptSectInfo.alt ?: thePar, doc.currentPage, partOrder, cptOrder, sectOrder))
 
             handler.paragraphBuffer.clear()
         }
@@ -890,8 +939,39 @@ object BTeXParser {
             }
         }
 
-        private fun typesetChapterHeading(thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
-            typesetParagraphs("\n$ccDefault"+thePar, handler, width - indent).also {
+        private fun typesetPartHeading(num: Int, thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
+            typesetParagraphs("${ccDefault}Part ${num.toRomanNum()}", handler)
+            typesetParagraphs(titleFont, "$ccDefault$thePar\n ", handler)
+
+            doc.currentPageObj.let { page ->
+                val yStart = page.drawCalls.minOf { it.posY }
+                val yEnd = page.drawCalls.maxOf { it.posY + it.lineCount * doc.lineHeightInPx }
+                val pageHeight = doc.textHeight
+
+                val newYpos = (pageHeight - (yEnd - yStart)) / 2
+                val yDelta = newYpos - yStart
+
+                val xStart = page.drawCalls.minOf { it.posX }
+                val xEnd = page.drawCalls.maxOf { it.posX + it.width }
+                val pageWidth = doc.textWidth
+
+                val newXpos = (pageWidth - (xEnd - xStart)) / 2
+                val xDelta = newXpos - xStart
+
+                page.drawCalls.forEach {
+                    it.posX += xDelta
+                    it.posY += yDelta
+                }
+
+            }
+
+            doc.addNewPage()
+            doc.addNewPage()
+        }
+
+        private fun typesetChapterHeading(chapNum: Int?, thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
+            val header = if (chapNum == null) thePar else "$chapNum\uDBBF\uDFF8$thePar"
+            typesetParagraphs("\n$ccDefault$header", handler, width - indent).also {
                 // add indents and adjust text y pos
                 it.forEach {
                     it.posX += indent
@@ -911,8 +991,8 @@ object BTeXParser {
             }
         }
 
-        private fun typesetSectionHeading(thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
-            typesetParagraphs("\n$ccDefault"+thePar, handler, width - indent).also {
+        private fun typesetSectionHeading(chapNum: Int, sectNum: Int, thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
+            typesetParagraphs("\n$ccDefault$chapNum.$sectNum\uDBBF\uDFF8$thePar", handler, width - indent).also {
                 // add indents and adjust text y pos
                 it.forEach {
                     it.posX += indent
@@ -1002,12 +1082,12 @@ object BTeXParser {
                 Character.toString(it.toChar())
         }
 
-        private fun typesetTOCline(name: String, pageNum: Int, handler: BTeXHandler, indentation: Int = 0, pageToWrite: Int? = null) {
+        private fun typesetTOCline(heading: String, name: String, pageNum: Int, handler: BTeXHandler, indentation: Int = 0, pageToWrite: Int? = null) {
             val pageNum = pageNum.plus(1).toString()
             val pageNumWidth = getFont().getWidth(pageNum)
             val typeWidth = doc.textWidth - indentation
 
-            typesetParagraphs(ccDefault + name, handler, typeWidth, pageToWrite ?: doc.currentPage).let {
+            typesetParagraphs("$ccDefault$heading$name", handler, typeWidth, pageToWrite ?: doc.currentPage).let {
                 it.forEach {
                     it.posX += indentation
                 }
@@ -1023,7 +1103,7 @@ object BTeXParser {
                         val y = y + (call.lineCount - 1).coerceAtLeast(0) * doc.lineHeightInPx
 
                         val textWidth = if (call.text is TypesetDrawCall) {
-                            font.getWidth(call.text.movableType.typesettedSlugs.last())
+                            font.getWidthNormalised(call.text.movableType.typesettedSlugs.last())
                         }
                         else call.width
 
@@ -1079,6 +1159,24 @@ object BTeXParser {
                 }
 
                 return tokens.toUTF8Bytes().toString(Charsets.UTF_8)
+            }
+
+            fun Int.toRomanNum(): String = when (this) {
+                in 1000..3999 -> "M" + (this - 1000).toRomanNum()
+                in 900 until 1000 -> "CM" + (this - 900).toRomanNum()
+                in 500 until 900 -> "D" + (this - 500).toRomanNum()
+                in 400 until 500 -> "CD" + (this - 400).toRomanNum()
+                in 100 until 400 -> "C" + (this - 100).toRomanNum()
+                in 90 until 100 -> "XC" + (this - 90).toRomanNum()
+                in 50 until 90 -> "L" + (this - 50).toRomanNum()
+                in 40 until 50 -> "XL" + (this - 40).toRomanNum()
+                in 10 until 40 -> "X" + (this - 10).toRomanNum()
+                9 -> "IX"
+                in 5 until 9 -> "V" + (this - 5).toRomanNum()
+                4 -> "IV"
+                in 1 until 4 -> "I" + (this - 1).toRomanNum()
+                0 -> ""
+                else -> throw IllegalArgumentException("Number out of range: $this")
             }
         }
 
