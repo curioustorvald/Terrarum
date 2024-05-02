@@ -763,25 +763,24 @@ object BTeXParser {
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemFULLPAGEBOX(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             doc.currentPageObj.let { page ->
-                val yStart = page.drawCalls.minOf { it.posY }
-                val yEnd = page.drawCalls.maxOf { it.posY + it.lineCount * doc.lineHeightInPx }
-                val pageHeight = doc.textHeight
-
-                val newYpos = (pageHeight - (yEnd - yStart)) / 2
-                val yDelta = newYpos - yStart
-
-                val xStart = page.drawCalls.minOf { it.posX }
-                val xEnd = page.drawCalls.maxOf { it.posX + it.width }
-                val pageWidth = doc.textWidth
-
-                val newXpos = (pageWidth - (xEnd - xStart)) / 2
-                val xDelta = newXpos - xStart
-
                 page.drawCalls.forEach {
+                    val yStart = it.posY
+                    val yEnd = it.posY + it.lineCount * doc.lineHeightInPx
+                    val pageHeight = doc.textHeight
+
+                    val newYpos = (pageHeight - (yEnd - yStart)) / 2
+                    val yDelta = newYpos - yStart
+
+                    val xStart = it.posX
+                    val xEnd = it.posX + it.width
+                    val pageWidth = doc.textWidth
+
+                    val newXpos = (pageWidth - (xEnd - xStart)) / 2
+                    val xDelta = newXpos - xStart
+
                     it.posX += xDelta
                     it.posY += yDelta
                 }
-
             }
 
             doc.addNewPage()
@@ -1012,7 +1011,32 @@ object BTeXParser {
             typesetParagraphs("${ccDefault}Part ${num.toRomanNum()}", handler)
             typesetParagraphs(titleFont, "$ccDefault$thePar\n ", handler)
 
+            // get global yDelta
             doc.currentPageObj.let { page ->
+                val yStart = page.drawCalls.minOf { it.posY }
+                val yEnd = page.drawCalls.maxOf { it.posY + it.lineCount * doc.lineHeightInPx }
+                val pageHeight = doc.textHeight
+
+                val newYpos = (pageHeight - (yEnd - yStart)) / 2
+                val yDelta = newYpos - yStart
+
+
+                page.drawCalls.forEach {
+                    // get individual xDelta
+                    val xStart = it.posX
+                    val xEnd = it.posX + it.width
+                    val pageWidth = doc.textWidth
+
+                    val newXpos = (pageWidth - (xEnd - xStart)) / 2
+                    val xDelta = newXpos - xStart
+
+                    // apply the movement
+                    it.posX += xDelta
+                    it.posY += yDelta
+                }
+            }
+
+            /*doc.currentPageObj.let { page ->
                 val yStart = page.drawCalls.minOf { it.posY }
                 val yEnd = page.drawCalls.maxOf { it.posY + it.lineCount * doc.lineHeightInPx }
                 val pageHeight = doc.textHeight
@@ -1032,9 +1056,12 @@ object BTeXParser {
                     it.posY += yDelta
                 }
 
-            }
+            }*/
 
-            doc.addNewPage()
+
+            if (doc.currentPage % 2 == 0)
+                doc.addNewPage()
+
             doc.addNewPage()
         }
 

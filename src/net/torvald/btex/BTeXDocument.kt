@@ -377,7 +377,7 @@ class BTeXDrawCall(
     internal val width: Int
         get() = if (text != null)
             if (text is TypesetDrawCall)
-                text.movableType.width
+                text.movableType.width * text.movableType.font.scale
             else
                 TODO()
         else
