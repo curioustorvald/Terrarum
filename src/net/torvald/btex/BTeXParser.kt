@@ -704,7 +704,7 @@ object BTeXParser {
 
             // if tocPage != null, estimate TOC page size, renumber indexMap and cptSectMap if needed, then typeset the toc
             if (tocPage != null) {
-                // TODO estimate the number of TOC pages
+                // estimate the number of TOC pages
                 val tocSizeInPages = (cptSectMap.size + 2) / doc.pageLines
 
                 // renumber things
@@ -1196,20 +1196,23 @@ object BTeXParser {
             val pageNum = pageNum.plus(1).toString()
             val pageNumWidth = getFont().getWidth(pageNum)
             val typeWidth = doc.textWidth - indentation
+            val dotGap = 10
+            val dotPosEnd = typeWidth - pageNumWidth - dotGap*1.5f
 
             typesetParagraphs("$ccDefault$heading$name", handler, typeWidth, pageToWrite ?: doc.currentPage).let {
                 it.forEach {
                     it.posX += indentation
+
+//                    println("pos: (${it.posX}, ${it.posY})\tTOC: $name")
                 }
 
-                it.last().let { call ->
+                it.last { it.text != null }.let { call ->
                     call.extraDrawFun = { batch, x, y ->
                         val oldCol = batch.color.cpy()
 
                         batch.color = Color.BLACK
 
                         val font = getFont()
-                        val dotGap = 10
                         val y = y + (call.lineCount - 1).coerceAtLeast(0) * doc.lineHeightInPx
 
                         val textWidth = if (call.text is TypesetDrawCall) {
@@ -1218,7 +1221,7 @@ object BTeXParser {
                         else call.width
 
                         var dotCursor = (x + textWidth).div(dotGap).ceilToFloat() * dotGap
-                        while (dotCursor < x + typeWidth - pageNumWidth - dotGap*1.5f) {
+                        while (dotCursor < x + dotPosEnd) {
                             font.draw(batch, "·", dotCursor + dotGap/2, y)
                             dotCursor += dotGap
                         }
@@ -1226,6 +1229,10 @@ object BTeXParser {
                         font.draw(batch, pageNum, x + typeWidth - pageNumWidth.toFloat(), y)
 
                         batch.color = oldCol
+
+
+
+//                        println("pos: ($x, $y)\tTOC: $name -- dot start: ${(x + textWidth).div(dotGap).ceilToFloat() * dotGap}, dot end: $dotCursor, typeWidth=$typeWidth, pageNumWidth=$pageNumWidth")
                     }
                 }
             }
