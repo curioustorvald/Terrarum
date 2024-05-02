@@ -2,10 +2,12 @@ package net.torvald.btex
 
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath.DEG_TO_RAD
 import net.torvald.colourutil.OKLch
 import net.torvald.colourutil.tosRGB
 import net.torvald.terrarum.App
+import net.torvald.terrarum.btex.BTeXBatchDrawCall
 import net.torvald.terrarum.btex.BTeXDocument
 import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_ORNAMENTS_COL
 import net.torvald.terrarum.btex.BTeXDrawCall
@@ -15,7 +17,6 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.toHex
 import net.torvald.terrarum.tryDispose
 import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.worlddrawer.toRGBA
 import net.torvald.terrarumsansbitmap.MovableType
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
@@ -86,6 +87,12 @@ object BTeXParser {
 
         private val paragraphBuffer = StringBuilder()
 
+        fun clearParBuffer() {
+            paragraphBuffer.clear()
+        }
+
+        private val objDict = HashMap<String, BTeXBatchDrawCall>()
+
         private var lastTagAtDepth = Array(24) { "" }
         private var pTagCntAtDepth = IntArray(24)
 
@@ -108,6 +115,12 @@ object BTeXParser {
 
         private val bodyTextShadowAlpha = 0.36f
 
+        private fun StringBuilder.appendObject(id: String) {
+            (objDict[id] ?: throw NullPointerException("No OBJ with id '$id' exists")).let {
+                this.append(objectMarkerWithWidth(id, it.getWidth()))
+            }
+        }
+
         init {
             BTeXHandler::class.declaredFunctions.filter { it.findAnnotation<OpenTag>() != null }.forEach {
 //                println("Tag opener: ${it.name}")
@@ -117,6 +130,45 @@ object BTeXParser {
             BTeXHandler::class.declaredFunctions.filter { it.findAnnotation<CloseTag>() != null }.forEach {
 //                println("Tag closer: ${it.name}")
                 elemClosers[it.name] = it
+            }
+
+            objDict["TAG@BTEX"] = object : BTeXBatchDrawCall {
+                override fun getWidth() = 32
+                override fun getLineHeight() = 0
+                override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
+                    val scale = font!!.scale
+                    val interchar = font.interchar
+                    font.draw(batch, "${ccDefault}B", x + ( 0 + 0*interchar)*scale, y + 0*scale)
+                    font.draw(batch, "${ccDefault}T", x + ( 8 + 1*interchar)*scale, y + 0*scale)
+                    font.draw(batch, "${ccDefault}E", x + (15 + 2*interchar)*scale, y + 4*scale)
+                    font.draw(batch, "${ccDefault}X", x + (23 + 3*interchar)*scale, y + 0*scale)
+                }
+            }
+
+            objDict["TAG@LATEX"] = object : BTeXBatchDrawCall {
+                override fun getWidth() = 36
+                override fun getLineHeight() = 0
+                override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
+                    val scale = font!!.scale
+                    val interchar = font.interchar
+                    font.draw(batch, "${ccDefault}L", x + ( 0 + 0*interchar)*scale, y + 0*scale)
+                    font.draw(batch, "${ccDefault}ᴀ", x + ( 4 + 0*interchar)*scale, y + -4*scale)
+                    font.draw(batch, "${ccDefault}T", x + (12 + 1*interchar)*scale, y + 0*scale)
+                    font.draw(batch, "${ccDefault}E", x + (19 + 2*interchar)*scale, y + 4*scale)
+                    font.draw(batch, "${ccDefault}X", x + (27 + 3*interchar)*scale, y + 0*scale)
+                }
+            }
+
+            objDict["TAG@TEX"] = object : BTeXBatchDrawCall {
+                override fun getWidth() = 24
+                override fun getLineHeight() = 0
+                override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
+                    val scale = font!!.scale
+                    val interchar = font.interchar
+                    font.draw(batch, "${ccDefault}T", x + ( 0 + 1*interchar)*scale, y + 0*scale)
+                    font.draw(batch, "${ccDefault}E", x + ( 7 + 2*interchar)*scale, y + 4*scale)
+                    font.draw(batch, "${ccDefault}X", x + (15 + 3*interchar)*scale, y + 0*scale)
+                }
             }
         }
 
@@ -519,21 +571,21 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
         }
         @OpenTag // reflective access is impossible with 'private'
         fun processElemSUBTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemEDITION(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -568,8 +620,19 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemBTEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.append("BTeX")
+            handler.paragraphBuffer.appendObject("TAG@BTEX")
         }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemLATEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            handler.paragraphBuffer.appendObject("TAG@LATEX")
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemTEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            handler.paragraphBuffer.appendObject("TAG@TEX")
+        }
+
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCOVER(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
@@ -599,12 +662,12 @@ object BTeXParser {
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTABLEOFCONTENTS(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             tocPage = doc.currentPage
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTABLEOFINDICES(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
 
             // prepare contents
             val pageWidth = doc.textWidth
@@ -664,10 +727,10 @@ object BTeXParser {
                     val heading = if (part == null && cpt == null && sect == null)
                         ""
                     else if (part != null && cpt == null && sect == null)
-                        "Part ${part.toRomanNum()}.\uDBBF\uDFF8"
+                        "Part ${part.toRomanNum()}.${glueToString(9)}"
                     else
-                        listOfNotNull(cpt, sect).joinToString(".") + "\uDBBF\uDFF8" +
-                                (if (cpt != null && cpt < 10) "\uDBBF\uDFF8" else "")
+                        listOfNotNull(cpt, sect).joinToString(".") + "${glueToString(9)}" +
+                                (if (cpt != null && cpt < 10) "${glueToString(9)}" else "")
 
                     typesetTOCline("$heading", name, pg, handler, indent, tocPage)
                 }
@@ -726,7 +789,7 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemP(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
         }
 
         @CloseTag
@@ -734,7 +797,7 @@ object BTeXParser {
             typesetParagraphs("${ccDefault}――――――――――――", handler).also {it.first().let {
                 it.posX += (doc.textWidth - it.width) / 2
             } }
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
         }
 
         @CloseTag
@@ -750,7 +813,7 @@ object BTeXParser {
         fun closeElemTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookTitle(thePar, handler)
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
 
             doc.theTitle = thePar.replace("\n", " ")
         }
@@ -758,7 +821,7 @@ object BTeXParser {
         fun closeElemSUBTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookEdition(thePar, handler)
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
 
             doc.theSubtitle = thePar.replace("\n", " ")
         }
@@ -766,7 +829,7 @@ object BTeXParser {
         fun closeElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookAuthor(thePar, handler)
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
 
             doc.theAuthor = thePar.replace("\n", " ")
         }
@@ -774,7 +837,7 @@ object BTeXParser {
         fun closeElemEDITION(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val thePar = handler.paragraphBuffer.toString().trim()
             typesetBookEdition(thePar, handler)
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
 
             doc.theEdition = thePar.replace("\n", " ")
         }
@@ -782,7 +845,7 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemPART(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
 
             if (attribs["hide"] == null)
                 cptSectStack.add(CptSect("part", attribs["alt"]))
@@ -791,7 +854,7 @@ object BTeXParser {
         }
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
 
             if (attribs["hide"] == null)
                 cptSectStack.add(CptSect("chapter", attribs["alt"]))
@@ -800,7 +863,7 @@ object BTeXParser {
         }
         @OpenTag // reflective access is impossible with 'private'
         fun processElemSECTION(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
 
             if (attribs["hide"] == null)
                 cptSectStack.add(CptSect("section", attribs["alt"]))
@@ -820,7 +883,7 @@ object BTeXParser {
             if (!cptSectInfo.type.endsWith("-hidden"))
                 cptSectMap.add(CptSectInfo("part", cptSectInfo.alt ?: thePar, doc.currentPage, partOrder, null, null))
 
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
@@ -837,7 +900,7 @@ object BTeXParser {
             if (!cptSectInfo.type.endsWith("-hidden"))
                 cptSectMap.add(CptSectInfo("chapter", cptSectInfo.alt ?: thePar, doc.currentPage, partOrder, cptOrder, null))
 
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemSECTION(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
@@ -865,7 +928,7 @@ object BTeXParser {
             if (!cptSectInfo.type.endsWith("-hidden"))
                 cptSectMap.add(CptSectInfo("section", cptSectInfo.alt ?: thePar, doc.currentPage, partOrder, cptOrder, sectOrder))
 
-            handler.paragraphBuffer.clear()
+            handler.clearParBuffer()
         }
 
 
@@ -877,12 +940,18 @@ object BTeXParser {
             val thePar = handler.paragraphBuffer.toString().trim()
 
             val text =
-                if (siblingIndex > 1 && penultTag != "ANONBREAK" && penultTag != "BR") "\u3000$thePar"
+                // DON't indent on centering context
+                if (tagStack.contains("CENTER") || tagStack.contains("FULLPAGEBOX")) thePar
+                // indent the second+ pars (or don't indent first par after cpt/sect, anonbreak and br)
+                else if (siblingIndex > 1 && penultTag != "ANONBREAK" && penultTag != "BR") "\u3000$thePar"
+                // if the very first tag within the MANUSCRIPT is par (i.e. no chapter), create a "virtual" chapter
                 else if (penultTag == "MANUSCRIPT") "\n\n$thePar"
+                // else, print the text normally
                 else thePar
 
             typesetParagraphs(ccDefault + text, handler)
-            handler.paragraphBuffer.clear()
+
+            handler.clearParBuffer()
         }
 
         @CloseTag // reflective access is impossible with 'private'
@@ -970,7 +1039,7 @@ object BTeXParser {
         }
 
         private fun typesetChapterHeading(chapNum: Int?, thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
-            val header = if (chapNum == null) thePar else "$chapNum\uDBBF\uDFF8$thePar"
+            val header = if (chapNum == null) thePar else "$chapNum${glueToString(9)}$thePar"
             typesetParagraphs("\n$ccDefault$header", handler, width - indent).also {
                 // add indents and adjust text y pos
                 it.forEach {
@@ -992,7 +1061,7 @@ object BTeXParser {
         }
 
         private fun typesetSectionHeading(chapNum: Int, sectNum: Int, thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
-            typesetParagraphs("\n$ccDefault$chapNum.$sectNum\uDBBF\uDFF8$thePar", handler, width - indent).also {
+            typesetParagraphs("\n$ccDefault$chapNum.$sectNum${glueToString(9)}$thePar", handler, width - indent).also {
                 // add indents and adjust text y pos
                 it.forEach {
                     it.posX += indent
@@ -1019,16 +1088,13 @@ object BTeXParser {
 
             if (slugHeight > remainder) {
                 val subset = linesOut to remainder
+                val posYline = doc.linesPrintedOnPage[pageNum]
 
-                val drawCall = BTeXDrawCall(
-                    doc,
-                    0,
-                    doc.linesPrintedOnPage[pageNum] * doc.lineHeightInPx,
-                    handler.currentTheme,
-                    TypesetDrawCall(slugs, subset.first, subset.second)
-                )
-
-                doc.appendDrawCall(doc.pages[pageNum], drawCall); drawCalls.add(drawCall)
+                (textToDrawCall(handler, posYline, slugs, subset.first, subset.second) + parseAndGetObjDrawCalls(font, handler, posYline, slugs, subset.first, subset.second)).let {
+                    it.forEach {
+                        doc.appendDrawCall(doc.pages[pageNum], it); drawCalls.add(it)
+                    }
+                }
 
                 linesOut += remainder
                 slugHeight -= remainder
@@ -1040,16 +1106,13 @@ object BTeXParser {
                 remainder = minOf(slugHeight, doc.pageLines)
 
                 val subset = linesOut to remainder
+                val posYline = doc.linesPrintedOnPage[pageNum]
 
-                val drawCall = BTeXDrawCall(
-                    doc,
-                    0,
-                    doc.linesPrintedOnPage[pageNum] * doc.lineHeightInPx,
-                    handler.currentTheme,
-                    TypesetDrawCall(slugs, subset.first, subset.second)
-                )
-
-                doc.appendDrawCall(doc.pages[pageNum], drawCall); drawCalls.add(drawCall)
+                (textToDrawCall(handler, posYline, slugs, subset.first, subset.second) + parseAndGetObjDrawCalls(font, handler, posYline, slugs, subset.first, subset.second)).let {
+                    it.forEach {
+                        doc.appendDrawCall(doc.pages[pageNum], it); drawCalls.add(it)
+                    }
+                }
 
                 linesOut += remainder
                 slugHeight -= remainder
@@ -1063,6 +1126,53 @@ object BTeXParser {
             if (doc.linesPrintedOnPage[pageNum] == 1 && doc.pages[pageNum].isEmpty()) doc.linesPrintedOnPage[pageNum] = 0 // '\n' adds empty draw call to the page, which makes isEmpty() to return false
 
             return drawCalls
+        }
+
+        private fun textToDrawCall(handler: BTeXHandler, posYline: Int, slugs: MovableType, lineStart: Int, lineEnd: Int): List<BTeXDrawCall> {
+            return listOf(
+                BTeXDrawCall(
+                    doc,
+                    0,
+                    posYline * doc.lineHeightInPx,
+                    handler.currentTheme,
+                    TypesetDrawCall(slugs, lineStart, lineEnd)
+                )
+            )
+        }
+
+        private fun parseAndGetObjDrawCalls(font: TerrarumSansBitmap, handler: BTeXHandler, posYline: Int, slugs: MovableType, lineStart: Int, lineEnd: Int): List<BTeXDrawCall> {
+            val out = ArrayList<BTeXDrawCall>()
+
+            slugs.typesettedSlugs.subList(lineStart, lineEnd).forEachIndexed { lineNumCnt, line ->
+                line.mapIndexed { i, c -> i to c }.filter { it.second == OBJ }.map { it.first }.forEach { xIndex ->
+                    val x = font.getWidthNormalised(CodepointSequence(line.subList(0, xIndex)))
+                    val y = (posYline + lineNumCnt) * doc.lineHeightInPx
+
+                    // get OBJ id
+                    val idbuf = StringBuilder()
+
+                    var c = xIndex + 1
+                    while (true) {
+                        val codepoint = line[c]
+                        if (codepoint == 0xFFF9F) break
+                        idbuf.append(codepointToObjIdChar(codepoint))
+                        c += 1
+                    }
+
+                    val extraDrawCall = BTeXDrawCall(
+                        doc,
+                        x,
+                        y,
+                        handler.currentTheme,
+                        cmd = objDict[idbuf.toString()] ?: throw NullPointerException("No OBJ with id '$idbuf' exists"),
+                        font = font
+                    )
+
+                    out.add(extraDrawCall)
+                }
+            }
+
+            return out
         }
 
         private fun CodepointSequence.toReadable() = this.joinToString("") {
@@ -1128,37 +1238,54 @@ object BTeXParser {
             private const val ZWSP = 0x200B
             private const val SHY = 0xAD
             private const val NBSP = 0xA0
-            private const val GLUE_POSITIVE_ONE = 0xFFFF0
-            private const val GLUE_POSITIVE_SIXTEEN = 0xFFFFF
-            private const val GLUE_NEGATIVE_ONE = 0xFFFE0
-            private const val GLUE_NEGATIVE_SIXTEEN = 0xFFFEF
+            private const val OBJ = 0xFFFC
+            private const val SPACING_BLOCK_ONE = 0xFFFD0
+            private const val SPACING_BLOCK_SIXTEEN = 0xFFFDF
 
             fun glueToString(glue: Int): String {
                 val tokens = CodepointSequence()
 
-                if (glue == 0)
+                if (glue < 0)
+                    throw IllegalArgumentException("Space is less than zero ($glue)")
+                else if (glue == 0)
                     tokens.add(ZWSP)
-                else if (glue.absoluteValue <= 16)
-                    if (glue > 0)
-                        tokens.add(GLUE_POSITIVE_ONE + (glue - 1))
-                    else
-                        tokens.add(GLUE_NEGATIVE_ONE + (glue.absoluteValue - 1))
+                else if (glue in 1..16)
+                    tokens.add(SPACING_BLOCK_ONE + (glue - 1))
                 else {
-                    val fullGlues = glue.absoluteValue / 16
-                    val smallGlues = glue.absoluteValue % 16
-                    if (glue > 0)
+                    val fullGlues = glue / 16
+                    val smallGlues = glue % 16
+                    if (smallGlues > 0) {
                         tokens.addAll(
-                            List(fullGlues) { GLUE_POSITIVE_SIXTEEN } +
-                                    listOf(GLUE_POSITIVE_ONE + (smallGlues - 1))
+                            List(fullGlues) { SPACING_BLOCK_SIXTEEN } +
+                                    listOf(SPACING_BLOCK_ONE + (smallGlues - 1))
                         )
-                    else
+                    }
+                    else {
                         tokens.addAll(
-                            List(fullGlues) { GLUE_NEGATIVE_SIXTEEN } +
-                                    listOf(GLUE_NEGATIVE_ONE + (smallGlues - 1))
+                            List(fullGlues) { SPACING_BLOCK_SIXTEEN }
                         )
+                    }
                 }
 
                 return tokens.toUTF8Bytes().toString(Charsets.UTF_8)
+            }
+
+            fun objectMarkerWithWidth(id: String, width: Int): String {
+                val idstr = CodepointSequence()
+
+                id.forEach {
+                    idstr.add(when (it) {
+                        '@' -> 0xFFF80
+                        '-' -> 0xFFF7D
+                        in '0'..'9' -> 0xFFF70 + (it.code - 0x30)
+                        in 'A'..'Z' -> 0xFFF81 + (it.code - 0x41)
+                        else -> throw IllegalArgumentException("Non-object ID char: $it")
+                    })
+                }
+
+                idstr.add(0xFFF9F)
+
+                return "\uFFFC" + idstr.toUTF8Bytes().toString(Charsets.UTF_8) + glueToString(width)
             }
 
             fun Int.toRomanNum(): String = when (this) {
@@ -1178,15 +1305,24 @@ object BTeXParser {
                 0 -> ""
                 else -> throw IllegalArgumentException("Number out of range: $this")
             }
-        }
 
+            private fun codepointToObjIdChar(c: Int): Char {
+                return when (c) {
+                    in 0xFFF70..0xFFF79 -> (0x30 + (c - 0xFFF70)).toChar()
+                    in 0xFFF81..0xFFF9A -> (0x41 + (c - 0xFFF81)).toChar()
+                    0xFFF7D -> '-'
+                    0xFFF80 -> '@'
+                    else -> throw IllegalArgumentException("Non-object ID char: $c")
+                }
+            }
+        }
     }
 
 
     private annotation class OpenTag
     private annotation class CloseTag
-
 }
+
 
 
 class BTeXParsingException(s: String) : RuntimeException(s) {

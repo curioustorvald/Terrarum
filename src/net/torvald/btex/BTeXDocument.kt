@@ -17,6 +17,7 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarumsansbitmap.MovableType
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import java.io.File
 import java.io.RandomAccessFile
 import java.util.zip.Deflater
@@ -324,17 +325,24 @@ data class TypesetDrawCall(val movableType: MovableType, override val rowStart: 
     }
 }
 
+interface BTeXBatchDrawCall {
+    fun getWidth(): Int
+    fun getLineHeight(): Int
+    fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap? = null)
+}
+
 class BTeXDrawCall(
     val doc: BTeXDocument,
     var posX: Int, // position relative to the page start (excluding page margin)
     var posY: Int, // position relative to the page start (excluding page margin)
     val theme: String,
     val text: BTeXTextDrawCall? = null,
-    val texture: TextureRegion? = null,
+    val cmd: BTeXBatchDrawCall? = null,
+    val font: TerrarumSansBitmap? = null
 ) {
 
     init {
-        if (text != null && texture != null) throw IllegalArgumentException("Text and Texture are both non-null")
+        if (text != null && cmd != null) throw IllegalArgumentException("Text and Texture are both non-null")
     }
 
     fun draw(batch: SpriteBatch, x: Int, y: Int) {
@@ -348,11 +356,11 @@ class BTeXDrawCall(
 
         batch.color = Color.WHITE
 
-        if (text != null && texture == null) {
+        if (text != null && cmd == null) {
             text.draw(doc, batch, px, py)
         }
-        else if (text == null && texture != null) {
-            batch.draw(texture, px, py)
+        else if (text == null && cmd != null) {
+            cmd.draw(doc, batch, px, py, font)
         }
         else throw Error("Text and Texture are both non-null")
 
@@ -360,7 +368,7 @@ class BTeXDrawCall(
     }
 
     fun isNotBlank(): Boolean {
-        if (text == null && texture == null) return false
+        if (text == null && cmd == null) return false
         if (text is TypesetDrawCall && text.movableType.inputText.isBlank()) return false
 //        if (text is RaggedLeftDrawCall && text.raggedType.inputText.isBlank()) return false
         return true
@@ -373,13 +381,13 @@ class BTeXDrawCall(
             else
                 TODO()
         else
-            texture!!.regionWidth
+            cmd!!.getWidth()
 
     internal var extraDrawFun: (SpriteBatch, Float, Float) -> Unit = { _, _, _ ->}
     internal val lineCount = if (text != null)
         text.rows
     else
-        TODO()
+        cmd!!.getLineHeight()
 
     companion object {
         private fun CodepointSequence.isBlank() = this.all { whitespaces.contains(it) }

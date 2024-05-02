@@ -122,7 +122,7 @@ object TerrarumPostProcessor : Disposable {
                         if (App.scr.magn % 1.0 < 0.0001) Texture.TextureFilter.Nearest else Texture.TextureFilter.Linear
                 )
 
-                postShader(projMat, fbo)
+                drawFBOwithDither(projMat, fbo)
 
                 // draw things when F keys are on
                 if (App.IS_DEVELOPMENT_BUILD && KeyToggler.isOn(Input.Keys.F11)) {
@@ -243,7 +243,7 @@ object TerrarumPostProcessor : Disposable {
         0f,0f,0f,1f, 0f,0f,1f,0f, 0f,1f,0f,0f, 1f,0f,0f,0f,
     )
 
-    private fun postShader(projMat: Matrix4, fbo: FrameBuffer) {
+    private fun drawFBOwithDither(projMat: Matrix4, fbo: FrameBuffer) {
 
         val shader = if (App.getConfigBoolean("fx_dither"))
             shaderPostDither

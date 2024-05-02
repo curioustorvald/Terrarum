@@ -46,10 +46,10 @@
 
     <chapter>Introduction</chapter>
 
-    <p><index id="btex language" /><btex /> is a markup language based on XML, with a resemblance of the LaTeX. The <btex />
-        abstracts away the meticulous styling and typesetting configurations, so you can focus on writing
-        texts than debugging the LaTeX macros. This does come with a downside of not being able to change
-        the given style.</p>
+    <p><index id="btex language" /><btex /> is a markup language based on XML, with a resemblance of the <latex />.
+        <btex /> abstracts away the meticulous styling and typesetting configurations, so you can focus on
+        actually writing your texts than debugging the <latex /> macros. This does come with a downside of
+        not being able to change the given style.</p>
     <p><btex /> document is divided up to five parts: the <itemname>Style Declaration</itemname>, the
         <itemname>Cover</itemname>, the <itemname>Table of Contents</itemname>, the
         <itemname>Manuscript</itemname>, and the <itemname>Index Page</itemname>. Of which the
