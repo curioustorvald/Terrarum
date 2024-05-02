@@ -28,7 +28,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.StringReader
 import javax.xml.parsers.SAXParserFactory
-import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
@@ -91,7 +90,8 @@ object BTeXParser {
             paragraphBuffer.clear()
         }
 
-        private val objDict = HashMap<String, BTeXBatchDrawCall>()
+        private val objDict = HashMap<String, (BTeXDrawCall) -> BTeXBatchDrawCall>()
+        private val objWidthDict = HashMap<String, Int>()
 
         private var lastTagAtDepth = Array(24) { "" }
         private var pTagCntAtDepth = IntArray(24)
@@ -115,9 +115,9 @@ object BTeXParser {
 
         private val bodyTextShadowAlpha = 0.36f
 
-        private fun StringBuilder.appendObject(id: String) {
-            (objDict[id] ?: throw NullPointerException("No OBJ with id '$id' exists")).let {
-                this.append(objectMarkerWithWidth(id, it.getWidth()))
+        private fun StringBuilder.appendObjectPlaceholder(id: String) {
+            (objWidthDict[id] ?: throw NullPointerException("No OBJ with id '$id' exists")).let {
+                this.append(objectMarkerWithWidth(id, it))
             }
         }
 
@@ -132,42 +132,45 @@ object BTeXParser {
                 elemClosers[it.name] = it
             }
 
-            objDict["TAG@BTEX"] = object : BTeXBatchDrawCall {
-                override fun getWidth() = 32
-                override fun getLineHeight() = 0
-                override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
-                    val scale = font!!.scale
-                    val interchar = font.interchar
-                    font.draw(batch, "${ccDefault}B", x + ( 0 + 0*interchar)*scale, y + 0*scale)
-                    font.draw(batch, "${ccDefault}T", x + ( 8 + 1*interchar)*scale, y + 0*scale)
-                    font.draw(batch, "${ccDefault}E", x + (15 + 2*interchar)*scale, y + 4*scale)
-                    font.draw(batch, "${ccDefault}X", x + (23 + 3*interchar)*scale, y + 0*scale)
+            objWidthDict["TAG@BTEX"] = 32
+            objDict["TAG@BTEX"] = { text: BTeXDrawCall ->
+                object : BTeXBatchDrawCall(32, 0, text) {
+                    override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
+                        val scale = font!!.scale
+                        val interchar = font.interchar
+                        font.draw(batch, "${ccDefault}B", x + ( 0 + 0*interchar)*scale, y + 0*scale)
+                        font.draw(batch, "${ccDefault}T", x + ( 8 + 1*interchar)*scale, y + 0*scale)
+                        font.draw(batch, "${ccDefault}E", x + (15 + 2*interchar)*scale, y + 4*scale)
+                        font.draw(batch, "${ccDefault}X", x + (23 + 3*interchar)*scale, y + 0*scale)
+                    }
                 }
             }
 
-            objDict["TAG@LATEX"] = object : BTeXBatchDrawCall {
-                override fun getWidth() = 36
-                override fun getLineHeight() = 0
-                override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
-                    val scale = font!!.scale
-                    val interchar = font.interchar
-                    font.draw(batch, "${ccDefault}L", x + ( 0 + 0*interchar)*scale, y + 0*scale)
-                    font.draw(batch, "${ccDefault}ᴀ", x + ( 4 + 0*interchar)*scale, y + -4*scale)
-                    font.draw(batch, "${ccDefault}T", x + (12 + 1*interchar)*scale, y + 0*scale)
-                    font.draw(batch, "${ccDefault}E", x + (19 + 2*interchar)*scale, y + 4*scale)
-                    font.draw(batch, "${ccDefault}X", x + (27 + 3*interchar)*scale, y + 0*scale)
+            objWidthDict["TAG@LATEX"] = 36
+            objDict["TAG@LATEX"] = { text: BTeXDrawCall ->
+                object : BTeXBatchDrawCall(36, 0, text) {
+                    override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
+                        val scale = font!!.scale
+                        val interchar = font.interchar
+                        font.draw(batch, "${ccDefault}L", x + (0 + 0 * interchar) * scale, y + 0 * scale)
+                        font.draw(batch, "${ccDefault}ᴀ", x + (4 + 0 * interchar) * scale, y + -4 * scale)
+                        font.draw(batch, "${ccDefault}T", x + (12 + 1 * interchar) * scale, y + 0 * scale)
+                        font.draw(batch, "${ccDefault}E", x + (19 + 2 * interchar) * scale, y + 4 * scale)
+                        font.draw(batch, "${ccDefault}X", x + (27 + 3 * interchar) * scale, y + 0 * scale)
+                    }
                 }
             }
 
-            objDict["TAG@TEX"] = object : BTeXBatchDrawCall {
-                override fun getWidth() = 24
-                override fun getLineHeight() = 0
-                override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
-                    val scale = font!!.scale
-                    val interchar = font.interchar
-                    font.draw(batch, "${ccDefault}T", x + ( 0 + 1*interchar)*scale, y + 0*scale)
-                    font.draw(batch, "${ccDefault}E", x + ( 7 + 2*interchar)*scale, y + 4*scale)
-                    font.draw(batch, "${ccDefault}X", x + (15 + 3*interchar)*scale, y + 0*scale)
+            objWidthDict["TAG@TEX"] = 24
+            objDict["TAG@TEX"] = { text: BTeXDrawCall ->
+                object : BTeXBatchDrawCall(24, 0, text) {
+                    override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
+                        val scale = font!!.scale
+                        val interchar = font.interchar
+                        font.draw(batch, "${ccDefault}T", x + (0 + 1 * interchar) * scale, y + 0 * scale)
+                        font.draw(batch, "${ccDefault}E", x + (7 + 2 * interchar) * scale, y + 4 * scale)
+                        font.draw(batch, "${ccDefault}X", x + (15 + 3 * interchar) * scale, y + 0 * scale)
+                    }
                 }
             }
         }
@@ -620,17 +623,17 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemBTEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.appendObject("TAG@BTEX")
+            handler.paragraphBuffer.appendObjectPlaceholder("TAG@BTEX")
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemLATEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.appendObject("TAG@LATEX")
+            handler.paragraphBuffer.appendObjectPlaceholder("TAG@LATEX")
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.appendObject("TAG@TEX")
+            handler.paragraphBuffer.appendObjectPlaceholder("TAG@TEX")
         }
 
 
@@ -1008,8 +1011,10 @@ object BTeXParser {
         }
 
         private fun typesetPartHeading(num: Int, thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
-            typesetParagraphs("${ccDefault}Part ${num.toRomanNum()}", handler)
-            typesetParagraphs(titleFont, "$ccDefault$thePar\n ", handler)
+            typesetParagraphs("${ccDefault}⁃ Part ${num.toRomanNum()} ⁃", handler)
+            typesetParagraphs(" ", handler)
+//            typesetParagraphs(getTitleFont(), "$ccDefault$thePar", handler)
+            typesetParagraphs(getSubtitleFont(), "$ccDefault$thePar", handler)
 
             // get global yDelta
             doc.currentPageObj.let { page ->
@@ -1022,18 +1027,40 @@ object BTeXParser {
 
 
                 page.drawCalls.forEach {
-                    // get individual xDelta
-                    val xStart = it.posX
-                    val xEnd = it.posX + it.width
-                    val pageWidth = doc.textWidth
+                    val text = it.text?.getText()
+                    val batchCall = it.cmd
+                    /*if (text != null) {
+                        println("Part draw call (${text.size} lines, pos: ${it.posX}, ${it.posY}, width: ${it.width}):" +
+                                "\n${text.joinToString("\n") { it.toReadable() }}")
+                    }
+                    else if (batchCall != null) {
+                        println("Part draw call (batch, pos: ${it.posX}, ${it.posY}, width: ${it.width})")
+                    }
+                    else {
+                        println("wtf?")
+                    }*/
 
-                    val newXpos = (pageWidth - (xEnd - xStart)) / 2
-                    val xDelta = newXpos - xStart
+                    // set posX
+                    //// if the batchcall has parent text, use parent's delta value to move things around
+                    if (batchCall != null && batchCall.parentText != null) {
+                        it.posX += it.cmd.parentText!!.deltaX
+                        it.deltaX += it.cmd.parentText!!.deltaX
+                    }
+                    else {
+                        // get individual xDelta
+                        val xDelta = (doc.textWidth - it.width) / 2
 
-                    // apply the movement
-                    it.posX += xDelta
+                        // apply the movement
+                        it.posX += xDelta
+                        it.deltaX += xDelta
+                    }
+
+                    // set posY
                     it.posY += yDelta
+                    it.deltaY += yDelta
                 }
+
+                println()
             }
 
             /*doc.currentPageObj.let { page ->
@@ -1117,7 +1144,9 @@ object BTeXParser {
                 val subset = linesOut to remainder
                 val posYline = doc.linesPrintedOnPage[pageNum]
 
-                (textToDrawCall(handler, posYline, slugs, subset.first, subset.second) + parseAndGetObjDrawCalls(font, handler, posYline, slugs, subset.first, subset.second)).let {
+                val textDrawCalls = textToDrawCall(handler, posYline, slugs, subset.first, subset.second)
+                val objectDrawCalls = parseAndGetObjDrawCalls(textDrawCalls[0], font, handler, posYline, slugs, subset.first, subset.second)
+                (textDrawCalls + objectDrawCalls).let {
                     it.forEach {
                         doc.appendDrawCall(doc.pages[pageNum], it); drawCalls.add(it)
                     }
@@ -1135,7 +1164,9 @@ object BTeXParser {
                 val subset = linesOut to remainder
                 val posYline = doc.linesPrintedOnPage[pageNum]
 
-                (textToDrawCall(handler, posYline, slugs, subset.first, subset.second) + parseAndGetObjDrawCalls(font, handler, posYline, slugs, subset.first, subset.second)).let {
+                val textDrawCalls = textToDrawCall(handler, posYline, slugs, subset.first, subset.second)
+                val objectDrawCalls = parseAndGetObjDrawCalls(textDrawCalls[0], font, handler, posYline, slugs, subset.first, subset.second)
+                (textDrawCalls + objectDrawCalls).let {
                     it.forEach {
                         doc.appendDrawCall(doc.pages[pageNum], it); drawCalls.add(it)
                     }
@@ -1155,22 +1186,22 @@ object BTeXParser {
             return drawCalls
         }
 
-        private fun textToDrawCall(handler: BTeXHandler, posYline: Int, slugs: MovableType, lineStart: Int, lineEnd: Int): List<BTeXDrawCall> {
+        private fun textToDrawCall(handler: BTeXHandler, posYline: Int, slugs: MovableType, lineStart: Int, lineCount: Int): List<BTeXDrawCall> {
             return listOf(
                 BTeXDrawCall(
                     doc,
                     0,
                     posYline * doc.lineHeightInPx,
                     handler.currentTheme,
-                    TypesetDrawCall(slugs, lineStart, lineEnd)
+                    TypesetDrawCall(slugs, lineStart, lineCount)
                 )
             )
         }
 
-        private fun parseAndGetObjDrawCalls(font: TerrarumSansBitmap, handler: BTeXHandler, posYline: Int, slugs: MovableType, lineStart: Int, lineEnd: Int): List<BTeXDrawCall> {
+        private fun parseAndGetObjDrawCalls(textDrawCall: BTeXDrawCall, font: TerrarumSansBitmap, handler: BTeXHandler, posYline: Int, slugs: MovableType, lineStart: Int, lineCount: Int): List<BTeXDrawCall> {
             val out = ArrayList<BTeXDrawCall>()
 
-            slugs.typesettedSlugs.subList(lineStart, lineEnd).forEachIndexed { lineNumCnt, line ->
+            slugs.typesettedSlugs.subList(lineStart, lineStart + lineCount).forEachIndexed { lineNumCnt, line ->
                 line.mapIndexed { i, c -> i to c }.filter { it.second == OBJ }.map { it.first }.forEach { xIndex ->
                     val x = font.getWidthNormalised(CodepointSequence(line.subList(0, xIndex)))
                     val y = (posYline + lineNumCnt) * doc.lineHeightInPx
@@ -1191,8 +1222,8 @@ object BTeXParser {
                         x,
                         y,
                         handler.currentTheme,
-                        cmd = objDict[idbuf.toString()] ?: throw NullPointerException("No OBJ with id '$idbuf' exists"),
-                        font = font
+                        cmd = objDict[idbuf.toString()]?.invoke(textDrawCall) ?: throw NullPointerException("No OBJ with id '$idbuf' exists"),
+                        font = font,
                     )
 
                     out.add(extraDrawCall)

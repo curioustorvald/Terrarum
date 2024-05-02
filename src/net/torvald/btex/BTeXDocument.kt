@@ -313,22 +313,20 @@ class BTeXPage(
     fun isNotEmpty() = drawCalls.isNotEmpty()
 }
 
-interface BTeXTextDrawCall {
-    val rowStart: Int
-    val rows: Int
-    fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float)
-}
 
-data class TypesetDrawCall(val movableType: MovableType, override val rowStart: Int, override val rows: Int): BTeXTextDrawCall {
-    override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float) {
+data class TypesetDrawCall(val movableType: MovableType, val rowStart: Int, val rows: Int) {
+    fun getText(): List<CodepointSequence> = movableType.typesettedSlugs.subList(rowStart, minOf(movableType.typesettedSlugs.size, rowStart + rows))
+    fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float) {
         movableType.draw(batch, x, y, rowStart, minOf(rows, doc.pageLines))
     }
 }
 
-interface BTeXBatchDrawCall {
-    fun getWidth(): Int
-    fun getLineHeight(): Int
-    fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap? = null)
+abstract class BTeXBatchDrawCall(
+    val width: Int,
+    val lineHeight: Int,
+    val parentText: BTeXDrawCall?// = null
+) {
+    abstract fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap? = null)
 }
 
 class BTeXDrawCall(
@@ -336,10 +334,13 @@ class BTeXDrawCall(
     var posX: Int, // position relative to the page start (excluding page margin)
     var posY: Int, // position relative to the page start (excluding page margin)
     val theme: String,
-    val text: BTeXTextDrawCall? = null,
+    val text: TypesetDrawCall? = null,
     val cmd: BTeXBatchDrawCall? = null,
     val font: TerrarumSansBitmap? = null
 ) {
+
+    internal var deltaX = 0 // used by the BTexParser.typeset*()
+    internal var deltaY = 0 // used by the BTexParser.typeset*()
 
     init {
         if (text != null && cmd != null) throw IllegalArgumentException("Text and Texture are both non-null")
@@ -376,18 +377,15 @@ class BTeXDrawCall(
 
     internal val width: Int
         get() = if (text != null)
-            if (text is TypesetDrawCall)
-                text.movableType.width * text.movableType.font.scale
-            else
-                TODO()
+            text.movableType.width * text.movableType.font.scale
         else
-            cmd!!.getWidth()
+            cmd!!.width
 
     internal var extraDrawFun: (SpriteBatch, Float, Float) -> Unit = { _, _, _ ->}
     internal val lineCount = if (text != null)
         text.rows
     else
-        cmd!!.getLineHeight()
+        cmd!!.lineHeight
 
     companion object {
         private fun CodepointSequence.isBlank() = this.all { whitespaces.contains(it) }
