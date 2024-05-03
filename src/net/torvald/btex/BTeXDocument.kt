@@ -300,7 +300,14 @@ class BTeXPage(
         if (drawCall.isNotBlank()) drawCalls.add(drawCall)
     }
 
+    private var prerender = false
+
     fun render(frameDelta: Float, batch: SpriteBatch, x: Int, y: Int, marginH: Int, marginV: Int) {
+        if (!prerender) {
+            prerender = true
+            drawCalls.sortBy { if (it.text != null) 16 else 0 }
+        }
+
         batch.color = back.cpy().also { it.a = 0.93f }
         Toolkit.fillArea(batch, x, y, width, height)
         batch.color = Color.WHITE

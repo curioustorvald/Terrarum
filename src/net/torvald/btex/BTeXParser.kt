@@ -79,6 +79,7 @@ object BTeXParser {
 
         private var currentTheme = ""
         private var spanColour: String? = null
+        private var codeMode: Boolean = false
 
 
         private val elemOpeners: HashMap<String, KFunction<*>> = HashMap()
@@ -175,6 +176,26 @@ object BTeXParser {
             }
         }
 
+        private fun getOrPutCodeTagRef(width: Int): ((BTeXDrawCall) -> BTeXBatchDrawCall)? {
+            val tagname = "TAG@CODE-$width"
+            if (!objDict.contains(tagname)) {
+                objWidthDict[tagname] = 0
+                objDict[tagname] = { text: BTeXDrawCall ->
+                    object : BTeXBatchDrawCall(0, 0, text) {
+                        override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
+                            val oldcol = batch.color.cpy()
+                            batch.color = Color(0xccccccff.toInt())
+                            Toolkit.fillArea(batch, x - 2, y - 1, width + 4f, doc.lineHeightInPx + 2f)
+                            batch.color = Color(0x999999ff.toInt())
+                            Toolkit.drawBoxBorder(batch, x - 2, y - 1, width + 4f, doc.lineHeightInPx + 2f)
+                            batch.color = oldcol
+                        }
+                    }
+                }
+            }
+            return objDict[tagname]
+        }
+
         fun dispose() {
             if (::testFont.isInitialized) testFont.tryDispose()
             if (::titleFont.isInitialized) titleFont.tryDispose()
@@ -262,12 +283,14 @@ object BTeXParser {
         }
 
         private var oldSpanColour: String? = null
+        private var oldCodeMode = false
 
         override fun characters(ch: CharArray, start: Int, length: Int) {
             val str =
                 String(ch.sliceArray(start until start + length)).replace('\n', ' ').replace(Regex(" +"), " ")//.trim()
 
             if (str.isNotEmpty()) {
+                // process span request
                 if (spanColour != oldSpanColour || spanColour != null) {
 //                    printdbg("Characters [col:${spanColour}] \t\"$str\"")
 
@@ -283,12 +306,22 @@ object BTeXParser {
                             spanGdxCol.b.times(15f).roundToInt()
                         ))
                     }
-
                 }
+
+                // process code request
+                if (codeMode != oldCodeMode && codeMode) {
+                    println("CODE tag for str '$str'")
+                    val w = getFont().getWidth(str)
+                    getOrPutCodeTagRef(w)
+                    paragraphBuffer.appendObjectPlaceholder("TAG@CODE-$w")
+                }
+
+
 
                 paragraphBuffer.append(str)
 
                 oldSpanColour = spanColour
+                oldCodeMode = codeMode
             }
         }
 
@@ -634,6 +667,15 @@ object BTeXParser {
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.paragraphBuffer.appendObjectPlaceholder("TAG@TEX")
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemCODE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            handler.codeMode = true
+        }
+        @CloseTag
+        fun closeElemCODE(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
+            handler.codeMode = false
         }
 
 
