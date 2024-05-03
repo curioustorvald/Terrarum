@@ -286,7 +286,7 @@ object BTeXParser {
         private var oldCodeMode = false
 
         override fun characters(ch: CharArray, start: Int, length: Int) {
-            val str =
+            var str =
                 String(ch.sliceArray(start until start + length)).replace('\n', ' ').replace(Regex(" +"), " ")//.trim()
 
             if (str.isNotEmpty()) {
@@ -309,11 +309,20 @@ object BTeXParser {
                 }
 
                 // process code request
-                if (codeMode != oldCodeMode && codeMode) {
+                if (codeMode != oldCodeMode || codeMode) {
                     println("CODE tag for str '$str'")
-                    val w = getFont().getWidth(str)
-                    getOrPutCodeTagRef(w)
-                    paragraphBuffer.appendObjectPlaceholder("TAG@CODE-$w")
+
+                    str = CodepointSequence(listOf(0xF901D, 0xF901D, 0xF901D)).toUTF8Bytes().decodeToString()
+
+                    if (!codeMode) {
+                        paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideDefault)
+                    }
+                    else {
+                        val w = getFont().getWidth(str)
+                        getOrPutCodeTagRef(w)
+                        paragraphBuffer.appendObjectPlaceholder("TAG@CODE-$w")
+                        paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideCodestyle)
+                    }
                 }
 
 
