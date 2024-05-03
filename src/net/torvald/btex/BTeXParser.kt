@@ -226,8 +226,8 @@ object BTeXParser {
 
         override fun startElement(uri: String, localName: String, qName: String, attributes: Attributes) {
             val tag = qName
-            if (tagStack.isEmpty() && tag.lowercase() != "btexdoc") throw BTeXParsingException("Document is not BTeX")
             val theTag = tag.uppercase()
+            if (tagStack.isEmpty() && theTag != "BTEXDOC") throw BTeXParsingException("Document is not BTeX")
 
             if (tagStack.isNotEmpty() && tagStack.any { textTags.contains(it) } && textTags.contains(theTag))
                 throw IllegalStateException("Text tag '$theTag' used inside of text tags (tag stack is ${tagStack.joinToString()}, $theTag)")
@@ -284,6 +284,7 @@ object BTeXParser {
 
         private var oldSpanColour: String? = null
         private var oldCodeMode = false
+        private val CODE_TAG_MARGIN = 2
 
         override fun characters(ch: CharArray, start: Int, length: Int) {
             var str =
@@ -310,17 +311,17 @@ object BTeXParser {
 
                 // process code request
                 if (codeMode != oldCodeMode || codeMode) {
-                    println("CODE tag for str '$str'")
-
-                    str = CodepointSequence(listOf(0xF901D, 0xF901D, 0xF901D)).toUTF8Bytes().decodeToString()
 
                     if (!codeMode) {
                         paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideDefault)
+                        paragraphBuffer.append(glueToString(CODE_TAG_MARGIN))
                     }
                     else {
-                        val w = getFont().getWidth(str)
+                        println("CODE tag for str '$str'")
+                        val w = getFont().getWidth(str) + 2*CODE_TAG_MARGIN
                         getOrPutCodeTagRef(w)
-                        paragraphBuffer.appendObjectPlaceholder("TAG@CODE-$w")
+                        paragraphBuffer.appendObjectPlaceholder("TAG@CODE-${w}")
+                        paragraphBuffer.append(glueToString(CODE_TAG_MARGIN))
                         paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideCodestyle)
                     }
                 }

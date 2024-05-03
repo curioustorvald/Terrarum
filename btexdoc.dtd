@@ -1,0 +1,121 @@
+<!ENTITY % special.extra "img">
+<!ENTITY % special.basic "br | span">
+<!ENTITY % special "%special.basic; | %special.extra;">
+<!ENTITY % fontstyle.extra "big | small | font | basefont">
+<!ENTITY % fontstyle.basic "tt | i | b | u | s | strike ">
+<!ENTITY % fontstyle "%fontstyle.basic; | %fontstyle.extra;">
+<!ENTITY % inlinelogo "btex | tex | latex">
+<!ENTITY % inline "a | %special; | %fontstyle; | code | %inlinelogo; | index | var">
+<!ENTITY % Inline "(#PCDATA | %inline;)*">
+<!ENTITY % Text "CDATA">
+<!ENTITY % TextAlign "align (left|center|right|justify) #IMPLIED">
+<!ENTITY % HeadingAttr
+"hide CDATA #IMPLIED
+ alt %Text; #IMPLIED">
+
+<!ENTITY % BTeXcover "cover (hardcover|none) #IMPLIED">
+<!ENTITY % BTeXinner "inner (standard) #IMPLIED">
+<!ENTITY % BTeXpapersize "papersize (standard) #IMPLIED">
+<!ENTITY % BTeXdefs "defs (mail|giro|examination) #IMPLIED">
+
+<!ENTITY % id-only "id ID #REQUIRED">
+<!ENTITY % key-value
+"key CDATA #REQUIRED
+ value CDATA #REQUIRED">
+<!ENTITY % coreattrs
+"id          ID             #IMPLIED
+ class       CDATA          #IMPLIED
+ title       %Text;         #IMPLIED">
+
+<!ENTITY % attrs "%coreattrs;">
+
+<!ENTITY % heading "part | chapter | section | subsection">
+<!ENTITY % lists "ul | ol">
+<!ENTITY % blocktext "pre | anonbreak | pbox | center | fullpagebox">
+<!ENTITY % block "p | %heading; | %lists; | %blocktext;">
+<!ENTITY % Flow "(#PCDATA | %block; | %inline;)*">
+
+<!ENTITY % ULStyle "(disc|square|circle)">
+<!ENTITY % Number "CDATA">
+<!ENTITY % LIStyle "CDATA">
+
+<!ELEMENT btexdoc (cover?,tocpage?,manuscript,indexpage?)>
+<!ATTLIST btexdoc
+        %BTeXcover;
+        %BTeXinner;
+        %BTeXpapersize;
+        %BTeXdefs;
+        >
+
+<!-- COVER tag specification -->
+<!ELEMENT cover (title?, subtitle?, author?, edition?)>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT subtitle (#PCDATA)>
+<!ELEMENT author (#PCDATA)>
+<!ELEMENT edition (#PCDATA)>
+
+<!-- TOC-like tag specification -->
+<!ELEMENT tocpage (tableofcontents)>
+<!ELEMENT indexpage (tableofindices)>
+
+<!-- MANUSCRIPT tag specification -->
+<!ELEMENT manuscript %Flow;>
+<!ELEMENT fullpagebox %Flow;>
+<!ELEMENT pbox %Inline;>
+<!ATTLIST pbox %attrs; %TextAlign;>
+
+<!ELEMENT part %Inline;>
+<!ATTLIST part %HeadingAttr;>
+<!ELEMENT chapter %Inline;>
+<!ATTLIST chapter %HeadingAttr;>
+<!ELEMENT section %Inline;>
+<!ATTLIST section %HeadingAttr;>
+<!ELEMENT subsection %Inline;>
+<!ATTLIST subsection %HeadingAttr;>
+
+
+<!-- self-closing tags -->
+<!ELEMENT tableofcontents EMPTY>
+<!ELEMENT tableofindices EMPTY>
+<!ELEMENT anonbreak EMPTY>
+<!ELEMENT newpage EMPTY>
+<!ELEMENT btex EMPTY>
+<!ELEMENT latex EMPTY>
+<!ELEMENT tex EMPTY>
+<!ELEMENT var EMPTY>
+<!ATTLIST var %id-only;>
+<!ELEMENT pair EMPTY>
+<!ATTLIST pair %key-value;>
+<!ELEMENT index EMPTY>
+<!ATTLIST index %id-only;>
+
+<!-- inherit from HTML -->
+<!ELEMENT p %Inline;>
+<!ATTLIST p %attrs; %TextAlign;>
+<!ELEMENT span %Inline;>
+<!ATTLIST span %attrs;>
+<!ELEMENT emph %Inline;>
+<!ELEMENT itemname %Inline;>
+<!ELEMENT targetname %Inline;>
+<!ELEMENT code %Inline;>
+<!ELEMENT br EMPTY>
+<!ELEMENT ul (li)+>
+<!ATTLIST ul
+        %attrs;
+        type        %ULStyle;     #IMPLIED
+        compact     (compact)     #IMPLIED
+        >
+<!ENTITY % OLStyle "CDATA">
+<!ELEMENT ol (li)+>
+<!ATTLIST ol
+        %attrs;
+        type        %OLStyle;      #IMPLIED
+        compact     (compact)      #IMPLIED
+        start       %Number;       #IMPLIED
+        >
+<!ELEMENT li %Flow;>
+<!ATTLIST li
+        %attrs;
+        type        %LIStyle;      #IMPLIED
+        value       %Number;       #IMPLIED
+        >

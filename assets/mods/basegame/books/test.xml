@@ -1,0 +1,178 @@
+<btexdoc cover="hardcover" inner="standard" papersize="standard">
+<cover>
+    <title>The Way to Mastery of<br />Lorem Ipsum</title>
+    <subtitle>Or, How To Write and Publish a Book</subtitle>
+    <author>Terran Publishing</author>
+    <edition>Test Edition</edition>
+</cover>
+
+<tocpage><tableofcontents /></tocpage>
+
+<manuscript>
+    <part>The Book</part>
+
+    <chapter>What Is a Book</chapter>
+
+    <p>This example book is written to give readers the example of the Book Language.</p>
+
+    <section hide="1">What Qualifies as a Book</section>
+
+    <p><index id="the book" />Under the book typesetting system, a Book is a collection of texts typesetted for an improved
+        legibility, enumerable pages, with insertion of other helpful resources such as illustrations
+        and <a href="hyperlink">hyperlinks</a>.</p>
+    <p>Books are considered as bound and always presented in two pages for reading.</p>
+
+    <chapter>Writing a Book Using a Typewriter</chapter>
+
+    <p><index id="typewriter" />Typewriter allows quick scribbling of the words in convenient manners, just click on them and get
+        writing!</p>
+    <p>But it comes with big downsides: you cannot type in multiple writing systems, cannot have defined
+        chapters and sections, cannot include any illustrations, no hyperlinks, and of course, ragged texts.</p>
+    <p>Typed papers are considered as non-bound and only one page at a time will be presented.</p>
+    <p>All in all, you cannot write a true Book using a typewriter.</p>
+
+    <chapter>Writing a Book with Publishers and Printing Presses</chapter>
+
+    <p>Professional-looking texts, with all the benefits of a real Book can be made, or even mass-produced
+        easily with the help of publishers.</p>
+    <p>To have your precious texts to be printed, you must send your manuscripts to a publisher, and the
+        manuscript must be written in a special language: the <btex />.</p>
+    <p><btex /> allows concise description of the entire shape of your book, any style the book typesetting
+        system can support can be described and printing presses will produce the papers accordingly.
+        You can even try to mimic the look and feel of papers created using a typewriter, if you want to.</p>
+
+
+    <part>The <btex /></part>
+
+    <chapter>Introduction</chapter>
+
+    <p><index id="btex language" /><btex /> is a markup language based on XML, with a resemblance of the <latex />.
+        <btex /> abstracts away the meticulous styling and typesetting configurations, so you can focus on
+        actually writing your texts than debugging the <latex /> macros. This does come with a downside of
+        not being able to change the given style.</p>
+    <p><btex /> document is divided up to five parts: the <itemname>Style Declaration</itemname>, the
+        <itemname>Cover</itemname>, the <itemname>Table of Contents</itemname>, the
+        <itemname>Manuscript</itemname>, and the <itemname>Index Page</itemname>. Of which the
+        Style Declaration and the Manuscript is the mandatory parts.</p>
+
+
+    <chapter>The Style Declaration</chapter>
+
+    <p><index id="btexdoc" />The Style Declaration is the very first line of a <btex /> document. Its syntax is as follows:</p>
+
+    <pbox>
+        <index id="btexdoc (tag)" />
+        &lt;btexdoc cover="hardcover" inner="standard" papersize="standard"&gt;
+    </pbox>
+
+    <p>The <code>btexdoc</code> tag takes three attributes: <code>cover</code>, <code>inner</code> and <code>papersize</code>.</p>
+    <ul>
+        <li><code>cover</code> — changes the style of the cover. Possible values: <code>hardcover</code>, <code>none</code></li>
+        <li><code>inner</code> — changes the style of the body. Possible values: <code>standard</code>, <code>typewriter</code></li>
+        <li><code>papersize</code> — defines the size of the paper. Possible values: <code>standard</code></li>
+    </ul>
+
+    <chapter>The Cover</chapter>
+
+    <p><index id="cover" />The Cover defines the text on the cover of the book. If your text has no cover, this part can be omitted. Its syntax is as follows:</p>
+    <pbox>
+        <index id="cover (tag)" />
+        <index id="title (tag)" />
+        <index id="subtitle (tag)" />
+        <index id="author (tag)" />
+        <index id="edition (tag)" />
+        &lt;cover&gt;
+        　　&lt;title&gt;Title of your book&lt;/title&gt;
+        　　&lt;subtitle&gt;Subtitle if necessary&lt;/subtitle&gt;
+        　　&lt;author&gt;Who wrote this book&lt;/author&gt;
+        　　&lt;edition&gt;Edition information if necessary&lt;/edition&gt;
+        &lt;/cover&gt;
+    </pbox>
+    <p>Only the <code>title</code> tag is mandatory. Cover texts will be printed using a special font that has wider
+        gaps between characters. The title text will be printed in a double-size.</p>
+
+
+    <chapter>The Table of Contents</chapter>
+
+    <p><index id="table of contents" />The contents of the Table of Contents is filled in automatically by reading through your manuscript;
+        parts, chapters and sections will be added. Its syntax is as follows:</p>
+
+    <pbox>
+        <index id="tocpage (tag)" />
+        &lt;tocpage title="Custom page name if necessary"&gt;&lt;tableofcontents /&gt;&lt;/tocpage&gt;
+    </pbox>
+
+    <p>The optional <code>title</code> attribute allows a custom name can be given to this page.
+        If unspecified, the default name is “Table of Contents”.</p>
+    <p>The tag <code>&lt;tableofcontents /&gt;</code> is an internal tag used by the typesetter.</p>
+
+
+    <chapter>The Manuscript</chapter>
+
+    <p><index id="manuscript" /><index id="tags" />This is the part where you actually write your body texts in. The body text can have the following tags:</p>
+    <ul>
+        <li><index id="part (tag)" /><code>part</code> — inserts part separation page to your book</li>
+        <li><index id="chapter (tag)" /><index id="section (tag)" /><code>chapter</code>, <code>section</code> — inserts a new chapter/section. If an alternative name is required on the Table of Contents, the <code>alt</code> attribute can be used. If the chapter/section needs to be hidden on the Table of Contents, add the <code>hide="1"</code> attribute. If the chapter must start on a new page, simply add <code>newpage</code> in front of the chapter tag</li>
+        <li><index id="p (tag)" /><code>p</code> — inserts a new paragraph. The body texts must be written inside this tag. All paragraphs will have a 16-pixel indentation, with the following exceptions: first <code>p</code> of the part/chapter/section; first <code>p</code> after <code>br</code>, <code>newpage</code>, <code>pbox</code>, <code>ul</code>, <code>ol</code> or <code>anonbreak</code></li>
+        <li><index id="span (tag)" /><code>span</code> — allows changing the colour of the texts. The colour must be specified in the <code>colour</code> attribute. Six-digit hex code, three-digit hex code and CSS Colors Level 4 named colours are supported. Note that all the colours will be rounded to the nearest three-digit hex code</li>
+        <li><index id="emph (tag)" /><code>emph</code> — is a special case of the <code>span</code> tag. The resulting text will be <emph>red</emph></li>
+        <li><index id="itemname (tag)" /><code>itemname</code> — is a special case of the <code>span</code> tag used to highlight the name of the ingame item. The resulting text will be <itemname>blue</itemname></li>
+        <li><index id="targetname (tag)" /><code>targetname</code> — is a special case of the <code>span</code> tag used to highlight the name of an arbitrary target or goals. The resulting text will be <targetname>green</targetname></li>
+        <li><index id="code (tag)" /><code>code</code> — is a special case of the <code>span</code> tag used to highlight the code element in-line. The resulting text will be <code>surrounded in a grey box</code></li>
+        <li><index id="br (tag)" /><code>br</code> — self-closing tag; inserts an anonymous line break</li>
+        <li><index id="newpage (tag)" /><code>newpage</code> — self-closing tag; inserts an anonymous page break</li>
+        <li><index id="anonbreak (tag)" /><code>anonbreak</code> — self-closing tag; inserts a paragraph break in the text. The break will be in a form of a long straight line on the centre of the text. Useful for typesetting novels</li>
+        <li><index id="pbox (tag)" /><code>pbox</code> — is a paragraph box that holds a text in a grey box, a style similar to the <code>code</code> tag</li>
+        <li><index id="ul (tag)" /><index id="li (tag)" /><code>ul</code> — starts an unordered list. List elements are defined using the <code>li</code> tag</li>
+        <li><index id="ol (tag)" /><code>ol</code> — starts an ordered list. List elements are defined using the <code>li</code> tag</li>
+        <li><index id="fullpagebox (tag)" /><code>fullpagebox</code> — is used to typeset its child tags into a box that fills an entire page, with its contents centred on the page. Must be used after the <code>newpage</code></li>
+        <li><index id="btex (tag)" /><code>btex</code> — self-closing tag; inserts an inline form of the <btex /> logo in the text</li>
+    </ul>
+    <p>Self-closing tags have no child tags. To use a self-closing tag, simply do <code>&lt;tagname /&gt;</code>.</p>
+
+
+    <section>Hyperlinking</section>
+
+    <p><index id="hyperlink" />Hyperlinks can be defined using <code>index</code> and <code>a</code> tags.</p>
+    <ul>
+        <li><index id="index (tag)" /><code>index</code> — will define a target for a link. Indices require a unique identifier to work as a link, and the identifier must be defined in the <code>id</code> attribute</li>
+        <li><index id="a (tag)" /><code>a</code> — will make its child texts to be clickable. The link target (index identifier) must be defined in the <code>href</code> attribute</li>
+    </ul>
+
+    <chapter>The Index Page</chapter>
+
+    <p><index id="index page" />The contents of the Index Page is filled in automatically by reading through your manuscript.
+        All the usage of <code>index</code> tags will be shown here. Its syntax is as follows:</p>
+
+    <pbox>
+        <index id="indexpage (tag)" />
+        &lt;indexpage title="Custom page name if necessary"&gt;&lt;tableofindices /&gt;&lt;/indexpage&gt;
+    </pbox>
+
+    <p>The optional <code>title</code> attribute allows a custom name can be given to this page. If unspecified,
+        the default name is “Index”.</p>
+
+
+    <chapter>Ending the Document</chapter>
+
+    <p>The <btex /> document must begin with the opening <code>btexdoc</code> tag, and therefore must
+        end with a matching closing tag. Simply write away <code>&lt;/btexdoc&gt;</code> and the
+        document is finished.</p>
+
+
+    <chapter>Conclusion</chapter>
+
+    <p>The finished book description using <btex /> can be sent to a publisher, and if there are no errors
+        on your submission, the printed books of specified number of copies will be delivered to your
+        location within a reasonable amount of business days. Happy writing!</p>
+
+    <newpage />
+
+    <fullpagebox>
+        <p><span colour="#666">this page is intentionally left blank</span></p>
+    </fullpagebox>
+
+</manuscript>
+
+<indexpage><tableofindices /></indexpage>
+</btexdoc>
