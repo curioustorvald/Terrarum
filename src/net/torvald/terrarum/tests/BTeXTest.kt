@@ -40,6 +40,11 @@ class BTeXTest : ApplicationAdapter() {
 
     private lateinit var bg: TextureRegion
 
+    private val varMap = hashMapOf(
+        "terrarumver" to "Alpha 1.3",
+        "bucks" to "121687"
+    )
+
     override fun create() {
         batch = FlippingSpriteBatch(1000)
         camera = OrthographicCamera(1280f, 720f)
@@ -53,7 +58,7 @@ class BTeXTest : ApplicationAdapter() {
 
         if (!isBookFinalised) {
             measureTimeMillis {
-                val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"))
+                val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"), varMap)
                 document = f.first
                 documentHandler = f.second
             }.also {

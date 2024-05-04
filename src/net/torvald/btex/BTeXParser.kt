@@ -20,9 +20,11 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.MovableType
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
+import net.torvald.unicode.CURRENCY
 import net.torvald.unicode.toUTF8Bytes
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
+import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
 import java.io.File
 import java.io.FileInputStream
@@ -41,26 +43,26 @@ object BTeXParser {
     internal val textTags = hashSetOf("P", "PBOX", "TITLE", "AUTHOR", "EDITION", "CHAPTER", "SECTION", "LI")
     internal val textDecorTags = hashSetOf("SPAN", "CODE")
 
-    operator fun invoke(file: FileHandle) = invoke(file.file())
+    operator fun invoke(file: FileHandle, varMap: Map<String, String>) = invoke(file.file(), varMap)
 
-    operator fun invoke(file: File): Pair<BTeXDocument, BTeXHandler> {
+    operator fun invoke(file: File, varMap: Map<String, String>): Pair<BTeXDocument, BTeXHandler> {
         val doc = BTeXDocument()
         val parser = SAXParserFactory.newDefaultInstance().newSAXParser()
         val stream = FileInputStream(file)
-        val handler = BTeXHandler(doc)
+        val handler = BTeXHandler(doc, varMap)
         parser.parse(stream, handler)
         return doc to handler
     }
 
-    operator fun invoke(string: String): Pair<BTeXDocument, BTeXHandler> {
+    operator fun invoke(string: String, varMap: Map<String, String>): Pair<BTeXDocument, BTeXHandler> {
         val doc = BTeXDocument()
         val parser = SAXParserFactory.newDefaultInstance().newSAXParser()
-        val handler = BTeXHandler(doc)
+        val handler = BTeXHandler(doc, varMap)
         parser.parse(InputSource(StringReader(string)), handler)
         return doc to handler
     }
 
-    class BTeXHandler(val doc: BTeXDocument) : DefaultHandler() {
+    class BTeXHandler(val doc: BTeXDocument, val varMap: Map<String, String>) : DefaultHandler() {
         private var cover = ""
         private var inner = ""
         private var papersize = ""
@@ -80,6 +82,7 @@ object BTeXParser {
         private var currentTheme = ""
         private var spanColour: String? = null
         private var codeMode: Boolean = false
+        private var bucksMode: Boolean = false
 
 
         private val elemOpeners: HashMap<String, KFunction<*>> = HashMap()
@@ -185,9 +188,9 @@ object BTeXParser {
                         override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
                             val oldcol = batch.color.cpy()
                             batch.color = Color(0xccccccff.toInt())
-                            Toolkit.fillArea(batch, x - 2, y - 1, width + 4f, doc.lineHeightInPx + 2f)
+                            Toolkit.fillArea(batch, x - 2, y, width + 4f, doc.lineHeightInPx.toFloat())
                             batch.color = Color(0x999999ff.toInt())
-                            Toolkit.drawBoxBorder(batch, x - 2, y - 1, width + 4f, doc.lineHeightInPx + 2f)
+                            Toolkit.drawBoxBorder(batch, x - 2, y, width + 4f, doc.lineHeightInPx.toFloat())
                             batch.color = oldcol
                         }
                     }
@@ -200,6 +203,18 @@ object BTeXParser {
             if (::testFont.isInitialized) testFont.tryDispose()
             if (::titleFont.isInitialized) titleFont.tryDispose()
             if (::subtitleFont.isInitialized) subtitleFont.tryDispose()
+        }
+
+        override fun warning(e: SAXParseException) {
+            e.printStackTrace()
+        }
+
+        override fun error(e: SAXParseException) {
+            throw e
+        }
+
+        override fun fatalError(e: SAXParseException) {
+            throw e
         }
 
         private fun printdbg(message: String?) {
@@ -284,16 +299,17 @@ object BTeXParser {
 
         private var oldSpanColour: String? = null
         private var oldCodeMode = false
+        private var oldBucksMode = false
         private val CODE_TAG_MARGIN = 2
 
         override fun characters(ch: CharArray, start: Int, length: Int) {
-            var str =
+            val str =
                 String(ch.sliceArray(start until start + length)).replace('\n', ' ').replace(Regex(" +"), " ")//.trim()
 
             if (str.isNotEmpty()) {
+                printdbg("Characters [col:${spanColour}] \t\"$str\"")
                 // process span request
                 if (spanColour != oldSpanColour || spanColour != null) {
-//                    printdbg("Characters [col:${spanColour}] \t\"$str\"")
 
                     val spanGdxCol = getSpanColourOrNull()
 
@@ -311,13 +327,12 @@ object BTeXParser {
 
                 // process code request
                 if (codeMode != oldCodeMode || codeMode) {
-
                     if (!codeMode) {
                         paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideDefault)
                         paragraphBuffer.append(glueToString(CODE_TAG_MARGIN))
                     }
                     else {
-                        println("CODE tag for str '$str'")
+//                        println("CODE tag for str '$str'")
                         val w = getFont().getWidth(str) + 2*CODE_TAG_MARGIN
                         getOrPutCodeTagRef(w)
                         paragraphBuffer.appendObjectPlaceholder("TAG@CODE-${w}")
@@ -326,12 +341,25 @@ object BTeXParser {
                     }
                 }
 
+                // process bucks request
+                if (bucksMode != oldBucksMode || bucksMode) {
+                    if (!bucksMode) {
+                        paragraphBuffer.append(ccDefault)
+
+                    }
+                    else {
+                        paragraphBuffer.append(ccBucks)
+                        val str2 = str.replace(' ', '\u00A0')
+
+                    }
+                }
 
 
                 paragraphBuffer.append(str)
 
                 oldSpanColour = spanColour
                 oldCodeMode = codeMode
+                oldBucksMode = bucksMode
             }
         }
 
@@ -688,6 +716,16 @@ object BTeXParser {
             handler.codeMode = false
         }
 
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemBUCKS(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            handler.bucksMode = true
+            handler.paragraphBuffer.append("$CURRENCY\u00A0")
+        }
+        @CloseTag
+        fun closeElemBUCKS(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
+            handler.bucksMode = false
+        }
+
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCOVER(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
@@ -796,6 +834,14 @@ object BTeXParser {
         fun processElemINDEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             attribs["id"]?.let {
                 indexMap[it] = doc.currentPage + 1
+            }
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemVAR(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            attribs["id"]?.let {
+                val value = varMap[it] ?: throw NullPointerException("No variable definition of '$it'")
+                handler.paragraphBuffer.append(value)
             }
         }
 
@@ -1351,6 +1397,7 @@ object BTeXParser {
 
         companion object {
             val ccDefault = TerrarumSansBitmap.toColorCode(0,0,0)
+            val ccBucks = TerrarumSansBitmap.toColorCode(4,0,0)
 
             private const val ZWSP = 0x200B
             private const val SHY = 0xAD

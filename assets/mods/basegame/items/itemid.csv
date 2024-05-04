@@ -64,15 +64,6 @@ id;classname;tags
 118;net.torvald.terrarum.modulebasegame.gameitems.IngotSilver;INGOT
 119;net.torvald.terrarum.modulebasegame.gameitems.IngotLead;INGOT
 
-# alloys
-26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT,ALLOY
-176;net.torvald.terrarum.modulebasegame.gameitems.IngotBronze;INGOT,ALLOY
-177;net.torvald.terrarum.modulebasegame.gameitems.IngotBrass;INGOT,ALLOY
-178;net.torvald.terrarum.modulebasegame.gameitems.IngotElectrum;INGOT,ALLOY
-179;net.torvald.terrarum.modulebasegame.gameitems.IngotSilverBillon;INGOT,ALLOY
-180;net.torvald.terrarum.modulebasegame.gameitems.IngotRosegold;INGOT,ALLOY
-181;net.torvald.terrarum.modulebasegame.gameitems.IngotSolder;INGOT,ALLOY
-
 # ores
 128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper;SMELTABLE
 129;net.torvald.terrarum.modulebasegame.gameitems.OreIron;SMELTABLE
@@ -82,7 +73,6 @@ id;classname;tags
 133;net.torvald.terrarum.modulebasegame.gameitems.OreGold;SMELTABLE
 134;net.torvald.terrarum.modulebasegame.gameitems.OreSilver;SMELTABLE
 135;net.torvald.terrarum.modulebasegame.gameitems.OreLead;SMELTABLE
-
 
 # gemstones
 144;net.torvald.terrarum.modulebasegame.gameitems.GemQuartz;SMELTABLE,SIO2
@@ -102,7 +92,32 @@ id;classname;tags
 170;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsBirch;COMBUSTIBLE,SMELTABLE,LOGS
 171;net.torvald.terrarum.modulebasegame.gameitems.ItemLogsRosewood;COMBUSTIBLE,SMELTABLE,LOGS
 
+# alloyed ingots
+26;net.torvald.terrarum.modulebasegame.gameitems.IngotSteel;INGOT,ALLOY
+176;net.torvald.terrarum.modulebasegame.gameitems.IngotBronze;INGOT,ALLOY
+177;net.torvald.terrarum.modulebasegame.gameitems.IngotBrass;INGOT,ALLOY
+178;net.torvald.terrarum.modulebasegame.gameitems.IngotElectrum;INGOT,ALLOY
+179;net.torvald.terrarum.modulebasegame.gameitems.IngotSilverBillon;INGOT,ALLOY
+180;net.torvald.terrarum.modulebasegame.gameitems.IngotRosegold;INGOT,ALLOY
+181;net.torvald.terrarum.modulebasegame.gameitems.IngotSolder;INGOT,ALLOY
 
+# sheet metals
+192;net.torvald.terrarum.modulebasegame.gameitems.SheetCopper;SHEETMETAL
+193;net.torvald.terrarum.modulebasegame.gameitems.SheetIron;SHEETMETAL
+194;net.torvald.terrarum.modulebasegame.gameitems.SheetSteel;SHEETMETAL,ALLOY
+195;net.torvald.terrarum.modulebasegame.gameitems.SheetZinc;SHEETMETAL
+196;net.torvald.terrarum.modulebasegame.gameitems.SheetTin;SHEETMETAL
+197;net.torvald.terrarum.modulebasegame.gameitems.SheetGold;SHEETMETAL
+198;net.torvald.terrarum.modulebasegame.gameitems.SheetSilver;SHEETMETAL
+199;net.torvald.terrarum.modulebasegame.gameitems.SheetLead;SHEETMETAL
+200;net.torvald.terrarum.modulebasegame.gameitems.SheetBronze;SHEETMETAL,ALLOY
+201;net.torvald.terrarum.modulebasegame.gameitems.SheetBrass;SHEETMETAL,ALLOY
+202;net.torvald.terrarum.modulebasegame.gameitems.SheetElectrum;SHEETMETAL,ALLOY
+203;net.torvald.terrarum.modulebasegame.gameitems.SheetSilverBillon;SHEETMETAL,ALLOY
+204;net.torvald.terrarum.modulebasegame.gameitems.SheetRosegold;SHEETMETAL,ALLOY
+205;net.torvald.terrarum.modulebasegame.gameitems.SheetSolder;SHEETMETAL,ALLOY
+
+# doors
 256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak;FIXTURE
 257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony;FIXTURE
 258;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorBirch;FIXTURE

@@ -1,3 +1,6 @@
+<!ENTITY nbsp "&#xA0;">
+<!ENTITY money "&#xA4;">
+
 <!ENTITY % special.extra "img">
 <!ENTITY % special.basic "br | span">
 <!ENTITY % special "%special.basic; | %special.extra;">
@@ -5,7 +8,7 @@
 <!ENTITY % fontstyle.basic "tt | i | b | u | s | strike ">
 <!ENTITY % fontstyle "%fontstyle.basic; | %fontstyle.extra;">
 <!ENTITY % inlinelogo "btex | tex | latex">
-<!ENTITY % inline "a | %special; | %fontstyle; | code | %inlinelogo; | index | var">
+<!ENTITY % inline "a | %special; | %fontstyle; | code | bucks | %inlinelogo; | index | var">
 <!ENTITY % Inline "(#PCDATA | %inline;)*">
 <!ENTITY % Text "CDATA">
 <!ENTITY % TextAlign "align (left|center|right|justify) #IMPLIED">
@@ -56,7 +59,9 @@
 
 <!-- TOC-like tag specification -->
 <!ELEMENT tocpage (tableofcontents)>
+<!ATTLIST tocpage title %Text; #IMPLIED>
 <!ELEMENT indexpage (tableofindices)>
+<!ATTLIST indexpage title %Text; #IMPLIED>
 
 <!-- MANUSCRIPT tag specification -->
 <!ELEMENT manuscript %Flow;>
@@ -89,7 +94,7 @@
 <!ELEMENT index EMPTY>
 <!ATTLIST index %id-only;>
 
-<!-- inherit from HTML -->
+<!-- inherited from HTML -->
 <!ELEMENT p %Inline;>
 <!ATTLIST p %attrs; %TextAlign;>
 <!ELEMENT span %Inline;>
@@ -98,6 +103,7 @@
 <!ELEMENT itemname %Inline;>
 <!ELEMENT targetname %Inline;>
 <!ELEMENT code %Inline;>
+<!ELEMENT bucks %Inline;>
 <!ELEMENT br EMPTY>
 <!ELEMENT ul (li)+>
 <!ATTLIST ul
