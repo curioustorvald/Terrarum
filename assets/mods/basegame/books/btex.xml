@@ -1,3 +1,4 @@
+<!DOCTYPE btexdoc SYSTEM "btexdoc.dtd">
 <btexdoc cover="hardcover" inner="standard" papersize="standard">
 <cover>
     <title>The Way to Mastery of<br />Lorem Ipsum</title>
@@ -50,10 +51,10 @@
         <btex /> abstracts away the meticulous styling and typesetting configurations, so you can focus on
         actually writing your texts than debugging the <latex /> macros. This does come with a downside of
         not being able to change the given style.</p>
-    <p><btex /> document is divided up to five parts: the <itemname>Style Declaration</itemname>, the
-        <itemname>Cover</itemname>, the <itemname>Table of Contents</itemname>, the
-        <itemname>Manuscript</itemname>, and the <itemname>Index Page</itemname>. Of which the
-        Style Declaration and the Manuscript is the mandatory parts.</p>
+    <p><btex /> document is divided up to five parts: the <a href="btexdoc">Style Declaration</a>, the
+        <a href="cover">Cover</a>, the <a href="table of contents">Table of Contents</a>, the
+        <a href="manuscript">Manuscript</a>, and the <a href="index page">Index Page</a>, of which the
+        Style Declaration and the Manuscript are the mandatory parts.</p>
 
 
     <chapter>The Style Declaration</chapter>
@@ -65,7 +66,8 @@
         &lt;btexdoc cover="hardcover" inner="standard" papersize="standard"&gt;
     </pbox>
 
-    <p>The <code>btexdoc</code> tag takes three attributes: <code>cover</code>, <code>inner</code> and <code>papersize</code>.</p>
+    <p>The <code>btexdoc</code> tag takes three attributes:<br />
+        <code>cover</code>, <code>inner</code> and <code>papersize</code>.</p>
     <ul>
         <li><code>cover</code> — changes the style of the cover. Possible values: <code>hardcover</code>, <code>none</code></li>
         <li><code>inner</code> — changes the style of the body. Possible values: <code>standard</code>, <code>typewriter</code></li>

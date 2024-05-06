@@ -2,31 +2,36 @@
 <!ENTITY money "&#xA4;">
 
 <!ENTITY % special.extra "img">
-<!ENTITY % special.basic "br | span">
+<!ENTITY % special.basic "br | span | newpage">
 <!ENTITY % special "%special.basic; | %special.extra;">
 <!ENTITY % fontstyle.extra "big | small | font | basefont">
 <!ENTITY % fontstyle.basic "tt | i | b | u | s | strike ">
 <!ENTITY % fontstyle "%fontstyle.basic; | %fontstyle.extra;">
 <!ENTITY % inlinelogo "btex | tex | latex">
-<!ENTITY % inline "a | %special; | %fontstyle; | code | bucks | %inlinelogo; | index | var">
+<!ENTITY % textdecor "emph | itemname | targetname">
+<!ENTITY % inline "a | %special; | %fontstyle; | code | bucks | %inlinelogo; | index | var | %textdecor;">
+<!ENTITY % inline.meta "a | %special.basic; | %inlinelogo;">
 <!ENTITY % Inline "(#PCDATA | %inline;)*">
+<!ENTITY % Inline.meta "(#PCDATA | %inline.meta;)*">
 <!ENTITY % Text "CDATA">
 <!ENTITY % TextAlign "align (left|center|right|justify) #IMPLIED">
 <!ENTITY % HeadingAttr
 "hide CDATA #IMPLIED
  alt %Text; #IMPLIED">
+<!ENTITY % pre.content
+        "(#PCDATA | a | %special.basic; | %fontstyle.basic;)*">
 
 <!ENTITY % BTeXcover "cover (hardcover|none) #IMPLIED">
 <!ENTITY % BTeXinner "inner (standard) #IMPLIED">
 <!ENTITY % BTeXpapersize "papersize (standard) #IMPLIED">
 <!ENTITY % BTeXdefs "defs (mail|giro|examination) #IMPLIED">
 
-<!ENTITY % id-only "id ID #REQUIRED">
+<!ENTITY % id-only "id CDATA #REQUIRED">
 <!ENTITY % key-value
 "key CDATA #REQUIRED
  value CDATA #REQUIRED">
 <!ENTITY % coreattrs
-"id          ID             #IMPLIED
+"id          CDATA             #IMPLIED
  class       CDATA          #IMPLIED
  title       %Text;         #IMPLIED">
 
@@ -52,10 +57,10 @@
 
 <!-- COVER tag specification -->
 <!ELEMENT cover (title?, subtitle?, author?, edition?)>
-<!ELEMENT title (#PCDATA)>
-<!ELEMENT subtitle (#PCDATA)>
-<!ELEMENT author (#PCDATA)>
-<!ELEMENT edition (#PCDATA)>
+<!ELEMENT title %Inline.meta;>
+<!ELEMENT subtitle %Inline.meta;>
+<!ELEMENT author %Inline.meta;>
+<!ELEMENT edition %Inline.meta;>
 
 <!-- TOC-like tag specification -->
 <!ELEMENT tocpage (tableofcontents)>
@@ -98,11 +103,15 @@
 <!ELEMENT p %Inline;>
 <!ATTLIST p %attrs; %TextAlign;>
 <!ELEMENT span %Inline;>
-<!ATTLIST span %attrs;>
+<!ATTLIST span
+        %attrs;
+        color %Text; #IMPLIED
+        colour %Text; #IMPLIED
+        >
 <!ELEMENT emph %Inline;>
 <!ELEMENT itemname %Inline;>
 <!ELEMENT targetname %Inline;>
-<!ELEMENT code %Inline;>
+<!ELEMENT code %pre.content;>
 <!ELEMENT bucks %Inline;>
 <!ELEMENT br EMPTY>
 <!ELEMENT ul (li)+>
@@ -124,4 +133,10 @@
         %attrs;
         type        %LIStyle;      #IMPLIED
         value       %Number;       #IMPLIED
+        >
+<!ENTITY % a.content
+        "(#PCDATA | %special; | %fontstyle; | code | var)*">
+<!ELEMENT a %a.content;>
+<!ATTLIST a
+        href CDATA #REQUIRED
         >

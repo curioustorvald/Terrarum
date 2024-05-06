@@ -90,6 +90,7 @@ object BTeXParser {
         private var currentTheme = ""
         private var spanColour: String? = null
         private var codeMode: Boolean = false
+        private var hrefMode: Boolean = false
         private var bucksMode: Boolean = false
 
 
@@ -189,7 +190,7 @@ object BTeXParser {
             }
         }
 
-        private fun getOrPutCodeTagRef(width: Int): ((BTeXDrawCall) -> BTeXBatchDrawCall)? {
+        /*private fun getOrPutCodeTagRef(width: Int): ((BTeXDrawCall) -> BTeXBatchDrawCall)? {
             val tagname = "TAG@CODE-$width"
             if (!objDict.contains(tagname)) {
                 objWidthDict[tagname] = 0
@@ -207,7 +208,7 @@ object BTeXParser {
                 }
             }
             return objDict[tagname]
-        }
+        }*/
 
         fun dispose() {
             if (::testFont.isInitialized) testFont.tryDispose()
@@ -309,6 +310,7 @@ object BTeXParser {
 
         private var oldSpanColour: String? = null
         private var oldCodeMode = false
+        private var oldHrefMode = false
         private var oldBucksMode = false
         private val CODE_TAG_MARGIN = 2
 
@@ -339,15 +341,27 @@ object BTeXParser {
                 if (codeMode != oldCodeMode || codeMode) {
                     if (!codeMode) {
                         paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideDefault)
+                        paragraphBuffer.append(ccDefault)
                         paragraphBuffer.append(glueToString(CODE_TAG_MARGIN))
                     }
                     else {
 //                        println("CODE tag for str '$str'")
-                        val w = getFont().getWidth(str) + 2*CODE_TAG_MARGIN
-                        getOrPutCodeTagRef(w)
-                        paragraphBuffer.appendObjectPlaceholder("TAG@CODE-${w}")
+//                        val w = getFont().getWidth(str) + 2*CODE_TAG_MARGIN
+//                        getOrPutCodeTagRef(w)
+//                        paragraphBuffer.appendObjectPlaceholder("TAG@CODE-${w}")
                         paragraphBuffer.append(glueToString(CODE_TAG_MARGIN))
+                        paragraphBuffer.append(ccCode)
                         paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideCodestyle)
+                    }
+                }
+
+                // process href request
+                if (hrefMode != oldHrefMode || hrefMode) {
+                    if (!hrefMode) {
+                        paragraphBuffer.append(ccDefault)
+                    }
+                    else {
+                        paragraphBuffer.append(ccHref)
                     }
                 }
 
@@ -369,6 +383,7 @@ object BTeXParser {
 
                 oldSpanColour = spanColour
                 oldCodeMode = codeMode
+                oldHrefMode = hrefMode
                 oldBucksMode = bucksMode
             }
         }
@@ -618,7 +633,7 @@ object BTeXParser {
         )
 
         private val ccEmph = "#C11"// TerrarumSansBitmap.toColorCode(0xfd44)
-        private val ccItemName = "#14C" // TerrarumSansBitmap.toColorCode(0xf37d)
+        private val ccItemName = "#03B" // TerrarumSansBitmap.toColorCode(0xf37d)
         private val ccTargetName = "#170" // TerrarumSansBitmap.toColorCode(0xf3c4)
 
         @OpenTag // reflective access is impossible with 'private'
@@ -727,6 +742,15 @@ object BTeXParser {
         }
 
         @OpenTag // reflective access is impossible with 'private'
+        fun processElemA(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            handler.hrefMode = true
+        }
+        @CloseTag
+        fun closeElemA(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
+            handler.hrefMode = false
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
         fun processElemBUCKS(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.bucksMode = true
             handler.paragraphBuffer.append("$CURRENCY\u00A0")
@@ -830,7 +854,7 @@ object BTeXParser {
                     val heading = if (part == null && cpt == null && sect == null)
                         ""
                     else if (part != null && cpt == null && sect == null)
-                        "Part ${part.toRomanNum()}.${glueToString(9)}"
+                        "Part ${part.toRomanNum()}${glueToString(9)}"
                     else
                         listOfNotNull(cpt, sect).joinToString(".") + "${glueToString(9)}" +
                                 (if (cpt != null && cpt < 10) "${glueToString(9)}" else "")
@@ -1408,6 +1432,8 @@ object BTeXParser {
         companion object {
             val ccDefault = TerrarumSansBitmap.toColorCode(0,0,0)
             val ccBucks = TerrarumSansBitmap.toColorCode(4,0,0)
+            val ccCode = TerrarumSansBitmap.toColorCode(0,5,7)
+            val ccHref = TerrarumSansBitmap.toColorCode(0,3,11)
 
             private const val ZWSP = 0x200B
             private const val SHY = 0xAD
