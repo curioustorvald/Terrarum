@@ -47,7 +47,11 @@ object BTeXParser {
 
     operator fun invoke(file: File, varMap: Map<String, String>): Pair<BTeXDocument, BTeXHandler> {
         val doc = BTeXDocument()
-        val parser = SAXParserFactory.newDefaultInstance().newSAXParser()
+        val parser = SAXParserFactory.newInstance().let {
+            it.isNamespaceAware = true
+            it.isValidating = true
+            it.newSAXParser()
+        }
         val stream = FileInputStream(file)
         val handler = BTeXHandler(doc, varMap)
         parser.parse(stream, handler)
@@ -56,7 +60,11 @@ object BTeXParser {
 
     operator fun invoke(string: String, varMap: Map<String, String>): Pair<BTeXDocument, BTeXHandler> {
         val doc = BTeXDocument()
-        val parser = SAXParserFactory.newDefaultInstance().newSAXParser()
+        val parser = SAXParserFactory.newInstance().let {
+            it.isNamespaceAware = true
+            it.isValidating = true
+            it.newSAXParser()
+        }
         val handler = BTeXHandler(doc, varMap)
         parser.parse(InputSource(StringReader(string)), handler)
         return doc to handler
@@ -118,6 +126,8 @@ object BTeXParser {
         private lateinit var subtitleFont: TerrarumSansBitmap
 
         private val bodyTextShadowAlpha = 0.36f
+
+
 
         private fun StringBuilder.appendObjectPlaceholder(id: String) {
             (objWidthDict[id] ?: throw NullPointerException("No OBJ with id '$id' exists")).let {
@@ -307,7 +317,7 @@ object BTeXParser {
                 String(ch.sliceArray(start until start + length)).replace('\n', ' ').replace(Regex(" +"), " ")//.trim()
 
             if (str.isNotEmpty()) {
-                printdbg("Characters [col:${spanColour}] \t\"$str\"")
+//                printdbg("Characters [col:${spanColour}] \t\"$str\"")
                 // process span request
                 if (spanColour != oldSpanColour || spanColour != null) {
 
