@@ -1043,7 +1043,7 @@ object BTeXParser {
                 // DON't indent on centering context
                 if (tagStack.contains("CENTER") || tagStack.contains("FULLPAGEBOX")) thePar
                 // indent the second+ pars (or don't indent first par after cpt/sect, anonbreak and br)
-                else if (siblingIndex > 1 && penultTag != "ANONBREAK" && penultTag != "BR") "\u3000$thePar"
+                else if (siblingIndex > 1 && penultTag != "ANONBREAK" && penultTag != "BR") "\uDBBF\uDFDF$thePar"
                 // if the very first tag within the MANUSCRIPT is par (i.e. no chapter), create a "virtual" chapter
                 else if (penultTag == "MANUSCRIPT") "\n\n$thePar"
                 // else, print the text normally
