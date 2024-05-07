@@ -42,7 +42,7 @@ import kotlin.reflect.full.findAnnotation
  */
 object BTeXParser {
 
-    internal val textTags = hashSetOf("P", "PBOX", "TITLE", "AUTHOR", "EDITION", "CHAPTER", "SECTION", "LI")
+    internal val textTags = hashSetOf("P", "CALLOUT", "TITLE", "AUTHOR", "EDITION", "CHAPTER", "SECTION", "LI")
     internal val textDecorTags = hashSetOf("SPAN", "CODE")
 
     operator fun invoke(file: FileHandle, varMap: Map<String, String>) = invoke(file.file(), varMap)
@@ -720,6 +720,10 @@ object BTeXParser {
         @OpenTag // reflective access is impossible with 'private'
         fun processElemSPAN(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.spanColour = attribs["colour"] ?: attribs["color"]
+
+            if (attribs["class"] == "code") {
+                handler.codeMode = true
+            }
         }
 
         @CloseTag
@@ -939,22 +943,29 @@ object BTeXParser {
         @OpenTag // reflective access is impossible with 'private'
         fun processElemP(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.clearParBuffer()
+
+            currentAlign = attribs["align"] ?: "justify"
+
+            if (attribs["class"] == "code") {
+                handler.codeMode = true
+                handler.spanColour = "black"
+            }
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemPBOX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+        fun processElemCALLOUT(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             handler.clearParBuffer()
 
             currentAlign = attribs["align"] ?: "justify"
 
             if (attribs["class"] == "code") {
                 handler.codeMode = true
-                spanColour = "black"
+                handler.spanColour = "black"
             }
         }
 
         @CloseTag // reflective access is impossible with 'private'
-        fun closeElemPBOX(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
+        fun closeElemCALLOUT(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // if this P is a very first P without chapters, leave two lines before typesetting
             val penultTag = tagHistory.getOrNull(tagHistory.lastIndex - 1)
             val thePar = handler.paragraphBuffer.toString().trim()
@@ -971,15 +982,29 @@ object BTeXParser {
 
                 // add boxes
                 it.extraDrawFun = { batch, x, y ->
-                    val width = it.width.toFloat()
+                    val width = doc.textWidth - 2 * MARGIN_PARBOX_H.toFloat()
                     val height = it.lineCount * doc.lineHeightInPx.toFloat()
 
-                    val oldcol = batch.color.cpy()
-                    batch.color = Color(0xccccccff.toInt())
-                    Toolkit.fillArea(batch, x - MARGIN_PARBOX_H, y - MARGIN_PARBOX_V, width + 2*MARGIN_PARBOX_H, height + 2*MARGIN_PARBOX_V)
-                    batch.color = Color(0x999999ff.toInt())
-                    Toolkit.drawBoxBorder(batch, x - MARGIN_PARBOX_H, y - MARGIN_PARBOX_V, width + 2*MARGIN_PARBOX_H, height + 2*MARGIN_PARBOX_V)
-                    batch.color = oldcol
+                    if (height > 0) {
+                        val oldcol = batch.color.cpy()
+                        batch.color = Color(0xccccccff.toInt())
+                        Toolkit.fillArea(
+                            batch,
+                            x - MARGIN_PARBOX_H,
+                            y - MARGIN_PARBOX_V,
+                            width + 2 * MARGIN_PARBOX_H,
+                            height + 2 * MARGIN_PARBOX_V
+                        )
+                        batch.color = Color(0x999999ff.toInt())
+                        Toolkit.drawBoxBorder(
+                            batch,
+                            x - MARGIN_PARBOX_H,
+                            y - MARGIN_PARBOX_V,
+                            width + 2 * MARGIN_PARBOX_H,
+                            height + 2 * MARGIN_PARBOX_V
+                        )
+                        batch.color = oldcol
+                    }
                 }
             }
 
@@ -1116,10 +1141,11 @@ object BTeXParser {
             var cnt = cptSectMap.size - 1
             while (cnt >= 0) {
                 if (cptSectMap[cnt].type.startsWith("section")) {
-                    cnt += 1
                     sectOrder += 1
                 }
                 else break
+
+                cnt -= 1
             }
 
 
@@ -1507,8 +1533,8 @@ object BTeXParser {
 
 
         companion object {
-            private const val MARGIN_PARBOX_V = 2
-            private const val MARGIN_PARBOX_H = 8
+            private const val MARGIN_PARBOX_V = 4
+            private const val MARGIN_PARBOX_H = 12
             private const val MARGIN_TITLE_TEXTS = 8
             private const val PAR_INDENTATION = 16
             private const val HEADING_NUM_TITLE_GAP = 9

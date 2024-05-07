@@ -61,13 +61,10 @@
 
     <p><index id="btexdoc"/>The Style Declaration is the very first line of a <btex/> document. Its syntax is as follows:</p>
 
-    <pbox align="left" class="code">
-        <index id="btexdoc (tag)"/>
-&lt;btexdoc cover="hardcover" inner="standard" papersize="standard"&gt;
-    </pbox>
+    <callout align="left" class="code"><index id="btexdoc (tag)"/>&lt;btexdoc cover="hardcover" inner="standard" papersize="standard"&gt;
+    </callout>
 
-    <p>The <code>btexdoc</code> tag takes three attributes:<br/>
-        <code>cover</code>, <code>inner</code> and <code>papersize</code>.</p>
+    <p>The <code>btexdoc</code> tag takes following attributes:</p>
     <ul>
         <li><code>cover</code> — changes the style of the cover. Possible values: <code>hardcover</code>, <code>none</code></li>
         <li><code>inner</code> — changes the style of the body. Possible values: <code>standard</code>, <code>typewriter</code></li>
@@ -77,19 +74,13 @@
     <chapter>The Cover</chapter>
 
     <p><index id="cover"/>The Cover defines the text on the cover of the book. If your text has no cover, this part can be omitted. Its syntax is as follows:</p>
-    <pbox align="left" class="code">
-        <index id="cover (tag)"/>
-        <index id="title (tag)"/>
-        <index id="subtitle (tag)"/>
-        <index id="author (tag)"/>
-        <index id="edition (tag)"/>
-&lt;cover&gt;
-　　&lt;title&gt;Title of your book&lt;/title&gt;
-　　&lt;subtitle&gt;Subtitle if necessary&lt;/subtitle&gt;
-　　&lt;author&gt;Who wrote this book&lt;/author&gt;
-　　&lt;edition&gt;Edition information if necessary&lt;/edition&gt;
+    <callout align="left" class="code"><index id="cover (tag)"/><index id="title (tag)"/><index id="subtitle (tag)"/><index id="author (tag)"/><index id="edition (tag)"/>&lt;cover&gt;<br/>
+　　&lt;title&gt;Title of your book&lt;/title&gt;<br/>
+　　&lt;subtitle&gt;Subtitle if necessary&lt;/subtitle&gt;<br/>
+　　&lt;author&gt;Who wrote this book&lt;/author&gt;<br/>
+　　&lt;edition&gt;Edition information if necessary&lt;/edition&gt;<br/>
 &lt;/cover&gt;
-    </pbox>
+    </callout>
     <p>Only the <code>title</code> tag is mandatory. Cover texts will be printed using a special font that has wider
         gaps between characters. The title text will be printed in a double-size.</p>
 
@@ -99,10 +90,8 @@
     <p><index id="table of contents"/>The contents of the Table of Contents is filled in automatically by reading through your manuscript;
         parts, chapters and sections will be added. Its syntax is as follows:</p>
 
-    <pbox align="left" class="code">
-        <index id="tocpage (tag)"/>
-&lt;tocpage title="Custom page name if necessary"&gt;&lt;tableofcontents/&gt;&lt;/tocpage&gt;
-    </pbox>
+    <callout align="left" class="code"><index id="tocpage (tag)"/>&lt;tocpage title="Custom page name if necessary"&gt;&lt;tableofcontents/&gt;&lt;/tocpage&gt;
+    </callout>
 
     <p>The optional <code>title</code> attribute allows a custom name can be given to this page.
         If unspecified, the default name is “Table of Contents”.</p>
@@ -115,7 +104,7 @@
     <ul>
         <li><index id="part (tag)"/><code>part</code> — inserts part separation page to your book</li>
         <li><index id="chapter (tag)"/><index id="section (tag)"/><code>chapter</code>, <code>section</code> — inserts a new chapter/section. If an alternative name is required on the Table of Contents, the <code>alt</code> attribute can be used. If the chapter/section needs to be hidden on the Table of Contents, add the <code>hide="1"</code> attribute. If the chapter must start on a new page, simply add <code>newpage</code> in front of the chapter tag</li>
-        <li><index id="p (tag)"/><code>p</code> — inserts a new paragraph. The body texts must be written inside this tag. All paragraphs will have a 16-pixel indentation, with the following exceptions: first <code>p</code> of the part/chapter/section; first <code>p</code> after <code>br</code>, <code>newpage</code>, <code>pbox</code>, <code>ul</code>, <code>ol</code> or <code>anonbreak</code></li>
+        <li><index id="p (tag)"/><code>p</code> — inserts a new paragraph. The body texts must be written inside this tag. All paragraphs will have a 16-pixel indentation, with the following exceptions: first <code>p</code> of the part/chapter/section; first <code>p</code> after <code>br</code>, <code>newpage</code>, <code>callout</code>, <code>ul</code>, <code>ol</code> or <code>anonbreak</code></li>
         <li><index id="span (tag)"/><code>span</code> — allows changing the colour of the texts. The colour must be specified in the <code>colour</code> attribute. Six-digit hex code, three-digit hex code and CSS Colors Level 4 named colours are supported. Note that all the colours will be rounded to the nearest three-digit hex code</li>
         <li><index id="emph (tag)"/><code>emph</code> — is a special case of the <code>span</code> tag. The resulting text will be <emph>red</emph></li>
         <li><index id="itemname (tag)"/><code>itemname</code> — is a special case of the <code>span</code> tag used to highlight the name of the ingame item. The resulting text will be <itemname>blue</itemname></li>
@@ -124,13 +113,36 @@
         <li><index id="br (tag)"/><code>br</code> — self-closing tag; inserts an anonymous line break</li>
         <li><index id="newpage (tag)"/><code>newpage</code> — self-closing tag; inserts an anonymous page break</li>
         <li><index id="anonbreak (tag)"/><code>anonbreak</code> — self-closing tag; inserts a paragraph break in the text. The break will be in a form of a long straight line on the centre of the text. Useful for typesetting novels</li>
-        <li><index id="pbox (tag)"/><code>pbox</code> — is a paragraph box that holds a text in a grey box, a style similar to the <code>code</code> tag</li>
+        <li><index id="callout (tag)"/><code>callout</code> — is a paragraph box that holds a text in a grey box, a style similar to the <code>code</code> tag</li>
         <li><index id="ul (tag)"/><index id="li (tag)"/><code>ul</code> — starts an unordered list. List elements are defined using the <code>li</code> tag</li>
         <li><index id="ol (tag)"/><code>ol</code> — starts an ordered list. List elements are defined using the <code>li</code> tag</li>
         <li><index id="fullpagebox (tag)"/><code>fullpagebox</code> — is used to typeset its child tags into a box that fills an entire page, with its contents centred on the page. Must be used after the <code>newpage</code></li>
         <li><index id="btex (tag)"/><code>btex</code> — self-closing tag; inserts an inline form of the <btex/> logo in the text</li>
     </ul>
     <p>Self-closing tags have no child tags. To use a self-closing tag, simply do <code>&lt;tagname/&gt;</code>.</p>
+
+
+    <section>Heading Styling</section>
+
+    <p>The <code>part</code>, <code>chapter</code> and <code>section</code> takes optional <code>type</code> attributes which changes how the chapter should be numbered. Available options are:</p>
+    <ul>
+        <li><code>a</code> — use alphabet for the number (a, b, c, …)</li>
+        <li><code>A</code> — use majuscule alphabet for the number (A, B, C, …)</li>
+        <li><code>i</code> — use Roman numeral for the number (i, ii, iii, …)</li>
+        <li><code>I</code> — use majuscule Roman numeral for the number (I, II, III, …)</li>
+        <li><code>1</code> — use numbers (1, 2, 3)</li>
+    </ul>
+    <p>By default, parts use majuscule Roman numerals and others use just numbers.</p>
+
+
+    <section>Paragraph Styling</section>
+
+    <p>The <code>p</code> and <code>callout</code> tag take <code>align</code> attribute, which controls how the text should be aligned. Available options are:</p>
+    <ul>
+        <li><code>left</code> — aligns the text to the left without breaking words, also known as ragged-right</li>
+        <li><code>justify</code> — aligns the text as evenly as possible, like real books. This is the default value.</li>
+    </ul>
+    <p>The <code>p</code>, <code>span</code> and <code>callout</code> tags also take <code>class="code"</code> attribute, which results in the text printed using the <span class="code">code font.</span></p>
 
 
     <section>Hyperlinking</section>
@@ -141,15 +153,14 @@
         <li><index id="a (tag)"/><code>a</code> — will make its child texts to be clickable. The link target (index identifier) must be defined in the <code>href</code> attribute</li>
     </ul>
 
+
     <chapter>The Index Page</chapter>
 
     <p><index id="index page"/>The contents of the Index Page is filled in automatically by reading through your manuscript.
         All the usage of <code>index</code> tags will be shown here. Its syntax is as follows:</p>
 
-    <pbox align="left" class="code">
-        <index id="indexpage (tag)"/>
-&lt;indexpage title="Custom page name if necessary"&gt;&lt;tableofindices/&gt;&lt;/indexpage&gt;
-    </pbox>
+    <callout align="left" class="code"><index id="indexpage (tag)"/>&lt;indexpage title="Custom page name if necessary"&gt;&lt;tableofindices/&gt;&lt;/indexpage&gt;
+    </callout>
 
     <p>The optional <code>title</code> attribute allows a custom name can be given to this page. If unspecified,
         the default name is “Index”.</p>

@@ -8,14 +8,13 @@
     <p>The <code>btexdoc</code> tag takes two attributes: <code>cover</code> and <code>inner</code>.</p>
     <p>The <code>btexdoc</code> tag takes three attributes: <code>cover</code>, <code>inner</code> and <code>papersize</code>.</p>
     <p>Test with  excessive   white    spaces        !!</p>
-    <pbox>
+    <callout>
         A Callout!
-    </pbox>
-    <p>Another paragraph, another Lorem Ipsum. Eget duis at tellus at urna. Eget sit amet tellus cras adipiscing enim eu. Sit amet tellus cras adipiscing enim eu turpis egestas. Aliquam faucibus purus in massa tempor. Eget nullam non nisi est sit amet. Eu ultrices vitae auctor eu augue ut lectus. Tortor at auctor urna nunc.Quam lacus suspendisse faucibus interdum posuere lorem ipsum.</p>
-    <pbox align="left" class="code">
-        Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph Long Pbox paragraph
-    </pbox>
-    <p>Yet another paragraph, another Lorem Ipsum. Eget duis at tellus at urna. Eget sit amet tellus cras adipiscing enim eu. Sit amet tellus cras adipiscing enim eu turpis egestas. Aliquam faucibus purus in massa tempor. Eget nullam non nisi est sit amet. Eu ultrices vitae auctor eu augue ut lectus. Tortor at auctor urna nunc.Quam lacus suspendisse faucibus interdum posuere lorem ipsum.</p>
+    </callout>
+    <p class="code">Another paragraph, another Lorem Ipsum. Eget duis at tellus at urna. Eget sit amet tellus cras adipiscing enim eu. Sit amet tellus cras adipiscing enim eu turpis egestas. Aliquam faucibus purus in massa tempor. Eget nullam non nisi est sit amet. Eu ultrices vitae auctor eu augue ut lectus. Tortor at auctor urna nunc. Quam lacus suspendisse faucibus interdum posuere lorem ipsum.</p>
+    <callout align="left" class="code">Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph
+    </callout>
+    <p>Yet another paragraph, another Lorem Ipsum. Eget duis at tellus at urna. Eget sit amet tellus cras adipiscing enim eu. Sit amet tellus cras adipiscing enim eu turpis egestas. Aliquam faucibus purus in massa tempor. Eget nullam non nisi est sit amet. Eu ultrices vitae auctor eu augue ut lectus. Tortor at auctor urna nunc. Quam lacus suspendisse faucibus interdum posuere lorem ipsum.</p>
 
 </manuscript>
 </btexdoc>

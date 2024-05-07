@@ -49,7 +49,7 @@
 
 <!ENTITY % heading "part | chapter | section | subsection">
 <!ENTITY % lists "ul | ol">
-<!ENTITY % blocktext "pre | anonbreak | pbox | center | fullpagebox">
+<!ENTITY % blocktext "pre | anonbreak | callout | center | fullpagebox">
 <!ENTITY % block "p | %heading; | %lists; | %blocktext;">
 <!ENTITY % Flow "(#PCDATA | %block; | %inline;)*">
 
@@ -77,8 +77,8 @@
 <!-- MANUSCRIPT tag specification -->
 <!ELEMENT manuscript %Flow;>
 <!ELEMENT fullpagebox %Flow;>
-<!ELEMENT pbox %Inline;>
-<!ATTLIST pbox %attrs; %TextAlign;>
+<!ELEMENT callout %Inline;>
+<!ATTLIST callout %attrs; %TextAlign;>
 
 <!ELEMENT part %Inline;>
 <!ATTLIST part
