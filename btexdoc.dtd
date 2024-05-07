@@ -111,6 +111,8 @@
 <!-- inherited from HTML -->
 <!ELEMENT p %Inline;>
 <!ATTLIST p %attrs; %TextAlign;>
+<!ELEMENT i %Inline;> <!-- how should I style this? CAPS? ALLCAPS? -->
+<!ATTLIST i %attrs; %TextAlign;>
 <!ELEMENT span %Inline;>
 <!ATTLIST span
         %attrs;
