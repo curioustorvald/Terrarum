@@ -1,6 +1,12 @@
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY money "&#xA4;">
 
+<!ENTITY % ULStyle "(disc|square|circle)">
+<!ENTITY % Number "CDATA">
+<!ENTITY % LIStyle "CDATA">
+<!ENTITY % OLStyle "CDATA">
+
+<!ENTITY % counters "(i|I|1|a|A)">
 <!ENTITY % special.extra "img">
 <!ENTITY % special.basic "br | span | newpage">
 <!ENTITY % special "%special.basic; | %special.extra;">
@@ -26,6 +32,10 @@
 <!ENTITY % BTeXpapersize "papersize (standard) #IMPLIED">
 <!ENTITY % BTeXdefs "defs (mail|giro|examination) #IMPLIED">
 
+<!ENTITY % Countable
+"type %counters; #IMPLIED
+ start %Number; #IMPLIED">
+
 <!ENTITY % id-only "id CDATA #REQUIRED">
 <!ENTITY % key-value
 "key CDATA #REQUIRED
@@ -42,10 +52,6 @@
 <!ENTITY % blocktext "pre | anonbreak | pbox | center | fullpagebox">
 <!ENTITY % block "p | %heading; | %lists; | %blocktext;">
 <!ENTITY % Flow "(#PCDATA | %block; | %inline;)*">
-
-<!ENTITY % ULStyle "(disc|square|circle)">
-<!ENTITY % Number "CDATA">
-<!ENTITY % LIStyle "CDATA">
 
 <!ELEMENT btexdoc (cover?,tocpage?,manuscript,indexpage?)>
 <!ATTLIST btexdoc
@@ -75,13 +81,16 @@
 <!ATTLIST pbox %attrs; %TextAlign;>
 
 <!ELEMENT part %Inline;>
-<!ATTLIST part %HeadingAttr;>
+<!ATTLIST part
+        %HeadingAttr;
+        %Countable;
+        >
 <!ELEMENT chapter %Inline;>
-<!ATTLIST chapter %HeadingAttr;>
+<!ATTLIST chapter %HeadingAttr; %Countable;>
 <!ELEMENT section %Inline;>
-<!ATTLIST section %HeadingAttr;>
+<!ATTLIST section %HeadingAttr; %Countable;>
 <!ELEMENT subsection %Inline;>
-<!ATTLIST subsection %HeadingAttr;>
+<!ATTLIST subsection %HeadingAttr; %Countable;>
 
 
 <!-- self-closing tags -->
@@ -120,13 +129,10 @@
         type        %ULStyle;     #IMPLIED
         compact     (compact)     #IMPLIED
         >
-<!ENTITY % OLStyle "CDATA">
 <!ELEMENT ol (li)+>
 <!ATTLIST ol
         %attrs;
-        type        %OLStyle;      #IMPLIED
-        compact     (compact)      #IMPLIED
-        start       %Number;       #IMPLIED
+        %Countable;
         >
 <!ELEMENT li %Flow;>
 <!ATTLIST li

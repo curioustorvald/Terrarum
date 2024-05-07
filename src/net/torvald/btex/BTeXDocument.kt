@@ -362,6 +362,8 @@ class BTeXDrawCall(
             println("code themed")
         }
 
+        extraDrawFun(batch, px, py)
+
         batch.color = Color.WHITE
 
         if (text != null && cmd == null) {
@@ -371,8 +373,6 @@ class BTeXDrawCall(
             cmd.draw(doc, batch, px, py, font)
         }
         else throw Error("Text and Texture are both non-null")
-
-        extraDrawFun(batch, px, py)
     }
 
     fun isNotBlank(): Boolean {
