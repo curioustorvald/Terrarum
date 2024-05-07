@@ -1,5 +1,6 @@
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY money "&#xA4;">
+<!ENTITY zwsp "&#x200B;">
 
 <!ENTITY % ULStyle "(disc|square|circle)">
 <!ENTITY % Number "CDATA">
@@ -53,16 +54,17 @@
 <!ENTITY % block "p | %heading; | %lists; | %blocktext;">
 <!ENTITY % Flow "(#PCDATA | %block; | %inline;)*">
 
-<!ELEMENT btexdoc (cover?,tocpage?,manuscript,indexpage?)>
+<!ELEMENT btexdoc (macrodef?,cover?,tocpage?,manuscript,indexpage?)>
 <!ATTLIST btexdoc
         %BTeXcover;
         %BTeXinner;
         %BTeXpapersize;
         %BTeXdefs;
         >
+<!ELEMENT macrodef (pair)*>
 
 <!-- COVER tag specification -->
-<!ELEMENT cover (title?, subtitle?, author?, edition?)>
+<!ELEMENT cover (title?,subtitle?,author?,edition?)>
 <!ELEMENT title %Inline.meta;>
 <!ELEMENT subtitle %Inline.meta;>
 <!ELEMENT author %Inline.meta;>

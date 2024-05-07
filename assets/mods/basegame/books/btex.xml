@@ -47,7 +47,7 @@
 
     <chapter>Introduction</chapter>
 
-    <p><index id="btex language"/><btex/> is a markup language based on XML, with a resemblance of the <latex/>.
+    <p><index id="btex language"/><btex/> (pronounced as /biːtɛk/) is a markup language based on XML, with a resemblance of the <latex/>.
         <btex/> abstracts away the meticulous styling and typesetting configurations, so you can focus on
         actually writing your texts than debugging the <latex/> macros. This does come with a downside of
         not being able to change the given style.</p>
@@ -74,23 +74,23 @@
     <chapter>The Cover</chapter>
 
     <p><index id="cover"/>The Cover defines the text on the cover of the book. If your text has no cover, this part can be omitted. Its syntax is as follows:</p>
-    <callout align="left" class="code"><index id="cover (tag)"/><index id="title (tag)"/><index id="subtitle (tag)"/><index id="author (tag)"/><index id="edition (tag)"/>&lt;cover&gt;<br/>
-　　&lt;title&gt;Title of your book&lt;/title&gt;<br/>
-　　&lt;subtitle&gt;Subtitle if necessary&lt;/subtitle&gt;<br/>
-　　&lt;author&gt;Who wrote this book&lt;/author&gt;<br/>
-　　&lt;edition&gt;Edition information if necessary&lt;/edition&gt;<br/>
+    <callout align="left" class="code"><index id="cover (tag)"/><index id="title (tag)"/><index id="subtitle (tag)"/><index id="author (tag)"/><index id="edition (tag)"/>&lt;cover hue="358"&gt;<br/>
+　　&lt;title&gt;Title of your book&zwsp;&lt;/title&gt;<br/>
+　　&lt;subtitle&gt;Subtitle if necessary&zwsp;&lt;/subtitle&gt;<br/>
+　　&lt;author&gt;Who wrote this book&zwsp;&lt;/author&gt;<br/>
+　　&lt;edition&gt;Edition information if necessary&zwsp;&lt;/edition&gt;<br/>
 &lt;/cover&gt;
     </callout>
     <p>Only the <code>title</code> tag is mandatory. Cover texts will be printed using a special font that has wider
         gaps between characters. The title text will be printed in a double-size.</p>
-
+    <p>The cover can have different colour with the <code>hue</code> attribute, which takes a number between 0 and 360.</p>
 
     <chapter>The Table of Contents</chapter>
 
     <p><index id="table of contents"/>The contents of the Table of Contents is filled in automatically by reading through your manuscript;
         parts, chapters and sections will be added. Its syntax is as follows:</p>
 
-    <callout align="left" class="code"><index id="tocpage (tag)"/>&lt;tocpage title="Custom page name if necessary"&gt;&lt;tableofcontents/&gt;&lt;/tocpage&gt;
+    <callout align="left" class="code"><index id="tocpage (tag)"/>&lt;tocpage title="Custom page name if necessary"&gt;&zwsp;&lt;tableofcontents/&gt;&zwsp;&lt;/tocpage&gt;
     </callout>
 
     <p>The optional <code>title</code> attribute allows a custom name can be given to this page.
@@ -132,7 +132,7 @@
         <li><code>I</code> — use majuscule Roman numeral for the number (I, II, III, …)</li>
         <li><code>1</code> — use numbers (1, 2, 3)</li>
     </ul>
-    <p>By default, parts use majuscule Roman numerals and others use just numbers.</p>
+    <p>By default, parts use majuscule Roman numerals and others use just numbers. Alternative styling for the <code>part</code> and the <code>chapter</code> can be defined using the <a href="macro definition">Macro Definition</a>.</p>
 
 
     <section>Paragraph Styling</section>
@@ -159,7 +159,7 @@
     <p><index id="index page"/>The contents of the Index Page is filled in automatically by reading through your manuscript.
         All the usage of <code>index</code> tags will be shown here. Its syntax is as follows:</p>
 
-    <callout align="left" class="code"><index id="indexpage (tag)"/>&lt;indexpage title="Custom page name if necessary"&gt;&lt;tableofindices/&gt;&lt;/indexpage&gt;
+    <callout align="left" class="code"><index id="indexpage (tag)"/>&lt;indexpage title="Custom page name if necessary"&gt;&zwsp;&lt;tableofindices/&gt;&zwsp;&lt;/indexpage&gt;
     </callout>
 
     <p>The optional <code>title</code> attribute allows a custom name can be given to this page. If unspecified,

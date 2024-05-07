@@ -31,6 +31,7 @@ import org.xml.sax.helpers.DefaultHandler
 import java.io.File
 import java.io.FileInputStream
 import java.io.StringReader
+import java.util.regex.Pattern
 import javax.xml.parsers.SAXParserFactory
 import kotlin.math.roundToInt
 import kotlin.reflect.KFunction
@@ -136,6 +137,17 @@ object BTeXParser {
         private lateinit var subtitleFont: TerrarumSansBitmap
 
         private val bodyTextShadowAlpha = 0.36f
+
+        private val macrodefs = hashMapOf(
+            "thepart" to "Part %1\$s",
+            "thechapter" to "%1\$s"
+        )
+
+        private fun invokeMacro(name: String, vararg args: String): String {
+            val name = name.lowercase()
+            val template = macrodefs[name] ?: throw IllegalArgumentException("No macro '$name' exists")
+            return String.format(template, *args)
+        }
 
 
         private fun Int.toListNumStr(style: String) = when (style) {
@@ -675,11 +687,16 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemPAIR(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            if (tagStack.size == 3 && tagStack.getOrNull(1) == "blocklut") {
+            if (tagStack.size == 3 && tagStack.getOrNull(1) == "BLOCKLUT") {
                 blockLut[attribs["key"]!!] = attribs["value"]!!
             }
+            else if (tagStack.size == 3 && tagStack.getOrNull(1) == "MACRODEF") {
+                val key = attribs["key"]!!
+                val value = attribs["value"]!!
+                macrodefs[key.lowercase()] = value
+            }
             else {
-                throw BTeXParsingException("<pair> used outside of <blocklut>")
+                throw BTeXParsingException("<pair> used outside of <blocklut> or <macrodef>")
             }
         }
 
@@ -873,10 +890,11 @@ object BTeXParser {
                     val heading = if (part == null && cpt == null && sect == null)
                         ""
                     else if (part != null && cpt == null && sect == null)
-                        "Part $part${glueToString(HEADING_NUM_TITLE_GAP)}"
+                        "${invokeMacro("thepart", part)}${glueToString(HEADING_NUM_TITLE_GAP)}"
+                    else if (cpt != null && sect == null)
+                        "${invokeMacro("thechapter", cpt)}${glueToString(HEADING_NUM_TITLE_GAP)}"
                     else
-                        listOfNotNull(cpt, sect).joinToString(".") + "${glueToString(HEADING_NUM_TITLE_GAP)}" +
-                                (if (cpt != null && cpt.length < 2 && cpt.isNum()) "${glueToString(HEADING_NUM_TITLE_GAP)}" else "")
+                        "$cpt.$sect${glueToString(HEADING_NUM_TITLE_GAP)}"
 
                     typesetTOCline("$heading", name, pg, handler, indent, tocPage)
                 }
@@ -1103,7 +1121,7 @@ object BTeXParser {
             val cptSectInfo = cptSectStack.removeLast()
             val partNumStr = partOrder.toListNumStr(cptSectInfo.style)
 
-            typesetPartHeading(partNumStr, thePar, handler)
+            typesetPartHeading(invokeMacro("thepart", partNumStr), thePar, handler)
             if (!cptSectInfo.type.endsWith("-hidden"))
                 cptSectMap.add(CptSectInfo("part", cptSectInfo.alt ?: thePar, doc.currentPage, partNumStr, null, null))
 
@@ -1123,7 +1141,7 @@ object BTeXParser {
             val partNumStr = partOrder.toListNumStr(cptSectStack.findLast { it.type.startsWith("part") }?.type ?: "1")
             val cptNumStr = cptOrder.toListNumStr(cptSectInfo.style)
 
-            typesetChapterHeading(cptNumStr, thePar, handler, 16)
+            typesetChapterHeading(invokeMacro("thechapter", cptNumStr), thePar, handler, 16)
             if (!cptSectInfo.type.endsWith("-hidden"))
                 cptSectMap.add(CptSectInfo("chapter", cptSectInfo.alt ?: thePar, doc.currentPage, partNumStr, cptNumStr, null))
 
@@ -1241,7 +1259,7 @@ object BTeXParser {
         }
 
         private fun typesetPartHeading(num: String, thePar: String, handler: BTeXHandler, indent: Int = PAR_INDENTATION, width: Int = doc.textWidth) {
-            typesetParagraphs("${ccDefault}⁃ Part $num ⁃", handler, align = "left")
+            typesetParagraphs("${ccDefault}⁃ $num ⁃", handler, align = "left")
             typesetParagraphs(" ", handler, align = "left")
 //            typesetParagraphs(getTitleFont(), "$ccDefault$thePar", handler)
             typesetParagraphs(getSubtitleFont(), "$ccDefault$thePar", handler, align = "left")
