@@ -14,7 +14,7 @@ import net.torvald.terrarum.btex.BTeXDrawCall
 import net.torvald.terrarum.btex.TypesetDrawCall
 import net.torvald.terrarum.ceilToFloat
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.modulebasegame.console.GetAV.isNum
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.toHex
 import net.torvald.terrarum.tryDispose
 import net.torvald.terrarum.ui.Toolkit
@@ -31,7 +31,6 @@ import org.xml.sax.helpers.DefaultHandler
 import java.io.File
 import java.io.FileInputStream
 import java.io.StringReader
-import java.util.regex.Pattern
 import javax.xml.parsers.SAXParserFactory
 import kotlin.math.roundToInt
 import kotlin.reflect.KFunction
@@ -909,10 +908,25 @@ object BTeXParser {
         }
 
         @OpenTag // reflective access is impossible with 'private'
-        fun processElemVAR(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            attribs["id"]?.let {
+        fun processElemV(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            val hasID = (attribs["id"] != null)
+            val hasFROMGAME = (attribs["fromgame"] != null)
+
+            if (hasID && hasFROMGAME) {
+                throw IllegalStateException("Use only one of following attributes: id, fromgame")
+            }
+            else if (hasID) {
+                val it = attribs["id"]!!
                 val value = varMap[it] ?: throw NullPointerException("No variable definition of '$it'")
                 handler.paragraphBuffer.append(value)
+            }
+            else if (hasFROMGAME) {
+                val it = attribs["fromgame"]!!
+                val value = Lang.get(it, true)
+                handler.paragraphBuffer.append(value)
+            }
+            else {
+                throw IllegalStateException("One of following attribute required: id, fromgame")
             }
         }
 

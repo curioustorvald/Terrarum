@@ -11,11 +11,9 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import net.torvald.btex.BTeXParser
-import net.torvald.terrarum.FlippingSpriteBatch
+import net.torvald.terrarum.*
 import net.torvald.terrarum.btex.BTeXDocument
-import net.torvald.terrarum.ceilToInt
-import net.torvald.terrarum.gdxClearAndEnableBlend
-import net.torvald.terrarum.inUse
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.unicode.EMDASH
 import java.io.File
 import kotlin.system.measureTimeMillis
@@ -26,7 +24,7 @@ import kotlin.system.measureTimeMillis
  */
 class BTeXTest : ApplicationAdapter() {
 
-    val filePath = "btex_ko.xml"
+    val filePath = "btex.xml"
 //    val filePath = "test.xml"
 //    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
 //    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
@@ -46,6 +44,8 @@ class BTeXTest : ApplicationAdapter() {
     )
 
     override fun create() {
+        Lang.invoke()
+
         batch = FlippingSpriteBatch(1000)
         camera = OrthographicCamera(1280f, 720f)
         camera.setToOrtho(true) // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin

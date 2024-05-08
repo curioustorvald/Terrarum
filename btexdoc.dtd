@@ -16,7 +16,8 @@
 <!ENTITY % fontstyle "%fontstyle.basic; | %fontstyle.extra;">
 <!ENTITY % inlinelogo "btex | tex | latex">
 <!ENTITY % textdecor "emph | itemname | targetname">
-<!ENTITY % inline "a | %special; | %fontstyle; | code | bucks | %inlinelogo; | index | var | %textdecor;">
+<!ENTITY % vars "v | veun | vneun | vi | vga | veul | vreul | vwa | vgwa | vro | veuro">
+<!ENTITY % inline "a | %special; | %fontstyle; | code | bucks | %inlinelogo; | index | %vars; | %textdecor;">
 <!ENTITY % inline.meta "a | %special.basic; | %inlinelogo;">
 <!ENTITY % Inline "(#PCDATA | %inline;)*">
 <!ENTITY % Inline.meta "(#PCDATA | %inline.meta;)*">
@@ -38,6 +39,9 @@
  start %Number; #IMPLIED">
 
 <!ENTITY % id-only "id CDATA #REQUIRED">
+<!ENTITY % varattr
+"id CDATA #IMPLIED
+ fromgame CDATA #IMPLIED">
 <!ENTITY % key-value
 "key CDATA #REQUIRED
  value CDATA #REQUIRED">
@@ -103,8 +107,6 @@
 <!ELEMENT btex EMPTY>
 <!ELEMENT latex EMPTY>
 <!ELEMENT tex EMPTY>
-<!ELEMENT var EMPTY>
-<!ATTLIST var %id-only;>
 <!ELEMENT pair EMPTY>
 <!ATTLIST pair %key-value;>
 <!ELEMENT index EMPTY>
@@ -150,3 +152,29 @@
 <!ATTLIST a
         href CDATA #REQUIRED
         >
+
+<!-- var tags -->
+<!ELEMENT v EMPTY>
+<!ATTLIST v %varattr;>
+<!-- regular josa -->
+<!ELEMENT veun EMPTY>
+<!ATTLIST veun %varattr;>
+<!ELEMENT vneun EMPTY>
+<!ATTLIST vneun %varattr;>
+<!ELEMENT vi EMPTY>
+<!ATTLIST vi %varattr;>
+<!ELEMENT vga EMPTY>
+<!ATTLIST vga %varattr;>
+<!ELEMENT veul EMPTY>
+<!ATTLIST veul %varattr;>
+<!ELEMENT vreul EMPTY>
+<!ATTLIST vreul %varattr;>
+<!ELEMENT vwa EMPTY>
+<!ATTLIST vwa %varattr;>
+<!ELEMENT vgwa EMPTY>
+<!ATTLIST vgwa %varattr;>
+<!-- irregular josa -->
+<!ELEMENT vro EMPTY>
+<!ATTLIST vro %varattr;>
+<!ELEMENT veuro EMPTY>
+<!ATTLIST veuro %varattr;>
