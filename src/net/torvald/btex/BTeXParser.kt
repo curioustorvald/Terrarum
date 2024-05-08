@@ -80,21 +80,12 @@ object BTeXParser {
 
         private var btexOpened = false
 
-//        private var pageWidth = doc.textWidth
-//        private var pageLines = doc.pageLines
-//        private var pageHeight = doc.textHeight
-
         private val blockLut = HashMap<String, ItemID>()
 
         private val tagStack = ArrayList<String>() // index zero should be "btex"
         private var tagHistory = ArrayList<String>()
 
         private var currentTheme = ""
-        private var spanColour: String? = null
-        private var codeMode: Boolean = false
-        private var hrefMode: Boolean = false
-        private var bucksMode: Boolean = false
-
 
         private val elemOpeners: HashMap<String, KFunction<*>> = HashMap()
         private val elemClosers: HashMap<String, KFunction<*>> = HashMap()
@@ -105,10 +96,6 @@ object BTeXParser {
         fun clearParBuffer() {
             paragraphBuffer.clear()
             currentAlign = "justify"
-            codeMode = false
-            hrefMode = false
-            bucksMode = false
-            spanColour = null
             currentTheme = ""
         }
 
@@ -218,26 +205,6 @@ object BTeXParser {
             }
         }
 
-        /*private fun getOrPutCodeTagRef(width: Int): ((BTeXDrawCall) -> BTeXBatchDrawCall)? {
-            val tagname = "TAG@CODE-$width"
-            if (!objDict.contains(tagname)) {
-                objWidthDict[tagname] = 0
-                objDict[tagname] = { text: BTeXDrawCall ->
-                    object : BTeXBatchDrawCall(0, 0, text) {
-                        override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
-                            val oldcol = batch.color.cpy()
-                            batch.color = Color(0xccccccff.toInt())
-                            Toolkit.fillArea(batch, x - 2, y, width + 4f, doc.lineHeightInPx.toFloat())
-                            batch.color = Color(0x999999ff.toInt())
-                            Toolkit.drawBoxBorder(batch, x - 2, y, width + 4f, doc.lineHeightInPx.toFloat())
-                            batch.color = oldcol
-                        }
-                    }
-                }
-            }
-            return objDict[tagname]
-        }*/
-
         fun dispose() {
             if (::testFont.isInitialized) testFont.tryDispose()
             if (::titleFont.isInitialized) titleFont.tryDispose()
@@ -342,13 +309,27 @@ object BTeXParser {
         private var oldBucksMode = false
         private val CODE_TAG_MARGIN = 2
 
-        private fun spanColToColourCode(): String? {
-            val spanGdxCol = getSpanColourOrNull()
-            if (spanGdxCol == null) return null
+        private val CODEMODE_BEGIN = "${glueToString(CODE_TAG_MARGIN)}$ccCode${TerrarumSansBitmap.charsetOverrideCodestyle}"
+        private val CODEMODE_END = "${TerrarumSansBitmap.charsetOverrideDefault}$ccDefault${glueToString(CODE_TAG_MARGIN)}"
+
+        private val HREF_BEGIN = "$ccHref"
+        private val HREF_END = "$ccDefault"
+
+        private val BUCKS_BEGIN = "$ccBucks"
+        private val BUCKS_END = "$ccDefault"
+
+        private val EMPH_BEGIN = "$ccEmph"
+        private val EMPH_END = "$ccDefault"
+        private val ITEMNAME_BEGIN = "$ccItemName"
+        private val TARGETNAME_BEGIN = "$ccTargetName"
+
+        private val SPAN_END = "$ccDefault${TerrarumSansBitmap.charsetOverrideDefault}"
+
+        private fun Color.toCC(): String {
             return TerrarumSansBitmap.toColorCode(
-                spanGdxCol.r.times(15f).roundToInt(),
-                spanGdxCol.g.times(15f).roundToInt(),
-                spanGdxCol.b.times(15f).roundToInt()
+                this.r.times(15f).roundToInt(),
+                this.g.times(15f).roundToInt(),
+                this.b.times(15f).roundToInt()
             )
         }
 
@@ -358,73 +339,9 @@ object BTeXParser {
 
             if (str.isNotEmpty()) {
 //                printdbg("Characters [col:${spanColour}] \t\"$str\"")
-                // process span request
-                val spanCC = spanColToColourCode()
-
-                if (spanColour != oldSpanColour || spanColour != null) {
-                    paragraphBuffer.append(spanCC ?: ccDefault)
-                }
-
-                // process code request
-                if (codeMode != oldCodeMode || codeMode) {
-                    if (!codeMode) {
-                        paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideDefault)
-                        paragraphBuffer.append(ccDefault)
-                        paragraphBuffer.append(glueToString(CODE_TAG_MARGIN))
-                    }
-                    else {
-//                        println("CODE tag for str '$str'")
-//                        val w = getFont().getWidth(str) + 2*CODE_TAG_MARGIN
-//                        getOrPutCodeTagRef(w)
-//                        paragraphBuffer.appendObjectPlaceholder("TAG@CODE-${w}")
-                        paragraphBuffer.append(glueToString(CODE_TAG_MARGIN))
-                        paragraphBuffer.append(spanCC ?: ccCode)
-                        paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideCodestyle)
-                    }
-                }
-
-                // process href request
-                if (hrefMode != oldHrefMode || hrefMode) {
-                    if (!hrefMode) {
-                        paragraphBuffer.append(ccDefault)
-                    }
-                    else {
-                        paragraphBuffer.append(ccHref)
-                    }
-                }
-
-                // process bucks request
-                if (bucksMode != oldBucksMode || bucksMode) {
-                    if (!bucksMode) {
-                        paragraphBuffer.append(ccDefault)
-                    }
-                    else {
-                        paragraphBuffer.append(ccBucks)
-                        str = str.replace(' ', '\u00A0')
-                    }
-                }
-
-
                 paragraphBuffer.append(str)
-
-                oldSpanColour = spanColour
-                oldCodeMode = codeMode
-                oldHrefMode = hrefMode
-                oldBucksMode = bucksMode
             }
         }
-
-        /*private fun Color?.toInternalColourCodeStr(): String {
-            return if (this == null) "\u000E"
-            else {
-                val rgba = this.toRGBA()
-                val r = rgba.ushr(24).and(255) + 0xF800
-                val g = rgba.ushr(16).and(255) + 0xF800
-                val b = rgba.ushr(8).and(255) + 0xF800
-
-                return "\u000F" + Char(r) + Char(g) + Char(b)
-            }
-        }*/
 
         private fun getFont() = when (cover) {
             "typewriter" -> TODO()
@@ -452,13 +369,11 @@ object BTeXParser {
         private val hexColRegexRGBshort = Regex("#[0-9a-fA-F]{3,3}")
         private val hexColRegexRGB = Regex("#[0-9a-fA-F]{6,6}")
 
-        private fun getSpanColourOrNull() = if (spanColour == null) null else getSpanColour()
-
-        private fun getSpanColour(): Color = if (spanColour == null) Color.BLACK
-        else if (spanColour!!.matches(hexColRegexRGB)) {
-            val rs = spanColour!!.substring(1,3)
-            val gs = spanColour!!.substring(3,5)
-            val bs = spanColour!!.substring(5,7)
+        private fun getSpanColour(spanColour: String): Color =
+        if (spanColour.matches(hexColRegexRGB)) {
+            val rs = spanColour.substring(1,3)
+            val gs = spanColour.substring(3,5)
+            val bs = spanColour.substring(5,7)
 
             val r = rs.toInt(16) / 255f
             val g = gs.toInt(16) / 255f
@@ -466,10 +381,10 @@ object BTeXParser {
 
             Color(r, g, b, 1f)
         }
-        else if (spanColour!!.matches(hexColRegexRGBshort)) {
-            val rs = spanColour!!.substring(1,2)
-            val gs = spanColour!!.substring(2,3)
-            val bs = spanColour!!.substring(3,4)
+        else if (spanColour.matches(hexColRegexRGBshort)) {
+            val rs = spanColour.substring(1,2)
+            val gs = spanColour.substring(2,3)
+            val bs = spanColour.substring(3,4)
 
             val r = rs.toInt(16) / 15f
             val g = gs.toInt(16) / 15f
@@ -658,22 +573,18 @@ object BTeXParser {
             "examination" to 18,
         )
 
-        private val ccEmph = "#C11"// TerrarumSansBitmap.toColorCode(0xfd44)
-        private val ccItemName = "#03B" // TerrarumSansBitmap.toColorCode(0xf37d)
-        private val ccTargetName = "#170" // TerrarumSansBitmap.toColorCode(0xf3c4)
-
         @OpenTag // reflective access is impossible with 'private'
         fun processElemBTEXDOC(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            if (handler.btexOpened) {
+            if (btexOpened) {
                 throw BTeXParsingException("BTEXDOC tag has already opened")
             }
 
             if (attribs.containsKey("def"))
-                handler.def = attribs["def"]!!
+                def = attribs["def"]!!
             else {
-                handler.cover = attribs["cover"] ?: "printout"
-                handler.inner = attribs["inner"] ?: "standard"
-                handler.papersize = attribs["papersize"] ?: "standard"
+                cover = attribs["cover"] ?: "printout"
+                inner = attribs["inner"] ?: "standard"
+                papersize = attribs["papersize"] ?: "standard"
 
                 //change the "default values" of the document
 
@@ -681,7 +592,7 @@ object BTeXParser {
                 doc.pageLines = pageHeightMap[papersize]!!
             }
 
-            handler.btexOpened = true
+            btexOpened = true
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -701,45 +612,47 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.clearParBuffer()
+            clearParBuffer()
         }
         @OpenTag // reflective access is impossible with 'private'
         fun processElemSUBTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.clearParBuffer()
+            clearParBuffer()
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.clearParBuffer()
+            clearParBuffer()
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemEDITION(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.clearParBuffer()
+            clearParBuffer()
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemEMPH(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.spanColour = ccEmph
+            paragraphBuffer.append(EMPH_BEGIN)
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemITEMNAME(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.spanColour = ccItemName
+            paragraphBuffer.append(ITEMNAME_BEGIN)
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTARGETNAME(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.spanColour = ccTargetName
+            paragraphBuffer.append(TARGETNAME_BEGIN)
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemSPAN(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.spanColour = attribs["colour"] ?: attribs["color"]
+            val col = attribs["colour"] ?: attribs["color"]
 
-            if (attribs["class"] == "code") {
-                handler.codeMode = true
-            }
+            if (col != null)
+                paragraphBuffer.append(getSpanColour(col).toCC())
+
+            if (attribs["class"] == "code")
+                paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideCodestyle)
         }
 
         @CloseTag
@@ -748,51 +661,51 @@ object BTeXParser {
         fun closeElemITEMNAME(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) = closeElemEMPH(handler, doc, uri, siblingIndex)
         @CloseTag
         fun closeElemEMPH(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            handler.spanColour = null
+            paragraphBuffer.append(EMPH_END)
         }
 
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemBTEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.appendObjectPlaceholder("TAG@BTEX")
+            paragraphBuffer.appendObjectPlaceholder("TAG@BTEX")
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemLATEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.appendObjectPlaceholder("TAG@LATEX")
+            paragraphBuffer.appendObjectPlaceholder("TAG@LATEX")
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.appendObjectPlaceholder("TAG@TEX")
+            paragraphBuffer.appendObjectPlaceholder("TAG@TEX")
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCODE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.codeMode = true
+            paragraphBuffer.append(CODEMODE_BEGIN)
         }
         @CloseTag
         fun closeElemCODE(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            handler.codeMode = false
+            paragraphBuffer.append(CODEMODE_END)
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemA(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.hrefMode = true
+            paragraphBuffer.append(HREF_BEGIN)
         }
         @CloseTag
         fun closeElemA(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            handler.hrefMode = false
+            paragraphBuffer.append(HREF_END)
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemBUCKS(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.bucksMode = true
-            handler.paragraphBuffer.append("$ccBucks$CURRENCY\u00A0")
+            paragraphBuffer.append(BUCKS_BEGIN)
+            paragraphBuffer.append("$ccBucks$CURRENCY\u00A0")
         }
         @CloseTag
         fun closeElemBUCKS(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            handler.bucksMode = false
+            paragraphBuffer.append(BUCKS_END)
         }
 
 
@@ -804,7 +717,6 @@ object BTeXParser {
             val (r, g, b) = coverColLCH.tosRGB()
             coverCol = Color(r, g, b, 1f)
             doc.addNewPage(coverCol!!)
-//            handler.spanColour = "white"
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -824,12 +736,12 @@ object BTeXParser {
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTABLEOFCONTENTS(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             tocPage = doc.currentPage
-            handler.clearParBuffer()
+            clearParBuffer()
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTABLEOFINDICES(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.clearParBuffer()
+            clearParBuffer()
 
             // prepare contents
             val pageWidth = doc.textWidth
@@ -918,12 +830,12 @@ object BTeXParser {
             else if (hasID) {
                 val it = attribs["id"]!!
                 val value = varMap[it] ?: throw NullPointerException("No variable definition of '$it'")
-                handler.paragraphBuffer.append(value)
+                paragraphBuffer.append(value)
             }
             else if (hasFROMGAME) {
                 val it = attribs["fromgame"]!!
                 val value = Lang.get(it, true)
-                handler.paragraphBuffer.append(value)
+                paragraphBuffer.append(value)
             }
             else {
                 throw IllegalStateException("One of following attribute required: id, fromgame")
@@ -938,7 +850,7 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemBR(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.paragraphBuffer.append("\n")
+            paragraphBuffer.append("\n")
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -974,38 +886,34 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemP(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.clearParBuffer()
+            clearParBuffer()
 
             currentAlign = attribs["align"] ?: "justify"
 
-            if (attribs["class"] == "code") {
-                handler.codeMode = true
-                handler.spanColour = "black"
-            }
+            if (attribs["class"] == "code")
+                paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideCodestyle)
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCALLOUT(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.clearParBuffer()
+            clearParBuffer()
 
             currentAlign = attribs["align"] ?: "justify"
 
-            if (attribs["class"] == "code") {
-                handler.codeMode = true
-                handler.spanColour = "black"
-            }
+            if (attribs["class"] == "code")
+                paragraphBuffer.append(TerrarumSansBitmap.charsetOverrideCodestyle)
         }
 
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemCALLOUT(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // if this P is a very first P without chapters, leave two lines before typesetting
             val penultTag = tagHistory.getOrNull(tagHistory.lastIndex - 1)
-            val thePar = handler.paragraphBuffer.toString().trim()
+            val thePar = paragraphBuffer.toString().trim()
             if (penultTag == "MANUSCRIPT")
                 doc.linesPrintedOnPage[doc.currentPage] += 2
 
 
-            typesetParagraphs("$ccDefault$thePar", handler, width = doc.textWidth - 2*MARGIN_PARBOX_H, align = handler.currentAlign).forEachIndexed { index, it ->
+            typesetParagraphs("$ccDefault$thePar", handler, width = doc.textWidth - 2*MARGIN_PARBOX_H, align = currentAlign).forEachIndexed { index, it ->
                 it.posX += MARGIN_PARBOX_H
                 it.deltaX += MARGIN_PARBOX_H
 
@@ -1043,7 +951,7 @@ object BTeXParser {
             if (doc.linesPrintedOnPage[doc.currentPage] < doc.pageLines)
                 doc.linesPrintedOnPage[doc.currentPage] += 1
 
-            handler.clearParBuffer()
+            clearParBuffer()
         }
 
         @CloseTag
@@ -1051,13 +959,11 @@ object BTeXParser {
             typesetParagraphs("${ccDefault}――――――――――――", handler, align = "left").also {it.first().let {
                 it.posX += (doc.textWidth - it.width) / 2
             } }
-            handler.clearParBuffer()
+            clearParBuffer()
         }
 
         @CloseTag
         fun closeElemCOVER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            handler.spanColour = null
-
             if (hasCover) {
                 doc.addNewPage()
             }
@@ -1065,33 +971,33 @@ object BTeXParser {
 
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            val thePar = handler.paragraphBuffer.toString().trim()
+            val thePar = paragraphBuffer.toString().trim()
             typesetBookTitle(thePar, handler)
-            handler.clearParBuffer()
+            clearParBuffer()
 
             doc.theTitle = thePar.replace("\n", " ")
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemSUBTITLE(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            val thePar = handler.paragraphBuffer.toString().trim()
+            val thePar = paragraphBuffer.toString().trim()
             typesetBookEdition(thePar, handler)
-            handler.clearParBuffer()
+            clearParBuffer()
 
             doc.theSubtitle = thePar.replace("\n", " ")
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemAUTHOR(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            val thePar = handler.paragraphBuffer.toString().trim()
+            val thePar = paragraphBuffer.toString().trim()
             typesetBookAuthor(thePar, handler)
-            handler.clearParBuffer()
+            clearParBuffer()
 
             doc.theAuthor = thePar.replace("\n", " ")
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemEDITION(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            val thePar = handler.paragraphBuffer.toString().trim()
+            val thePar = paragraphBuffer.toString().trim()
             typesetBookEdition(thePar, handler)
-            handler.clearParBuffer()
+            clearParBuffer()
 
             doc.theEdition = thePar.replace("\n", " ")
         }
@@ -1099,7 +1005,7 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemPART(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.clearParBuffer()
+            clearParBuffer()
 
             if (attribs["hide"] == null)
                 cptSectStack.add(CptSect("part", attribs["alt"], attribs["type"] ?: "I", attribs["start"]?.toInt()))
@@ -1108,7 +1014,7 @@ object BTeXParser {
         }
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.clearParBuffer()
+            clearParBuffer()
 
             if (attribs["hide"] == null)
                 cptSectStack.add(CptSect("chapter", attribs["alt"], attribs["type"] ?: "1", attribs["start"]?.toInt()))
@@ -1117,7 +1023,7 @@ object BTeXParser {
         }
         @OpenTag // reflective access is impossible with 'private'
         fun processElemSECTION(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            handler.clearParBuffer()
+            clearParBuffer()
 
             if (attribs["hide"] == null)
                 cptSectStack.add(CptSect("section", attribs["alt"], attribs["type"] ?: "1", attribs["start"]?.toInt()))
@@ -1130,7 +1036,7 @@ object BTeXParser {
             if (doc.currentPageObj.isNotEmpty()) doc.addNewPage()
 
             val partOrder = cptSectMap.count { it.type.startsWith("part") } + 1
-            val thePar = handler.paragraphBuffer.toString().trim()
+            val thePar = paragraphBuffer.toString().trim()
 
             val cptSectInfo = cptSectStack.removeLast()
             val partNumStr = partOrder.toListNumStr(cptSectInfo.style)
@@ -1139,7 +1045,7 @@ object BTeXParser {
             if (!cptSectInfo.type.endsWith("-hidden"))
                 cptSectMap.add(CptSectInfo("part", cptSectInfo.alt ?: thePar, doc.currentPage, partNumStr, null, null))
 
-            handler.clearParBuffer()
+            clearParBuffer()
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
@@ -1149,7 +1055,7 @@ object BTeXParser {
             val partOrder = cptSectMap.count { it.type.startsWith("part") }
             val cptOrder = cptSectMap.count { it.type.startsWith("chapter") } + 1
 
-            val thePar = handler.paragraphBuffer.toString().trim()
+            val thePar = paragraphBuffer.toString().trim()
 
             val cptSectInfo = cptSectStack.removeLast()
             val partNumStr = partOrder.toListNumStr(cptSectStack.findLast { it.type.startsWith("part") }?.type ?: "1")
@@ -1159,7 +1065,7 @@ object BTeXParser {
             if (!cptSectInfo.type.endsWith("-hidden"))
                 cptSectMap.add(CptSectInfo("chapter", cptSectInfo.alt ?: thePar, doc.currentPage, partNumStr, cptNumStr, null))
 
-            handler.clearParBuffer()
+            clearParBuffer()
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemSECTION(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
@@ -1181,7 +1087,7 @@ object BTeXParser {
             }
 
 
-            val thePar = handler.paragraphBuffer.toString().trim()
+            val thePar = paragraphBuffer.toString().trim()
 
             val cptSectInfo = cptSectStack.removeLast()
             val partNumStr = partOrder.toListNumStr(cptSectStack.findLast { it.type.startsWith("part") }?.type ?: "1")
@@ -1192,7 +1098,7 @@ object BTeXParser {
             if (!cptSectInfo.type.endsWith("-hidden"))
                 cptSectMap.add(CptSectInfo("section", cptSectInfo.alt ?: thePar, doc.currentPage, partNumStr, cptNumStr, sectNumStr))
 
-            handler.clearParBuffer()
+            clearParBuffer()
         }
 
 
@@ -1201,7 +1107,7 @@ object BTeXParser {
         fun closeElemP(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // if this P is a very first P without chapters, leave two lines before typesetting
             val penultTag = tagHistory.getOrNull(tagHistory.lastIndex - 1)
-            val thePar = handler.paragraphBuffer.toString().trim()
+            val thePar = paragraphBuffer.toString().trim()
 
             val text =
                 // DON't indent on centering context
@@ -1213,14 +1119,14 @@ object BTeXParser {
                 // else, print the text normally
                 else thePar
 
-            typesetParagraphs("$ccDefault$text", handler, align = handler.currentAlign)
+            typesetParagraphs("$ccDefault$text", handler, align = currentAlign)
 
-            handler.clearParBuffer()
+            clearParBuffer()
         }
 
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemSPAN(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            spanColour = null
+            paragraphBuffer.append(SPAN_END)
         }
 
         @CloseTag
@@ -1275,7 +1181,6 @@ object BTeXParser {
         private fun typesetPartHeading(num: String, thePar: String, handler: BTeXHandler, indent: Int = PAR_INDENTATION, width: Int = doc.textWidth) {
             typesetParagraphs("${ccDefault}⁃ $num ⁃", handler, align = "left")
             typesetParagraphs(" ", handler, align = "left")
-//            typesetParagraphs(getTitleFont(), "$ccDefault$thePar", handler)
             typesetParagraphs(getSubtitleFont(), "$ccDefault$thePar", handler, align = "left")
 
             // get global yDelta
@@ -1291,16 +1196,6 @@ object BTeXParser {
                 page.drawCalls.forEach {
                     val text = it.text?.getText()
                     val batchCall = it.cmd
-                    /*if (text != null) {
-                        println("Part draw call (${text.size} lines, pos: ${it.posX}, ${it.posY}, width: ${it.width}):" +
-                                "\n${text.joinToString("\n") { it.toReadable() }}")
-                    }
-                    else if (batchCall != null) {
-                        println("Part draw call (batch, pos: ${it.posX}, ${it.posY}, width: ${it.width})")
-                    }
-                    else {
-                        println("wtf?")
-                    }*/
 
                     // set posX
                     //// if the batchcall has parent text, use parent's delta value to move things around
@@ -1324,29 +1219,6 @@ object BTeXParser {
 
                 println()
             }
-
-            /*doc.currentPageObj.let { page ->
-                val yStart = page.drawCalls.minOf { it.posY }
-                val yEnd = page.drawCalls.maxOf { it.posY + it.lineCount * doc.lineHeightInPx }
-                val pageHeight = doc.textHeight
-
-                val newYpos = (pageHeight - (yEnd - yStart)) / 2
-                val yDelta = newYpos - yStart
-
-                val xStart = page.drawCalls.minOf { it.posX }
-                val xEnd = page.drawCalls.maxOf { it.posX + it.width }
-                val pageWidth = doc.textWidth
-
-                val newXpos = (pageWidth - (xEnd - xStart)) / 2
-                val xDelta = newXpos - xStart
-
-                page.drawCalls.forEach {
-                    it.posX += xDelta
-                    it.posY += yDelta
-                }
-
-            }*/
-
 
             if (doc.currentPage % 2 == 0)
                 doc.addNewPage()
@@ -1459,7 +1331,7 @@ object BTeXParser {
                     doc,
                     0,
                     posYline * doc.lineHeightInPx,
-                    handler.currentTheme,
+                    currentTheme,
                     TypesetDrawCall(slugs, lineStart, lineCount)
                 )
             )
@@ -1488,7 +1360,7 @@ object BTeXParser {
                         doc,
                         x,
                         y,
-                        handler.currentTheme,
+                        currentTheme,
                         cmd = objDict[idbuf.toString()]?.invoke(textDrawCall) ?: throw NullPointerException("No OBJ with id '$idbuf' exists"),
                         font = font,
                     )
@@ -1575,6 +1447,9 @@ object BTeXParser {
             val ccBucks = TerrarumSansBitmap.toColorCode(5,0,0)
             val ccCode = TerrarumSansBitmap.toColorCode(0,4,8)
             val ccHref = TerrarumSansBitmap.toColorCode(0,3,11)
+            val ccEmph = TerrarumSansBitmap.toColorCode(0xfc11)
+            val ccItemName = TerrarumSansBitmap.toColorCode(0xf03b)
+            val ccTargetName = TerrarumSansBitmap.toColorCode(0xf170)
 
             private const val ZWSP = 0x200B
             private const val SHY = 0xAD
