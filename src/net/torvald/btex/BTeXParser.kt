@@ -6,17 +6,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath.DEG_TO_RAD
 import net.torvald.colourutil.OKLch
 import net.torvald.colourutil.tosRGB
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.btex.BTeXBatchDrawCall
 import net.torvald.terrarum.btex.BTeXDocument
 import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_ORNAMENTS_COL
 import net.torvald.terrarum.btex.BTeXDrawCall
 import net.torvald.terrarum.btex.TypesetDrawCall
-import net.torvald.terrarum.ceilToFloat
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.toHex
-import net.torvald.terrarum.tryDispose
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.MovableType
 import net.torvald.terrarumsansbitmap.TypesettingStrategy
@@ -762,24 +759,14 @@ object BTeXParser {
 
         @CloseTag
         fun closeElemMANUSCRIPT(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            // setup pages such that:
-            // toc: openright (done on processElemTOCPAGE)
-            // first chapter: openright
-            // second+ chapter: openany
-            if (cptSectMap.isNotEmpty() && cptSectMap.first().pagenum % 2 == 1) {
-                doc.addNewPageAt(cptSectMap.first().pagenum)
-                cptSectMap.forEach { it.pagenum += 1 }
-            }
-            else if (cptSectMap.isNotEmpty()) {
-                doc.addNewPageAt(cptSectMap.first().pagenum)
-                doc.addNewPageAt(cptSectMap.first().pagenum)
-                cptSectMap.forEach { it.pagenum += 2 }
-            }
-
             // if tocPage != null, estimate TOC page size, renumber indexMap and cptSectMap if needed, then typeset the toc
             if (tocPage != null) {
                 // estimate the number of TOC pages
-                val tocSizeInPages = (cptSectMap.size + 2) / doc.pageLines
+                // TOC page always takes up a full paper, therefore tocSizeInPages is always multiple of 2
+                var tocSizeInPages = (cptSectMap.size + 2) / doc.pageLines
+                if (tocSizeInPages == 0) tocSizeInPages = 2
+                if (tocSizeInPages % 2 == 1) tocSizeInPages += 1
+
 
                 // renumber things
                 if (tocSizeInPages > 1) {
@@ -1032,7 +1019,7 @@ object BTeXParser {
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemPART(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            // if the last page is not empty, create new oen
+            // if the last page is not empty, create new one
             if (doc.currentPageObj.isNotEmpty()) doc.addNewPage()
 
             val partOrder = cptSectMap.count { it.type.startsWith("part") } + 1
@@ -1220,7 +1207,8 @@ object BTeXParser {
                 println()
             }
 
-            if (doc.currentPage % 2 == 0)
+            // make sure page after the part always openright
+            if (doc.currentPage % 2 == 1)
                 doc.addNewPage()
 
             doc.addNewPage()
