@@ -2,7 +2,7 @@
 <btexdoc cover="hardcover" inner="standard" papersize="standard">
 <manuscript>
     <chapter>The Style Declaration</chapter>
-    <p>Terrarum version <var id="terrarumver" />. The transaction fee is <bucks><var id="bucks" /></bucks></p>
+    <p>Terrarum version <v id="terrarumver" />. The transaction fee is <bucks><v id="bucks" /></bucks></p>
     <p><index id="btexdoc" />The Style Declaration is the very first line of a <btex /> document. Its syntax is as follows:</p>
     <p>The <code>btexdoc</code> tag takes one attribute: <code>cover</code>.</p>
     <p>The <code>btexdoc</code> tag takes two attributes: <code>cover</code> and <code>inner</code>.</p>
@@ -15,6 +15,20 @@
     <callout align="left" class="code">Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph
     </callout>
     <p>Yet another paragraph, another Lorem Ipsum. Eget duis at tellus at urna. Eget sit amet tellus cras adipiscing enim eu. Sit amet tellus cras adipiscing enim eu turpis egestas. Aliquam faucibus purus in massa tempor. Eget nullam non nisi est sit amet. Eu ultrices vitae auctor eu augue ut lectus. Tortor at auctor urna nunc. Quam lacus suspendisse faucibus interdum posuere lorem ipsum.</p>
+    <ul>
+        <li>li</li>
+        <li>lii</li>
+        <li>liii</li>
+        <li>liiii</li>
+    </ul>
+    <p>Peeeeee</p>
+    <ol>
+        <li>li</li>
+        <li>lii</li>
+        <li>liii</li>
+        <li>liiii</li>
+    </ol>
+
 
 </manuscript>
 </btexdoc>

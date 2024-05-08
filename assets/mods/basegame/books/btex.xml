@@ -109,7 +109,7 @@
         <li><index id="emph (tag)"/><code>emph</code> — is a special case of the <code>span</code> tag. The resulting text will be <emph>red</emph></li>
         <li><index id="itemname (tag)"/><code>itemname</code> — is a special case of the <code>span</code> tag used to highlight the name of the ingame item. The resulting text will be <itemname>blue</itemname></li>
         <li><index id="targetname (tag)"/><code>targetname</code> — is a special case of the <code>span</code> tag used to highlight the name of an arbitrary target or goals. The resulting text will be <targetname>green</targetname></li>
-        <li><index id="code (tag)"/><code>code</code> — is a special case of the <code>span</code> tag used to highlight the code element in-line. The resulting text will be <code>surrounded in a grey box</code></li>
+        <li><index id="code (tag)"/><code>code</code> — is a special case of the <code>span</code> tag used to highlight the code element in-line. The resulting text will be <code>teal and monospaced</code></li>
         <li><index id="br (tag)"/><code>br</code> — self-closing tag; inserts an anonymous line break</li>
         <li><index id="newpage (tag)"/><code>newpage</code> — self-closing tag; inserts an anonymous page break</li>
         <li><index id="anonbreak (tag)"/><code>anonbreak</code> — self-closing tag; inserts a paragraph break in the text. The break will be in a form of a long straight line on the centre of the text. Useful for typesetting novels</li>
