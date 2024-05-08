@@ -1,34 +1,12 @@
 <!DOCTYPE btexdoc SYSTEM "btexdoc.dtd">
 <btexdoc cover="hardcover" inner="standard" papersize="standard">
 <manuscript>
-    <chapter>The Style Declaration</chapter>
-    <p>Terrarum version <v id="terrarumver" />. The transaction fee is <bucks><v id="bucks" /></bucks></p>
-    <p><index id="btexdoc" />The Style Declaration is the very first line of a <btex /> document. Its syntax is as follows:</p>
-    <p>The <code>btexdoc</code> tag takes one attribute: <code>cover</code>.</p>
-    <p>The <code>btexdoc</code> tag takes two attributes: <code>cover</code> and <code>inner</code>.</p>
-    <p>The <code>btexdoc</code> tag takes three attributes: <code>cover</code>, <code>inner</code> and <code>papersize</code>.</p>
-    <p>Test with  excessive   white    spaces        !!</p>
-    <callout>
-        A Callout!
-    </callout>
-    <p class="code">Another paragraph, another Lorem Ipsum. Eget duis at tellus at urna. Eget sit amet tellus cras adipiscing enim eu. Sit amet tellus cras adipiscing enim eu turpis egestas. Aliquam faucibus purus in massa tempor. Eget nullam non nisi est sit amet. Eu ultrices vitae auctor eu augue ut lectus. Tortor at auctor urna nunc. Quam lacus suspendisse faucibus interdum posuere lorem ipsum.</p>
-    <callout align="left" class="code">Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph Long callout paragraph
-    </callout>
-    <p>Yet another paragraph, another Lorem Ipsum. Eget duis at tellus at urna. Eget sit amet tellus cras adipiscing enim eu. Sit amet tellus cras adipiscing enim eu turpis egestas. Aliquam faucibus purus in massa tempor. Eget nullam non nisi est sit amet. Eu ultrices vitae auctor eu augue ut lectus. Tortor at auctor urna nunc. Quam lacus suspendisse faucibus interdum posuere lorem ipsum.</p>
-    <ul>
-        <li>li</li>
-        <li>lii</li>
-        <li>liii</li>
-        <li>liiii</li>
-    </ul>
-    <p>Peeeeee</p>
-    <ol>
-        <li>li</li>
-        <li>lii</li>
-        <li>liii</li>
-        <li>liiii</li>
-    </ol>
 
+    <p>1972년 11월 21일, 김두한은 오랜 지병이었던 고혈압으로 쓰러졌다. 향년 55세였고, 박정희 정권의 독재가 또 한번의 정권 연장을 위해 유신헌법을 통과한지 한 달만이었다. 많은 인파가 몰린 그의 장례행렬에는 한 무리의 어린아이들도 그 뒤를 잇고 있었다. 백야 김좌진 장군의 국가유공자 연금 전액을 매달 삼애 고아원이라는 곳에 기탁한 이유였다. 김두한. 그는 일제 말 우리가 주권을 잃었던 식민지 시절부터 해방 이후 좌우익의 대립에 이어서 자유당 부패정치와 5.16 박정희 정권에 이르기까지 그의 전생에 온 몸을 다 던져 불의와 싸웠다.</p>
+
+    <callout>최동열: 난 오랫동안 자네를 지켜봐온 사람일세. 자네는 자네답게 살았어. 조선의 주먹 황제답게 말이야. 늘 야인이였지만 용감하고 멋있게 살았어. 나름대로 자네의 역사를 가지고 자네의 시대를 치열하고 열심히 살았다는 얘기야. 뭐랄까...? 야인시대라고나 할까?</callout>
+
+    <p>야인시대! 그렇다. 그것은 바로 그가 몸바쳐 살아왔던 이 나라 격동기의 또 다른 역사의 한 장이었다.</p>
 
 </manuscript>
 </btexdoc>

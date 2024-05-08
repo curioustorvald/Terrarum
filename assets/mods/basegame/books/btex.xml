@@ -105,7 +105,7 @@
         <li><index id="part (tag)"/><code>part</code> — inserts part separation page to your book</li>
         <li><index id="chapter (tag)"/><index id="section (tag)"/><code>chapter</code>, <code>section</code> — inserts a new chapter/section. If an alternative name is required on the Table of Contents, the <code>alt</code> attribute can be used. If the chapter/section needs to be hidden on the Table of Contents, add the <code>hide="1"</code> attribute. If the chapter must start on a new page, simply add <code>newpage</code> in front of the chapter tag</li>
         <li><index id="p (tag)"/><code>p</code> — inserts a new paragraph. The body texts must be written inside this tag. All paragraphs will have a 16-pixel indentation, with the following exceptions: first <code>p</code> of the part/chapter/section; first <code>p</code> after <code>br</code>, <code>newpage</code>, <code>callout</code>, <code>ul</code>, <code>ol</code> or <code>anonbreak</code></li>
-        <li><index id="span (tag)"/><code>span</code> — allows changing the colour of the texts. The colour must be specified in the <code>colour</code> attribute. Six-digit hex code, three-digit hex code and CSS Colors Level 4 named colours are supported. Note that all the colours will be rounded to the nearest three-digit hex code</li>
+        <li><index id="span (tag)"/><code>span</code> — allows changing the colour or the style of the texts. The colour must be specified in the <code>colour</code> attribute. Six-digit hex code, three-digit hex code and CSS Colors Level 4 named colours are supported. Note that all the colours will be rounded to the nearest three-digit hex code</li>
         <li><index id="emph (tag)"/><code>emph</code> — is a special case of the <code>span</code> tag. The resulting text will be <emph>red</emph></li>
         <li><index id="itemname (tag)"/><code>itemname</code> — is a special case of the <code>span</code> tag used to highlight the name of the ingame item. The resulting text will be <itemname>blue</itemname></li>
         <li><index id="targetname (tag)"/><code>targetname</code> — is a special case of the <code>span</code> tag used to highlight the name of an arbitrary target or goals. The resulting text will be <targetname>green</targetname></li>
@@ -113,7 +113,7 @@
         <li><index id="br (tag)"/><code>br</code> — self-closing tag; inserts an anonymous line break</li>
         <li><index id="newpage (tag)"/><code>newpage</code> — self-closing tag; inserts an anonymous page break</li>
         <li><index id="anonbreak (tag)"/><code>anonbreak</code> — self-closing tag; inserts a paragraph break in the text. The break will be in a form of a long straight line on the centre of the text. Useful for typesetting novels</li>
-        <li><index id="callout (tag)"/><code>callout</code> — is a paragraph box that holds a text in a grey box, a style similar to the <code>code</code> tag</li>
+        <li><index id="callout (tag)"/><code>callout</code> — is a paragraph box that holds a text in a grey box</li>
         <li><index id="ul (tag)"/><index id="li (tag)"/><code>ul</code> — starts an unordered list. List elements are defined using the <code>li</code> tag</li>
         <li><index id="ol (tag)"/><code>ol</code> — starts an ordered list. List elements are defined using the <code>li</code> tag</li>
         <li><index id="fullpagebox (tag)"/><code>fullpagebox</code> — is used to typeset its child tags into a box that fills an entire page, with its contents centred on the page. Must be used after the <code>newpage</code></li>

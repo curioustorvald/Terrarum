@@ -36,13 +36,13 @@ class BTeXDocument : Disposable {
     var theAuthor = ""
     var theEdition = ""
 
-    var textWidth = 512
+    var textWidth = 508
     val lineHeightInPx = 24
     var pageLines = 24
     val textHeight: Int
         get() = pageLines * lineHeightInPx
 
-    val pageMarginH = 15
+    val pageMarginH = 20
     val pageMarginV = 12
 
     val pageDimensionWidth: Int

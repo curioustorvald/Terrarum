@@ -571,7 +571,7 @@ object BTeXParser {
         )
 
         private val pageWidthMap = hashMapOf(
-            "standard" to 512,
+            "standard" to 508,
             "examination" to 640,
         )
         private val pageHeightMap = hashMapOf(

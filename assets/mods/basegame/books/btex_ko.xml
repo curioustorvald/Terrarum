@@ -90,29 +90,29 @@
 
         <chapter>원고</chapter>
 
-        <p><index id="원고"/><index id="태그 목록"/>원고는 실제 책의 본문이 담긴 부분을 말한다. 본문에는 다음의 태그를 사용할 수 있다.</p>
+        <p><index id="원고"/><index id="태그 목록"/>원고는 책의 진짜 본문이 담긴 부분을 말한다. 본문에는 다음의 태그를 사용할 수 있다.</p>
         <ul>
-            <li><index id="part (태그)"/><code>part</code> — inserts part separation page to your book</li>
-            <li><index id="chapter (태그)"/><index id="section (태그)"/><code>chapter</code>, <code>section</code> — inserts a new chapter/section. If an alternative name is required on the Table of Contents, the <code>alt</code> attribute can be used. If the chapter/section needs to be hidden on the Table of Contents, add the <code>hide="1"</code> attribute. If the chapter must start on a new page, simply add <code>newpage</code> in front of the chapter tag</li>
-            <li><index id="p (태그)"/><code>p</code> — inserts a new paragraph. The body texts must be written inside this tag. All paragraphs will have a 16-pixel indentation, with the following exceptions: first <code>p</code> of the part/chapter/section; first <code>p</code> after <code>br</code>, <code>newpage</code>, <code>callout</code>, <code>ul</code>, <code>ol</code> or <code>anonbreak</code></li>
-            <li><index id="span (태그)"/><code>span</code> — allows changing the colour of the texts. The colour must be specified in the <code>colour</code> attribute. Six-digit hex code, three-digit hex code and CSS Colors Level 4 named colours are supported. Note that all the colours will be rounded to the nearest three-digit hex code</li>
-            <li><index id="emph (태그)"/><code>emph</code> — is a special case of the <code>span</code> tag. The resulting text will be <emph>red</emph></li>
-            <li><index id="itemname (태그)"/><code>itemname</code> — is a special case of the <code>span</code> tag used to highlight the name of the ingame item. The resulting text will be <itemname>blue</itemname></li>
-            <li><index id="targetname (태그)"/><code>targetname</code> — is a special case of the <code>span</code> tag used to highlight the name of an arbitrary target or goals. The resulting text will be <targetname>green</targetname></li>
-            <li><index id="code (태그)"/><code>code</code> — is a special case of the <code>span</code> tag used to highlight the code element in-line. The resulting text will be <code>teal and monospaced</code></li>
-            <li><index id="br (태그)"/><code>br</code> — self-closing tag; inserts an anonymous line break</li>
-            <li><index id="newpage (태그)"/><code>newpage</code> — self-closing tag; inserts an anonymous page break</li>
-            <li><index id="anonbreak (태그)"/><code>anonbreak</code> — self-closing tag; inserts a paragraph break in the text. The break will be in a form of a long straight line on the centre of the text. Useful for typesetting novels</li>
-            <li><index id="callout (태그)"/><code>callout</code> — is a paragraph box that holds a text in a grey box, a style similar to the <code>code</code> tag</li>
-            <li><index id="ul (태그)"/><index id="li (태그)"/><code>ul</code> — starts an unordered list. List elements are defined using the <code>li</code> tag</li>
-            <li><index id="ol (태그)"/><code>ol</code> — starts an ordered list. List elements are defined using the <code>li</code> tag</li>
-            <li><index id="fullpagebox (태그)"/><code>fullpagebox</code> — is used to typeset its child tags into a box that fills an entire page, with its contents centred on the page. Must be used after the <code>newpage</code></li>
-            <li><index id="btex (태그)"/><code>btex</code> — self-closing tag; inserts an inline form of the <btex/> logo in the text</li>
+            <li><index id="part (태그)"/><code>part</code> — 원고에 새 부(part)를 추가함</li>
+            <li><index id="chapter (태그)"/><index id="section (태그)"/><code>chapter</code>, <code>section</code> — 원고에 새 장(chapter)/절(section)을 추가함. 목차 페이지에는 다른 이름을 표시하고 싶다면 <code>alt</code> 속성을 사용할 수 있음. 목차 페이지에서 숨기고 싶다면 <code>hide="1"</code> 속성을 추가할 것. 장이 새 페이지에서 시작되게 하려면 <code>chapter</code> 태그 앞에 <code>newpage</code>를 추가할 것</li>
+            <li><index id="p (태그)"/><code>p</code> — 새 문단을 삽입함. 본문의 글은 반드시 이 태그 내부에 작성되어야 함. 모든 문단는 16픽셀의 들여쓰기로 조판되나, 다음의 경우 들여쓰기가 적용되지 않음. 부·장·절의 첫 문단, <code>br</code>, <code>newpage</code>, <code>callout</code>, <code>ul</code>, <code>ol</code>,  <code>anonbreak</code> 태그 직후의 문단</li>
+            <li><index id="span (태그)"/><code>span</code> — 문구의 색상이나 스타일을 변경함. 색상은 <code>colour</code> 속성에 작성되어야 함. 6자리 헥스코드, 3자리 헥스코드, CSS Colour Level 4에 정의된 색상명을 사용할 수 있음. 모든 색상은 내부적으로 가장 가까운 3자리 헥스코드로 변경됨에 유의할 것</li>
+            <li><index id="emph (태그)"/><code>emph</code> — <code>span</code>의 특수한 경우로, 문구를 <emph>빨간색으로</emph> 인자함</li>
+            <li><index id="itemname (태그)"/><code>itemname</code> — <code>span</code>의 특수한 경우로, 게임 내 아이템의 이름을 강조 표시할 때 사용함. 문구는 <itemname>파란색으로</itemname> 인자됨</li>
+            <li><index id="targetname (태그)"/><code>targetname</code> — <code>span</code>의 특수한 경우로, 임의의 목표를 강조 표시할 때 사용함. 문구는 <targetname>초록색으로</targetname> 인자됨</li>
+            <li><index id="code (태그)"/><code>code</code> — <code>span</code>의 특수한 경우로, 코드를 강조 표시할 때 사용함. 문구는 <code>청록색의 고정폭으로</code> 인자됨</li>
+            <li><index id="br (태그)"/><code>br</code> — 스스로 닫는 태그. 임의의 줄바꿈을 삽입함</li>
+            <li><index id="newpage (태그)"/><code>newpage</code> — 스스로 닫는 태그. 임의의 새 페이지를 삽입함</li>
+            <li><index id="anonbreak (태그)"/><code>anonbreak</code> — 스스로 닫는 태그. 임의의 문단 분할을 적용함. 분할 표시는 한 줄을 비우고 가운데에 긴 줄을 삽입하여 이루어짐.주로 소설을 조판하는 데에 사용됨</li>
+            <li><index id="callout (태그)"/><code>callout</code> — 문단 태크로서, 문단을 회색 상자에 넣어 돋보이게 조판함</li>
+            <li><index id="ul (태그)"/><index id="li (태그)"/><code>ul</code> — 순서 없는 목록을 조판함. 목록의 항목은 <code>li</code> 태그를 사용해 기술됨</li>
+            <li><index id="ol (태그)"/><code>ol</code> — 순서 있는 목록을 조판함. 목록의 항목은 <code>li</code> 태그를 사용해 기술됨</li>
+            <li><index id="fullpagebox (태그)"/><code>fullpagebox</code> — 문구를 한 페이지를 비우고, 그 페이지의 중앙에 조판함. 반드시 <code>newpage</code> 태그가 직전에 쓰여야 함</li>
+            <li><index id="btex (태그)"/><code>btex</code> — 스스로 닫는 태그. <btex/> 로고를 삽입</li>
         </ul>
         <p>스스로 닫는 태그는 하위 내용을 담을 수 없다. 스스로 닫는 태그는, 예를 들어 tagname이라는 태그가 있으면, 다음과 같이 쓴다. <code>&lt;tagname/&gt;</code>.</p>
 
 
-        <section>장절제목 스타일</section>
+        <section>장·절 제목 스타일</section>
 
         <p>부와 장과 절은 <code>type</code> 속성을 사용해 번호가 찍히는 스타일을 지정할 수 있다. 지원하는 스타일은 다음과 같다.</p>
         <ul>
@@ -137,7 +137,7 @@
 
         <section>하이퍼링크</section>
 
-        <p><index id="하이퍼링크"/>하이퍼링크는<code>index</code>와 <code>a</code> 태그를 사용해 적용할 수 있다.</p>
+        <p><index id="하이퍼링크"/>하이퍼링크는 <code>index</code>와 <code>a</code> 태그를 사용해 적용할 수 있다.</p>
         <ul>
             <li><index id="index (태그)"/><code>index</code> — 링크의 목적지를 정의함. 링크의 이름은 문서 전체에서 유일하여야 하며, <code>id</code> 속성에 작성함</li>
             <li><index id="a (태그)"/><code>a</code> — 태그 내부의 문구를 클릭 가능하게 함. 링크의 목적지는 (index 태그의 id) <code>href</code> 속성에 작성함</li>
