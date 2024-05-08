@@ -311,36 +311,29 @@ object Lang {
         }
     }
 
-    fun postEunNeun(word: String): String {
+    fun getHangulJosa(word: String, josa1: String, josa2: String): String {
         val lastChar = getLastChar(word)
+        val isIrregular = josa1.startsWith("로") && josa2.startsWith("으로")
 
-        if (isHangul(lastChar)) {
+        val selected = if (isHangul(lastChar)) {
             val index = lastChar.toInt() - HANGUL_SYL_START
-            return if (index % 28 == 0) word + "는" else word + "은"
+            if (isIrregular)
+                if (index % 28 == 0 || index % 28 == 8) josa1 else josa2
+            else
+                if (index % 28 == 0) josa1 else josa2
         }
         else if (lastChar in 'A'..'Z' || lastChar in 'a'..'z') {
             val index = (lastChar.toInt() - 0x41) % 0x20
-            return if (HANGUL_POST_INDEX_ALPH[index] == 0) word + "는" else word + "은"
+            if (isIrregular)
+                if (HANGUL_POST_RO_INDEX_ALPH[index] == 0) josa1 else josa2
+            else
+                if (HANGUL_POST_INDEX_ALPH[index] == 0) josa1 else josa2
         }
         else {
-            return "은"
+            josa2
         }
-    }
 
-    fun postIiGa(word: String): String {
-        val lastChar = getLastChar(word)
-
-        if (isHangul(lastChar)) {
-            val index = lastChar.toInt() - HANGUL_SYL_START
-            return if (index % 28 == 0) word + "가" else word + "이"
-        }
-        else if (lastChar in 'A'..'Z' || lastChar in 'a'..'z') {
-            val index = (lastChar.toInt() - 0x41) % 0x20
-            return if (HANGUL_POST_INDEX_ALPH[index] == 0) word + "가" else word + "이"
-        }
-        else {
-            return "이"
-        }
+        return "$word$selected"
     }
 
     private fun isHangul(c: Char): Boolean {

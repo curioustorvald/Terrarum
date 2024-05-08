@@ -806,8 +806,7 @@ object BTeXParser {
             }
         }
 
-        @OpenTag // reflective access is impossible with 'private'
-        fun processElemV(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+        private fun tagVimpl(attribs: HashMap<String, String>): String {
             val hasID = (attribs["id"] != null)
             val hasFROMGAME = (attribs["fromgame"] != null)
 
@@ -817,16 +816,72 @@ object BTeXParser {
             else if (hasID) {
                 val it = attribs["id"]!!
                 val value = varMap[it] ?: throw NullPointerException("No variable definition of '$it'")
-                paragraphBuffer.append(value)
+                return value
             }
             else if (hasFROMGAME) {
                 val it = attribs["fromgame"]!!
                 val value = Lang.get(it, true)
-                paragraphBuffer.append(value)
+                return value
             }
             else {
                 throw IllegalStateException("One of following attribute required: id, fromgame")
             }
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemV(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            paragraphBuffer.append(tagVimpl(attribs))
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemVEUN(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            vjosa(tagVimpl(attribs), "는", "은")
+        }
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemVNEUN(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            processElemVEUN(handler, doc, uri, attribs)
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemVI(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            vjosa(tagVimpl(attribs), "가", "이")
+        }
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemVGA(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            processElemVI(handler, doc, uri, attribs)
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemVEUL(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            vjosa(tagVimpl(attribs), "를", "을")
+        }
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemVREUL(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            processElemVEUL(handler, doc, uri, attribs)
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemVWA(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            vjosa(tagVimpl(attribs), "와", "과")
+        }
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemVGWA(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            processElemVWA(handler, doc, uri, attribs)
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemVRO(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            vjosa(tagVimpl(attribs), "로", "으로")
+        }
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemVEURO(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            processElemVRO(handler, doc, uri, attribs)
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        private fun vjosa(str: String, josa1: String, josa2: String) {
+            val value = Lang.getHangulJosa(str, josa1, josa2)
+            paragraphBuffer.append(value)
         }
 
 
