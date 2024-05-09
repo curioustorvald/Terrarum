@@ -1408,6 +1408,8 @@ object BTeXParser {
         ): List<BTeXDrawCall> {
             val strat = when (align) {
                 "left" -> TypesettingStrategy.RAGGED_RIGHT
+                "right" -> TypesettingStrategy.RAGGED_LEFT
+                "center", "centre" -> TypesettingStrategy.CENTRED
                 "justify" -> TypesettingStrategy.JUSTIFIED
                 else -> throw IllegalArgumentException("Unknown text alignment")
             }
@@ -1429,7 +1431,7 @@ object BTeXParser {
                 val subset = linesOut to remainder
                 val posYline = doc.linesPrintedOnPage[pageNum]
 
-                println("typeset par slugHeight=$slugHeight, remainder=$remainder, linesOut=$linesOut")
+//                println("typeset par slugHeight=$slugHeight, remainder=$remainder, linesOut=$linesOut")
 
                 val textDrawCalls = textToDrawCall(handler, posYline, slugs, subset.first, subset.second)
                 val objectDrawCalls = parseAndGetObjDrawCalls(textDrawCalls[0], font, handler, posYline, slugs, subset.first, subset.second)
