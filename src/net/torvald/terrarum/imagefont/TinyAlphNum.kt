@@ -15,7 +15,7 @@ object TinyAlphNum : BitmapFont() {
     internal const val W = 7
     internal const val H = 13
 
-    internal val fontSheet = TextureRegionPack("./assets/graphics/fonts/7x13_Tamzen7x14b.tga", W, H)
+    internal val fontSheet = TextureRegionPack("./assets/graphics/fonts/7x13_Tamzen7x14b.tga", W+1, H+1)
 
 
     init {
@@ -34,12 +34,10 @@ object TinyAlphNum : BitmapFont() {
     }
 
     lateinit var colMain: Color
-    lateinit var colShadow: Color
 
     override fun draw(batch: Batch, text: CharSequence, x: Float, y: Float): GlyphLayout? {
         val originalColour = batch.color.cpy()
         colMain = batch.color.cpy()
-        colShadow = colMain.cpy().mul(1f, 1f, 1f, 0.5f)
 
         val x = x.roundToFloat()
         val y = y.roundToFloat()
@@ -52,15 +50,8 @@ object TinyAlphNum : BitmapFont() {
                 val colour = getColour(cchigh, cclow)
 
                 colMain = colour
-                colShadow = colMain.cpy().mul(0.5f, 0.5f, 0.5f, 1f)
             }
             else if (c in 0.toChar()..255.toChar()) {
-                batch.color = colShadow
-                batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W + 1, y)
-                batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W, y + 1)
-                batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W + 1, y + 1)
-
-
                 batch.color = colMain
                 batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W, y)
 

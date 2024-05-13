@@ -24,11 +24,11 @@ import kotlin.system.measureTimeMillis
  */
 class BTeXTest : ApplicationAdapter() {
 
-//    val filePath = "btex.xml"
-    val filePath = "test.xml"
-//    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
+    val filePath = "btex.xml"
+//    val filePath = "test.xml"
+//    val filePath = "literature/en/daniel_defoe_robinson_crusoe.btxbook"
 //    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
-//    val filePath = "literature/koKR/yisang_nalgae.xml"
+//    val filePath = "literature/koKR/yisang_nalgae.btxbook"
 
 
     private lateinit var document: BTeXDocument
@@ -54,7 +54,7 @@ class BTeXTest : ApplicationAdapter() {
 
         bg = TextureRegion(Texture(Gdx.files.internal("test_assets/real_bg_with_guides.png")))
 
-        val isBookFinalised = filePath.endsWith(".btexbin")
+        val isBookFinalised = filePath.endsWith(".btxbook")
 
         if (!isBookFinalised) {
             measureTimeMillis {
@@ -65,7 +65,7 @@ class BTeXTest : ApplicationAdapter() {
                 println("Time spent on typesetting [ms]: $it")
             }
 
-            /*measureTimeMillis {
+            measureTimeMillis {
                 document.finalise()
                 documentHandler.dispose()
             }.also {
@@ -73,10 +73,10 @@ class BTeXTest : ApplicationAdapter() {
             }
 
             measureTimeMillis {
-                document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btexbin")}"))
+                document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btxbook")}"))
             }.also {
                 println("Time spent on serialisation [ms]: $it")
-            }*/
+            }
         }
         else {
             measureTimeMillis {

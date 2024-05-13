@@ -1614,7 +1614,7 @@ object BTeXParser {
 
             val ccDefault = TerrarumSansBitmap.toColorCode(0,0,0)
             val ccBucks = TerrarumSansBitmap.toColorCode(5,0,0)
-            val ccCode = TerrarumSansBitmap.toColorCode(0,4,8)
+            val ccCode = TerrarumSansBitmap.toColorCode(8,0,0)
             val ccHref = TerrarumSansBitmap.toColorCode(0,3,11)
             val ccEmph = TerrarumSansBitmap.toColorCode(0xfc11)
             val ccItemName = TerrarumSansBitmap.toColorCode(0xf03b)
