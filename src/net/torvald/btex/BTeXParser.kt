@@ -82,6 +82,8 @@ object BTeXParser {
         private val tagStack = ArrayList<String>() // index zero should be "btex"
         private var tagHistory = ArrayList<String>()
 
+        private var currentHrefId: String? = null // any Unicode string that is not empty
+
         private var currentTheme = ""
 
         private val elemOpeners: HashMap<String, KFunction<*>> = HashMap()
@@ -698,10 +700,14 @@ object BTeXParser {
         @OpenTag // reflective access is impossible with 'private'
         fun processElemA(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             paragraphBuffer.append(HREF_BEGIN)
+            currentHrefId = attribs["href"]
+            if (currentHrefId != null && currentHrefId!!.isBlank())
+                throw IllegalStateException("Hyperlink target cannot be empty or blank")
         }
         @CloseTag
         fun closeElemA(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             paragraphBuffer.append(HREF_END)
+            currentHrefId = null
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -753,7 +759,7 @@ object BTeXParser {
             val pageWidth = doc.textWidth
 
             indexMap.keys.toList().sorted().forEach { key ->
-                typesetTOCline("", key, indexMap[key]!!, handler)
+                typesetTOCline("", key, indexMap[key]!! - 1, handler)
             }
         }
 

@@ -65,7 +65,7 @@ class BTeXTest : ApplicationAdapter() {
                 println("Time spent on typesetting [ms]: $it")
             }
 
-            measureTimeMillis {
+            /*measureTimeMillis {
                 document.finalise()
                 documentHandler.dispose()
             }.also {
@@ -76,7 +76,7 @@ class BTeXTest : ApplicationAdapter() {
                 document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btxbook")}"))
             }.also {
                 println("Time spent on serialisation [ms]: $it")
-            }
+            }*/
         }
         else {
             measureTimeMillis {
@@ -114,6 +114,10 @@ class BTeXTest : ApplicationAdapter() {
             scroll = (scroll - 2).coerceAtLeast(0)
         else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT))
             scroll = (scroll + 2).coerceAtMost(document.pageIndices.endInclusive.toFloat().div(2f).ceilToInt().times(2))
+        else if (Gdx.input.isKeyJustPressed(Input.Keys.PAGE_UP))
+            scroll = 0
+        else if (Gdx.input.isKeyJustPressed(Input.Keys.PAGE_DOWN))
+            scroll = document.pageIndices.endInclusive.toFloat().div(2f).ceilToInt().times(2)
     }
 
 

@@ -74,11 +74,11 @@
     <chapter>The Cover</chapter>
 
     <p><index id="cover"/>The Cover defines the text on the cover of the book. If your text has no cover, this part can be omitted. Its syntax is as follows:</p>
-    <callout align="left" class="code"><index id="cover (tag)"/><index id="title (tag)"/><index id="subtitle (tag)"/><index id="author (tag)"/><index id="edition (tag)"/>&lt;cover hue="358"&gt;<br/>
-　　&lt;title&gt;Title of your book&zwsp;&lt;/title&gt;<br/>
-　　&lt;subtitle&gt;Subtitle if necessary&zwsp;&lt;/subtitle&gt;<br/>
-　　&lt;author&gt;Who wrote this book&zwsp;&lt;/author&gt;<br/>
-　　&lt;edition&gt;Edition information if necessary&zwsp;&lt;/edition&gt;<br/>
+    <callout align="left" class="code"><index id="cover (tag)"/><index id="title (tag)"/><index id="subtitle (tag)"/><index id="author (tag)"/><index id="edition (tag)"/>&lt;cover hue="358"&gt;<br/><!--
+-->　　&lt;title&gt;Title of your book&zwsp;&lt;/title&gt;<br/><!--
+-->　　&lt;subtitle&gt;Subtitle if necessary&zwsp;&lt;/subtitle&gt;<br/><!--
+-->　　&lt;author&gt;Who wrote this book&zwsp;&lt;/author&gt;<br/><!--
+-->　　&lt;edition&gt;Edition information if necessary&zwsp;&lt;/edition&gt;<br/>
 &lt;/cover&gt;
     </callout>
     <p>Only the <code>title</code> tag is mandatory. Cover texts will be printed using a special font that has wider
@@ -126,21 +126,23 @@
 
     <p>The <code>part</code>, <code>chapter</code> and <code>section</code> takes optional <code>type</code> attributes which changes how the chapter should be numbered. Available options are:</p>
     <ul>
-        <li><code>a</code> — use alphabet for the number (a, b, c, …)</li>
-        <li><code>A</code> — use majuscule alphabet for the number (A, B, C, …)</li>
-        <li><code>i</code> — use Roman numeral for the number (i, ii, iii, …)</li>
-        <li><code>I</code> — use majuscule Roman numeral for the number (I, II, III, …)</li>
-        <li><code>1</code> — use numbers (1, 2, 3)</li>
+        <li><code>a</code> — use alphabets for the number (a, b, c, …)</li>
+        <li><code>A</code> — use majuscule alphabets for the number (A, B, C, …)</li>
+        <li><code>i</code> — use Roman numerals for the number (i, ii, iii, …)</li>
+        <li><code>I</code> — use majuscule Roman numerals for the number (I, II, III, …)</li>
+        <li><code>1</code> — use Arabic numerals (1, 2, 3)</li>
     </ul>
-    <p>By default, parts use majuscule Roman numerals and others use just numbers. Alternative styling for the <code>part</code> and the <code>chapter</code> can be defined using the <a href="macro definition">Macro Definition</a>.</p>
+    <p>By default, parts use majuscule Roman numerals and others use Arabic. Alternative styling for the <code>part</code> and the <code>chapter</code> can be defined using the <a href="macro definition">Macro Definition</a>.</p>
 
 
     <section>Paragraph Styling</section>
 
-    <p>The <code>p</code> and <code>callout</code> tag take <code>align</code> attribute, which controls how the text should be aligned. Available options are:</p>
+    <p>The <code>p</code> and <code>callout</code> tags can take <code>align</code> attribute, which controls how the text should be aligned. Available options are:</p>
     <ul>
-        <li><code>left</code> — aligns the text to the left without breaking words, also known as ragged-right</li>
-        <li><code>justify</code> — aligns the text as evenly as possible, like real books. This is the default value.</li>
+        <li><code>left</code> — aligns the text flush to the left without breaking words, also known as ragged-right</li>
+        <li><code>right</code> — aligns the text flush to the right without breaking words, also known as ragged-left</li>
+        <li><code>center</code> — aligns the text aligned at the centre along the width of the paper without breaking words</li>
+        <li><code>justify</code> — aligns the text as evenly as possible, similar to real books. This is the default value.</li>
     </ul>
     <p>The <code>p</code>, <code>span</code> and <code>callout</code> tags also take <code>class="code"</code> attribute, which results in the text printed using the <span class="code">code font.</span></p>
 
@@ -164,6 +166,7 @@
 
     <p>The optional <code>title</code> attribute allows a custom name can be given to this page. If unspecified,
         the default name is “Index”.</p>
+    <p>The tag <code>&lt;tableofindices/&gt;</code> is an internal tag used by the typesetter.</p>
 
 
     <chapter>Ending the Document</chapter>
@@ -178,6 +181,91 @@
     <p>The finished book description using <btex/> can be sent to a publisher, and if there are no errors
         on your submission, the printed books of specified number of copies will be delivered to your
         location within a reasonable amount of business days. Happy writing!</p>
+
+
+
+    <part>Advanced Macros</part>
+
+
+    <chapter>The Macro Definition</chapter>
+
+    <p><index id="macro definition"/>This part explains the set of macros the typesetting system uses,
+        and how you can manipulate them to introduce a limited set of customisations.</p>
+    <p><index id="macrodef (tag)"/>Macros can be defined using the <code>macrodef</code> tag which comes before the
+        <code>cover</code> tag. Its syntax is as follows:</p>
+
+    <callout align="left" class="code">&lt;macrodef&gt;<br/><!--
+-->　　&lt;pair key="macro name" value="the value"/&gt;<br/><!--
+-->　　&lt;pair key="another macro" value="its value"/&gt;<br/><!--
+-->&lt;/macrodef&gt;</callout>
+
+
+    <section>Macro Keys</section>
+
+    <p>Internally, part and chapter headings are printed using macros. Changing the value of the macro
+        will change how the heading numbers are printed. The following is a list of names and default values:</p>
+
+    <ul>
+        <li><code>thepart</code> — Part heading. Default: <code>Part %1$s</code></li>
+        <li><code>thechapter</code> — Chapter heading. Default: <code>%1$s</code></li>
+    </ul>
+
+    <p>The argument key <code>%1$s</code> will be replaced into a number, Roman numerals, etc.
+        depending on the value of <code>type</code> attribute.</p>
+
+    <p>These macros can be used to localise the chapter headings for your language. For example,
+        in Korean text, you might want to change <code>thechapter</code> into <code>%1$s장</code>.</p>
+
+
+    <chapter>Printing External Variables</chapter>
+
+    <p>Defining the text to be printed outside the typesetting system, such as the name of the sender
+    and the recipient, can be desired. These texts can be used with the self-closing <code>v</code> tag. This tag
+        can also be used to use an ingame string as well.</p>
+    <p>To print an external variable, use the <code>id</code> attribute; to print an ingame string, use
+    <code>fromgame</code> attribute. Note that only one of two attributes must be used, using both
+        attributes in a single tag will cause an error.</p>
+
+    <section>Printing the Ingame Currency</section>
+
+    <p><index id="bucks (tag)"/>In order to print a text such as “The total is <bucks>1234</bucks>”, the <code>bucks</code>
+        tag can be used along with the <code>v</code> tag. The following code is an example case:</p>
+
+    <callout align="left" class="code">&lt;p&gt;The total is &lt;bucks&gt;&lt;v id="invoice_total_amount"/&gt;&lt;/bucks&gt;&lt;/p&gt;</callout>
+
+    <p>If the external variable <code>invoice_total_amount</code> contains a string <code>toomany</code>,
+        this code would print out “The total is <bucks>toomany</bucks>”.</p>
+
+
+    <section>Korean Language Specific Tags</section>
+
+    <p><index id="korean postpositions"/>To accommodate the Korean Postposition transformations, special <code>v</code> series tags are added:</p>
+
+    <ul>
+        <li><code>veun</code> <code>vneun</code> — 은/는</li>
+        <li><code>vi</code> <code>vga</code> — 이/가</li>
+        <li><code>veul</code> <code>vreul</code> — 을/를</li>
+        <li><code>vwa</code> <code>vgwa</code> — 와/과</li>
+        <li><code>vro</code> <code>veuro</code> — 로/으로</li>
+    </ul>
+
+    <p>Either of the tag in the pair can be used; they will put the correct postposition based on the word.
+        In other words, <code>veun</code> and <code>vneun</code> are identical.</p>
+    <p>These tags can be used in the following situation: suppose you have a <btex/> document,</p>
+
+    <callout align="left" class="code">[en] Send your &lt;v fromgame="GAME_ITEM_HOLOTAPE"/&gt; that contains the manuscript to the publisher via mail to have your books printed.<br/><!--
+    -->[koKR] 원고가 담긴 &lt;veul fromgame="GAME_ITEM_HOLOTAPE"/&gt; 출판사로 우편을 통해 보내야 책이 인쇄됩니다.</callout>
+
+    <p>The variables will be resolved based on the current ingame language, then the necessary
+        linguistic processing is performed, which would result in a following paragraph
+        (text in blue denotes the text is inserted using the tags):</p>
+
+    <callout>[en] Send your <itemname>Holotape</itemname> that contains the manuscript to the publisher via mail to have your books printed.<br/><!--
+    -->[koKR] 원고가 담긴 <itemname>홀로테이프를</itemname> 출판사로 우편을 통해 보내야 책이 인쇄됩니다.</callout>
+
+
+
+
 
     <newpage/>
 

@@ -45,8 +45,13 @@
 
         <p><index id="btex 언어"/><btex/>(발음: [비ː텍])은 <latex/>과 유사하게 설계된 XML 기반의 마크업 언어이다.
             <btex/>은 세세한 스타일 정의문과 조판 설정을 추상화하여, 글을 쓰면서 <latex/> 매크로를 디버깅하는 등의 일 없이 글쓰기에 집중할 수 있도록 설계되었다. 다만 이러한 이유로 미리 정의된 스타일을 뜯어고치는 것은 어렵다.</p>
-        <p><btex/> 문서는 다음의 다섯 부분으로 나뉘어진다. <a href="btexdoc">스타일 정의문</a>,
-            <a href="표지 정의문">표지 정의문</a>, <a href="목차 정의문">목차 정의문</a>, <a href="원고">원고</a>, <a href="색인 페이지">색인 페이지</a>. 이 중 스타일 정의문과 원고는 필수로 존재하여야 하는 부분이다.</p>
+        <p><btex/> 문서는 다음의 다섯 부분으로 나뉘어진다: <!--
+            --><a href="btexdoc">스타일 정의문</a>·<!--
+            --><a href="표지 정의문">표지 정의문</a>·<!--
+            --><a href="목차 정의문">목차 정의문</a>·<!--
+            --><a href="원고">원고</a>·<!--
+            --><a href="색인 페이지">색인 페이지</a>.
+            이 중 스타일 정의문과 원고는 필수로 존재하여야 하는 부분이다.</p>
 
 
         <chapter>스타일 정의문</chapter>
@@ -74,7 +79,7 @@
             &lt;/cover&gt;
         </callout>
         <p>이 중 <code>title</code> 태그만이 필수 태그이다. 표지의 문구는 글자간 간격이 넓게 인쇄된다. 책 제목은 두배 큰 크기로 인쇄된다.</p>
-        <p>표지의 색깔은 <code>hue</code> 속성을 사용해 바꿀 수 있다. 0에서 360 사이의 숫자를 사용할 수 있다.</p>
+        <p>표지의 색깔은 <code>hue</code> 속성을 사용하여 바꿀 수 있다. 0에서 360 사이의 숫자를 사용할 수 있다.</p>
 
 
         <chapter>목차 정의문</chapter>
@@ -93,8 +98,8 @@
         <p><index id="원고"/><index id="태그 목록"/>원고는 책의 진짜 본문이 담긴 부분을 말한다. 본문에는 다음의 태그를 사용할 수 있다.</p>
         <ul>
             <li><index id="part (태그)"/><code>part</code> — 원고에 새 부(part)를 추가함</li>
-            <li><index id="chapter (태그)"/><index id="section (태그)"/><code>chapter</code>, <code>section</code> — 원고에 새 장(chapter)/절(section)을 추가함. 목차 페이지에는 다른 이름을 표시하고 싶다면 <code>alt</code> 속성을 사용할 수 있음. 목차 페이지에서 숨기고 싶다면 <code>hide="1"</code> 속성을 추가할 것. 장이 새 페이지에서 시작되게 하려면 <code>chapter</code> 태그 앞에 <code>newpage</code>를 추가할 것</li>
-            <li><index id="p (태그)"/><code>p</code> — 새 문단을 삽입함. 본문의 글은 반드시 이 태그 내부에 작성되어야 함. 모든 문단는 16픽셀의 들여쓰기로 조판되나, 다음의 경우 들여쓰기가 적용되지 않음. 부·장·절의 첫 문단, <code>br</code>, <code>newpage</code>, <code>callout</code>, <code>ul</code>, <code>ol</code>,  <code>anonbreak</code> 태그 직후의 문단</li>
+            <li><index id="chapter (태그)"/><index id="section (태그)"/><code>chapter</code>, <code>section</code> — 원고에 새 장(chapter)·절(section)을 추가함. 목차 페이지에는 다른 이름을 표시하고 싶다면 <code>alt</code> 속성을 사용할 수 있음. 목차 페이지에서 숨기고 싶다면 <code>hide="1"</code> 속성을 추가할 것. 장이 새 페이지에서 시작되게 하려면 <code>chapter</code> 태그 앞에 <code>newpage</code>를 추가할 것</li>
+            <li><index id="p (태그)"/><code>p</code> — 새 문단을 삽입함. 본문의 글은 반드시 이 태그 내부에 작성되어야 함. 모든 문단는 16픽셀의 들여쓰기로 조판되나, 다음의 경우 들여쓰기가 적용되지 않음: 부·장·절의 첫 문단, <code>br</code>, <code>newpage</code>, <code>callout</code>, <code>ul</code>, <code>ol</code>,  <code>anonbreak</code> 태그 직후의 문단</li>
             <li><index id="span (태그)"/><code>span</code> — 문구의 색상이나 스타일을 변경함. 색상은 <code>colour</code> 속성에 작성되어야 함. 6자리 헥스코드, 3자리 헥스코드, CSS Colour Level 4에 정의된 색상명을 사용할 수 있음. 모든 색상은 내부적으로 가장 가까운 3자리 헥스코드로 변경됨에 유의할 것</li>
             <li><index id="emph (태그)"/><code>emph</code> — <code>span</code>의 특수한 경우로, 문구를 <emph>빨간색으로</emph> 인자함</li>
             <li><index id="itemname (태그)"/><code>itemname</code> — <code>span</code>의 특수한 경우로, 게임 내 아이템의 이름을 강조 표시할 때 사용함. 문구는 <itemname>파란색으로</itemname> 인자됨</li>
@@ -102,27 +107,27 @@
             <li><index id="code (태그)"/><code>code</code> — <code>span</code>의 특수한 경우로, 코드를 강조 표시할 때 사용함. 문구는 <code>청록색의 고정폭으로</code> 인자됨</li>
             <li><index id="br (태그)"/><code>br</code> — 스스로 닫는 태그. 임의의 줄바꿈을 삽입함</li>
             <li><index id="newpage (태그)"/><code>newpage</code> — 스스로 닫는 태그. 임의의 새 페이지를 삽입함</li>
-            <li><index id="anonbreak (태그)"/><code>anonbreak</code> — 스스로 닫는 태그. 임의의 문단 분할을 적용함. 분할 표시는 한 줄을 비우고 가운데에 긴 줄을 삽입하여 이루어짐.주로 소설을 조판하는 데에 사용됨</li>
-            <li><index id="callout (태그)"/><code>callout</code> — 문단 태크로서, 문단을 회색 상자에 넣어 돋보이게 조판함</li>
-            <li><index id="ul (태그)"/><index id="li (태그)"/><code>ul</code> — 순서 없는 목록을 조판함. 목록의 항목은 <code>li</code> 태그를 사용해 기술됨</li>
-            <li><index id="ol (태그)"/><code>ol</code> — 순서 있는 목록을 조판함. 목록의 항목은 <code>li</code> 태그를 사용해 기술됨</li>
+            <li><index id="anonbreak (태그)"/><code>anonbreak</code> — 스스로 닫는 태그. 임의의 문단 분할을 적용함. 분할 표시는 한 줄을 비우고 가운데에 긴 줄을 삽입하여 이루어짐. 주로 소설을 조판하는 데에 사용됨</li>
+            <li><index id="callout (태그)"/><code>callout</code> — 문단 태그로서, 문단을 회색 상자에 넣어 돋보이게 조판함</li>
+            <li><index id="ul (태그)"/><index id="li (태그)"/><code>ul</code> — 순서 없는 목록을 조판함. 목록의 항목은 <code>li</code> 태그를 사용하여 기술됨</li>
+            <li><index id="ol (태그)"/><code>ol</code> — 순서 있는 목록을 조판함. 목록의 항목은 <code>li</code> 태그를 사용하여 기술됨</li>
             <li><index id="fullpagebox (태그)"/><code>fullpagebox</code> — 문구를 한 페이지를 비우고, 그 페이지의 중앙에 조판함. 반드시 <code>newpage</code> 태그가 직전에 쓰여야 함</li>
-            <li><index id="btex (태그)"/><code>btex</code> — 스스로 닫는 태그. <btex/> 로고를 삽입</li>
+            <li><index id="btex (태그)"/><code>btex</code> — 스스로 닫는 태그. <btex/> 로고를 삽입함</li>
         </ul>
-        <p>스스로 닫는 태그는 하위 내용을 담을 수 없다. 스스로 닫는 태그는, 예를 들어 tagname이라는 태그가 있으면, 다음과 같이 쓴다. <code>&lt;tagname/&gt;</code>.</p>
+        <p>스스로 닫는 태그는 하위 내용을 담을 수 없다. 스스로 닫는 태그는, 예를 들어 tagname이라는 태그가 있으면, 다음과 같이 쓴다: <code>&lt;tagname/&gt;</code>.</p>
 
 
         <section>장·절 제목 스타일</section>
 
-        <p>부와 장과 절은 <code>type</code> 속성을 사용해 번호가 찍히는 스타일을 지정할 수 있다. 지원하는 스타일은 다음과 같다.</p>
+        <p>부와 장·절은 <code>type</code> 속성을 사용하여 번호가 찍히는 스타일을 지정할 수 있다. 지원하는 스타일은 다음과 같다.</p>
         <ul>
             <li><code>a</code> — 번호로 알파벳을 사용함 (a, b, c, …)</li>
             <li><code>A</code> — 번호로 알파벳 대문자를 사용함 (A, B, C, …)</li>
             <li><code>i</code> — 번호로 로마 숫자를 사용함 (i, ii, iii, …)</li>
             <li><code>I</code> — 번호로 로마 숫자 대문자를 사용함 (I, II, III, …)</li>
-            <li><code>1</code> — 번호를 사용함 (1, 2, 3)</li>
+            <li><code>1</code> — 번호로 아라비아 숫자를 사용함 (1, 2, 3)</li>
         </ul>
-        <p>기본값은, 부는 로마 숫자 대문자, 장과 절은 그냥 번호를 사용한다. “Part I”로 찍히는 것을 “제1절”로 변경하는 등의 심화된 스타일은 <a href="macro definition">매크로 정의문</a>에서 정의할 수 있다.</p>
+        <p>기본값은, 부는 로마 숫자 대문자, 장·절은 아라비아 숫자를 사용한다. 부의 경우 영어로 “Part I”과 같이 찍히고, 이를 “제1절”로 변경하는 등의 심화된 스타일은 <a href="macro definition">매크로 정의문</a>에서 정의할 수 있다.</p>
 
 
         <section>문단 스타일</section>
@@ -130,14 +135,16 @@
         <p><code>p</code>와 <code>callout</code> 태그는 <code>align</code> 속성을 지원한다. 지원하는 스타일은 다음과 같다.</p>
         <ul>
             <li><code>left</code> — 문단을 좌측정렬함</li>
+            <li><code>right</code> — 문단을 우측정렬함</li>
+            <li><code>center</code> — 문단을 중앙정렬함</li>
             <li><code>justify</code> — 문단을 양끝정렬함. 기본값</li>
         </ul>
-        <p><code>p</code>, <code>span</code>, <code>callout</code> 태그는 추가로 <code>class="code"</code> 속성을 지원한다. 이 속성이 적용된 문구는 <code>코드꼴(code font)</code>을 사용해 인자된다.</p>
+        <p><code>p</code>, <code>span</code>, <code>callout</code> 태그는 추가로 <code>class="code"</code> 속성을 지원한다. 이 속성이 적용된 문구는 <span class="code">코드꼴(code font)</span>을 사용하여 인자된다.</p>
 
 
         <section>하이퍼링크</section>
 
-        <p><index id="하이퍼링크"/>하이퍼링크는 <code>index</code>와 <code>a</code> 태그를 사용해 적용할 수 있다.</p>
+        <p><index id="하이퍼링크"/>하이퍼링크는 <code>index</code>와 <code>a</code> 태그를 사용하여 적용할 수 있다.</p>
         <ul>
             <li><index id="index (태그)"/><code>index</code> — 링크의 목적지를 정의함. 링크의 이름은 문서 전체에서 유일하여야 하며, <code>id</code> 속성에 작성함</li>
             <li><index id="a (태그)"/><code>a</code> — 태그 내부의 문구를 클릭 가능하게 함. 링크의 목적지는 (index 태그의 id) <code>href</code> 속성에 작성함</li>
@@ -153,6 +160,7 @@
         </callout>
 
         <p><code>title</code> 속성은 색인 페이지의 장제목을 지정한다. 지정하지 않았으면 “Index”가 인자된다.</p>
+        <p><code>&lt;tableofindices/&gt;</code> 태그는 조판 시스템이 내부적으로 사용하는 태그이다.</p>
 
 
         <chapter>문서 끝맺기</chapter>
@@ -163,6 +171,78 @@
         <chapter>마무리</chapter>
 
         <p><btex/>으로 작성된 최종 원고는 출판사에 도착한 후 인쇄가 시작된다. 원고에 오류가 없다면 주문한 부수대로 책이 인쇄되어 합리적인 영업일 내에 우편으로 배송된다. 즐거운 글쓰기가 되길!</p>
+
+
+
+        <part>고급 매크로</part>
+
+
+        <chapter>매크로 정의문</chapter>
+
+        <p><index id="매크로 정의문"/>여기서는 조판 시스템이 사용하는 태그를 설명하고, 이 태그를 조작하여 조금이나마 미리 정의된 스타일을 변경하는 법을 기술한다.</p>
+        <p><index id="macrodef (태그)"/>매크로는 <code>cover</code> 앞에 <code>macrodef</code>태그를 두어 정의할 수 있다. 매크로 정의문의 구조는 다음과 같다.</p>
+
+        <callout align="left" class="code">&lt;macrodef&gt;<br/><!--
+-->　　&lt;pair key="매크로 이름" value="매크로 값"/&gt;<br/><!--
+-->　　&lt;pair key="또다른 매크로" value="또다른 값"/&gt;<br/><!--
+-->&lt;/macrodef&gt;</callout>
+
+
+        <section>매크로 키</section>
+
+        <p>내부적으로 부와 장 제목은 매크로를 사용하여 인자된다. 매크로의 값을 바꾸면 번호가 인자되는 스타일을 변경할 수 있다. 매크로의 이름과 기본값은 다음과 같다.</p>
+
+        <ul>
+            <li><code>thepart</code> — 부 제목 번호. 기본값: <code>Part %1$s</code></li>
+            <li><code>thechapter</code> — 장 제목 번호. 기본값: <code>%1$s</code></li>
+        </ul>
+
+        <p>매개변수인 <code>%1$s</code>는 각 제목의 <code>type</code> 속성에 따라 적절한 숫자로 치환된다.</p>
+
+        <p>이 매크로는 장제목을 원하는 언어의 스타일로 변경하는 데에 사용될 수 있다. 예를 들면 한국어 환경에서는 <code>thechapter</code>를 <code>%1$s장</code>으로 정의하는 것이 되겠다.</p>
+
+
+        <chapter>외부 변수 인자하기</chapter>
+
+        <p>편지의 보내는 사람과 받는 사람과 같이 인자될 문구를 조판 시스템 외부에서 정의하는 것이 바람직한 경우가 있다. 이러한 문구는 스스로 닫는 <code>v</code> 태그를 사용하여 추가할 수 있다. 이 태그는 또한 게임 내에 정의된 문자열을 가져오는 데에 사용될 수도 있다.</p>
+        <p>외부 변수를 인자하려면 <code>id</code> 속성을 사용하여야 한다. 게임 내 문자열을 가져오려면 <code>fromgame</code> 속성을 사용하라. 두 속성은 서로 상충되므로 하나의 속성만을 사용하여야 한다.</p>
+
+        <section>게임 내 화폐 단위 인자하기</section>
+
+        <p><index id="bucks (태그)"/>“총액: <bucks>1234</bucks>”와 같은 문구를 인쇄하려면 <code>bucks</code> 태그 내부에 <code>v</code> 태그를 넣어서 사용할 수 있다. 예시 코드는 다음과 같다.</p>
+
+        <callout align="left" class="code">&lt;p&gt;총액: &lt;bucks&gt;&lt;v id="invoice_total_amount"/&gt;&lt;/bucks&gt;&lt;/p&gt;</callout>
+
+        <p>외부변수 <code>invoice_total_amount</code>에 <code>너무많음</code>이라는 문자열이 선언되어 있다면, 위 코드는 “총액: <bucks>너무많음</bucks>”을 인쇄할 것이다.</p>
+
+
+        <section>한국어 전용 태그</section>
+
+        <p><index id="조사처리"/>조사 처리를 위한 <code>v</code>태그는 다음과 같다.</p>
+
+        <ul>
+            <li><code>veun</code> <code>vneun</code> — 은/는</li>
+            <li><code>vi</code> <code>vga</code> — 이/가</li>
+            <li><code>veul</code> <code>vreul</code> — 을/를</li>
+            <li><code>vwa</code> <code>vgwa</code> — 와/과</li>
+            <li><code>vro</code> <code>veuro</code> — 로/으로</li>
+        </ul>
+
+        <p>태그 쌍 중에서는 아무거나 사용해도 무방하다. 어느 쪽이든 알맞는 조사를 추가할 것이다. 달리 말하면, <code>veun</code>과 <code>vneun</code>은 완전히 동일한 태그이다.</p>
+
+        <p>이 태그들은 다음과 같은 상황에 쓰일 수 있다. 아래와 같은 <btex/> 문서가 있다면,</p>
+
+        <callout align="left" class="code">[en] Send your &lt;v fromgame="GAME_ITEM_HOLOTAPE"/&gt; that contains the manuscript to the publisher via mail to have your books printed.<br/><!--
+        -->[koKR] 원고가 담긴 &lt;veul fromgame="GAME_ITEM_HOLOTAPE"/&gt; 출판사로 우편을 통해 보내야 책이 인쇄됩니다.</callout>
+
+        <p>변수는 현재 게임 언어에 따라 대입되고, 그 다음 조사처리가 진행된다. 조판이 완료된 문구는 다음과 같다. (파란색은 해당 단어가 태그에 의해 대입되었음을 뜻한다)</p>
+
+        <callout>[en] Send your <itemname>Holotape</itemname> that contains the manuscript to the publisher via mail to have your books printed.<br/><!--
+        -->[koKR] 원고가 담긴 <itemname>홀로테이프를</itemname> 출판사로 우편을 통해 보내야 책이 인쇄됩니다.</callout>
+
+
+
+
 
         <newpage/>
 
