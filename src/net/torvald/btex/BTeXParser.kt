@@ -122,6 +122,7 @@ object BTeXParser {
         private var coverCol: Color? = null
 
         private lateinit var testFont: TerrarumSansBitmap
+        private lateinit var partTitleFont: TerrarumSansBitmap
         private lateinit var titleFont: TerrarumSansBitmap
         private lateinit var subtitleFont: TerrarumSansBitmap
 
@@ -129,7 +130,9 @@ object BTeXParser {
 
         private val macrodefs = hashMapOf(
             "thepart" to "Part %1\$s",
-            "thechapter" to "%1\$s"
+            "parttype" to "I",
+            "thechapter" to "%1\$s",
+            "chaptertype" to "1"
         )
 
         private fun invokeMacro(name: String, vararg args: String): String {
@@ -211,6 +214,7 @@ object BTeXParser {
         fun dispose() {
             if (::testFont.isInitialized) testFont.tryDispose()
             if (::titleFont.isInitialized) titleFont.tryDispose()
+            if (::partTitleFont.isInitialized) partTitleFont.tryDispose()
             if (::subtitleFont.isInitialized) subtitleFont.tryDispose()
         }
 
@@ -357,6 +361,13 @@ object BTeXParser {
                 if (!::testFont.isInitialized) testFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha, textCacheSize = 4096)
                 testFont
             }
+        }
+
+        private fun getPartTitleFont(): TerrarumSansBitmap {
+            if (!::partTitleFont.isInitialized) partTitleFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha).also {
+                it.interchar = 1
+            }
+            return partTitleFont
         }
 
         private fun getTitleFont(): TerrarumSansBitmap {
@@ -1119,18 +1130,18 @@ object BTeXParser {
             clearParBuffer()
 
             if (attribs["hide"] == null)
-                cptSectStack.add(CptSect("part", attribs["alt"], attribs["type"] ?: "I", attribs["start"]?.toInt()))
+                cptSectStack.add(CptSect("part", attribs["alt"], attribs["type"] ?: macrodefs["parttype"]!!, attribs["start"]?.toInt()))
             else
-                cptSectStack.add(CptSect("part-hidden", attribs["alt"], attribs["type"] ?: "I", attribs["start"]?.toInt()))
+                cptSectStack.add(CptSect("part-hidden", attribs["alt"], attribs["type"] ?: macrodefs["parttype"]!!, attribs["start"]?.toInt()))
         }
         @OpenTag // reflective access is impossible with 'private'
         fun processElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             clearParBuffer()
 
             if (attribs["hide"] == null)
-                cptSectStack.add(CptSect("chapter", attribs["alt"], attribs["type"] ?: "1", attribs["start"]?.toInt()))
+                cptSectStack.add(CptSect("chapter", attribs["alt"], attribs["type"] ?: macrodefs["chaptertype"]!!, attribs["start"]?.toInt()))
             else
-                cptSectStack.add(CptSect("chapter-hidden", attribs["alt"], attribs["type"] ?: "1", attribs["start"]?.toInt()))
+                cptSectStack.add(CptSect("chapter-hidden", attribs["alt"], attribs["type"] ?: macrodefs["chaptertype"]!!, attribs["start"]?.toInt()))
         }
         @OpenTag // reflective access is impossible with 'private'
         fun processElemSECTION(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
@@ -1304,7 +1315,7 @@ object BTeXParser {
         private fun typesetPartHeading(num: String, thePar: String, handler: BTeXHandler, indent: Int = PAR_INDENTATION, width: Int = doc.textWidth) {
             typesetParagraphs("${ccDefault}⁃ $num ⁃", handler, align = "left")
             typesetParagraphs(" ", handler, align = "left")
-            typesetParagraphs(getSubtitleFont(), "$ccDefault$thePar", handler, align = "left")
+            typesetParagraphs(getPartTitleFont(), "$ccDefault$thePar", handler, align = "left")
 
             // get global yDelta
             doc.currentPageObj.let { page ->

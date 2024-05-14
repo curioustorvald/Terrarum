@@ -109,7 +109,7 @@
         <li><index id="part (tag)"/><code>part</code> — inserts part separation page to your book</li>
         <li><index id="chapter (tag)"/><index id="section (tag)"/><code>chapter</code>, <code>section</code> — inserts a new chapter/section. If an alternative name is required on the Table of Contents, the <code>alt</code> attribute can be used. If the chapter/section needs to be hidden on the Table of Contents, add the <code>hide="1"</code> attribute. If the chapter must start on a new page, simply add <code>newpage</code> in front of the chapter tag</li>
         <li><index id="p (tag)"/><code>p</code> — inserts a new paragraph. The body texts must be written inside this tag. All paragraphs will have a 16-pixel indentation, with the following exceptions: first <code>p</code> of the part/chapter/section; first <code>p</code> after <code>br</code>, <code>newpage</code>, <code>callout</code>, <code>ul</code>, <code>ol</code> or <code>anonbreak</code></li>
-        <li><index id="span (tag)"/><code>span</code> — allows changing the colour or the style of the texts. The colour must be specified in the <code>colour</code> attribute. Six-digit hex code, three-digit hex code and CSS Colors Level 4 named colours are supported. Note that all the colours will be rounded to the nearest three-digit hex code</li>
+        <li><index id="span (tag)"/><code>span</code> — allows changing the colour or the style of the texts. The colour must be specified in the <code>colour</code> attribute. Six-digit hex code, three-digit hex code and CSS Colours Level 4 named colours are supported. Note that all the colours will be rounded to the nearest three-digit hex code</li>
         <li><index id="emph (tag)"/><code>emph</code> — is a special case of the <code>span</code> tag. The resulting text will be <emph>red</emph></li>
         <li><index id="itemname (tag)"/><code>itemname</code> — is a special case of the <code>span</code> tag used to highlight the name of the ingame item. The resulting text will be <itemname>blue</itemname></li>
         <li><index id="targetname (tag)"/><code>targetname</code> — is a special case of the <code>span</code> tag used to highlight the name of an arbitrary target or goals. The resulting text will be <targetname>green</targetname></li>
@@ -211,14 +211,22 @@
 
     <ul>
         <li><code>thepart</code> — Part heading. Default: <code>Part %1$s</code></li>
+        <li><code>parttype</code> — Default style of the <code>part</code> tag. Default: <code>I</code></li>
         <li><code>thechapter</code> — Chapter heading. Default: <code>%1$s</code></li>
+        <li><code>parttype</code> — Default style of the <code>chapter</code> tag. Default: <code>1</code></li>
     </ul>
 
     <p>The argument key <code>%1$s</code> will be replaced into a number, Roman numerals, etc.
         depending on the value of <code>type</code> attribute.</p>
 
     <p>These macros can be used to localise the chapter headings for your language. For example,
-        in Korean text, you might want to change <code>thechapter</code> into <code>%1$s장</code>.</p>
+        in Korean text, the following idiomatic definition will be useful:</p>
+
+    <callout align="left" class="code">&lt;macrodef&gt;<br/><!--
+-->　　&lt;pair key="thepart" value="제%1$s부"/&gt;<br/><!--
+-->　　&lt;pair key="parttype" value="1"/&gt;<br/><!--
+-->　　&lt;pair key="thechapter" value="%1$s장"/&gt;<br/><!--
+-->&lt;/macrodef&gt;</callout>
 
 
     <chapter>Printing External Variables</chapter>

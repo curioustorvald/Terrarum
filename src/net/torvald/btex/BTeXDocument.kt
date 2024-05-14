@@ -150,6 +150,8 @@ class BTeXDocument : Disposable {
         if (fromArchive) throw IllegalStateException("Document is loaded from the archive and thus cannot be finalised")
         if (isFinalised) throw IllegalStateException("Page is already been finalised")
 
+        // TODO serialise and finalise via CPU (store every page as Pixmap)
+
         pageTextures = ArrayList()
         pageFrameBuffers = ArrayList()
 
