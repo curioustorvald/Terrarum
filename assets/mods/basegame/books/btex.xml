@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE btexdoc SYSTEM "btexdoc.dtd">
 <btexdoc cover="hardcover" inner="standard" papersize="standard">
 <cover>
@@ -61,7 +62,10 @@
 
     <p><index id="btexdoc"/>The Style Declaration is the very first line of a <btex/> document. Its syntax is as follows:</p>
 
-    <callout align="left" class="code"><index id="btexdoc (tag)"/>&lt;btexdoc cover="hardcover" inner="standard" papersize="standard"&gt;
+    <callout align="left" class="code"><index id="btexdoc (tag)"/><!--
+    -->&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br/><!--
+    -->&lt;!DOCTYPE btexdoc SYSTEM "btexdoc.dtd"&gt;<br/><!--
+    -->&lt;btexdoc cover="hardcover" inner="standard" papersize="standard"&gt;
     </callout>
 
     <p>The <code>btexdoc</code> tag takes following attributes:</p>

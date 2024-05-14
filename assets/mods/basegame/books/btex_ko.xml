@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE btexdoc SYSTEM "btexdoc.dtd">
 <btexdoc cover="hardcover" inner="standard" papersize="standard">
     <macrodef>
@@ -58,7 +59,10 @@
 
         <p><index id="btexdoc"/>스타일 정의문은 <btex/> 문서의 가장 첫 부분이다. 스타일 정의문의 구조는 다음과 같다.</p>
 
-        <callout align="left" class="code"><index id="btexdoc (태그)"/>&lt;btexdoc cover="hardcover" inner="standard" papersize="standard"&gt;
+        <callout align="left" class="code"><index id="btexdoc (tag)"/><!--
+        -->&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br/><!--
+        -->&lt;!DOCTYPE btexdoc SYSTEM "btexdoc.dtd"&gt;<br/><!--
+        -->&lt;btexdoc cover="hardcover" inner="standard" papersize="standard"&gt;
         </callout>
 
         <p><code>btexdoc</code> 태그는 다음의 속성을 지원한다.</p>
