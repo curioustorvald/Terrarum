@@ -201,7 +201,7 @@
             <li><code>thepart</code> — 부 제목 번호. 기본값: <code>Part %1$s</code></li>
             <li><code>parttype</code> — <code>part</code> 태그의 기본 스타일. 기본값: <code>I</code></li>
             <li><code>thechapter</code> — 장 제목 번호. 기본값: <code>%1$s</code></li>
-            <li><code>parttype</code> — <code>chapter</code> 태그의 기본 스타일. 기본값: <code>1</code></li>
+            <li><code>chaptertype</code> — <code>chapter</code> 태그의 기본 스타일. 기본값: <code>1</code></li>
         </ul>
 
         <p>매개변수인 <code>%1$s</code>는 각 제목의 <code>type</code> 속성에 따라 적절한 숫자로 치환된다.</p>

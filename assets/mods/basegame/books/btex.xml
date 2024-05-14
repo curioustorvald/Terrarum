@@ -213,7 +213,7 @@
         <li><code>thepart</code> — Part heading. Default: <code>Part %1$s</code></li>
         <li><code>parttype</code> — Default style of the <code>part</code> tag. Default: <code>I</code></li>
         <li><code>thechapter</code> — Chapter heading. Default: <code>%1$s</code></li>
-        <li><code>parttype</code> — Default style of the <code>chapter</code> tag. Default: <code>1</code></li>
+        <li><code>chaptertype</code> — Default style of the <code>chapter</code> tag. Default: <code>1</code></li>
     </ul>
 
     <p>The argument key <code>%1$s</code> will be replaced into a number, Roman numerals, etc.
