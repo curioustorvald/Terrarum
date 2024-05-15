@@ -1,11 +1,14 @@
 package net.torvald.terrarum.imagefont
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import net.torvald.terrarum.roundToFloat
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2016-04-15.
@@ -16,11 +19,16 @@ object TinyAlphNum : BitmapFont() {
     internal const val H = 13
 
     internal val fontSheet = TextureRegionPack("./assets/graphics/fonts/7x13_Tamzen7x14b.tga", W+1, H+1)
-
+    internal val fontPixmap = Pixmap(Gdx.files.internal("./assets/graphics/fonts/7x13_Tamzen7x14b.tga"))
 
     init {
         setOwnsTexture(true)
         setUseIntegerPositions(true)
+    }
+
+    override fun dispose() {
+        fontSheet.dispose()
+        fontPixmap.dispose()
     }
 
     fun getWidth(str: String): Int {
@@ -33,7 +41,8 @@ object TinyAlphNum : BitmapFont() {
         return W * l
     }
 
-    lateinit var colMain: Color
+    private var colMain = Color.WHITE
+    private var colMainInt = -1
 
     override fun draw(batch: Batch, text: CharSequence, x: Float, y: Float): GlyphLayout? {
         val originalColour = batch.color.cpy()
@@ -64,6 +73,79 @@ object TinyAlphNum : BitmapFont() {
 
         return null
     }
+
+    fun drawToPixmap(pixmap: Pixmap, text: String, x: Int, y: Int) {
+        var charsPrinted = 0
+
+
+        text.forEachIndexed { index, c ->
+            if (isColourCodeHigh(c)) {
+                val cchigh = c
+                val cclow = text[index + 1]
+                val colour = getColour(cchigh, cclow)
+
+                colMainInt = colour.toRGBA8888()
+            }
+            else if (c in 0.toChar()..255.toChar()) {
+                val srcX = (c.code % 16) * (W+1)
+                val srcY = (c.code / 16) * (H+1)
+                val destX = x + charsPrinted * W
+                val destY = y
+
+                pixmap.drawPixmap(fontPixmap, srcX, srcY, W+1, H+1, destX, destY, colMainInt)
+
+                charsPrinted += 1
+            }
+        }
+    }
+
+
+    /***
+     * @param col RGBA8888 representation
+     */
+    private fun Pixmap.drawPixmap(pixmap: Pixmap, srcX: Int, srcY: Int, srcW: Int, srcH: Int, destX: Int, destY: Int, col: Int) {
+        for (y in srcY until srcY + srcH) {
+            for (x in srcX until srcX + srcW) {
+                val pixel = pixmap.getPixel(x, y)
+
+                val newPixel = pixel colorTimes col
+
+                this.drawPixel(destX + x - srcX, destY + y - srcY, newPixel)
+            }
+        }
+    }
+
+    private fun Color.toRGBA8888() =
+        (this.r * 255f).toInt().shl(24) or
+                (this.g * 255f).toInt().shl(16) or
+                (this.b * 255f).toInt().shl(8) or
+                (this.a * 255f).toInt()
+
+    /**
+     * RGBA8888 representation
+     */
+    private fun Int.forceOpaque() = this.and(0xFFFFFF00.toInt()) or 0xFF
+
+    private infix fun Int.colorTimes(other: Int): Int {
+        val thisBytes = IntArray(4) { this.ushr(it * 8).and(255) }
+        val otherBytes = IntArray(4) { other.ushr(it * 8).and(255) }
+
+        return (thisBytes[0] times256 otherBytes[0]) or
+                (thisBytes[1] times256 otherBytes[1]).shl(8) or
+                (thisBytes[2] times256 otherBytes[2]).shl(16) or
+                (thisBytes[3] times256 otherBytes[3]).shl(24)
+    }
+
+    private infix fun Int.times256(other: Int) = multTable255[this][other]
+
+    private val multTable255 = Array(256) { left ->
+        IntArray(256) { right ->
+            (255f * (left / 255f).times(right / 255f)).roundToInt()
+        }
+    }
+
+
+
 
     override fun getLineHeight() = H.toFloat()
     override fun getCapHeight() = getLineHeight()

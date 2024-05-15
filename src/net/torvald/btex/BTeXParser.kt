@@ -2,7 +2,9 @@ package net.torvald.btex
 
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath.DEG_TO_RAD
 import net.torvald.colourutil.OKLch
 import net.torvald.colourutil.tosRGB
@@ -121,13 +123,6 @@ object BTeXParser {
         private var hasCover = false
         private var coverCol: Color? = null
 
-        private lateinit var testFont: TerrarumSansBitmap
-        private lateinit var partTitleFont: TerrarumSansBitmap
-        private lateinit var titleFont: TerrarumSansBitmap
-        private lateinit var subtitleFont: TerrarumSansBitmap
-
-        private val bodyTextShadowAlpha = 0.36f
-
         private val macrodefs = hashMapOf(
             "thepart" to "Part %1\$s",
             "parttype" to "I",
@@ -158,6 +153,10 @@ object BTeXParser {
         }
 
         init {
+            if (!fontInit) {
+                throw RuntimeException("Font not initialised: call BTeXParser.BTeXHandler.preloadFonts() WITHIN OpenGL-context thread to initialise the fonts.")
+            }
+
             BTeXHandler::class.declaredFunctions.filter { it.findAnnotation<OpenTag>() != null }.forEach {
 //                println("Tag opener: ${it.name}")
                 elemOpeners[it.name] = it
@@ -179,6 +178,14 @@ object BTeXParser {
                         font.draw(batch, "${ccDefault}E", x + (15 + 2*interchar)*scale, y + 4*scale)
                         font.draw(batch, "${ccDefault}X", x + (23 + 3*interchar)*scale, y + 0*scale)
                     }
+                    override fun drawToPixmap(doc: BTeXDocument, pixmap: Pixmap, x: Int, y: Int, font: TerrarumSansBitmap?) {
+                        val scale = font!!.scale
+                        val interchar = font.interchar
+                        font.drawToPixmap(pixmap, "${ccDefault}B", x + ( 0 + 0*interchar)*scale, y + 0*scale)
+                        font.drawToPixmap(pixmap, "${ccDefault}T", x + ( 8 + 1*interchar)*scale, y + 0*scale)
+                        font.drawToPixmap(pixmap, "${ccDefault}E", x + (15 + 2*interchar)*scale, y + 4*scale)
+                        font.drawToPixmap(pixmap, "${ccDefault}X", x + (23 + 3*interchar)*scale, y + 0*scale)
+                    }
                 }
             }
 
@@ -194,6 +201,15 @@ object BTeXParser {
                         font.draw(batch, "${ccDefault}E", x + (19 + 2 * interchar) * scale, y + 4 * scale)
                         font.draw(batch, "${ccDefault}X", x + (27 + 3 * interchar) * scale, y + 0 * scale)
                     }
+                    override fun drawToPixmap(doc: BTeXDocument, pixmap: Pixmap, x: Int, y: Int, font: TerrarumSansBitmap?) {
+                        val scale = font!!.scale
+                        val interchar = font.interchar
+                        font.drawToPixmap(pixmap, "${ccDefault}L", x + (0 + 0 * interchar) * scale, y + 0 * scale)
+                        font.drawToPixmap(pixmap, "${ccDefault}ᴀ", x + (4 + 0 * interchar) * scale, y + -4 * scale)
+                        font.drawToPixmap(pixmap, "${ccDefault}T", x + (12 + 1 * interchar) * scale, y + 0 * scale)
+                        font.drawToPixmap(pixmap, "${ccDefault}E", x + (19 + 2 * interchar) * scale, y + 4 * scale)
+                        font.drawToPixmap(pixmap, "${ccDefault}X", x + (27 + 3 * interchar) * scale, y + 0 * scale)
+                    }
                 }
             }
 
@@ -207,15 +223,15 @@ object BTeXParser {
                         font.draw(batch, "${ccDefault}E", x + (7 + 2 * interchar) * scale, y + 4 * scale)
                         font.draw(batch, "${ccDefault}X", x + (15 + 3 * interchar) * scale, y + 0 * scale)
                     }
+                    override fun drawToPixmap(doc: BTeXDocument, pixmap: Pixmap, x: Int, y: Int, font: TerrarumSansBitmap?) {
+                        val scale = font!!.scale
+                        val interchar = font.interchar
+                        font.drawToPixmap(pixmap, "${ccDefault}T", x + (0 + 1 * interchar) * scale, y + 0 * scale)
+                        font.drawToPixmap(pixmap, "${ccDefault}E", x + (7 + 2 * interchar) * scale, y + 4 * scale)
+                        font.drawToPixmap(pixmap, "${ccDefault}X", x + (15 + 3 * interchar) * scale, y + 0 * scale)
+                    }
                 }
             }
-        }
-
-        fun dispose() {
-            if (::testFont.isInitialized) testFont.tryDispose()
-            if (::titleFont.isInitialized) titleFont.tryDispose()
-            if (::partTitleFont.isInitialized) partTitleFont.tryDispose()
-            if (::subtitleFont.isInitialized) subtitleFont.tryDispose()
         }
 
         override fun warning(e: SAXParseException) {
@@ -357,31 +373,18 @@ object BTeXParser {
 
         private fun getFont() = when (cover) {
             "typewriter" -> TODO()
-            else -> {
-                if (!::testFont.isInitialized) testFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha, textCacheSize = 4096)
-                testFont
-            }
+            else -> testFont
         }
 
         private fun getPartTitleFont(): TerrarumSansBitmap {
-            if (!::partTitleFont.isInitialized) partTitleFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha).also {
-                it.interchar = 1
-            }
             return partTitleFont
         }
 
         private fun getTitleFont(): TerrarumSansBitmap {
-            if (!::titleFont.isInitialized) titleFont = TerrarumSansBitmap(App.FONT_DIR).also {
-                it.interchar = 1
-                it.scale = 2
-            }
             return titleFont
         }
 
         private fun getSubtitleFont(): TerrarumSansBitmap {
-            if (!::subtitleFont.isInitialized) subtitleFont = TerrarumSansBitmap(App.FONT_DIR).also {
-                it.interchar = 1
-            }
             return subtitleFont
         }
 
@@ -1020,6 +1023,27 @@ object BTeXParser {
                         batch.color = oldcol
                     }
                 }
+                it.extraPixmapDrawFun = { pixmap, x, y ->
+                    val width = doc.textWidth - 2 * MARGIN_PARBOX_H
+                    val height = it.lineCount * doc.lineHeightInPx
+
+                    if (height > 0) {
+                        pixmap.setColor(Color(0xccccccff.toInt()))
+                        pixmap.fillRectangle(
+                            x - MARGIN_PARBOX_H,
+                            y - MARGIN_PARBOX_V,
+                            width + 2 * MARGIN_PARBOX_H,
+                            height + 2 * MARGIN_PARBOX_V
+                        )
+                        pixmap.setColor(Color(0x999999ff.toInt()))
+                        Toolkit.drawBoxBorderToPixmap(pixmap,
+                            x - MARGIN_PARBOX_H,
+                            y - MARGIN_PARBOX_V,
+                            width + 2 * MARGIN_PARBOX_H,
+                            height + 2 * MARGIN_PARBOX_V
+                        )
+                    }
+                }
             }
 
             insertOneEmptyLineOrAddNewPage()
@@ -1291,6 +1315,15 @@ object BTeXParser {
                     batch.color = Color.WHITE
                     Toolkit.fillArea(batch, px, py, pw, 1f)
                 }
+                it.last().extraPixmapDrawFun = { pixmap, x, y ->
+                    val px = x
+                    val py = y + doc.lineHeightInPx - 1
+                    val pw = doc.textWidth - 2 * MARGIN_TITLE_TEXTS
+                    pixmap.setColor(Color(1f,1f,1f,.5f))
+                    pixmap.fillRectangle(px, py, pw+1, 2)
+                    pixmap.setColor(Color.WHITE)
+                    pixmap.fillRectangle(px, py, pw, 1)
+                }
 
                 it.forEach {
                     it.posX += MARGIN_TITLE_TEXTS
@@ -1388,6 +1421,22 @@ object BTeXParser {
                             (it.lineCount - 1).coerceAtLeast(1) * doc.lineHeightInPx.toFloat()
                         )
                         batch.color = oldCol
+                    }
+                    it.extraPixmapDrawFun = { pixmap, x, y ->
+                        pixmap.setColor(DEFAULT_ORNAMENTS_COL.cpy().also { it.a *= bodyTextShadowAlpha })
+                        pixmap.fillRectangle(
+                            x - (indent - 2),
+                            y + doc.lineHeightInPx,
+                            7,
+                            1 + (it.lineCount - 1).coerceAtLeast(1) * doc.lineHeightInPx
+                        )
+                        pixmap.setColor(DEFAULT_ORNAMENTS_COL)
+                        pixmap.fillRectangle(
+                            x - (indent - 2),
+                            y + doc.lineHeightInPx,
+                            6,
+                            (it.lineCount - 1).coerceAtLeast(1) * doc.lineHeightInPx
+                        )
                     }
                 }
             }
@@ -1601,10 +1650,24 @@ object BTeXParser {
                         font.draw(batch, pageNum, x + typeWidth - pageNumWidth.toFloat(), y)
 
                         batch.color = oldCol
-
-
-
 //                        println("pos: ($x, $y)\tTOC: $name -- dot start: ${(x + textWidth).div(dotGap).ceilToFloat() * dotGap}, dot end: $dotCursor, typeWidth=$typeWidth, pageNumWidth=$pageNumWidth")
+                    }
+                    call.extraPixmapDrawFun = { pixmap, x, y ->
+                        val font = getFont()
+                        val y = y + (call.lineCount - 1).coerceAtLeast(0) * doc.lineHeightInPx
+
+                        val textWidth = if (call.text is TypesetDrawCall) {
+                            font.getWidthNormalised(call.text.movableType.typesettedSlugs.last())
+                        }
+                        else call.width
+
+                        var dotCursor = (x.toFloat() + textWidth).div(dotGap).ceilToInt() * dotGap
+                        while (dotCursor < x + dotPosEnd) {
+                            font.drawToPixmap(pixmap, "$ccDefault·", dotCursor + dotGap/2, y)
+                            dotCursor += dotGap
+                        }
+
+                        font.drawToPixmap(pixmap, "$ccDefault$pageNum", x + typeWidth - pageNumWidth, y)
                     }
                 }
             }
@@ -1619,9 +1682,43 @@ object BTeXParser {
 
 
         companion object {
+            init {
+                App.disposables.add(object : Disposable {
+                    override fun dispose() {
+                        testFont.dispose()
+                        partTitleFont.dispose()
+                        titleFont.dispose()
+                        subtitleFont.dispose()
+                    }
+                })
+            }
+
             private val siblingAwareTags = arrayOf(
                 "PART","CHAPTER","SECTION","SUBSECTION","P","I","LI"
             )
+
+            private val bodyTextShadowAlpha = 0.36f
+
+            private var fontInit = false
+            private lateinit var testFont: TerrarumSansBitmap
+            private lateinit var partTitleFont: TerrarumSansBitmap
+            private lateinit var titleFont: TerrarumSansBitmap
+            private lateinit var subtitleFont: TerrarumSansBitmap
+
+            fun preloadFonts() {
+                testFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha, textCacheSize = 4096)
+                partTitleFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha).also {
+                    it.interchar = 1
+                }
+                titleFont = TerrarumSansBitmap(App.FONT_DIR).also {
+                    it.interchar = 1
+                    it.scale = 2
+                }
+                subtitleFont = TerrarumSansBitmap(App.FONT_DIR).also {
+                    it.interchar = 1
+                }
+                fontInit = true
+            }
 
             private const val MARGIN_PARBOX_V = 4
             private const val MARGIN_PARBOX_H = 12

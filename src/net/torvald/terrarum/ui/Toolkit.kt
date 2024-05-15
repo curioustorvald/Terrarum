@@ -188,6 +188,18 @@ object Toolkit : Disposable {
 
     }
 
+    // draws highly simplified box border
+    fun drawBoxBorderToPixmap(pixmap: Pixmap, x: Int, y: Int, w: Int, h: Int) {
+        // top edge
+        pixmap.fillRectangle(x, y - 1, w, 1)
+        // bottom edge
+        pixmap.fillRectangle(x, y + h, w, 1)
+        // left edge
+        pixmap.fillRectangle(x - 1, y, 1, h)
+        // right edge
+        pixmap.fillRectangle(x + w, y, 1, h)
+    }
+
     private lateinit var blurtex0: Texture
     private lateinit var blurtex1: Texture
     private lateinit var blurtex2: Texture

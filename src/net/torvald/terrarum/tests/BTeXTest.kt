@@ -13,7 +13,9 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import net.torvald.btex.BTeXParser
 import net.torvald.terrarum.*
 import net.torvald.terrarum.btex.BTeXDocument
+import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.unicode.EMDASH
 import java.io.File
 import kotlin.system.measureTimeMillis
@@ -44,7 +46,10 @@ class BTeXTest : ApplicationAdapter() {
     )
 
     override fun create() {
-        Lang.invoke()
+        Lang
+        TinyAlphNum
+        Toolkit
+        BTeXParser.BTeXHandler.preloadFonts()
 
         batch = FlippingSpriteBatch(1000)
         camera = OrthographicCamera(1280f, 720f)
@@ -57,26 +62,27 @@ class BTeXTest : ApplicationAdapter() {
         val isBookFinalised = filePath.endsWith(".btxbook")
 
         if (!isBookFinalised) {
-            measureTimeMillis {
-                val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"), varMap)
-                document = f.first
-                documentHandler = f.second
-            }.also {
-                println("Time spent on typesetting [ms]: $it")
-            }
+            Thread {
+                measureTimeMillis {
+                    val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"), varMap)
+                    document = f.first
+                    documentHandler = f.second
+                }.also {
+                    println("Time spent on typesetting [ms]: $it")
+                }
 
-            /*measureTimeMillis {
-                document.finalise()
-                documentHandler.dispose()
-            }.also {
-                println("Time spent on finalising [ms]: $it")
-            }
+                measureTimeMillis {
+                    document.finalise()
+                }.also {
+                    println("Time spent on finalising [ms]: $it")
+                }
 
-            measureTimeMillis {
+                /*measureTimeMillis {
                 document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btxbook")}"))
-            }.also {
-                println("Time spent on serialisation [ms]: $it")
-            }*/
+                }.also {
+                    println("Time spent on serialisation [ms]: $it")
+                }*/
+            }.start()
         }
         else {
             measureTimeMillis {
@@ -96,28 +102,35 @@ class BTeXTest : ApplicationAdapter() {
 
         gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
-        val drawX = (1280 - (pageGap + document.pageDimensionWidth*2)) / 2
-        val drawY = 24
+        if (::document.isInitialized) {
+            if (document.isFinalised) {
+                val drawX = (1280 - (pageGap + document.pageDimensionWidth * 2)) / 2
+                val drawY = 24
 
-        batch.inUse {
-            batch.color = Color.WHITE
-            batch.draw(bg, 0f, 0f)
+                batch.inUse {
+                    batch.color = Color.WHITE
+                    batch.draw(bg, 0f, 0f)
 
-            if (scroll - 1 in document.pageIndices)
-                document.render(0f, batch, scroll - 1, drawX, drawY)
-            if (scroll in document.pageIndices)
-                document.render(0f, batch, scroll, drawX + (6 + document.pageDimensionWidth), drawY)
+                    if (scroll - 1 in document.pageIndices)
+                        document.render(0f, batch, scroll - 1, drawX, drawY)
+                    if (scroll in document.pageIndices)
+                        document.render(0f, batch, scroll, drawX + (6 + document.pageDimensionWidth), drawY)
+                }
+
+
+                if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT))
+                    scroll = (scroll - 2).coerceAtLeast(0)
+                else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT))
+                    scroll =
+                        (scroll + 2).coerceAtMost(
+                            document.pageIndices.endInclusive.toFloat().div(2f).ceilToInt().times(2)
+                        )
+                else if (Gdx.input.isKeyJustPressed(Input.Keys.PAGE_UP))
+                    scroll = 0
+                else if (Gdx.input.isKeyJustPressed(Input.Keys.PAGE_DOWN))
+                    scroll = document.pageIndices.endInclusive.toFloat().div(2f).ceilToInt().times(2)
+            }
         }
-
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT))
-            scroll = (scroll - 2).coerceAtLeast(0)
-        else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT))
-            scroll = (scroll + 2).coerceAtMost(document.pageIndices.endInclusive.toFloat().div(2f).ceilToInt().times(2))
-        else if (Gdx.input.isKeyJustPressed(Input.Keys.PAGE_UP))
-            scroll = 0
-        else if (Gdx.input.isKeyJustPressed(Input.Keys.PAGE_DOWN))
-            scroll = document.pageIndices.endInclusive.toFloat().div(2f).ceilToInt().times(2)
     }
 
 
