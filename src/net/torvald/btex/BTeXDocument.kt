@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.FlippingSpriteBatch
 import net.torvald.terrarum.ceilToInt
+import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClusteredFormatDOM
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.Clustfile
@@ -21,6 +22,7 @@ import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import java.io.File
 import java.io.RandomAccessFile
+import java.util.concurrent.Callable
 import java.util.zip.Deflater
 
 /**
@@ -161,14 +163,35 @@ class BTeXDocument : Disposable {
             pageTextures = Array(pages.size) { null }
             pagePixmaps = Array(pages.size) { null }
 
-            pages.forEachIndexed { pageNum, page ->
-                val pixmap = Pixmap(pageDimensionWidth, pageDimensionHeight, Pixmap.Format.RGBA8888).also {
-                    it.blending = Pixmap.Blending.SourceOver
-                    it.filter = Pixmap.Filter.NearestNeighbour
+            if (!multithread) {
+                pages.forEachIndexed { pageNum, page ->
+                    val pixmap = Pixmap(pageDimensionWidth, pageDimensionHeight, Pixmap.Format.RGBA8888).also {
+                        it.blending = Pixmap.Blending.SourceOver
+                        it.filter = Pixmap.Filter.NearestNeighbour
+                    }
+                    page.renderToPixmap(pixmap, 0, 0, pageMarginH, pageMarginV)
+                    printPageNumber(pixmap, pageNum, 0, 0)
+                    pagePixmaps[pageNum] = pixmap
                 }
-                page.renderToPixmap(pixmap, 0, 0, pageMarginH, pageMarginV)
-                printPageNumber(pixmap, pageNum, 0, 0)
-                pagePixmaps[pageNum] = pixmap
+            }
+            else {
+                val jobs = pages.indices.map { pageNum -> Callable {
+                    val page = pages[pageNum]
+                    val pixmap = Pixmap(pageDimensionWidth, pageDimensionHeight, Pixmap.Format.RGBA8888).also {
+                        it.blending = Pixmap.Blending.SourceOver
+                        it.filter = Pixmap.Filter.NearestNeighbour
+                    }
+                    page.renderToPixmap(pixmap, 0, 0, pageMarginH, pageMarginV)
+                    printPageNumber(pixmap, pageNum, 0, 0)
+                    pagePixmaps[pageNum] = pixmap
+                } }
+
+                // my experiment tells 4, 8, 16, 32 threads all perform the same
+                ThreadExecutor(Runtime.getRuntime().availableProcessors().div(2).coerceIn(1..4)).also {
+                    it.renew()
+                    it.submitAll(jobs)
+                    it.join()
+                }
             }
 
             isFinalised = true

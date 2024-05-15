@@ -26,9 +26,9 @@ import kotlin.system.measureTimeMillis
  */
 class BTeXTest : ApplicationAdapter() {
 
-    val filePath = "btex_ko.xml"
+//    val filePath = "btex_ko.xml"
 //    val filePath = "test.xml"
-//    val filePath = "literature/en/daniel_defoe_robinson_crusoe.btxbook"
+    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
 //    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
 //    val filePath = "literature/koKR/yisang_nalgae.btxbook"
 
@@ -72,7 +72,7 @@ class BTeXTest : ApplicationAdapter() {
                 }
 
                 measureTimeMillis {
-                    document.finalise()
+                    document.finalise(true)
                 }.also {
                     println("Time spent on finalising [ms]: $it")
                 }
@@ -103,7 +103,7 @@ class BTeXTest : ApplicationAdapter() {
         gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
         if (::document.isInitialized) {
-            if (document.isFinalised) {
+            if (document.isFinalised || document.fromArchive) {
                 val drawX = (1280 - (pageGap + document.pageDimensionWidth * 2)) / 2
                 val drawY = 24
 
