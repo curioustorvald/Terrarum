@@ -107,7 +107,7 @@
     <p><index id="manuscript"/><index id="tags"/>This is the part where you actually write your body texts in. The body text can have the following tags:</p>
     <ul>
         <li><index id="part (tag)"/><code>part</code> — inserts part separation page to your book</li>
-        <li><index id="chapter (tag)"/><index id="section (tag)"/><code>chapter</code>, <code>section</code> — inserts a new chapter/section. If an alternative name is required on the Table of Contents, the <code>alt</code> attribute can be used. If the chapter/section needs to be hidden on the Table of Contents, add the <code>hide="1"</code> attribute. If the chapter must start on a new page, simply add <code>newpage</code> in front of the chapter tag</li>
+        <li><index id="chapter (tag)"/><index id="section (tag)"/><code>chapter</code>, <code>section</code> — inserts a new chapter/section. If an alternative name is required on the Table of Contents, the <code>alt</code> attribute can be used. If the chapter/section needs to be hidden on the Table of Contents, add the <code>hide="1"</code> attribute. If the chapter must start on a new page, see <a href="macro definition">The Macro Definition</a></li>
         <li><index id="p (tag)"/><code>p</code> — inserts a new paragraph. The body texts must be written inside this tag. All paragraphs will have a 16-pixel indentation, with the following exceptions: first <code>p</code> of the part/chapter/section; first <code>p</code> after <code>br</code>, <code>newpage</code>, <code>callout</code>, <code>ul</code>, <code>ol</code> or <code>anonbreak</code></li>
         <li><index id="span (tag)"/><code>span</code> — allows changing the colour or the style of the texts. The colour must be specified in the <code>colour</code> attribute. Six-digit hex code, three-digit hex code and CSS Colours Level 4 named colours are supported. Note that all the colours will be rounded to the nearest three-digit hex code</li>
         <li><index id="emph (tag)"/><code>emph</code> — is a special case of the <code>span</code> tag. The resulting text will be <emph>red</emph></li>
@@ -229,10 +229,11 @@
         will change how the heading numbers are printed. The following is a list of names and default values:</p>
 
     <ul>
-        <li><code>thepart</code> — Part heading. Default: <code>Part %1$s</code></li>
-        <li><code>parttype</code> — Default style of the <code>part</code> tag. Default: <code>I</code></li>
-        <li><code>thechapter</code> — Chapter heading. Default: <code>%1$s</code></li>
-        <li><code>chaptertype</code> — Default style of the <code>chapter</code> tag. Default: <code>1</code></li>
+        <li><index id="thepart (macro)"/><code>thepart</code> — Part heading. Default: <code>Part %1$s</code></li>
+        <li><index id="parttype (macro)"/><code>parttype</code> — Default style of the <code>part</code> tag. Default: <code>I</code></li>
+        <li><index id="thechapter (macro)"/><code>thechapter</code> — Chapter heading. Default: <code>%1$s</code></li>
+        <li><index id="chaptertype (macro)"/><code>chaptertype</code> — Default style of the <code>chapter</code> tag. Default: <code>1</code></li>
+        <li><index id="chapteronnewpage (macro)"/><code>chapteronnewpage</code> — Controls if a chapter must start on a new page. Put non-zero value to enable this behaviour. Default: <code>0</code></li>
     </ul>
 
     <p>The argument key <code>%1$s</code> will be replaced into a number, Roman numerals, etc.
@@ -250,7 +251,7 @@
 
     <chapter>Printing External Variables</chapter>
 
-    <p>Defining the text to be printed outside the typesetting system, such as the name of the sender
+    <p><index id="v (tag)"/>Defining the text to be printed outside the typesetting system, such as the name of the sender
     and the recipient, can be desired. These texts can be used with the self-closing <code>v</code> tag. This tag
         can also be used to use an ingame string as well.</p>
     <p>To print an external variable, use the <code>id</code> attribute; to print an ingame string, use
@@ -273,11 +274,11 @@
     <p><index id="korean postpositions"/>To accommodate the Korean Postposition transformations, special <code>v</code> series tags are added:</p>
 
     <ul>
-        <li><code>veun</code> <code>vneun</code> — 은/는</li>
-        <li><code>vi</code> <code>vga</code> — 이/가</li>
-        <li><code>veul</code> <code>vreul</code> — 을/를</li>
-        <li><code>vwa</code> <code>vgwa</code> — 와/과</li>
-        <li><code>vro</code> <code>veuro</code> — 로/으로</li>
+        <li><index id="veun (tag)"/><index id="vneun (tag)"/><code>veun</code> <code>vneun</code> — 은/는</li>
+        <li><index id="vi (tag)"/><index id="vga (tag)"/><code>vi</code> <code>vga</code> — 이/가</li>
+        <li><index id="veul (tag)"/><index id="vreul (tag)"/><code>veul</code> <code>vreul</code> — 을/를</li>
+        <li><index id="vwa (tag)"/><index id="vgwa (tag)"/><code>vwa</code> <code>vgwa</code> — 와/과</li>
+        <li><index id="vro (tag)"/><index id="veuro (tag)"/><code>vro</code> <code>veuro</code> — 로/으로</li>
     </ul>
 
     <p>Either of the tag in the pair can be used; they will put the correct postposition based on the word.

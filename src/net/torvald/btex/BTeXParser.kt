@@ -130,7 +130,8 @@ object BTeXParser {
             "thepart" to "Part %1\$s",
             "parttype" to "I",
             "thechapter" to "%1\$s",
-            "chaptertype" to "1"
+            "chaptertype" to "1",
+            "chapteronnewpage" to "0",
         )
 
         private fun invokeMacro(name: String, vararg args: String): String {
@@ -1286,9 +1287,6 @@ object BTeXParser {
         }
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            // if current line is the last line, proceed to the next page
-            if (doc.linesPrintedOnPage.last() >= doc.pageLines - 2) doc.addNewPage()
-
             val partOrder = cptSectMap.count { it.type.startsWith("part") }
             val cptOrder = cptSectMap.count { it.type.startsWith("chapter") } + 1
 
@@ -1297,6 +1295,25 @@ object BTeXParser {
             val cptSectInfo = cptSectStack.removeLast()
             val partNumStr = partOrder.toListNumStr(cptSectStack.findLast { it.type.startsWith("part") }?.type ?: "1")
             val cptNumStr = cptOrder.toListNumStr(cptSectInfo.style)
+            var cptSibling = 1 // alternative for siblingIndex as the value is always 1 here
+
+            var cnt = cptSectMap.size - 1
+            while (cnt >= 0) {
+                if (cptSectMap[cnt].type.startsWith("part"))
+                    break
+                else
+                    cptSibling += 1
+
+                cnt -= 1
+            }
+
+
+            // if current line is the last line, proceed to the next page
+            if (doc.linesPrintedOnPage.last() >= doc.pageLines - 2) doc.addNewPage()
+            // if defined by the macro, proceed to the next page
+            if (macrodefs["chapteronnewpage"] != "0" && cptSibling > 1)
+                doc.addNewPage()
+
 
             typesetChapterHeading(invokeMacro("thechapter", cptNumStr), thePar, handler, 16)
             if (!cptSectInfo.type.endsWith("-hidden"))
