@@ -63,6 +63,8 @@ class BTeXDocument : Disposable {
 
         private fun String.escape() = this.replace("\"", "\\\"")
 
+        private fun newTempFile(name: String) = FileHandle.tempFile(name)
+
         fun fromFile(fileHandle: FileHandle) = fromFile(fileHandle.file())
 
         fun fromFile(file: File): BTeXDocument {
@@ -97,7 +99,7 @@ class BTeXDocument : Disposable {
                 Clustfile(DOM, "/${page}.png").also {
                     if (!it.exists()) throw IllegalStateException("No file '${page}.png' on the archive")
 
-                    val tempFile = Gdx.files.external("./.btex-import.png") // must create new file descriptor for every page, or else every page will share a single file descriptor which cause problems
+                    val tempFile = newTempFile("btex-import.png") // must create new file descriptor for every page, or else every page will share a single file descriptor which cause problems
                     it.exportFileTo(tempFile.file())
                     val texture = TextureRegion(Texture(tempFile))
                     doc.pageTextures[page] = texture
@@ -236,7 +238,7 @@ class BTeXDocument : Disposable {
         pagePixmaps.forEachIndexed { index, pixmap ->
             Clustfile(DOM, "$index.png").also { file ->
                 file.createNewFile()
-                val tempFile = Gdx.files.external("./.btex-export.png")
+                val tempFile = newTempFile("btex-export.png")
                 PixmapIO.writePNG(tempFile, pixmap, Deflater.BEST_COMPRESSION, false)
                 val outstream = ClustfileOutputStream(file)
                 outstream.write(tempFile.readBytes())

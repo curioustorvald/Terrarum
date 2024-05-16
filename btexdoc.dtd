@@ -8,9 +8,8 @@
 <!ENTITY % OLStyle "CDATA">
 
 <!ENTITY % counters "(i|I|1|a|A)">
-<!ENTITY % special.extra "img">
 <!ENTITY % special.basic "br | span | newpage">
-<!ENTITY % special "%special.basic; | %special.extra;">
+<!ENTITY % special "%special.basic;">
 <!ENTITY % fontstyle.extra "big | small | font | basefont">
 <!ENTITY % fontstyle.basic "tt | i | b | u | s | strike ">
 <!ENTITY % fontstyle "%fontstyle.basic; | %fontstyle.extra;">
@@ -45,6 +44,11 @@
 <!ENTITY % key-value
 "key CDATA #REQUIRED
  value CDATA #REQUIRED">
+<!ENTITY % imgAttrs
+"src CDATA #IMPLIED
+ fromgame CDATA #IMPLIED
+ gameitem CDATA #IMPLIED
+ height %Number; #REQUIRED">
 <!ENTITY % coreattrs
 "id          CDATA             #IMPLIED
  class       CDATA          #IMPLIED
@@ -55,7 +59,7 @@
 <!ENTITY % heading "part | chapter | section | subsection">
 <!ENTITY % lists "ul | ol">
 <!ENTITY % blocktext "pre | anonbreak | callout | center | fullpagebox">
-<!ENTITY % block "p | %heading; | %lists; | %blocktext;">
+<!ENTITY % block "p | %heading; | %lists; | %blocktext; | img">
 <!ENTITY % Flow "(#PCDATA | %block; | %inline;)*">
 
 <!ELEMENT btexdoc (macrodef?,cover?,tocpage?,manuscript,indexpage?)>
@@ -111,6 +115,8 @@
 <!ATTLIST pair %key-value;>
 <!ELEMENT index EMPTY>
 <!ATTLIST index %id-only;>
+<!ELEMENT img EMPTY>
+<!ATTLIST img %imgAttrs;>
 
 <!-- inherited from HTML -->
 <!ELEMENT p %Inline;>

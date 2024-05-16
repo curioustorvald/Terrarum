@@ -48,11 +48,11 @@
         <p><index id="btex 언어"/><btex/>(발음: [비ː텍])은 <latex/>과 유사하게 설계된 XML 기반의 마크업 언어이다.
             <btex/>은 세세한 스타일 정의문과 조판 설정을 추상화하여, 글을 쓰면서 <latex/> 매크로를 디버깅하는 등의 일 없이 글쓰기에 집중할 수 있도록 설계되었다. 다만 이러한 이유로 미리 정의된 스타일을 뜯어고치는 것은 어렵다.</p>
         <p><btex/> 문서는 다음의 다섯 부분으로 나뉘어진다: <!--
-            --><a href="btexdoc">스타일 정의문</a>·<!--
-            --><a href="표지 정의문">표지 정의문</a>·<!--
-            --><a href="목차 정의문">목차 정의문</a>·<!--
-            --><a href="원고">원고</a>·<!--
-            --><a href="색인 페이지">색인 페이지</a>.
+        --><a href="btexdoc">스타일 정의문</a>·<!--
+        --><a href="표지 정의문">표지 정의문</a>·<!--
+        --><a href="목차 정의문">목차 정의문</a>·<!--
+        --><a href="원고">원고</a>·<!--
+        --><a href="색인 페이지">색인 페이지</a>.
             이 중 스타일 정의문과 원고는 필수로 존재하여야 하는 부분이다.</p>
 
 
@@ -61,9 +61,9 @@
         <p><index id="btexdoc"/>스타일 정의문은 <btex/> 문서의 가장 첫 부분이다. 스타일 정의문의 구조는 다음과 같다.</p>
 
         <callout align="left" class="code"><index id="btexdoc (tag)"/><!--
-        -->&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br/><!--
-        -->&lt;!DOCTYPE btexdoc SYSTEM "btexdoc.dtd"&gt;<br/><!--
-        -->&lt;btexdoc cover="hardcover" inner="standard" papersize="standard"&gt;
+    -->&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br/><!--
+    -->&lt;!DOCTYPE btexdoc SYSTEM "btexdoc.dtd"&gt;<br/><!--
+    -->&lt;btexdoc cover="hardcover" inner="standard" papersize="standard"&gt;
         </callout>
 
         <p><code>btexdoc</code> 태그는 다음의 속성을 지원한다.</p>
@@ -77,10 +77,10 @@
 
         <p><index id="표지 정의문"/><code>cover</code> 태그는 책의 표지를 지정한다. 표지가 없는 책이라면 이 부분은 생략 가능하다. 표지 정의문의 구조는 다음과 같다.</p>
         <callout align="left" class="code"><index id="cover (태그)"/><index id="title (태그)"/><index id="subtitle (태그)"/><index id="author (태그)"/><index id="edition (태그)"/>&lt;cover hue="358"&gt;<br/>
-            　　&lt;title&gt;책 제목&zwsp;&lt;/title&gt;<br/>
-            　　&lt;subtitle&gt;필요한 경우 부제목&zwsp;&lt;/subtitle&gt;<br/>
-            　　&lt;author&gt;누가 이 책을 집필하였는가&zwsp;&lt;/author&gt;<br/>
-            　　&lt;edition&gt;필요한 경우 판본 정보&zwsp;&lt;/edition&gt;<br/>
+            &lt;title&gt;책 제목&zwsp;&lt;/title&gt;<br/>
+            &lt;subtitle&gt;필요한 경우 부제목&zwsp;&lt;/subtitle&gt;<br/>
+            &lt;author&gt;누가 이 책을 집필하였는가&zwsp;&lt;/author&gt;<br/>
+            &lt;edition&gt;필요한 경우 판본 정보&zwsp;&lt;/edition&gt;<br/>
             &lt;/cover&gt;
         </callout>
         <p>이 중 <code>title</code> 태그만이 필수 태그이다. 표지의 문구는 글자간 간격이 넓게 인쇄된다. 책 제목은 두배 큰 크기로 인쇄된다.</p>
@@ -154,6 +154,21 @@
             <li><index id="index (태그)"/><code>index</code> — 링크의 목적지를 정의함. 링크의 이름은 문서 전체에서 유일하여야 하며, <code>id</code> 속성에 작성함</li>
             <li><index id="a (태그)"/><code>a</code> — 태그 내부의 문구를 클릭 가능하게 함. 링크의 목적지는 (index 태그의 id) <code>href</code> 속성에 작성함</li>
         </ul>
+
+
+        <section>그림</section>
+
+        <p><index id="img (태그)"/>외부 이미지는 스스로 닫는 <code>img</code> 태그를 사용해 넣을 수 있다. 그림은 세로로는 현재 줄에서부터, 가로로는 페이지의 중앙에 인쇄된다. 페이지에 남아 있는 줄보다 이미지의 높이가 더 크다면, 이미지는 새로운 페이지에 인쇄된다. <code>img</code> 태그의 구조는 다음과 같다.</p>
+
+        <callout align="left" class="code"><!--
+    -->&lt;img src="http(s)나 file URL" height="8"/&gt;<br/><!--
+    -->&lt;img fromgame="basegame:gui/small.png" height="4"/&gt;<br/><!--
+    -->&lt;img gameitem="basegame:33" height="1"/&gt;
+        </callout>
+
+        <p><code>height</code> 속성은 이미지의 높이를 <emph>픽셀 단위가 아닌 줄의 개수</emph>로 지정하어야 한다. 이미지의 너비는 자동으로 계산된다. 텍스트의 너비보다 넓다면 오류가 발생한다.</p>
+
+        <p>지원하는 이미지 포맷: JPEG·PNG·BMP·TGA</p>
 
 
         <chapter>색인 페이지</chapter>
@@ -245,12 +260,12 @@
         <p>이 태그들은 다음과 같은 상황에 쓰일 수 있다. 아래와 같은 <btex/> 문서가 있다면,</p>
 
         <callout align="left" class="code">[en] Send your &lt;v fromgame="GAME_ITEM_HOLOTAPE"/&gt; that contains the manuscript to the publisher via mail to have your books printed.<br/><!--
-        -->[koKR] 원고가 담긴 &lt;veul fromgame="GAME_ITEM_HOLOTAPE"/&gt; 출판사로 우편을 통해 보내야 책이 인쇄됩니다.</callout>
+    -->[koKR] 원고가 담긴 &lt;veul fromgame="GAME_ITEM_HOLOTAPE"/&gt; 출판사로 우편을 통해 보내야 책이 인쇄됩니다.</callout>
 
         <p>변수는 현재 게임 언어에 따라 대입되고, 그 다음 조사처리가 진행된다. 조판이 완료된 문구는 다음과 같다. (파란색은 해당 단어가 태그에 의해 대입되었음을 뜻한다)</p>
 
         <callout>[en] Send your <itemname>Holotape</itemname> that contains the manuscript to the publisher via mail to have your books printed.<br/><!--
-        -->[koKR] 원고가 담긴 <itemname>홀로테이프를</itemname> 출판사로 우편을 통해 보내야 책이 인쇄됩니다.</callout>
+    -->[koKR] 원고가 담긴 <itemname>홀로테이프를</itemname> 출판사로 우편을 통해 보내야 책이 인쇄됩니다.</callout>
 
 
 

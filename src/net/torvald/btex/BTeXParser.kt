@@ -1,10 +1,13 @@
 package net.torvald.btex
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath.DEG_TO_RAD
 import net.torvald.colourutil.OKLch
 import net.torvald.colourutil.tosRGB
@@ -27,14 +30,14 @@ import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
-import java.io.File
-import java.io.FileInputStream
-import java.io.StringReader
+import java.io.*
+import java.net.URL
 import javax.xml.parsers.SAXParserFactory
 import kotlin.math.roundToInt
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotation
+
 
 /**
  * Created by minjaesong on 2023-10-28.
@@ -917,6 +920,74 @@ object BTeXParser {
         private fun vjosa(str: String, josa1: String, josa2: String) {
             val value = Lang.getHangulJosa(str, josa1, josa2)
             paragraphBuffer.append(value)
+        }
+
+        @OpenTag // reflective access is impossible with 'private'
+        fun processElemIMG(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
+            val heightInLines = attribs["height"]!!.toInt()
+            val imgHeight = doc.lineHeightInPx * heightInLines - 6
+            val btexObjName = "IMG@${makeRandomObjName()}"
+            val img = attribs["src"]
+
+            // image overflowing?
+            if (doc.pageLines - doc.linesPrintedOnPage.last() < heightInLines)
+                doc.addNewPage()
+
+            if (img != null) {
+                val tempFile = FileHandle.tempFile("btex_$btexObjName")
+                try {
+
+                    val inputPixmap = if (img.startsWith("file://")) {
+//                        printdbg("Using local file ${img.substring(7)}")
+                        Pixmap(Gdx.files.absolute(img.substring(7)))
+                    }
+                    else {
+//                        printdbg("Downloading image $img")
+                        BufferedInputStream(URL(img).openStream()).use { `in` ->
+                            FileOutputStream(tempFile.file()).use { fileOutputStream ->
+                                val dataBuffer = ByteArray(1024)
+                                var bytesRead: Int
+                                while ((`in`.read(dataBuffer, 0, 1024).also { bytesRead = it }) != -1) {
+                                    fileOutputStream.write(dataBuffer, 0, bytesRead)
+                                }
+                            }
+                        }
+                        Pixmap(tempFile).also { App.disposables.add(it) }
+                    }
+
+                    val imgWidth = (imgHeight.toFloat() / inputPixmap.height * inputPixmap.width).roundToInt()
+
+                    if (imgWidth > doc.textWidth)
+                        throw RuntimeException("Image width ($imgWidth) is larger than the text width (${doc.textWidth})")
+
+                    val drawCallObj = { parentText: BTeXDrawCall -> object : BTeXBatchDrawCall(imgWidth, (heightInLines - 1).coerceAtLeast(0), parentText) {
+                        private lateinit var inputTexture: Texture
+                        override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
+                            if (!::inputTexture.isInitialized) {
+                                inputTexture = Texture(inputPixmap).also { App.disposables.add(it) }
+                            }
+                            val destX = (x + (doc.pageDimensionWidth - imgWidth) / 2)
+                            val destY = y + 1
+                            batch.draw(inputTexture, destX, destY, imgWidth.toFloat(), imgHeight.toFloat())
+                        }
+                        override fun drawToPixmap(doc: BTeXDocument, pixmap: Pixmap, x: Int, y: Int, font: TerrarumSansBitmap?) {
+                            val destX = x
+                            val destY = y + 1
+                            pixmap.drawPixmap(inputPixmap, 0, 0, inputPixmap.width, inputPixmap.height, destX, destY, imgWidth, imgHeight)
+                        }
+                    } }
+
+                    objDict[btexObjName] = { text: BTeXDrawCall -> drawCallObj(text) }
+                    objWidthDict[btexObjName] = imgWidth
+
+                    typesetParagraphs(objectMarkerWithWidth(btexObjName, imgWidth), handler, align = "center")
+                }
+                catch (e: IOException) { }
+                catch (e: GdxRuntimeException) { }
+                finally {
+                    tempFile.delete()
+                }
+            }
         }
 
 
@@ -1827,6 +1898,8 @@ object BTeXParser {
                     else -> throw IllegalArgumentException("Non-object ID char: $c")
                 }
             }
+
+            private fun makeRandomObjName() = (0 until 12).joinToString("") { "${hashStrMap.random()}" }
         }
     }
 
