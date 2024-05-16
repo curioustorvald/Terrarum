@@ -160,6 +160,24 @@
     </ul>
 
 
+    <section>Figures</section>
+
+    <p>Figures, or external images can be inserted using the self-closing <code>img</code> tag.
+        This tag inserts the image starting from the current line; if the size is taller than the
+        remaining lines, the image will be printed onto the next page. Its syntax is as follows:</p>
+
+    <callout align="left" class="code"><!--
+    -->&lt;img src="web URL" height="8"/&gt;<br/><!--
+    -->&lt;img fromgame="basegame:gui/small.png" height="4"/&gt;<br/><!--
+    -->&lt;img gameitem="basegame:33" height="1"/&gt;
+    </callout>
+
+    <p>The <code>height</code> attribute specifies the height of the image <emph>in the number of lines</emph>,
+        rather than pixels.</p>
+
+    <p>Supported image formats: JPEG, PNG, BMP or TGA</p>
+
+
     <chapter>The Index Page</chapter>
 
     <p><index id="index page"/>The contents of the Index Page is filled in automatically by reading through your manuscript.

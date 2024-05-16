@@ -792,10 +792,11 @@ object BTeXParser {
             if (tocPage != null) {
                 // estimate the number of TOC pages
                 // TOC page always takes up a full paper, therefore tocSizeInPages is always multiple of 2
-                var tocSizeInPages = (cptSectMap.size + 2) / doc.pageLines
+                var tocSizeInPages = ((cptSectMap.size + 2f) / doc.pageLines).ceilToInt()
                 if (tocSizeInPages == 0) tocSizeInPages = 2
                 if (tocSizeInPages % 2 == 1) tocSizeInPages += 1
 
+                println("TOC number of entries: ${cptSectMap.size}, estimated page count: $tocSizeInPages")
 
                 // renumber things
                 if (tocSizeInPages > 1) {
@@ -812,6 +813,7 @@ object BTeXParser {
                     }
                 }
 
+                var currentTOCpage = tocPage!!
                 cptSectMap.forEach { (type, name, pg, part, cpt, sect) ->
                     val indent = if (type == "subsection") 2*PAR_INDENTATION else if (type == "section") PAR_INDENTATION else 0
                     val heading = if (part == null && cpt == null && sect == null)
@@ -823,7 +825,11 @@ object BTeXParser {
                     else
                         "$cpt.$sect${spacingBlockToString(HEADING_NUM_TITLE_GAP)}"
 
-                    typesetTOCline("$heading", name, pg, handler, indent, tocPage)
+                    typesetTOCline("$heading", name, pg, handler, indent, currentTOCpage)
+
+                    if (doc.linesPrintedOnPage[currentTOCpage] >= doc.pageLines) {
+                        currentTOCpage += 1
+                    }
                 }
             }
         }
@@ -1728,7 +1734,7 @@ object BTeXParser {
 
             val ccDefault = TerrarumSansBitmap.toColorCode(0,0,0)
             val ccBucks = TerrarumSansBitmap.toColorCode(5,0,0)
-            val ccCode = TerrarumSansBitmap.toColorCode(8,0,0)
+            val ccCode = TerrarumSansBitmap.toColorCode(7,0,0)
             val ccHref = TerrarumSansBitmap.toColorCode(0,3,11)
             val ccEmph = TerrarumSansBitmap.toColorCode(0xfc11)
             val ccItemName = TerrarumSansBitmap.toColorCode(0xf03b)

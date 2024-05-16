@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
-import net.torvald.terrarum.FlippingSpriteBatch
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.imagefont.TinyAlphNum
