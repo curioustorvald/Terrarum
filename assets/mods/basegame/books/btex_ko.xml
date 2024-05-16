@@ -142,7 +142,7 @@
             <li><code>left</code> — 문단을 좌측정렬함</li>
             <li><code>right</code> — 문단을 우측정렬함</li>
             <li><code>center</code> — 문단을 중앙정렬함</li>
-            <li><code>justify</code> — 문단을 양끝정렬함. 기본값</li>
+            <li><code>justify</code> — 문단을 양쪽정렬함. 기본값</li>
         </ul>
         <p><code>p</code>, <code>span</code>, <code>callout</code> 태그는 추가로 <code>class="code"</code> 속성을 지원한다. 이 속성이 적용된 문구는 <span class="code">코드꼴(code font)</span>을 사용하여 인자된다.</p>
 
@@ -162,11 +162,10 @@
 
         <callout align="left" class="code"><!--
     -->&lt;img src="http(s)나 file URL" height="8"/&gt;<br/><!--
-    -->&lt;img fromgame="basegame:gui/small.png" height="4"/&gt;<br/><!--
-    -->&lt;img gameitem="basegame:33" height="1"/&gt;
+    -->&lt;img fromgame="basegame:gui/small.png" height="4"/&gt;
         </callout>
 
-        <p><code>height</code> 속성은 이미지의 높이를 <emph>픽셀 단위가 아닌 줄의 개수</emph>로 지정하어야 한다. 이미지의 너비는 자동으로 계산된다. 텍스트의 너비보다 넓다면 오류가 발생한다.</p>
+        <p><code>height</code> 속성은 이미지의 높이를 <emph>픽셀 단위가 아닌 줄의 개수</emph>로 지정하어야 한다. 이미지의 너비는 자동으로 계산되며, 텍스트의 너비보다 넓다면 오류가 발생한다. 이미지 하단에 문구를 출력하려면 <code>caption</code> 속성을 사용할 수 있다.</p>
 
         <p>지원하는 이미지 포맷: JPEG·PNG·BMP·TGA</p>
 
@@ -268,8 +267,15 @@
     -->[koKR] 원고가 담긴 <itemname>홀로테이프를</itemname> 출판사로 우편을 통해 보내야 책이 인쇄됩니다.</callout>
 
 
+        <part>일반인 출입금지</part>
 
+        <chapter>왜 책이 인쇄될 때까지 기다려야 하나요? 인쇄기를 직접 사용할 수는 없나요?</chapter>
 
+        <p><btex/> 엔진은 빠른 물건이 아니다. 책을 하나 조판하려면 최소 몇 초가 필요하다. “대기 시스템”은 별도의 스레드 풀에서 (멀티스레딩으로 작동함) 책이 인쇄되도록 하여 게임플레이를 방해하지 않도록 도입되었다. 이것이 없다면 책이 한번 인쇄될 때마다 게임이 ‘응답 없음’ 상태가 될 것이고, 이는 인게임 경험에 매우 부정적으로 작용한다.</p>
+
+        <p>인쇄 프로세스가 오류 없이 종료되었다면, 우편 시스템을 통해 플레이어에게 완성된 책을 배송한다. 오류가 있다면 오류 정보를 담은 우편이 대신 배송된다.</p>
+
+        <p>상기와 같은 이유로 “인쇄기”는 플레이어에게 직접적으로 제공되지 않고, “출판사”와 우편을 통해 간접적으로 이용하는 형태로 제공된다.</p>
 
         <newpage/>
 

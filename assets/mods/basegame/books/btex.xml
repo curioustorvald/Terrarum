@@ -169,12 +169,12 @@
 
     <callout align="left" class="code"><!--
     -->&lt;img src="http(s) or file URL" height="8"/&gt;<br/><!--
-    -->&lt;img fromgame="basegame:gui/small.png" height="4"/&gt;<br/><!--
-    -->&lt;img gameitem="basegame:33" height="1"/&gt;
+    -->&lt;img fromgame="basegame:gui/small.png" height="4"/&gt;
     </callout>
 
     <p>The <code>height</code> attribute specifies the height of the image <emph>in the number of lines</emph>,
-        rather than pixels, the width is calculated automatically. Image width wider than the text width will cause an error.</p>
+        rather than pixels, the width is calculated automatically; image width wider than the text width
+        will cause an error. The tag optionally takes caption attribute which prints a text below the image.</p>
 
     <p>Supported image formats: JPEG, PNG, BMP or TGA</p>
 
@@ -304,7 +304,9 @@
         system is there because the book is being printed in the background on separate threads
         (yes, they are multi-threaded!) to not interfere with the normal gameplay, or else the players will
         encounter the freezing every time the book is being printed, and this would be a huge minus towards
-        the gameplay experience. If the process exits without any error, the mailing system will be
+        the gameplay experience.</p>
+
+    <p>If the process exits without any error, the mailing system will be
         notified and will send the mail containing finished books to the player; if the process exits
         with errors, the mail containing details of the errors will be sent instead.</p>
 

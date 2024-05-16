@@ -928,21 +928,27 @@ object BTeXParser {
             val imgHeight = doc.lineHeightInPx * heightInLines - 6
             val btexObjName = "IMG@${makeRandomObjName()}"
             val img = attribs["src"]
+            val fromgame = attribs["fromgame"]
+            val caption = attribs["caption"]
+
+            if (listOf(img, fromgame).count { it != null } != 1) {
+                throw IllegalArgumentException()
+            }
 
             // image overflowing?
             if (doc.pageLines - doc.linesPrintedOnPage.last() < heightInLines)
                 doc.addNewPage()
 
-            if (img != null) {
-                val tempFile = FileHandle.tempFile("btex_$btexObjName")
-                try {
+            val tempFile = FileHandle.tempFile("btex_$btexObjName")
+            try {
 
-                    val inputPixmap = if (img.startsWith("file://")) {
-//                        printdbg("Using local file ${img.substring(7)}")
+                val inputPixmap = if (img != null) {
+                    if (img.startsWith("file://")) {
+    //                        printdbg("Using local file ${img.substring(7)}")
                         Pixmap(Gdx.files.absolute(img.substring(7)))
                     }
                     else {
-//                        printdbg("Downloading image $img")
+    //                        printdbg("Downloading image $img")
                         BufferedInputStream(URL(img).openStream()).use { `in` ->
                             FileOutputStream(tempFile.file()).use { fileOutputStream ->
                                 val dataBuffer = ByteArray(1024)
@@ -954,39 +960,47 @@ object BTeXParser {
                         }
                         Pixmap(tempFile).also { App.disposables.add(it) }
                     }
-
-                    val imgWidth = (imgHeight.toFloat() / inputPixmap.height * inputPixmap.width).roundToInt()
-
-                    if (imgWidth > doc.textWidth)
-                        throw RuntimeException("Image width ($imgWidth) is larger than the text width (${doc.textWidth})")
-
-                    val drawCallObj = { parentText: BTeXDrawCall -> object : BTeXBatchDrawCall(imgWidth, (heightInLines - 1).coerceAtLeast(0), parentText) {
-                        private lateinit var inputTexture: Texture
-                        override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
-                            if (!::inputTexture.isInitialized) {
-                                inputTexture = Texture(inputPixmap).also { App.disposables.add(it) }
-                            }
-                            val destX = (x + (doc.pageDimensionWidth - imgWidth) / 2)
-                            val destY = y + 1
-                            batch.draw(inputTexture, destX, destY, imgWidth.toFloat(), imgHeight.toFloat())
-                        }
-                        override fun drawToPixmap(doc: BTeXDocument, pixmap: Pixmap, x: Int, y: Int, font: TerrarumSansBitmap?) {
-                            val destX = x
-                            val destY = y + 1
-                            pixmap.drawPixmap(inputPixmap, 0, 0, inputPixmap.width, inputPixmap.height, destX, destY, imgWidth, imgHeight)
-                        }
-                    } }
-
-                    objDict[btexObjName] = { text: BTeXDrawCall -> drawCallObj(text) }
-                    objWidthDict[btexObjName] = imgWidth
-
-                    typesetParagraphs(objectMarkerWithWidth(btexObjName, imgWidth), handler, align = "center")
                 }
-                catch (e: IOException) { }
-                catch (e: GdxRuntimeException) { }
-                finally {
-                    tempFile.delete()
+                else if (fromgame != null) {
+                    val moduleName = fromgame.substringBefore(':')
+                    val modulePath = fromgame.substringAfter(':')
+                    Pixmap(ModMgr.getGdxFile(moduleName, modulePath))
                 }
+                else throw InternalError()
+
+                val imgWidth = (imgHeight.toFloat() / inputPixmap.height * inputPixmap.width).roundToInt()
+
+                if (imgWidth > doc.textWidth)
+                    throw RuntimeException("Image width ($imgWidth) is larger than the text width (${doc.textWidth})")
+
+                val drawCallObj = { parentText: BTeXDrawCall -> object : BTeXBatchDrawCall(imgWidth, (heightInLines - 1).coerceAtLeast(0), parentText) {
+                    private lateinit var inputTexture: Texture
+                    override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
+                        if (!::inputTexture.isInitialized) {
+                            inputTexture = Texture(inputPixmap).also { App.disposables.add(it) }
+                        }
+                        val destX = (x + (doc.pageDimensionWidth - imgWidth) / 2)
+                        val destY = y + 1
+                        batch.draw(inputTexture, destX, destY, imgWidth.toFloat(), imgHeight.toFloat())
+                    }
+                    override fun drawToPixmap(doc: BTeXDocument, pixmap: Pixmap, x: Int, y: Int, font: TerrarumSansBitmap?) {
+                        val destX = x
+                        val destY = y + 1
+                        pixmap.drawPixmap(inputPixmap, 0, 0, inputPixmap.width, inputPixmap.height, destX, destY, imgWidth, imgHeight)
+                    }
+                } }
+
+                objDict[btexObjName] = { text: BTeXDrawCall -> drawCallObj(text) }
+                objWidthDict[btexObjName] = imgWidth
+
+                typesetParagraphs(objectMarkerWithWidth(btexObjName, imgWidth), handler, align = "center")
+                if (caption != null)
+                    typesetParagraphs("$ccDefault$caption", handler, align = "center")
+            }
+            catch (e: IOException) { }
+            catch (e: GdxRuntimeException) { }
+            finally {
+                tempFile.delete()
             }
         }
 
@@ -1697,7 +1711,7 @@ object BTeXParser {
             val dotGap = 10
             val dotPosEnd = typeWidth - pageNumWidth - dotGap*1.5f
 
-            typesetParagraphs("$ccDefault$heading$name", handler, typeWidth, startingPage = pageToWrite ?: doc.currentPage, align = "justify").let {
+            typesetParagraphs("$ccDefault$heading$name", handler, typeWidth - pageNumWidth - dotGap, startingPage = pageToWrite ?: doc.currentPage, align = "justify").let {
                 it.forEach {
                     it.posX += indentation
 

@@ -99,7 +99,8 @@ class BTeXDocument : Disposable {
                 Clustfile(DOM, "/${page}.png").also {
                     if (!it.exists()) throw IllegalStateException("No file '${page}.png' on the archive")
 
-                    val tempFile = newTempFile("btex-import.png") // must create new file descriptor for every page, or else every page will share a single file descriptor which cause problems
+//                    val tempFile = newTempFile("btex-import") // must create new file descriptor for every page, or else every page will share a single file descriptor which cause problems
+                    val tempFile = Gdx.files.external("./btex-import.tmp") // tmpfs not working???
                     it.exportFileTo(tempFile.file())
                     val texture = TextureRegion(Texture(tempFile))
                     doc.pageTextures[page] = texture
