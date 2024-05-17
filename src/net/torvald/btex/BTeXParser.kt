@@ -12,11 +12,8 @@ import com.jme3.math.FastMath.DEG_TO_RAD
 import net.torvald.colourutil.OKLch
 import net.torvald.colourutil.tosRGB
 import net.torvald.terrarum.*
-import net.torvald.terrarum.btex.BTeXBatchDrawCall
-import net.torvald.terrarum.btex.BTeXDocument
+import net.torvald.terrarum.btex.*
 import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_ORNAMENTS_COL
-import net.torvald.terrarum.btex.BTeXDrawCall
-import net.torvald.terrarum.btex.TypesetDrawCall
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
@@ -88,6 +85,7 @@ object BTeXParser {
         private var tagHistory = ArrayList<String>()
 
         private var currentHrefId: String? = null // any Unicode string that is not empty
+        private var oldHrefTarget: String? = null
 
         private var currentTheme = ""
 
@@ -104,6 +102,7 @@ object BTeXParser {
         }
 
         private val objDict = HashMap<String, (BTeXDrawCall) -> BTeXBatchDrawCall>()
+        private val hrefDict = HashMap<String, String>()
         private val objWidthDict = HashMap<String, Int>()
 
         private var lastTagAtDepth = Array(24) { "" }
@@ -119,7 +118,6 @@ object BTeXParser {
 
         private val cptSectStack = ArrayList<CptSect>()
 
-        private val indexMap = HashMap<String, Int>() // id to pagenum
         private val cptSectMap = ArrayList<CptSectInfo>()
         private var tocPage: Int? = null
 
@@ -335,10 +333,6 @@ object BTeXParser {
 //            printdbg("  End element \t($popped)")
         }
 
-        private var oldSpanColour: String? = null
-        private var oldCodeMode = false
-        private var oldHrefMode = false
-        private var oldBucksMode = false
         private val CODE_TAG_MARGIN = 2
 
         private val CODEMODE_BEGIN = "${spacingBlockToString(CODE_TAG_MARGIN)}$ccCode${TerrarumSansBitmap.charsetOverrideCodestyle}"
@@ -365,12 +359,50 @@ object BTeXParser {
             )
         }
 
+        private val REGEX_WHITESPACES = Regex("\\s+")
+
         override fun characters(ch: CharArray, start: Int, length: Int) {
             var str =
                 String(ch.sliceArray(start until start + length)).replace('\n', ' ').replace(Regex(" +"), " ")//.trim()
 
             if (str.isNotEmpty()) {
-//                printdbg("Characters [col:${spanColour}] \t\"$str\"")
+
+
+                // rising/falling edge of the hrefId
+                if (currentHrefId != oldHrefTarget) {
+                    // rising edge
+                    if (currentHrefId != null) {
+                        printdbg("Href IN($currentHrefId) \t\"$str\"")
+
+                        // put OBJ on every word, separated by whitespaces
+                        // transform the word such that:
+                        //      word1 word2 -> [OBJ:XXX]word1 [OBJ:YYY]word2
+                        str = str.trim().split(" ").map {
+                            val wordWidth = getFont().getWidth(it)
+                            val btexObjName = "HREF@${makeRandomObjName()}"
+
+                            hrefDict[btexObjName] = currentHrefId!!
+
+                            objectMarkerWithWidth(btexObjName, 0) + it
+                        }.joinToString(" ")
+
+                    }
+                    // falling edge
+                    else {
+                        printdbg("Href OUT(null) \t\"$str\"")
+                    }
+                }
+                // hrefId held high
+                else if (currentHrefId != null) {
+                    printdbg("Href($currentHrefId) \t\"$str\"")
+                }
+                else {
+                    printdbg("String \t\"$str\"")
+                }
+
+
+
+                oldHrefTarget = currentHrefId
                 paragraphBuffer.append(str)
             }
         }
@@ -725,6 +757,9 @@ object BTeXParser {
         @CloseTag
         fun closeElemA(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             paragraphBuffer.append(HREF_END)
+
+
+
             currentHrefId = null
         }
 
@@ -776,8 +811,8 @@ object BTeXParser {
             // prepare contents
             val pageWidth = doc.textWidth
 
-            indexMap.keys.toList().sorted().forEach { key ->
-                typesetTOCline("", key, indexMap[key]!! - 1, handler)
+            doc.indexTable.keys.toList().sorted().forEach { key ->
+                typesetTOCline("", key, doc.indexTable[key]!! - 1, handler)
             }
         }
 
@@ -792,7 +827,7 @@ object BTeXParser {
 
         @CloseTag
         fun closeElemMANUSCRIPT(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            // if tocPage != null, estimate TOC page size, renumber indexMap and cptSectMap if needed, then typeset the toc
+            // if tocPage != null, estimate TOC page size, renumber doc.indexTable and cptSectMap if needed, then typeset the toc
             if (tocPage != null) {
                 // estimate the number of TOC pages
                 // TOC page always takes up a full paper, therefore tocSizeInPages is always multiple of 2
@@ -800,13 +835,13 @@ object BTeXParser {
                 if (tocSizeInPages == 0) tocSizeInPages = 2
                 if (tocSizeInPages % 2 == 1) tocSizeInPages += 1
 
-                println("TOC number of entries: ${cptSectMap.size}, estimated page count: $tocSizeInPages")
+//                printdbg("TOC number of entries: ${cptSectMap.size}, estimated page count: $tocSizeInPages")
 
                 // renumber things
                 if (tocSizeInPages > 1) {
                     val pageDelta = tocSizeInPages - 1
-                    indexMap.keys.forEach {
-                        indexMap[it] = indexMap[it]!! + pageDelta
+                    doc.indexTable.keys.forEach {
+                        doc.indexTable[it] = doc.indexTable[it]!! + pageDelta
                     }
 
                     cptSectMap.forEach { it.pagenum += pageDelta }
@@ -841,7 +876,7 @@ object BTeXParser {
         @OpenTag // reflective access is impossible with 'private'
         fun processElemINDEX(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             attribs["id"]?.let {
-                indexMap[it] = doc.currentPage + 1
+                doc.indexTable[it] = doc.currentPage + 1
             }
         }
 
@@ -1614,6 +1649,18 @@ object BTeXParser {
                         doc.appendDrawCall(doc.pages[pageNum], it); drawCalls.add(it)
                     }
                 }
+                val hrefs = parseAndGetHref(textDrawCalls[0], font, handler, posYline, slugs, subset.first, subset.second)
+                hrefs.forEach {
+                    // search for:
+                    // ..... [OBJ:RSETNFAOON]word setaf
+                    // get width of "word"
+                    val searchStr = slugs.typesettedSlugs.subList(subset.first, subset.first + subset.second)
+                    printdbg("HREF searchStr: ${searchStr.joinToString { it.toReadable() }}")
+//                    val clickable = BTeXClickable(it.x, it.y, undefined, doc.lineHeightInPx) { viewer ->
+//                        viewer.gotoIndex(it.hrefTarget)
+//                    }
+//                    doc.appendClickable(doc.pages[pageNum], it)
+                }
 
                 linesOut += remainder
                 slugHeight -= remainder
@@ -1634,6 +1681,13 @@ object BTeXParser {
                         doc.appendDrawCall(doc.pages[pageNum], it); drawCalls.add(it)
                     }
                 }
+                // >>> HREF code here!! <<<
+                val hrefs = parseAndGetHref(textDrawCalls[0], font, handler, posYline, slugs, subset.first, subset.second)
+                hrefs.forEach {
+                    val searchStr = slugs.typesettedSlugs.subList(subset.first, subset.first + subset.second)
+                    printdbg("HREF searchStr: ${searchStr.joinToString { it.toReadable() }}")
+                }
+                // >>> HREF code ends here!! <<<
 
                 linesOut += remainder
                 slugHeight -= remainder
@@ -1652,10 +1706,7 @@ object BTeXParser {
         private fun textToDrawCall(handler: BTeXHandler, posYline: Int, slugs: MovableType, lineStart: Int, lineCount: Int): List<BTeXDrawCall> {
             return listOf(
                 BTeXDrawCall(
-                    doc,
-                    0,
-                    posYline * doc.lineHeightInPx,
-                    currentTheme,
+                    doc, 0, posYline * doc.lineHeightInPx, currentTheme,
                     TypesetDrawCall(slugs, lineStart, lineCount)
                 )
             )
@@ -1688,16 +1739,51 @@ object BTeXParser {
                         c += 1
                     }
 
-                    val extraDrawCall = BTeXDrawCall(
-                        doc,
-                        x,
-                        y,
-                        currentTheme,
-                        cmd = objDict[idbuf.toString()]?.invoke(textDrawCall) ?: throw NullPointerException("No OBJ with id '$idbuf' exists"),
-                        font = font,
-                    )
+                    if (!idbuf.startsWith("HREF@")) {
+                        out.add(BTeXDrawCall(
+                            doc, x, y, currentTheme,
+                            cmd = objDict[idbuf.toString()]?.invoke(textDrawCall)
+                                ?: throw NullPointerException("No OBJ with id '$idbuf' exists"),
+                            font = font,
+                        ))
+                    }
+                }
+            }
 
-                    out.add(extraDrawCall)
+            return out
+        }
+
+        private fun parseAndGetHref(
+            textDrawCall: BTeXDrawCall,
+            font: TerrarumSansBitmap,
+            handler: BTeXHandler,
+            posYline: Int,
+            slugs: MovableType,
+            lineStart: Int,
+            lineCount: Int
+        ): List<_HrefObject> {
+            val out = ArrayList<_HrefObject>()
+
+            slugs.typesettedSlugs.subList(lineStart, lineStart + lineCount).forEachIndexed { lineNumCnt, line ->
+                line.mapIndexed { i, c -> i to c }.filter { it.second == OBJ }.map { it.first }.forEach { xIndex ->
+                    val x = font.getWidthNormalised(CodepointSequence(line.subList(0, xIndex)))
+                    val y = (posYline + lineNumCnt) * doc.lineHeightInPx
+
+                    // get OBJ id
+                    val idbuf = StringBuilder()
+
+                    var c = xIndex + 1
+                    while (true) {
+                        val codepoint = line[c]
+                        if (codepoint == 0xFFF9F) break
+                        idbuf.append(codepointToObjIdChar(codepoint))
+                        c += 1
+                    }
+
+                    if (idbuf.startsWith("HREF@")) {
+                        val id = hrefDict[idbuf.toString()]!!
+                        out.add(_HrefObject(x, y, id))
+                    }
                 }
             }
 
@@ -1788,6 +1874,7 @@ object BTeXParser {
                 doc.addNewPage()
         }
 
+        private data class _HrefObject(val x: Int, val y: Int, val hrefTarget: String)
 
         companion object {
             init {

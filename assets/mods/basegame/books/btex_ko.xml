@@ -103,7 +103,7 @@
         <p><index id="원고"/><index id="태그 목록"/>원고는 책의 진짜 본문이 담긴 부분을 말한다. 본문에는 다음의 태그를 사용할 수 있다.</p>
         <ul>
             <li><index id="part (태그)"/><code>part</code> — 원고에 새 부(part)를 추가함</li>
-            <li><index id="chapter (태그)"/><index id="section (태그)"/><code>chapter</code>, <code>section</code> — 원고에 새 장(chapter)·절(section)을 추가함. 목차 페이지에는 다른 이름을 표시하고 싶다면 <code>alt</code> 속성을 사용할 수 있음. 목차 페이지에서 숨기고 싶다면 <code>hide="1"</code> 속성을 추가할 것. 장이 새 페이지에서 시작되게 하려면 <a href="macro definition">매크로 정의문</a>을 볼 것</li>
+            <li><index id="chapter (태그)"/><index id="section (태그)"/><code>chapter</code>, <code>section</code> — 원고에 새 장(chapter)·절(section)을 추가함. 목차 페이지에는 다른 이름을 표시하고 싶다면 <code>alt</code> 속성을 사용할 수 있음. 목차 페이지에서 숨기고 싶다면 <code>hide="1"</code> 속성을 추가할 것. 장이 새 페이지에서 시작되게 하려면 <a href="매크로 정의문">매크로 정의문</a>을 볼 것</li>
             <li><index id="p (태그)"/><code>p</code> — 새 문단을 삽입함. 본문의 글은 반드시 이 태그 내부에 작성되어야 함. 모든 문단는 16픽셀의 들여쓰기로 조판되나, 다음의 경우 들여쓰기가 적용되지 않음: 부·장·절의 첫 문단, <code>br</code>, <code>newpage</code>, <code>callout</code>, <code>ul</code>, <code>ol</code>,  <code>anonbreak</code> 태그 직후의 문단</li>
             <li><index id="span (태그)"/><code>span</code> — 문구의 색상이나 스타일을 변경함. 색상은 <code>colour</code> 속성에 작성되어야 함. 6자리 헥스코드, 3자리 헥스코드, CSS Colours Level 4에 정의된 색상명을 사용할 수 있음. 모든 색상은 내부적으로 가장 가까운 3자리 헥스코드로 변경됨에 유의할 것</li>
             <li><index id="emph (태그)"/><code>emph</code> — <code>span</code>의 특수한 경우로, 문구를 <emph>빨간색으로</emph> 인자함</li>
@@ -132,7 +132,7 @@
             <li><code>I</code> — 번호로 로마 숫자 대문자를 사용함 (I, II, III, …)</li>
             <li><code>1</code> — 번호로 아라비아 숫자를 사용함 (1, 2, 3)</li>
         </ul>
-        <p>기본값은, 부는 로마 숫자 대문자, 장·절은 아라비아 숫자를 사용한다. 부의 경우 영어로 “Part I”과 같이 찍히고, 이를 “제1절”로 변경하는 등의 심화된 스타일은 <a href="macro definition">매크로 정의문</a>에서 정의할 수 있다.</p>
+        <p>기본값은, 부는 로마 숫자 대문자, 장·절은 아라비아 숫자를 사용한다. 부의 경우 영어로 “Part I”과 같이 찍히고, 이를 “제1절”로 변경하는 등의 심화된 스타일은 <a href="매크로 정의문">매크로 정의문</a>에서 정의할 수 있다.</p>
 
 
         <section>문단 스타일</section>

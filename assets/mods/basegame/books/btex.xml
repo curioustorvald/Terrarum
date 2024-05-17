@@ -107,7 +107,7 @@
     <p><index id="manuscript"/><index id="tags"/>This is the part where you actually write your body texts in. The body text can have the following tags:</p>
     <ul>
         <li><index id="part (tag)"/><code>part</code> — inserts part separation page to your book</li>
-        <li><index id="chapter (tag)"/><index id="section (tag)"/><code>chapter</code>, <code>section</code> — inserts a new chapter/section. If an alternative name is required on the Table of Contents, the <code>alt</code> attribute can be used. If the chapter/section needs to be hidden on the Table of Contents, add the <code>hide="1"</code> attribute. If the chapter must start on a new page, see <a href="macro definition">The Macro Definition</a></li>
+        <li><index id="chapter (tag)"/><index id="section (tag)"/><code>chapter</code>, <code>section</code> — inserts a new chapter/section. If an alternative name is required on the Table of Contents, the <code>alt</code> attribute can be used. If the chapter/section needs to be hidden on the Table of Contents, add the <code>hide="1"</code> attribute. If the chapter must start on a new page, see <a href="macro definition">the Macro Definition</a></li>
         <li><index id="p (tag)"/><code>p</code> — inserts a new paragraph. The body texts must be written inside this tag. All paragraphs will have a 16-pixel indentation, with the following exceptions: first <code>p</code> of the part/chapter/section; first <code>p</code> after <code>br</code>, <code>newpage</code>, <code>callout</code>, <code>ul</code>, <code>ol</code> or <code>anonbreak</code></li>
         <li><index id="span (tag)"/><code>span</code> — allows changing the colour or the style of the texts. The colour must be specified in the <code>colour</code> attribute. Six-digit hex code, three-digit hex code and CSS Colours Level 4 named colours are supported. Note that all the colours will be rounded to the nearest three-digit hex code</li>
         <li><index id="emph (tag)"/><code>emph</code> — is a special case of the <code>span</code> tag. The resulting text will be <emph>red</emph></li>
@@ -136,7 +136,7 @@
         <li><code>I</code> — use majuscule Roman numerals for the number (I, II, III, …)</li>
         <li><code>1</code> — use Arabic numerals (1, 2, 3)</li>
     </ul>
-    <p>By default, parts use majuscule Roman numerals and others use Arabic. Alternative styling for the <code>part</code> and the <code>chapter</code> can be defined using the <a href="macro definition">Macro Definition</a>.</p>
+    <p>By default, parts use majuscule Roman numerals and others use Arabic. Alternative styling for the <code>part</code> and the <code>chapter</code> can be defined using <a href="macro definition">the Macro Definition</a>.</p>
 
 
     <section>Paragraph Styling</section>
@@ -311,7 +311,7 @@
         notified and will send the mail containing finished books to the player; if the process exits
         with errors, the mail containing details of the errors will be sent instead.</p>
 
-    <p>For this reason the “printing press” is not exposed to the player, they only get to interact with it
+    <p>For this reason, the “printing press” is not exposed to the player, they only get to interact with it
         indirectly through the “publisher” via mail.</p>
 
 

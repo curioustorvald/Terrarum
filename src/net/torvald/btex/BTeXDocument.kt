@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.btex.BTeXDocViewer
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.imagefont.TinyAlphNum
@@ -54,6 +55,8 @@ class BTeXDocument : Disposable {
 
     var endOfPageStart = 2147483647
     var tocPageStart = 2
+
+    val indexTable = HashMap<String, Int>()
 
     companion object {
         val DEFAULT_PAGE_BACK = Color(0xe0dfdb_ff.toInt())
@@ -260,17 +263,15 @@ class BTeXDocument : Disposable {
      *
      * `currentLine` *will* be updated automatically.
      */
-    fun appendDrawCall(drawCall: BTeXDrawCall) {
-        pages.last().appendDrawCall(drawCall)
-
-        linesPrintedOnPage[linesPrintedOnPage.lastIndex] += drawCall.lineCount
-    }
-
     fun appendDrawCall(page: BTeXPage, drawCall: BTeXDrawCall) {
         page.appendDrawCall(drawCall)
 
         val pagenum = pages.indexOf(page)
         linesPrintedOnPage[pagenum] += drawCall.lineCount
+    }
+
+    fun appendClickable(page: BTeXPage, clickable: BTeXClickable) {
+        page.appendClickable(clickable)
     }
 
     fun render(frameDelta: Float, batch: SpriteBatch, page: Int, x: Int, y: Int) {
@@ -330,15 +331,25 @@ class BTeXDocument : Disposable {
     }
 }
 
+data class BTeXClickable(
+    val posX: Int, val posY: Int, val width: Int, val height: Int,
+    val onClick: (BTeXDocViewer) -> Unit,
+//    val onHover: () -> Unit = {}
+)
+
 class BTeXPage(
     val back: Color,
     val width: Int,
     val height: Int,
 ) {
     internal val drawCalls = ArrayList<BTeXDrawCall>()
+    internal val clickableElements = ArrayList<BTeXClickable>()
 
     fun appendDrawCall(drawCall: BTeXDrawCall) {
         if (drawCall.isNotBlank()) drawCalls.add(drawCall)
+    }
+    fun appendClickable(clickable: BTeXClickable) {
+        clickableElements.add(clickable)
     }
 
     private var prerender = false
@@ -357,9 +368,24 @@ class BTeXPage(
         }
     }
 
+    fun touchDown(viewer: BTeXDocViewer, screenX: Int, screenY: Int, pointer: Int, button: Int) {
+        val pageRelX = screenX - drawX
+        val pageRelY = screenY - drawY
+        // filter clickable elements that are under the cursor
+        clickableElements.filter {
+            pageRelX in it.posX until it.posX+it.width &&
+            pageRelY in it.posY until it.posY+it.height
+        }.forEach { it.onClick(viewer) }
+    }
+
     fun isEmpty() = drawCalls.isEmpty()
     fun isNotEmpty() = drawCalls.isNotEmpty()
+
+    private var drawX = 0
+    private var drawY = 0
+
     fun renderToPixmap(pixmap: Pixmap, x: Int, y: Int, marginH: Int, marginV: Int) {
+        drawX = x; drawY = y
         drawCalls.sortedBy { if (it.text != null) 16 else 0 }.let { drawCalls ->
             val backCol = back.cpy().also { it.a = 0.93f }
             pixmap.setColor(backCol)

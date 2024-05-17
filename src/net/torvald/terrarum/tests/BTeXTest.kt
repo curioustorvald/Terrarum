@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import net.torvald.btex.BTeXDocViewer
 import net.torvald.btex.BTeXParser
 import net.torvald.terrarum.*
 import net.torvald.terrarum.btex.BTeXDocument
@@ -94,42 +95,44 @@ class BTeXTest : ApplicationAdapter() {
         }
     }
 
-    private var scroll = 0
+    var init = false
+    private lateinit var viewer: BTeXDocViewer
 
-    val pageGap = 6
+    private val drawY = 24
 
     override fun render() {
         Gdx.graphics.setTitle("BTeXTest $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
         gdxClearAndEnableBlend(.063f, .070f, .086f, 1f)
 
+
         if (::document.isInitialized) {
-            if (document.isFinalised || document.fromArchive) {
-                val drawX = (1280 - (pageGap + document.pageDimensionWidth * 2)) / 2
-                val drawY = 24
-
+            if (!init) {
+                init = true
+                viewer = BTeXDocViewer(document)
+            }
+            else {
                 batch.inUse {
-                    batch.color = Color.WHITE
                     batch.draw(bg, 0f, 0f)
+                    viewer.render(batch, 640f, drawY.toFloat())
 
-                    if (scroll - 1 in document.pageIndices)
-                        document.render(0f, batch, scroll - 1, drawX, drawY)
-                    if (scroll in document.pageIndices)
-                        document.render(0f, batch, scroll, drawX + (6 + document.pageDimensionWidth), drawY)
+                    batch.color = Color.WHITE
+                    val pageText = "${viewer.currentPageStr()}/${viewer.pageCount}"
+                    Toolkit.drawTextCentered(
+                        batch, TinyAlphNum, pageText,
+                        1280, 0, drawY + document.pageDimensionHeight + 12
+                    )
                 }
 
-
+                // control
                 if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT))
-                    scroll = (scroll - 2).coerceAtLeast(0)
+                    viewer.prevPage()
                 else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT))
-                    scroll =
-                        (scroll + 2).coerceAtMost(
-                            document.pageIndices.endInclusive.toFloat().div(2f).ceilToInt().times(2)
-                        )
+                    viewer.nextPage()
                 else if (Gdx.input.isKeyJustPressed(Input.Keys.PAGE_UP))
-                    scroll = 0
+                    viewer.gotoFirstPage()
                 else if (Gdx.input.isKeyJustPressed(Input.Keys.PAGE_DOWN))
-                    scroll = document.pageIndices.endInclusive.toFloat().div(2f).ceilToInt().times(2)
+                    viewer.gotoLastPage()
             }
         }
     }
