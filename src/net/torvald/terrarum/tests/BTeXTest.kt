@@ -112,16 +112,24 @@ class BTeXTest : ApplicationAdapter() {
                 viewer = BTeXDocViewer(document)
             }
             else {
-                batch.inUse {
-                    batch.draw(bg, 0f, 0f)
-                    viewer.render(batch, 640f, drawY.toFloat())
+                if (document.isFinalised || document.fromArchive) {
+                    batch.inUse {
+                        batch.draw(bg, 0f, 0f)
+                        viewer.render(batch, 640f, drawY.toFloat())
 
-                    batch.color = Color.WHITE
-                    val pageText = "${viewer.currentPageStr()}/${viewer.pageCount}"
-                    Toolkit.drawTextCentered(
-                        batch, TinyAlphNum, pageText,
-                        1280, 0, drawY + document.pageDimensionHeight + 12
-                    )
+                        batch.color = Color.WHITE
+                        val pageText = "${viewer.currentPageStr()}/${viewer.pageCount}"
+                        Toolkit.drawTextCentered(
+                            batch, TinyAlphNum, pageText,
+                            1280, 0, drawY + document.pageDimensionHeight + 12
+                        )
+                    }
+                }
+                else {
+                    batch.inUse {
+                        batch.color = Color.WHITE
+                        Toolkit.drawTextCentered(batch, TinyAlphNum, "Rendering...", 1280, 0, 354)
+                    }
                 }
 
                 // control
@@ -133,6 +141,12 @@ class BTeXTest : ApplicationAdapter() {
                     viewer.gotoFirstPage()
                 else if (Gdx.input.isKeyJustPressed(Input.Keys.PAGE_DOWN))
                     viewer.gotoLastPage()
+            }
+        }
+        else {
+            batch.inUse {
+                batch.color = Color.WHITE
+                Toolkit.drawTextCentered(batch, TinyAlphNum, "Typesetting...", 1280, 0, 354)
             }
         }
     }

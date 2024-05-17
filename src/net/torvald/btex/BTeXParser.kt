@@ -12,12 +12,16 @@ import com.jme3.math.FastMath.DEG_TO_RAD
 import net.torvald.colourutil.OKLch
 import net.torvald.colourutil.tosRGB
 import net.torvald.terrarum.*
-import net.torvald.terrarum.btex.*
+import net.torvald.terrarum.btex.BTeXBatchDrawCall
+import net.torvald.terrarum.btex.BTeXDocument
 import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_ORNAMENTS_COL
+import net.torvald.terrarum.btex.BTeXDrawCall
+import net.torvald.terrarum.btex.TypesetDrawCall
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.MovableType
+import net.torvald.terrarumsansbitmap.MovableType.Companion.toReadable
 import net.torvald.terrarumsansbitmap.TypesettingStrategy
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
@@ -1788,23 +1792,6 @@ object BTeXParser {
             }
 
             return out
-        }
-
-        private fun CodepointSequence.toReadable() = this.joinToString("") {
-            if (it in 0x00..0x1f)
-                "${(0x2400 + it).toChar()}"
-            else if (it == 0x20)
-                "\u2423"
-            else if (it == NBSP)
-                "{NBSP}"
-            else if (it == SHY)
-                "{SHY}"
-            else if (it == ZWSP)
-                "{ZWSP}"
-            else if (it >= 0xF0000)
-                it.toHex() + " "
-            else
-                Character.toString(it.toChar())
         }
 
         private fun typesetTOCline(heading: String, name: String, pageNum: Int, handler: BTeXHandler, indentation: Int = 0, pageToWrite: Int? = null) {
