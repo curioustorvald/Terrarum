@@ -12,11 +12,8 @@ import com.jme3.math.FastMath.DEG_TO_RAD
 import net.torvald.colourutil.OKLch
 import net.torvald.colourutil.tosRGB
 import net.torvald.terrarum.*
-import net.torvald.terrarum.btex.BTeXBatchDrawCall
-import net.torvald.terrarum.btex.BTeXDocument
+import net.torvald.terrarum.btex.*
 import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_ORNAMENTS_COL
-import net.torvald.terrarum.btex.BTeXDrawCall
-import net.torvald.terrarum.btex.TypesetDrawCall
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
@@ -31,6 +28,7 @@ import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
+import java.awt.SystemColor.text
 import java.io.*
 import java.net.URL
 import javax.xml.parsers.SAXParserFactory
@@ -343,7 +341,7 @@ object BTeXParser {
         private val CODEMODE_END = "${TerrarumSansBitmap.charsetOverrideDefault}$ccDefault${spacingBlockToString(CODE_TAG_MARGIN)}"
 
         private val HREF_BEGIN = "$ccHref"
-        private val HREF_END = "$ccDefault"
+        private val HREF_END = "${OBJ.codepointToString()}${OBJ_END.codepointToString()}$ccDefault"
 
         private val BUCKS_BEGIN = "$ccBucks"
         private val BUCKS_END = "$ccDefault"
@@ -354,6 +352,10 @@ object BTeXParser {
         private val TARGETNAME_BEGIN = "$ccTargetName"
 
         private val SPAN_END = "$ccDefault${TerrarumSansBitmap.charsetOverrideDefault}"
+
+        private fun CharArray.toSurrogatedString(): String = if (this.size == 1) "${this[0]}" else "${this[0]}${this[1]}"
+        private fun Int.codepointToString() = Character.toChars(this).toSurrogatedString()
+
 
         private fun Color.toCC(): String {
             return TerrarumSansBitmap.toColorCode(
@@ -1121,58 +1123,57 @@ object BTeXParser {
                 width = doc.textWidth - 2*MARGIN_PARBOX_H,
                 height = doc.pageLines - 1,
                 align = currentAlign
-            ).forEachIndexed { index, it ->
-                it.posX += MARGIN_PARBOX_H
-                it.deltaX += MARGIN_PARBOX_H
-
-                it.posY += doc.lineHeightInPx / 2
-                it.deltaY += doc.lineHeightInPx / 2
+            ).let {
+                it.moveObjectsAround(MARGIN_PARBOX_H, doc.lineHeightInPx / 2)
 
                 // add boxes
-                it.extraDrawFun = { batch, x, y ->
-                    val width = doc.textWidth - 2 * MARGIN_PARBOX_H.toFloat()
-                    val height = it.lineCount * doc.lineHeightInPx.toFloat()
+                it.first.forEach {
+                    it.extraDrawFun = { batch, x, y ->
+                        val width = doc.textWidth - 2 * MARGIN_PARBOX_H.toFloat()
+                        val height = it.lineCount * doc.lineHeightInPx.toFloat()
 
-                    if (height > 0) {
-                        val oldcol = batch.color.cpy()
-                        batch.color = Color(0xccccccff.toInt())
-                        Toolkit.fillArea(
-                            batch,
-                            x - MARGIN_PARBOX_H,
-                            y - MARGIN_PARBOX_V,
-                            width + 2 * MARGIN_PARBOX_H,
-                            height + 2 * MARGIN_PARBOX_V
-                        )
-                        batch.color = Color(0x999999ff.toInt())
-                        Toolkit.drawBoxBorder(
-                            batch,
-                            x - MARGIN_PARBOX_H,
-                            y - MARGIN_PARBOX_V,
-                            width + 2 * MARGIN_PARBOX_H,
-                            height + 2 * MARGIN_PARBOX_V
-                        )
-                        batch.color = oldcol
+                        if (height > 0) {
+                            val oldcol = batch.color.cpy()
+                            batch.color = Color(0xccccccff.toInt())
+                            Toolkit.fillArea(
+                                batch,
+                                x - MARGIN_PARBOX_H,
+                                y - MARGIN_PARBOX_V,
+                                width + 2 * MARGIN_PARBOX_H,
+                                height + 2 * MARGIN_PARBOX_V
+                            )
+                            batch.color = Color(0x999999ff.toInt())
+                            Toolkit.drawBoxBorder(
+                                batch,
+                                x - MARGIN_PARBOX_H,
+                                y - MARGIN_PARBOX_V,
+                                width + 2 * MARGIN_PARBOX_H,
+                                height + 2 * MARGIN_PARBOX_V
+                            )
+                            batch.color = oldcol
+                        }
                     }
-                }
-                it.extraPixmapDrawFun = { pixmap, x, y ->
-                    val width = doc.textWidth - 2 * MARGIN_PARBOX_H
-                    val height = it.lineCount * doc.lineHeightInPx
+                    it.extraPixmapDrawFun = { pixmap, x, y ->
+                        val width = doc.textWidth - 2 * MARGIN_PARBOX_H
+                        val height = it.lineCount * doc.lineHeightInPx
 
-                    if (height > 0) {
-                        pixmap.setColor(Color(0xccccccff.toInt()))
-                        pixmap.fillRectangle(
-                            x - MARGIN_PARBOX_H,
-                            y - MARGIN_PARBOX_V,
-                            width + 2 * MARGIN_PARBOX_H,
-                            height + 2 * MARGIN_PARBOX_V
-                        )
-                        pixmap.setColor(Color(0x999999ff.toInt()))
-                        Toolkit.drawBoxBorderToPixmap(pixmap,
-                            x - MARGIN_PARBOX_H,
-                            y - MARGIN_PARBOX_V,
-                            width + 2 * MARGIN_PARBOX_H,
-                            height + 2 * MARGIN_PARBOX_V
-                        )
+                        if (height > 0) {
+                            pixmap.setColor(Color(0xccccccff.toInt()))
+                            pixmap.fillRectangle(
+                                x - MARGIN_PARBOX_H,
+                                y - MARGIN_PARBOX_V,
+                                width + 2 * MARGIN_PARBOX_H,
+                                height + 2 * MARGIN_PARBOX_V
+                            )
+                            pixmap.setColor(Color(0x999999ff.toInt()))
+                            Toolkit.drawBoxBorderToPixmap(
+                                pixmap,
+                                x - MARGIN_PARBOX_H,
+                                y - MARGIN_PARBOX_V,
+                                width + 2 * MARGIN_PARBOX_H,
+                                height + 2 * MARGIN_PARBOX_V
+                            )
+                        }
                     }
                 }
             }
@@ -1220,20 +1221,14 @@ object BTeXParser {
                 width = doc.textWidth - 2*MARGIN_PARBOX_H,
                 height = doc.pageLines - 1,
                 align = currentAlign
-            ).forEachIndexed { index, it ->
-                it.posX += MARGIN_PARBOX_H
-                it.deltaX += MARGIN_PARBOX_H
-
-                it.posY += doc.lineHeightInPx / 2
-                it.deltaY += doc.lineHeightInPx / 2
-            }
+            ).moveObjectsAround(MARGIN_PARBOX_H, doc.lineHeightInPx / 2)
 
             clearParBuffer()
         }
 
         @CloseTag
         fun closeElemANONBREAK(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
-            typesetParagraphs("${ccDefault}――――――――――――", handler, align = "left").also {it.first().let {
+            typesetParagraphs("${ccDefault}――――――――――――", handler, align = "left").also {it.first.first().let {
                 it.posX += (doc.textWidth - it.width) / 2
             } }
             clearParBuffer()
@@ -1435,7 +1430,7 @@ object BTeXParser {
 
         private fun typesetBookTitle(thePar: String, handler: BTeXHandler) {
             val label = "\n${TerrarumSansBitmap.toColorCode(15, 15, 15)}" + thePar
-            typesetParagraphs(getTitleFont(), label, handler, doc.textWidth - 2*MARGIN_TITLE_TEXTS, align = "left").also {
+            typesetParagraphs(getTitleFont(), label, handler, doc.textWidth - 2*MARGIN_TITLE_TEXTS, align = "left").first.also {
                 val addedLines = it.sumOf { it.lineCount }
                 doc.linesPrintedOnPage[doc.currentPage] += addedLines
 
@@ -1453,7 +1448,7 @@ object BTeXParser {
                 doc.textWidth - 2*MARGIN_TITLE_TEXTS,
                 align = "left"
             ).also {
-                it.last().extraDrawFun = { batch, x, y ->
+                it.first.last().extraDrawFun = { batch, x, y ->
                     val px = x
                     val py = y + doc.lineHeightInPx - 1
                     val pw = doc.textWidth - 2f * MARGIN_TITLE_TEXTS
@@ -1462,7 +1457,7 @@ object BTeXParser {
                     batch.color = Color.WHITE
                     Toolkit.fillArea(batch, px, py, pw, 1f)
                 }
-                it.last().extraPixmapDrawFun = { pixmap, x, y ->
+                it.first.last().extraPixmapDrawFun = { pixmap, x, y ->
                     val px = x
                     val py = y + doc.lineHeightInPx - 1
                     val pw = doc.textWidth - 2 * MARGIN_TITLE_TEXTS
@@ -1472,9 +1467,7 @@ object BTeXParser {
                     pixmap.fillRectangle(px, py, pw, 1)
                 }
 
-                it.forEach {
-                    it.posX += MARGIN_TITLE_TEXTS
-                }
+                it.moveObjectsAround(MARGIN_TITLE_TEXTS, 0)
             }
         }
 
@@ -1485,11 +1478,7 @@ object BTeXParser {
                 handler,
                 doc.textWidth - 2*MARGIN_TITLE_TEXTS,
                 align = "left"
-            ).also {
-                it.forEach {
-                    it.posX += MARGIN_TITLE_TEXTS
-                }
-            }
+            ).moveObjectsAround(MARGIN_TITLE_TEXTS, 0)
         }
 
         private fun typesetPartHeading(num: String, thePar: String, handler: BTeXHandler, indent: Int = PAR_INDENTATION, width: Int = doc.textWidth) {
@@ -1545,12 +1534,11 @@ object BTeXParser {
             val header = if (num == null) thePar else "$num${spacingBlockToString(9)}$thePar"
             typesetParagraphs("\n$ccDefault$header", handler, width - indent, align = "left").also {
                 // add indents and adjust text y pos
-                it.forEach {
-                    it.posX += indent
-                    it.posY -= doc.lineHeightInPx / 2
-                }
+                it.moveObjectsAround(indent, -doc.lineHeightInPx / 2)
+
+
                 // add ornamental column on the left
-                it.forEach {
+                it.first.forEach {
                     it.extraDrawFun = { batch, x, y ->
                         val oldCol = batch.color.cpy()
                         batch.color = DEFAULT_ORNAMENTS_COL.cpy().also { it.a *= bodyTextShadowAlpha }
@@ -1592,10 +1580,7 @@ object BTeXParser {
         private fun typesetSectionHeading(num: String, thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
             typesetParagraphs("\n$ccDefault$num${spacingBlockToString(9)}$thePar", handler, width - indent, align = "left").also {
                 // add indents and adjust text y pos
-                it.forEach {
-                    it.posX += indent
-                    it.posY -= doc.lineHeightInPx / 2
-                }
+                it.moveObjectsAround(indent, -doc.lineHeightInPx / 2)
             }
         }
 
@@ -1606,7 +1591,7 @@ object BTeXParser {
             height: Int = doc.pageLines,
             startingPage: Int = doc.currentPage,
             align: String
-        ): List<BTeXDrawCall> {
+        ): Pair<List<BTeXDrawCall>, List<BTeXClickable>> {
             return typesetParagraphs(getFont(), thePar, handler, width, height, startingPage, align)
         }
 
@@ -1618,7 +1603,7 @@ object BTeXParser {
             height: Int = doc.pageLines,
             startingPage: Int = doc.currentPage,
             align: String
-        ): List<BTeXDrawCall> {
+        ): Pair<List<BTeXDrawCall>, List<BTeXClickable>> {
             val strat = when (align) {
                 "left" -> TypesettingStrategy.RAGGED_RIGHT
                 "right" -> TypesettingStrategy.RAGGED_LEFT
@@ -1630,6 +1615,7 @@ object BTeXParser {
             var pageNum = startingPage
 
             val drawCalls = ArrayList<BTeXDrawCall>()
+            val clickables = ArrayList<BTeXClickable>()
 
             var remainder = height - doc.linesPrintedOnPage.last()
             var slugHeight = slugs.height
@@ -1653,18 +1639,57 @@ object BTeXParser {
                         doc.appendDrawCall(doc.pages[pageNum], it); drawCalls.add(it)
                     }
                 }
+                // >>> HREF code here!! <<<
                 val hrefs = parseAndGetHref(textDrawCalls[0], font, handler, posYline, slugs, subset.first, subset.second)
-                hrefs.forEach {
+                var objectIsSplit = false
+                hrefs.forEach { (hrefObj, objSeq) ->
                     // search for:
                     // ..... [OBJ:RSETNFAOON]word setaf
                     // get width of "word"
-                    val searchStr = slugs.typesettedSlugs.subList(subset.first, subset.first + subset.second)
-                    printdbg("HREF searchStr: ${searchStr.joinToString { it.toReadable() }}")
-//                    val clickable = BTeXClickable(it.x, it.y, undefined, doc.lineHeightInPx) { viewer ->
-//                        viewer.gotoIndex(it.hrefTarget)
-//                    }
-//                    doc.appendClickable(doc.pages[pageNum], it)
+                    val searchStrs = slugs.typesettedSlugs.subList(subset.first, subset.first + subset.second)
+                    searchStrs.forEach { str ->
+                        printdbg("1HREF searchStr: ${str.toReadable()}")
+                        printdbg("1HREF object: ${objSeq.toReadable()} (id=${hrefDict[objSeq.toReadable()]})")
+
+                        val indexOfSequence = str.indexOfSequence(objSeq)
+
+                        val theIndex = if (objectIsSplit) -(objSeq.size + 4) else indexOfSequence
+
+                        theIndex?.let { index -> // we never know which line the object appears
+                            val wordOffset = index + objSeq.size + 4 // must be index of starting NUL
+                            // target word is on the current line
+                            if (wordOffset < str.size) {
+                                var wordEnd = wordOffset + 1 // will be right on the ending NUL
+                                // find ending OBJ
+                                while (!(wordEnd >= str.size || str[wordEnd] == OBJ)) {
+                                    wordEnd++
+                                }
+                                val substr = CodepointSequence(str.subList(wordOffset + 1, wordEnd))
+
+                                printdbg("1HREF word: ${substr.toReadable()}")
+                                printdbg("1HREF hrefObj: ${hrefObj}")
+
+                                val hrefX = if (objectIsSplit) 0 else hrefObj.x
+                                var hrefY = hrefObj.y; if (objectIsSplit) hrefY += doc.lineHeightInPx
+
+                                val clickable = BTeXClickable(hrefX, hrefY, getFont().getWidth(substr), doc.lineHeightInPx) { viewer ->
+                                    viewer.gotoIndex(hrefObj.hrefTarget)
+                                }
+                                doc.appendClickable(doc.pages[pageNum], clickable); clickables.add(clickable)
+
+                                objectIsSplit = false
+                            }
+                            // target word is on the next line (probably)
+                            else {
+                                printdbg("1HREF object was cut off by the linebreak")
+                                objectIsSplit = true
+                            }
+                        }
+
+                        printdbg("  ")
+                    }
                 }
+                // >>> HREF code ends here!! <<<
 
                 linesOut += remainder
                 slugHeight -= remainder
@@ -1687,9 +1712,53 @@ object BTeXParser {
                 }
                 // >>> HREF code here!! <<<
                 val hrefs = parseAndGetHref(textDrawCalls[0], font, handler, posYline, slugs, subset.first, subset.second)
-                hrefs.forEach {
-                    val searchStr = slugs.typesettedSlugs.subList(subset.first, subset.first + subset.second)
-                    printdbg("HREF searchStr: ${searchStr.joinToString { it.toReadable() }}")
+                var objectIsSplit = false
+                hrefs.forEach { (hrefObj, objSeq) ->
+                    // search for:
+                    // ..... [OBJ:RSETNFAOON]word setaf
+                    // get width of "word"
+                    val searchStrs = slugs.typesettedSlugs.subList(subset.first, subset.first + subset.second)
+                    searchStrs.forEach { str ->
+                        printdbg("2HREF searchStr: ${str.toReadable()}")
+                        printdbg("2HREF object: ${objSeq.toReadable()} (id=${hrefDict[objSeq.toReadable()]})")
+
+                        val indexOfSequence = str.indexOfSequence(objSeq)
+
+                        val theIndex = if (objectIsSplit) -(objSeq.size + 4) else indexOfSequence
+
+                        theIndex?.let { index -> // we never know which line the object appears
+                            val wordOffset = index + objSeq.size + 4 // must be index of starting NUL
+                            // target word is on the current line
+                            if (wordOffset < str.size) {
+                                var wordEnd = wordOffset + 1 // will be right on the ending NUL
+                                // find ending OBJ
+                                while (!(wordEnd >= str.size || str[wordEnd] == OBJ)) {
+                                    wordEnd++
+                                }
+                                val substr = CodepointSequence(str.subList(wordOffset + 1, wordEnd))
+
+                                printdbg("2HREF word: ${substr.toReadable()}")
+                                printdbg("2HREF hrefObj: ${hrefObj}")
+
+                                val hrefX = if (objectIsSplit) 0 else hrefObj.x
+                                var hrefY = hrefObj.y; if (objectIsSplit) hrefY += doc.lineHeightInPx
+
+                                val clickable = BTeXClickable(hrefX, hrefY, getFont().getWidth(substr), doc.lineHeightInPx) { viewer ->
+                                    viewer.gotoIndex(hrefObj.hrefTarget)
+                                }
+                                doc.appendClickable(doc.pages[pageNum], clickable); clickables.add(clickable)
+
+                                objectIsSplit = false
+                            }
+                            // target word is on the next line (probably)
+                            else {
+                                printdbg("2HREF object was cut off by the linebreak")
+                                objectIsSplit = true
+                            }
+                        }
+
+                        printdbg("  ")
+                    }
                 }
                 // >>> HREF code ends here!! <<<
 
@@ -1704,7 +1773,7 @@ object BTeXParser {
             // if typesetting the paragraph leaves the first line of new page empty, move the "row cursor" back up
             if (doc.linesPrintedOnPage[pageNum] == 1 && doc.pages[pageNum].isEmpty()) doc.linesPrintedOnPage[pageNum] = 0 // '\n' adds empty draw call to the page, which makes isEmpty() to return false
 
-            return drawCalls
+            return drawCalls to clickables
         }
 
         private fun textToDrawCall(handler: BTeXHandler, posYline: Int, slugs: MovableType, lineStart: Int, lineCount: Int): List<BTeXDrawCall> {
@@ -1743,7 +1812,7 @@ object BTeXParser {
                         c += 1
                     }
 
-                    if (!idbuf.startsWith("HREF@")) {
+                    if (idbuf.isNotBlank() && !idbuf.startsWith("HREF@")) {
                         out.add(BTeXDrawCall(
                             doc, x, y, currentTheme,
                             cmd = objDict[idbuf.toString()]?.invoke(textDrawCall)
@@ -1765,8 +1834,8 @@ object BTeXParser {
             slugs: MovableType,
             lineStart: Int,
             lineCount: Int
-        ): List<_HrefObject> {
-            val out = ArrayList<_HrefObject>()
+        ): List<Pair<_HrefObject, CodepointSequence>> {
+            val out = ArrayList<Pair<_HrefObject, CodepointSequence>>()
 
             slugs.typesettedSlugs.subList(lineStart, lineStart + lineCount).forEachIndexed { lineNumCnt, line ->
                 line.mapIndexed { i, c -> i to c }.filter { it.second == OBJ }.map { it.first }.forEach { xIndex ->
@@ -1775,18 +1844,20 @@ object BTeXParser {
 
                     // get OBJ id
                     val idbuf = StringBuilder()
+                    val cpseq = CodepointSequence()
 
                     var c = xIndex + 1
                     while (true) {
                         val codepoint = line[c]
                         if (codepoint == 0xFFF9F) break
                         idbuf.append(codepointToObjIdChar(codepoint))
+                        cpseq.add(codepoint)
                         c += 1
                     }
 
-                    if (idbuf.startsWith("HREF@")) {
+                    if (idbuf.isNotBlank() && idbuf.startsWith("HREF@")) {
                         val id = hrefDict[idbuf.toString()]!!
-                        out.add(_HrefObject(x, y, id))
+                        out.add(_HrefObject(x, y, id) to cpseq)
                     }
                 }
             }
@@ -1802,13 +1873,9 @@ object BTeXParser {
             val dotPosEnd = typeWidth - pageNumWidth - dotGap*1.5f
 
             typesetParagraphs("$ccDefault$heading$name", handler, typeWidth - pageNumWidth - dotGap, startingPage = pageToWrite ?: doc.currentPage, align = "justify").let {
-                it.forEach {
-                    it.posX += indentation
+                it.moveObjectsAround(indentation, 0)
 
-//                    println("pos: (${it.posX}, ${it.posY})\tTOC: $name")
-                }
-
-                it.last { it.text != null }.let { call ->
+                it.first.last { it.text != null }.let { call ->
                     call.extraDrawFun = { batch, x, y ->
                         val oldCol = batch.color.cpy()
 
@@ -1916,10 +1983,12 @@ object BTeXParser {
             val ccItemName = TerrarumSansBitmap.toColorCode(0xf03b)
             val ccTargetName = TerrarumSansBitmap.toColorCode(0xf170)
 
+            private const val NUL = 0
             private const val ZWSP = 0x200B
             private const val SHY = 0xAD
             private const val NBSP = 0xA0
             private const val OBJ = 0xFFFC
+            private const val OBJ_END = 0xFFF9F
             private const val SPACING_BLOCK_ONE = 0xFFFD0
             private const val SPACING_BLOCK_SIXTEEN = 0xFFFDF
 
@@ -1966,7 +2035,10 @@ object BTeXParser {
 
                 idstr.add(0xFFF9F)
 
-                return "\uFFFC" + idstr.toUTF8Bytes().toString(Charsets.UTF_8) + spacingBlockToString(width)
+                if (width != 0)
+                    return "\uFFFC" + idstr.toUTF8Bytes().toString(Charsets.UTF_8) + spacingBlockToString(width)
+                else
+                    return "\uFFFC" + idstr.toUTF8Bytes().toString(Charsets.UTF_8)
             }
 
             fun Int.toRomanNum(): String = when (this) {
@@ -2004,7 +2076,46 @@ object BTeXParser {
                 }
             }
 
-            private fun makeRandomObjName() = (0 until 12).joinToString("") { "${hashStrMap.random()}" }
+            private fun makeRandomObjName() = (0 until 16).joinToString("") { "${hashStrMap.random()}" }
+
+            // KMP algorithm
+            internal fun CodepointSequence.indexOfSequence(pattern: CodepointSequence): Int? {
+                if (pattern.isEmpty())
+                    throw IllegalArgumentException("Pattern is empty")
+                if (this.isEmpty())
+                    throw IllegalArgumentException("Pattern is empty")
+
+                // next[i] stores the index of the next best partial match
+                val next = IntArray(pattern.size + 1)
+                for (i in 1 until pattern.size) {
+                    var j = next[i]
+
+                    while (j > 0 && this[j] != this[i]) {
+                        j = next[j]
+                    }
+
+                    if (j > 0 || this[j] == this[i]) {
+                        next[i + 1] = j + 1
+                    }
+                }
+
+                var i = 0
+                var j = 0
+                while (i < this.size) {
+                    if (j < pattern.size && this[i] == pattern[j]) {
+                        if (++j == pattern.size) {
+                            return i - j + 1
+                        }
+                    }
+                    else if (j > 0) {
+                        j = next[j]
+                        i-- // since i will be incremented in the next iteration
+                    }
+                    i++
+                }
+
+                return null
+            }
         }
     }
 
@@ -2013,6 +2124,20 @@ object BTeXParser {
     private annotation class CloseTag
 }
 
+private fun Pair<List<BTeXDrawCall>, List<BTeXClickable>>.moveObjectsAround(x: Int, y: Int) {
+    this.first.forEachIndexed { index, it ->
+        it.posX += x
+        it.deltaX += x
+        it.posY += y
+        it.deltaY += y
+    }
+    this.second.forEachIndexed { index, it ->
+        it.posX += x
+        it.deltaX += x
+        it.posY += y
+        it.deltaY += y
+    }
+}
 
 
 class BTeXParsingException(s: String) : RuntimeException(s) {

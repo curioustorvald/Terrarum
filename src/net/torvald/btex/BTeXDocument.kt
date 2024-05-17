@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.btex.BTeXDocViewer
+import net.torvald.terrarum.btex.BTeXDocument.Companion.HREF_UNDERLINE
+import net.torvald.terrarum.btex.BTeXDocument.Companion.UNDERLINE_Y
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.imagefont.TinyAlphNum
@@ -62,7 +64,10 @@ class BTeXDocument : Disposable {
         val DEFAULT_PAGE_BACK = Color(0xe0dfdb_ff.toInt())
 //        val DEFAULT_PAGE_FORE = Color(0x0a0706_ff)
         val DEFAULT_ORNAMENTS_COL = Color(0x3f3c3b_ff)
+        val HREF_UNDERLINE = Color(0x0033BBff)
         val ccPagenum = TerrarumSansBitmap.toColorCode(0xf333)
+
+        const val UNDERLINE_Y = 22
 
         private fun String.escape() = this.replace("\"", "\\\"")
 
@@ -143,12 +148,12 @@ class BTeXDocument : Disposable {
     @Transient private val fontNum = TinyAlphNum
 
     fun addNewPage(back: Color = DEFAULT_PAGE_BACK) {
-        pages.add(BTeXPage(back, pageDimensionWidth, pageDimensionHeight))
+        pages.add(BTeXPage(this, back, pageDimensionWidth, pageDimensionHeight))
         linesPrintedOnPage.add(0)
     }
 
     fun addNewPageAt(index: Int, back: Color = DEFAULT_PAGE_BACK) {
-        pages.add(index, BTeXPage(back, pageDimensionWidth, pageDimensionHeight))
+        pages.add(index, BTeXPage(this, back, pageDimensionWidth, pageDimensionHeight))
         linesPrintedOnPage.add(index, 0)
     }
 
@@ -332,12 +337,16 @@ class BTeXDocument : Disposable {
 }
 
 data class BTeXClickable(
-    val posX: Int, val posY: Int, val width: Int, val height: Int,
+    var posX: Int, var posY: Int, val width: Int, val height: Int,
     val onClick: (BTeXDocViewer) -> Unit,
 //    val onHover: () -> Unit = {}
-)
+) {
+    var deltaX = 0
+    var deltaY = 0
+}
 
 class BTeXPage(
+    val doc: BTeXDocument,
     val back: Color,
     val width: Int,
     val height: Int,
@@ -360,8 +369,11 @@ class BTeXPage(
             drawCalls.sortBy { if (it.text != null) 16 else 0 }
         }
 
+        // paint background
         batch.color = back.cpy().also { it.a = 0.93f }
         Toolkit.fillArea(batch, x, y, width, height)
+
+        // print texts
         batch.color = Color.WHITE
         drawCalls.forEach {
             it.draw(batch, x + marginH, y + marginV)
@@ -387,10 +399,18 @@ class BTeXPage(
     fun renderToPixmap(pixmap: Pixmap, x: Int, y: Int, marginH: Int, marginV: Int) {
         drawX = x; drawY = y
         drawCalls.sortedBy { if (it.text != null) 16 else 0 }.let { drawCalls ->
+            // paint background
             val backCol = back.cpy().also { it.a = 0.93f }
             pixmap.setColor(backCol)
             pixmap.fill()
 
+            // debug underlines on clickableElements
+            clickableElements.forEach {
+                pixmap.setColor(HREF_UNDERLINE)
+                pixmap.drawRectangle(it.posX + doc.pageMarginH, it.posY + doc.pageMarginV, it.width, doc.lineHeightInPx)
+            }
+
+            // print texts
             pixmap.setColor(Color.WHITE)
             drawCalls.forEach {
                 it.drawToPixmap(pixmap, x + marginH, y + marginV)
