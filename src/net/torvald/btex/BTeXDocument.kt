@@ -26,6 +26,7 @@ import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import java.io.File
 import java.io.RandomAccessFile
 import java.util.concurrent.Callable
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.Deflater
 
 /**
@@ -149,14 +150,16 @@ class BTeXDocument : Disposable {
 
     @Transient private val fontNum = TinyAlphNum
 
-    fun addNewPage(back: Color = DEFAULT_PAGE_BACK) {
+    fun addNewPage(progressIndicator: AtomicInteger, back: Color = DEFAULT_PAGE_BACK) {
         pages.add(BTeXPage(this, back, pageDimensionWidth, pageDimensionHeight))
         linesPrintedOnPage.add(0)
+        progressIndicator.getAndAdd(1)
     }
 
-    fun addNewPageAt(index: Int, back: Color = DEFAULT_PAGE_BACK) {
+    fun addNewPageAt(progressIndicator: AtomicInteger, index: Int, back: Color = DEFAULT_PAGE_BACK) {
         pages.add(index, BTeXPage(this, back, pageDimensionWidth, pageDimensionHeight))
         linesPrintedOnPage.add(index, 0)
+        progressIndicator.getAndAdd(1)
     }
 
     private val lock = Any()
@@ -165,7 +168,7 @@ class BTeXDocument : Disposable {
     /**
      * Must be called on a thread with GL context!
      */
-    fun finalise(multithread: Boolean = false) {
+    fun finalise(progressIndicator: AtomicInteger, multithread: Boolean = false) {
         synchronized(lock) {
             if (fromArchive) throw IllegalStateException("Document is loaded from the archive and thus cannot be finalised")
             if (isFinalised) throw IllegalStateException("Page is already been finalised")
@@ -184,6 +187,7 @@ class BTeXDocument : Disposable {
                     page.renderToPixmap(pixmap, 0, 0, pageMarginH, pageMarginV)
                     printPageNumber(pixmap, pageNum, 0, 0)
                     pagePixmaps[pageNum] = pixmap
+                    progressIndicator.getAndAdd(1)
                 }
             }
             else {
@@ -196,6 +200,8 @@ class BTeXDocument : Disposable {
                     page.renderToPixmap(pixmap, 0, 0, pageMarginH, pageMarginV)
                     printPageNumber(pixmap, pageNum, 0, 0)
                     pagePixmaps[pageNum] = pixmap
+                    progressIndicator.getAndAdd(1)
+                    Unit
                 } }
 
                 // my experiment tells 4, 8, 16, 32 threads all perform the same

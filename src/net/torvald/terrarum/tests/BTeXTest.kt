@@ -23,6 +23,7 @@ import net.torvald.terrarum.inUse
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.unicode.EMDASH
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.system.measureTimeMillis
 
@@ -56,6 +57,9 @@ class BTeXTest : ApplicationAdapter() {
         it.set(null)
     }
 
+    private val typesetProgress = AtomicInteger(0)
+    private val renderProgress = AtomicInteger(0)
+
     override fun create() {
         Lang
         TinyAlphNum
@@ -76,7 +80,7 @@ class BTeXTest : ApplicationAdapter() {
             Thread {
                 try {
                     measureTimeMillis {
-                        val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"), varMap)
+                        val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"), varMap, typesetProgress)
                         document = f.first
                         documentHandler = f.second
                     }.also {
@@ -84,7 +88,7 @@ class BTeXTest : ApplicationAdapter() {
                     }
 
                     measureTimeMillis {
-                        document.finalise(true)
+                        document.finalise(renderProgress, true)
                     }.also {
                         println("Time spent on finalising [ms]: $it")
                     }
@@ -151,6 +155,16 @@ class BTeXTest : ApplicationAdapter() {
         else {
             batch.color = Color.WHITE
             Toolkit.drawTextCentered(batch, TinyAlphNum, stage, 1280, 0, 354)
+
+            if (stage.lowercase().startsWith("typesetting")) {
+                val pgCnt = typesetProgress.get()
+                Toolkit.drawTextCentered(batch, TinyAlphNum, "Pages: $pgCnt", 1280, 0, 375)
+            }
+            else if (stage.lowercase().startsWith("rendering")) {
+                val pgCnt = document.pages.size
+                val renderCnt = renderProgress.get()
+                Toolkit.drawTextCentered(batch, TinyAlphNum, "Pages: $renderCnt/$pgCnt", 1280, 0, 375)
+            }
         }
     }
 

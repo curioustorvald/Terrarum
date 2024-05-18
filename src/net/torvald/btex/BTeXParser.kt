@@ -31,6 +31,7 @@ import org.xml.sax.helpers.DefaultHandler
 import java.awt.SystemColor.text
 import java.io.*
 import java.net.URL
+import java.util.concurrent.atomic.AtomicInteger
 import javax.xml.parsers.SAXParserFactory
 import kotlin.math.roundToInt
 import kotlin.reflect.KFunction
@@ -46,9 +47,9 @@ object BTeXParser {
     internal val textTags = hashSetOf("P", "CALLOUT", "TITLE", "AUTHOR", "EDITION", "CHAPTER", "SECTION", "LI")
     internal val textDecorTags = hashSetOf("SPAN", "CODE")
 
-    operator fun invoke(file: FileHandle, varMap: Map<String, String>) = invoke(file.file(), varMap)
+    operator fun invoke(file: FileHandle, varMap: Map<String, String>, progressIndicator: AtomicInteger) = invoke(file.file(), varMap, progressIndicator)
 
-    operator fun invoke(file: File, varMap: Map<String, String>): Pair<BTeXDocument, BTeXHandler> {
+    operator fun invoke(file: File, varMap: Map<String, String>, progressIndicator: AtomicInteger): Pair<BTeXDocument, BTeXHandler> {
         val doc = BTeXDocument()
         val parser = SAXParserFactory.newInstance().let {
             it.isNamespaceAware = true
@@ -56,24 +57,24 @@ object BTeXParser {
             it.newSAXParser()
         }
         val stream = FileInputStream(file)
-        val handler = BTeXHandler(doc, varMap)
+        val handler = BTeXHandler(doc, varMap, progressIndicator)
         parser.parse(stream, handler)
         return doc to handler
     }
 
-    operator fun invoke(string: String, varMap: Map<String, String>): Pair<BTeXDocument, BTeXHandler> {
+    operator fun invoke(string: String, varMap: Map<String, String>, progressIndicator: AtomicInteger): Pair<BTeXDocument, BTeXHandler> {
         val doc = BTeXDocument()
         val parser = SAXParserFactory.newInstance().let {
             it.isNamespaceAware = true
             it.isValidating = true
             it.newSAXParser()
         }
-        val handler = BTeXHandler(doc, varMap)
+        val handler = BTeXHandler(doc, varMap, progressIndicator)
         parser.parse(InputSource(StringReader(string)), handler)
         return doc to handler
     }
 
-    class BTeXHandler(val doc: BTeXDocument, val varMap: Map<String, String>) : DefaultHandler() {
+    class BTeXHandler(val doc: BTeXDocument, val varMap: Map<String, String>, val progressIndicator: AtomicInteger) : DefaultHandler() {
         private var cover = ""
         private var inner = ""
         private var papersize = ""
@@ -787,19 +788,19 @@ object BTeXParser {
             val coverColLCH = OKLch(hue, 0.05f, 0.36f)
             val (r, g, b) = coverColLCH.tosRGB()
             coverCol = Color(r, g, b, 1f)
-            doc.addNewPage(coverCol!!)
+            doc.addNewPage(progressIndicator, coverCol!!)
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemTOCPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            doc.addNewPage() // toc: openright
+            doc.addNewPage(progressIndicator) // toc: openright
             val header = attribs["title"] ?: "Table of Contents"
             typesetChapterHeading(null, header, handler, PAR_INDENTATION)
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemINDEXPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            if (doc.currentPageObj.isNotEmpty()) doc.addNewPage()
+            if (doc.currentPageObj.isNotEmpty()) doc.addNewPage(progressIndicator)
             val header = attribs["title"] ?: "Index"
             typesetChapterHeading(null, header, handler, PAR_INDENTATION)
         }
@@ -828,7 +829,7 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemMANUSCRIPT(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            doc.addNewPage()
+            doc.addNewPage(progressIndicator)
         }
 
         @CloseTag
@@ -854,7 +855,7 @@ object BTeXParser {
 
                     // insert new pages
                     repeat(pageDelta) {
-                        doc.addNewPageAt(tocPage!! + 1)
+                        doc.addNewPageAt(progressIndicator, tocPage!! + 1)
                     }
                 }
 
@@ -979,7 +980,7 @@ object BTeXParser {
 
             // image overflowing?
             if (doc.pageLines - doc.linesPrintedOnPage.last() < heightInLines)
-                doc.addNewPage()
+                doc.addNewPage(progressIndicator)
 
             val tempFile = FileHandle.tempFile("btex_$btexObjName")
             try {
@@ -1059,7 +1060,7 @@ object BTeXParser {
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemNEWPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
-            doc.addNewPage()
+            doc.addNewPage(progressIndicator)
         }
 
         @CloseTag // reflective access is impossible with 'private'
@@ -1085,7 +1086,7 @@ object BTeXParser {
                 }
             }
 
-            doc.addNewPage()
+            doc.addNewPage(progressIndicator)
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -1237,7 +1238,7 @@ object BTeXParser {
         @CloseTag
         fun closeElemCOVER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             if (hasCover) {
-                doc.addNewPage()
+                doc.addNewPage(progressIndicator)
             }
         }
 
@@ -1305,7 +1306,7 @@ object BTeXParser {
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemPART(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // if the last page is not empty, create new one
-            if (doc.currentPageObj.isNotEmpty()) doc.addNewPage()
+            if (doc.currentPageObj.isNotEmpty()) doc.addNewPage(progressIndicator)
 
             val partOrder = cptSectMap.count { it.type.startsWith("part") } + 1
             val thePar = paragraphBuffer.toString().trim()
@@ -1343,10 +1344,10 @@ object BTeXParser {
 
 
             // if current line is the last line, proceed to the next page
-            if (doc.linesPrintedOnPage.last() >= doc.pageLines - 2) doc.addNewPage()
+            if (doc.linesPrintedOnPage.last() >= doc.pageLines - 2) doc.addNewPage(progressIndicator)
             // if defined by the macro, proceed to the next page
             if (macrodefs["chapteronnewpage"] != "0" && cptSibling > 1)
-                doc.addNewPage()
+                doc.addNewPage(progressIndicator)
 
 
             typesetChapterHeading(invokeMacro("thechapter", cptNumStr), thePar, handler, 16)
@@ -1358,7 +1359,7 @@ object BTeXParser {
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemSECTION(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // if current line is the last line, proceed to the next page
-            if (doc.linesPrintedOnPage.last() >= doc.pageLines - 1) doc.addNewPage()
+            if (doc.linesPrintedOnPage.last() >= doc.pageLines - 1) doc.addNewPage(progressIndicator)
 
             val partOrder = cptSectMap.count { it.type.startsWith("part") }
             val cptOrder = cptSectMap.count { it.type.startsWith("chapter") }
@@ -1421,8 +1422,8 @@ object BTeXParser {
         fun closeElemBTEXDOC(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             // make sure the last pair ends with paper and end-cover
             doc.endOfPageStart = doc.currentPage + 1
-            if (doc.pages.size % 2 == 1) doc.addNewPage()
-            doc.addNewPage()
+            if (doc.pages.size % 2 == 1) doc.addNewPage(progressIndicator)
+            doc.addNewPage(progressIndicator)
         }
 
 
@@ -1523,9 +1524,9 @@ object BTeXParser {
 
             // make sure page after the part always openright
             if (doc.currentPage % 2 == 1)
-                doc.addNewPage()
+                doc.addNewPage(progressIndicator)
 
-            doc.addNewPage()
+            doc.addNewPage(progressIndicator)
         }
 
         private fun typesetChapterHeading(num: String?, thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
@@ -1622,7 +1623,7 @@ object BTeXParser {
 //            printdbg("Page: ${doc.currentPage+1}, Line: ${doc.currentLine}")
 
             if (remainder <= 0) {
-                doc.addNewPage(); pageNum += 1
+                doc.addNewPage(progressIndicator); pageNum += 1
             }
             else if (slugHeight > remainder) {
                 val subset = linesOut to remainder
@@ -1692,7 +1693,7 @@ object BTeXParser {
                 linesOut += remainder
                 slugHeight -= remainder
 
-                doc.addNewPage(); pageNum += 1
+                doc.addNewPage(progressIndicator); pageNum += 1
             }
 
             while (slugHeight > 0) {
@@ -1717,8 +1718,8 @@ object BTeXParser {
                     // get width of "word"
                     val searchStrs = slugs.typesettedSlugs.subList(subset.first, subset.first + subset.second)
                     searchStrs.forEach { str ->
-                        printdbg("2HREF searchStr: ${str.toReadable()}")
-                        printdbg("2HREF object: ${objSeq.toReadable()} (id=${hrefDict[objSeq.toReadable()]})")
+//                        printdbg("2HREF searchStr: ${str.toReadable()}")
+//                        printdbg("2HREF object: ${objSeq.toReadable()} (id=${hrefDict[objSeq.toReadable()]})")
 
                         val indexOfSequence = str.indexOfSequence(objSeq)
 
@@ -1739,8 +1740,8 @@ object BTeXParser {
                                 // retrieve the actual word
                                 val substr = CodepointSequence(str.subList(wordOffset + 1, wordEnd))
 
-                                printdbg("2HREF word: ${substr.toReadable()}")
-                                printdbg("2HREF hrefObj: ${hrefObj}")
+//                                printdbg("2HREF word: ${substr.toReadable()}")
+//                                printdbg("2HREF hrefObj: ${hrefObj}")
 
                                 val hrefX = if (objectIsSplit) 0 else hrefObj.x
                                 var hrefY = hrefObj.y; if (objectIsSplit) hrefY += doc.lineHeightInPx
@@ -1754,7 +1755,7 @@ object BTeXParser {
                             }
                             // target word is on the next line (probably)
                             else {
-                                printdbg("2HREF object was cut off by the linebreak")
+//                                printdbg("2HREF object was cut off by the linebreak")
                                 objectIsSplit = true
                             }
                         }
@@ -1768,7 +1769,7 @@ object BTeXParser {
                 slugHeight -= remainder
 
                 if (remainder == height) {
-                    doc.addNewPage(); pageNum += 1
+                    doc.addNewPage(progressIndicator); pageNum += 1
                 }
             }
 
@@ -1947,7 +1948,7 @@ object BTeXParser {
             if (doc.linesPrintedOnPage[doc.currentPage] < doc.pageLines)
                 doc.linesPrintedOnPage[doc.currentPage] += 1
             else
-                doc.addNewPage()
+                doc.addNewPage(progressIndicator)
         }
 
         private data class _HrefObject(val x: Int, val y: Int, val hrefTarget: String)
