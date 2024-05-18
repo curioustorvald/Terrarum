@@ -356,7 +356,7 @@ data class BTeXClickable(
     }
 
     fun drawUnderline(pixmap: Pixmap, doc: BTeXDocument) {
-        if (drawUnderline && width > 1) {
+        if (drawUnderline) {
             val x = posX - HBPADH + doc.pageMarginH
             val y = posY - HBPADV + doc.pageMarginV + UNDERLINE_Y
             val width = width + HBPADH
@@ -391,7 +391,8 @@ class BTeXPage(
         if (drawCall.isNotBlank()) drawCalls.add(drawCall)
     }
     fun appendClickable(clickable: BTeXClickable) {
-        clickableElements.add(clickable)
+        if (clickable.width > 1)
+            clickableElements.add(clickable)
     }
 
     private var prerender = false

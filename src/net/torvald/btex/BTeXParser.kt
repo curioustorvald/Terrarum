@@ -1717,8 +1717,8 @@ object BTeXParser {
                     // get width of "word"
                     val searchStrs = slugs.typesettedSlugs.subList(subset.first, subset.first + subset.second)
                     searchStrs.forEach { str ->
-//                        printdbg("2HREF searchStr: ${str.toReadable()}")
-//                        printdbg("2HREF object: ${objSeq.toReadable()} (id=${hrefDict[objSeq.toReadable()]})")
+                        printdbg("2HREF searchStr: ${str.toReadable()}")
+                        printdbg("2HREF object: ${objSeq.toReadable()} (id=${hrefDict[objSeq.toReadable()]})")
 
                         val indexOfSequence = str.indexOfSequence(objSeq)
 
@@ -1739,8 +1739,8 @@ object BTeXParser {
                                 // retrieve the actual word
                                 val substr = CodepointSequence(str.subList(wordOffset + 1, wordEnd))
 
-//                                printdbg("2HREF word: ${substr.toReadable()}")
-//                                printdbg("2HREF hrefObj: ${hrefObj}")
+                                printdbg("2HREF word: ${substr.toReadable()}")
+                                printdbg("2HREF hrefObj: ${hrefObj}")
 
                                 val hrefX = if (objectIsSplit) 0 else hrefObj.x
                                 var hrefY = hrefObj.y; if (objectIsSplit) hrefY += doc.lineHeightInPx
@@ -1754,7 +1754,7 @@ object BTeXParser {
                             }
                             // target word is on the next line (probably)
                             else {
-//                                printdbg("2HREF object was cut off by the linebreak")
+                                printdbg("2HREF object was cut off by the linebreak")
                                 objectIsSplit = true
                             }
                         }
