@@ -818,7 +818,7 @@ object BTeXParser {
             val pageWidth = doc.textWidth
 
             doc.indexTable.keys.toList().sorted().forEach { key ->
-                typesetTOCline("", key, doc.indexTable[key]!! - 1, handler)
+                typesetTOCline("", key, doc.indexTable[key]!!, handler, isIndex = true)
             }
         }
 
@@ -1670,7 +1670,7 @@ object BTeXParser {
                                 val hrefX = if (objectIsSplit) 0 else hrefObj.x
                                 var hrefY = hrefObj.y; if (objectIsSplit) hrefY += doc.lineHeightInPx
 
-                                val clickable = BTeXClickable(hrefX, hrefY, getFont().getWidth(substr), doc.lineHeightInPx) { viewer ->
+                                val clickable = BTeXClickable(hrefX, hrefY, getFont().getWidth(substr), doc.lineHeightInPx, false) { viewer ->
                                     viewer.gotoIndex(hrefObj.hrefTarget)
                                 }
                                 doc.appendClickable(doc.pages[pageNum], clickable); clickables.add(clickable)
@@ -1867,8 +1867,12 @@ object BTeXParser {
             return out
         }
 
-        private fun typesetTOCline(heading: String, name: String, pageNumInt: Int, handler: BTeXHandler, indentation: Int = 0, pageToWrite: Int? = null) {
-            val pageNum = pageNumInt.plus(1).toString()
+        private fun typesetTOCline(heading: String, name: String, pageNumInt: Int, handler: BTeXHandler, indentation: Int = 0, pageToWrite: Int? = null, isIndex: Boolean = false) {
+            val pageNum = if (isIndex)
+                pageNumInt.toString()
+            else
+                pageNumInt.plus(1).toString()
+
             val pageNumWidth = getFont().getWidth(pageNum)
             val typeWidth = doc.textWidth - indentation
             val dotGap = 10
@@ -1929,8 +1933,8 @@ object BTeXParser {
                         val target = pageNumInt
                         val thePage = call.pageObject
 
-                        thePage.appendClickable(BTeXClickable(boxx, boxy, boxw, boxh) {
-                            printdbg("Goto page p. ${target+1}")
+                        thePage.appendClickable(BTeXClickable(boxx, boxy, boxw, boxh, false) {
+//                            printdbg("Goto page p. ${target+1}")
                             it.gotoPage(target)
                         })
                     }

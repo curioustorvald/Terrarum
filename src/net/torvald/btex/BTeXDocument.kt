@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.btex.BTeXDocViewer
 import net.torvald.terrarum.btex.BTeXDocument.Companion.HREF_UNDERLINE
+import net.torvald.terrarum.btex.BTeXDocument.Companion.HREF_UNDERLINE_SHADOW
 import net.torvald.terrarum.btex.BTeXDocument.Companion.UNDERLINE_Y
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.concurrent.ThreadExecutor
@@ -65,6 +66,7 @@ class BTeXDocument : Disposable {
 //        val DEFAULT_PAGE_FORE = Color(0x0a0706_ff)
         val DEFAULT_ORNAMENTS_COL = Color(0x3f3c3b_ff)
         val HREF_UNDERLINE = Color(0x0033BBff)
+        val HREF_UNDERLINE_SHADOW = Color(0x7F99ddff) // blend=none makes transparency unusable
         val ccPagenum = TerrarumSansBitmap.toColorCode(0xf333)
 
         const val UNDERLINE_Y = 22
@@ -337,7 +339,7 @@ class BTeXDocument : Disposable {
 }
 
 data class BTeXClickable(
-    var posX: Int, var posY: Int, val width: Int, val height: Int,
+    var posX: Int, var posY: Int, val width: Int, val height: Int, val drawUnderline: Boolean = true,
     val onClick: (BTeXDocViewer) -> Unit,
 //    val onHover: () -> Unit = {}
 ) {
@@ -348,17 +350,30 @@ data class BTeXClickable(
         pixmap.drawRectangle(
             posX - HBPADH + doc.pageMarginH,
             posY - HBPADV + doc.pageMarginV,
-            width + 2 * HBPADH,
+            width + HBPADH,
             height + 2 * HBPADV
         )
     }
 
+    fun drawUnderline(pixmap: Pixmap, doc: BTeXDocument) {
+        if (drawUnderline && width > 1) {
+            val x = posX - HBPADH + doc.pageMarginH
+            val y = posY - HBPADV + doc.pageMarginV + UNDERLINE_Y
+            val width = width + HBPADH
+
+            pixmap.setColor(HREF_UNDERLINE_SHADOW)
+            pixmap.drawRectangle(x, y, width + 1, 2)
+            pixmap.setColor(HREF_UNDERLINE)
+            pixmap.drawRectangle(x, y, width, 1)
+        }
+    }
+
     fun pointInHitbox(doc: BTeXDocument, x: Int, y: Int) =
-        (x in posX - HBPADH + doc.pageMarginH until posX - HBPADH + doc.pageMarginH + width + 2 * HBPADH &&
+        (x in posX - HBPADH + doc.pageMarginH until posX - HBPADH + doc.pageMarginH + width + HBPADH &&
         y in posY - HBPADV + doc.pageMarginV until posY - HBPADV + doc.pageMarginV + height + 2 * HBPADV)
 
     companion object {
-        private const val HBPADH = 0
+        private const val HBPADH = 1
         private const val HBPADV = 1
     }
 }
@@ -412,18 +427,19 @@ class BTeXPage(
         drawCalls.sortedBy { if (it.text != null) 16 else 0 }.let { drawCalls ->
             // paint background
             val backCol = back.cpy().also { it.a = 0.93f }
+            pixmap.blending = Pixmap.Blending.None
             pixmap.setColor(backCol)
             pixmap.fill()
 
             // debug underlines on clickableElements
             clickableElements.forEach {
                 pixmap.setColor(HREF_UNDERLINE)
-//                it.debugDrawHitboxToPixmap(pixmap, doc)
-                // TODO actually draw underlines
+                it.drawUnderline(pixmap, doc)
             }
 
             // print texts
             pixmap.setColor(Color.WHITE)
+            pixmap.blending = Pixmap.Blending.SourceOver
             drawCalls.forEach {
                 it.drawToPixmap(pixmap, x + marginH, y + marginV)
             }
