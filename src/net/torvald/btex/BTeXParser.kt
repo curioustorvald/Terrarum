@@ -1929,7 +1929,10 @@ object BTeXParser {
                         val target = pageNumInt
                         val thePage = call.pageObject
 
-                        thePage.appendClickable(BTeXClickable(boxx, boxy, boxw, boxh) { it.gotoPage(target) })
+                        thePage.appendClickable(BTeXClickable(boxx, boxy, boxw, boxh) {
+                            printdbg("Goto page p. ${target+1}")
+                            it.gotoPage(target)
+                        })
                     }
 
                 }

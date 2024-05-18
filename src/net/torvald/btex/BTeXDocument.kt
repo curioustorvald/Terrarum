@@ -398,24 +398,17 @@ class BTeXPage(
         }
     }
 
-    fun touchDown(viewer: BTeXDocViewer, screenX: Int, screenY: Int, pointer: Int, button: Int) {
-        val pageRelX = screenX - drawX
-        val pageRelY = screenY - drawY
+    fun touchDown(viewer: BTeXDocViewer, pageRelX: Int, pageRelY: Int, pointer: Int, button: Int) {
         // filter clickable elements that are under the cursor
         clickableElements.filter {
-            pageRelX in it.posX until it.posX+it.width &&
-            pageRelY in it.posY until it.posY+it.height
-        }.forEach { it.onClick(viewer) }
+            it.pointInHitbox(doc, pageRelX, pageRelY)
+        }.lastOrNull()?.let { it.onClick(viewer) }
     }
 
     fun isEmpty() = drawCalls.isEmpty()
     fun isNotEmpty() = drawCalls.isNotEmpty()
 
-    private var drawX = 0
-    private var drawY = 0
-
     fun renderToPixmap(pixmap: Pixmap, x: Int, y: Int, marginH: Int, marginV: Int) {
-        drawX = x; drawY = y
         drawCalls.sortedBy { if (it.text != null) 16 else 0 }.let { drawCalls ->
             // paint background
             val backCol = back.cpy().also { it.a = 0.93f }
@@ -425,7 +418,8 @@ class BTeXPage(
             // debug underlines on clickableElements
             clickableElements.forEach {
                 pixmap.setColor(HREF_UNDERLINE)
-                it.debugDrawHitboxToPixmap(pixmap, doc)
+//                it.debugDrawHitboxToPixmap(pixmap, doc)
+                // TODO actually draw underlines
             }
 
             // print texts

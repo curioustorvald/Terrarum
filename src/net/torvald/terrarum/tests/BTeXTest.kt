@@ -3,6 +3,8 @@ package net.torvald.terrarum.tests
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
@@ -104,6 +106,21 @@ class BTeXTest : ApplicationAdapter() {
                 document = BTeXDocument.fromFile(Gdx.files.internal("./assets/mods/basegame/books/$filePath"))
             }.also {
                 println("Time spent on loading [ms]: $it")
+            }
+        }
+
+
+        Gdx.input.inputProcessor = object : InputAdapter() {
+            override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+                if (::viewer.isInitialized)
+                    viewer.touchDown(screenX, screenY, pointer, button)
+                return true
+            }
+
+            override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+                if (::viewer.isInitialized)
+                    viewer.touchUp(screenX, screenY, pointer, button)
+                return true
             }
         }
     }

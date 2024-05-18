@@ -41,40 +41,66 @@ class BTeXDocViewer(val doc: BTeXDocument) {
         }
     }
 
+    private var x1: Int = 0
+    private var x2: Int = 0
+    private var y: Int = 0
 
     /**
      * @param x top-centre
      * @param y top-centre
      */
     fun render(batch: SpriteBatch, x: Float, y: Float) {
-        val x1 = if (isTome)
+        x1 = if (isTome)
             x.toInt() - pageGap/2 - doc.pageDimensionWidth
         else
             x.toInt() - doc.pageDimensionWidth / 2
 
-        val x2 = if (isTome)
+        x2 = if (isTome)
             x.toInt() + pageGap/2
         else
             0
 
-        val y = y.toInt()
+        this.y = y.toInt()
 
         if (doc.isFinalised || doc.fromArchive) {
             if (isTome) {
                 batch.color = Color.WHITE
 
                 if (currentPage - 1 in doc.pageIndices)
-                    doc.render(0f, batch, currentPage - 1, x1, y)
+                    doc.render(0f, batch, currentPage - 1, x1, this.y)
                 if (currentPage in doc.pageIndices)
-                    doc.render(0f, batch, currentPage, x2, y)
+                    doc.render(0f, batch, currentPage, x2, this.y)
             }
             else {
                 batch.color = Color.WHITE
 
                 if (currentPage in doc.pageIndices)
-                    doc.render(0f, batch, currentPage, x1, y)
+                    doc.render(0f, batch, currentPage, x1, this.y)
             }
         }
+    }
+
+    private var clickLatched = false//true
+
+    fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int) {
+        if (!clickLatched) {
+            clickLatched = true
+
+            if (isTome) {
+                if (currentPage - 1 in doc.pageIndices)
+                    doc.pages[currentPage - 1].touchDown(this, screenX - x1, screenY - y, pointer, button)
+                if (currentPage in doc.pageIndices)
+                    doc.pages[currentPage].touchDown(this, screenX - x2, screenY - y, pointer, button)
+            }
+            else {
+                if (currentPage in doc.pageIndices)
+                    doc.pages[currentPage].touchDown(this, screenX - x1, screenY - y, pointer, button)
+            }
+        }
+    }
+
+    fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int) {
+        clickLatched = false
     }
 
     fun prevPage() {
