@@ -343,6 +343,24 @@ data class BTeXClickable(
 ) {
     var deltaX = 0
     var deltaY = 0
+
+    fun debugDrawHitboxToPixmap(pixmap: Pixmap, doc: BTeXDocument) {
+        pixmap.drawRectangle(
+            posX - HBPADH + doc.pageMarginH,
+            posY - HBPADV + doc.pageMarginV,
+            width + 2 * HBPADH,
+            doc.lineHeightInPx + 2 * HBPADV
+        )
+    }
+
+    fun pointInHitbox(doc: BTeXDocument, x: Int, y: Int) =
+        (x in posX - HBPADH + doc.pageMarginH until posX - HBPADH + doc.pageMarginH + width + 2 * HBPADH &&
+        y in posY - HBPADV + doc.pageMarginV until posY - HBPADV + doc.pageMarginV + doc.lineHeightInPx + 2 * HBPADV)
+
+    companion object {
+        private const val HBPADH = 0
+        private const val HBPADV = 1
+    }
 }
 
 class BTeXPage(
@@ -407,7 +425,7 @@ class BTeXPage(
             // debug underlines on clickableElements
             clickableElements.forEach {
                 pixmap.setColor(HREF_UNDERLINE)
-                pixmap.drawRectangle(it.posX + doc.pageMarginH, it.posY + doc.pageMarginV, it.width, doc.lineHeightInPx)
+                it.debugDrawHitboxToPixmap(pixmap, doc)
             }
 
             // print texts

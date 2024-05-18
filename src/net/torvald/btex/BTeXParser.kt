@@ -1653,10 +1653,10 @@ object BTeXParser {
 
                         val indexOfSequence = str.indexOfSequence(objSeq)
 
-                        val theIndex = if (objectIsSplit) -(objSeq.size + 4) else indexOfSequence
+                        val theIndex = if (objectIsSplit) -(objSeq.size) else indexOfSequence
 
                         theIndex?.let { index -> // we never know which line the object appears
-                            val wordOffset = index + objSeq.size + 4 // must be index of starting NUL
+                            val wordOffset = index + objSeq.size // must be index of starting NUL
                             // target word is on the current line
                             if (wordOffset < str.size) {
                                 var wordEnd = wordOffset + 1 // will be right on the ending NUL
@@ -1724,10 +1724,10 @@ object BTeXParser {
 
                         val indexOfSequence = str.indexOfSequence(objSeq)
 
-                        val theIndex = if (objectIsSplit) -(objSeq.size + 4) else indexOfSequence
+                        val theIndex = if (objectIsSplit) -(objSeq.size) else indexOfSequence
 
                         theIndex?.let { index -> // we never know which line the object appears
-                            val wordOffset = index + objSeq.size + 4 // must be index of starting NUL
+                            val wordOffset = index + objSeq.size // must be index of starting NUL
                             // target word is on the current line
                             if (wordOffset < str.size) {
                                 var wordEnd = wordOffset + 1 // will be right on the ending NUL
@@ -1735,6 +1735,10 @@ object BTeXParser {
                                 while (!(wordEnd >= str.size || str[wordEnd] == OBJ)) {
                                     wordEnd++
                                 }
+                                // if searching finished without finding OBJ, mark it
+                                val objectIsSplit2 = (wordEnd >= str.size)
+
+                                // retrieve the actual word
                                 val substr = CodepointSequence(str.subList(wordOffset + 1, wordEnd))
 
                                 printdbg("2HREF word: ${substr.toReadable()}")
@@ -1748,7 +1752,7 @@ object BTeXParser {
                                 }
                                 doc.appendClickable(doc.pages[pageNum], clickable); clickables.add(clickable)
 
-                                objectIsSplit = false
+                                objectIsSplit = objectIsSplit2
                             }
                             // target word is on the next line (probably)
                             else {
@@ -2083,7 +2087,11 @@ object BTeXParser {
                 if (pattern.isEmpty())
                     throw IllegalArgumentException("Pattern is empty")
                 if (this.isEmpty())
-                    throw IllegalArgumentException("Pattern is empty")
+                    throw IllegalArgumentException("String is empty")
+
+                // pattern cannot exist because the string is shorter than the pattern
+                if (this.size < pattern.size)
+                    return null
 
                 // next[i] stores the index of the next best partial match
                 val next = IntArray(pattern.size + 1)

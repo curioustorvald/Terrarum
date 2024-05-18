@@ -8,17 +8,20 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import net.torvald.btex.BTeXDocViewer
 import net.torvald.btex.BTeXParser
-import net.torvald.terrarum.*
+import net.torvald.terrarum.FlippingSpriteBatch
 import net.torvald.terrarum.btex.BTeXDocument
+import net.torvald.terrarum.gdxClearAndEnableBlend
 import net.torvald.terrarum.imagefont.TinyAlphNum
+import net.torvald.terrarum.inUse
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.unicode.EMDASH
-import java.io.File
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.system.measureTimeMillis
 
 
@@ -27,8 +30,8 @@ import kotlin.system.measureTimeMillis
  */
 class BTeXTest : ApplicationAdapter() {
 
-//    val filePath = "btex.xml"
-    val filePath = "btex_ko.xml"
+    val filePath = "btex.xml"
+//    val filePath = "btex_ko.xml"
 //    val filePath = "test.xml"
 //    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
 //    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
@@ -46,6 +49,10 @@ class BTeXTest : ApplicationAdapter() {
         "terrarumver" to "Alpha 1.3",
         "bucks" to "121687"
     )
+
+    private val errorInfo = AtomicReference<Throwable?>().also {
+        it.set(null)
+    }
 
     override fun create() {
         Lang
@@ -65,25 +72,31 @@ class BTeXTest : ApplicationAdapter() {
 
         if (!isBookFinalised) {
             Thread {
-                measureTimeMillis {
-                    val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"), varMap)
-                    document = f.first
-                    documentHandler = f.second
-                }.also {
-                    println("Time spent on typesetting [ms]: $it")
-                }
+                try {
+                    measureTimeMillis {
+                        val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"), varMap)
+                        document = f.first
+                        documentHandler = f.second
+                    }.also {
+                        println("Time spent on typesetting [ms]: $it")
+                    }
 
-                measureTimeMillis {
-                    document.finalise(true)
-                }.also {
-                    println("Time spent on finalising [ms]: $it")
-                }
+                    measureTimeMillis {
+                        document.finalise(true)
+                    }.also {
+                        println("Time spent on finalising [ms]: $it")
+                    }
 
-                /*measureTimeMillis {
-                document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btxbook")}"))
-                }.also {
-                    println("Time spent on serialisation [ms]: $it")
-                }*/
+                    /*measureTimeMillis {
+                    document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btxbook")}"))
+                    }.also {
+                        println("Time spent on serialisation [ms]: $it")
+                    }*/
+                }
+                catch (e: Throwable) {
+                    errorInfo.set(e)
+                    e.printStackTrace()
+                }
             }.start()
         }
         else {
@@ -99,6 +112,30 @@ class BTeXTest : ApplicationAdapter() {
     private lateinit var viewer: BTeXDocViewer
 
     private val drawY = 24
+
+    private fun drawLoadingMsg(batch: SpriteBatch, stage: String) {
+        val e = errorInfo.get()
+        if (e != null) {
+            val st = e.message!!.split('\n').let {
+                val idx = it.indexOfFirst { it.startsWith("Caused by: ") }
+                it.subList(idx, it.size)
+            }
+            val th = 14 * st.size
+            val tw = st.maxOf { it.length } * 7
+
+            val tx = (1280 - tw) / 2
+            val ty = (720 - th) / 2
+
+            batch.color = Color.CORAL
+            st.forEachIndexed { i, s ->
+                TinyAlphNum.draw(batch, s, tx.toFloat(), ty + 14f*i)
+            }
+        }
+        else {
+            batch.color = Color.WHITE
+            Toolkit.drawTextCentered(batch, TinyAlphNum, stage, 1280, 0, 354)
+        }
+    }
 
     override fun render() {
         Gdx.graphics.setTitle("BTeXTest $EMDASH F: ${Gdx.graphics.framesPerSecond}")
@@ -127,8 +164,7 @@ class BTeXTest : ApplicationAdapter() {
                 }
                 else {
                     batch.inUse {
-                        batch.color = Color.WHITE
-                        Toolkit.drawTextCentered(batch, TinyAlphNum, "Rendering...", 1280, 0, 354)
+                        drawLoadingMsg(batch, "Rendering...")
                     }
                 }
 
@@ -145,8 +181,7 @@ class BTeXTest : ApplicationAdapter() {
         }
         else {
             batch.inUse {
-                batch.color = Color.WHITE
-                Toolkit.drawTextCentered(batch, TinyAlphNum, "Typesetting...", 1280, 0, 354)
+                drawLoadingMsg(batch, "Typesetting...")
             }
         }
     }
