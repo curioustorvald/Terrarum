@@ -301,7 +301,7 @@ object BTeXParser {
 
             elemOpeners["processElem$theTag"].let {
                 if (it == null)
-                    System.err.println("Unknown tag: $theTag")
+//                    System.err.println("Unknown tag: $theTag")
                 else {
                     try {
                         it.call(this, this, doc, uri, attribs)
@@ -378,7 +378,7 @@ object BTeXParser {
                 if (currentHrefId != oldHrefTarget) {
                     // rising edge
                     if (currentHrefId != null) {
-                        printdbg("Href IN($currentHrefId) \t\"$str\"")
+//                        printdbg("Href IN($currentHrefId) \t\"$str\"")
 
                         // put OBJ on every word, separated by whitespaces
                         // transform the word such that:
@@ -395,15 +395,15 @@ object BTeXParser {
                     }
                     // falling edge
                     else {
-                        printdbg("Href OUT(null) \t\"$str\"")
+//                        printdbg("Href OUT(null) \t\"$str\"")
                     }
                 }
                 // hrefId held high
                 else if (currentHrefId != null) {
-                    printdbg("Href($currentHrefId) \t\"$str\"")
+//                    printdbg("Href($currentHrefId) \t\"$str\"")
                 }
                 else {
-                    printdbg("String \t\"$str\"")
+//                    printdbg("String \t\"$str\"")
                 }
 
 
@@ -1519,8 +1519,6 @@ object BTeXParser {
                     it.posY += yDelta
                     it.deltaY += yDelta
                 }
-
-                println()
             }
 
             // make sure page after the part always openright
@@ -1632,8 +1630,8 @@ object BTeXParser {
 
 //                println("typeset par slugHeight=$slugHeight, remainder=$remainder, linesOut=$linesOut")
 
-                val textDrawCalls = textToDrawCall(handler, posYline, slugs, subset.first, subset.second)
-                val objectDrawCalls = parseAndGetObjDrawCalls(textDrawCalls[0], font, handler, posYline, slugs, subset.first, subset.second)
+                val textDrawCalls = textToDrawCall(doc.pages[pageNum], posYline, slugs, subset.first, subset.second)
+                val objectDrawCalls = parseAndGetObjDrawCalls(textDrawCalls[0], font, doc.pages[pageNum], posYline, slugs, subset.first, subset.second)
                 (textDrawCalls + objectDrawCalls).let {
                     it.forEach {
                         doc.appendDrawCall(doc.pages[pageNum], it); drawCalls.add(it)
@@ -1648,8 +1646,8 @@ object BTeXParser {
                     // get width of "word"
                     val searchStrs = slugs.typesettedSlugs.subList(subset.first, subset.first + subset.second)
                     searchStrs.forEach { str ->
-                        printdbg("1HREF searchStr: ${str.toReadable()}")
-                        printdbg("1HREF object: ${objSeq.toReadable()} (id=${hrefDict[objSeq.toReadable()]})")
+//                        printdbg("1HREF searchStr: ${str.toReadable()}")
+//                        printdbg("1HREF object: ${objSeq.toReadable()} (id=${hrefDict[objSeq.toReadable()]})")
 
                         val indexOfSequence = str.indexOfSequence(objSeq)
 
@@ -1666,8 +1664,8 @@ object BTeXParser {
                                 }
                                 val substr = CodepointSequence(str.subList(wordOffset + 1, wordEnd))
 
-                                printdbg("1HREF word: ${substr.toReadable()}")
-                                printdbg("1HREF hrefObj: ${hrefObj}")
+//                                printdbg("1HREF word: ${substr.toReadable()}")
+//                                printdbg("1HREF hrefObj: ${hrefObj}")
 
                                 val hrefX = if (objectIsSplit) 0 else hrefObj.x
                                 var hrefY = hrefObj.y; if (objectIsSplit) hrefY += doc.lineHeightInPx
@@ -1681,12 +1679,12 @@ object BTeXParser {
                             }
                             // target word is on the next line (probably)
                             else {
-                                printdbg("1HREF object was cut off by the linebreak")
+//                                printdbg("1HREF object was cut off by the linebreak")
                                 objectIsSplit = true
                             }
                         }
 
-                        printdbg("  ")
+//                        printdbg("  ")
                     }
                 }
                 // >>> HREF code ends here!! <<<
@@ -1703,8 +1701,8 @@ object BTeXParser {
                 val subset = linesOut to remainder
                 val posYline = doc.linesPrintedOnPage[pageNum]
 
-                val textDrawCalls = textToDrawCall(handler, posYline, slugs, subset.first, subset.second)
-                val objectDrawCalls = parseAndGetObjDrawCalls(textDrawCalls[0], font, handler, posYline, slugs, subset.first, subset.second)
+                val textDrawCalls = textToDrawCall(doc.pages[pageNum], posYline, slugs, subset.first, subset.second)
+                val objectDrawCalls = parseAndGetObjDrawCalls(textDrawCalls[0], font, doc.pages[pageNum], posYline, slugs, subset.first, subset.second)
                 (textDrawCalls + objectDrawCalls).let {
                     it.forEach {
                         doc.appendDrawCall(doc.pages[pageNum], it); drawCalls.add(it)
@@ -1719,8 +1717,8 @@ object BTeXParser {
                     // get width of "word"
                     val searchStrs = slugs.typesettedSlugs.subList(subset.first, subset.first + subset.second)
                     searchStrs.forEach { str ->
-                        printdbg("2HREF searchStr: ${str.toReadable()}")
-                        printdbg("2HREF object: ${objSeq.toReadable()} (id=${hrefDict[objSeq.toReadable()]})")
+//                        printdbg("2HREF searchStr: ${str.toReadable()}")
+//                        printdbg("2HREF object: ${objSeq.toReadable()} (id=${hrefDict[objSeq.toReadable()]})")
 
                         val indexOfSequence = str.indexOfSequence(objSeq)
 
@@ -1741,8 +1739,8 @@ object BTeXParser {
                                 // retrieve the actual word
                                 val substr = CodepointSequence(str.subList(wordOffset + 1, wordEnd))
 
-                                printdbg("2HREF word: ${substr.toReadable()}")
-                                printdbg("2HREF hrefObj: ${hrefObj}")
+//                                printdbg("2HREF word: ${substr.toReadable()}")
+//                                printdbg("2HREF hrefObj: ${hrefObj}")
 
                                 val hrefX = if (objectIsSplit) 0 else hrefObj.x
                                 var hrefY = hrefObj.y; if (objectIsSplit) hrefY += doc.lineHeightInPx
@@ -1756,12 +1754,12 @@ object BTeXParser {
                             }
                             // target word is on the next line (probably)
                             else {
-                                printdbg("2HREF object was cut off by the linebreak")
+//                                printdbg("2HREF object was cut off by the linebreak")
                                 objectIsSplit = true
                             }
                         }
 
-                        printdbg("  ")
+//                        printdbg("  ")
                     }
                 }
                 // >>> HREF code ends here!! <<<
@@ -1780,10 +1778,10 @@ object BTeXParser {
             return drawCalls to clickables
         }
 
-        private fun textToDrawCall(handler: BTeXHandler, posYline: Int, slugs: MovableType, lineStart: Int, lineCount: Int): List<BTeXDrawCall> {
+        private fun textToDrawCall(page: BTeXPage, posYline: Int, slugs: MovableType, lineStart: Int, lineCount: Int): List<BTeXDrawCall> {
             return listOf(
                 BTeXDrawCall(
-                    doc, 0, posYline * doc.lineHeightInPx, currentTheme,
+                    doc, page, 0, posYline * doc.lineHeightInPx, currentTheme,
                     TypesetDrawCall(slugs, lineStart, lineCount)
                 )
             )
@@ -1792,7 +1790,7 @@ object BTeXParser {
         private fun parseAndGetObjDrawCalls(
             textDrawCall: BTeXDrawCall,
             font: TerrarumSansBitmap,
-            handler: BTeXHandler,
+            page: BTeXPage,
             posYline: Int,
             slugs: MovableType,
             lineStart: Int,
@@ -1818,7 +1816,7 @@ object BTeXParser {
 
                     if (idbuf.isNotBlank() && !idbuf.startsWith("HREF@")) {
                         out.add(BTeXDrawCall(
-                            doc, x, y, currentTheme,
+                            doc, page, x, y, currentTheme,
                             cmd = objDict[idbuf.toString()]?.invoke(textDrawCall)
                                 ?: throw NullPointerException("No OBJ with id '$idbuf' exists"),
                             font = font,
@@ -1869,8 +1867,8 @@ object BTeXParser {
             return out
         }
 
-        private fun typesetTOCline(heading: String, name: String, pageNum: Int, handler: BTeXHandler, indentation: Int = 0, pageToWrite: Int? = null) {
-            val pageNum = pageNum.plus(1).toString()
+        private fun typesetTOCline(heading: String, name: String, pageNumInt: Int, handler: BTeXHandler, indentation: Int = 0, pageToWrite: Int? = null) {
+            val pageNum = pageNumInt.plus(1).toString()
             val pageNumWidth = getFont().getWidth(pageNum)
             val typeWidth = doc.textWidth - indentation
             val dotGap = 10
@@ -1921,6 +1919,19 @@ object BTeXParser {
 
                         font.drawToPixmap(pixmap, "$ccDefault$pageNum", x + typeWidth - pageNumWidth, y)
                     }
+
+                    // create and add hyperlinks to the page
+                    if (call.text?.getText() != null) {
+                        val boxh = call.text.getText().size * doc.lineHeightInPx
+                        val boxw = doc.textWidth
+                        val boxx = call.posX - indentation
+                        val boxy = call.posY
+                        val target = pageNumInt
+                        val thePage = call.pageObject
+
+                        thePage.appendClickable(BTeXClickable(boxx, boxy, boxw, boxh) { it.gotoPage(target) })
+                    }
+
                 }
             }
         }

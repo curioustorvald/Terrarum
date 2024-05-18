@@ -349,13 +349,13 @@ data class BTeXClickable(
             posX - HBPADH + doc.pageMarginH,
             posY - HBPADV + doc.pageMarginV,
             width + 2 * HBPADH,
-            doc.lineHeightInPx + 2 * HBPADV
+            height + 2 * HBPADV
         )
     }
 
     fun pointInHitbox(doc: BTeXDocument, x: Int, y: Int) =
         (x in posX - HBPADH + doc.pageMarginH until posX - HBPADH + doc.pageMarginH + width + 2 * HBPADH &&
-        y in posY - HBPADV + doc.pageMarginV until posY - HBPADV + doc.pageMarginV + doc.lineHeightInPx + 2 * HBPADV)
+        y in posY - HBPADV + doc.pageMarginV until posY - HBPADV + doc.pageMarginV + height + 2 * HBPADV)
 
     companion object {
         private const val HBPADH = 0
@@ -460,6 +460,7 @@ abstract class BTeXBatchDrawCall(
 
 class BTeXDrawCall(
     val doc: BTeXDocument,
+    val pageObject: BTeXPage,
     var posX: Int, // position relative to the page start (excluding page margin)
     var posY: Int, // position relative to the page start (excluding page margin)
     val theme: String,
