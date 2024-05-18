@@ -133,6 +133,7 @@ object BTeXParser {
             "thechapter" to "%1\$s",
             "chaptertype" to "1",
             "chapteronnewpage" to "0",
+            "parindent" to "16"
         )
 
         private fun invokeMacro(name: String, vararg args: String): String {
@@ -1398,11 +1399,14 @@ object BTeXParser {
             val penultTag = tagHistory.getOrNull(tagHistory.lastIndex - 1)
             val thePar = paragraphBuffer.toString().trim()
 
+            val indentSize = macrodefs["parindent"]!!.toInt()
+            val indent = if (indentSize > 0) spacingBlockToString(indentSize) else ""
+
             val text =
                 // DON't indent on centering context
                 if (tagStack.contains("CENTER") || tagStack.contains("FULLPAGEBOX")) thePar
                 // indent the second+ pars (or don't indent first par after cpt/sect, anonbreak and br)
-                else if (siblingIndex > 1 && penultTag != "ANONBREAK" && penultTag != "BR") "\uDBBF\uDFDF$thePar"
+                else if (siblingIndex > 1 && penultTag != "ANONBREAK" && penultTag != "BR") "$indent$thePar"
                 // if the very first tag within the MANUSCRIPT is par (i.e. no chapter), create a "virtual" chapter
                 else if (penultTag == "MANUSCRIPT") "\n\n$thePar"
                 // else, print the text normally

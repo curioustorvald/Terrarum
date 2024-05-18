@@ -4,7 +4,6 @@ import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
@@ -39,6 +38,7 @@ class BTeXTest : ApplicationAdapter() {
 //    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
 //    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
 //    val filePath = "literature/koKR/yisang_nalgae.xml"
+//    val filePath = "literature/koKR/yisang_geonchukmuhanyukmyeongakche.xml"
 
 
     private lateinit var document: BTeXDocument

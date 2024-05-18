@@ -234,6 +234,7 @@
         <li><index id="thechapter (macro)"/><code>thechapter</code> — Chapter heading. Default: <code>%1$s</code></li>
         <li><index id="chaptertype (macro)"/><code>chaptertype</code> — Default style of the <code>chapter</code> tag. Default: <code>1</code></li>
         <li><index id="chapteronnewpage (macro)"/><code>chapteronnewpage</code> — Controls if a chapter must start on a new page. Put non-zero value to enable this behaviour. Default: <code>0</code></li>
+        <li><index id="parindent (macro)"/><code>parindent</code> — Controls the indentation size of the paragraphs. Default: <code>16</code></li>
     </ul>
 
     <p>The argument key <code>%1$s</code> will be replaced into a number, Roman numerals, etc.
