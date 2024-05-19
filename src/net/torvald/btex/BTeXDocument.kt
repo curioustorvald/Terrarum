@@ -227,7 +227,7 @@ class BTeXDocument : Disposable {
         }
     }
 
-    fun serialise(archiveFile: File) {
+    fun serialise(viewer: BTeXDocViewer,archiveFile: File) {
         if (!isFinalised) throw IllegalStateException("Document must be finalised before being serialised")
 
         val diskFile = ClusteredFormatDOM.createNewArchive(archiveFile, Common.CHARSET, "", 0x7FFFF)
@@ -250,6 +250,26 @@ class BTeXDocument : Disposable {
         Clustfile(DOM, "bibliography.json").also {
             it.createNewFile()
             it.writeBytes(json.encodeToByteArray())
+        }
+
+        val json2 = StringBuilder(); json2.append("{\n")
+        pages.forEachIndexed { index, page ->
+            if (page.clickableElements.isNotEmpty()) {
+                json2.append("\"$index\":[")
+                page.clickableElements.forEach {
+                    val objStr = "{\"x\":${it.posX},\"y\":${it.posY},\"w\":${it.width},\"h\":${it.height},\"a\":${it.getTargetPage(viewer)}},"
+                    json2.append(objStr)
+                }
+                json2.deleteCharAt(json2.length - 1)
+                json2.append("],\n")
+            }
+        }
+        if (json2.length > 5) json2.deleteCharAt(json2.length - 2) // delete , but not \n
+        json2.append("}")
+
+        Clustfile(DOM, "hrefs.json").also {
+            it.createNewFile()
+            it.writeBytes(json2.toString().encodeToByteArray())
         }
 
         pagePixmaps.forEachIndexed { index, pixmap ->
@@ -346,7 +366,7 @@ class BTeXDocument : Disposable {
 
 data class BTeXClickable(
     var posX: Int, var posY: Int, val width: Int, val height: Int, val drawUnderline: Boolean = true,
-    val onClick: (BTeXDocViewer) -> Unit,
+    val getTargetPage: (BTeXDocViewer) -> Int,
 //    val onHover: () -> Unit = {}
 ) {
     var deltaX = 0
@@ -424,7 +444,10 @@ class BTeXPage(
         // filter clickable elements that are under the cursor
         clickableElements.filter {
             it.pointInHitbox(doc, pageRelX, pageRelY)
-        }.lastOrNull()?.let { it.onClick(viewer) }
+        }.lastOrNull()?.let {
+            val target = it.getTargetPage(viewer)
+            viewer.gotoPage(target)
+        }
     }
 
     fun isEmpty() = drawCalls.isEmpty()

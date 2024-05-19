@@ -375,6 +375,7 @@ object BTeXParser {
 
             if (str.isNotEmpty()) {
 
+//                printdbg(str)
 
                 // rising/falling edge of the hrefId
                 if (currentHrefId != oldHrefTarget) {
@@ -1676,7 +1677,7 @@ object BTeXParser {
                                 var hrefY = hrefObj.y; if (objectIsSplit) hrefY += doc.lineHeightInPx
 
                                 val clickable = BTeXClickable(hrefX, hrefY, getFont().getWidth(substr), doc.lineHeightInPx, false) { viewer ->
-                                    viewer.gotoIndex(hrefObj.hrefTarget)
+                                    viewer.getPageOfIndex(hrefObj.hrefTarget)
                                 }
                                 doc.appendClickable(doc.pages[pageNum], clickable); clickables.add(clickable)
 
@@ -1751,7 +1752,7 @@ object BTeXParser {
                                 var hrefY = hrefObj.y; if (objectIsSplit) hrefY += doc.lineHeightInPx
 
                                 val clickable = BTeXClickable(hrefX, hrefY, getFont().getWidth(substr), doc.lineHeightInPx) { viewer ->
-                                    viewer.gotoIndex(hrefObj.hrefTarget)
+                                    viewer.getPageOfIndex(hrefObj.hrefTarget)
                                 }
                                 doc.appendClickable(doc.pages[pageNum], clickable); clickables.add(clickable)
 
@@ -1939,8 +1940,7 @@ object BTeXParser {
                         val thePage = call.pageObject
 
                         thePage.appendClickable(BTeXClickable(boxx, boxy, boxw, boxh, false) {
-//                            printdbg("Goto page p. ${target+1}")
-                            it.gotoPage(target)
+                            target
                         })
                     }
 

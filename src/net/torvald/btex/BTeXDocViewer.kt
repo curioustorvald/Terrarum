@@ -24,8 +24,8 @@ class BTeXDocViewer(val doc: BTeXDocument) {
         else
             currentPage = page
     }
-    fun gotoIndex(id: String) {
-        gotoPage(doc.indexTable[id]!!)
+    fun getPageOfIndex(id: String): Int {
+        return doc.indexTable[id]!!
     }
 
     fun currentPageStr(): String {
