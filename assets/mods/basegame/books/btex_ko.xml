@@ -217,6 +217,7 @@
             <li><index id="thechapter (매크로)"/><code>thechapter</code> — 장 제목 번호. 기본값: <code>%1$s</code></li>
             <li><index id="chaptertype (매크로)"/><code>chaptertype</code> — <code>chapter</code> 태그의 기본 스타일. 기본값: <code>1</code></li>
             <li><index id="chapteronnewpage (매크로)"/><code>chapteronnewpage</code> — 새 페이지에서 장이 시작되게 하기. 활성화하려면 0이 아닌 임의의 값을 넣을 것. 기본값: <code>0</code></li>
+            <li><index id="resetchapterafterpart (매크로)"/><code>resetchapterafterpart</code> — 부(part) 뒤에 오는 장번호가 1에서 시작되게 하기. 활성화하려면 0이 아닌 임의의 값을 넣을 것. 기본값: <code>0</code></li>
             <li><index id="parindent (매크로)"/><code>parindent</code> — 문단의 들여쓰기 크기를 조절함. 기본값: <code>16</code></li>
         </ul>
 

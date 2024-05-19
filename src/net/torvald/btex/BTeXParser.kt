@@ -133,6 +133,7 @@ object BTeXParser {
             "thechapter" to "%1\$s",
             "chaptertype" to "1",
             "chapteronnewpage" to "0",
+            "resetchapterafterpart" to "0",
             "parindent" to "16"
         )
 
@@ -1325,7 +1326,21 @@ object BTeXParser {
         @CloseTag // reflective access is impossible with 'private'
         fun closeElemCHAPTER(handler: BTeXHandler, doc: BTeXDocument, uri: String, siblingIndex: Int) {
             val partOrder = cptSectMap.count { it.type.startsWith("part") }
-            val cptOrder = cptSectMap.count { it.type.startsWith("chapter") } + 1
+            val cptOrder = if (macrodefs["resetchapterafterpart"] != "0") {
+                var cnt = cptSectMap.size - 1
+                var sectOrder = 0
+                while (cnt >= 0) {
+                    if (cptSectMap[cnt].type.startsWith("chapter")) {
+                        sectOrder += 1
+                    }
+                    else break
+
+                    cnt -= 1
+                }
+                sectOrder + 1
+            }
+            else
+                cptSectMap.count { it.type.startsWith("chapter") } + 1
 
             val thePar = paragraphBuffer.toString().trim()
 
@@ -1364,7 +1379,22 @@ object BTeXParser {
             if (doc.linesPrintedOnPage.last() >= doc.pageLines - 1) doc.addNewPage(progressIndicator)
 
             val partOrder = cptSectMap.count { it.type.startsWith("part") }
-            val cptOrder = cptSectMap.count { it.type.startsWith("chapter") }
+            val cptOrder = if (macrodefs["resetchapterafterpart"] != "0") {
+                var cnt = cptSectMap.size - 1
+                var sectOrder = 0
+                while (cnt >= 0) {
+                    if (cptSectMap[cnt].type.startsWith("chapter")) {
+                        sectOrder += 1
+                    }
+                    else break
+
+                    cnt -= 1
+                }
+                sectOrder + 1
+            }
+            else
+                cptSectMap.count { it.type.startsWith("chapter") } + 1
+
             var sectOrder = 1
 
             var cnt = cptSectMap.size - 1
