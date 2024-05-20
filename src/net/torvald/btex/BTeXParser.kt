@@ -18,7 +18,6 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.MovableType
-import net.torvald.terrarumsansbitmap.MovableType.Companion.toReadable
 import net.torvald.terrarumsansbitmap.TypesettingStrategy
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
@@ -28,7 +27,6 @@ import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
-import java.awt.SystemColor.text
 import java.io.*
 import java.net.URL
 import java.util.concurrent.atomic.AtomicInteger

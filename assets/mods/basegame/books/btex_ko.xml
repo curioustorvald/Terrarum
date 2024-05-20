@@ -247,7 +247,7 @@
 
         <section>한국어 전용 태그</section>
 
-        <p><index id="조사처리"/>조사 처리를 위한 <code>v</code>태그는 다음과 같다.</p>
+        <p><index id="조사 처리"/><code>v</code> 태그의 조사 처리를 위해서는 아래의 태그를 사용할 수 있다. 조사 처리 태그는 <code>v</code> 태그처럼 변수를 인자하는데, 치환된 단어에 적절한 조사를 같이 붙여 인자한다.</p>
 
         <ul>
             <li><index id="veun (태그)"/><index id="vneun (태그)"/><code>veun</code> <code>vneun</code> — 은/는</li>
