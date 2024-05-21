@@ -123,7 +123,7 @@ class UIItemTextLineInput(
 
     private var fboUpdateLatch = true
 
-    private var currentPlaceholderText = ArrayList<Int>(placeholder().toCodePoints()) // the placeholder text may change every time you call it
+    private var currentPlaceholderText = CodepointSequence(placeholder().toCodePoints()) // the placeholder text may change every time you call it
 
 
     private val btn1PosX; get() = posX
@@ -259,7 +259,7 @@ class UIItemTextLineInput(
      * Only makes sense when the placeholder returns randomised texts
      */
     fun refreshPlaceholder() {
-        currentPlaceholderText = ArrayList<Int>(placeholder().toCodePoints())
+        currentPlaceholderText = CodepointSequence(placeholder().toCodePoints())
     }
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {
