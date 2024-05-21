@@ -1220,10 +1220,10 @@ object BTeXParser {
             typesetParagraphs(
                 "$ccDefault$heading$thePar",
                 handler,
-                width = doc.textWidth - 2*MARGIN_PARBOX_H,
+                width = doc.textWidth - MARGIN_LIST_LEFT, // only make indent on the left, not tightening the box
                 height = doc.pageLines - 1,
                 align = currentAlign
-            ).moveObjectsAround(MARGIN_PARBOX_H, doc.lineHeightInPx / 2)
+            ).moveObjectsAround(MARGIN_LIST_LEFT, doc.lineHeightInPx / 2)
 
             clearParBuffer()
         }
@@ -2027,6 +2027,7 @@ object BTeXParser {
             private const val MARGIN_PARBOX_V = 4
             private const val MARGIN_PARBOX_H = 12
             private const val MARGIN_TITLE_TEXTS = 8
+            private const val MARGIN_LIST_LEFT = 6
             private const val PAR_INDENTATION = 16
             private const val HEADING_NUM_TITLE_GAP = 9
 
