@@ -13,8 +13,9 @@ class ItemWallCalendar(originalID: ItemID) : FixtureItemBase(originalID, "net.to
     override var baseMass = 1.0
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/calendar.tga")
+    init {
+        itemImage = getItemImageFromSingleImage("basegame", "sprites/fixtures/calendar.tga")
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_CALENDAR"

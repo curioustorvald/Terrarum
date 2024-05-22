@@ -17,8 +17,9 @@ class ItemLogicSignalSevenSeg(originalID: ItemID) : FixtureItemBase(originalID, 
     override var baseMass = FixtureLogicSignalEmitter.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(15, 3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(15, 3)
+    }
     override val itemImageEmissive: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(15, 4)
 

@@ -17,8 +17,9 @@ class ItemLogicSignalBlocker(originalID: ItemID) : FixtureItemBase(originalID, "
     override var baseMass = FixtureLogicSignalEmitter.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(10, 3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(10, 3)
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_LOGIC_SIGNAL_BLOCKER"
@@ -44,8 +45,9 @@ class ItemLogicSignalLatch(originalID: ItemID) : FixtureItemBase(originalID, "ne
     override var baseMass = FixtureLogicSignalEmitter.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(11, 3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(11, 3)
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_LOGIC_SIGNAL_LATCH"
@@ -71,8 +73,9 @@ class ItemLogicSignalRepeaterHorz(originalID: ItemID) : FixtureItemBase(original
     override var baseMass = FixtureLogicSignalEmitter.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(12, 3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(12, 3)
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_LOGIC_SIGNAL_REPEATER"
@@ -98,8 +101,9 @@ class ItemLogicSignalAdder(originalID: ItemID) : FixtureItemBase(originalID, "ne
     override var baseMass = FixtureLogicSignalEmitter.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(14, 3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(14, 3)
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_LOGIC_SIGNAL_ADDER"

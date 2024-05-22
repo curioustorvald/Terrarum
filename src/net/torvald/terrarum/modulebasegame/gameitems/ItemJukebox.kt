@@ -13,8 +13,9 @@ class ItemJukebox(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald
     override var baseMass = 200.0
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(6,3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(6,3)
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_JUKEBOX"
@@ -30,8 +31,9 @@ class ItemMusicalTurntable(originalID: ItemID) : FixtureItemBase(originalID, "ne
     override var baseMass = 20.0
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(7,3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(7,3)
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_TURNTABLE"
@@ -48,8 +50,9 @@ class ItemMechanicalTines(originalID: ItemID) : FixtureItemBase(originalID, "net
     override var baseMass = 20.0
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/mechanical_tines.tga")
+    init {
+        itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/mechanical_tines.tga")
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_MECHANICAL_TINES"

@@ -21,8 +21,9 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = false
     override val materialId = "CUPR"
     override var baseMass = 2.0
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(2,3)
+    }
     override var equipPosition = HAND_GRIP
     override var originalName = "ITEM_MULTIMETER"
 

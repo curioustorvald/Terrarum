@@ -12,8 +12,9 @@ class ItemWireRollingMill(originalID: ItemID) : FixtureItemBase(originalID, "net
     override var baseMass = 50.0
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/wire_rolling_mill.tga")
+    init {
+        itemImage = getItemImageFromSingleImage("basegame", "sprites/fixtures/wire_rolling_mill.tga")
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_WIRE_ROLLING_MILL"

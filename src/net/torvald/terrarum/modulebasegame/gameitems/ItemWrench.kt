@@ -24,8 +24,9 @@ class ItemWrench(originalID: ItemID) : GameItem(originalID), FixtureInteractionB
     override var inventoryCategory = Category.TOOL
     override val canBeDynamic = false
     override val materialId = "STAL" // this is to just increase the reach
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(5, 2)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(5, 2)
+    }
 
     init {
         stackable = false

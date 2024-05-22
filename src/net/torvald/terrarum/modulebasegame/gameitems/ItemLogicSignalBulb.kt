@@ -17,8 +17,9 @@ class ItemLogicSignalBulb(originalID: ItemID) : FixtureItemBase(originalID, "net
     override var baseMass = FixtureLogicSignalEmitter.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9, 3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(9, 3)
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_COPPER_BULB"

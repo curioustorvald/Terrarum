@@ -973,9 +973,10 @@ object BTeXParser {
             val btexObjName = "IMG@${makeRandomObjName()}"
             val img = attribs["src"]
             val fromgame = attribs["fromgame"]
+            val itemimg = attribs["itemimg"]
             val caption = attribs["caption"]
 
-            if (listOf(img, fromgame).count { it != null } != 1) {
+            if (listOf(img, fromgame, itemimg).count { it != null } != 1) {
                 throw IllegalArgumentException()
             }
 
@@ -1009,6 +1010,9 @@ object BTeXParser {
                     val moduleName = fromgame.substringBefore(':')
                     val modulePath = fromgame.substringAfter(':')
                     Pixmap(ModMgr.getGdxFile(moduleName, modulePath))
+                }
+                else if (itemimg != null) {
+                    ItemCodex.getItemImagePixmap(itemimg)!!
                 }
                 else throw InternalError()
 

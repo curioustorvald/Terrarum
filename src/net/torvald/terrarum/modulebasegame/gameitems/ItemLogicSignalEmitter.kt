@@ -17,8 +17,9 @@ class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, "
     override var baseMass = FixtureLogicSignalEmitter.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")
+    init {
+        itemImage = getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_LOGIC_SIGNAL_EMITTER"

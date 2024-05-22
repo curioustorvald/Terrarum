@@ -1,5 +1,6 @@
 package net.torvald.terrarum.itemproperties
 
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
@@ -133,6 +134,37 @@ class ItemCodex {
     fun getItemImage(item: GameItem?): TextureRegion? {
         if (item == null) return null
         return getItemImage(item.originalID)
+    }
+
+    fun getItemImagePixmap(itemID: ItemID?): Pixmap? {
+        if (itemID == null) return null
+
+        if (itemID.isDynamic()) {
+            return getItemImagePixmap(dynamicToStaticID(itemID))
+        }
+        else if (itemID.isItem()) {
+            return itemCodex[itemID]?.itemImagePixmap
+        }
+        else if (itemID.isWire()) {
+            return itemCodex[itemID]?.itemImagePixmap
+        }
+        else if (itemID.isWall()) {
+            val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID.substring(5))
+            return TODO()
+            /*return BlocksDrawer.tileItemWallPixmap.getPortion(
+                itemSheetNumber % App.tileMaker.TILES_IN_X,
+                itemSheetNumber / App.tileMaker.TILES_IN_X
+            )*/
+        }
+        // else: terrain
+        else {
+            val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID)
+            return TODO()
+            /*return BlocksDrawer.tileItemTerrainPixmap.getPortion(
+                itemSheetNumber % App.tileMaker.TILES_IN_X,
+                itemSheetNumber / App.tileMaker.TILES_IN_X
+            )*/
+        }
     }
 
     fun getItemImageGlow(item: GameItem?): TextureRegion? {

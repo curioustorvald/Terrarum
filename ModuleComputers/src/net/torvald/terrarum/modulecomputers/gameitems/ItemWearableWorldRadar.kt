@@ -34,8 +34,9 @@ class ItemWearableWorldRadar(originalID: String) {// : GameItem(originalID) {
     override val isUnique = false
     override val isDynamic = true
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")
+    init {
+        itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")
+    }
 
     override var baseToolSize: Double? = baseMass
 

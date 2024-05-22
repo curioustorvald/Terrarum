@@ -272,10 +272,9 @@ class AxeCopper(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "CUPR"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,0)
 
     init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(3,0)
         equipPosition = GameItem.EquipPosition.HAND_GRIP
         maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
         durability = maxDurability.toFloat()
@@ -301,8 +300,9 @@ class AxeIron(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "IRON"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(4,0)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(4,0)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -330,8 +330,9 @@ class AxeSteel(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "STAL"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(5,0)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(5,0)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -359,8 +360,9 @@ class AxeWood(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "WOOD"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,4)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(9,4)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -388,8 +390,9 @@ class AxeStone(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "ROCK"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(12,4)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(12,4)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP

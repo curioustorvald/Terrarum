@@ -52,8 +52,11 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
      *
      * ```get() = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")```
      */
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_32")
+
+    init {
+        itemImage = CommonResourcePool.getAsTextureRegion("itemplaceholder_32")
+
+    }
 
     override var baseToolSize: Double? = baseMass
 

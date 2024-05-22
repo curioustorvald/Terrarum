@@ -283,8 +283,9 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "CUPR"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,0)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(0,0)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -313,8 +314,9 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "IRON"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,0)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(1,0)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -343,8 +345,9 @@ class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "STAL"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,0)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(2,0)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -373,8 +376,9 @@ class PickaxeWood(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "WOOD"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,4)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(8,4)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -403,8 +407,9 @@ class PickaxeStone(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "ROCK"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(11,4)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(11,4)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP

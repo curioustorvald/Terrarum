@@ -52,7 +52,9 @@ open class MusicDiscPrototype(originalID: ItemID, module: String, path: String) 
             "${meta.author.trim()}${meta.album.trim()}"
     }
 
-    @Transient override val itemImage: TextureRegion = generateSprite()
+    init {
+        itemImage = generateSprite()
+    }
 
     /**
      * Reads a channel-wise black and white image and tints it using HSLuv colour space

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameitems
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
@@ -159,7 +160,24 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      * ```
      *
      */
-    @Transient open val itemImage: TextureRegion? = null
+    @Transient var itemImage: TextureRegion? = null
+        set(tex) {
+            field = tex
+            tex?.let {
+                val texdata = tex.texture.textureData.also {
+                    if (!it.isPrepared) it.prepare()
+                }
+                itemImagePixmap = Pixmap(tex.regionWidth, tex.regionHeight, texdata.format).also {
+                    it.drawPixmap(
+                        texdata.consumePixmap(),
+                        0, 0, tex.regionX, tex.regionY, tex.regionWidth, tex.regionHeight
+                    )
+                    App.disposables.add(it)
+                }
+            }
+        }
+
+    @Transient open var itemImagePixmap: Pixmap? = null; internal set
     @Transient open val itemImageGlow: TextureRegion? = null
     @Transient open val itemImageEmissive: TextureRegion? = null
 
@@ -407,6 +425,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
             return ret
         }
     }
+
 }
 
 /**

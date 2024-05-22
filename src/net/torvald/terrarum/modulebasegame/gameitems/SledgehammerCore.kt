@@ -133,8 +133,9 @@ class SledgehammerCopper(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "CUPR"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(6,0)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(6,0)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -157,8 +158,9 @@ class SledgehammerIron(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "IRON"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(7,0)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(7,0)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -181,8 +183,9 @@ class SledgehammerSteel(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "STAL"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,0)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(8,0)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -208,8 +211,9 @@ class SledgehammerWood(originalID: ItemID) : GameItem(originalID) {
     override val canBeDynamic = true
     override val materialId = "WOOD"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(10,4)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(10,4)
+    }
 
     init {
         equipPosition = GameItem.EquipPosition.HAND_GRIP

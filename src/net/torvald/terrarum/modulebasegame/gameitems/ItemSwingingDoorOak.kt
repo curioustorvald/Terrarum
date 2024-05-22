@@ -16,8 +16,9 @@ class ItemSwingingDoorOak(originalID: ItemID) :
     override var baseMass = 20.0 // 360[L] * 0.1 * 0.56[SpecificGravity], rounded to the nearest integer
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,10)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(8,10)
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_DOOR_OAK"
 }
@@ -29,8 +30,9 @@ class ItemSwingingDoorEbony(originalID: ItemID) :
     override var baseMass = 30.0 // 360[L] * 0.1 * 0.82[SpecificGravity], rounded to the nearest integer
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,10)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(9,10)
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_DOOR_EBONY"
 }
@@ -42,8 +44,9 @@ class ItemSwingingDoorBirch(originalID: ItemID) :
     override var baseMass = 17.0 // 360[L] * 0.1 * 0.48[SpecificGravity], rounded to the nearest integer
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(10,10)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(10,10)
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_DOOR_BIRCH"
 }
@@ -55,8 +58,9 @@ class ItemSwingingDoorRosewood(originalID: ItemID) :
     override var baseMass = 24.0 // 360[L] * 0.1 * 0.68[SpecificGravity], rounded to the nearest integer
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(11,10)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(11,10)
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_DOOR_ROSEWOOD"
 }

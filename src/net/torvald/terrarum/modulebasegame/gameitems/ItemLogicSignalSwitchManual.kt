@@ -17,8 +17,9 @@ class ItemLogicSignalSwitchManual(originalID: ItemID) : FixtureItemBase(original
     override var baseMass = FixtureLogicSignalEmitter.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8, 3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(8, 3)
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_LOGIC_SIGNAL_SWITCH"

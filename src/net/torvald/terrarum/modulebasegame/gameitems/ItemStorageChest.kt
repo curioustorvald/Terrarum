@@ -15,8 +15,9 @@ class ItemStorageChest(originalID: ItemID) : FixtureItemBase(originalID, "net.to
     override var baseMass = FixtureTikiTorch.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/storage_chest.tga")
+    init {
+        itemImage = getItemImageFromSingleImage("basegame", "sprites/fixtures/storage_chest.tga")
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_STORAGE_CHEST"
 }
@@ -29,8 +30,9 @@ class ItemStorageChestEbony(originalID: ItemID) : FixtureItemBase(originalID, "n
     override var baseMass = FixtureTikiTorch.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/storage_chest_2.tga")
+    init {
+        itemImage = getItemImageFromSingleImage("basegame", "sprites/fixtures/storage_chest_2.tga")
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_STORAGE_CHEST"
 }
@@ -43,8 +45,9 @@ class ItemStorageChestBirch(originalID: ItemID) : FixtureItemBase(originalID, "n
     override var baseMass = FixtureTikiTorch.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/storage_chest_3.tga")
+    init {
+        itemImage = getItemImageFromSingleImage("basegame", "sprites/fixtures/storage_chest_3.tga")
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_STORAGE_CHEST"
 }
@@ -57,8 +60,9 @@ class ItemStorageChestRosewood(originalID: ItemID) : FixtureItemBase(originalID,
     override var baseMass = FixtureTikiTorch.MASS
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/storage_chest_4.tga")
+    init {
+        itemImage = getItemImageFromSingleImage("basegame", "sprites/fixtures/storage_chest_4.tga")
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_STORAGE_CHEST"
 }

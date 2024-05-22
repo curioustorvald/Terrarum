@@ -70,6 +70,7 @@ fun getThrowPosAndVector(actor: ActorWithBody): Pair<Vector2, Vector2> {
  */
 class ItemCherryBomb(originalID: ItemID) : ItemThrowable(originalID, "net.torvald.terrarum.modulebasegame.gameactors.ActorCherryBomb") {
     override var originalName = "ITEM_CHERRY_BOMB"
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,13)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(0,13)
+    }
 }

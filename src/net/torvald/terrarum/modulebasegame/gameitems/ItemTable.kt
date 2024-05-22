@@ -11,8 +11,9 @@ class ItemTable(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.t
     override var baseMass = 20.0
     override val canBeDynamic = false
     override val materialId = "WOOD"
-    override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/table_1.tga")
+    init {
+        itemImage = getItemImageFromSingleImage("basegame", "sprites/fixtures/table_1.tga")
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_TABLE_OAK"
 }
@@ -25,8 +26,9 @@ class ItemTableEbony(originalID: ItemID) : FixtureItemBase(originalID, "net.torv
     override var baseMass = 20.0
     override val canBeDynamic = false
     override val materialId = "WOOD"
-    override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/table_2.tga")
+    init {
+        itemImage = getItemImageFromSingleImage("basegame", "sprites/fixtures/table_2.tga")
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_TABLE_EBONY"
 }
@@ -39,8 +41,9 @@ class ItemTableBirch(originalID: ItemID) : FixtureItemBase(originalID, "net.torv
     override var baseMass = 20.0
     override val canBeDynamic = false
     override val materialId = "WOOD"
-    override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/table_3.tga")
+    init {
+        itemImage = getItemImageFromSingleImage("basegame", "sprites/fixtures/table_3.tga")
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_TABLE_BIRCH"
 }
@@ -53,8 +56,9 @@ class ItemTableRosewood(originalID: ItemID) : FixtureItemBase(originalID, "net.t
     override var baseMass = 20.0
     override val canBeDynamic = false
     override val materialId = "WOOD"
-    override val itemImage: TextureRegion
-        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/table_4.tga")
+    init {
+        itemImage = getItemImageFromSingleImage("basegame", "sprites/fixtures/table_4.tga")
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_TABLE_ROSEWOOD"
 }

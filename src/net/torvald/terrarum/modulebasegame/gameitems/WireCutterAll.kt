@@ -91,8 +91,9 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID), FixtureInteracti
     override var inventoryCategory = Category.TOOL
     override val canBeDynamic = false
     override val materialId = "STAL" // this is to just increase the reach
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1, 3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(1, 3)
+    }
 
     @Transient val selectorUI = UIWireCutterPie(originalID)
 

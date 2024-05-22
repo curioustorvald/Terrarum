@@ -20,8 +20,9 @@ class ItemTapestry(originalID: ItemID) : FixtureItemBase(originalID, "net.torval
     override var baseMass = 6.0
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
+    init {
+        itemImage = CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
+    }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_TAPESTRY"
 

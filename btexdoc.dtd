@@ -48,6 +48,7 @@
 "src CDATA #IMPLIED
  fromgame CDATA #IMPLIED
  gameitem CDATA #IMPLIED
+ itemimg CDATA #IMPLIED
  caption %Text; #IMPLIED
  height %Number; #REQUIRED">
 <!ENTITY % coreattrs

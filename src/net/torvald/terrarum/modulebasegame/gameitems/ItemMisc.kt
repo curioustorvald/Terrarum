@@ -34,8 +34,9 @@ class OreStick(originalID: ItemID) : LightIngredientBase(originalID) {
     override val materialId = "WOOD"
     override var calories = 600.0
     override var smokiness = 0.2f
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,6)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(0,6)
+    }
 }
 
 /**
@@ -43,8 +44,9 @@ class OreStick(originalID: ItemID) : LightIngredientBase(originalID) {
  */
 class ItemClayBall(originalID: ItemID) : LightIngredientBase(originalID) {
     override var originalName = "BLOCK_CLAY"
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(11,6)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(11,6)
+    }
 }
 
 /**
@@ -52,8 +54,9 @@ class ItemClayBall(originalID: ItemID) : LightIngredientBase(originalID) {
  */
 class ItemGunpowder(originalID: ItemID) : LightIngredientBase(originalID) {
     override var originalName = "ITEM_GUNPOWDER"
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,12)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(0,12)
+    }
 }
 
 /**
@@ -64,8 +67,9 @@ class ItemTorch(originalID: ItemID) : LightIngredientBase(originalID) {
     override var inventoryCategory = Category.FIXTURE
 
     override var originalName = "BLOCK_TORCH"
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,14)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(0,14)
+    }
     override val itemImageEmissive: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,14)
 
@@ -95,6 +99,7 @@ class ItemTorch(originalID: ItemID) : LightIngredientBase(originalID) {
  */
 class ItemSolderingWire(originalID: ItemID) : LightIngredientBase(originalID) {
     override var originalName = "ITEM_SOLDERING_WIRE"
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(6,2)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(6,2)
+    }
 }

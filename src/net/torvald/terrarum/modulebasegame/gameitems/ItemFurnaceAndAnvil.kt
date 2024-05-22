@@ -13,8 +13,9 @@ class ItemFurnaceAndAnvil(originalID: ItemID) : FixtureItemBase(originalID, "net
     override var baseMass = 100.0
     override val canBeDynamic = false
     override val materialId = ""
-    override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(5,3)
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(5,3)
+    }
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_FURNACE_AND_ANVIL"
