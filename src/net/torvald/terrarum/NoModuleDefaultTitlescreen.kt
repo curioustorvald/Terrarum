@@ -57,8 +57,8 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
         App.setConfig("screenmagnifyingfilter", "bilinear")
     }
 
-    override fun render(updateRate: Float) {
-        super.render(updateRate)
+    override fun renderImpl(updateRate: Float) {
+        super.renderImpl(updateRate)
 
         gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 

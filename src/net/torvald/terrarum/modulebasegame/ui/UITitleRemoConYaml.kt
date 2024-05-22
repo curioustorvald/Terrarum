@@ -34,6 +34,7 @@ object UITitleRemoConYaml {
 """
 
     val menuBaseDev = """
+- MENU_MODE_BTEXTYPESETTER : net.torvald.terrarum.modulebasegame.ui.UIProxyBTeXTest
 - MENU_MODE_BUILDINGMAKER : net.torvald.terrarum.modulebasegame.ui.UIProxyNewBuildingMaker
 """ + menuBase
 

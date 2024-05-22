@@ -194,7 +194,22 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         gameInitialised = true
     }
 
-    override fun render(updateRate: Float) {
+    private var prerenderCalled = false
+
+    open fun preRender() {
+
+    }
+
+    final override fun render(updateRate: Float) {
+        if (!prerenderCalled) {
+            preRender()
+            prerenderCalled = true
+        }
+
+        renderImpl(updateRate)
+    }
+
+    open fun renderImpl(updateRate: Float) {
 
     }
 
