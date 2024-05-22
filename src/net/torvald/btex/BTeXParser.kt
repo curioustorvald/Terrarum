@@ -796,14 +796,14 @@ object BTeXParser {
         fun processElemTOCPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             doc.addNewPage(progressIndicator) // toc: openright
             val header = attribs["title"] ?: "Table of Contents"
-            typesetChapterHeading(null, header, handler, PAR_INDENTATION)
+            typesetChapterHeading(null, header, handler, HEADING_INDENTATION)
         }
 
         @OpenTag // reflective access is impossible with 'private'
         fun processElemINDEXPAGE(handler: BTeXHandler, doc: BTeXDocument, uri: String, attribs: HashMap<String, String>) {
             if (doc.currentPageObj.isNotEmpty()) doc.addNewPage(progressIndicator)
             val header = attribs["title"] ?: "Index"
-            typesetChapterHeading(null, header, handler, PAR_INDENTATION)
+            typesetChapterHeading(null, header, handler, HEADING_INDENTATION)
         }
 
         @OpenTag // reflective access is impossible with 'private'
@@ -862,7 +862,7 @@ object BTeXParser {
 
                 var currentTOCpage = tocPage!!
                 cptSectMap.forEach { (type, name, pg, part, cpt, sect) ->
-                    val indent = if (type == "subsection") 2*PAR_INDENTATION else if (type == "section") PAR_INDENTATION else 0
+                    val indent = if (type == "subsection") 2*HEADING_INDENTATION else if (type == "section") HEADING_INDENTATION else 0
                     val heading = if (part == null && cpt == null && sect == null)
                         ""
                     else if (part != null && cpt == null && sect == null)
@@ -1515,7 +1515,7 @@ object BTeXParser {
             ).moveObjectsAround(MARGIN_TITLE_TEXTS, 0)
         }
 
-        private fun typesetPartHeading(num: String, thePar: String, handler: BTeXHandler, indent: Int = PAR_INDENTATION, width: Int = doc.textWidth) {
+        private fun typesetPartHeading(num: String, thePar: String, handler: BTeXHandler, indent: Int = HEADING_INDENTATION, width: Int = doc.textWidth) {
             typesetParagraphs("${ccDefault}⁃ $num ⁃", handler, align = "left")
             typesetParagraphs(" ", handler, align = "left")
             typesetParagraphs(getPartTitleFont(), "$ccDefault$thePar", handler, align = "left")
@@ -2028,7 +2028,7 @@ object BTeXParser {
             private const val MARGIN_PARBOX_H = 12
             private const val MARGIN_TITLE_TEXTS = 8
             private const val MARGIN_LIST_LEFT = 6
-            private const val PAR_INDENTATION = 16
+            private const val HEADING_INDENTATION = 16
             private const val HEADING_NUM_TITLE_GAP = 9
 
             val ccDefault = TerrarumSansBitmap.toColorCode(0,0,0)
