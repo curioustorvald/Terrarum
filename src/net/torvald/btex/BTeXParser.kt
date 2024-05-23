@@ -1568,7 +1568,7 @@ object BTeXParser {
 
         private fun typesetChapterHeading(num: String?, thePar: String, handler: BTeXHandler, indent: Int = 16, width: Int = doc.textWidth) {
             val header = if (num == null) thePar else "$num${spacingBlockToString(9)}$thePar"
-            typesetParagraphs("\n$ccDefault$header", handler, width - indent, align = "left").also {
+            typesetParagraphs(getPartTitleFont(), "\n$ccDefault$header", handler, width - indent, align = "left").also {
                 // add indents and adjust text y pos
                 it.moveObjectsAround(indent, -doc.lineHeightInPx / 2)
 
