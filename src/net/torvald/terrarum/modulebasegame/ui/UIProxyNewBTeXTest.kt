@@ -74,7 +74,6 @@ class BTeXTest(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private lateinit var document: BTeXDocument
     private lateinit var documentHandler: BTeXParser.BTeXHandler
-    private lateinit var camera: OrthographicCamera
 
     private lateinit var bg: TextureRegion
 
@@ -95,11 +94,6 @@ class BTeXTest(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         TinyAlphNum
         Toolkit
         BTeXParser.BTeXHandler.preloadFonts()
-
-        camera = OrthographicCamera(1280f, 720f)
-        camera.setToOrtho(true) // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin
-        camera.update()
-        batch.projectionMatrix = camera.combined
 
         bg = TextureRegion(Texture(Gdx.files.internal("test_assets/real_bg_with_guides.png")))
 
@@ -173,8 +167,8 @@ class BTeXTest(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             val th = 14 * st.size
             val tw = st.maxOf { it.length } * 7
 
-            val tx = (1280 - tw) / 2
-            val ty = (720 - th) / 2
+            val tx = (App.scr.width - tw) / 2
+            val ty = (App.scr.height - th) / 2
 
             batch.color = Color.CORAL
             st.forEachIndexed { i, s ->
@@ -183,16 +177,16 @@ class BTeXTest(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
         else {
             batch.color = Color.WHITE
-            Toolkit.drawTextCentered(batch, TinyAlphNum, stage, 1280, 0, 354)
+            Toolkit.drawTextCentered(batch, TinyAlphNum, stage, App.scr.width, 0, App.scr.halfh - 8)
 
             if (stage.lowercase().startsWith("typesetting")) {
                 val pgCnt = typesetProgress.get()
-                Toolkit.drawTextCentered(batch, TinyAlphNum, "Pages: $pgCnt", 1280, 0, 375)
+                Toolkit.drawTextCentered(batch, TinyAlphNum, "Pages: $pgCnt", App.scr.width, 0, App.scr.halfh + 15)
             }
             else if (stage.lowercase().startsWith("rendering")) {
                 val pgCnt = document.pages.size
                 val renderCnt = renderProgress.get()
-                Toolkit.drawTextCentered(batch, TinyAlphNum, "Pages: $renderCnt/$pgCnt", 1280, 0, 375)
+                Toolkit.drawTextCentered(batch, TinyAlphNum, "Pages: $renderCnt/$pgCnt", App.scr.width, 0, App.scr.halfh + 15)
             }
         }
     }
@@ -212,13 +206,13 @@ class BTeXTest(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 if (document.isFinalised || document.fromArchive) {
                     batch.inUse {
                         batch.draw(bg, 0f, 0f)
-                        viewer.render(batch, 640f, drawY.toFloat())
+                        viewer.render(batch, App.scr.halfwf, drawY.toFloat())
 
                         batch.color = Color.WHITE
                         val pageText = "${viewer.currentPageStr()}/${viewer.pageCount}"
                         Toolkit.drawTextCentered(
                             batch, TinyAlphNum, pageText,
-                            1280, 0, drawY + document.pageDimensionHeight + 12
+                            App.scr.width, 0, drawY + document.pageDimensionHeight + 12
                         )
                     }
                 }
