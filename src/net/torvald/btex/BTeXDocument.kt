@@ -62,6 +62,8 @@ class BTeXDocument : Disposable {
 
     val indexTable = HashMap<String, Int>()
 
+    internal var inputXML: String? = null
+
     companion object {
         val DEFAULT_PAGE_BACK = Color(0xe0dfdb_ff.toInt())
 //        val DEFAULT_PAGE_FORE = Color(0x0a0706_ff)
@@ -83,6 +85,9 @@ class BTeXDocument : Disposable {
 
             val ra = RandomAccessFile(file, "r")
             val DOM = ClusteredFormatDOM(ra)
+
+            val xml = Clustfile(DOM, "/src.xml")
+            doc.inputXML = xml.readBytes().toString(Common.CHARSET)
 
             // get meta file
             val meta = Clustfile(DOM, "/bibliography.json")
@@ -125,6 +130,8 @@ class BTeXDocument : Disposable {
                     tempFile.delete() // deleting also affects file descriptor juggling
                 }
             }
+
+            // TODO read hrefs.json
 
             ra.close()
 
@@ -227,11 +234,18 @@ class BTeXDocument : Disposable {
         }
     }
 
-    fun serialise(viewer: BTeXDocViewer,archiveFile: File) {
+    fun serialise(viewer: BTeXDocViewer, archiveFile: File) {
         if (!isFinalised) throw IllegalStateException("Document must be finalised before being serialised")
 
         val diskFile = ClusteredFormatDOM.createNewArchive(archiveFile, Common.CHARSET, "", 0x7FFFF)
         val DOM = ClusteredFormatDOM(diskFile)
+
+        inputXML?.let { xmlstr ->
+            Clustfile(DOM, "src.xml").also {
+                it.createNewFile()
+                it.writeBytes(xmlstr.toByteArray(Common.CHARSET))
+            }
+        }
 
         val json = """
             {

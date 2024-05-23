@@ -16,6 +16,7 @@ import net.torvald.terrarum.btex.*
 import net.torvald.terrarum.btex.BTeXDocument.Companion.DEFAULT_ORNAMENTS_COL
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.MovableType
 import net.torvald.terrarumsansbitmap.TypesettingStrategy
@@ -54,6 +55,7 @@ object BTeXParser {
             it.isValidating = true
             it.newSAXParser()
         }
+        doc.inputXML = file.readText(Common.CHARSET)
         val stream = FileInputStream(file)
         val handler = BTeXHandler(doc, varMap, progressIndicator)
         parser.parse(stream, handler)
@@ -67,6 +69,7 @@ object BTeXParser {
             it.isValidating = true
             it.newSAXParser()
         }
+        doc.inputXML = string
         val handler = BTeXHandler(doc, varMap, progressIndicator)
         parser.parse(InputSource(StringReader(string)), handler)
         return doc to handler
