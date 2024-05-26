@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameitems
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
@@ -132,6 +133,8 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         get() = MaterialCodex.getOrDefault(materialId)
     abstract val materialId: String
 
+    @Transient private var itemImage0: TextureRegion? = null
+
     /**
      * DO NOT READ FROM THIS VALUE: USE `ItemCodex.getItemImage(item)`;
      * this hack is needed to avoid the unsolvable issue regarding the ItemImage of the tiles, of which they
@@ -160,22 +163,31 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      * ```
      *
      */
-    @Transient var itemImage: TextureRegion? = null
-        set(tex) {
-            field = tex
-            tex?.let {
-                val texdata = tex.texture.textureData.also {
+    var itemImage: TextureRegion?
+        get() = itemImage0
+        set(textureRegion) {
+            itemImage0 = textureRegion
+            textureRegion?.let {
+                val texdata = textureRegion.texture.textureData.also {
                     if (!it.isPrepared) it.prepare()
                 }
-                itemImagePixmap = Pixmap(tex.regionWidth, tex.regionHeight, texdata.format).also {
+                itemImagePixmap = Pixmap(textureRegion.regionWidth, textureRegion.regionHeight, texdata.format).also {
                     it.drawPixmap(
                         texdata.consumePixmap(),
-                        0, 0, tex.regionX, tex.regionY, tex.regionWidth, tex.regionHeight
+                        0, 0, textureRegion.regionX, textureRegion.regionY, textureRegion.regionWidth, textureRegion.regionHeight
                     )
                     App.disposables.add(it)
                 }
             }
         }
+
+
+    fun setItemImage(pixmap: Pixmap) {
+        val texture = TextureRegion(Texture(pixmap))
+        App.disposables.add(texture.texture)
+        this.itemImage0 = texture
+        this.itemImagePixmap = pixmap
+    }
 
     @Transient open var itemImagePixmap: Pixmap? = null; internal set
     @Transient open val itemImageGlow: TextureRegion? = null

@@ -53,13 +53,13 @@ open class MusicDiscPrototype(originalID: ItemID, module: String, path: String) 
     }
 
     init {
-        itemImage = generateSprite()
+        setItemImage(generateSprite())
     }
 
     /**
      * Reads a channel-wise black and white image and tints it using HSLuv colour space
      */
-    private fun generateSprite(): TextureRegion {
+    private fun generateSprite(): Pixmap {
         val authorHash = XXHash64.hash(author.encodeToByteArray(), 54)
         val albumHash = XXHash64.hash(collection.encodeToByteArray(), 32)
         val nameHash = XXHash64.hash(name.encodeToByteArray(), 10)
@@ -129,10 +129,7 @@ open class MusicDiscPrototype(originalID: ItemID, module: String, path: String) 
             }
         }
 
-        val ret = TextureRegion(Texture(pixmap))
-        pixmap.dispose()
-
-        return ret
+        return pixmap
     }
 }
 
