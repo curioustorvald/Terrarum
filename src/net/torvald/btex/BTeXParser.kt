@@ -91,7 +91,6 @@ object BTeXParser {
         private var currentHrefId: String? = null // any Unicode string that is not empty
         private var oldHrefTarget: String? = null
 
-        private var currentTheme = ""
 
         private val elemOpeners: HashMap<String, KFunction<*>> = HashMap()
         private val elemClosers: HashMap<String, KFunction<*>> = HashMap()
@@ -102,10 +101,9 @@ object BTeXParser {
         fun clearParBuffer() {
             paragraphBuffer.clear()
             currentAlign = "justify"
-            currentTheme = ""
         }
 
-        private val objDict = HashMap<String, (BTeXDrawCall) -> BTeXBatchDrawCall>()
+        private val objDict = HashMap<String, (DrawCallWrapper) -> BatchDrawCall>()
         private val hrefDict = HashMap<String, String>()
         private val objWidthDict = HashMap<String, Int>()
 
@@ -176,8 +174,8 @@ object BTeXParser {
             }
 
             objWidthDict["TAG@BTEX"] = 32
-            objDict["TAG@BTEX"] = { text: BTeXDrawCall ->
-                object : BTeXBatchDrawCall(32, 0, text) {
+            objDict["TAG@BTEX"] = { text: DrawCallWrapper ->
+                object : BatchDrawCall(32, 0, text) {
                     override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
                         val scale = font!!.scale
                         val interchar = font.interchar
@@ -198,8 +196,8 @@ object BTeXParser {
             }
 
             objWidthDict["TAG@LATEX"] = 36
-            objDict["TAG@LATEX"] = { text: BTeXDrawCall ->
-                object : BTeXBatchDrawCall(36, 0, text) {
+            objDict["TAG@LATEX"] = { text: DrawCallWrapper ->
+                object : BatchDrawCall(36, 0, text) {
                     override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
                         val scale = font!!.scale
                         val interchar = font.interchar
@@ -222,8 +220,8 @@ object BTeXParser {
             }
 
             objWidthDict["TAG@TEX"] = 24
-            objDict["TAG@TEX"] = { text: BTeXDrawCall ->
-                object : BTeXBatchDrawCall(24, 0, text) {
+            objDict["TAG@TEX"] = { text: DrawCallWrapper ->
+                object : BatchDrawCall(24, 0, text) {
                     override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
                         val scale = font!!.scale
                         val interchar = font.interchar
@@ -1024,7 +1022,7 @@ object BTeXParser {
                 if (imgWidth > doc.textWidth)
                     throw RuntimeException("Image width ($imgWidth) is larger than the text width (${doc.textWidth})")
 
-                val drawCallObj = { parentText: BTeXDrawCall -> object : BTeXBatchDrawCall(imgWidth, (heightInLines - 1).coerceAtLeast(0), parentText) {
+                val drawCallObj = { parentText: DrawCallWrapper -> object : BatchDrawCall(imgWidth, (heightInLines - 1).coerceAtLeast(0), parentText) {
                     private lateinit var inputTexture: Texture
                     override fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap?) {
                         if (!::inputTexture.isInitialized) {
@@ -1041,7 +1039,7 @@ object BTeXParser {
                     }
                 } }
 
-                objDict[btexObjName] = { text: BTeXDrawCall -> drawCallObj(text) }
+                objDict[btexObjName] = { text: DrawCallWrapper -> drawCallObj(text) }
                 objWidthDict[btexObjName] = imgWidth
 
                 typesetParagraphs(objectMarkerWithWidth(btexObjName, imgWidth), handler, align = "center")
@@ -1630,7 +1628,7 @@ object BTeXParser {
             height: Int = doc.pageLines,
             startingPage: Int = doc.currentPage,
             align: String
-        ): Pair<List<BTeXDrawCall>, List<BTeXClickable>> {
+        ): Pair<List<DrawCallWrapper>, List<BTeXClickable>> {
             return typesetParagraphs(getFont(), thePar, handler, width, height, startingPage, align)
         }
 
@@ -1642,7 +1640,7 @@ object BTeXParser {
             height: Int = doc.pageLines,
             startingPage: Int = doc.currentPage,
             align: String
-        ): Pair<List<BTeXDrawCall>, List<BTeXClickable>> {
+        ): Pair<List<DrawCallWrapper>, List<BTeXClickable>> {
             val strat = when (align) {
                 "left" -> TypesettingStrategy.RAGGED_RIGHT
                 "right" -> TypesettingStrategy.RAGGED_LEFT
@@ -1653,7 +1651,7 @@ object BTeXParser {
             val slugs = MovableType(font, thePar, width, strat)
             var pageNum = startingPage
 
-            val drawCalls = ArrayList<BTeXDrawCall>()
+            val drawCalls = ArrayList<DrawCallWrapper>()
             val clickables = ArrayList<BTeXClickable>()
 
             var remainder = height - doc.linesPrintedOnPage.last()
@@ -1819,25 +1817,25 @@ object BTeXParser {
             return drawCalls to clickables
         }
 
-        private fun textToDrawCall(page: BTeXPage, posYline: Int, slugs: MovableType, lineStart: Int, lineCount: Int): List<BTeXDrawCall> {
+        private fun textToDrawCall(page: BTeXPage, posYline: Int, slugs: MovableType, lineStart: Int, lineCount: Int): List<DrawCallWrapper> {
             return listOf(
-                BTeXDrawCall(
-                    doc, page, 0, posYline * doc.lineHeightInPx, currentTheme,
+                DrawCallWrapper(
+                    doc, page, 0, posYline * doc.lineHeightInPx,
                     TypesetDrawCall(slugs, lineStart, lineCount)
                 )
             )
         }
 
         private fun parseAndGetObjDrawCalls(
-            textDrawCall: BTeXDrawCall,
+            textDrawCall: DrawCallWrapper,
             font: TerrarumSansBitmap,
             page: BTeXPage,
             posYline: Int,
             slugs: MovableType,
             lineStart: Int,
             lineCount: Int
-        ): List<BTeXDrawCall> {
-            val out = ArrayList<BTeXDrawCall>()
+        ): List<DrawCallWrapper> {
+            val out = ArrayList<DrawCallWrapper>()
 
             slugs.typesettedSlugs.subList(lineStart, lineStart + lineCount).forEachIndexed { lineNumCnt, line ->
                 line.mapIndexed { i, c -> i to c }.filter { it.second == OBJ }.map { it.first }.forEach { xIndex ->
@@ -1856,8 +1854,8 @@ object BTeXParser {
                     }
 
                     if (idbuf.isNotBlank() && !idbuf.startsWith("HREF@")) {
-                        out.add(BTeXDrawCall(
-                            doc, page, x, y, currentTheme,
+                        out.add(DrawCallWrapper(
+                            doc, page, x, y,
                             cmd = objDict[idbuf.toString()]?.invoke(textDrawCall)
                                 ?: throw NullPointerException("No OBJ with id '$idbuf' exists"),
                             font = font,
@@ -1870,7 +1868,7 @@ object BTeXParser {
         }
 
         private fun parseAndGetHref(
-            textDrawCall: BTeXDrawCall,
+            textDrawCall: DrawCallWrapper,
             font: TerrarumSansBitmap,
             handler: BTeXHandler,
             posYline: Int,
@@ -2191,7 +2189,7 @@ object BTeXParser {
     private annotation class CloseTag
 }
 
-private fun Pair<List<BTeXDrawCall>, List<BTeXClickable>>.moveObjectsAround(x: Int, y: Int) {
+private fun Pair<List<DrawCallWrapper>, List<BTeXClickable>>.moveObjectsAround(x: Int, y: Int) {
     this.first.forEachIndexed { index, it ->
         it.posX += x
         it.deltaX += x

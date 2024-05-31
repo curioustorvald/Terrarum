@@ -22,6 +22,7 @@ import net.torvald.terrarum.inUse
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.unicode.EMDASH
+import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.system.measureTimeMillis
@@ -32,7 +33,7 @@ import kotlin.system.measureTimeMillis
  */
 class BTeXTest : ApplicationAdapter() {
 
-    val filePath = "btex.xml"
+    val filePath = "btex.btxbook"
 //    val filePath = "btex_ko.xml"
 //    val filePath = "test.xml"
 //    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
@@ -40,6 +41,7 @@ class BTeXTest : ApplicationAdapter() {
 //    val filePath = "literature/koKR/yisang_nalgae.xml"
 //    val filePath = "literature/koKR/yisang_geonchukmuhanyukmyeongakche.xml"
 
+    private var serialise = true
 
     private lateinit var document: BTeXDocument
     private lateinit var documentHandler: BTeXParser.BTeXHandler
@@ -92,12 +94,6 @@ class BTeXTest : ApplicationAdapter() {
                     }.also {
                         println("Time spent on finalising [ms]: $it")
                     }
-
-                    /*measureTimeMillis {
-                    document.serialise(File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btxbook")}"))
-                    }.also {
-                        println("Time spent on serialisation [ms]: $it")
-                    }*/
                 }
                 catch (e: Throwable) {
                     errorInfo.set(e)
@@ -178,9 +174,21 @@ class BTeXTest : ApplicationAdapter() {
             if (!init) {
                 init = true
                 viewer = BTeXDocViewer(document)
+
             }
             else {
-                if (document.isFinalised || document.fromArchive) {
+                if (serialise && document.isFinalised) {
+                    measureTimeMillis {
+                        document.serialise(viewer, File("./assets/mods/basegame/books/${filePath.replace(".xml", ".btxbook")}"))
+                    }.also {
+                        println("Time spent on serialisation [ms]: $it")
+                    }
+                    batch.inUse {
+                        drawLoadingMsg(batch, "Serialising...")
+                    }
+                    serialise = false
+                }
+                else if (document.isFinalised || document.fromArchive) {
                     batch.inUse {
                         batch.draw(bg, 0f, 0f)
                         viewer.render(batch, 640f, drawY.toFloat())

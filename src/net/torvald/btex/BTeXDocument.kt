@@ -310,7 +310,7 @@ class BTeXDocument : Disposable {
      *
      * `currentLine` *will* be updated automatically.
      */
-    fun appendDrawCall(page: BTeXPage, drawCall: BTeXDrawCall) {
+    fun appendDrawCall(page: BTeXPage, drawCall: DrawCallWrapper) {
         page.appendDrawCall(drawCall)
 
         val pagenum = pages.indexOf(page)
@@ -424,10 +424,10 @@ class BTeXPage(
     val width: Int,
     val height: Int,
 ) {
-    internal val drawCalls = ArrayList<BTeXDrawCall>()
+    internal val drawCalls = ArrayList<DrawCallWrapper>()
     internal val clickableElements = ArrayList<BTeXClickable>()
 
-    fun appendDrawCall(drawCall: BTeXDrawCall) {
+    fun appendDrawCall(drawCall: DrawCallWrapper) {
         if (drawCall.isNotBlank()) drawCalls.add(drawCall)
     }
     fun appendClickable(clickable: BTeXClickable) {
@@ -503,23 +503,22 @@ data class TypesetDrawCall(val movableType: MovableType, val rowStart: Int, val 
     }
 }
 
-abstract class BTeXBatchDrawCall(
+abstract class BatchDrawCall(
     val width: Int,
     val lineHeight: Int,
-    val parentText: BTeXDrawCall?// = null
+    val parentText: DrawCallWrapper?// = null
 ) {
     abstract fun draw(doc: BTeXDocument, batch: SpriteBatch, x: Float, y: Float, font: TerrarumSansBitmap? = null)
     abstract fun drawToPixmap(doc: BTeXDocument, pixmap: Pixmap, x: Int, y: Int, font: TerrarumSansBitmap? = null)
 }
 
-class BTeXDrawCall(
+class DrawCallWrapper(
     val doc: BTeXDocument,
     val pageObject: BTeXPage,
     var posX: Int, // position relative to the page start (excluding page margin)
     var posY: Int, // position relative to the page start (excluding page margin)
-    val theme: String,
     val text: TypesetDrawCall? = null,
-    val cmd: BTeXBatchDrawCall? = null,
+    val cmd: BatchDrawCall? = null,
     val font: TerrarumSansBitmap? = null
 ) {
 
