@@ -17,6 +17,7 @@ import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.Cluste
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.Clustfile
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClustfileOutputStream
 import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.toInt
 import net.torvald.terrarum.tryDispose
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.utils.JsonFetcher
@@ -107,7 +108,6 @@ class BTeXDocument : Disposable {
             doc.fromArchive = true
             doc.pageTextures = Array(pageCount) { null }
 
-
             println("Title: ${doc.theTitle}")
             println("Pages: $pageCount")
 
@@ -131,7 +131,36 @@ class BTeXDocument : Disposable {
                 }
             }
 
-            // TODO read hrefs.json
+            doc.pages.let {
+                it.clear()
+                repeat(pageCount) { _ ->
+                    it.add(BTeXPage(doc, Color.WHITE, doc.pageTextures[0]!!.regionWidth, doc.pageTextures[0]!!.regionHeight))
+                }
+            }
+
+            // read hrefs.json
+            val hrefs = Clustfile(DOM, "/hrefs.json")
+            if (hrefs.exists()) {
+                val hrefReader = hrefs.readBytes().toString(Common.CHARSET).reader()
+                val hrefJson = JsonFetcher.readFromJsonString(hrefReader)
+
+                JsonFetcher.forEachSiblings(hrefJson) { pageNum, value ->
+                    val pageNum = pageNum.toInt()
+                    JsonFetcher.forEachSiblings(value) { _, hrefObj ->
+                        doc.pages[pageNum].appendClickable(
+                            BTeXClickable(
+                                hrefObj.get("x").asInt(),
+                                hrefObj.get("y").asInt(),
+                                hrefObj.get("w").asInt(),
+                                hrefObj.get("h").asInt(),
+                                false
+                            ) {
+                                hrefObj.get("a").asInt()
+                            }
+                        )
+                    }
+                }
+            }
 
             ra.close()
 
