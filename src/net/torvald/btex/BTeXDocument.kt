@@ -12,6 +12,7 @@ import net.torvald.terrarum.btex.BTeXDocument.Companion.HREF_UNDERLINE_SHADOW
 import net.torvald.terrarum.btex.BTeXDocument.Companion.UNDERLINE_Y
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.concurrent.ThreadExecutor
+import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClusteredFormatDOM
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.Clustfile
@@ -227,7 +228,9 @@ class BTeXDocument : Disposable {
                 }
             }
             else {
-                val jobs = pages.indices.map { pageNum -> Callable {
+                // my experiment tells 4, 8, 16, 32 threads all perform the same
+                val THREAD_COUNT = Runtime.getRuntime().availableProcessors().div(2).coerceIn(1..4)
+                val jobs = pages.indices.sliceEvenly(THREAD_COUNT).map { Callable { it.forEach { pageNum ->
                     val page = pages[pageNum]
                     val pixmap = Pixmap(pageDimensionWidth, pageDimensionHeight, Pixmap.Format.RGBA8888).also {
                         it.blending = Pixmap.Blending.SourceOver
@@ -238,10 +241,9 @@ class BTeXDocument : Disposable {
                     pagePixmaps[pageNum] = pixmap
                     progressIndicator.getAndAdd(1)
                     Unit
-                } }
+                } } }
 
-                // my experiment tells 4, 8, 16, 32 threads all perform the same
-                ThreadExecutor(Runtime.getRuntime().availableProcessors().div(2).coerceIn(1..4)).also {
+                ThreadExecutor(THREAD_COUNT).also {
                     it.renew()
                     it.submitAll(jobs)
                     it.join()
