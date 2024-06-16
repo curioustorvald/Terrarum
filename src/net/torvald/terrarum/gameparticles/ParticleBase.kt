@@ -1,8 +1,11 @@
 package net.torvald.terrarum.gameparticles
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.Hitbox
@@ -93,8 +96,22 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, var despawnUponCollision
     fun defaultDrawFun(frameDelta: Float, batch: SpriteBatch, drawJob: (x: Float, y: Float) -> Unit) {
         val oldColour = batch.color.cpy()
         if (!flagDespawn) {
+            App.getCurrentDitherTex().bind(1)
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+
+
             batch.shader = IngameRenderer.shaderBayerAlpha
-            batch.shader.setUniformi("frame", App.GLOBAL_RENDER_TIMER.toInt() % 16)
+
+//            batch.shader.setUniformi("frame", App.GLOBAL_RENDER_TIMER.toInt() % 16)
+
+
+//            batch.shader.setUniformMatrix("u_projTrans", projMat)
+            batch.shader.setUniformi("u_texture", 0)
+            batch.shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
+            batch.shader.setUniformi("u_pattern", 1)
+            batch.shader.setUniformMatrix4fv("swizzler", swizzler, rng.nextInt(24), 16*4)
+
+
             batch.color = drawColour
             drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
                 drawJob(x, y)
@@ -103,7 +120,41 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, var despawnUponCollision
         batch.color = oldColour
     }
 
+    private val rng = HQRNG()
+
     open fun dispose() {
 
+    }
+
+    companion object {
+        private val swizzler = floatArrayOf(
+            1f,0f,0f,0f, 0f,1f,0f,0f, 0f,0f,1f,0f, 0f,0f,0f,1f,
+            1f,0f,0f,0f, 0f,1f,0f,0f, 0f,0f,0f,1f, 0f,0f,1f,0f,
+            1f,0f,0f,0f, 0f,0f,1f,0f, 0f,1f,0f,0f, 0f,0f,0f,1f,
+            1f,0f,0f,0f, 0f,0f,1f,0f, 0f,0f,0f,1f, 0f,1f,0f,0f,
+            1f,0f,0f,0f, 0f,0f,0f,1f, 0f,1f,0f,0f, 0f,0f,1f,0f,
+            1f,0f,0f,0f, 0f,0f,0f,1f, 0f,0f,1f,0f, 0f,1f,0f,0f,
+
+            0f,1f,0f,0f, 1f,0f,0f,0f, 0f,0f,1f,0f, 0f,0f,0f,1f,
+            0f,1f,0f,0f, 1f,0f,0f,0f, 0f,0f,0f,1f, 0f,0f,1f,0f,
+            0f,1f,0f,0f, 0f,0f,1f,0f, 1f,0f,0f,0f, 0f,0f,0f,1f,
+            0f,1f,0f,0f, 0f,0f,1f,0f, 0f,0f,0f,1f, 1f,0f,0f,0f,
+            0f,1f,0f,0f, 0f,0f,0f,1f, 1f,0f,0f,0f, 0f,0f,1f,0f,
+            0f,1f,0f,0f, 0f,0f,0f,1f, 0f,0f,1f,0f, 1f,0f,0f,0f,
+
+            0f,0f,1f,0f, 1f,0f,0f,0f, 0f,1f,0f,0f, 0f,0f,0f,1f,
+            0f,0f,1f,0f, 1f,0f,0f,0f, 0f,0f,0f,1f, 0f,1f,0f,0f,
+            0f,0f,1f,0f, 0f,1f,0f,0f, 1f,0f,0f,0f, 0f,0f,0f,1f,
+            0f,0f,1f,0f, 0f,1f,0f,0f, 0f,0f,0f,1f, 1f,0f,0f,0f,
+            0f,0f,1f,0f, 0f,0f,0f,1f, 1f,0f,0f,0f, 0f,1f,0f,0f,
+            0f,0f,1f,0f, 0f,0f,0f,1f, 0f,1f,0f,0f, 1f,0f,0f,0f,
+
+            0f,0f,0f,1f, 1f,0f,0f,0f, 0f,1f,0f,0f, 0f,0f,1f,0f,
+            0f,0f,0f,1f, 1f,0f,0f,0f, 0f,0f,1f,0f, 0f,1f,0f,0f,
+            0f,0f,0f,1f, 0f,1f,0f,0f, 1f,0f,0f,0f, 0f,0f,1f,0f,
+            0f,0f,0f,1f, 0f,1f,0f,0f, 0f,0f,1f,0f, 1f,0f,0f,0f,
+            0f,0f,0f,1f, 0f,0f,1f,0f, 1f,0f,0f,0f, 0f,1f,0f,0f,
+            0f,0f,0f,1f, 0f,0f,1f,0f, 0f,1f,0f,0f, 1f,0f,0f,0f,
+        )
     }
 }

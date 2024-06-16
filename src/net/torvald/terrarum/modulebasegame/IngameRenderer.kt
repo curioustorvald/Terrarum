@@ -146,7 +146,7 @@ object IngameRenderer : Disposable {
         shaderBlendGlowTex1Flip = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/blendGlowTex1Flip.frag")
         shaderDemultiply = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/demultiply.frag")
 
-        shaderBayerAlpha = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/bayeralpha.frag")
+        shaderBayerAlpha = App.loadShaderFromClasspath("shaders/default.vert", "shaders/alphadither.frag")
 
         shaderKawaseDown = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawasedown.frag")
         shaderKawaseUp = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawaseup.frag")
