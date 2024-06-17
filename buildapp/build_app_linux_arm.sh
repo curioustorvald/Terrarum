@@ -2,7 +2,7 @@
 if (( $EUID == 0 )); then echo "The build process is not meant to be run with root privilege, exiting now." >&2; exit 1; fi
 
 cd "${0%/*}"
-APPIMAGETOOL="appimagetool-aarch64.AppImage" # Note to self: run this on Asahi
+APPIMAGETOOL="appimagetool-x86_64.AppImage" # Note to self: run this on Asahi
 SRCFILES="terrarumlinux_arm"
 DESTDIR="TerrarumLinux.arm"
 RUNTIME="runtime-linux-arm"
@@ -35,7 +35,7 @@ mv $DESTDIR/assets_release $DESTDIR/assets
 cp "../out/$JARNAME" $DESTDIR/out/
 
 # Pack everything to AppImage
-"./$APPIMAGETOOL" $DESTDIR "out/$DESTDIR.AppImage" || { echo 'Building AppImage failed' >&2; exit 1; }
+ARCH=aarch64 "./$APPIMAGETOOL" $DESTDIR "out/$DESTDIR.AppImage" || { echo 'Building AppImage failed' >&2; exit 1; }
 chmod +x "out/$DESTDIR.AppImage"
 rm -rf $DESTDIR || true
 echo "Build successful: $DESTDIR"

@@ -6,20 +6,20 @@ The filenames must be:
 
 | Target OS/Arch      | filename           |
 |---------------------|--------------------|
-| Linux AMD64         | jdk-17.0.1-x86     |
-| Linux Aarch64       | jdk-17.0.1-arm     |
-| Windows AMD64       | jdk-17.0.1-windows |
-| macOS Apple Silicon | jdk-17.0.1.jdk-arm |
-| macOS Intel         | jdk-17.0.1.jdk-x86 |
+| Linux AMD64         | jdk-21.0.2-x86     |
+| Linux Aarch64       | jdk-21.0.2-arm     |
+| Windows AMD64       | jdk-21.0.2-windows |
+| macOS Apple Silicon | jdk-21.0.2.jdk-arm |
+| macOS Intel         | jdk-21.0.2.jdk-x86 |
 
 Then, on the terminal, run following commands:
 
 ```
-jlink --module-path ~/Documents/openjdk/jdk-17.0.1-x86/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-linux-x86 --no-header-files --no-man-pages --strip-debug --compress=2
-jlink --module-path ~/Documents/openjdk/jdk-17.0.1-arm/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-linux-arm --no-header-files --no-man-pages --strip-debug --compress=2
-jlink --module-path ~/Documents/openjdk/jdk-17.0.1-windows/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-windows-x86 --no-header-files --no-man-pages --strip-debug --compress=2
-jlink --module-path ~/Documents/openjdk/jdk-17.0.1.jdk-arm/Contents/Home/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-osx-arm --no-header-files --no-man-pages --strip-debug --compress=2
-jlink --module-path ~/Documents/openjdk/jdk-17.0.1.jdk-x86/Contents/Home/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-osx-x86 --no-header-files --no-man-pages --strip-debug --compress=2
+jlink --module-path ~/Documents/openjdk/jdk-21.0.2-x86/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-linux-x86 --no-header-files --no-man-pages --strip-debug --compress=2
+jlink --module-path ~/Documents/openjdk/jdk-21.0.2-arm/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-linux-arm --no-header-files --no-man-pages --strip-debug --compress=2
+jlink --module-path ~/Documents/openjdk/jdk-21.0.2-windows/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-windows-x86 --no-header-files --no-man-pages --strip-debug --compress=2
+jlink --module-path ~/Documents/openjdk/jdk-21.0.2.jdk-arm/Contents/Home/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-osx-arm --no-header-files --no-man-pages --strip-debug --compress=2
+jlink --module-path ~/Documents/openjdk/jdk-21.0.2.jdk-x86/Contents/Home/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-osx-x86 --no-header-files --no-man-pages --strip-debug --compress=2
 ```
 
 **Note: due to Apple being Apple, macOS runtimes must be created from the macOS**
