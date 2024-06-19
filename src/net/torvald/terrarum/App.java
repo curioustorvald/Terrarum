@@ -49,6 +49,8 @@ import net.torvald.unsafe.UnsafeHelper;
 import net.torvald.util.DebugTimers;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -439,18 +441,7 @@ public class App implements ApplicationListener {
             appConfig.useVsync(getConfigBoolean("usevsync"));
             appConfig.setResizable(false);
 
-            if (useFullscreen) {
-                // auto resize for fullscreen
-                var disp = Lwjgl3ApplicationConfiguration.getDisplayMode(Lwjgl3ApplicationConfiguration.getPrimaryMonitor());
-                var newWidth = ((int)(disp.width / magn)) & 0x7FFFFFFE;
-                var newHeight = ((int)(disp.height / magn)) & 0x7FFFFFFE;
-                scr.setDimension(newWidth, newHeight, magn);
-
-                appConfig.setFullscreenMode(disp);
-
-            }
-            else
-                appConfig.setWindowedMode(width, height);
+            appConfig.setWindowedMode(width, height);
 
             // if filter is none AND magn is not (100% or 200%), set filter to hq2x
             if (getConfigString("screenmagnifyingfilter").equals("none") && magn != 1f && magn != 2f) {
@@ -500,6 +491,22 @@ public class App implements ApplicationListener {
 
     @Override
     public void create() {
+        boolean useFullscreen = getConfigBoolean("fullscreen");
+        float magn = (float) getConfigDouble("screenmagnifying");
+
+        if (useFullscreen) {
+            // auto resize for fullscreen
+            var disp = Gdx.graphics.getDisplayMode();
+//            var disp = Lwjgl3ApplicationConfiguration.getDisplayMode(Lwjgl3ApplicationConfiguration.getPrimaryMonitor()); // won't work on macOS (reports 1920x1200 no matter what)
+            var newWidth = ((int)(disp.width / magn)) & 0x7FFFFFFE;
+            var newHeight = ((int)(disp.height / magn)) & 0x7FFFFFFE;
+            scr.setDimension(newWidth, newHeight, magn);
+
+            Gdx.graphics.setFullscreenMode(disp);
+        }
+
+
+
         File loadOrderFile = new File(App.loadOrderDir);
         if (loadOrderFile.exists()) {
             // load modules
