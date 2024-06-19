@@ -491,13 +491,13 @@ public class App implements ApplicationListener {
 
     @Override
     public void create() {
-        boolean useFullscreen = getConfigBoolean("fullscreen");
+        boolean useFullscreen = !Objects.equals(operationSystem, "OSX") && getConfigBoolean("fullscreen");
         float magn = (float) getConfigDouble("screenmagnifying");
 
         if (useFullscreen) {
             // auto resize for fullscreen
-            var disp = Gdx.graphics.getDisplayMode();
 //            var disp = Lwjgl3ApplicationConfiguration.getDisplayMode(Lwjgl3ApplicationConfiguration.getPrimaryMonitor()); // won't work on macOS (reports 1920x1200 no matter what)
+            var disp = Gdx.graphics.getDisplayMode(); // macOS still reports 1920x1200 *facepalm*
             var newWidth = ((int)(disp.width / magn)) & 0x7FFFFFFE;
             var newHeight = ((int)(disp.height / magn)) & 0x7FFFFFFE;
             scr.setDimension(newWidth, newHeight, magn);
