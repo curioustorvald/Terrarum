@@ -1,3 +1,7 @@
+### Prerequisites
+
+The building of all five executables can be done on an x86 Linux system, but the runtime MUST be prepared and copied from the target systems.
+
 ### Preparation
 
 Download and unzip the JDKs to ~/Documents/openjdk/* for the appropriate operating systems first! JDKs can be downloaded on https://jdk.java.net/archive/.
@@ -22,9 +26,9 @@ jlink --module-path ~/Documents/openjdk/jdk-21.0.2.jdk-arm/Contents/Home/jmods:m
 jlink --module-path ~/Documents/openjdk/jdk-21.0.2.jdk-x86/Contents/Home/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-osx-x86 --no-header-files --no-man-pages --strip-debug --compress=2
 ```
 
-**Note: due to Apple being Apple, macOS runtimes must be created from the macOS**
-
 This process assumes that the game does NOT use the Java 9+ modules and every single required libraries are fat-jar'd (their contents extracted right into the Jar)
+
+Copy the runtimes to your workstation, rename the `bin/java` into `bin/Terrarum`, then `chmod -R +x` all of them.
 
 ### Packaging
 
