@@ -1,3 +1,8 @@
+.DEFAULT_GOAL := what
+
+what:
+	./make_print_description_then_exit.sh
+
 assets:
 	./make_assets_release.sh || true
 
