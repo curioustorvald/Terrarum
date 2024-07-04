@@ -12,7 +12,7 @@ import net.torvald.terrarum.transaction.TransactionState
  */
 object MusicService : TransactionListener() {
 
-    private var currentPlaylist: TerrarumMusicPlaylist? = null
+    var currentPlaylist: TerrarumMusicPlaylist? = null; private set
 
     override fun getCurrentStatusForTransaction(): TransactionState {
         return TransactionState(

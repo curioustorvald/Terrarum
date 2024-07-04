@@ -1,6 +1,6 @@
 package net.torvald.terrarum
 
-open class BackgroundMusicPlayer {
+open class MusicStreamer {
 
     open fun update(ingameInstance: IngameInstance, delta: Float) {
 

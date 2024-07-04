@@ -19,7 +19,7 @@ import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.TerrarumBackgroundMusicPlayer
+import net.torvald.terrarum.modulebasegame.TerrarumMusicStreamer
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.modulebasegame.gameitems.MusicDiscHelper
@@ -106,7 +106,7 @@ class FixtureJukebox : Electric, PlaysMusic {
 
         // supress the normal background music playback
         if (musicIsPlaying && !flagDespawn) {
-            (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).stopMusic(this, true)
+            (INGAME.musicStreamer as TerrarumMusicStreamer).stopMusic(this, true)
         }
     }
 
@@ -138,7 +138,7 @@ class FixtureJukebox : Electric, PlaysMusic {
                 printdbg(this, "Stop music $title - $artist")
 
                 // can't call stopDiscPlayback() because of the recursion
-                (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).stopMusic(this, pauseLen = (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).getRandomMusicInterval())
+                (INGAME.musicStreamer as TerrarumMusicStreamer).stopMusic(this, pauseLen = (INGAME.musicStreamer as TerrarumMusicStreamer).getRandomMusicInterval())
             }
 
             discCurrentlyPlaying = index
@@ -185,7 +185,7 @@ class FixtureJukebox : Electric, PlaysMusic {
      */
     fun stopGracefully() {
         stopDiscPlayback()
-        (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).stopMusic(this, pauseLen = (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).getRandomMusicInterval())
+        (INGAME.musicStreamer as TerrarumMusicStreamer).stopMusic(this, pauseLen = (INGAME.musicStreamer as TerrarumMusicStreamer).getRandomMusicInterval())
 
     }
 

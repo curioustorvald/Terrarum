@@ -262,7 +262,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     override var gameFullyLoaded = false
         internal set
 
-    override val backgroundMusicPlayer = TerrarumBackgroundMusicPlayer()
+    override val musicStreamer = TerrarumMusicStreamer()
 
 
     //////////////
@@ -1006,7 +1006,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             oldSelectedWireRenderClass = selectedWireRenderClass
         }
 
-        backgroundMusicPlayer.update(this, delta)
+        musicStreamer.update(this, delta)
 
         ////////////////////////
         // ui-related updates //
@@ -1795,7 +1795,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             catch (e: IllegalArgumentException) {}
         }
 
-        backgroundMusicPlayer.dispose()
+        musicStreamer.dispose()
         super.dispose()
     }
 }

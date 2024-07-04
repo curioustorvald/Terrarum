@@ -581,7 +581,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         noticelet.sendNotification(itemID, itemCount)
     }
 
-    open val backgroundMusicPlayer: BackgroundMusicPlayer = BackgroundMusicPlayer()
+    open val musicStreamer: MusicStreamer = MusicStreamer()
 }
 
 inline fun Lock.lock(body: () -> Unit) {

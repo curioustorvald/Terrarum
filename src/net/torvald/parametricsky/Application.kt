@@ -240,8 +240,8 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
 
         }
 
-        ymaxDisp.text = "${ys.max()}"
-        ymaxDisp2.text = "${ys2.max()}"
+        ymaxDisp.text = "${ys.maxOrNull()}"
+        ymaxDisp2.text = "${ys2.maxOrNull()}"
 
         //System.exit(0)
     }

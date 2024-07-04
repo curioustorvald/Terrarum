@@ -11,7 +11,7 @@ import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import java.io.File
 
-class TerrarumBackgroundMusicPlayer : BackgroundMusicPlayer() {
+class TerrarumMusicStreamer : MusicStreamer() {
     private val STATE_INIT = 0
     private val STATE_FIREPLAY = 1
     private val STATE_PLAYING = 2
@@ -30,41 +30,7 @@ class TerrarumBackgroundMusicPlayer : BackgroundMusicPlayer() {
     private var shuffled = true
     private var diskJockeyingMode = "intermittent" // intermittent, continuous
 
-    private fun registerSongsFromDir(musicDir: String, fileToName: ((String) -> String)?) {
-        val musicDir = musicDir.replace('\\', '/')
-        playlistSource = musicDir
-        printdbg(this, "registerSongsFromDir $musicDir")
 
-        val fileToName = if (fileToName == null) {
-            { name: String -> name.substringBeforeLast('.').replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" ") }
-        }
-        else fileToName
-
-        playlistName = musicDir.substringAfterLast('/')
-
-        playlist = File(musicDir).listFiles()?.sortedBy { it.name }?.mapNotNull {
-            printdbg(this, "Music: ${it.absolutePath}")
-            try {
-                MusicContainer(
-                    fileToName(it.name),
-                    it
-                ).also { muscon ->
-
-                    printdbg(this, "MusicTitle: ${muscon.name}")
-
-                    muscon.songFinishedHook =  {
-                        if (App.audioMixer.musicTrack.currentTrack == it) {
-                            stopMusic(this, true, getRandomMusicInterval())
-                        }
-                    }
-                }
-            }
-            catch (e: GdxRuntimeException) {
-                e.printStackTrace()
-                null
-            }
-        } ?: emptyList() // TODO test code
-    }
 
     private fun restockMusicBin() {
         musicBin = ArrayList(if (shuffled) playlist.shuffled() else playlist.slice(playlist.indices))
@@ -232,7 +198,7 @@ class TerrarumBackgroundMusicPlayer : BackgroundMusicPlayer() {
         val timeNow = System.currentTimeMillis()
         val trackThis = App.audioMixer.musicTrack.currentTrack
 
-        if (caller is TerrarumBackgroundMusicPlayer) {
+        if (caller is TerrarumMusicStreamer) {
             if (stopCaller == null) {
 //                printdbg(this, "Caller: this, prev caller: $stopCaller, len: $pauseLen, obliging stop request")
                 stopMusic0(trackThis, callStopMusicHook, pauseLen)

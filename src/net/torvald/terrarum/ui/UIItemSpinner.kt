@@ -72,7 +72,7 @@ class UIItemSpinner(
 
             val intermediate = (0..(maxd - mind).div(stepd).ceilToInt()).map {
                 it to ((mind + stepd * it) - id).absoluteValue
-            }.minBy { it.second }.first * stepd + mind
+            }.minByOrNull { it.second }!!.first * stepd + mind
             initialValue = when (initialValue.javaClass.simpleName) {
                 "Integer" -> intermediate.toInt()
                 else -> intermediate

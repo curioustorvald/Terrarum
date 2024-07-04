@@ -123,8 +123,7 @@ class AudioMixer : Disposable {
 
     fun getFreeGuiTrackNoMatterWhat(): TerrarumAudioMixerTrack {
         synchronized(this) {
-            val it = getFreeGuiTrack() ?: guiTracks.minBy { it.playStartedTime }.also { it.checkedOutTime = System.nanoTime() }
-            return it
+            return getFreeGuiTrack() ?: guiTracks.minByOrNull { it.playStartedTime }.also { it!!.checkedOutTime = System.nanoTime() }!!
         }
     }
 
@@ -142,7 +141,7 @@ class AudioMixer : Disposable {
      */
     fun getFreeTrackNoMatterWhat(): TerrarumAudioMixerTrack {
         synchronized(this) {
-            return getFreeTrack() ?: dynamicTracks.minBy { it.playStartedTime }.also { it.checkedOutTime = System.nanoTime() }
+            return getFreeTrack() ?: dynamicTracks.minByOrNull { it.playStartedTime }.also { it!!.checkedOutTime = System.nanoTime() }!!
         }
     }
 
