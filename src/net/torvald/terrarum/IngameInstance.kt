@@ -1,12 +1,8 @@
 package net.torvald.terrarum
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.audio.audiobank.MusicContainer
-import net.torvald.terrarum.audio.dsp.BinoPan
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -37,7 +33,6 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.*
 import java.util.concurrent.locks.Lock
-import java.util.function.Consumer
 import kotlin.math.min
 
 /**
@@ -586,7 +581,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         noticelet.sendNotification(itemID, itemCount)
     }
 
-    open val musicGovernor: MusicGovernor = MusicGovernor()
+    open val backgroundMusicPlayer: BackgroundMusicPlayer = BackgroundMusicPlayer()
 }
 
 inline fun Lock.lock(body: () -> Unit) {

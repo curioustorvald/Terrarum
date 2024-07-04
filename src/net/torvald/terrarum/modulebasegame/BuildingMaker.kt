@@ -62,7 +62,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     lateinit var gameWorld: GameWorld
 
-    override val musicGovernor = TerrarumMusicGovernor()
+    override val backgroundMusicPlayer = TerrarumBackgroundMusicPlayer()
 
     init {
         gameUpdateGovernor = ConsistentUpdateRate
@@ -396,7 +396,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
 
-        musicGovernor.update(this, delta)
+        backgroundMusicPlayer.update(this, delta)
     }
 
 
@@ -495,7 +495,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 //        blockMarkings.dispose()
         uiPenMenu.dispose()
         uiGetPoiName.dispose()
-        musicGovernor.dispose()
+        backgroundMusicPlayer.dispose()
     }
 
     fun getPoiNameForExport(w: Int, h: Int, callback: (String) -> Unit) {

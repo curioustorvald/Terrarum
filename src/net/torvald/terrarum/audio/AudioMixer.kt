@@ -529,7 +529,11 @@ class AudioMixer : Disposable {
         // fade will be processed by the update()
     }
 
-    fun requestFadeOut(track: TerrarumAudioMixerTrack, length: Double = DEFAULT_FADEOUT_LEN, target: Double = 0.0, source: Double? = null, jobAfterFadeout: () -> Unit = {}) {
+    /**
+     * Preferably, audio apps should NOT call this function directly to change music, [MusicService] must be used
+     * to control the music playback instead.
+     */
+    internal fun requestFadeOut(track: TerrarumAudioMixerTrack, length: Double = DEFAULT_FADEOUT_LEN, target: Double = 0.0, source: Double? = null, jobAfterFadeout: () -> Unit = {}) {
         val req = fadeReqs[track]!!
         if (!req.fadeoutFired) {
             req.fadeLength = length.coerceAtLeast(1.0/1024.0)
@@ -541,7 +545,11 @@ class AudioMixer : Disposable {
         }
     }
 
-    fun requestFadeIn(track: TerrarumAudioMixerTrack, length: Double, target: Double = 1.0, source: Double? = null, jobAfterFadeout: () -> Unit = {}) {
+    /**
+     * Preferably, audio apps should NOT call this function directly to change music, [MusicService] must be used
+     * to control the music playback instead.
+     */
+    internal fun requestFadeIn(track: TerrarumAudioMixerTrack, length: Double, target: Double = 1.0, source: Double? = null, jobAfterFadeout: () -> Unit = {}) {
 //        printdbg(this, "fadein called by")
 //        printStackTrace(this)
 

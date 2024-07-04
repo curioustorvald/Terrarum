@@ -10,7 +10,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.TerrarumMusicGovernor
+import net.torvald.terrarum.modulebasegame.TerrarumBackgroundMusicPlayer
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.modulebasegame.gameitems.MusicDiscHelper
@@ -96,7 +96,7 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
 
         // supress the normal background music playback
         if (musicIsPlaying && !flagDespawn) {
-            (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, true)
+            (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).stopMusic(this, true)
         }
     }
 
@@ -111,21 +111,47 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
 
             App.printdbg(this, "Title: $title, artist: $artist")
 
-            musicNowPlaying = MusicContainer(title, musicFile.file()) {
+            val returnToInitialState = {
                 unloadEffector(musicNowPlaying)
                 musicNowPlaying?.tryDispose()
                 musicNowPlaying = null
 
+            }
+
+            musicNowPlaying = MusicContainer(title, musicFile.file()) {
                 App.printdbg(this, "Stop music $title - $artist")
 
                 // can't call stopDiscPlayback() because of the recursion
-
-                (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, pauseLen = (INGAME.musicGovernor as TerrarumMusicGovernor).getRandomMusicInterval())
+                (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).stopMusic(this, pauseLen = (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).getRandomMusicInterval())
             }
 
-            App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 2f) {
+
+            // FIXME the olde way -- must be replaced with one that utilises MusicService
+            /*App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 2f) {
                 startAudio(musicNowPlaying!!) { loadEffector(it) }
-            }
+            }*/
+
+            MusicService.playMusicalFixture(
+                // action: () -> Unit
+                {
+                    startAudio(musicNowPlaying!!) { loadEffector(it) }
+                },
+                // musicFinished: () -> Boolean
+                {
+                    !musicIsPlaying
+                },
+                // onSuccess: () -> Unit
+                {
+
+                },
+                // onFailure: (Throwable) -> Unit
+                {
+
+                },
+                // onFinally: () -> Unit
+                returnToInitialState
+            )
+
 
             (sprite as SheetSpriteAnimation).currentRow = 0
         }
@@ -137,7 +163,7 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
      */
     fun stopGracefully() {
         stopDiscPlayback()
-        (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, pauseLen = (INGAME.musicGovernor as TerrarumMusicGovernor).getRandomMusicInterval())
+        (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).stopMusic(this, pauseLen = (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).getRandomMusicInterval())
 
     }
 

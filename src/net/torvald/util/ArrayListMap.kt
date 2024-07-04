@@ -96,11 +96,11 @@ class ArrayListMap<K, V> : MutableMap<K, V> {
         return super.computeIfAbsent(key, mappingFunction)
     }
 
-    override fun computeIfPresent(key: K, remappingFunction: BiFunction<in K, in V, out V?>): V? {
+    override fun computeIfPresent(key: K, remappingFunction: BiFunction<in K, in V & Any, out V?>): V? {
         return super.computeIfPresent(key, remappingFunction)
     }
 
-    override fun merge(key: K, value: V, remappingFunction: BiFunction<in V, in V, out V?>): V? {
+    override fun merge(key: K, value: V & Any, remappingFunction: BiFunction<in V & Any, in V & Any, out V?>): V? {
         return super.merge(key, value, remappingFunction)
     }
 

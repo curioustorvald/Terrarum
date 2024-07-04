@@ -11,7 +11,7 @@ import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import java.io.File
 
-class TerrarumMusicGovernor : MusicGovernor() {
+class TerrarumBackgroundMusicPlayer : BackgroundMusicPlayer() {
     private val STATE_INIT = 0
     private val STATE_FIREPLAY = 1
     private val STATE_PLAYING = 2
@@ -22,7 +22,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
         musicState = STATE_INTERMISSION
     }
 
-    private var songs: List<MusicContainer> = emptyList()
+    private var playlist: List<MusicContainer> = emptyList()
     var playlistName = ""; private set
     /** canonicalPath with path separators converted to forward slash */
     var playlistSource = "" ; private set
@@ -42,7 +42,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
 
         playlistName = musicDir.substringAfterLast('/')
 
-        songs = File(musicDir).listFiles()?.sortedBy { it.name }?.mapNotNull {
+        playlist = File(musicDir).listFiles()?.sortedBy { it.name }?.mapNotNull {
             printdbg(this, "Music: ${it.absolutePath}")
             try {
                 MusicContainer(
@@ -67,77 +67,91 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     private fun restockMusicBin() {
-        musicBin = ArrayList(if (shuffled) songs.shuffled() else songs.slice(songs.indices))
+        musicBin = ArrayList(if (shuffled) playlist.shuffled() else playlist.slice(playlist.indices))
     }
 
     /**
+     * Send the playlist to the MusicService to be played at the other play commands.
+     *
      * @param musicDir where the music files are. Absolute path.
      * @param shuffled if the tracks are to be shuffled
      * @param diskJockeyingMode `intermittent` to give random gap between tracks, `continuous` for continuous playback
      */
-    fun queueDirectory(musicDir: String, shuffled: Boolean, diskJockeyingMode: String, fileToName: ((String) -> String)? = null) {
-        if (musicState != STATE_INIT && musicState != STATE_INTERMISSION) {
+    fun queueDirectory(musicDir: String, shuffled: Boolean, diskJockeyingMode: String, playImmediately: Boolean, fileToName: ((String) -> String) =  { name: String ->
+        name.substringBeforeLast('.').replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" ")
+    }): TerrarumMusicPlaylist {
+        // FIXME the olde way -- must be replaced with one that utilises MusicService
+        /*if (musicState != STATE_INIT && musicState != STATE_INTERMISSION) {
             App.audioMixer.requestFadeOut(App.audioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
             stopMusic0(App.audioMixer.musicTrack.currentTrack)
         }
 
-        songs.forEach { it.tryDispose() }
+        playlist.forEach { it.tryDispose() }
         registerSongsFromDir(musicDir, fileToName)
 
         this.shuffled = shuffled
         this.diskJockeyingMode = diskJockeyingMode
 
-        restockMusicBin()
+        restockMusicBin()*/
+
+        val playlist = TerrarumMusicPlaylist.fromDirectory(musicDir, shuffled, diskJockeyingMode, fileToName)
+
+        if (!playImmediately)
+            MusicService.putNewPlaylist(playlist) {}
+        else
+            MusicService.putNewPlaylist(playlist)
+
+        return playlist
     }
 
     /**
      * Adds a song to the head of the internal playlist (`musicBin`)
      */
-    fun queueMusicToPlayNext(music: MusicContainer) {
+    fun xxxqueueMusicToPlayNext(music: MusicContainer) {
         musicBin.add(0, music)
     }
 
     /**
      * Unshifts an internal playlist (`musicBin`). The `music` argument must be the song that exists on the `songs`.
      */
-    fun unshiftPlaylist(music: MusicContainer) {
-        val indexAtMusicBin = songs.indexOf(music)
+    fun xxxunshiftPlaylist(music: MusicContainer) {
+        val indexAtMusicBin = playlist.indexOf(music)
         if (indexAtMusicBin < 0) throw IllegalArgumentException("The music does not exist on the internal songs list ($music)")
 
         // rewrite musicBin
-        val newMusicBin = if (shuffled) songs.shuffled().toTypedArray().also {
+        val newMusicBin = if (shuffled) playlist.shuffled().toTypedArray().also {
             // if shuffled,
             // 1. create a shuffled version of songlist
             // 2. swap two songs such that the songs[indexAtMusicBin] comes first
-            val swapTo = it.indexOf(songs[indexAtMusicBin])
+            val swapTo = it.indexOf(playlist[indexAtMusicBin])
             val tmp = it[swapTo]
             it[swapTo] = it[0]
             it[0] = tmp
         }
-        else Array(songs.size - indexAtMusicBin) { offset ->
+        else Array(playlist.size - indexAtMusicBin) { offset ->
             val k = offset + indexAtMusicBin
-            songs[k]
+            playlist[k]
         }
 
         musicBin = ArrayList(newMusicBin.toList())
     }
 
-    fun queueIndexFromPlaylist(indexAtMusicBin: Int) {
-        if (indexAtMusicBin !in songs.indices) throw IndexOutOfBoundsException("The index is outside of the internal songs list ($indexAtMusicBin/${songs.size})")
+    fun xxxqueueIndexFromPlaylist(indexAtMusicBin: Int) {
+        if (indexAtMusicBin !in playlist.indices) throw IndexOutOfBoundsException("The index is outside of the internal songs list ($indexAtMusicBin/${playlist.size})")
 
         // rewrite musicBin
-        val newMusicBin =  if (shuffled) songs.shuffled().toTypedArray().also {
+        val newMusicBin =  if (shuffled) playlist.shuffled().toTypedArray().also {
             // if shuffled,
             // 1. create a shuffled version of songlist
             // 2. swap two songs such that the songs[indexAtMusicBin] comes first
-            val swapTo = it.indexOf(songs[indexAtMusicBin])
+            val swapTo = it.indexOf(playlist[indexAtMusicBin])
             val tmp = it[swapTo]
             it[swapTo] = it[0]
             it[0] = tmp
         }
-        else Array(songs.size - indexAtMusicBin) { offset ->
+        else Array(playlist.size - indexAtMusicBin) { offset ->
             val k = offset + indexAtMusicBin
-            songs[k]
+            playlist[k]
         }
 
         musicBin = ArrayList(newMusicBin.toList())
@@ -162,7 +176,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     private val musicStopHooks = ArrayList<(MusicContainer) -> Unit>()
 
     init {
-        queueDirectory(App.customMusicDir, true, "intermittent")
+        queueDirectory(App.customMusicDir, true, "intermittent", true)
     }
 
 
@@ -175,7 +189,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
     }
 
     init {
-        songs.forEach {
+        playlist.forEach {
             App.disposables.add(it)
         }
         ambients.forEach { (k, v) ->
@@ -218,7 +232,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
         val timeNow = System.currentTimeMillis()
         val trackThis = App.audioMixer.musicTrack.currentTrack
 
-        if (caller is TerrarumMusicGovernor) {
+        if (caller is TerrarumBackgroundMusicPlayer) {
             if (stopCaller == null) {
 //                printdbg(this, "Caller: this, prev caller: $stopCaller, len: $pauseLen, obliging stop request")
                 stopMusic0(trackThis, callStopMusicHook, pauseLen)
@@ -316,7 +330,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
         // start the song queueing if there is one to play
         if (firstTime) {
             firstTime = false
-            if (songs.isNotEmpty()) musicState = STATE_INTERMISSION
+            if (playlist.isNotEmpty()) musicState = STATE_INTERMISSION
             if (ambients.isNotEmpty()) ambState = STATE_INTERMISSION
         }
 
@@ -334,7 +348,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
             STATE_INTERMISSION -> {
                 intermissionAkku += delta
 
-                if (intermissionAkku >= intermissionLength && songs.isNotEmpty()) {
+                if (intermissionAkku >= intermissionLength && playlist.isNotEmpty()) {
                     intermissionAkku = 0f
                     musicState = STATE_FIREPLAY
                 }

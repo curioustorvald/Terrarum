@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
@@ -10,7 +9,6 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
-import net.torvald.terrarum.audio.AudioMixer.Companion.DEFAULT_FADEOUT_LEN
 import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.dsp.NullFilter
@@ -21,7 +19,7 @@ import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.TerrarumMusicGovernor
+import net.torvald.terrarum.modulebasegame.TerrarumBackgroundMusicPlayer
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.modulebasegame.gameitems.MusicDiscHelper
@@ -108,7 +106,7 @@ class FixtureJukebox : Electric, PlaysMusic {
 
         // supress the normal background music playback
         if (musicIsPlaying && !flagDespawn) {
-            (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, true)
+            (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).stopMusic(this, true)
         }
     }
 
@@ -127,27 +125,49 @@ class FixtureJukebox : Electric, PlaysMusic {
 
             printdbg(this, "Title: $title, artist: $artist")
 
-            musicNowPlaying = MusicContainer(title, musicFile.file()) {
+            val returnToInitialState = {
                 unloadEffector(musicNowPlaying)
                 discCurrentlyPlaying = null
                 musicNowPlaying?.tryDispose()
                 musicNowPlaying = null
-
-                printdbg(this, "Stop music $title - $artist")
-
-                // can't call stopDiscPlayback() because of the recursion
-
-                (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, pauseLen = (INGAME.musicGovernor as TerrarumMusicGovernor).getRandomMusicInterval())
-
                 backLamp.currentFrame = 0
                 playMech.currentFrame = 0
             }
 
+            musicNowPlaying = MusicContainer(title, musicFile.file()) {
+                printdbg(this, "Stop music $title - $artist")
+
+                // can't call stopDiscPlayback() because of the recursion
+                (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).stopMusic(this, pauseLen = (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).getRandomMusicInterval())
+            }
+
             discCurrentlyPlaying = index
 
-            App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
+            // FIXME the olde way -- must be replaced with one that utilises MusicService
+            /*App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
                 startAudio(musicNowPlaying!!) { loadEffector(it) }
-            }
+            }*/
+
+            MusicService.playMusicalFixture(
+                // action: () -> Unit
+                {
+                    startAudio(musicNowPlaying!!) { loadEffector(it) }
+                },
+                // musicFinished: () -> Boolean
+                {
+                    !musicIsPlaying
+                },
+                // onSuccess: () -> Unit
+                {
+
+                },
+                // onFailure: (Throwable) -> Unit
+                {
+
+                },
+                // onFinally: () -> Unit
+                returnToInitialState
+            )
 
 
             backLamp.currentFrame = 1 + (index / 2)
@@ -165,7 +185,7 @@ class FixtureJukebox : Electric, PlaysMusic {
      */
     fun stopGracefully() {
         stopDiscPlayback()
-        (INGAME.musicGovernor as TerrarumMusicGovernor).stopMusic(this, pauseLen = (INGAME.musicGovernor as TerrarumMusicGovernor).getRandomMusicInterval())
+        (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).stopMusic(this, pauseLen = (INGAME.backgroundMusicPlayer as TerrarumBackgroundMusicPlayer).getRandomMusicInterval())
 
     }
 
