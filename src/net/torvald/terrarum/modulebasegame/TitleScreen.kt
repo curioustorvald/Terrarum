@@ -304,6 +304,8 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         loadThingsWhileIntroIsVisible()
         printdbg(this, "show() exit")
+
+        MusicService.enterScene("title")
     }
 
 
@@ -330,6 +332,9 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         // update UIs //
         uiContainer.forEach { it?.update(delta) }
+
+        // update MusicService //
+        MusicService.update(delta)
     }
 
     private val particles = CircularArray<ParticleBase>(16, true)

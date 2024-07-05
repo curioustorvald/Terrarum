@@ -321,6 +321,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         )
 
         loadedTime_t = App.getTIME_T()
+
+        MusicService.enterScene("ingame")
     }
 
     data class NewGameParams(
@@ -1007,6 +1009,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
         musicStreamer.update(this, delta)
+        MusicService.update(delta)
 
         ////////////////////////
         // ui-related updates //

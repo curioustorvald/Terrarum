@@ -37,40 +37,6 @@ class TerrarumMusicStreamer : MusicStreamer() {
     }
 
     /**
-     * Send the playlist to the MusicService to be played at the other play commands.
-     *
-     * @param musicDir where the music files are. Absolute path.
-     * @param shuffled if the tracks are to be shuffled
-     * @param diskJockeyingMode `intermittent` to give random gap between tracks, `continuous` for continuous playback
-     */
-    fun queueDirectory(musicDir: String, shuffled: Boolean, diskJockeyingMode: String, playImmediately: Boolean, fileToName: ((String) -> String) =  { name: String ->
-        name.substringBeforeLast('.').replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" ")
-    }): TerrarumMusicPlaylist {
-        // FIXME the olde way -- must be replaced with one that utilises MusicService
-        /*if (musicState != STATE_INIT && musicState != STATE_INTERMISSION) {
-            App.audioMixer.requestFadeOut(App.audioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
-            stopMusic0(App.audioMixer.musicTrack.currentTrack)
-        }
-
-        playlist.forEach { it.tryDispose() }
-        registerSongsFromDir(musicDir, fileToName)
-
-        this.shuffled = shuffled
-        this.diskJockeyingMode = diskJockeyingMode
-
-        restockMusicBin()*/
-
-        val playlist = TerrarumMusicPlaylist.fromDirectory(musicDir, shuffled, diskJockeyingMode, fileToName)
-
-        if (!playImmediately)
-            MusicService.putNewPlaylist(playlist) {}
-        else
-            MusicService.putNewPlaylist(playlist)
-
-        return playlist
-    }
-
-    /**
      * Adds a song to the head of the internal playlist (`musicBin`)
      */
     fun xxxqueueMusicToPlayNext(music: MusicContainer) {
@@ -142,7 +108,8 @@ class TerrarumMusicStreamer : MusicStreamer() {
     private val musicStopHooks = ArrayList<(MusicContainer) -> Unit>()
 
     init {
-        queueDirectory(App.customMusicDir, true, "intermittent", true)
+        // TODO queue and play the default playlist
+        // TerrarumMusicPlaylist.fromDirectory(App.defaultMusicDir, true, "intermittent")
     }
 
 
@@ -175,78 +142,19 @@ class TerrarumMusicStreamer : MusicStreamer() {
     protected var ambState = 0
     protected var ambFired = false
 
-    fun getRandomMusicInterval() = 20f + Math.random().toFloat() * 4f // longer gap (20s to 24s)
+    fun getRandomMusicInterval() = MusicService.getRandomMusicInterval()
 
-    var stopCaller: Any? = null; private set
-    var playCaller: Any? = null; private set
-    var stopCallTime: Long? = null; private set
+    // call MusicService to fade out
+    // pauses playlist update
+    // called by MusicPlayerControl
+    fun stopMusicPlayback() {
 
-    private fun stopMusic0(song: AudioBank?, callStopMusicHook: Boolean = true, customPauseLen: Float? = null) {
-        musicState = if (customPauseLen == Float.POSITIVE_INFINITY) STATE_INIT else STATE_INTERMISSION
-//        printdbg(this, "stopMusic1 customLen=$customPauseLen, stateNow: $musicState, called by")
-//        printStackTrace(this)
-        intermissionAkku = 0f
-        intermissionLength = customPauseLen ?: getRandomMusicInterval()
-        musicFired = false
-        if (callStopMusicHook && musicStopHooks.isNotEmpty() && song is MusicContainer) musicStopHooks.forEach {
-            it(song)
-        }
-//        printdbg(this, "StopMusic Intermission: $intermissionLength seconds")
     }
 
-    fun stopMusic(caller: Any?, callStopMusicHook: Boolean = true, pauseLen: Float = Float.POSITIVE_INFINITY) {
-        val timeNow = System.currentTimeMillis()
-        val trackThis = App.audioMixer.musicTrack.currentTrack
+    // resumes playlist update
+    // called by MusicPlayerControl
+    fun resumeMusicPlayback() {
 
-        if (caller is TerrarumMusicStreamer) {
-            if (stopCaller == null) {
-//                printdbg(this, "Caller: this, prev caller: $stopCaller, len: $pauseLen, obliging stop request")
-                stopMusic0(trackThis, callStopMusicHook, pauseLen)
-            }
-            else {
-//                printdbg(this, "Caller: this, prev caller: $stopCaller, len: $pauseLen, ignoring stop request")
-            }
-        }
-        else {
-//            printdbg(this, "Caller: $caller, prev caller: <doesn't matter>, len: $pauseLen, obliging stop request")
-            stopMusic0(trackThis, callStopMusicHook, pauseLen)
-        }
-
-        stopCaller = caller?.javaClass?.canonicalName
-        stopCallTime = System.currentTimeMillis()
-
-//        printStackTrace(this)
-    }
-
-    fun startMusic(caller: Any?) {
-        playCaller = caller
-        startMusic0(pullNextMusicTrack())
-    }
-
-    private fun startMusic0(song: MusicContainer) {
-        stopCaller = null
-        stopCallTime = null
-
-        App.audioMixer.startMusic(song)
-//        printdbg(this, "startMusic Now playing: ${song.name}, called by:")
-//        printStackTrace(this)
-//        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
-        if (musicStartHooks.isNotEmpty()) musicStartHooks.forEach { it(song) }
-        musicState = STATE_PLAYING
-        intermissionLength = 42.42424f
-    }
-
-    // MixerTrackProcessor will call this function externally to make gapless playback work
-    fun pullNextMusicTrack(callNextMusicHook: Boolean = false): MusicContainer {
-//        printStackTrace(this)
-
-        // prevent same song to play twice in row (for the most time)
-        if (musicBin.isEmpty()) {
-            restockMusicBin()
-        }
-        return musicBin.removeAt(0).also { mus ->
-            if (callNextMusicHook && musicStartHooks.isNotEmpty()) musicStartHooks.forEach { it(mus) }
-        }
     }
 
     private fun stopAmbient() {
@@ -286,12 +194,6 @@ class TerrarumMusicStreamer : MusicStreamer() {
 
     override fun update(ingame: IngameInstance, delta: Float) {
         val timeNow = System.currentTimeMillis()
-        val callerRecordExpired = (timeNow - (stopCallTime ?: 0L) > 1000)
-
-        if (callerRecordExpired && stopCaller != null) {
-            stopCaller = null
-            stopCallTime = null
-        }
 
         // start the song queueing if there is one to play
         if (firstTime) {
@@ -300,12 +202,21 @@ class TerrarumMusicStreamer : MusicStreamer() {
             if (ambients.isNotEmpty()) ambState = STATE_INTERMISSION
         }
 
-
         when (musicState) {
             STATE_FIREPLAY -> {
                 if (!musicFired) {
-                    musicFired = true
-                    startMusic0(pullNextMusicTrack())
+                    MusicService.resumePlaylistPlayback(
+                        // onSuccess: () -> Unit
+                        {
+                            musicFired = true
+                            musicState = STATE_PLAYING
+                        },
+                        // onFailure: (Throwable) -> Unit
+                        {
+                            musicFired = false
+                            musicState = STATE_INTERMISSION
+                        },
+                    )
                 }
             }
             STATE_PLAYING -> {
@@ -428,8 +339,6 @@ class TerrarumMusicStreamer : MusicStreamer() {
     private val TRACK2_DAWN_ELEV_DN_MAX = -10.0
 
     override fun dispose() {
-        App.audioMixer.requestFadeOut(App.audioMixer.fadeBus, AudioMixer.DEFAULT_FADEOUT_LEN) // explicit call for fade-out when the game instance quits
-        stopMusic0(App.audioMixer.musicTrack.currentTrack)
         stopAmbient()
     }
 }

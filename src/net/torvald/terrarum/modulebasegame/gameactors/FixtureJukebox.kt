@@ -103,11 +103,6 @@ class FixtureJukebox : Electric, PlaysMusic {
 
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
-
-        // supress the normal background music playback
-        if (musicIsPlaying && !flagDespawn) {
-            (INGAME.musicStreamer as TerrarumMusicStreamer).stopMusic(this, true)
-        }
     }
 
 
@@ -135,10 +130,8 @@ class FixtureJukebox : Electric, PlaysMusic {
             }
 
             musicNowPlaying = MusicContainer(title, musicFile.file()) {
+                returnToInitialState()
                 printdbg(this, "Stop music $title - $artist")
-
-                // can't call stopDiscPlayback() because of the recursion
-                (INGAME.musicStreamer as TerrarumMusicStreamer).stopMusic(this, pauseLen = (INGAME.musicStreamer as TerrarumMusicStreamer).getRandomMusicInterval())
             }
 
             discCurrentlyPlaying = index
@@ -149,24 +142,18 @@ class FixtureJukebox : Electric, PlaysMusic {
             }*/
 
             MusicService.playMusicalFixture(
-                // action: () -> Unit
-                {
+                /* action: () -> Unit */ {
                     startAudio(musicNowPlaying!!) { loadEffector(it) }
                 },
-                // musicFinished: () -> Boolean
-                {
+                /* musicFinished: () -> Boolean */ {
                     !musicIsPlaying
                 },
-                // onSuccess: () -> Unit
-                {
+                /* onSuccess: () -> Unit */ {
 
                 },
-                // onFailure: (Throwable) -> Unit
-                {
-
-                },
-                // onFinally: () -> Unit
-                returnToInitialState
+                /* onFailure: (Throwable) -> Unit */ {
+                    returnToInitialState
+                }
             )
 
 
@@ -185,8 +172,10 @@ class FixtureJukebox : Electric, PlaysMusic {
      */
     fun stopGracefully() {
         stopDiscPlayback()
-        (INGAME.musicStreamer as TerrarumMusicStreamer).stopMusic(this, pauseLen = (INGAME.musicStreamer as TerrarumMusicStreamer).getRandomMusicInterval())
-
+        try {
+            MusicService.enterIntermission()
+        }
+        catch (_: Throwable) {}
     }
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {

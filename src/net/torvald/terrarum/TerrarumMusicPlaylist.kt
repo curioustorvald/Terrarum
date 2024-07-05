@@ -47,14 +47,19 @@ class TerrarumMusicPlaylist(
     fun getCurrent(): MusicContainer {
         checkRefill()
 
-        return musicList[currentIndexCursor]
+        return musicList[internalIndices[currentIndexCursor]]
     }
 
     fun getNext(): MusicContainer {
         checkRefill()
         currentIndexCursor += 1
 
-        return musicList[currentIndexCursor]
+        return musicList[internalIndices[currentIndexCursor]]
+    }
+
+    fun peekNext(): MusicContainer {
+        checkRefill()
+        return musicList[internalIndices[currentIndexCursor + 1]]
     }
 
     fun getPrev(): MusicContainer {
@@ -75,7 +80,7 @@ class TerrarumMusicPlaylist(
 
         currentIndexCursor -= 1
 
-        return musicList[currentIndexCursor]
+        return musicList[internalIndices[currentIndexCursor]]
     }
 
 
@@ -92,6 +97,8 @@ class TerrarumMusicPlaylist(
     }
 
     companion object {
+        private val validMusicExtensions = hashSetOf("mp3", "wav", "ogg")
+
         /**
          * Adding songFinishedHook to the songs is a responsibility of the caller.
          */
@@ -104,7 +111,7 @@ class TerrarumMusicPlaylist(
 
             val playlistName = musicDir.substringAfterLast('/')
 
-            val playlist = File(musicDir).listFiles()?.sortedBy { it.name }?.mapNotNull {
+            val playlist = File(musicDir).listFiles()?.sortedBy { it.name }?.filter { Companion.validMusicExtensions.contains(it.extension.lowercase()) }?.mapNotNull {
                 printdbg(this, "Music: ${it.absolutePath}")
                 try {
                     MusicContainer(

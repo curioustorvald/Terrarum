@@ -1052,6 +1052,7 @@ public class App implements ApplicationListener {
             printdbg("AppLoader-Static", "Screen before change: " + currentScreen.getClass().getCanonicalName());
 
             currentScreen.hide();
+            MusicService.INSTANCE.leaveScene();
             currentScreen.dispose();
         }
         else {

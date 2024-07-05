@@ -1,10 +1,12 @@
 package net.torvald.terrarum.transaction
 
+import net.torvald.terrarum.App.printdbg
+import java.util.concurrent.atomic.AtomicReference
+
 /**
  * Created by minjaesong on 2024-06-28.
  */
 interface Transaction {
-
     /**
      * Call this function to begin the transaction.
      *
@@ -28,18 +30,23 @@ interface Transaction {
 abstract class TransactionListener {
 
     /** `null` if not locked, a class that acquired the lock if locked */
-    var transactionLockedBy: Any? = null; private set
-    val transactionLocked: Boolean; get() = (transactionLockedBy != null)
+    private val transactionLockingClass: AtomicReference<Transaction?> = AtomicReference(null)
+    val transactionLocked: Boolean; get() = (transactionLockingClass.get() != null)
 
 
     /**
      * Transaction modifies a given state to a new state, then applies the new state to the object.
      * The given `transaction` may only modify values which is passed to it.
+     *
+     * Transaction is fully unlocked and the previous locker is unknowable by the time `onFinally` executes.
+     * Note that `onFinally` runs on the same thread the actual transaction has run (GL context not available).
      */
     fun runTransaction(transaction: Transaction, onFinally: () -> Unit = {}) {
+        printdbg(this, "Accepting transaction $transaction")
         Thread { synchronized(this) {
             val state = getCurrentStatusForTransaction()
             if (!transactionLocked) {
+                transactionLockingClass.set(transaction)
                 try {
                     transaction.start(state)
                     // if successful:
@@ -49,14 +56,17 @@ abstract class TransactionListener {
                 }
                 catch (e: Throwable) {
                     // if failed, notify the failure
+                    System.err.println("Transaction failure: generic")
                     transaction.onFailure(e, state)
                 }
                 finally {
+                    transactionLockingClass.set(null)
                     onFinally()
                 }
             }
             else {
-                transaction.onFailure(LockedException(this, transactionLockedBy), state)
+                System.err.println("Transaction failure: locked")
+                transaction.onFailure(LockedException(this, transactionLockingClass.get()), state)
             }
         } }.start()
     }
@@ -65,10 +75,10 @@ abstract class TransactionListener {
     protected abstract fun commitTransaction(state: TransactionState)
 }
 
-class LockedException(listener: TransactionListener, lockedBy: Any?) :
+class LockedException(listener: TransactionListener, lockedBy: Transaction?) :
     Exception("Transaction is rejected because the class '${listener.javaClass.canonicalName}' is locked by '${lockedBy?.javaClass?.canonicalName}'")
 
-@JvmInline value class TransactionState(val valueTable: MutableMap<String, Any?>) {
+@JvmInline value class TransactionState(val valueTable: HashMap<String, Any?>) {
     operator fun get(key: String) = valueTable[key]
     operator fun set(key: String, value: Any?) {
         valueTable[key] = value
