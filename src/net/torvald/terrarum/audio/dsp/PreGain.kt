@@ -9,7 +9,7 @@ import kotlin.math.roundToInt
 /**
  * Created by minjaesong on 2023-11-25.
  */
-class Gain(var gain: Float): TerrarumAudioFilter() {
+class PreGain(var gain: Float): TerrarumAudioFilter() {
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         for (i in 0 until App.audioBufferSize) {
             outbuf[0][i] = inbuf[0][i] * gain
@@ -25,7 +25,7 @@ class Gain(var gain: Float): TerrarumAudioFilter() {
     override val debugViewHeight = 16
 
     override fun copyParamsFrom(other: TerrarumAudioFilter) {
-        if (other is Gain) {
+        if (other is PreGain) {
             this.gain = other.gain
         }
     }

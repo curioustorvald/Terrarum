@@ -709,6 +709,7 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
 
 
         // debug codes
+        //// transaction state
         if (MusicService.transactionLocked) {
             batch.color = Color.RED
             Toolkit.drawTextCentered(batch, App.fontSmallNumbers, "LOCKED", Toolkit.drawWidth, 0, _posY.toInt() + height + 5)
@@ -717,11 +718,24 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
             batch.color = Color.WHITE
             Toolkit.drawTextCentered(batch, App.fontSmallNumbers, "UNLOCKED", Toolkit.drawWidth, 0, _posY.toInt() + height + 5)
         }
-
+        //// MusicService internal state
         batch.color = Color.WHITE
         val musicState = MusicService.currentPlaybackState.get()
         val str = "State: $musicState Wait: ${MusicService.waitAkku.toIntAndFrac(2)}/${MusicService.waitTime}"
         Toolkit.drawTextCentered(batch, App.fontSmallNumbers, str, Toolkit.drawWidth, 0, _posY.toInt() + height + 18)
+        //// playlist internal indices
+        MusicService.currentPlaylist?.let {
+            val indices = it.extortField<ArrayList<Int>>("internalIndices")!!
+            val currentIndex = it.extortField<Int>("currentIndexCursor")!!
+
+            for (k in 0 until indices.size) {
+                batch.color = if (k == currentIndex) Color.RED else Color.WHITE
+                App.fontSmallNumbers.draw(batch, "${indices[k]+1}", 28f + 18f * (k), App.scr.hf - 16f)
+            }
+        }
+        batch.color = Color.LIGHT_GRAY
+        App.fontSmallNumbers.draw(batch, "Playlist InternalIndices", 10f, App.scr.hf - 30f)
+        App.fontSmallNumbers.draw(batch, "..", 10f, App.scr.hf - 16f)
         // end of debug codes
 
 
@@ -1346,16 +1360,6 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
 
     private fun loadNewAlbum(albumDir: File): TerrarumMusicPlaylist {
         val albumProp = albumPropCache[albumDir]
-
-        App.audioMixer.musicTrack.let { track ->
-            track.doGaplessPlayback = (albumProp.diskJockeyingMode == "continuous")
-            if (track.doGaplessPlayback) {
-                track.pullNextTrack = {
-                    track.currentTrack = MusicService.currentPlaylist!!.queueNext()
-                    setMusicName(track.currentTrack?.name ?: "")
-                }
-            }
-        }
 
         currentlySelectedAlbum = albumProp
 

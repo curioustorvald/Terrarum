@@ -58,6 +58,7 @@ abstract class TransactionListener {
                 catch (e: Throwable) {
                     // if failed, notify the failure
                     System.err.println("Transaction failure: generic")
+                    e.printStackTrace()
                     transaction.onFailure(e, state)
                 }
                 finally {
@@ -67,7 +68,7 @@ abstract class TransactionListener {
             }
             else {
                 System.err.println("Transaction failure: locked")
-                transaction.onFailure(LockedException(this, currentLock), state)
+                transaction.onFailure(LockedException(transaction, this, currentLock), state)
             }
         }.start()
     }
@@ -76,8 +77,8 @@ abstract class TransactionListener {
     protected abstract fun commitTransaction(state: TransactionState)
 }
 
-class LockedException(listener: TransactionListener, lockedBy: Transaction) :
-    Exception("Transaction is rejected because the class '${listener.javaClass.canonicalName}' is locked by '${lockedBy.javaClass.canonicalName}'")
+class LockedException(offendingTransaction: Transaction, listener: TransactionListener, lockedBy: Transaction) :
+    Exception("Transaction '$offendingTransaction' is rejected because the class '$listener' is locked by '$lockedBy'")
 
 @JvmInline value class TransactionState(val valueTable: HashMap<String, Any?>) {
     operator fun get(key: String) = valueTable[key]

@@ -9,7 +9,7 @@ import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.audiobank.MusicContainer
-import net.torvald.terrarum.audio.dsp.Gain
+import net.torvald.terrarum.audio.dsp.PreGain
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
@@ -348,7 +348,7 @@ class FixtureSmelterBasic : FixtureBase {
         getTrackByAudio(static).let {
             if (it == null || (temperature > 0f && !it.isPlaying && !it.playRequested.get())) {
                 startAudio(static) {
-                    it.filters[filterIndex] = Gain(0f)
+                    it.filters[filterIndex] = PreGain(0f)
                 }
             }
             else if (it != null && it.isPlaying && temperature <= 0f) {
@@ -358,10 +358,10 @@ class FixtureSmelterBasic : FixtureBase {
             }
 
             if (it != null) {
-                if (it.filters[filterIndex] !is Gain) // just in case...
-                    it.filters[filterIndex] = Gain(0f)
+                if (it.filters[filterIndex] !is PreGain) // just in case...
+                    it.filters[filterIndex] = PreGain(0f)
 
-                (it.filters[filterIndex] as Gain).gain = (it.maxVolume * temperature * volRand.get()).toFloat()
+                (it.filters[filterIndex] as PreGain).gain = (it.maxVolume * temperature * volRand.get()).toFloat()
             }
         }
 

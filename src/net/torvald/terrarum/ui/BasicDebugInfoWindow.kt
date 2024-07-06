@@ -665,6 +665,7 @@ class BasicDebugInfoWindow : UICanvas() {
                     else it
                 },
                 //"C:${track.currentTrack?.codec ?: ""}",
+                "GL:${if (track.doGaplessPlayback) "Y" else "N"}",
                 "R:${track.currentTrack?.samplingRate ?: ""}",
             ).forEachIndexed { i, s ->
                 // gauge background
@@ -678,6 +679,14 @@ class BasicDebugInfoWindow : UICanvas() {
                     Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, STRIP_W * perc, 14f)
                     batch.color = COL_PROGRESS_GRAD
                     Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, STRIP_W * perc, 2f)
+                }
+
+                // fill the back if the track is in gapless mode
+                if (i == 1 && track.doGaplessPlayback) {
+                    batch.color = COL_PROGRESS_GRAD2
+                    Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f, STRIP_W.toFloat(), 14f)
+                    batch.color = COL_PROGRESS_GRAD
+                    Toolkit.fillArea(batch, x.toFloat(), faderY - (i + 1) * 16f + 14f, STRIP_W.toFloat(), 2f)
                 }
 
                 batch.color = FILTER_NAME_ACTIVE

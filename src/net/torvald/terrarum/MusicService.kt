@@ -166,6 +166,7 @@ object MusicService : TransactionListener() {
         stopPlaylistPlayback {}
     }
 
+
     /**
      * Puts the given playlist to this object if the transaction successes. If the given playlist is same as the
      * current playlist, the transaction will successfully finish immediately; otherwise the given playlist will
@@ -213,9 +214,20 @@ object MusicService : TransactionListener() {
                 oldPlaylist?.dispose()
 
                 (state["currentPlaylist"] as TerrarumMusicPlaylist?)?.let {
+                    // set songFinishedHook for every song
                     it.musicList.forEach {
                         it.songFinishedHook = {
                             onMusicFinishing(it)
+                        }
+                    }
+
+                    // set gaplessness of the Music track
+                    App.audioMixer.musicTrack.let { track ->
+                        track.doGaplessPlayback = (it.diskJockeyingMode == "continuous")
+                        if (track.doGaplessPlayback) {
+                            track.pullNextTrack = {
+                                track.currentTrack = MusicService.currentPlaylist!!.queueNext()
+                            }
                         }
                     }
                 }
@@ -313,7 +325,9 @@ object MusicService : TransactionListener() {
                 if (err != null) throw err!!
             }
 
-            override fun onSuccess(state: TransactionState) { onSuccess() }
+            override fun onSuccess(state: TransactionState) {
+                onSuccess()
+            }
             override fun onFailure(e: Throwable, state: TransactionState) {
                 e.printStackTrace()
             }

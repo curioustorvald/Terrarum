@@ -4,7 +4,7 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.audio.audiobank.MusicContainer
-import net.torvald.terrarum.audio.dsp.Gain
+import net.torvald.terrarum.audio.dsp.PreGain
 import net.torvald.terrarum.audio.dsp.NullFilter
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
@@ -112,7 +112,7 @@ class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
 
                 if (audioStatus == 0) {
                     startAudio(static) {
-                        it.filters[filterIndex] = Gain(0f)
+                        it.filters[filterIndex] = PreGain(0f)
                         audioStatus = 1
                     }
                 }
@@ -124,10 +124,10 @@ class FixtureFurnaceAndAnvil : FixtureBase, CraftingStation {
 
             if (it != null) {
                 if (it.processor.streamBuf != null || it.playRequested.get()) {
-                    if (it.filters[filterIndex] !is Gain) // just in case...
-                        it.filters[filterIndex] = Gain(0f)
+                    if (it.filters[filterIndex] !is PreGain) // just in case...
+                        it.filters[filterIndex] = PreGain(0f)
 
-                    (it.filters[filterIndex] as Gain).gain = 0.4f * volRand.get()
+                    (it.filters[filterIndex] as PreGain).gain = 0.4f * volRand.get()
                 }
                 else {
                     audioStatus = 0

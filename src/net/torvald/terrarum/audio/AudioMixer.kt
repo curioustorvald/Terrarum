@@ -250,7 +250,7 @@ class AudioMixer : Disposable {
         // initialise audio paths //
 
         listOf(musicTrack, ambientTrack1, ambientTrack2, ambientTrack3, ambientTrack4, guiTrack).forEach {
-            it.filters[0] = Gain(1f)
+            it.filters[0] = PreGain(1f)
         }
 
         guiTracks.forEach {
@@ -285,11 +285,11 @@ class AudioMixer : Disposable {
         }
 
         convolveBusOpen.filters[1] = Convolv("basegame", "audio/convolution/EchoThief - PurgatoryChasm.bin", decibelsToFullscale(-6.0).toFloat())
-        convolveBusOpen.filters[2] = Gain(decibelsToFullscale(17.0).toFloat()) // don't make it too loud; it'll sound like a shit
+        convolveBusOpen.filters[2] = PreGain(decibelsToFullscale(17.0).toFloat()) // don't make it too loud; it'll sound like a shit
         convolveBusOpen.volume = 0.5 // will be controlled by the other updater which surveys the world
 
         convolveBusCave.filters[1] = Convolv("basegame", "audio/convolution/EchoThief - WaterplacePark-trimmed.bin", decibelsToFullscale(-3.0).toFloat())
-        convolveBusCave.filters[2] = Gain(decibelsToFullscale(16.0).toFloat())
+        convolveBusCave.filters[2] = PreGain(decibelsToFullscale(16.0).toFloat())
         convolveBusCave.volume = 0.5 // will be controlled by the other updater which surveys the world
 
         fadeBus.addSidechainInput(sumBus, 1.0 / 3.0)
@@ -392,12 +392,12 @@ class AudioMixer : Disposable {
         // the real updates
         (Gdx.audio as? Lwjgl3Audio)?.update()
         masterTrack.volume = masterVolume
-        musicTrack.getFilter<Gain>().gain = musicVolume.toFloat() * 0.5f
+        musicTrack.getFilter<PreGain>().gain = musicVolume.toFloat() * 0.5f
         ambientTracks.forEach {
-            it.getFilter<Gain>().gain = ambientVolume.toFloat()
+            it.getFilter<PreGain>().gain = ambientVolume.toFloat()
         }
         sfxSumBus.volume = sfxVolume
-        guiTrack.getFilter<Gain>().gain = guiVolume.toFloat()
+        guiTrack.getFilter<PreGain>().gain = guiVolume.toFloat()
 
 
         // process fades

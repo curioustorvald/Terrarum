@@ -26,7 +26,7 @@ class TerrarumMusicPlaylist(
 ): Disposable {
 
     private val internalIndices = ArrayList<Int>()
-    private var currentIndexCursor = musicList.size
+    private var currentIndexCursor = musicList.size - 1
 
     init {
         reset()
@@ -36,7 +36,7 @@ class TerrarumMusicPlaylist(
         internalIndices.clear()
         refillInternalIndices()
         refillInternalIndices()
-        currentIndexCursor = musicList.size
+        currentIndexCursor = musicList.size - 1
     }
 
     private fun checkRefill() {
@@ -50,6 +50,11 @@ class TerrarumMusicPlaylist(
         return musicList[internalIndices[currentIndexCursor]]
     }
 
+    /**
+     * For Gapless playback, this function is called by track's pullNextTrack callback (defined in [MusicService.createTransactionPlaylistChange])
+     *
+     * For intermittent playback, this function is called by the transaction defined in [MusicService.update]
+     */
     fun queueNext(): MusicContainer {
         checkRefill()
         currentIndexCursor += 1
@@ -81,16 +86,12 @@ class TerrarumMusicPlaylist(
     fun queueNthSong(n: Int): MusicContainer {
         checkRefill()
         internalIndices.add(currentIndexCursor, n)
+        currentIndexCursor -= 1
         return musicList[internalIndices[currentIndexCursor]]
     }
 
     private fun refillInternalIndices() {
-        if (diskJockeyingMode == "continuous") {
-            internalIndices.add(0) // playlist is a one long track for the gapless playback
-        }
-        else {
-            internalIndices.addAll(musicList.indices.toMutableList().also { if (shuffled) it.shuffle() })
-        }
+        internalIndices.addAll(musicList.indices.toMutableList().also { if (shuffled) it.shuffle() })
     }
 
 
