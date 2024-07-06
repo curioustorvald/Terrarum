@@ -19,7 +19,6 @@ import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.TerrarumMusicStreamer
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.modulebasegame.gameitems.MusicDiscHelper

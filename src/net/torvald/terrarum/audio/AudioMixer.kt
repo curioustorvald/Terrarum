@@ -339,7 +339,6 @@ class AudioMixer : Disposable {
             map[it] = FadeRequest()
         }
     }
-    private val fadeReqsCol = fadeReqs.entries
 
     private var lpAkku = 0.0
     private var lpLength = 0.4
@@ -402,7 +401,7 @@ class AudioMixer : Disposable {
 
 
         // process fades
-        fadeReqsCol.forEach { val track = it.key; val req = it.value
+        fadeReqs.entries.forEach { val track = it.key; val req = it.value
             if (req.fadeoutFired) {
                 req.fadeAkku += delta
                 val step = req.fadeAkku / req.fadeLength
@@ -484,18 +483,26 @@ class AudioMixer : Disposable {
 
     private var ambientStopped = true
 
-    fun startMusic(song: AudioBank) {
+    /**
+     * Don't call this function from the application (fixture, user-made music player mod, etc.) directly!
+     * Use transactions from the MusicService.
+     */
+    internal fun startMusic(song: AudioBank) {
         if (musicTrack.isPlaying) {
             requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
         }
         musicTrack.nextTrack = song
     }
 
-    fun stopMusic() {
+    /**
+     * Don't call this function from the application (fixture, user-made music player mod, etc.) directly!
+     * Use transactions from the MusicService.
+     */
+    internal fun stopMusic() {
         requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
     }
 
-    fun startAmb(song: AudioBank) {
+    internal fun startAmb(song: AudioBank) {
         val ambientTrack = if (!ambientTrack1.streamPlaying.get())
             ambientTrack1
         else if (!ambientTrack2.streamPlaying.get())
@@ -512,7 +519,7 @@ class AudioMixer : Disposable {
         // fade will be processed by the update()
     }
 
-    fun startAmb1(song: AudioBank) {
+    internal fun startAmb1(song: AudioBank) {
         if (ambientTrack1.isPlaying == true) {
             requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
         }
@@ -520,7 +527,7 @@ class AudioMixer : Disposable {
         // fade will be processed by the update()
     }
 
-    fun startAmb2(song: AudioBank) {
+    internal fun startAmb2(song: AudioBank) {
         if (ambientTrack2.isPlaying == true) {
             requestFadeOut(musicTrack, DEFAULT_FADEOUT_LEN)
         }
@@ -584,7 +591,7 @@ class AudioMixer : Disposable {
         }
     }
 
-    fun reset() {
+    internal fun reset() {
         ambientStopped = true
         dynamicTracks.forEach { it.stop() }
         guiTracks.forEach { it.stop() }

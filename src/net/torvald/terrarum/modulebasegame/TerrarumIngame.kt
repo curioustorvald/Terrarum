@@ -262,7 +262,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     override var gameFullyLoaded = false
         internal set
 
-    override val musicStreamer = TerrarumMusicStreamer()
+    override val musicStreamer = TerrarumMusicAndAmbientStreamer()
 
 
     //////////////

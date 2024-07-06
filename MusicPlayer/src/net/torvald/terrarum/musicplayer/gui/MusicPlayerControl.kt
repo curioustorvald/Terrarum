@@ -16,6 +16,7 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.PlaysMusic
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
+import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.toIntAndFrac
 import net.torvald.terrarum.ui.MouseLatch
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -191,7 +192,6 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
     private var mouseOnList: Int? = null
 
     override fun updateImpl(delta: Float) {
-        val transactionLocked = MusicService.transactionLocked
         val currentPlaylist = getCurrentPlaylist()
 
         // process transition request
@@ -322,7 +322,7 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
         else null
 
 
-        // make button work
+        // make buttons work
         if (mouseUp) mouseLatch.latch {
             if (mouseOnButton != null) {
                 when (mouseOnButton) {
@@ -495,7 +495,7 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                         val playlist = loadNewAlbum(albumsList[index])
                         MusicService.putNewPlaylist(playlist) {
                             resetPlaylistScroll(App.audioMixer.musicTrack.nextTrack as? MusicContainer)
-                            App.audioMixer.startMusic(playlist.getCurrent())
+                            MusicService.resumePlaylistPlayback({}, {})
                         }
                     }
                 }
@@ -723,7 +723,9 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
         }
 
         batch.color = Color.WHITE
-        Toolkit.drawTextCentered(batch, App.fontSmallNumbers, "State: ${MusicService.currentPlaybackState.get()}", Toolkit.drawWidth, 0, _posY.toInt() + height + 18)
+        val musicState = MusicService.currentPlaybackState.get()
+        val str = "State: $musicState Wait: ${MusicService.waitAkku.toIntAndFrac(2)}/${MusicService.waitTime}"
+        Toolkit.drawTextCentered(batch, App.fontSmallNumbers, str, Toolkit.drawWidth, 0, _posY.toInt() + height + 18)
         // end of debug codes
 
 

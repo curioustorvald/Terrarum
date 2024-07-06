@@ -4,14 +4,11 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.audio.AudioBank
-import net.torvald.terrarum.audio.AudioMixer
 import net.torvald.terrarum.audio.audiobank.MusicContainer
 
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
-import java.io.File
 
-class TerrarumMusicStreamer : MusicStreamer() {
+class TerrarumMusicAndAmbientStreamer : MusicStreamer() {
     private val STATE_INIT = 0
     private val STATE_FIREPLAY = 1
     private val STATE_PLAYING = 2
@@ -19,7 +16,6 @@ class TerrarumMusicStreamer : MusicStreamer() {
 
 
     init {
-        musicState = STATE_INTERMISSION
     }
 
     private var playlist: List<MusicContainer> = emptyList()
@@ -198,38 +194,7 @@ class TerrarumMusicStreamer : MusicStreamer() {
         // start the song queueing if there is one to play
         if (firstTime) {
             firstTime = false
-            if (playlist.isNotEmpty()) musicState = STATE_INTERMISSION
             if (ambients.isNotEmpty()) ambState = STATE_INTERMISSION
-        }
-
-        when (musicState) {
-            STATE_FIREPLAY -> {
-                if (!musicFired) {
-                    MusicService.resumePlaylistPlayback(
-                        // onSuccess: () -> Unit
-                        {
-                            musicFired = true
-                            musicState = STATE_PLAYING
-                        },
-                        // onFailure: (Throwable) -> Unit
-                        {
-                            musicFired = false
-                            musicState = STATE_INTERMISSION
-                        },
-                    )
-                }
-            }
-            STATE_PLAYING -> {
-                // stopMusic() will be called when the music finishes; it's on the setOnCompletionListener
-            }
-            STATE_INTERMISSION -> {
-                intermissionAkku += delta
-
-                if (intermissionAkku >= intermissionLength && playlist.isNotEmpty()) {
-                    intermissionAkku = 0f
-                    musicState = STATE_FIREPLAY
-                }
-            }
         }
 
         val season = ingame.world.worldTime.ecologicalSeason

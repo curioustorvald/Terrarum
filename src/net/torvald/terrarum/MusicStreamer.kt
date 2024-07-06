@@ -6,10 +6,10 @@ open class MusicStreamer {
 
     }
 
-    protected var musicState = 0 // 0: disabled, 1: playing, 2: waiting
-    protected var intermissionAkku = 0f
-    protected var intermissionLength = 1f
-    protected var musicFired = false
+//    protected var musicState = 0 // 0: disabled, 1: playing, 2: waiting
+//    protected var intermissionAkku = 0f
+//    protected var intermissionLength = 1f
+//    protected var musicFired = false
 
 
     open fun dispose() {

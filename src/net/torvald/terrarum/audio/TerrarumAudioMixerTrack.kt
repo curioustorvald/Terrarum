@@ -192,7 +192,6 @@ class TerrarumAudioMixerTrack(
         }
 
         fireSongFinishHook()
-        // fireSoundFinishHook()
 
         trackingTarget = null
         processor.streamBuf = null

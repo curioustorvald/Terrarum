@@ -30,7 +30,7 @@ interface Transaction {
 abstract class TransactionListener {
 
     /** `null` if not locked, a class that acquired the lock if locked */
-    private val transactionLockingClass: AtomicReference<Transaction?> = AtomicReference(null)
+    val transactionLockingClass: AtomicReference<Transaction?> = AtomicReference(null)
     val transactionLocked: Boolean; get() = (transactionLockingClass.get() != null)
 
 
@@ -43,9 +43,10 @@ abstract class TransactionListener {
      */
     fun runTransaction(transaction: Transaction, onFinally: () -> Unit = {}) {
         printdbg(this, "Accepting transaction $transaction")
-        Thread { synchronized(this) {
+        Thread {
             val state = getCurrentStatusForTransaction()
-            if (!transactionLocked) {
+            val currentLock = transactionLockingClass.get()
+            if (currentLock == null) {
                 transactionLockingClass.set(transaction)
                 try {
                     transaction.start(state)
@@ -66,9 +67,9 @@ abstract class TransactionListener {
             }
             else {
                 System.err.println("Transaction failure: locked")
-                transaction.onFailure(LockedException(this, transactionLockingClass.get()), state)
+                transaction.onFailure(LockedException(this, currentLock), state)
             }
-        } }.start()
+        }.start()
     }
 
     protected abstract fun getCurrentStatusForTransaction(): TransactionState

@@ -1,5 +1,6 @@
 package net.torvald.terrarum
 
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioBank
 import net.torvald.terrarum.audio.AudioMixer.Companion.DEFAULT_FADEOUT_LEN
 import net.torvald.terrarum.transaction.Transaction
@@ -39,18 +40,18 @@ object MusicService : TransactionListener() {
     private const val STATE_PLAYING = 2
 
     val currentPlaybackState = AtomicInteger(STATE_INTERMISSION)
-    private var waitAkku = 0f
-    private var waitTime = 10f
+    var waitAkku = 0f; private set
+    var waitTime = 10f; private set
 
     private fun enterSTATE_INTERMISSION(waitFor: Float) {
         currentPlaybackState.set(STATE_INTERMISSION)
         waitTime = waitFor
         waitAkku = 0f
+        playTransactionOngoing = false
     }
 
     private fun enterSTATE_FIREPLAY() {
         val state = currentPlaybackState.get()
-        if (state == STATE_FIREPLAY) throw IllegalStateException("Cannot change state FIREPLAY -> FIREPLAY")
         if (state == STATE_PLAYING) throw IllegalStateException("Cannot change state PLAYING -> FIREPLAY")
 
         waitAkku = 0f
@@ -81,9 +82,7 @@ object MusicService : TransactionListener() {
     }
 
     fun onMusicFinishing(audio: AudioBank) {
-        synchronized(this) {
-            enterIntermissionAndWaitForPlaylist()
-        }
+        enterIntermissionAndWaitForPlaylist()
     }
 
     private var playTransactionOngoing = false
@@ -120,6 +119,9 @@ object MusicService : TransactionListener() {
                         }
                     )
                 }
+                else {
+                    println("PLAYing is deferred: playTransaction is ongoing")
+                }
             }
             STATE_PLAYING -> {
                 // onMusicFinishing() will be called when the music finishes; it's on the setOnCompletionListener
@@ -136,26 +138,22 @@ object MusicService : TransactionListener() {
 
 
     fun enterScene(id: String) {
-        synchronized(this) {
-            /*val playlist = when (id) {
-                "title" -> getTitlePlaylist()
-                "ingame" -> getIngameDefaultPlaylist()
-                else -> getIngameDefaultPlaylist()
-            }
-
-            putNewPlaylist(playlist) {
-                // after the fadeout, we'll...
-                enterSTATE_FIREPLAY()
-            }*/
-
-            stopPlaylistPlayback { }
+        /*val playlist = when (id) {
+            "title" -> getTitlePlaylist()
+            "ingame" -> getIngameDefaultPlaylist()
+            else -> getIngameDefaultPlaylist()
         }
+
+        putNewPlaylist(playlist) {
+            // after the fadeout, we'll...
+            enterSTATE_FIREPLAY()
+        }*/
+
+        stopPlaylistPlayback { }
     }
 
     fun leaveScene() {
-        synchronized(this) {
-            stopPlaylistPlayback {}
-        }
+        stopPlaylistPlayback {}
     }
 
     /**
@@ -363,10 +361,8 @@ object MusicService : TransactionListener() {
             override fun start(state: TransactionState) {
                 var fadedOut = false
                 var err: Throwable? = null
-                println("createTransactionPausePlaylistForMusicalFixture start")
                 // request fadeout
                 App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2.0) {
-                    println("createTransactionPausePlaylistForMusicalFixture fadeout end")
                     try {
                         // callback: let the caller actually take care of playing the audio
                         action()
@@ -383,11 +379,9 @@ object MusicService : TransactionListener() {
                 if (err != null) throw err!!
 
                 // enter intermission state
-                println("createTransactionPausePlaylistForMusicalFixture fadeout waiting end, entering INTERMISSION state")
                 enterSTATE_INTERMISSION(Float.POSITIVE_INFINITY)
 
                 // wait until the interjected music finishes
-                println("createTransactionPausePlaylistForMusicalFixture waiting for musicFinished()")
                 waitUntil { musicFinished() }
             }
 

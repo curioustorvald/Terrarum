@@ -9,7 +9,6 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.TerrarumMusicStreamer
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
 import net.torvald.terrarum.modulebasegame.gameitems.MusicDiscHelper
@@ -125,7 +124,6 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
 
             MusicService.playMusicalFixture(
                 /* action: () -> Unit */ {
-                    App.printdbg(this, "call startAudio(${musicNowPlaying?.name})")
                     startAudio(musicNowPlaying!!) { loadEffector(it) }
                 },
                 /* musicFinished: () -> Boolean */ {
@@ -151,9 +149,12 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
     fun stopGracefully() {
         stopDiscPlayback()
         try {
-            MusicService.enterIntermission()
+            if (musicIsPlaying)
+                MusicService.enterIntermission()
         }
-        catch (_: Throwable) {}
+        catch (e: Throwable) {
+            e.printStackTrace()
+        }
     }
 
     private fun stopDiscPlayback() {

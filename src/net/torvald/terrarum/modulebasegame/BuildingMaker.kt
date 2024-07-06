@@ -62,7 +62,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     lateinit var gameWorld: GameWorld
 
-    override val musicStreamer = TerrarumMusicStreamer()
+    override val musicStreamer = TerrarumMusicAndAmbientStreamer()
 
     init {
         gameUpdateGovernor = ConsistentUpdateRate
