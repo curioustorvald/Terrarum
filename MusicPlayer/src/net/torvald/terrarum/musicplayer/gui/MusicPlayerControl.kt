@@ -60,6 +60,9 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
     private val controlButtons = ModMgr.getGdxFile("musicplayer", "gui/control_buttons.tga").let {
         TextureRegionPack(it, BUTTON_WIDTH, BUTTON_HEIGHT)
     }
+    private val progressSheet = ModMgr.getGdxFile("musicplayer", "gui/progress.tga").let {
+        TextureRegionPack(it, BUTTON_WIDTH, BUTTON_HEIGHT)
+    }
 
     private val MODE_IDLE = 0
     private val MODE_PLAYING = 1
@@ -1061,14 +1064,13 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
             val separation = internalWidth / 5f
             val anchorX = Toolkit.hdrawWidthf
             val posY = posY + 12f
+            val alphaBase2 = 0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f)
             for (i in 0..4) {
-                val alphaBase  = 0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f) + (playControlAnimAkku[i] * 0.2f)
-                val alphaBase2 = 0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f)
+                val animAkku = if (i == 2) 0f else playControlAnimAkku[i] // disable mouseUp for the progress ring
+                val alphaBase  = 0.75f * (if (reverse) 1f - alpha0 else alpha0).pow(3f) + (animAkku * 0.2f)
 
                 val offset = i - 2
                 val posX = anchorX + offset * separation
-
-
                 val btnX = (posX - BUTTON_WIDTH / 2).roundToFloat()
                 val btnY = posY.roundToFloat()
 
@@ -1089,8 +1091,19 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                     // fade if avaliable
                     batch.color = baseCol * Color(1f, 1f, 1f, alphaBase * (1f - buttonFadePerc))
                     batch.draw(controlButtons.get(i, iconY), btnX, btnY)
-                    // page number with fade
 
+                    // progress ring
+                    val perc = ((App.audioMixer.musicTrack.currentTrack?.currentPositionInSamples()?.toFloat() ?: 0f) /
+                            (App.audioMixer.musicTrack.currentTrack?.totalSizeInSamples ?: Long.MAX_VALUE)).coerceAtMost(1f)
+                    val progress = (perc * 64).roundToInt() - 1
+                    if (progress >= 0) {
+                        val prx = progress % 8
+                        val pry = progress / 8
+                        batch.color = baseCol * Color(1f, 1f, 1f, alphaBase * (1f - buttonFadePerc))
+                        batch.draw(progressSheet.get(prx, pry), btnX, btnY)
+                    }
+
+                    // page number with fade
                     for (mode in 0..1) {
                         val alphaNum = if (mode == 0) 1f - listViewPanelScroll else listViewPanelScroll
                         batch.color = baseCol * Color(1f, 1f, 1f, alphaBase2 * buttonFadePerc * alphaNum) // don't use mouse-up effect
@@ -1113,7 +1126,6 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                     batch.draw(controlButtons.get(i, 0), btnX, btnY)
                 }
 
-
                 // update playControlAnimAkku
                 if (mouseOnButton == i && mode >= MODE_MOUSE_UP && modeNext >= MODE_MOUSE_UP)
                     playControlAnimAkku[i] = (playControlAnimAkku[i] + (delta / playControlAnimLength)).coerceIn(0f, 1f)
@@ -1121,6 +1133,9 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                     playControlAnimAkku[i] = (playControlAnimAkku[i] - (delta / playControlAnimLength)).coerceIn(0f, 1f)
             }
 //            printdbg(this, "playControlAnimAkku=${playControlAnimAkku.joinToString()}")
+
+
+
         }
     }
 
