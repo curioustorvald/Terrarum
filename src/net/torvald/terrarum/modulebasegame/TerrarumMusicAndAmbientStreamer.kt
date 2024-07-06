@@ -9,80 +9,12 @@ import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 
 class TerrarumMusicAndAmbientStreamer : MusicStreamer() {
-    private val STATE_INIT = 0
+    private val STATE_INTERMISSION = 0
     private val STATE_FIREPLAY = 1
     private val STATE_PLAYING = 2
-    private val STATE_INTERMISSION = 3
 
 
     init {
-    }
-
-    private var playlist: List<MusicContainer> = emptyList()
-    var playlistName = ""; private set
-    /** canonicalPath with path separators converted to forward slash */
-    var playlistSource = "" ; private set
-    private var musicBin: ArrayList<MusicContainer> = ArrayList()
-    private var shuffled = true
-    private var diskJockeyingMode = "intermittent" // intermittent, continuous
-
-
-
-    private fun restockMusicBin() {
-        musicBin = ArrayList(if (shuffled) playlist.shuffled() else playlist.slice(playlist.indices))
-    }
-
-    /**
-     * Adds a song to the head of the internal playlist (`musicBin`)
-     */
-    fun xxxqueueMusicToPlayNext(music: MusicContainer) {
-        musicBin.add(0, music)
-    }
-
-    /**
-     * Unshifts an internal playlist (`musicBin`). The `music` argument must be the song that exists on the `songs`.
-     */
-    fun xxxunshiftPlaylist(music: MusicContainer) {
-        val indexAtMusicBin = playlist.indexOf(music)
-        if (indexAtMusicBin < 0) throw IllegalArgumentException("The music does not exist on the internal songs list ($music)")
-
-        // rewrite musicBin
-        val newMusicBin = if (shuffled) playlist.shuffled().toTypedArray().also {
-            // if shuffled,
-            // 1. create a shuffled version of songlist
-            // 2. swap two songs such that the songs[indexAtMusicBin] comes first
-            val swapTo = it.indexOf(playlist[indexAtMusicBin])
-            val tmp = it[swapTo]
-            it[swapTo] = it[0]
-            it[0] = tmp
-        }
-        else Array(playlist.size - indexAtMusicBin) { offset ->
-            val k = offset + indexAtMusicBin
-            playlist[k]
-        }
-
-        musicBin = ArrayList(newMusicBin.toList())
-    }
-
-    fun xxxqueueIndexFromPlaylist(indexAtMusicBin: Int) {
-        if (indexAtMusicBin !in playlist.indices) throw IndexOutOfBoundsException("The index is outside of the internal songs list ($indexAtMusicBin/${playlist.size})")
-
-        // rewrite musicBin
-        val newMusicBin =  if (shuffled) playlist.shuffled().toTypedArray().also {
-            // if shuffled,
-            // 1. create a shuffled version of songlist
-            // 2. swap two songs such that the songs[indexAtMusicBin] comes first
-            val swapTo = it.indexOf(playlist[indexAtMusicBin])
-            val tmp = it[swapTo]
-            it[swapTo] = it[0]
-            it[0] = tmp
-        }
-        else Array(playlist.size - indexAtMusicBin) { offset ->
-            val k = offset + indexAtMusicBin
-            playlist[k]
-        }
-
-        musicBin = ArrayList(newMusicBin.toList())
     }
 
     private val ambients: HashMap<String, HashSet<MusicContainer>> =
@@ -100,8 +32,8 @@ class TerrarumMusicAndAmbientStreamer : MusicStreamer() {
             }
         }.toHashSet() }.toMap())
 
-    private val musicStartHooks = ArrayList<(MusicContainer) -> Unit>()
-    private val musicStopHooks = ArrayList<(MusicContainer) -> Unit>()
+//    private val musicStartHooks = ArrayList<(MusicContainer) -> Unit>()
+//    private val musicStopHooks = ArrayList<(MusicContainer) -> Unit>()
 
     init {
         // TODO queue and play the default playlist
@@ -109,18 +41,15 @@ class TerrarumMusicAndAmbientStreamer : MusicStreamer() {
     }
 
 
-    fun addMusicStartHook(f: (MusicContainer) -> Unit) {
+    /*fun addMusicStartHook(f: (MusicContainer) -> Unit) {
         musicStartHooks.add(f)
     }
 
     fun addMusicStopHook(f: (MusicContainer) -> Unit) {
         musicStopHooks.add(f)
-    }
+    }*/
 
     init {
-        playlist.forEach {
-            App.disposables.add(it)
-        }
         ambients.forEach { (k, v) ->
             printdbg(this, "Ambients: $k -> $v")
 
@@ -129,9 +58,6 @@ class TerrarumMusicAndAmbientStreamer : MusicStreamer() {
             }
         }
     }
-
-
-    private var warningPrinted = false
 
 
 
@@ -143,15 +69,15 @@ class TerrarumMusicAndAmbientStreamer : MusicStreamer() {
     // call MusicService to fade out
     // pauses playlist update
     // called by MusicPlayerControl
-    fun stopMusicPlayback() {
+    /*fun stopMusicPlayback() {
 
-    }
+    }*/
 
     // resumes playlist update
     // called by MusicPlayerControl
-    fun resumeMusicPlayback() {
+    /*fun resumeMusicPlayback() {
 
-    }
+    }*/
 
     private fun stopAmbient() {
 //        if (::currentAmbientTrack.isInitialized)

@@ -40,7 +40,7 @@ class TerrarumMusicPlaylist(
     }
 
     private fun checkRefill() {
-        if (internalIndices.size < currentIndexCursor + 1)
+        if (currentIndexCursor >= internalIndices.size - 2)
             refillInternalIndices()
     }
 
@@ -50,19 +50,14 @@ class TerrarumMusicPlaylist(
         return musicList[internalIndices[currentIndexCursor]]
     }
 
-    fun getNext(): MusicContainer {
+    fun queueNext(): MusicContainer {
         checkRefill()
         currentIndexCursor += 1
 
         return musicList[internalIndices[currentIndexCursor]]
     }
 
-    fun peekNext(): MusicContainer {
-        checkRefill()
-        return musicList[internalIndices[currentIndexCursor + 1]]
-    }
-
-    fun getPrev(): MusicContainer {
+    fun queuePrev(): MusicContainer {
         if (currentIndexCursor == 0) {
             if (shuffled) {
                 musicList.indices.toMutableList().also { if (shuffled) it.shuffle() }.reversed().forEach {
@@ -83,12 +78,21 @@ class TerrarumMusicPlaylist(
         return musicList[internalIndices[currentIndexCursor]]
     }
 
-
-    private fun refillInternalIndices() {
-        internalIndices.addAll(musicList.indices.toMutableList().also { if (shuffled) it.shuffle() })
+    fun queueNthSong(n: Int): MusicContainer {
+        checkRefill()
+        internalIndices.add(currentIndexCursor, n)
+        return musicList[internalIndices[currentIndexCursor]]
     }
 
-    inline fun getNthSong(n: Int) = musicList[n]
+    private fun refillInternalIndices() {
+        if (diskJockeyingMode == "continuous") {
+            internalIndices.add(0) // playlist is a one long track for the gapless playback
+        }
+        else {
+            internalIndices.addAll(musicList.indices.toMutableList().also { if (shuffled) it.shuffle() })
+        }
+    }
+
 
     override fun dispose() {
         musicList.forEach {

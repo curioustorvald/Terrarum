@@ -76,8 +76,8 @@ abstract class TransactionListener {
     protected abstract fun commitTransaction(state: TransactionState)
 }
 
-class LockedException(listener: TransactionListener, lockedBy: Transaction?) :
-    Exception("Transaction is rejected because the class '${listener.javaClass.canonicalName}' is locked by '${lockedBy?.javaClass?.canonicalName}'")
+class LockedException(listener: TransactionListener, lockedBy: Transaction) :
+    Exception("Transaction is rejected because the class '${listener.javaClass.canonicalName}' is locked by '${lockedBy.javaClass.canonicalName}'")
 
 @JvmInline value class TransactionState(val valueTable: HashMap<String, Any?>) {
     operator fun get(key: String) = valueTable[key]

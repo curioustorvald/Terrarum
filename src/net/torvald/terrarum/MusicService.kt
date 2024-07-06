@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioBank
 import net.torvald.terrarum.audio.AudioMixer.Companion.DEFAULT_FADEOUT_LEN
+import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.transaction.Transaction
 import net.torvald.terrarum.transaction.TransactionListener
 import net.torvald.terrarum.transaction.TransactionState
@@ -69,12 +70,14 @@ object MusicService : TransactionListener() {
     fun getRandomMusicInterval() = 20f + Math.random().toFloat() * 4f // longer gap (20s to 24s)
 
     private fun enterIntermissionAndWaitForPlaylist() {
-        val time = when (currentPlaylist?.diskJockeyingMode ?: "intermittent") {
+        val djmode = currentPlaylist?.diskJockeyingMode ?: "intermittent"
+        val time = when (djmode) {
             "intermittent" -> getRandomMusicInterval()
             "continuous" -> 0f
             else -> getRandomMusicInterval()
         }
         enterSTATE_INTERMISSION(time)
+        if (djmode == "continuous") enterSTATE_FIREPLAY()
     }
 
     fun enterIntermission() {
@@ -82,6 +85,7 @@ object MusicService : TransactionListener() {
     }
 
     fun onMusicFinishing(audio: AudioBank) {
+        printdbg(this, "onMusicFinishing ${audio.name}")
         enterIntermissionAndWaitForPlaylist()
     }
 
@@ -96,21 +100,27 @@ object MusicService : TransactionListener() {
                         /* onSuccess: () -> Unit */
                         {
                             runTransaction(object : Transaction {
+                                private lateinit var nextMusic: MusicContainer
+
                                 override fun start(state: TransactionState) {
-                                    App.audioMixer.startMusic((state["currentPlaylist"] as TerrarumMusicPlaylist).getCurrent())
+                                    nextMusic = (state["currentPlaylist"] as TerrarumMusicPlaylist).queueNext()
+                                    App.audioMixer.startMusic(nextMusic)
                                 }
 
                                 override fun onSuccess(state: TransactionState) {
+                                    printdbg(this, "FIREPLAY started music (${nextMusic.name})")
                                     enterSTATE_PLAYING()
                                 }
 
                                 override fun onFailure(e: Throwable, state: TransactionState) {
+                                    printdbg(this, "FIREPLAY resume OK but startMusic failed, entering intermission")
                                     enterSTATE_INTERMISSION(getRandomMusicInterval()) // will try again after a random interval
                                 }
                             })
                         },
                         /* onFailure: (Throwable) -> Unit */
                         {
+                            printdbg(this, "FIREPLAY resume failed, entering intermission")
                             enterSTATE_INTERMISSION(getRandomMusicInterval()) // will try again after a random interval
                         },
                         // onFinally: () -> Unit
@@ -120,7 +130,7 @@ object MusicService : TransactionListener() {
                     )
                 }
                 else {
-                    println("PLAYing is deferred: playTransaction is ongoing")
+                    printdbg(this, "FIREPLAY no-op: playTransaction is ongoing")
                 }
             }
             STATE_PLAYING -> {
@@ -168,11 +178,9 @@ object MusicService : TransactionListener() {
      * The old playlist will be disposed of if and only if the transaction was successful.
      *
      * @param playlist An instance of a [TerrarumMusicPlaylist] to be changed into
-     * @param onSuccess What to do after the transaction. Default behaviour is: `App.audioMixer.startMusic(playlist.getCurrent())`
+     * @param onSuccess What to do after the transaction
      */
-    private fun createTransactionPlaylistChange(playlist: TerrarumMusicPlaylist, onSuccess: () -> Unit = {
-        App.audioMixer.startMusic(playlist.getCurrent())
-    }): Transaction {
+    private fun createTransactionPlaylistChange(playlist: TerrarumMusicPlaylist, onSuccess: () -> Unit): Transaction {
         return object : Transaction {
             var oldPlaylist: TerrarumMusicPlaylist? = null
 
@@ -413,7 +421,7 @@ object MusicService : TransactionListener() {
         if (onSuccess != null)
             runTransaction(createTransactionPlaylistChange(playlist, onSuccess))
         else
-            runTransaction(createTransactionPlaylistChange(playlist))
+            runTransaction(createTransactionPlaylistChange(playlist, {}))
     }
     fun putNewPlaylist(playlist: TerrarumMusicPlaylist, onSuccess: () -> Unit, onFinally: () -> Unit) {
         runTransaction(createTransactionPlaylistChange(playlist, onSuccess), onFinally)
