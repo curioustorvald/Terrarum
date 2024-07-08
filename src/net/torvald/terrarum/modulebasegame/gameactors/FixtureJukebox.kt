@@ -135,11 +135,6 @@ class FixtureJukebox : Electric, PlaysMusic {
 
             discCurrentlyPlaying = index
 
-            // FIXME the olde way -- must be replaced with one that utilises MusicService
-            /*App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, DEFAULT_FADEOUT_LEN / 2f) {
-                startAudio(musicNowPlaying!!) { loadEffector(it) }
-            }*/
-
             MusicService.playMusicalFixture(
                 /* action: () -> Unit */ {
                     startAudio(musicNowPlaying!!) { loadEffector(it) }

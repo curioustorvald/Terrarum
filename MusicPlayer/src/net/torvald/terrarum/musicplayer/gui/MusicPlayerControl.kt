@@ -137,18 +137,6 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
             }
         }
 
-        /*ingame.musicStreamer.addMusicStartHook { music ->
-            setMusicName(music.name)
-            if (mode <= MODE_PLAYING)
-                transitionRequest = MODE_PLAYING
-        }
-
-        ingame.musicStreamer.addMusicStopHook { music ->
-            setIntermission()
-            if (mode <= MODE_PLAYING)
-                transitionRequest = MODE_IDLE
-        }*/
-
         setPlaylistDisplayVars(playlist)
 
         return playlist
@@ -447,18 +435,6 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                     if (index < currentPlaylist.musicList.size) {
                         // if selected song != currently playing
                         if (App.audioMixer.musicTrack.currentTrack == null || currentPlaylist.musicList[index] != App.audioMixer.musicTrack.currentTrack) {
-                            // FIXME the olde way -- must be replaced with one that utilises MusicService
-                            // rebuild playlist
-                            //ingame.backgroundMusicPlayer.queueIndexFromPlaylist(index)
-                            // fade out
-                            /*App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
-                                if (!shouldPlayerBeDisabled) {
-                                    ingame.backgroundMusicPlayer.startMusic(this) // required for "intermittent" mode
-                                    iHitTheStopButton = false
-                                    stopRequested = false
-                                }
-                            }*/
-
                             MusicService.playNthSongInPlaylist(index) {
                                 iHitTheStopButton = false
                                 stopRequested = false
@@ -476,22 +452,9 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                     // if selected album is not the same album currently playing, queue that album immediately
                     // (navigating into the selected album involves too much complication :p)
                     if (MusicService.currentPlaylist?.source != albumsList[index].canonicalPath) {
-                        // FIXME the olde way -- must be replaced with one that utilises MusicService
-                        // fade out
-                        /*App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 3f) {
-                            loadNewAlbum(albumsList[index])
-                            if (!shouldPlayerBeDisabled) {
-                                ingame.backgroundMusicPlayer.startMusic(this) // required for "intermittent" mode
-                                iHitTheStopButton = false
-                                stopRequested = false
-                            }
-                            resetPlaylistScroll(App.audioMixer.musicTrack.nextTrack as? MusicContainer)
-                        }*/
-
                         val playlist = loadNewAlbum(albumsList[index])
-                        MusicService.putNewPlaylist(playlist) {
+                        MusicService.putNewPlaylistAndResumePlayback(playlist) {
                             resetPlaylistScroll(App.audioMixer.musicTrack.nextTrack as? MusicContainer)
-                            MusicService.resumePlaylistPlayback({}, {})
                         }
                     }
                 }
@@ -505,7 +468,26 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
 
 //        printdbg(this, "mode = $mode; req = $transitionRequest")
 
+
+        // update music name disp
+        val musicTrack = App.audioMixer.musicTrack
+        val musicTrackPlaying = musicTrack.isPlaying
+        val musicNow = musicTrack.currentTrack
+        //// music changed, do something
+        if ((oldMusicTrackPlaying && !musicTrack.isPlaying) || (oldSong != null && musicNow == null)) {
+            setIntermission()
+            if (mode <= MODE_PLAYING && !transitionOngoing) transitionRequest = MODE_IDLE
+        }
+        else if ((!oldMusicTrackPlaying && musicTrack.isPlaying && musicNow != null) || (oldSong == null && musicNow != null) || (musicNow != oldSong && musicNow != null)) {
+            setMusicName(musicNow.name)
+            if (mode <= MODE_PLAYING && !transitionOngoing) transitionRequest = MODE_PLAYING
+        }
+        oldSong = musicNow
+        oldMusicTrackPlaying = musicTrackPlaying
     }
+
+    private var oldSong: AudioBank? = null
+    private var oldMusicTrackPlaying = false
 
     private var iHitTheStopButton = false
     private var stopRequested = false
@@ -535,18 +517,6 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
             playlistScroll = 0
         }
     }
-
-    /*private fun getPrevSongFromPlaylist(): MusicContainer? {
-        val list = songsInGovernor.slice(songsInGovernor.indices) // make copy of the list
-        val nowPlaying = App.audioMixer.musicTrack.currentTrack ?: return null
-
-        // find current index
-        val currentIndex = list.indexOfFirst { it == nowPlaying }
-        if (currentIndex < 0) return null
-
-        val prevIndex = (currentIndex - 1).fmod(list.size)
-        return list[prevIndex]
-    }*/
 
 //    private fun smoothstep(x: Float) = (x*x*(3f-2f*x)).coerceIn(0f, 1f)
 //    private fun smootherstep(x: Float) = (x*x*x*(x*(6f*x-15f)+10f)).coerceIn(0f, 1f)
@@ -710,7 +680,7 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
 
         // debug codes
         //// transaction state
-        if (MusicService.transactionLocked) {
+        /*if (MusicService.transactionLocked) {
             batch.color = Color.RED
             Toolkit.drawTextCentered(batch, App.fontSmallNumbers, "LOCKED", Toolkit.drawWidth, 0, _posY.toInt() + height + 5)
         }
@@ -736,6 +706,7 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
         batch.color = Color.LIGHT_GRAY
         App.fontSmallNumbers.draw(batch, "Playlist InternalIndices", 10f, App.scr.hf - 30f)
         App.fontSmallNumbers.draw(batch, "..", 10f, App.scr.hf - 16f)
+        */
         // end of debug codes
 
 

@@ -29,6 +29,11 @@ playback cannot change its sampling rate mid-stream.
 The audio engine cannot resample an audio file with sampling rate greater than 48000 Hz, nor is capable
 of reading anything that is not in 16-bit bit-depth.
 
+## Ogg Album Art Incompatibility
+
+Ogg files with album arts are not reliably recognised. Remove them using the following FFmpeg command:
+
+    ffmpeg -i inputfile.ogg -map a -c copy outputfile.ogg
 
 ## tl;dr
 

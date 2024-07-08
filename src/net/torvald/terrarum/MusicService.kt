@@ -67,7 +67,7 @@ object MusicService : TransactionListener() {
         currentPlaybackState.set(STATE_PLAYING)
     }
 
-    fun getRandomMusicInterval() = 20f + Math.random().toFloat() * 4f // longer gap (20s to 24s)
+    fun getRandomMusicInterval() = 16f + Math.random().toFloat() * 4f // longer gap (16s to 20s)
 
     private fun enterIntermissionAndWaitForPlaylist() {
         val djmode = currentPlaylist?.diskJockeyingMode ?: "intermittent"
@@ -85,7 +85,7 @@ object MusicService : TransactionListener() {
     }
 
     fun onMusicFinishing(audio: AudioBank) {
-        printdbg(this, "onMusicFinishing ${audio.name}")
+//        printdbg(this, "onMusicFinishing ${audio.name}")
         enterIntermissionAndWaitForPlaylist()
     }
 
@@ -108,19 +108,19 @@ object MusicService : TransactionListener() {
                                 }
 
                                 override fun onSuccess(state: TransactionState) {
-                                    printdbg(this, "FIREPLAY started music (${nextMusic.name})")
-                                    enterSTATE_PLAYING()
+//                                    printdbg(this, "FIREPLAY started music (${nextMusic.name})")
+                                    currentPlaybackState.set(STATE_PLAYING) // force PLAYING
                                 }
 
                                 override fun onFailure(e: Throwable, state: TransactionState) {
-                                    printdbg(this, "FIREPLAY resume OK but startMusic failed, entering intermission")
+//                                    printdbg(this, "FIREPLAY resume OK but startMusic failed, entering intermission")
                                     enterIntermissionAndWaitForPlaylist() // will try again
                                 }
                             })
                         },
                         /* onFailure: (Throwable) -> Unit */
                         {
-                            printdbg(this, "FIREPLAY resume failed, entering intermission")
+//                            printdbg(this, "FIREPLAY resume failed, entering intermission")
                             enterIntermissionAndWaitForPlaylist() // will try again
                         },
                         // onFinally: () -> Unit
@@ -130,7 +130,7 @@ object MusicService : TransactionListener() {
                     )
                 }
                 else {
-                    printdbg(this, "FIREPLAY no-op: playTransaction is ongoing")
+//                    printdbg(this, "FIREPLAY no-op: playTransaction is ongoing")
                 }
             }
             STATE_PLAYING -> {
@@ -140,7 +140,9 @@ object MusicService : TransactionListener() {
                 waitAkku += delta
 
                 if (waitAkku >= waitTime && currentPlaylist != null) {
-                    enterSTATE_FIREPLAY()
+                    // force FIREPLAY
+                    waitAkku = 0f
+                    currentPlaybackState.set(STATE_FIREPLAY)
                 }
             }
         }
@@ -240,8 +242,99 @@ object MusicService : TransactionListener() {
         }
     }
 
+    /**
+     * Puts the given playlist to this object if the transaction successes. If the given playlist is same as the
+     * current playlist, the transaction will successfully finish immediately; otherwise the given playlist will
+     * be reset as soon as the transaction starts. Note that the resetting behaviour is NOT atomic. (the given
+     * playlist will stay in reset state even if the transaction fails)
+     *
+     * When the transaction was successful, the old playlist gets disposed of, then the songFinishedHook of
+     * the songs in the new playlist will be overwritten, before `onSuccess` is called.
+     *
+     * The old playlist will be disposed of if and only if the transaction was successful.
+     *
+     * @param playlist An instance of a [TerrarumMusicPlaylist] to be changed into
+     * @param onSuccess What to do after the transaction
+     */
+    private fun createTransactionPlaylistChangeAndPlayImmediately(playlist: TerrarumMusicPlaylist, onSuccess: () -> Unit): Transaction {
+        return object : Transaction {
+            var oldPlaylist: TerrarumMusicPlaylist? = null
+            var oldState = currentPlaybackState.get()
+            var oldAkku = waitAkku
+            var oldTime = waitTime
+
+            override fun start(state: TransactionState) {
+                oldPlaylist = state["currentPlaylist"] as TerrarumMusicPlaylist?
+                if (oldPlaylist == playlist) return
+
+                playlist.reset()
+
+                // request fadeout
+                if (App.audioMixer.musicTrack.isPlaying) {
+                    var fadedOut = false
+
+                    App.audioMixer.requestFadeOut(App.audioMixer.musicTrack) {
+                        // put new playlist
+                        state["currentPlaylist"] = playlist
+
+                        fadedOut = true
+                    }
+
+                    waitUntil { fadedOut }
+                }
+                else {
+                    // put new playlist
+                    state["currentPlaylist"] = playlist
+                }
+
+                oldState = currentPlaybackState.get()
+                oldAkku = waitAkku
+                oldTime = waitTime
+
+                enterSTATE_INTERMISSION(0f)
+                enterSTATE_FIREPLAY()
+            }
+
+            override fun onSuccess(state: TransactionState) {
+                oldPlaylist?.dispose()
+
+                (state["currentPlaylist"] as TerrarumMusicPlaylist?)?.let {
+                    // set songFinishedHook for every song
+                    it.musicList.forEach {
+                        it.songFinishedHook = {
+                            onMusicFinishing(it)
+                        }
+                    }
+
+                    // set gaplessness of the Music track
+                    App.audioMixer.musicTrack.let { track ->
+                        track.doGaplessPlayback = (it.diskJockeyingMode == "continuous")
+                        if (track.doGaplessPlayback) {
+                            track.pullNextTrack = {
+                                track.currentTrack = MusicService.currentPlaylist!!.queueNext()
+                            }
+                        }
+                    }
+                }
+
+                onSuccess()
+            }
+            override fun onFailure(e: Throwable, state: TransactionState) {
+                e.printStackTrace()
+
+                currentPlaybackState.set(oldState)
+                waitAkku = oldAkku
+                waitTime = oldTime
+            }
+        }
+    }
+
     private fun createTransactionForNextMusicInPlaylist(onSuccess: () -> Unit): Transaction {
         return object : Transaction {
+            var oldState = currentPlaybackState.get()
+            var oldAkku = waitAkku
+            var oldTime = waitTime
+
             override fun start(state: TransactionState) {
                 var fadedOut = false
                 var err: Throwable? = null
@@ -259,21 +352,34 @@ object MusicService : TransactionListener() {
 
                 waitUntil { fadedOut || err != null }
                 if (err != null) throw err!!
+
+                oldState = currentPlaybackState.get()
+                oldAkku = waitAkku
+                oldTime = waitTime
+
+                enterSTATE_INTERMISSION(0f)
+                enterSTATE_FIREPLAY()
             }
 
             override fun onSuccess(state: TransactionState) {
-                enterSTATE_INTERMISSION(0f)
-                enterSTATE_FIREPLAY()
                 onSuccess()
             }
             override fun onFailure(e: Throwable, state: TransactionState) {
                 e.printStackTrace()
+
+                currentPlaybackState.set(oldState)
+                waitAkku = oldAkku
+                waitTime = oldTime
             }
         }
     }
 
     private fun createTransactionForPrevMusicInPlaylist(onSuccess: () -> Unit): Transaction {
         return object : Transaction {
+            var oldState = currentPlaybackState.get()
+            var oldAkku = waitAkku
+            var oldTime = waitTime
+
             override fun start(state: TransactionState) {
                 var fadedOut = false
                 var err: Throwable? = null
@@ -294,11 +400,16 @@ object MusicService : TransactionListener() {
 
                 waitUntil { fadedOut || err != null }
                 if (err != null) throw err!!
+
+                oldState = currentPlaybackState.get()
+                oldAkku = waitAkku
+                oldTime = waitTime
+
+                enterSTATE_INTERMISSION(0f)
+                enterSTATE_FIREPLAY()
             }
 
             override fun onSuccess(state: TransactionState) {
-                enterSTATE_INTERMISSION(0f)
-                enterSTATE_FIREPLAY()
                 onSuccess()
             }
             override fun onFailure(e: Throwable, state: TransactionState) {
@@ -306,12 +417,20 @@ object MusicService : TransactionListener() {
                 (state["currentPlaylist"] as TerrarumMusicPlaylist).queueNext()
 
                 e.printStackTrace()
+
+                currentPlaybackState.set(oldState)
+                waitAkku = oldAkku
+                waitTime = oldTime
             }
         }
     }
 
     private fun createTransactionForNthMusicInPlaylist(index: Int, onSuccess: () -> Unit): Transaction {
         return object : Transaction {
+            var oldState = currentPlaybackState.get()
+            var oldAkku = waitAkku
+            var oldTime = waitTime
+
             override fun start(state: TransactionState) {
                 var fadedOut = false
                 var err: Throwable? = null
@@ -331,15 +450,24 @@ object MusicService : TransactionListener() {
 
                 waitUntil { fadedOut || err != null }
                 if (err != null) throw err!!
+
+                oldState = currentPlaybackState.get()
+                oldAkku = waitAkku
+                oldTime = waitTime
+
+                enterSTATE_INTERMISSION(0f)
+                enterSTATE_FIREPLAY()
             }
 
             override fun onSuccess(state: TransactionState) {
-                enterSTATE_INTERMISSION(0f)
-                enterSTATE_FIREPLAY()
                 onSuccess()
             }
             override fun onFailure(e: Throwable, state: TransactionState) {
                 e.printStackTrace()
+
+                currentPlaybackState.set(oldState)
+                waitAkku = oldAkku
+                waitTime = oldTime
             }
         }
     }
@@ -369,6 +497,10 @@ object MusicService : TransactionListener() {
 
     private fun createTransactionForPlaylistResume(onSuccess: () -> Unit, onFailure: (Throwable) -> Unit): Transaction {
         return object : Transaction {
+            var oldState = currentPlaybackState.get()
+            var oldAkku = waitAkku
+            var oldTime = waitTime
+
             override fun start(state: TransactionState) {
                 enterSTATE_FIREPLAY()
             }
@@ -378,6 +510,11 @@ object MusicService : TransactionListener() {
             }
             override fun onFailure(e: Throwable, state: TransactionState) {
                 e.printStackTrace()
+
+                currentPlaybackState.set(oldState)
+                waitAkku = oldAkku
+                waitTime = oldTime
+
                 onFailure(e)
             }
         }
@@ -446,6 +583,12 @@ object MusicService : TransactionListener() {
             runTransaction(createTransactionPlaylistChange(playlist, onSuccess))
         else
             runTransaction(createTransactionPlaylistChange(playlist, {}))
+    }
+    fun putNewPlaylistAndResumePlayback(playlist: TerrarumMusicPlaylist, onSuccess: (() -> Unit)? = null) {
+        if (onSuccess != null)
+            runTransaction(createTransactionPlaylistChangeAndPlayImmediately(playlist, onSuccess))
+        else
+            runTransaction(createTransactionPlaylistChangeAndPlayImmediately(playlist, {}))
     }
     fun putNewPlaylist(playlist: TerrarumMusicPlaylist, onSuccess: () -> Unit, onFinally: () -> Unit) {
         runTransaction(createTransactionPlaylistChange(playlist, onSuccess), onFinally)

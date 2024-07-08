@@ -56,6 +56,7 @@ abstract class TransactionListener {
         printdbg(this, "Accepting transaction $transaction")
         Thread {
             val state = getCurrentStatusForTransaction()
+            var wasSuccessful = false
             val currentLock = transactionLockingClass.get()
             if (currentLock == null) {
                 acquireLock(transaction)
@@ -63,23 +64,27 @@ abstract class TransactionListener {
                     transaction.start(state)
                     // if successful:
                     commitTransaction(state)
-                    // notify the success
-                    transaction.onSuccess(state)
+
+                    wasSuccessful = true
                 }
                 catch (e: Throwable) {
                     // if failed, notify the failure
-                    System.err.println("Transaction failure: generic")
+                    System.err.println("Transaction failure: generic (failed transaction: $transaction)")
                     e.printStackTrace()
                     transaction.onFailure(e, state)
                 }
                 finally {
+                    if (wasSuccessful) {
+                        // notify the success
+                        transaction.onSuccess(state)
+                    }
                     releaseLock()
                     onFinally()
                 }
             }
             else {
-                System.err.println("Transaction failure: locked")
-                transaction.onFailure(LockedException(transaction, this, currentLock), state)
+                System.err.println("Transaction failure: locked (failed transaction: $transaction)")
+                transaction.onFailure(LockedException(this, currentLock), state)
             }
         }.start()
     }
@@ -88,8 +93,8 @@ abstract class TransactionListener {
     protected abstract fun commitTransaction(state: TransactionState)
 }
 
-class LockedException(offendingTransaction: Transaction, listener: TransactionListener, lockedBy: Transaction) :
-    Exception("Transaction '$offendingTransaction' is rejected because the class '$listener' is locked by '$lockedBy'")
+class LockedException(listener: TransactionListener, lockedBy: Transaction) :
+    Exception("The class '$listener' is locked by '$lockedBy'")
 
 @JvmInline value class TransactionState(val valueTable: HashMap<String, Any?>) {
     operator fun get(key: String) = valueTable[key]

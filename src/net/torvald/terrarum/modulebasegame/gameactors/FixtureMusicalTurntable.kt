@@ -116,12 +116,6 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
                 App.printdbg(this, "Stop music $title - $artist")
             }
 
-
-            // FIXME the olde way -- must be replaced with one that utilises MusicService
-            /*App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, AudioMixer.DEFAULT_FADEOUT_LEN / 2f) {
-                startAudio(musicNowPlaying!!) { loadEffector(it) }
-            }*/
-
             MusicService.playMusicalFixture(
                 /* action: () -> Unit */ {
                     startAudio(musicNowPlaying!!) { loadEffector(it) }
