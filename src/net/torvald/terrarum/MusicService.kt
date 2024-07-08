@@ -248,8 +248,7 @@ object MusicService : TransactionListener() {
                 // request fadeout
                 App.audioMixer.requestFadeOut(App.audioMixer.musicTrack) {
                     try {
-                        // callback: play next song in the playlist
-                        // TODO queue the next song on the playlist, the actual playback will be done by the state machine update
+                        // do nothing, really
 
                         fadedOut = true
                     }
@@ -263,6 +262,8 @@ object MusicService : TransactionListener() {
             }
 
             override fun onSuccess(state: TransactionState) {
+                enterSTATE_INTERMISSION(0f)
+                enterSTATE_FIREPLAY()
                 onSuccess()
             }
             override fun onFailure(e: Throwable, state: TransactionState) {
@@ -279,8 +280,10 @@ object MusicService : TransactionListener() {
                 // request fadeout
                 App.audioMixer.requestFadeOut(App.audioMixer.musicTrack) {
                     try {
-                        // callback: play prev song in the playlist
-                        // TODO queue the prev song on the playlist, the actual playback will be done by the state machine update
+                        // unshift the playlist
+                        // FIREPLAY always pulls next track, that's why we need two prev()
+                        (state["currentPlaylist"] as TerrarumMusicPlaylist).queuePrev()
+                        (state["currentPlaylist"] as TerrarumMusicPlaylist).queuePrev()
 
                         fadedOut = true
                     }
@@ -294,9 +297,15 @@ object MusicService : TransactionListener() {
             }
 
             override fun onSuccess(state: TransactionState) {
+
+                enterSTATE_INTERMISSION(0f)
+                enterSTATE_FIREPLAY()
                 onSuccess()
             }
             override fun onFailure(e: Throwable, state: TransactionState) {
+                // reshift the playlist
+                (state["currentPlaylist"] as TerrarumMusicPlaylist).queueNext()
+
                 e.printStackTrace()
             }
         }
