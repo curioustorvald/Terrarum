@@ -1051,6 +1051,8 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
     private val playControlAnimAkku = FloatArray(5) // how many control buttons?
     private val playControlAnimLength = 0.2f
 
+    private val colInactive = Color(0xaaaaaaff.toInt())
+
     private fun drawControls(delta: Float, batch: SpriteBatch, posX: Float, posY: Float) {
         val (alpha, reverse) = if (mode < MODE_MOUSE_UP && modeNext == MODE_MOUSE_UP)
             (transitionAkku / TRANSITION_LENGTH).let { if (it.isNaN()) 0f else it } to false
@@ -1070,7 +1072,7 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                 else
                     0f
 
-        val baseCol = if (MusicService.transactionLocked) Color.RED else Color.WHITE
+        val baseCol = if (MusicService.transactionLocked) colInactive else Color.WHITE
 
         if (alpha > 0f) {
             val alpha0 = alpha.coerceIn(0f, 1f).organicOvershoot().coerceAtMost(1f)

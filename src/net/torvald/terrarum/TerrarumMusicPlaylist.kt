@@ -84,9 +84,21 @@ class TerrarumMusicPlaylist(
     }
 
     fun queueNthSong(n: Int): MusicContainer {
-        checkRefill()
-        internalIndices.add(currentIndexCursor, n)
-        currentIndexCursor -= 1
+        if (shuffled) {
+            internalIndices.clear()
+            refillInternalIndices()
+            internalIndices.add(n)
+            refillInternalIndices()
+            currentIndexCursor = musicList.size - 1
+        }
+        else {
+            internalIndices.clear()
+            refillInternalIndices()
+            refillInternalIndices()
+            currentIndexCursor = musicList.size - 1 + n
+            checkRefill()
+        }
+
         return musicList[internalIndices[currentIndexCursor]]
     }
 

@@ -114,14 +114,14 @@ object MusicService : TransactionListener() {
 
                                 override fun onFailure(e: Throwable, state: TransactionState) {
                                     printdbg(this, "FIREPLAY resume OK but startMusic failed, entering intermission")
-                                    enterSTATE_INTERMISSION(getRandomMusicInterval()) // will try again after a random interval
+                                    enterIntermissionAndWaitForPlaylist() // will try again
                                 }
                             })
                         },
                         /* onFailure: (Throwable) -> Unit */
                         {
                             printdbg(this, "FIREPLAY resume failed, entering intermission")
-                            enterSTATE_INTERMISSION(getRandomMusicInterval()) // will try again after a random interval
+                            enterIntermissionAndWaitForPlaylist() // will try again
                         },
                         // onFinally: () -> Unit
                         {
@@ -297,7 +297,6 @@ object MusicService : TransactionListener() {
             }
 
             override fun onSuccess(state: TransactionState) {
-
                 enterSTATE_INTERMISSION(0f)
                 enterSTATE_FIREPLAY()
                 onSuccess()
@@ -320,8 +319,8 @@ object MusicService : TransactionListener() {
                 App.audioMixer.requestFadeOut(App.audioMixer.musicTrack) {
                     try {
                         // callback: play prev song in the playlist
-                        // TODO queue the nth song on the playlist, the actual playback will be done by the state machine update
-
+                        // queue the nth song on the playlist, the actual playback will be done by the state machine update
+                        (state["currentPlaylist"] as TerrarumMusicPlaylist).queueNthSong(index)
 
                         fadedOut = true
                     }
@@ -335,6 +334,8 @@ object MusicService : TransactionListener() {
             }
 
             override fun onSuccess(state: TransactionState) {
+                enterSTATE_INTERMISSION(0f)
+                enterSTATE_FIREPLAY()
                 onSuccess()
             }
             override fun onFailure(e: Throwable, state: TransactionState) {

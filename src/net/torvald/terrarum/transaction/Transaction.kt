@@ -33,6 +33,17 @@ abstract class TransactionListener {
     val transactionLockingClass: AtomicReference<Transaction?> = AtomicReference(null)
     val transactionLocked: Boolean; get() = (transactionLockingClass.get() != null)
 
+    private fun acquireLock(locker: Transaction) {
+        synchronized(this) {
+            transactionLockingClass.set(locker)
+        }
+    }
+
+    private fun releaseLock() {
+        synchronized(this) {
+            transactionLockingClass.set(null)
+        }
+    }
 
     /**
      * Transaction modifies a given state to a new state, then applies the new state to the object.
@@ -47,7 +58,7 @@ abstract class TransactionListener {
             val state = getCurrentStatusForTransaction()
             val currentLock = transactionLockingClass.get()
             if (currentLock == null) {
-                transactionLockingClass.set(transaction)
+                acquireLock(transaction)
                 try {
                     transaction.start(state)
                     // if successful:
@@ -62,7 +73,7 @@ abstract class TransactionListener {
                     transaction.onFailure(e, state)
                 }
                 finally {
-                    transactionLockingClass.set(null)
+                    releaseLock()
                     onFinally()
                 }
             }
