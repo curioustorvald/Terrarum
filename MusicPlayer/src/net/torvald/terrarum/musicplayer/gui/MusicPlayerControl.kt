@@ -176,7 +176,10 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
     private var mouseOnButton: Int? = null
     private var mouseOnList: Int? = null
 
+    private var transactionLocked = MusicService.transactionLocked
+
     override fun updateImpl(delta: Float) {
+        transactionLocked = MusicService.transactionLocked // the value need to be "latched"
         val currentPlaylist = getCurrentPlaylist()
 
         // process transition request
@@ -296,9 +299,13 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
         else {
             mouseOnButton = null
         }
+        //// manually nullify the buttons that does nothing when locked
+        if (transactionLocked && mode < MODE_SHOW_LIST && (mouseOnButton == 1 || mouseOnButton == 3)) {
+            mouseOnButton = null
+        }
 
         // mouse is over which list
-        mouseOnList = if (mode >= MODE_SHOW_LIST &&
+        mouseOnList = if (!transactionLocked && mode >= MODE_SHOW_LIST &&
             relativeMouseY.toFloat() in _posY + 9.._posY + 9 + PLAYLIST_LINES*PLAYLIST_LINE_HEIGHT &&
             relativeMouseX.toFloat() in _posX.._posX + width) {
 
@@ -335,9 +342,11 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                     1 -> { // prev
                         // prev song
                         if (mode < MODE_SHOW_LIST) {
-                            MusicService.playPrevSongInPlaylist {
-                                iHitTheStopButton = false
-                                stopRequested = false
+                            if (!transactionLocked) {
+                                MusicService.playPrevSongInPlaylist(true) {
+                                    iHitTheStopButton = false
+                                    stopRequested = false
+                                }
                             }
                         }
                         // prev page in the playlist
@@ -365,7 +374,7 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                                 if (thisMusic is MusicContainer) thisMusic.let { ingame.backgroundMusicPlayer.queueMusicToPlayNext(it) }
                                 iHitTheStopButton = true*/
 
-                                MusicService.stopPlaylistPlayback {
+                                MusicService.stopPlaylistPlayback(true) {
                                     iHitTheStopButton = true
                                 }
                             }
@@ -391,9 +400,11 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                     3 -> { // next
                         // next song
                         if (mode < MODE_SHOW_LIST) {
-                            MusicService.playNextSongInPlaylist {
-                                iHitTheStopButton = false
-                                stopRequested = false
+                            if (!transactionLocked) {
+                                MusicService.playNextSongInPlaylist(true) {
+                                    iHitTheStopButton = false
+                                    stopRequested = false
+                                }
                             }
                         }
                         // next page in the playlist
@@ -435,9 +446,11 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                     if (index < currentPlaylist.musicList.size) {
                         // if selected song != currently playing
                         if (App.audioMixer.musicTrack.currentTrack == null || currentPlaylist.musicList[index] != App.audioMixer.musicTrack.currentTrack) {
-                            MusicService.playNthSongInPlaylist(index) {
-                                iHitTheStopButton = false
-                                stopRequested = false
+                            if (!transactionLocked) {
+                                MusicService.playNthSongInPlaylist(index, true) {
+                                    iHitTheStopButton = false
+                                    stopRequested = false
+                                }
                             }
                         }
                     }
@@ -452,9 +465,11 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                     // if selected album is not the same album currently playing, queue that album immediately
                     // (navigating into the selected album involves too much complication :p)
                     if (MusicService.currentPlaylist?.source != albumsList[index].canonicalPath) {
-                        val playlist = loadNewAlbum(albumsList[index])
-                        MusicService.putNewPlaylistAndResumePlayback(playlist) {
-                            resetPlaylistScroll(App.audioMixer.musicTrack.nextTrack as? MusicContainer)
+                        if (!transactionLocked) {
+                            val playlist = loadNewAlbum(albumsList[index])
+                            MusicService.putNewPlaylistAndResumePlayback(playlist, true) {
+                                resetPlaylistScroll(App.audioMixer.musicTrack.nextTrack as? MusicContainer)
+                            }
                         }
                     }
                 }
@@ -680,7 +695,7 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
 
         // debug codes
         //// transaction state
-        /*if (MusicService.transactionLocked) {
+        /*if (transactionLocked) {
             batch.color = Color.RED
             Toolkit.drawTextCentered(batch, App.fontSmallNumbers, "LOCKED", Toolkit.drawWidth, 0, _posY.toInt() + height + 5)
         }
@@ -1020,7 +1035,7 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
     }
 
     private val playControlAnimAkku = FloatArray(5) // how many control buttons?
-    private val playControlAnimLength = 0.2f
+    private val playControlAnimLength = 0.16f
 
     private val colInactive = Color(0xaaaaaaff.toInt())
 
@@ -1043,7 +1058,7 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
                 else
                     0f
 
-        val baseCol = if (MusicService.transactionLocked) colInactive else Color.WHITE
+        val baseCol = if (transactionLocked) colInactive else Color.WHITE
 
         if (alpha > 0f) {
             val alpha0 = alpha.coerceIn(0f, 1f).organicOvershoot().coerceAtMost(1f)

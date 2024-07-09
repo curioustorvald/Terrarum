@@ -256,7 +256,7 @@ object MusicService : TransactionListener() {
      * @param playlist An instance of a [TerrarumMusicPlaylist] to be changed into
      * @param onSuccess What to do after the transaction
      */
-    private fun createTransactionPlaylistChangeAndPlayImmediately(playlist: TerrarumMusicPlaylist, onSuccess: () -> Unit): Transaction {
+    private fun createTransactionPlaylistChangeAndPlayImmediately(playlist: TerrarumMusicPlaylist, fadeLen: Double, onSuccess: () -> Unit): Transaction {
         return object : Transaction {
             var oldPlaylist: TerrarumMusicPlaylist? = null
             var oldState = currentPlaybackState.get()
@@ -273,7 +273,7 @@ object MusicService : TransactionListener() {
                 if (App.audioMixer.musicTrack.isPlaying) {
                     var fadedOut = false
 
-                    App.audioMixer.requestFadeOut(App.audioMixer.musicTrack) {
+                    App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, fadeLen) {
                         // put new playlist
                         state["currentPlaylist"] = playlist
 
@@ -329,7 +329,7 @@ object MusicService : TransactionListener() {
         }
     }
 
-    private fun createTransactionForNextMusicInPlaylist(onSuccess: () -> Unit): Transaction {
+    private fun createTransactionForNextMusicInPlaylist(fadeLen: Double, onSuccess: () -> Unit): Transaction {
         return object : Transaction {
             var oldState = currentPlaybackState.get()
             var oldAkku = waitAkku
@@ -339,7 +339,7 @@ object MusicService : TransactionListener() {
                 var fadedOut = false
                 var err: Throwable? = null
                 // request fadeout
-                App.audioMixer.requestFadeOut(App.audioMixer.musicTrack) {
+                App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, fadeLen) {
                     try {
                         // do nothing, really
 
@@ -374,7 +374,7 @@ object MusicService : TransactionListener() {
         }
     }
 
-    private fun createTransactionForPrevMusicInPlaylist(onSuccess: () -> Unit): Transaction {
+    private fun createTransactionForPrevMusicInPlaylist(fadeLen: Double, onSuccess: () -> Unit): Transaction {
         return object : Transaction {
             var oldState = currentPlaybackState.get()
             var oldAkku = waitAkku
@@ -384,7 +384,7 @@ object MusicService : TransactionListener() {
                 var fadedOut = false
                 var err: Throwable? = null
                 // request fadeout
-                App.audioMixer.requestFadeOut(App.audioMixer.musicTrack) {
+                App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, fadeLen) {
                     try {
                         // unshift the playlist
                         // FIREPLAY always pulls next track, that's why we need two prev()
@@ -425,7 +425,7 @@ object MusicService : TransactionListener() {
         }
     }
 
-    private fun createTransactionForNthMusicInPlaylist(index: Int, onSuccess: () -> Unit): Transaction {
+    private fun createTransactionForNthMusicInPlaylist(index: Int, fadeLen: Double, onSuccess: () -> Unit): Transaction {
         return object : Transaction {
             var oldState = currentPlaybackState.get()
             var oldAkku = waitAkku
@@ -435,7 +435,7 @@ object MusicService : TransactionListener() {
                 var fadedOut = false
                 var err: Throwable? = null
                 // request fadeout
-                App.audioMixer.requestFadeOut(App.audioMixer.musicTrack) {
+                App.audioMixer.requestFadeOut(App.audioMixer.musicTrack, fadeLen) {
                     try {
                         // callback: play prev song in the playlist
                         // queue the nth song on the playlist, the actual playback will be done by the state machine update
@@ -584,11 +584,11 @@ object MusicService : TransactionListener() {
         else
             runTransaction(createTransactionPlaylistChange(playlist, {}))
     }
-    fun putNewPlaylistAndResumePlayback(playlist: TerrarumMusicPlaylist, onSuccess: (() -> Unit)? = null) {
+    fun putNewPlaylistAndResumePlayback(playlist: TerrarumMusicPlaylist, shortFade: Boolean = false, onSuccess: (() -> Unit)? = null) {
         if (onSuccess != null)
-            runTransaction(createTransactionPlaylistChangeAndPlayImmediately(playlist, onSuccess))
+            runTransaction(createTransactionPlaylistChangeAndPlayImmediately(playlist, DEFAULT_FADEOUT_LEN / shortFade.toInt().plus(1), onSuccess))
         else
-            runTransaction(createTransactionPlaylistChangeAndPlayImmediately(playlist, {}))
+            runTransaction(createTransactionPlaylistChangeAndPlayImmediately(playlist, DEFAULT_FADEOUT_LEN / shortFade.toInt().plus(1), {}))
     }
     fun putNewPlaylist(playlist: TerrarumMusicPlaylist, onSuccess: () -> Unit, onFinally: () -> Unit) {
         runTransaction(createTransactionPlaylistChange(playlist, onSuccess), onFinally)
@@ -603,25 +603,25 @@ object MusicService : TransactionListener() {
         runTransaction(createTransactionPausePlaylistForMusicalFixture(action, musicFinished, onSuccess, onFailure), onFinally)
     }
 
-    fun playNextSongInPlaylist(onSuccess: () -> Unit) {
-        runTransaction(createTransactionForNextMusicInPlaylist(onSuccess))
+    fun playNextSongInPlaylist(shortFade: Boolean = false, onSuccess: () -> Unit) {
+        runTransaction(createTransactionForNextMusicInPlaylist(DEFAULT_FADEOUT_LEN / shortFade.toInt().plus(1), onSuccess))
     }
-    fun playNextSongInPlaylist(onSuccess: () -> Unit, onFinally: () -> Unit) {
-        runTransaction(createTransactionForNextMusicInPlaylist(onSuccess), onFinally)
-    }
-
-    fun playPrevSongInPlaylist(onSuccess: () -> Unit) {
-        runTransaction(createTransactionForPrevMusicInPlaylist(onSuccess))
-    }
-    fun playPrevSongInPlaylist(onSuccess: () -> Unit, onFinally: () -> Unit) {
-        runTransaction(createTransactionForPrevMusicInPlaylist(onSuccess), onFinally)
+    fun playNextSongInPlaylist(shortFade: Boolean = false, onSuccess: () -> Unit, onFinally: () -> Unit) {
+        runTransaction(createTransactionForNextMusicInPlaylist(DEFAULT_FADEOUT_LEN / shortFade.toInt().plus(1), onSuccess), onFinally)
     }
 
-    fun playNthSongInPlaylist(index: Int, onSuccess: () -> Unit) {
-        runTransaction(createTransactionForNthMusicInPlaylist(index, onSuccess))
+    fun playPrevSongInPlaylist(shortFade: Boolean = false, onSuccess: () -> Unit) {
+        runTransaction(createTransactionForPrevMusicInPlaylist(DEFAULT_FADEOUT_LEN / shortFade.toInt().plus(1), onSuccess))
     }
-    fun playNthSongInPlaylist(index: Int, onSuccess: () -> Unit, onFinally: () -> Unit) {
-        runTransaction(createTransactionForNthMusicInPlaylist(index, onSuccess), onFinally)
+    fun playPrevSongInPlaylist(shortFade: Boolean = false, onSuccess: () -> Unit, onFinally: () -> Unit) {
+        runTransaction(createTransactionForPrevMusicInPlaylist(DEFAULT_FADEOUT_LEN / shortFade.toInt().plus(1), onSuccess), onFinally)
+    }
+
+    fun playNthSongInPlaylist(index: Int, shortFade: Boolean = false, onSuccess: () -> Unit) {
+        runTransaction(createTransactionForNthMusicInPlaylist(index, DEFAULT_FADEOUT_LEN / shortFade.toInt().plus(1), onSuccess))
+    }
+    fun playNthSongInPlaylist(index: Int, shortFade: Boolean = false, onSuccess: () -> Unit, onFinally: () -> Unit) {
+        runTransaction(createTransactionForNthMusicInPlaylist(index, DEFAULT_FADEOUT_LEN / shortFade.toInt().plus(1), onSuccess), onFinally)
     }
 
     fun stopPlaylistPlayback(onSuccess: () -> Unit) {
