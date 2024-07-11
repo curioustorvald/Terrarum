@@ -169,8 +169,15 @@ open class DroppedItem : ActorWithBody {
 
     fun onItemPickup(actor: ActorWithBody) {
         flagDespawn = true
+        val actorHadTheSameItem = (actor as Pocketed).inventory.contains(itemID)
         (actor as Pocketed).inventory.add(itemID, itemCount)
         Terrarum.ingame!!.sendItemPickupNoticelet(itemID, itemCount)
         ItemCodex[itemID]!!.effectOnPickup(actor)
+
+        // if actor did not have the same item AND holding nothing, equip it
+        val qs = actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)
+        if (!actorHadTheSameItem && qs != null && (actor as Pocketed).inventory.getQuickslotItem(qs) == null) {
+            (actor as Pocketed).inventory.setQuickslotItem(qs, itemID)
+        }
     }
 }
