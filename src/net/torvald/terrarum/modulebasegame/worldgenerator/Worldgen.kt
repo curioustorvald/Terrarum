@@ -11,11 +11,13 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
+import kotlin.experimental.and
 import kotlin.math.ln
 import kotlin.math.pow
 import kotlin.math.roundToLong
@@ -100,14 +102,34 @@ object Worldgen {
         world.spawnX = spawnX
         world.spawnY = spawnY
 
+        // generated the missing chunks, 5x5 centred to the player
+        val pcx = spawnX / CHUNK_W
+        val pcy = spawnY / CHUNK_H
+        App.getLoadScreen().addMessage(Lang["MENU_IO_WORLDGEN_CLEANING_UP"])
+        listOf(
+            Point2iMod(pcx - 1, pcy - 2), Point2iMod(pcx, pcy - 2), Point2iMod(pcx + 1, pcy - 2),
+            Point2iMod(pcx - 2, pcy - 1), Point2iMod(pcx - 1, pcy - 1), Point2iMod(pcx, pcy - 1), Point2iMod(pcx + 1, pcy - 1),  Point2iMod(pcx + 2, pcy - 1),
+            Point2iMod(pcx - 2, pcy), Point2iMod(pcx - 1, pcy), Point2iMod(pcx + 1, pcy),  Point2iMod(pcx + 2, pcy),
+            Point2iMod(pcx - 2, pcy + 1), Point2iMod(pcx - 1, pcy + 1), Point2iMod(pcx, pcy + 1), Point2iMod(pcx + 1, pcy + 1),  Point2iMod(pcx + 2, pcy + 1),
+            Point2iMod(pcx - 1, pcy + 2), Point2iMod(pcx, pcy + 2), Point2iMod(pcx + 1, pcy + 2),
+        ).filter { it.y in 0 until world.height }.filter {  (cx, cy) ->
+            if (cy !in 0 until world.height / CHUNK_H) false
+            else (world.chunkFlags[cy][cx].and(0x7F) == 0.toByte())
+        }.forEach { (cx, cy) ->
+            Worldgen.generateChunkIngame(cx, cy, true) { cx, cy -> }
+        }
+
+
         printdbg(this, "Generation job finished")
 
     }
 
+    private fun Point2iMod(x: Int, y: Int) = Point2i(x fmod (world.width / CHUNK_W), y)
+
     /**
      * Chunk flags will be set automatically
      */
-    fun generateChunkIngame(cx: Int, cy: Int, callback: (Int, Int) -> Unit) {
+    fun generateChunkIngame(cx: Int, cy: Int, join: Boolean = false, callback: (Int, Int) -> Unit) {
         val jobs = getJobs()
         printdbg(this, "Generating chunk on ($cx, $cy)")
         Thread {
@@ -123,6 +145,7 @@ object Worldgen {
         }.let {
             it.priority = 2
             it.start()
+            if (join) it.join()
         }
     }
 
@@ -131,7 +154,6 @@ object Worldgen {
     fun getEstimationSec(width: Int, height: Int): Long {
         val testMachineBogoFlops = 48000000
         val testMachineThreads = 32
-        val dataPoints = intArrayOf(9, 15, 23, 32)
         val eqMult = 0.0214 // use google sheet to get trend line equation
         val eqPow = 0.396 // use google sheet to get trend line equation
 
@@ -146,7 +168,8 @@ object Worldgen {
         val start = (0.00342f * world.height - 3.22f).floorToInt().coerceAtLeast(1)
         // this value has to extend up, otherwise the player may spawn into the chopped-off mountaintop
         // this value has to extend down into the rock layer, otherwise, if the bottom of the bottom chunk is dirt, they will turn into grasses
-        return start to start + 5
+        //     - the second condition is nullified with the new NOT-GENERATED markers on the terrain
+        return start - 1 to start + 5
     }
 
     private val rockScoreMin = 40
@@ -413,7 +436,7 @@ abstract class Gen(val world: GameWorld, val isFinal: Boolean, val seed: Long, v
 
     private fun getChunksRange(): List<Int> {
         val (yStart, yEnd) = Worldgen.getChunkGenStrip(world)
-        return (0 until world.width / CHUNK_W).flatMap { cx ->
+        return (0 until world.width / CHUNK_W step 2).flatMap { cx -> // skip every other column because we can :smiling_face_with_horns:
             (LandUtil.chunkXYtoChunkNum(world, cx, yStart)..LandUtil.chunkXYtoChunkNum(world, cx, yEnd)).toList()
         }
     }

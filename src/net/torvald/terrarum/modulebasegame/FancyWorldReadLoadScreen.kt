@@ -121,7 +121,7 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
 
 class FancyWorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidth: Int, private val worldheight: Int) : FancyWorldReadLoadScreen(screenToBeLoaded, worldwidth, worldheight, {}) {
 
-    private val chunks = (worldwidth / CHUNK_W) * 9
+    private val chunks = (worldwidth / CHUNK_W).div(2f).ceilToInt() * 7
 
     override fun getProgress(): Double {
         return progress.get().toDouble() / chunks * previewWidth
