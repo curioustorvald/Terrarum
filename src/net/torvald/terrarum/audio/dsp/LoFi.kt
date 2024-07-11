@@ -28,12 +28,12 @@ open class LoFi(
     internal val convolver = Convolv(irModule, irPath, crossfeed, gain)
 
     private val immAfterStaticMix = listOf(FloatArray(App.audioBufferSize), FloatArray(App.audioBufferSize))
-    private val immAfterConvolv = listOf(FloatArray(App.audioBufferSize), FloatArray(App.audioBufferSize))
+    private val immAfterSat = listOf(FloatArray(App.audioBufferSize), FloatArray(App.audioBufferSize))
 
     override fun thru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {
         staticMixThru(inbuf, immAfterStaticMix)
-        convolver.thru(immAfterStaticMix, immAfterConvolv)
-        saturatorThru(immAfterConvolv, outbuf)
+        saturatorThru(immAfterStaticMix, immAfterSat)
+        convolver.thru(immAfterSat, outbuf)
     }
 
     private fun staticMixThru(inbuf: List<FloatArray>, outbuf: List<FloatArray>) {

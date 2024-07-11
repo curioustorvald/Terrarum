@@ -47,9 +47,12 @@ class Convolv(irModule: String, irPath: String, val crossfeed: Float, gain: Floa
     private val fftOutR = FloatArray(fftLen)
 
     private fun convolve(x: ComplexArray, h: ComplexArray, output: FloatArray) {
-        FFT.fftInto(x, fftIn)
-        fftIn.mult(h, fftMult)
-        FFT.ifftAndGetReal(fftMult, output)
+        try {
+            FFT.fftInto(x, fftIn)
+            fftIn.mult(h, fftMult)
+            FFT.ifftAndGetReal(fftMult, output)
+        }
+        catch (_: InterruptedException) { /* ignore it */ }
     }
 
     /**
