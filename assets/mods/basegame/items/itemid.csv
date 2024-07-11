@@ -53,6 +53,8 @@ id;classname;tags
 52;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalSevenSeg;FIXTURE,SIGNAL
 53;net.torvald.terrarum.modulebasegame.gameitems.ItemEngravingWorkbench;FIXTURE,CRAFTING
 54;net.torvald.terrarum.modulebasegame.gameitems.ItemMechanicalTines;FIXTURE,MUSIC,SIGNAL
+55;net.torvald.terrarum.modulebasegame.gameitems.ItemGlowOrb;LIGHT,THROWABLE
+
 
 # ingots
 112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper;INGOT

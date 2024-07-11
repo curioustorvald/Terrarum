@@ -74,3 +74,15 @@ class ItemCherryBomb(originalID: ItemID) : ItemThrowable(originalID, "net.torval
         itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(0,13)
     }
 }
+
+
+/**
+ * Created by minjaesong on 2024-07-12.
+ */
+class ItemGlowOrb(originalID: ItemID) : ItemThrowable(originalID, "net.torvald.terrarum.modulebasegame.gameactors.ActorGlowOrb") {
+    override var originalName = "ITEM_GLOW_ORB"
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(1,13)
+    }
+    // itemImageEmissive is not set because held glow orb does not glow (they get activated only when thrown)
+}
