@@ -2,7 +2,6 @@ package net.torvald.terrarum.serialise
 
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID

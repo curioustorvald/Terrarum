@@ -12,5 +12,4 @@ object Fluid {
     val WATER = "fluid@basegame:1"
     val LAVA = "fluid@basegame:2"
 
-
 }

@@ -11,6 +11,7 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.utils.HashArray
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.AtlasSource.*
@@ -309,6 +310,9 @@ class CreateTileAtlas {
                     (a / pxCount)
             )
         }
+
+        // special colour
+        terrainTileColourMap[Block.NULL] = Cvec(1f, 0f, 0f, 1f)
 
         itemTerrainTexture = Texture(itemTerrainPixmap)
         itemTerrainTextureGlow = Texture(itemTerrainPixmapGlow)

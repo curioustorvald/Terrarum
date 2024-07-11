@@ -53,6 +53,9 @@ internal object ExportMap : ConsoleCommand {
             var mapDataPointer = 0
 
             for ((terr, wall, ore) in world.terrainIterator()) {
+                val terr = if (terr == "basegame:-2") "basegame:-1" else terr
+                val wall = if (wall == "basegame:-2") "basegame:-1" else wall // world.getTileFromWall() returns item ID WITHOUT wall tag
+
                 val colOre = (oreColourMap.get(ore) ?: throw NullPointerException("nullore $ore")).toByteArray()
                 val colFore = (App.tileMaker.terrainTileColourMap.get(terr) ?: throw NullPointerException("nullterr $terr")).toByteArray()
                 val colWall = (App.tileMaker.terrainTileColourMap.get(wall) ?: throw NullPointerException("nullwall $wall")).cpy().mul(WALL_OVERLAY).toByteArray()

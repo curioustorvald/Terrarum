@@ -6,7 +6,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.BlockLayerI16F16
-import net.torvald.terrarum.gameworld.BlockLayerI16I8
+import net.torvald.terrarum.gameworld.BlockLayerOresI16I8
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.GameWorld.Companion.CHUNK_LOADED
 import net.torvald.terrarum.langpack.Lang
@@ -150,7 +150,7 @@ object LoadSavegame {
 
         world.layerTerrain = BlockLayerI16(world.width, world.height)
         world.layerWall = BlockLayerI16(world.width, world.height)
-        world.layerOres = BlockLayerI16I8(world.width, world.height)
+        world.layerOres = BlockLayerOresI16I8(world.width, world.height)
         world.layerFluids = BlockLayerI16F16(world.width, world.height)
         world.chunkFlags = Array(world.height / LandUtil.CHUNK_H) { ByteArray(world.width / LandUtil.CHUNK_W) }
 

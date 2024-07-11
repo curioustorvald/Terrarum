@@ -86,7 +86,7 @@ open class GameWorld(
     //layers
     @Transient open lateinit var layerWall: BlockLayerI16
     @Transient open lateinit var layerTerrain: BlockLayerI16
-    @Transient open lateinit var layerOres: BlockLayerI16I8 // damage to the block follows `terrainDamages`
+    @Transient open lateinit var layerOres: BlockLayerOresI16I8 // damage to the block follows `terrainDamages`
     @Transient open lateinit var layerFluids: BlockLayerI16F16
     val wallDamages = HashArray<Float>()
     val terrainDamages = HashArray<Float>()
@@ -146,22 +146,25 @@ open class GameWorld(
     )
 
     @Transient private val forcedTileNumberToNames = hashSetOf(
-        Block.AIR, Block.UPDATE
+        Block.AIR, Block.UPDATE, Block.NOT_GENERATED
     )
     @Transient private val forcedFluidNumberToTiles = hashSetOf(
         Fluid.NULL
     )
     val tileNumberToNameMap = HashArray<ItemID>().also {
         it[0] = Block.AIR
-        it[2] = Block.UPDATE
+        it[1] = Block.UPDATE
+        it[65535] = Block.NOT_GENERATED // unlike Block.NULL, this one is solid
     }
     val fluidNumberToNameMap = HashArray<ItemID>().also {
         it[0] = Fluid.NULL
+        it[65535] = Fluid.NULL // 65535 denotes "not generated"
     }
     // does not go to the savefile
     @Transient val tileNameToNumberMap = HashMap<ItemID, Int>().also {
         it[Block.AIR] = 0
-        it[Block.UPDATE] = 2
+        it[Block.UPDATE] = 1
+        it[Block.NOT_GENERATED] = 65535 // unlike Block.NULL, this one is solid
     }
     @Transient val fluidNameToNumberMap = HashMap<ItemID, Int>().also {
         it[Fluid.NULL] = 0
@@ -221,7 +224,7 @@ open class GameWorld(
 
         layerTerrain = BlockLayerI16(width, height)
         layerWall = BlockLayerI16(width, height)
-        layerOres = BlockLayerI16I8(width, height)
+        layerOres = BlockLayerOresI16I8(width, height)
         layerFluids = BlockLayerI16F16(width, height)
         chunkFlags = Array(height / CHUNK_H) { ByteArray(width / CHUNK_W) }
 
@@ -252,8 +255,13 @@ open class GameWorld(
     fun coordInWorldStrict(x: Int, y: Int) = x in 0 until width && y in 0 until height // ROUNDWORLD implementation
 
     fun renumberTilesAfterLoad() {
+        // patch the "old"map
+        tileNumberToNameMap[0] = Block.AIR
+        tileNumberToNameMap[1] = Block.UPDATE
+        tileNumberToNameMap[65535] = Block.NOT_GENERATED
         // before the renaming, update the name maps
         val oldTileNumberToNameMap: Map<Long, ItemID> = tileNumberToNameMap.toMap()
+
         tileNumberToNameMap.clear()
         tileNameToNumberMap.clear()
         App.tileMaker.tags.forEach {
@@ -263,23 +271,28 @@ open class GameWorld(
             tileNameToNumberMap[it.key] = it.value.tileNumber
         }
 
+        // force this rule to the old saves
+        tileNumberToNameMap[0] = Block.AIR
+        tileNumberToNameMap[1] = Block.UPDATE
+        tileNumberToNameMap[65535] = Block.NOT_GENERATED
+        tileNameToNumberMap[Block.AIR] = 0
+        tileNameToNumberMap[Block.UPDATE] = 1
+        tileNameToNumberMap[Block.NOT_GENERATED] = 65535
+        fluidNumberToNameMap[0] = Fluid.NULL
+        fluidNumberToNameMap[65535] = Fluid.NULL
+        fluidNameToNumberMap[Fluid.NULL] = 0
+
         // perform renaming of tile layers
         for (y in 0 until layerTerrain.height) {
             for (x in 0 until layerTerrain.width) {
                 layerTerrain.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerTerrain.unsafeGetTile(x, y).toLong()]]!!)
                 layerWall.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerWall.unsafeGetTile(x, y).toLong()]]!!)
-                layerOres.unsafeSetTileKeepPlacement(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerOres.unsafeGetTile(x, y).toLong()]]!!)
+
+                val oldNum = layerOres.unsafeGetTile(x, y).toLong()
+                val oldName = oldTileNumberToNameMap[oldNum]
+                layerOres.unsafeSetTileKeepPlacement(x, y, oldName.let { tileNameToNumberMap[it] ?: throw NullPointerException("Unknown tile name: $oldName (<- $oldNum)") })
             }
         }
-
-        // force this rule to the old saves
-        tileNumberToNameMap[0] = Block.AIR
-        tileNumberToNameMap[2] = Block.UPDATE
-        tileNameToNumberMap[Block.AIR] = 0
-        tileNameToNumberMap[Block.UPDATE] = 2
-        fluidNumberToNameMap[0] = Fluid.NULL
-        fluidNameToNumberMap[Fluid.NULL] = 0
-
 
         BlocksDrawer.rebuildInternalPrecalculations()
     }

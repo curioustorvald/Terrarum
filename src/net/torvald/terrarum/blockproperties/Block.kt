@@ -132,5 +132,6 @@ object Block {
     const val WATER = "basegame:4095"
 
     const val NULL = "basegame:-1"
+    const val NOT_GENERATED = "basegame:-2"
 
 }

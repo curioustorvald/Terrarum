@@ -13,7 +13,7 @@ import net.torvald.unsafe.UnsafePtr
  * where a_n is a tile number, p_n is a placement index
  * Created by minjaesong on 2023-10-10.
  */
-class BlockLayerI16I8 (override val width: Int, override val height: Int) : BlockLayer {
+class BlockLayerOresI16I8 (override val width: Int, override val height: Int) : BlockLayer {
     override val bytesPerBlock = BYTES_PER_BLOCK
 
     // for some reason, all the efforts of saving the memory space were futile.
@@ -25,7 +25,7 @@ class BlockLayerI16I8 (override val width: Int, override val height: Int) : Bloc
         get() = ptr.destroyed
 
     init {
-        ptr.fillWith(0)
+        ptr.fillWith(0) // there is no NOT-GENERATED for ores, keep it as 0
     }
 
     /**

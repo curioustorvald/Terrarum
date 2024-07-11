@@ -29,7 +29,7 @@ class BlockLayerI16F16(override val width: Int, override val height: Int) : Bloc
         get() = ptr.destroyed
 
     init {
-        ptr.fillWith(0)
+        ptr.fillWith(-1)
     }
 
     /**
