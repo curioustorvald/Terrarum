@@ -3,7 +3,6 @@
     <option name="JAR_PATH" value="$PROJECT_DIR$/out/TerrarumBuild.jar" />
     <option name="VM_PARAMETERS" value="-ea -Dswing.aatext=true -Dawt.useSystemAAFontSettings=lcd" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="ALTERNATIVE_JRE_PATH" value="17" />
     <module name="TerrarumBuild" />
     <method v="2">
