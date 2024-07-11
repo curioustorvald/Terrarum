@@ -146,7 +146,7 @@ object Worldgen {
         val start = (0.00342f * world.height - 3.22f).floorToInt().coerceAtLeast(1)
         // this value has to extend up, otherwise the player may spawn into the chopped-off mountaintop
         // this value has to extend down into the rock layer, otherwise, if the bottom of the bottom chunk is dirt, they will turn into grasses
-        return start - 1 to start + 7
+        return start to start + 5
     }
 
     private val rockScoreMin = 40
@@ -157,31 +157,38 @@ object Worldgen {
         val tallies = ArrayList<Pair<Point2i, Vector3f>>() // xypos, score (0..1+)
         var tries = 0
         var found = false
+        val ySearchRadius = 30
         while (tries < 99) {
             val posX = (Math.random() * world.width).toInt()
             var posY = yInit * CHUNK_H
             // go up?
             if (BlockCodex[world.getTileFromTerrain(posX, posY)].isSolid) {
                 // go up!
-                while (BlockCodex[world.getTileFromTerrain(posX, posY)].isSolid) {
+                while (posY > ySearchRadius && BlockCodex[world.getTileFromTerrain(posX, posY)].isSolid) {
                     posY -= 1
                 }
             }
             else {
                 // go down!
-                while (!BlockCodex[world.getTileFromTerrain(posX, posY)].isSolid) {
+                while (posY < world.height - ySearchRadius && !BlockCodex[world.getTileFromTerrain(posX, posY)].isSolid) {
                     posY += 1
                 }
             }
 
             printdbg(this, "Trying spawn point #${tries + 1} at ($posX, $posY)")
 
+            if (posY !in ySearchRadius+1 until world.height - ySearchRadius) {
+                printdbg(this, "...Survey says: X=$posX has no floor")
+                tries += 1
+                continue
+            }
+
             var rocks = 0
             var trees = 0
             var flatness = 0
             // make survey
             for (sx in -80..80) {
-                for (sy in -30..30) {
+                for (sy in -ySearchRadius..ySearchRadius) {
                     val x = posX + sx
                     val y = posY + sy
                     val tile = BlockCodex[world.getTileFromTerrain(x, y)]
