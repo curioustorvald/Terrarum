@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
-import com.jme3.math.Vector2f
 import com.jme3.math.Vector3f
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
@@ -18,7 +17,6 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import kotlin.experimental.and
-import kotlin.math.ln
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
@@ -84,6 +82,7 @@ object Worldgen {
     }
 
     fun generateMap(loadscreen: LoadScreenBase) {
+        val t1 = System.nanoTime()
         val jobs = getJobs()
 
 
@@ -120,8 +119,8 @@ object Worldgen {
         }
 
 
-        printdbg(this, "Generation job finished")
-
+        val tDiff = System.nanoTime() - t1
+        printdbg(this, "Generation job finished; time took: ${tDiff / 1000000000.0} seconds, bogoflops: ${App.bogoflops}")
     }
 
     private fun Point2iMod(x: Int, y: Int) = Point2i(x fmod (world.width / CHUNK_W), y)
@@ -152,13 +151,17 @@ object Worldgen {
     data class Work(val loadingScreenName: String, val theWork: Gen, val tags: List<String>)
 
     fun getEstimationSec(width: Int, height: Int): Long {
-        val testMachineBogoFlops = 48000000
-        val testMachineThreads = 32
-        val eqMult = 0.0214 // use google sheet to get trend line equation
-        val eqPow = 0.396 // use google sheet to get trend line equation
+        // test method: fresh new instance every worldgen
+        // test machine is loaded with the IDE and Web Browser (Firefox) running 1 Twitch stream and 1 YouTube video, both at 1080p
 
-        val f = eqMult * (width.toDouble() * height).pow(eqPow)
-        return (1.3 * (testMachineBogoFlops.toDouble() / bogoflops) * f * (testMachineThreads.toDouble() / THREAD_COUNT)).roundToLong()
+        val testMachineBogoFlops = 47518464.58
+        val testMachineThreads = 32
+        // eq: ax^b
+        val a = 0.05 // use google sheet to get trend line equation
+        val b = 0.343 // use google sheet to get trend line equation
+
+        val f = a * (width.toDouble() * height).pow(b)
+        return (1.25 * (testMachineBogoFlops / bogoflops) * f * (testMachineThreads.toDouble() / THREAD_COUNT)).roundToLong()
     }
 
     /**
