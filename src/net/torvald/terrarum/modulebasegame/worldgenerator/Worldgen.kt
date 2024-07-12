@@ -63,17 +63,13 @@ object Worldgen {
             it.putAll(oreRegistry.map { it.tile to it.tiling })
         }
 
-        val tagFilter = if (tags.isEmpty()) { { work: Work -> true } }
-        else {
-            { work: Work ->
-                (work.tags union tags).isNotEmpty()
-            }
-        }
+        val tagFilter = if (tags.isEmpty()) { _: Work -> true }
+        else { work: Work -> (work.tags union tags).isNotEmpty() }
+
         return listOf(
-            Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, false, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")),
+            Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, false, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")), // also generates marble veins
             Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, false, caveAttenuateBiasScaledCache, params.seed, oreRegistry), listOf("ORES")),
             Work(Lang["MENU_IO_WORLDGEN_POSITIONING_ROCKS"], OregenAutotiling(world, false, params.seed, oreTilingModes), listOf("ORES")),
-            // TODO generate rock veins
             // TODO generate gemstones
             Work(Lang["MENU_IO_WORLDGEN_CARVING_EARTH"], Cavegen(world, false, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
             Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Biomegen(world, false, params.seed, params.biomegenParams, biomeMap), listOf("BIOME")),

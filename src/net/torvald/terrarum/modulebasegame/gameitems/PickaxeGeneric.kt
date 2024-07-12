@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
@@ -29,7 +28,8 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2019-03-10.
  */
 object PickaxeCore {
-    private val hash = 10002L
+    private val tooltipHash = 10002L
+    private val soundPlayedForThisTick = HashMap<ActorWithBody, Long>()
 
     /**
      * @param mx centre position of the digging
@@ -41,6 +41,11 @@ object PickaxeCore {
             actor: ActorWithBody, delta: Float, item: GameItem?, mx: Int, my: Int,
             dropProbability: Double = 1.0, mw: Int = 1, mh: Int = 1
     ) = mouseInInteractableRangeTools(actor, item) {
+        if (!soundPlayedForThisTick.containsKey(actor)) {
+            soundPlayedForThisTick[actor] = 0L
+        }
+        val updateTimer = INGAME.WORLD_UPDATE_TIMER
+
         // un-round the mx
         val ww = INGAME.world.width
         val hpww = ww * TILE_SIZE / 2
@@ -92,8 +97,12 @@ object PickaxeCore {
             val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
             val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
-            if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toLong()) {
+            // prevent double-playing of sound effects
+            if (soundPlayedForThisTick[actor]!! < updateTimer - 4 &&
+                updateTimer % 11 == (Math.random() * 3).toLong()) {
+
                 makeNoiseTileTouching(actor, tile)
+                soundPlayedForThisTick[actor] = updateTimer
             }
 
             INGAME.world.inflictTerrainDamage(
@@ -228,7 +237,7 @@ object PickaxeCore {
         val overlayUIopen = (INGAME as? TerrarumIngame)?.uiBlur?.isVisible ?: false
         var tooltipSet = false
 
-        val tooltipWasShown = tooltipShowing[hash] ?: false
+        val tooltipWasShown = tooltipShowing[tooltipHash] ?: false
 
         mouseInInteractableRangeTools(actor, tool) {
             val tileUnderCursor = INGAME.world.getTileFromOre(mx, my).item
@@ -241,7 +250,7 @@ object PickaxeCore {
                 else "???"
                 if (App.getConfigBoolean("basegame:showpickaxetooltip")) {
                     INGAME.setTooltipMessage(tileName)
-                    tooltipShowing[hash] = true
+                    tooltipShowing[tooltipHash] = true
                 }
                 tooltipSet = true
             }
@@ -260,7 +269,7 @@ object PickaxeCore {
             true // just a placeholder
         }
 
-        if (App.getConfigBoolean("basegame:showpickaxetooltip") && !tooltipSet) tooltipShowing[hash] = false
+        if (App.getConfigBoolean("basegame:showpickaxetooltip") && !tooltipSet) tooltipShowing[tooltipHash] = false
     }
 
     private val soundCue = MusicContainer(

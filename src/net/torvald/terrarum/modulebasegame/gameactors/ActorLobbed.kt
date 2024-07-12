@@ -1,19 +1,23 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SingleImageSprite
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.audio.audiobank.MusicContainer
-import net.torvald.terrarum.audio.decibelsToFullscale
-import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.Hitbox
+import net.torvald.terrarum.gameactors.Lightbox
+import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.modulebasegame.ExplosionManager
-import java.util.ArrayList
 import kotlin.math.log10
+
+/**
+ * Created by minjaesong on 2024-07-12.
+ */
+open class ActorLobbed : ActorWithBody()
+
 
 /**
  * Created by minjaesong on 2024-02-13.
@@ -23,7 +27,7 @@ open class ActorPrimedBomb(
     private var fuse: Second = 1f,
     @Transient private var dropProbNonOre: Float = 0.25f,
     @Transient private var dropProbOre: Float = 0.75f
-) : ActorWithBody() {
+) : ActorLobbed() {
 
     init {
         renderOrder = RenderOrder.MIDTOP
@@ -94,10 +98,6 @@ open class ActorPrimedBomb(
         }
     }
 
-    fun updatePhysOnly(delta: Float) {
-        super.updateImpl(delta)
-    }
-
     override fun dispose() {
         super.dispose()
         boomSound.dispose()
@@ -126,7 +126,7 @@ class ActorCherryBomb : ActorPrimedBomb(14f, 4.5f) { // 14 is the intended value
 /**
  * Created by minjaesong on 2024-07-12.
  */
-class ActorGlowOrb : ActorPrimedBomb(0f, 0f) { // 14 is the intended value; 32 is for testing
+class ActorGlowOrb : ActorLobbed() {
     val spawnTime = INGAME.world.worldTime.TIME_T
 
     init {
@@ -148,7 +148,7 @@ class ActorGlowOrb : ActorPrimedBomb(0f, 0f) { // 14 is the intended value; 32 i
 
 
     override fun updateImpl(delta: Float) {
-        updatePhysOnly(delta)
+        super.updateImpl(delta)
 
         val timeDelta0 = INGAME.world.worldTime.TIME_T - spawnTime
         val timeDelta = timeDelta0.coerceIn(0, 9 * lifePower)
@@ -162,7 +162,7 @@ class ActorGlowOrb : ActorPrimedBomb(0f, 0f) { // 14 is the intended value; 32 i
             lumCol.baseLumColB * charge * lumMult,
             lumCol.baseLumColA * charge * lumMult,
         )
-        // remove the actor some time AFTER the chemicals are exhausted
+        // remove the actor some time AFTER the chemicals have exhausted
         if (timeDelta0 >= 10 * lifePower) {
             flagDespawn()
         }

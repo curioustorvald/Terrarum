@@ -18,11 +18,17 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2023-11-13.
  */
 object AxeCore {
+    private val tooltipHash = 10003L
+    private val soundPlayedForThisTick = HashMap<ActorWithBody, Long>()
 
     fun startPrimaryUse(
         actor: ActorWithBody, delta: Float, item: GameItem?, mx: Int, my: Int,
         mw: Int = 1, mh: Int = 1, additionalCheckTags: List<String> = listOf()
     ) = mouseInInteractableRangeTools(actor, item) {
+        if (!soundPlayedForThisTick.containsKey(actor)) {
+            soundPlayedForThisTick[actor] = 0L
+        }
+        val updateTimer = INGAME.WORLD_UPDATE_TIMER
         val mh = 1
 
         // un-round the mx
@@ -69,8 +75,12 @@ object AxeCore {
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
-                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toLong()) {
+                // prevent double-playing of sound effects
+                if (soundPlayedForThisTick[actor]!! < updateTimer - 4 &&
+                    updateTimer % 11 == (Math.random() * 3).toLong()) {
+
                     PickaxeCore.makeNoiseTileTouching(actor, tile)
+                    soundPlayedForThisTick[actor] = updateTimer
                 }
 
                 INGAME.world.inflictTerrainDamage(
@@ -95,8 +105,12 @@ object AxeCore {
                 val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
                 val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
-                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toLong()) {
+                // prevent double-playing of sound effects
+                if (soundPlayedForThisTick[actor]!! < updateTimer - 4 &&
+                    updateTimer % 11 == (Math.random() * 3).toLong()) {
+
                     PickaxeCore.makeNoiseTileTouching(actor, tile)
+                    soundPlayedForThisTick[actor] = updateTimer
                 }
 
                 INGAME.world.inflictTerrainDamage(
@@ -127,8 +141,12 @@ object AxeCore {
                 val isLargeTree = tileprop.hasTag("TREELARGE")
                 val axePowerMult = if (isLargeTree) 0.5f else 1f
 
-                if (INGAME.WORLD_UPDATE_TIMER % 11 == (Math.random() * 3).toLong()) {
+                // prevent double-playing of sound effects
+                if (soundPlayedForThisTick[actor]!! < updateTimer - 4 &&
+                    updateTimer % 11 == (Math.random() * 3).toLong()) {
+
                     PickaxeCore.makeNoiseTileTouching(actor, tile)
+                    soundPlayedForThisTick[actor] = updateTimer
                 }
 
                 INGAME.world.inflictTerrainDamage(
@@ -211,7 +229,7 @@ object AxeCore {
                             upCtr += 1
                         }
                         // drop the item under cursor
-                        PickaxeCore.dropItem(BlockCodex[tileBroken].drop, x, y) // todo use log item if applicable
+                        PickaxeCore.dropItem(BlockCodex[tileBroken].drop, x, y) // the drop should be something like "item@basegame:168"
                         PickaxeCore.makeDust(tile, x, y, 9)
                         PickaxeCore.makeNoiseTileBurst(actor, tile)
                     }

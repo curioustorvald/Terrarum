@@ -32,7 +32,7 @@ class AudioCodex {
     fun getRandomAudio(identifier: String): MusicContainer? {
         val file = audio[identifier]?.random()
         return if (file != null) {
-            MusicContainer(file.nameWithoutExtension(), file.file()) {
+            MusicContainer(identifier.substringBeforeLast('.') + "." + file.nameWithoutExtension(), file.file()) {
                 it.tryDispose()
             }
         }
