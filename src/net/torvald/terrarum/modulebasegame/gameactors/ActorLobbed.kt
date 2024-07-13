@@ -16,29 +16,46 @@ import kotlin.math.log10
 /**
  * Created by minjaesong on 2024-07-12.
  */
-open class ActorLobbed : ActorWithBody()
+open class ActorLobbed(throwPitch: Float) : ActorWithBody() {
+
+    protected constructor() : this(1f)
+
+    @Transient private val whooshSound = MusicContainer(
+        "throw_low_short", ModMgr.getFile("basegame", "audio/effects/throwing/throw_low_short.wav"),
+        toRAM = true,
+        samplingRateOverride = 48000f * throwPitch.coerceIn(0.5f, 2f)
+    )
+
+    init {
+        renderOrder = RenderOrder.FRONT
+        physProp = PhysProperties.PHYSICS_OBJECT()
+        elasticity = 0.34
+    }
+
+    private var soundFired = false
+
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
+        if (!soundFired) {
+            soundFired = true
+            startAudio(whooshSound, 1.0)
+        }
+    }
+}
 
 
 /**
  * Created by minjaesong on 2024-02-13.
  */
 open class ActorPrimedBomb(
+    throwPitch: Float,
     @Transient private var explosionPower: Float = 1f,
     private var fuse: Second = 1f,
     @Transient private var dropProbNonOre: Float = 0.25f,
     @Transient private var dropProbOre: Float = 0.75f
-) : ActorLobbed() {
+) : ActorLobbed(throwPitch) {
 
-    init {
-        renderOrder = RenderOrder.MIDTOP
-        physProp = PhysProperties.PHYSICS_OBJECT()
-        elasticity = 0.34
-    }
-
-    protected constructor() : this(1f, 1f) {
-        renderOrder = RenderOrder.MIDTOP
-        physProp = PhysProperties.PHYSICS_OBJECT()
-    }
+    protected constructor() : this(1f, 1f, 1f)
 
     private var explosionCalled = false
 
@@ -110,7 +127,10 @@ open class ActorPrimedBomb(
 /**
  * Created by minjaesong on 2024-02-14.
  */
-class ActorCherryBomb : ActorPrimedBomb(14f, 4.5f) { // 14 is the intended value; 32 is for testing
+class ActorCherryBomb(throwPitch: Float) : ActorPrimedBomb(throwPitch, 14f, 4.5f) { // 14 is the intended value; 32 is for testing
+
+    private constructor() : this(1f)
+
     init {
         val itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(0,13)
 
@@ -126,7 +146,10 @@ class ActorCherryBomb : ActorPrimedBomb(14f, 4.5f) { // 14 is the intended value
 /**
  * Created by minjaesong on 2024-07-12.
  */
-class ActorGlowOrb : ActorLobbed() {
+class ActorGlowOrb(throwPitch: Float) : ActorLobbed(throwPitch) {
+
+    private constructor() : this(1f)
+
     val spawnTime = INGAME.world.worldTime.TIME_T
 
     init {

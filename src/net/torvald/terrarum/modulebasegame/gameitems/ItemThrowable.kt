@@ -33,7 +33,10 @@ open class ItemThrowable(originalID: ItemID, private val throwableActorClassName
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long = mouseInInteractableRange(actor) { mx, my, mtx, mty ->
         val (throwPos, throwForce) = getThrowPosAndVector(actor)
 
-        val lobbed = Class.forName(throwableActorClassName).getDeclaredConstructor().newInstance() as ActorWithBody
+        val magnRel = throwForce.magnitude / actor.avStrength * 1000.0
+        val pitch = (magnRel * 0.2).sqrt().toFloat()
+
+        val lobbed = Class.forName(throwableActorClassName).getDeclaredConstructor(pitch.javaClass).newInstance(pitch) as ActorWithBody
         lobbed.setPositionFromCentrePoint(throwPos)
         lobbed.externalV.set(throwForce)
         setupLobbedActor(lobbed)

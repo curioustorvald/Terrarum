@@ -14,6 +14,7 @@ import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioBank
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.unsafe.UnsafePtr
@@ -26,11 +27,35 @@ class MusicContainer(
     val file: File,
     val looping: Boolean = false,
     val toRAM: Boolean = false,
+    val samplingRateOverride: Float?, // this is FIXED sampling rate
     override var songFinishedHook: (AudioBank) -> Unit = {}
 ): AudioBank() {
-    override val samplingRate: Int
+    override val samplingRate: Float
     override val channels: Int
     val codec: String
+
+    // make Java code shorter
+    constructor(
+        name: String,
+        file: File,
+        looping: Boolean = false,
+        toRAM: Boolean = false,
+        songFinishedHook: (AudioBank) -> Unit = {}
+    ) : this(name, file, looping, toRAM, null, songFinishedHook)
+    // make Java code shorter
+    constructor(
+        name: String,
+        file: File,
+        looping: Boolean = false,
+        songFinishedHook: (AudioBank) -> Unit = {}
+    ) : this(name, file, looping, false, null, songFinishedHook)
+    // make Java code shorter
+    constructor(
+        name: String,
+        file: File,
+        songFinishedHook: (AudioBank) -> Unit = {}
+    ) : this(name, file, false, false, null, songFinishedHook)
+
 
     var samplesReadCount = 0L; internal set
     override val totalSizeInSamples: Long
@@ -55,18 +80,18 @@ class MusicContainer(
         
         bytesPerSample = 2 * channels
 
-        samplingRate = when (gdxMusic) {
+        samplingRate = samplingRateOverride ?: when (gdxMusic) {
             is Wav.Music -> {
                 val rate = gdxMusic.extortField<Wav.WavInputStream>("input")!!.sampleRate
 
 //                App.printdbg(this, "music $name is WAV; rate = $rate")
-                rate
+                rate.toFloat()
             }
             is Ogg.Music -> {
                 val rate = gdxMusic.extortField<OggInputStream>("input")!!.sampleRate
 
 //                App.printdbg(this, "music $name is OGG; rate = $rate")
-                rate
+                rate.toFloat()
             }
             is Mp3.Music -> {
                 val tempMusic = Gdx.audio.newMusic(Gdx.files.absolute(file.absolutePath))
@@ -81,11 +106,11 @@ class MusicContainer(
 //                gdxMusic.reset()
 
 //                App.printdbg(this, "music $name is MP3; rate = $rate")
-                rate
+                rate.toFloat()
             }
             else -> {
 //                App.printdbg(this, "music $name is ${gdxMusic::class.qualifiedName}; rate = default")
-                TerrarumAudioMixerTrack.SAMPLING_RATE
+                TerrarumAudioMixerTrack.SAMPLING_RATEF
             }
         }
 
@@ -315,7 +340,7 @@ class MusicContainer(
     }
 
     override fun makeCopy(): AudioBank {
-        val new = MusicContainer(name, file, looping, false, songFinishedHook)
+        val new = MusicContainer(name, file, looping, false, samplingRateOverride, songFinishedHook)
 
         synchronized(this) {
             if (this.toRAM) {

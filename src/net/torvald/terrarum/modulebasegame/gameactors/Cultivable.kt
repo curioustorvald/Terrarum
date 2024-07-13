@@ -51,6 +51,8 @@ open class Cultivable: FixtureBase {
  * Created by minjaesong on 2024-02-03.
  */
 open class SaplingBase(val species: Int) : Cultivable(72000) {
+    private constructor() : this(0)
+
     private val variant = (0..3).random()
     init {
         CommonResourcePool.addToLoadingList("basegame/sprites/saplings.tga") {

@@ -19,7 +19,7 @@ abstract class AudioBank : Disposable {
 
     abstract val name: String
 
-    abstract val samplingRate: Int
+    abstract val samplingRate: Float
     abstract val channels: Int
     abstract val totalSizeInSamples: Long
     abstract fun currentPositionInSamples(): Long

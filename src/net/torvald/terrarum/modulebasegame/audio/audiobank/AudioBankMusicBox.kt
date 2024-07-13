@@ -19,7 +19,7 @@ class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {})
     }
 
     override val name = "spieluhr"
-    override val samplingRate = 48000 // 122880 // use 122880 to make each tick is 2048 samples
+    override val samplingRate = 48000f // 122880 // use 122880 to make each tick is 2048 samples
     override val channels = 1
 
     private val getSample = // usage: getSample(noteNum 0..60)

@@ -4,6 +4,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
+import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATEF
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.floorToInt
 import net.torvald.terrarum.serialise.toUint
@@ -25,7 +26,7 @@ private data class Frac(var nom: Int, val denom: Int) {
  *
  * Created by minjaesong on 2023-11-17.
  */
-class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (FloatArray, FloatArray) -> Int?, val onAudioFinished: () -> Unit) {
+class AudioProcessBuf(val inputSamplingRate: Float, val audioReadFun: (FloatArray, FloatArray) -> Int?, val onAudioFinished: () -> Unit) {
 
     var pitch: Float = 1f
     var playbackSpeed = 1f
@@ -48,6 +49,10 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (FloatArray,
         else 1f / (1f - this)
     }
 
+    /**
+     * PlayRate is varying value for simulation of Doppler Shift, etc., if all you want is to just change
+     * the pitch of the entire audio, override the sampling rate of the [MusicContainer].
+     */
     internal val playRate: Float
         get() = (playbackSpeed * pitch).coerceIn(0.5f, 2f)/*(playbackSpeed * when (jitterMode) {  // disabled until arraycopy negative length bug is resolved
             1 -> jitterMode1(totalSamplesPlayed.toFloat())
@@ -58,7 +63,7 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (FloatArray,
         get() = inputSamplingRate * playRate
 
     private val doResample
-        get() = !(inputSamplingRate == SAMPLING_RATE && (playRate - 1f).absoluteValue < (1f / 1024f))
+        get() = !(inputSamplingRate == SAMPLING_RATEF && (playRate - 1f).absoluteValue < (1f / 1024f))
 
     companion object {
         private val RPM = 45f
@@ -90,6 +95,8 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (FloatArray,
 
         private val bufLut = HashMap<Pair<Int, Int>, Int>()
 
+        private val bufferRates = arrayOf(48000,44100,32768,32000,24000,22050,16384,16000,12000,11025,8192,8000)
+
         init {
             val bl = arrayOf(
                 1152,1380,1814,1792,2304,2634,3502,3456,4608,5141,6874,6912,
@@ -99,14 +106,17 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (FloatArray,
                 4096,4554,5421,5376,6144,7056,8796,8704,10240,12078,15544,15360
             )
 
-            arrayOf(48000,44100,32768,32000,24000,22050,16384,16000,12000,11025,8192,8000).forEachIndexed { ri, r ->
+            bufferRates.forEachIndexed { ri, r ->
                 arrayOf(128,256,512,1024,2048).forEachIndexed { bi, b ->
-                    bufLut[b to r] = bl[bi * 12 + ri] * 2
+                    bufLut[b to r] = (bl[bi * 12 + ri] * 1.05).ceilToInt() * 2
                 }
             }
         }
 
-        private fun getOptimalBufferSize(rate: Int) = bufLut[App.audioBufferSize to rate]!!
+        private fun getOptimalBufferSize(rate: Float): Int {
+            val validRate = bufferRates.map { (rate - it) to it }.first { it.first >= 0 }.second
+            return bufLut[App.audioBufferSize to validRate]!!
+        }
     }
 
     private val q
@@ -146,8 +156,8 @@ class AudioProcessBuf(val inputSamplingRate: Int, val audioReadFun: (FloatArray,
 
     private val finL = FloatArray(fetchSize + 2 * PADSIZE)
     private val finR = FloatArray(fetchSize + 2 * PADSIZE)
-    private val fmidL = FloatArray((fetchSize * 2 + 1.0).toInt())
-    private val fmidR = FloatArray((fetchSize * 2 + 1.0).toInt())
+    private val fmidL = FloatArray(fetchSize * 4)
+    private val fmidR = FloatArray(fetchSize * 4)
     private val foutL = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
     private val foutR = FloatArray(internalBufferSize) // 640 for (44100, 48000), 512 for (48000, 48000) with BUFFER_SIZE = 512 * 4
     private val readBufL = FloatArray(fetchSize)

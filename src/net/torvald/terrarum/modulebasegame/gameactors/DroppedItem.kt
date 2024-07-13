@@ -16,11 +16,15 @@ import org.dyn4j.geometry.Vector2
 /**
  * Created by minjaesong on 2016-03-15.
  */
-open class DroppedItem : ActorWithBody {
+class DroppedItem : ActorWithBody {
 
     companion object {
         const val NO_PICKUP_TIME = 1f
         const val MERGER_RANGE = 8.0 * TILE_SIZED // the wanted distance, squared
+    }
+
+    init {
+        renderOrder = RenderOrder.FRONT
     }
 
     var itemID: ItemID = ""; private set

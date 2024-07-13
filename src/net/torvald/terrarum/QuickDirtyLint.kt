@@ -8,16 +8,11 @@ import kotlin.system.exitProcess
 /**
  * Created by minjaesong on 2023-05-22.
  */
-fun main() {
-
-    val csiR = "\u001B[31m"
-    val csiG = "\u001B[32m"
-    val csi0 = "\u001B[m"
-
-    val superClasses = listOf(
-        Actor::class.java,
-        GameItem::class.java
-    )
+class QuickDirtyLint {
+    private val csiBold = "\u001B[1m"
+    private val csiR = "\u001B[31m"
+    private val csiG = "\u001B[32m"
+    private val csi0 = "\u001B[m"
 
     val serialisablePrimitives = listOf(
         // comparison: exact match
@@ -101,37 +96,102 @@ fun main() {
         "Ljava/util/List" to "java.util.List has no zero-arg constructor."
     )
 
-    var retcode = 0
+    val classGraph = ClassGraph().acceptPackages("net.torvald.terrarum")/*.verbose()*/.enableAllInfo().scan()
 
-    ClassGraph().acceptPackages("net.torvald.terrarum")/*.verbose()*/.enableAllInfo().scan().let { scan ->
-        val offendingFields = scan.allClasses.filter { classinfo ->
-            superClasses.any { classinfo.extendsSuperclass(it) || classinfo.name == it.canonicalName } &&
-            !classaNonGrata.contains(classinfo.name)
-        }.flatMap { clazz ->
-            clazz.declaredFieldInfo.filter { field ->
-                !field.isTransient &&
-                !field.isEnum &&
-                !serialisablePrimitives.contains(field.typeSignatureOrTypeDescriptorStr) &&
-                serialisableTypes.none { field.typeSignatureOrTypeDescriptorStr.startsWith(it) }
+    fun checkForNonSerialisableFields(): Int {
+        val superClasses = listOf(
+            Actor::class.java,
+            GameItem::class.java
+        )
+
+        var retcode = 0
+
+        classGraph.let { scan ->
+            val offendingFields = scan.allClasses.filter { classinfo ->
+                superClasses.any { classinfo.extendsSuperclass(it) || classinfo.name == it.canonicalName } &&
+                        !classaNonGrata.contains(classinfo.name)
+            }.flatMap { clazz ->
+                clazz.declaredFieldInfo.filter { field ->
+                    !field.isTransient &&
+                            !field.isEnum &&
+                            !serialisablePrimitives.contains(field.typeSignatureOrTypeDescriptorStr) &&
+                            serialisableTypes.none { field.typeSignatureOrTypeDescriptorStr.startsWith(it) }
+                }
+            }.filter {
+                !classaNomenNonGrata.contains(it.name) && !it.name.startsWith("this") && !it.name.contains("\$delegate")
             }
-        }.filter {
-            !classaNomenNonGrata.contains(it.name) && !it.name.startsWith("this") && !it.name.contains("\$delegate")
+
+            if (offendingFields.isNotEmpty()) {
+                println("$csiBold$csiR= Classes with non-@Transient fields =$csi0\n")
+            }
+
+            offendingFields.forEach {
+                println("$csiBold${it.name}$csi0\n" +
+                        "\t${csiG}from: ${csi0}${it.className}\n" +
+                        "\t${csiG}type: ${csi0}${it.typeSignatureOrTypeDescriptorStr}\n" +
+                        "\t${csiG}remarks: ${csi0}${
+                            remarks.keys.filter { key ->
+                                it.typeSignatureOrTypeDescriptorStr.startsWith(
+                                    key
+                                )
+                            }.map { remarks[it] }.joinToString(" ")
+                        }"
+                )
+                retcode = 1
+            }
         }
 
-//        println(offendingFields)
-
-        offendingFields.forEach {
-            println("\u001B[1m${it.name}\u001B[m\n" +
-                    "\t${csiG}from: ${csi0}${it.className}\n" +
-                    "\t${csiG}type: ${csi0}${it.typeSignatureOrTypeDescriptorStr}\n" +
-                    "\t${csiG}remarks: ${csi0}${remarks.keys.filter { key -> it.typeSignatureOrTypeDescriptorStr.startsWith(key) }.map { remarks[it] }.joinToString(" ")}")
-            retcode = 1
+        if (retcode != 0) {
+            println("\n${csiR}Having above classes as non-@Transient may cause savegame to not load!$csi0")
         }
+
+        return retcode
     }
 
-    if (retcode != 0) {
-        println("\n${csiR}Having above classes as non-@Transient may cause savegame to not load!$csi0")
+    fun checkForNoZeroArgConstructor(): Int {
+        val superClasses = listOf(
+            Actor::class.java
+        )
+
+        var retcode = 0
+
+        classGraph.let { scan ->
+            val offendingClasses = scan.allClasses.filter { classinfo ->
+                superClasses.any { classinfo.extendsSuperclass(it) || classinfo.name == it.canonicalName } &&
+                        !classaNonGrata.contains(classinfo.name)
+            }.filter {
+                !classaNomenNonGrata.contains(it.name) && !it.name.startsWith("this") && !it.name.contains("\$delegate") &&
+                        !it.name.endsWith("$1") && !it.name.endsWith("$2") && !it.name.endsWith("$3") &&
+                        !it.name.endsWith("$4") && !it.name.endsWith("$5") && !it.name.endsWith("$6")
+            }.filter {
+                it.declaredConstructorInfo.none { it.parameterInfo.isEmpty() }
+            }
+
+            if (offendingClasses.isNotEmpty()) {
+                println("$csiBold$csiR= Classes with no-zero-arg constructors =$csi0\n")
+            }
+
+            offendingClasses.forEach {
+                println("$csiBold${it.name}$csi0\n")
+                retcode = 1
+            }
+        }
+
+        if (retcode != 0) {
+            println("\n${csiR}Having no zero-arg constructors for above classes will cause savegame to not load!$csi0")
+        }
+
+        return retcode
     }
 
-    exitProcess(retcode)
+    fun main() {
+        val nonSerialisable = checkForNonSerialisableFields()
+        val noZeroArgConstructor = checkForNoZeroArgConstructor()
+
+        exitProcess(nonSerialisable or noZeroArgConstructor)
+    }
+}
+
+fun main() {
+    QuickDirtyLint().main()
 }
