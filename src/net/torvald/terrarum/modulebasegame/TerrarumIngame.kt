@@ -913,7 +913,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
             // process actor addition requests
             val addCueCpy = actorAdditionQueue.toList()
-            addCueCpy.forEach { forceAddActor(it.first, it.second) }
+            addCueCpy.forEach {
+                forceAddActor(it.first, it.second)
+                it.third(it.first)
+            }
             actorAdditionQueue.removeAll(addCueCpy)
             // determine whether the inactive actor should be activated
             wakeDormantActors()
@@ -923,7 +926,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             killOrKnockdownActors()
             // process actor removal requests
             val remCueCpy = actorRemovalQueue.toList()
-            remCueCpy.forEach { forceRemoveActor(it.first, it.second) }
+            remCueCpy.forEach {
+                forceRemoveActor(it.first, it.second)
+                it.third(it.first)
+            }
             actorRemovalQueue.removeAll(remCueCpy)
             // update particles
             particlesContainer.toList().forEach { if (!it.flagDespawn) particlesActive++; it.update(delta) }

@@ -12,6 +12,7 @@ import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.modulebasegame.ExplosionManager
 import kotlin.math.log10
+import kotlin.math.pow
 
 /**
  * Created by minjaesong on 2024-07-12.
@@ -20,10 +21,11 @@ open class ActorLobbed(throwPitch: Float) : ActorWithBody() {
 
     protected constructor() : this(1f)
 
+    @Transient private val pitch = throwPitch.coerceIn(0.5f, 2f)
     @Transient private val whooshSound = MusicContainer(
         "throw_low_short", ModMgr.getFile("basegame", "audio/effects/throwing/throw_low_short.wav"),
         toRAM = true,
-        samplingRateOverride = 48000f * throwPitch.coerceIn(0.5f, 2f)
+        samplingRateOverride = 48000f * pitch
     )
 
     init {
@@ -38,7 +40,8 @@ open class ActorLobbed(throwPitch: Float) : ActorWithBody() {
         super.updateImpl(delta)
         if (!soundFired) {
             soundFired = true
-            startAudio(whooshSound, 1.0)
+            val amp = 1.65 * (pitch - 0.495)
+            startAudio(whooshSound, amp)
         }
     }
 }

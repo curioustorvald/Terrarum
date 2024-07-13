@@ -139,8 +139,8 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     val actorContainerActive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
 
-    val actorAdditionQueue = ArrayList<Pair<Actor, Throwable>>()
-    val actorRemovalQueue = ArrayList<Pair<Actor, Throwable>>()
+    val actorAdditionQueue = ArrayList<Triple<Actor, Throwable, (Actor) -> Unit>>() // actor, stacktrace object, onSpawn
+    val actorRemovalQueue = ArrayList<Triple<Actor, Throwable, (Actor) -> Unit>>() // actor, stacktrace object, onDespawn
 
     /**
      * ## BIG NOTE: Calculated actor distance is the **Euclidean distance SQUARED**
@@ -357,7 +357,12 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
      */
     open fun queueActorRemoval(actor: Actor?) {
         if (actor == null) return
-        actorRemovalQueue.add(actor to StackTraceRecorder())
+        actorRemovalQueue.add(Triple(actor, StackTraceRecorder(), {}))
+    }
+
+    open fun queueActorRemoval(actor: Actor?, onDespawn: (Actor) -> Unit) {
+        if (actor == null) return
+        actorRemovalQueue.add(Triple(actor, StackTraceRecorder(), onDespawn))
     }
 
     protected open fun forceRemoveActor(actor: Actor, caller: Throwable = StackTraceRecorder()) {
@@ -386,10 +391,15 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
      * If the actor is null, this function will do nothing.
      */
     open fun queueActorAddition(actor: Actor?) {
-//        printdbg(this, "New actor $actor")
         if (actor == null) return
-        actorAdditionQueue.add(actor to StackTraceRecorder())
+        actorAdditionQueue.add(Triple(actor, StackTraceRecorder(), {}))
     }
+
+    open fun queueActorAddition(actor: Actor?, onSpawn: (Actor) -> Unit) {
+        if (actor == null) return
+        actorAdditionQueue.add(Triple(actor, StackTraceRecorder(), onSpawn))
+    }
+
 
     fun isActive(ID: Int): Boolean =
             if (actorContainerActive.size == 0)
