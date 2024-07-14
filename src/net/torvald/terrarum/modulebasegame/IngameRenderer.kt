@@ -196,6 +196,8 @@ object IngameRenderer : Disposable {
 //        printdbg(this, "Set new RenderedWorld (UUID=${world.worldIndex}) at time ${System.currentTimeMillis()} (disposed: ${world.disposed}), called by:")
 //        printStackTrace(this)
 
+        var successful = false
+
         try {
 
             // change worlds from internal methods
@@ -210,10 +212,18 @@ object IngameRenderer : Disposable {
 //                                   "new world: ${world.hashCode()}")
                 newWorldLoadedLatch = true
             }
+
+            successful = true
         }
         catch (e: Throwable) {
             e.printStackTrace()
             // new init, do nothing
+        }
+        finally {
+            if (successful)
+                TerrarumPostProcessor.debugUI.world = world
+            else
+                TerrarumPostProcessor.debugUI.world = null
         }
     }
 

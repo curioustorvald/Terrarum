@@ -42,7 +42,7 @@ object TerrarumPostProcessor : Disposable {
     private val safeAreaCol2 = Color(0xffffff44.toInt())
     private val currentResCol = Color(0xfff066_88.toInt())
 
-    private val debugUI = BasicDebugInfoWindow()
+    internal val debugUI = BasicDebugInfoWindow()
 
     private val functionRowHelper = Texture(Gdx.files.internal("assets/graphics/function_row_help.png"))
 

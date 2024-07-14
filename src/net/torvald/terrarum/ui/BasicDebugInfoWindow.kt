@@ -51,7 +51,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private var ydelta = 0.0
 
     private var ingame: IngameInstance? = null
-    private var world: GameWorld? = null
+    internal var world: GameWorld? = null // is set by IngameRenderer.setRenderedWorld(GameWorld)
 
     private val icons = TextureRegionPack(Gdx.files.internal("assets/graphics/gui/debug_window_symbols.tga"), 21, 26)
     private val back = Texture(Gdx.files.internal("assets/graphics/gui/debug_window_background.tga"))
@@ -86,12 +86,9 @@ class BasicDebugInfoWindow : UICanvas() {
     private var showAudioMixer2 = false
     private var showChunks = false
 
-    override fun show() {
-        ingame = Terrarum.ingame
-        world = ingame?.world
-    }
-
     override fun updateImpl(delta: Float) {
+        ingame = Terrarum.ingame
+
         val player = ingame?.actorNowPlaying
         val hitbox = player?.hitbox
 
@@ -382,24 +379,24 @@ class BasicDebugInfoWindow : UICanvas() {
          */
 
         if (ingame != null) {
-            App.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${ingame!!.actorContainerActive.size + ingame!!.actorContainerInactive.size}",
-                TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 2f)
-            App.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${ingame!!.actorContainerActive.size}",
-                TinyAlphNum.W * 2f + (17 * 8), App.scr.height - TinyAlphNum.H * 2f)
-            App.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${ingame!!.actorContainerInactive.size}",
-                TinyAlphNum.W * 2f + (28 * 8), App.scr.height - TinyAlphNum.H * 2f)
+//            App.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${ingame!!.actorContainerActive.size + ingame!!.actorContainerInactive.size}",
+//                TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 2f)
+//            App.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${ingame!!.actorContainerActive.size}",
+//                TinyAlphNum.W * 2f + (17 * 8), App.scr.height - TinyAlphNum.H * 2f)
+//            App.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${ingame!!.actorContainerInactive.size}",
+//                TinyAlphNum.W * 2f + (28 * 8), App.scr.height - TinyAlphNum.H * 2f)
             if (ingame is TerrarumIngame) {
                 App.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${(ingame as TerrarumIngame).particlesActive}$ccY/$ccG${(ingame as TerrarumIngame).PARTICLES_MAX}",
-                    TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 4f)
+                    TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 3f)
             }
             App.fontSmallNumbers.draw(batch, "${ccM}Clouds $ccG${WeatherMixer.cloudsSpawned}$ccY/$ccG${WeatherMixer.cloudSpawnMax}",
-                TinyAlphNum.W * 2f + (18 * 8), App.scr.height - TinyAlphNum.H * 4f)
+                TinyAlphNum.W * 2f + (18 * 8), App.scr.height - TinyAlphNum.H * 3f)
         }
 
         App.fontSmallNumbers.draw(batch, "${ccY}Actors rendering $ccG${IngameRenderer.renderingActorsCount}",
-                TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 3f)
+                TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 2f)
         App.fontSmallNumbers.draw(batch, "${ccY}UIs rendering $ccG${IngameRenderer.renderingUIsCount}",
-                TinyAlphNum.W * 2f + (21 * 8), App.scr.height - TinyAlphNum.H * 3f)
+                TinyAlphNum.W * 2f + (21 * 8), App.scr.height - TinyAlphNum.H * 2f)
 
         /**
          * Bottom right

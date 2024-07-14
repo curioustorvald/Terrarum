@@ -35,6 +35,7 @@ class EntryPoint : ModuleEntryPoint() {
         ModMgr.GameItemLoader.invoke(moduleName)
         ModMgr.GameBlockLoader.invoke(moduleName)
         ModMgr.GameOreLoader.invoke(moduleName)
+        ModMgr.GameFluidLoader.invoke(moduleName)
         ModMgr.GameLanguageLoader.invoke(moduleName)
         ModMgr.GameCraftingRecipeLoader.invoke(moduleName)
         ModMgr.GameAudioLoader.invoke(moduleName)

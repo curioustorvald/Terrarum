@@ -163,7 +163,7 @@ class ActorGlowOrb(throwPitch: Float) : ActorLobbed(throwPitch) {
         spriteEmissive = SingleImageSprite(this, itemImage)
 
         avBaseMass = 1.0
-        density = 1400.0
+        density = 580.0
     }
 
     @Transient private val lifePower = 10000L // charge reaches 0 on timeDelta = 9 * lifePower

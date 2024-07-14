@@ -88,7 +88,7 @@ object WorldSimulator {
 
         if (ingame.terrainChangeQueue.isNotEmpty()) { App.measureDebugTime("WorldSimulator.degrass") { buryGrassImmediately() } }
         App.measureDebugTime("WorldSimulator.growGrass") { growOrKillGrass() }
-        App.measureDebugTime("WorldSimulator.fluids") { /*moveFluids(delta)*/ }
+        App.measureDebugTime("WorldSimulator.fluids") { moveFluids(delta) }
         App.measureDebugTime("WorldSimulator.fallables") { displaceFallables(delta) }
         App.measureDebugTime("WorldSimulator.wires") { simulateWires(delta) }
         App.measureDebugTime("WorldSimulator.collisionDroppedItem") { collideDroppedItems() }

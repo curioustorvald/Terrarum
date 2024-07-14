@@ -248,6 +248,12 @@ open class GameWorld(
                     tileNameToNumberMap[it.key] = it.value.tileNumber
                 }
             }
+            Terrarum.fluidCodex.fluidProps.entries.forEach {
+                if (!forcedFluidNumberToTiles.contains(it.key)) {
+                    fluidNumberToNameMap[it.value.numericID.toLong()] = it.key
+                    fluidNameToNumberMap[it.key] = it.value.numericID
+                }
+            }
         }
     }
 
@@ -269,6 +275,10 @@ open class GameWorld(
 
             tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key
             tileNameToNumberMap[it.key] = it.value.tileNumber
+        }
+        Terrarum.fluidCodex.fluidProps.entries.forEach {
+            fluidNumberToNameMap[it.value.numericID.toLong()] = it.key
+            fluidNameToNumberMap[it.key] = it.value.numericID
         }
 
         // force this rule to the old saves
@@ -749,11 +759,11 @@ open class GameWorld(
 
 
         if (fluidType == Fluid.NULL && fill != 0f) {
-            throw Error("Illegal fluid at ($x,$y): ${FluidInfo(fluidType, fill)}")
+            throw Error("Illegal fluid fill at ($x,$y): ${FluidInfo(fluidType, fill)}")
         }
 
 
-        val addr = LandUtil.getBlockAddr(this, x, y)
+//        val addr = LandUtil.getBlockAddr(this, x, y)
 
         val fluidNumber = fluidNameToNumberMap[fluidType]!!
 
@@ -778,7 +788,7 @@ open class GameWorld(
         val (type, fill) = layerFluids.unsafeGetTile1(x, y)
         val fluidID = fluidNumberToNameMap[type.toLong()] ?: throw NullPointerException("No such fluid: $type")
 
-        return FluidInfo(fluidID, fill)
+        return FluidInfo(fluidID, fill.let { if (it.isNaN()) 0f else it }) // hex FFFFFFFF (magic number for ungenerated tiles) is interpreted as Float.NaN
     }
 
     /*private fun fluidTypeToBlock(type: FluidType) = when (type.abs()) {

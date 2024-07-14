@@ -158,3 +158,5 @@ id;classname;tags
 # ...
 # 10FF00h..10FFFFh : Fluid type 255 (???) x container type 0..255
 
+# reserved for debug items
+16777216;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessWaterBucket;DEBUG,TOOL

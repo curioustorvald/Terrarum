@@ -8,10 +8,7 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.App.setToGameConfig
 import net.torvald.terrarum.audio.AudioCodex
-import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.blockproperties.BlockProp
-import net.torvald.terrarum.blockproperties.OreCodex
-import net.torvald.terrarum.blockproperties.WireCodex
+import net.torvald.terrarum.blockproperties.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.IME
 import net.torvald.terrarum.gameitems.FixtureInteractionBlocked
@@ -762,6 +759,18 @@ object ModMgr {
 
         @JvmStatic operator fun invoke(module: String) {
             Terrarum.materialCodex.fromModule(module, matePath + "materials.csv")
+        }
+    }
+
+    object GameFluidLoader {
+        const val fluidPath = "fluids/"
+
+        init {
+            Terrarum.fluidCodex = FluidCodex()
+        }
+
+        @JvmStatic operator fun invoke(module: String) {
+            Terrarum.fluidCodex.fromModule(module, fluidPath + "fluids.csv")
         }
     }
 
