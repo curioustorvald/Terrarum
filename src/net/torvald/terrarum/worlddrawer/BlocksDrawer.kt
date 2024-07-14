@@ -58,7 +58,6 @@ internal object BlocksDrawer {
     val tileItemWall: TextureRegionPack
     val tileItemWallGlow: TextureRegionPack
     val tileItemWallEmissive: TextureRegionPack
-    val tilesFluid: TextureRegionPack
     val tilesGlow: TextureRegionPack
     val tilesEmissive: TextureRegionPack
 
@@ -69,7 +68,6 @@ internal object BlocksDrawer {
     val WALL = GameWorld.WALL
     val TERRAIN = GameWorld.TERRAIN
     val ORES = GameWorld.ORES
-    //val WIRE = GameWorld.WIRE
     val FLUID = -2
     val OCCLUSION = 31337
 
@@ -92,7 +90,6 @@ internal object BlocksDrawer {
     private lateinit var terrainTilesBuffer: Array<IntArray>
     private lateinit var wallTilesBuffer: Array<IntArray>
     private lateinit var oreTilesBuffer: Array<IntArray>
-    //private lateinit var wireTilesBuffer: Array<IntArray>
     private lateinit var fluidTilesBuffer: Array<IntArray>
     private lateinit var occlusionBuffer: Array<IntArray>
     private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
@@ -120,8 +117,6 @@ internal object BlocksDrawer {
             TextureRegionPack(Texture(App.tileMaker.atlasHibernal), TILE_SIZE, TILE_SIZE),
         )
 
-        //tilesWire = TextureRegionPack(ModMgr.getGdxFile("basegame", "wires/wire.tga"), TILE_SIZE, TILE_SIZE)
-        tilesFluid = TextureRegionPack(Texture(App.tileMaker.atlasFluid), TILE_SIZE, TILE_SIZE)
         tilesGlow = TextureRegionPack(Texture(App.tileMaker.atlasGlow), TILE_SIZE, TILE_SIZE)
         tilesEmissive = TextureRegionPack(Texture(App.tileMaker.atlasEmissive), TILE_SIZE, TILE_SIZE)
 
@@ -247,13 +242,7 @@ internal object BlocksDrawer {
         renderUsingBuffer(FLUID, projectionMatrix, false, drawEmissive)
 
 
-
         gdxBlendNormalStraightAlpha()
-
-        /*if (selectedWireRenderClass.isNotBlank()) {
-            //println("Wires! draw: $drawWires") // use F10 instead
-            renderUsingBuffer(WIRE, projectionMatrix, false)
-        }*/
     }
 
     /**
@@ -362,7 +351,7 @@ internal object BlocksDrawer {
                     TERRAIN -> world.layerTerrain.unsafeGetTile(wx, wy)
                     ORES -> world.layerOres.unsafeGetTile(wx, wy)//.also { println(it) }
                     FLUID -> world.layerFluids.unsafeGetTile1(wx, wy).let { (number, fill) ->
-                        if (fill < 1f/30f) 0
+                        if (number == 65535 || fill < 1f/30f) 0
                         else number
                     }
                     OCCLUSION -> 0
@@ -414,6 +403,7 @@ internal object BlocksDrawer {
                 }
 
                 val renderTag = if (mode == OCCLUSION) occlusionRenderTag else App.tileMaker.getRenderTag(thisTile)
+
                 val tileNumberBase = renderTag.tileNumber
                 var tileNumber = if (thisTile == 0 && mode != OCCLUSION) 0
                     // special case: actorblocks and F3 key
@@ -436,7 +426,7 @@ internal object BlocksDrawer {
 
                 // hide tiles with super low lights, kinda like Minecraft's Orebfuscator
                 val lightAtXY = LightmapRenderer.getLight(x, y) ?: Cvec(0)
-                if (maxOf(lightAtXY.fastLum(), lightAtXY.a) <= 1.5f / 255f) {
+                if (mode != FLUID && mode != OCCLUSION && maxOf(lightAtXY.fastLum(), lightAtXY.a) <= 1.5f / 255f) {
                     tileNumber = 2 // black solid
                 }
 
@@ -700,7 +690,6 @@ internal object BlocksDrawer {
             TERRAIN -> terrainTilesBuffer
             WALL -> wallTilesBuffer
             ORES -> oreTilesBuffer
-            //WIRE -> wireTilesBuffer
             FLUID -> fluidTilesBuffer
             OCCLUSION -> occlusionBuffer
             else -> throw IllegalArgumentException()
@@ -723,22 +712,19 @@ internal object BlocksDrawer {
 
 
         val tileAtlas = when (mode) {
-            TERRAIN, ORES, WALL, OCCLUSION -> tilesTerrain
-            //WIRE -> tilesWire
-            FLUID -> tilesFluid
+            TERRAIN, ORES, WALL, OCCLUSION, FLUID -> tilesTerrain
             else -> throw IllegalArgumentException()
         }
         val sourceBuffer = when(mode) {
             TERRAIN -> terrainTilesBuffer
             WALL -> wallTilesBuffer
             ORES -> oreTilesBuffer
-            //WIRE -> wireTilesBuffer
             FLUID -> fluidTilesBuffer
             OCCLUSION -> occlusionBuffer
             else -> throw IllegalArgumentException()
         }
         val vertexColour = when (mode) {
-            TERRAIN, /*WIRE,*/ ORES, FLUID, OCCLUSION -> Color.WHITE
+            TERRAIN, ORES, FLUID, OCCLUSION -> Color.WHITE
             WALL -> WALL_OVERLAY_COLOUR
             else -> throw IllegalArgumentException()
         }
@@ -798,7 +784,6 @@ internal object BlocksDrawer {
             0f
         )
         shader.setUniformf("mulBlendIntensity", if (mode == OCCLUSION) occlusionIntensity else 1f)
-        //shader.setUniformf("drawBreakage", if (mode == WIRE) 0f else 1f)
         tilesQuad.render(shader, GL20.GL_TRIANGLE_FAN)
 
         //tilesBufferAsTex.dispose()
@@ -897,7 +882,6 @@ internal object BlocksDrawer {
         tileItemWall.dispose()
         tileItemWallGlow.dispose()
         tileItemWallEmissive.dispose()
-        tilesFluid.dispose()
         tilesBuffer.dispose()
         _tilesBufferAsTex.dispose()
         tilesQuad.tryDispose()

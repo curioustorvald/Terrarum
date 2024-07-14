@@ -115,7 +115,7 @@ internal object ExportMap : ConsoleCommand {
     override fun printUsage() {
 
         Echo("Usage: export <name>")
-        Echo("Exports current map into echo image.")
+        Echo("Exports current map into an image.")
         Echo("The image can be found at %appdata%/terrarum/Exports")
     }
 }

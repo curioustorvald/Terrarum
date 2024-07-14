@@ -30,7 +30,6 @@ class ItemBottomlessWaterBucket(originalID: ItemID) : GameItem(originalID) {
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
         val mx = Terrarum.mouseTileX; val my =Terrarum.mouseTileY
         INGAME.world.setFluid(mx, my, Fluid.WATER, 1f)
-        printdbg(this, "Pouring water at ($mx, $my)")
         return 0L
     }
 }

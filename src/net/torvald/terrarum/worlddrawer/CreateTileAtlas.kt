@@ -47,7 +47,6 @@ class CreateTileAtlas {
     lateinit var atlasSerotinal: Pixmap
     lateinit var atlasAutumnal: Pixmap
     lateinit var atlasHibernal: Pixmap
-    lateinit var atlasFluid: Pixmap
     lateinit var atlasGlow: Pixmap // glowing won't be affected by the season... for now
     lateinit var atlasEmissive: Pixmap // glowing won't be affected by the season... for now
     lateinit var itemTerrainTexture: Texture
@@ -146,7 +145,6 @@ class CreateTileAtlas {
         atlasSerotinal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
         atlasAutumnal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
         atlasHibernal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
-        atlasFluid = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
         atlasGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
         atlasEmissive = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
 
@@ -508,7 +506,6 @@ class CreateTileAtlas {
                 SEROTINAL -> atlasSerotinal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 AUTUMNAL -> atlasAutumnal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 HIBERNAL -> atlasHibernal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                FLUID -> atlasFluid.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 GLOW -> atlasGlow.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 EMISSIVE -> atlasEmissive.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 else -> throw IllegalArgumentException("Unknown draw source $source")
@@ -556,7 +553,6 @@ class CreateTileAtlas {
         atlasSerotinal.dispose()
         atlasAutumnal.dispose()
         atlasHibernal.dispose()
-        atlasFluid.dispose()
         atlasGlow.dispose()
         atlasEmissive.dispose()
         //itemTerrainTexture.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemTerrain (TextureRegionPack)'
@@ -570,7 +566,7 @@ class CreateTileAtlas {
     }
 
     private enum class AtlasSource {
-        /*FOUR_SEASONS, SUMMER, AUTUMN, WINTER, SPRING,*/ FLUID, GLOW, EMISSIVE,
+        /*FOUR_SEASONS, SUMMER, AUTUMN, WINTER, SPRING,*/ GLOW, EMISSIVE,
         SIX_SEASONS, PREVERNAL, VERNAL, AESTIVAL, SEROTINAL, AUTUMNAL, HIBERNAL,
     }
 
