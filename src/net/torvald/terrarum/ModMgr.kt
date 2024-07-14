@@ -763,7 +763,7 @@ object ModMgr {
     }
 
     object GameFluidLoader {
-        const val fluidPath = "fluids/"
+        const val fluidPath = "fluid/"
 
         init {
             Terrarum.fluidCodex = FluidCodex()

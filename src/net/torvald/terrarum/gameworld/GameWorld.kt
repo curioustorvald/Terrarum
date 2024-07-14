@@ -145,30 +145,32 @@ open class GameWorld(
             30L * WorldTime.MINUTE_SEC
     )
 
+    // Terrain, ores and fluids all use the same number space
+
     @Transient private val forcedTileNumberToNames = hashSetOf(
         Block.AIR, Block.UPDATE, Block.NOT_GENERATED
     )
-    @Transient private val forcedFluidNumberToTiles = hashSetOf(
+    /*@Transient private val forcedFluidNumberToTiles = hashSetOf(
         Fluid.NULL
-    )
+    )*/
     val tileNumberToNameMap = HashArray<ItemID>().also {
         it[0] = Block.AIR
         it[1] = Block.UPDATE
         it[65535] = Block.NOT_GENERATED // unlike Block.NULL, this one is solid
     }
-    val fluidNumberToNameMap = HashArray<ItemID>().also {
+    /*val fluidNumberToNameMap = HashArray<ItemID>().also {
         it[0] = Fluid.NULL
         it[65535] = Fluid.NULL // 65535 denotes "not generated"
-    }
+    }*/
     // does not go to the savefile
     @Transient val tileNameToNumberMap = HashMap<ItemID, Int>().also {
         it[Block.AIR] = 0
         it[Block.UPDATE] = 1
         it[Block.NOT_GENERATED] = 65535 // unlike Block.NULL, this one is solid
     }
-    @Transient val fluidNameToNumberMap = HashMap<ItemID, Int>().also {
+    /*@Transient val fluidNameToNumberMap = HashMap<ItemID, Int>().also {
         it[Fluid.NULL] = 0
-    }
+    }*/
 
     val extraFields = HashMap<String, Any?>()
 
@@ -248,12 +250,12 @@ open class GameWorld(
                     tileNameToNumberMap[it.key] = it.value.tileNumber
                 }
             }
-            Terrarum.fluidCodex.fluidProps.entries.forEach {
+            /*Terrarum.fluidCodex.fluidProps.entries.forEach {
                 if (!forcedFluidNumberToTiles.contains(it.key)) {
                     fluidNumberToNameMap[it.value.numericID.toLong()] = it.key
                     fluidNameToNumberMap[it.key] = it.value.numericID
                 }
-            }
+            }*/
         }
     }
 
@@ -276,10 +278,10 @@ open class GameWorld(
             tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key
             tileNameToNumberMap[it.key] = it.value.tileNumber
         }
-        Terrarum.fluidCodex.fluidProps.entries.forEach {
+        /*Terrarum.fluidCodex.fluidProps.entries.forEach {
             fluidNumberToNameMap[it.value.numericID.toLong()] = it.key
             fluidNameToNumberMap[it.key] = it.value.numericID
-        }
+        }*/
 
         // force this rule to the old saves
         tileNumberToNameMap[0] = Block.AIR
@@ -288,9 +290,9 @@ open class GameWorld(
         tileNameToNumberMap[Block.AIR] = 0
         tileNameToNumberMap[Block.UPDATE] = 1
         tileNameToNumberMap[Block.NOT_GENERATED] = 65535
-        fluidNumberToNameMap[0] = Fluid.NULL
-        fluidNumberToNameMap[65535] = Fluid.NULL
-        fluidNameToNumberMap[Fluid.NULL] = 0
+//        fluidNumberToNameMap[0] = Fluid.NULL
+//        fluidNumberToNameMap[65535] = Fluid.NULL
+//        fluidNameToNumberMap[Fluid.NULL] = 0
 
         // perform renaming of tile layers
         for (y in 0 until layerTerrain.height) {
@@ -402,7 +404,7 @@ open class GameWorld(
         terrainDamages.remove(blockAddr)
 
         if (BlockCodex[itemID].isSolid) {
-            layerFluids.unsafeSetTile(x, y, fluidNameToNumberMap[Fluid.NULL]!!, 0f)
+            layerFluids.unsafeSetTile(x, y, tileNameToNumberMap[Fluid.NULL]!!, 0f)
 //            Terrarum.ingame?.modified(LandUtil.LAYER_FLUID, x, y)
         }
         // fluid tiles-item should be modified so that they will also place fluid onto their respective map
@@ -751,7 +753,7 @@ open class GameWorld(
             wallDamages[LandUtil.getBlockAddr(this, x, y)] ?: 0f
 
     fun setFluid(x: Int, y: Int, fluidType: ItemID, fill: Float) {
-        if (!fluidType.isFluid()) throw IllegalArgumentException("Fluid type is not actually fluid: $fluidType")
+        if (!fluidType.isFluid() && fluidType != Block.AIR) throw IllegalArgumentException("Fluid type is not actually fluid: $fluidType")
 
         /*if (x == 60 && y == 256) {
             printdbg(this, "Setting fluid $fill at ($x,$y)")
@@ -765,7 +767,7 @@ open class GameWorld(
 
 //        val addr = LandUtil.getBlockAddr(this, x, y)
 
-        val fluidNumber = fluidNameToNumberMap[fluidType]!!
+        val fluidNumber = tileNameToNumberMap[fluidType] ?: throw NullPointerException("No such fluid: $fluidType")
 
         if (fill > WorldSimulator.FLUID_MIN_MASS) {
             //setTileTerrain(x, y, fluidTypeToBlock(fluidType))
@@ -786,7 +788,10 @@ open class GameWorld(
     fun getFluid(x: Int, y: Int): FluidInfo {
         val (x, y) = coerceXY(x, y)
         val (type, fill) = layerFluids.unsafeGetTile1(x, y)
-        val fluidID = fluidNumberToNameMap[type.toLong()] ?: throw NullPointerException("No such fluid: $type")
+        var fluidID = tileNumberToNameMap[type.toLong()] ?: throw NullPointerException("No such fluid: $type")
+
+        if (fluidID == Block.NULL || fluidID == Block.NOT_GENERATED)
+            fluidID = Fluid.NULL
 
         return FluidInfo(fluidID, fill.let { if (it.isNaN()) 0f else it }) // hex FFFFFFFF (magic number for ungenerated tiles) is interpreted as Float.NaN
     }

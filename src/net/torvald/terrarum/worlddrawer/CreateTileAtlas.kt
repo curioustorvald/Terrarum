@@ -161,15 +161,15 @@ class CreateTileAtlas {
 //        val tgaListOres = ArrayList<Pair<String, FileHandle>>()
 
         val tgaList = HashMap<String, ArrayList<Pair<String, FileHandle>>>() // Key: directory name, value: pair of <modname, filehandle>
-        val dirList = listOf("blocks", "ores")
-        dirList.forEach { dirName ->
-            tgaList[dirName] = ArrayList()
-            ModMgr.getGdxFilesFromEveryMod(dirName).forEach { (modname, dir) ->
+        val prefixes = listOf("blocks", "ores", "fluid")
+        prefixes.forEach { prefix ->
+            tgaList[prefix] = ArrayList()
+            ModMgr.getGdxFilesFromEveryMod(prefix).forEach { (modname, dir) ->
                 if (!dir.isDirectory) {
                     throw Error("Path '${dir.path()}' is not a directory")
                 }
 
-                if (dirName == "blocks") {
+                if (prefix == "blocks") {
                     // filter files that do not exist on the blockcodex
                     dir.list()
                         .filter { tgaFile -> tgaFile.extension() == "tga" && !tgaFile.isDirectory && (BlockCodex.getOrNull("$modname:${tgaFile.nameWithoutExtension()}") != null) }
@@ -177,11 +177,11 @@ class CreateTileAtlas {
                         .forEach { tgaFile: FileHandle -> // toInt() to sort by the number, not lexicographically
                             // tgaFile be like: ./assets/mods/basegame/blocks/32.tga (which is not always .tga)
                             val newFile = ModMgr.GameRetextureLoader.altFilePaths.getOrDefault(tgaFile.path(), tgaFile)
-                            tgaList[dirName]!!.add(modname to newFile)
+                            tgaList[prefix]!!.add(modname to newFile)
                             // printdbg(this, "modname = $modname, file = $newFile")
                         }
                 }
-                else {
+                else if (prefix == "ores") {
                     // filter files that do not exist on the orecodex
                     dir.list()
                         .filter { tgaFile -> tgaFile.extension() == "tga" && !tgaFile.isDirectory && (OreCodex.getOrNull("ores@$modname:${tgaFile.nameWithoutExtension()}") != null) }
@@ -189,7 +189,19 @@ class CreateTileAtlas {
                         .forEach { tgaFile: FileHandle -> // toInt() to sort by the number, not lexicographically
                             // tgaFile be like: ./assets/mods/basegame/blocks/32.tga (which is not always .tga)
                             val newFile = ModMgr.GameRetextureLoader.altFilePaths.getOrDefault(tgaFile.path(), tgaFile)
-                            tgaList[dirName]!!.add(modname to newFile)
+                            tgaList[prefix]!!.add(modname to newFile)
+                            // printdbg(this, "modname = $modname, file = $newFile")
+                        }
+                }
+                else if (prefix == "fluid") {
+                    // filter files that do not exist on the orecodex
+                    dir.list()
+                        .filter { tgaFile -> tgaFile.extension() == "tga" && !tgaFile.isDirectory && (FluidCodex.getOrNull("fluid@$modname:${tgaFile.nameWithoutExtension()}") != null) }
+                        .sortedBy { it.nameWithoutExtension().toInt() }
+                        .forEach { tgaFile: FileHandle -> // toInt() to sort by the number, not lexicographically
+                            // tgaFile be like: ./assets/mods/basegame/blocks/32.tga (which is not always .tga)
+                            val newFile = ModMgr.GameRetextureLoader.altFilePaths.getOrDefault(tgaFile.path(), tgaFile)
+                            tgaList[prefix]!!.add(modname to newFile)
                             // printdbg(this, "modname = $modname, file = $newFile")
                         }
                 }
@@ -199,9 +211,9 @@ class CreateTileAtlas {
 
 
         // Sift through the file list for blocks, but TGA format first
-        dirList.forEach { dirName ->
-            tgaList[dirName]!!.forEach { (modname, filehandle) ->
-                printdbg(this, "processing $dirName $modname:${filehandle.name()}")
+        prefixes.forEach { prefix ->
+            tgaList[prefix]!!.forEach { (modname, filehandle) ->
+                printdbg(this, "processing $prefix $modname:${filehandle.name()}")
 
                 try {
                     val glowFile = Gdx.files.internal(
@@ -214,7 +226,7 @@ class CreateTileAtlas {
                         modname, filehandle,
                         if (glowFile.exists()) glowFile else null,
                         if (emissiveFile.exists()) emissiveFile else null,
-                        if (dirName == "blocks") null else dirName
+                        if (prefix == "blocks") null else prefix
                     )
                 }
                 catch (e: GdxRuntimeException) {
@@ -337,12 +349,12 @@ class CreateTileAtlas {
 
     val nullTile = Pixmap(TILE_SIZE * 16, TILE_SIZE * 16, Pixmap.Format.RGBA8888)
 
-    private fun fileToAtlantes(modname: String, diffuse: FileHandle, glow: FileHandle?, emissive: FileHandle?, mode: String?) {
+    private fun fileToAtlantes(modname: String, diffuse: FileHandle, glow: FileHandle?, emissive: FileHandle?, prefix: String?) {
         val tilesPixmap = Pixmap(diffuse)
         val tilesGlowPixmap = if (glow != null) Pixmap(glow) else nullTile
         val tilesEmissivePixmap = if (emissive != null) Pixmap(emissive) else nullTile
         val blockName = diffuse.nameWithoutExtension().split('-').last().toInt() // basically a filename
-        val blockID = if (mode != null) "$mode@$modname:$blockName" else "$modname:$blockName"
+        val blockID = if (prefix != null) "$prefix@$modname:$blockName" else "$modname:$blockName"
 
 
         // determine the type of the block (populate tags list)

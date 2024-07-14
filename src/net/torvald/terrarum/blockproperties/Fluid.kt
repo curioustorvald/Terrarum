@@ -8,7 +8,7 @@ import net.torvald.terrarum.gameitems.ItemID
  */
 object Fluid {
 
-    val NULL = "fluid@basegame:0"
+    val NULL = Block.AIR
     val WATER = "fluid@basegame:1"
     val LAVA = "fluid@basegame:2"
 

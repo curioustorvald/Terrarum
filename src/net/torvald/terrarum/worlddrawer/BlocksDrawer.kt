@@ -16,6 +16,7 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.modulebasegame.WorldSimulator.FLUID_MIN_MASS
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
@@ -218,7 +219,6 @@ internal object BlocksDrawer {
                 drawTiles(ORES)
                 drawTiles(FLUID)
                 drawTiles(OCCLUSION)
-                //drawTiles(WIRE)
             }
         }
     }
@@ -330,8 +330,6 @@ internal object BlocksDrawer {
      * @param wire coduitTypes bit that is selected to be drawn. Must be the power of two.
      */
     private fun drawTiles(mode: Int) {
-        if (mode == FLUID) return
-
         // can't be "WorldCamera.y / TILE_SIZE":
         //      ( 3 / 16) == 0
         //      (-3 / 16) == -1  <-- We want it to be '-1', not zero
@@ -363,7 +361,10 @@ internal object BlocksDrawer {
                     WALL -> world.layerWall.unsafeGetTile(wx, wy)
                     TERRAIN -> world.layerTerrain.unsafeGetTile(wx, wy)
                     ORES -> world.layerOres.unsafeGetTile(wx, wy)//.also { println(it) }
-                    FLUID -> 0 // TODO need new wire storing format //world.getFluid(x, y).type.abs()
+                    FLUID -> world.layerFluids.unsafeGetTile1(wx, wy).let { (number, fill) ->
+                        if (fill < 1f/30f) 0
+                        else number
+                    }
                     OCCLUSION -> 0
                     else -> throw IllegalArgumentException()
                 }
@@ -379,9 +380,14 @@ internal object BlocksDrawer {
                 else if (mode == ORES) {
                     0
                 }
-                /*else if (mode == FLUID) {
-                    getNearbyTilesInfoFluids(x, y)
-                }*/
+                else if (mode == FLUID) {
+                    if (thisTile == 0)
+                        0
+                    else {
+                        val fill = world.layerFluids.unsafeGetTile1(wx, wy).second.let { if (it.isNaN()) 0f else it }
+                        (fill * 15f).roundToInt().coerceIn(0, 15)
+                    }
+                }
                 else if (treeLeavesTiles.binarySearch(thisTile) >= 0) {
                     getNearbyTilesInfoTrees(x, y, mode).swizzle8(thisTile, hash)
                 }
@@ -408,18 +414,14 @@ internal object BlocksDrawer {
                 }
 
                 val renderTag = if (mode == OCCLUSION) occlusionRenderTag else App.tileMaker.getRenderTag(thisTile)
-                val tileNumberBase =
-//                        if (mode == FLUID)
-//                            App.tileMaker.fluidToTileNumber(world.getFluid(x, y))
-//                        else
-                            renderTag.tileNumber
+                val tileNumberBase = renderTag.tileNumber
                 var tileNumber = if (thisTile == 0 && mode != OCCLUSION) 0
                     // special case: actorblocks and F3 key
                     else if (renderOnF3Only.binarySearch(thisTile) >= 0 && !KeyToggler.isOn(Keys.F3))
                         0
                     // special case: fluids
                     else if (mode == FLUID)
-                        tileNumberBase + connectLut47[nearbyTilesInfo]
+                        tileNumberBase + nearbyTilesInfo
                     // special case: ores
                     else if (mode == ORES)
                         tileNumberBase + world.layerOres.unsafeGetTile1(wx, wy).second
@@ -438,12 +440,8 @@ internal object BlocksDrawer {
                     tileNumber = 2 // black solid
                 }
 
-                var thisTileX = tileNumber % App.tileMaker.TILES_IN_X
-                var thisTileY = tileNumber / App.tileMaker.TILES_IN_X
-
-                if (mode == FLUID && thisTileX == 22 && thisTileY == 3) {
-                    //println("tileNumberBase = $tileNumberBase, tileNumber = $tileNumber, fluid = ${world.getFluid(x, y)}")
-                }
+                val thisTileX = tileNumber % App.tileMaker.TILES_IN_X
+                val thisTileY = tileNumber / App.tileMaker.TILES_IN_X
 
                 val breakage =  if (mode == TERRAIN || mode == ORES) world.getTerrainDamage(x, y) else if (mode == WALL) world.getWallDamage(x, y) else 0f
                 if (breakage.isNaN()) throw IllegalStateException("Block breakage at ($x, $y) is NaN (mode=$mode)")
@@ -591,20 +589,20 @@ internal object BlocksDrawer {
     /**
      * Basically getNearbyTilesInfoConMutual() but connects mutually with all the fluids
      */
-    /*private fun getNearbyTilesInfoFluids(x: Int, y: Int): Int {
+    private fun getNearbyTilesInfoFluids(x: Int, y: Int): Int {
         val nearbyPos = getNearbyTilesPos(x, y)
         val nearbyTiles: List<ItemID> = nearbyPos.map { world.getTileFromTerrain(it.x, it.y) }
 
         var ret = 0
         for (i in nearbyTiles.indices) {
             val fluid = world.getFluid(nearbyPos[i].x, nearbyPos[i].y)
-            if (BlockCodex[nearbyTiles[i]].isSolidForTileCnx || (fluid.isFluid() && 0 < App.tileMaker.fluidFillToTileLevel(fluid.amount))) {
+            if (BlockCodex[nearbyTiles[i]].isSolidForTileCnx || (fluid.isFluid() && fluid.amount > FLUID_MIN_MASS)) {
                 ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
 
         return ret
-    }*/
+    }
 
     private fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
         val nearbyTiles = arrayOf(Block.NULL, Block.NULL, Block.NULL, Block.NULL)

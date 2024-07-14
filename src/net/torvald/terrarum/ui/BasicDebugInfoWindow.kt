@@ -325,7 +325,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 App.fontSmallNumbers.draw(batch, "$ccO$WIRE$ccG$wireCount ${ccY}X$ccO$mouseTileX ${ccY}Y$ccO$mouseTileY", gap + 7f*(tileCursX + 3), line(tileCursY + 3))
                 App.fontSmallNumbers.draw(batch, "$ccR$rawR $ccG$rawG $ccB$rawB $ccW$rawA", gap + 7f*(tileCursX + 3), line(tileCursY + 4))
                 App.fontSmallNumbers.draw(batch, "$ccO${TERRAIN}D $ccG$tdmg  $ccO${WALL}D $ccG$wdmg", gap + 7f*(tileCursX + 3), line(tileCursY + 5))
-                App.fontSmallNumbers.draw(batch, "$ccO$LIQUID$ccG${fluid.type.substring(6).padEnd(15)}$ccO$BEAKER$ccG${fluid.amount.toIntAndFrac(2)}", gap + 7f*(tileCursX + 3), line(tileCursY + 6))
+                App.fontSmallNumbers.draw(batch, "$ccO$LIQUID$ccG${fluid.type.padEnd(16)}$ccO$BEAKER$ccG${fluid.amount.toIntAndFrac(2)}", gap + 7f*(tileCursX + 3), line(tileCursY + 6))
 
                 batch.draw(icons.get(4,0), gap + 7f*tileCursX, line(tileCursY + 1) + 7)
             }

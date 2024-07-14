@@ -33,6 +33,9 @@ class FluidCodex {
         }
     }
 
+    fun getOrNull(blockID: ItemID?): FluidProp? {
+        return fluidProps[blockID]
+    }
 
     /**
      * Later entry (possible from other modules) will replace older ones

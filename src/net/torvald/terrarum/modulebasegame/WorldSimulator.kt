@@ -451,10 +451,6 @@ object WorldSimulator {
                 fluidTypeMap[y][x] = fluidData.type
                 fluidNewMap[y][x] = fluidData.amount
                 fluidNewTypeMap[y][x] = fluidData.type
-
-                /*if (x + updateXFrom == 60 && y + updateYFrom == 256) {
-                    printdbg(this, "making array amount ${fluidData.amount} for (60,256)")
-                }*/
             }
         }
     }
