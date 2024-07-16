@@ -13,12 +13,11 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
-import net.torvald.terrarum.blockproperties.Fluid
-import net.torvald.terrarum.blockproperties.FluidCodex
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.createRandomBlockParticle
 import net.torvald.terrarum.gameworld.BlockAddress
+import net.torvald.terrarum.gameworld.FLUID_MIN_MASS
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -690,10 +689,7 @@ open class ActorWithBody : Actor {
             feetPosPoint.set(hitbox.centeredX, hitbox.endY)
             feetPosTile.set(hIntTilewiseHitbox.centeredX.floorToInt(), hIntTilewiseHitbox.endY.floorToInt())
 
-            submergedHeight = max(
-                getContactingAreaFluid(COLLIDING_LEFT),
-                getContactingAreaFluid(COLLIDING_RIGHT)
-            ).toDouble()
+            submergedHeight = getSubmergedHeight()
             submergedVolume = submergedHeight * hitbox.width * hitbox.width
             submergedRatio = if (hitbox.height == 0.0) throw RuntimeException("Hitbox.height is zero")
                     else submergedHeight / hitbox.height
@@ -712,6 +708,11 @@ open class ActorWithBody : Actor {
 //        isStationary = (hitbox - oldHitbox).magnitudeSquared < PHYS_EPSILON_VELO
         isStationary = isCloseEnough(hitbox.startX, oldHitbox.startX) && // this is supposed to be more accurate, idk
                        isCloseEnough(hitbox.startY, oldHitbox.startY)
+
+
+        if (this is IngamePlayer) {
+            printdbg(this, "Submerged=$submergedVolume   rho=$tileDensityFluid")
+        }
     }
 
     fun getDrag(externalForce: Vector2): Vector2 {
@@ -1507,8 +1508,29 @@ open class ActorWithBody : Actor {
     // TODO: as for the platform, only apply it when it's a feet tile
 
 
+    private fun getSubmergedHeight(): Double {
+        if (world == null) return 0.0
+        val straightGravity = (world!!.gravitation.y > 0)
 
-    private fun getContactingAreaFluid(side: Int, translateX: Int = 0, translateY: Int = 0): Int {
+        val dbgTYLs = HashSet<Int>()
+
+        val txL = (hitbox.startX / TILE_SIZED).floorToInt()
+        val txR = (hitbox.endX / TILE_SIZED).floorToInt()
+        var hL = 0
+        var hR = 0
+        for (q in 0 until hitbox.height.toInt()) {
+            val y = if (straightGravity) hitbox.endY - q else hitbox.startX + q
+            val ty = (y / TILE_SIZED).floorToInt()
+            if (world!!.getFluid(txL, ty).amount >= FLUID_MIN_MASS) hL += 1
+            if (world!!.getFluid(txR, ty).amount >= FLUID_MIN_MASS) hR += 1
+            dbgTYLs.add(ty)
+        }
+
+        // returns average of two sides
+        return (hL + hR) / 2.0
+    }
+
+    private fun xxxxgetContactingAreaFluid(side: Int, translateX: Int = 0, translateY: Int = 0): Int {
         if (world == null) return 0
 
         var contactAreaCounter = 0
@@ -1621,7 +1643,7 @@ open class ActorWithBody : Actor {
      * F(bo) = density * submerged_volume * gravitational_acceleration [N]
      */
     private fun applyBuoyancy(): Vector2 {
-        val rho = FluidCodex[Fluid.WATER].density //tileDensityFluid // kg / m^3
+        val rho = tileDensityFluid // kg / m^3
         val V = submergedVolume / (METER.pow(3)) // m^3
         val g = world?.gravitation ?: Vector2() // m / s^2
         val F = g * (rho * V / SI_TO_GAME_VELO) // Newtons = kg * m / s^2

@@ -263,6 +263,8 @@ open class GameWorld(
     fun coordInWorldStrict(x: Int, y: Int) = x in 0 until width && y in 0 until height // ROUNDWORLD implementation
 
     fun renumberTilesAfterLoad() {
+        printdbg(this, "renumberTilesAfterLoad()")
+
         // patch the "old"map
         tileNumberToNameMap[0] = Block.AIR
         tileNumberToNameMap[1] = Block.UPDATE
@@ -307,6 +309,8 @@ open class GameWorld(
         }
 
         BlocksDrawer.rebuildInternalPrecalculations()
+
+        printdbg(this, "renumberTilesAfterLoad done!")
     }
     
     /**
@@ -769,7 +773,7 @@ open class GameWorld(
 
         val fluidNumber = tileNameToNumberMap[fluidType] ?: throw NullPointerException("No such fluid: $fluidType")
 
-        if (fill > WorldSimulator.FLUID_MIN_MASS) {
+        if (fill > FLUID_MIN_MASS) {
             //setTileTerrain(x, y, fluidTypeToBlock(fluidType))
             layerFluids.unsafeSetTile(x, y, fluidNumber, fill)
         }
@@ -804,7 +808,7 @@ open class GameWorld(
 
     data class FluidInfo(val type: ItemID = Fluid.NULL, val amount: Float = 0f) {
         /** test if this fluid should be considered as one */
-        fun isFluid() = type != Fluid.NULL && amount >= WorldSimulator.FLUID_MIN_MASS
+        fun isFluid() = type != Fluid.NULL && amount >= FLUID_MIN_MASS
         fun getProp() = FluidCodex[type]
         override fun toString() = "Fluid type: ${type}, amount: $amount"
     }

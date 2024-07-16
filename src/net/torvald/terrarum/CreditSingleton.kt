@@ -347,11 +347,11 @@ $BULLET Foleys:
 ℗ 2011, 2013, 2015, 2020, 2021 Klankbeeld
 Sound from <https://www.freesound.org/people/klankbeeld>
 
-    - effects/steps/GRSS.*.ogg
-    - effects/steps/GRVL.*.ogg
-    - effects/steps/ROCK.*.ogg
-    - effects/steps/SAND.*.ogg
-    - effects/steps/WOOD.*.ogg
+    - effects/{mining|steps}/GRSS.*.wav
+    - effects/{mining|steps}/GRVL.*.wav
+    - effects/{mining|steps}/ROCK.*.wav
+    - effects/{mining|steps}/SAND.*.wav
+    - effects/{mining|steps}/WOOD.*.wav
     - effects/door/wooden_open.*.ogg
     - effects/door/wooden_close.*.ogg
 ℗ 2020, 2021, 2022 Nox Sound
@@ -373,12 +373,12 @@ Sound from <https://freesound.org/people/joedeshon>
 ℗ 2019 DrinkingWindGames
 Sound from <https://freesound.org/people/DrinkingWindGames>
 
-    - effects/explosion/bang_bomb.ogg
+    - effects/explosion/bang_bomb.wav
 ℗ 2019 Richwise
-Sound from <https://freesound.org/people/richwise>
+Remixed sound from <https://freesound.org/people/richwise>
 
-    - effects/explosion/fuse.ogg
-    - effects/explosion/fuse_continue.ogg
+    - effects/explosion/fuse.wav
+    - effects/explosion/fuse_continue.wav
 ℗ 2012, 2015 j1987 and ScouseMouseJB
 Remixed sound from <https://freesound.org/people/j1987> and <https://freesound.org/people/ScouseMouseJB>
 
@@ -393,6 +393,11 @@ Sound from <https://freesound.org/people/CuriousTorvald/>
     - effects/notes/spieluhr.ogg
 ℗ 2013 Ubikphonik
 Sound from <https://freesound.org/people/UbikPhonik/>
+
+    - effects/throwing/throw_low_short.wav
+℗ 2023 Killerkipler
+Remixed sound from <https://freesound.org/people/killerkipler/>
+
 
 
 $BULLET Impulse Responses:
