@@ -93,7 +93,8 @@ class QuickDirtyLint {
     )
 
     val remarks = mapOf(
-        "Ljava/util/List" to "java.util.List has no zero-arg constructor."
+        "Ljava/util/List" to "java.util.List has no zero-arg constructor.",
+        "Lcom/badlogic/gdx/graphics" to "Anything under gdx.graphics needs GL context to initialise."
     )
 
     val classGraph = ClassGraph().acceptPackages("net.torvald.terrarum")/*.verbose()*/.enableAllInfo().scan()
@@ -131,9 +132,7 @@ class QuickDirtyLint {
                         "\t${csiG}type: ${csi0}${it.typeSignatureOrTypeDescriptorStr}\n" +
                         "\t${csiG}remarks: ${csi0}${
                             remarks.keys.filter { key ->
-                                it.typeSignatureOrTypeDescriptorStr.startsWith(
-                                    key
-                                )
+                                it.typeSignatureOrTypeDescriptorStr.startsWith(key)
                             }.map { remarks[it] }.joinToString(" ")
                         }"
                 )

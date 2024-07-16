@@ -34,9 +34,6 @@ class BlockProp : TaggedProp {
 
     var strength: Int = 0
     var density: Int = 0
-    var viscosity: Int = 0
-    /** Fluid colour */
-    var colour: Int = 0
 
     /** isSolid is NOT SAME AS !isOpaqueis
      * Like, don't ever use this vars to tell this block should be removed by water or something,

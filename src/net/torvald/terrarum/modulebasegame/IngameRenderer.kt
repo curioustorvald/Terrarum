@@ -17,6 +17,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.FluidCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.METER
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.SI_TO_GAME_ACC
@@ -865,7 +866,7 @@ object IngameRenderer : Disposable {
     }
 
     private val bodyFriction = BlockCodex[Block.AIR].friction.frictionToMult()
-    private val bodyViscosity = BlockCodex[Block.AIR].viscosity.viscosityToMult()
+    private val bodyViscosity = FluidCodex[Block.AIR].viscosity.viscosityToMult()
 
 
     private fun applyGravitation(gravitation: Vector2, hitboxWidth: Double) {

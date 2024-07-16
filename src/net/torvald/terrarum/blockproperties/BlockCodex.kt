@@ -78,6 +78,7 @@ class BlockCodex {
 
     private fun register(module: String, records: List<CSVRecord>, blockRegisterHook: (BlockProp) -> Unit) {
         records.forEach {
+            val id = it.intVal("id")
             /*if (it.intVal("id") == -1) {
                 setProp(nullProp, it)
             }
@@ -85,8 +86,8 @@ class BlockCodex {
                 setProp(blockProps[it.intVal("id")], it)
             }*/
 
-            setProp(module, it.intVal("id"), it)
-            val tileId = "$module:${it.intVal("id")}"
+            setProp(module, id, it)
+            val tileId = "$module:$id"
 
             // register tiles with dynamic light
             if ((blockProps[tileId]?.dynamicLuminosityFunction ?: 0) != 0) {
@@ -209,8 +210,6 @@ class BlockCodex {
         prop.baseLumCol.set(prop.baseLumColR, prop.baseLumColG, prop.baseLumColB, prop.baseLumColA)
 
         prop.friction = record.intVal("fr")
-        prop.viscosity = record.intVal("vscs")
-        prop.colour = record.str16ToInt("colour")
 
         //prop.isFluid = record.boolVal("fluid")
         prop.isSolid = record.boolVal("solid")

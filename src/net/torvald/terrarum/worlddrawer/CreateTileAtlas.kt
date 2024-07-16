@@ -388,13 +388,18 @@ class CreateTileAtlas {
         }
         // predefined by the image dimension: 256x256
         else if (tilesPixmap.width == TILE_SIZE * 16 && tilesPixmap.height == TILE_SIZE * 16) {
+            addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_FLUID)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_FLUID)
+        }
+        // predefined by the image dimension: 288x16
+        else if (tilesPixmap.width == TILE_SIZE * 18 && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X16)
             drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_16X16)
         }
         // 112x112 or 224x224
         else {
             if (tilesPixmap.width != tilesPixmap.height && tilesPixmap.width % (7 * TILE_SIZE) >= 2) {
-                throw IllegalArgumentException("Unrecognized image dimension ${tilesPixmap.width}x${tilesPixmap.height} from $modname:${diffuse.name()}")
+                throw IllegalArgumentException("Unrecognized image dimension ${tilesPixmap.width}x${tilesPixmap.height} from ${diffuse.path()}")
             }
             // figure out the tags
             var connectionType = 0
@@ -531,6 +536,7 @@ class CreateTileAtlas {
             const val MASK_16X4 = 5
             const val MASK_16X8 = 6
             const val MASK_16X16 = 7
+            const val MASK_FLUID = 8
 
             fun maskTypeToTileCount(maskType: Int) = when (maskType) {
                 MASK_NA -> 1
@@ -541,6 +547,7 @@ class CreateTileAtlas {
                 MASK_16X4 -> 64
                 MASK_16X8 -> 128
                 MASK_16X16 -> 256
+                MASK_FLUID -> 18
                 else -> throw IllegalArgumentException("Unknown maskType: $maskType")
             }
         }

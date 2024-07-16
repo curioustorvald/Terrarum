@@ -49,9 +49,7 @@ import kotlin.math.cos
  * internal functions `getFormattedTime()`, `getShortTime()`, and `getFilenameTime()`
  * - Preferred computerised date format is YearMonthDate. E.g. 01250407
  * - Rest of the format (e.g. time intervals) follows ISO 8601 standard.
- *
- * (Check please:)
- * - Equinox/Solstice always occur on 21st day of the month
+ * - Equinox/Solstice always occur on 15th day of the month
  *
  *
  * Created by minjaesong on 2016-01-24.

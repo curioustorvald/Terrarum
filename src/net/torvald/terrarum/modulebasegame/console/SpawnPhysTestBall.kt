@@ -25,7 +25,7 @@ internal object SpawnPhysTestBall : ConsoleCommand {
             val ball = PhysTestBall()
             ball.setPosition(mouseX, mouseY)
             ball.elasticity = elasticity
-            ball.applyForce(Vector2(xvel, yvel))
+            ball.applyAcceleration(Vector2(xvel, yvel))
 
             INGAME.queueActorAddition(ball)
         }

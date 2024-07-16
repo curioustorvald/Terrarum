@@ -805,7 +805,7 @@ open class GameWorld(
     data class FluidInfo(val type: ItemID = Fluid.NULL, val amount: Float = 0f) {
         /** test if this fluid should be considered as one */
         fun isFluid() = type != Fluid.NULL && amount >= WorldSimulator.FLUID_MIN_MASS
-        fun getProp(): Nothing = TODO()
+        fun getProp() = FluidCodex[type]
         override fun toString() = "Fluid type: ${type}, amount: $amount"
     }
 

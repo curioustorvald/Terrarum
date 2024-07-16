@@ -13,6 +13,8 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
+import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.blockproperties.FluidCodex
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.createRandomBlockParticle
@@ -478,10 +480,18 @@ open class ActorWithBody : Actor {
      *
      * Since we're adding some value every frame, the value is equivalent to the acceleration.
      * Look for Newton's second law for the background knowledge.
-     * @param acc : Acceleration in Vector2
+     * @param acc acceleration in Vector2, the unit is [px / InternalFrame^2]
      */
-    fun applyForce(acc: Vector2) {
+    fun applyAcceleration(acc: Vector2) {
         externalV += acc * speedMultByTile
+    }
+
+    private fun Vector2.applyViscoseDrag() {
+        val viscosity = bodyViscosity
+        val divisor = 1.0 + (viscosity / 16.0)
+
+        this.x /= divisor
+        this.y /= divisor
     }
 
     private val bounceDampenVelThreshold = 0.5
@@ -554,15 +564,11 @@ open class ActorWithBody : Actor {
             ////////////////////////////////////////////////////////////////
 
             // --> Apply more forces <-- //
-            if (!isChronostasis) {
-                // Actors are subject to the gravity and the buoyancy if they are not levitating
-
-                if (!isNoSubjectToGrav) {
-                    applyGravitation()
-                }
-
-                //applyBuoyancy()
+            // Actors are subject to the gravity and the buoyancy if they are not levitating
+            if (!isNoSubjectToGrav) {
+                applyGravitation()
             }
+
 
             // hard limit velocity
             externalV.x = externalV.x.bipolarClamp(VELO_HARD_LIMIT) // displaceHitbox SHOULD use moveDelta
@@ -573,6 +579,10 @@ open class ActorWithBody : Actor {
                 // Codes that (SHOULD) displaces hitbox directly //
                 ///////////////////////////////////////////////////
 
+//                if (this is IngamePlayer) {
+//                    printdbg(this, "BodyViscosity=$bodyViscosity   FeetViscosity=$feetViscosity   BodyFriction=$bodyFriction   FeetFriction=$feetFriction")
+//                }
+
                 val vecSum = (externalV + (controllerV ?: Vector2(0.0, 0.0)))
                 /**
                  * solveCollision()?
@@ -580,7 +590,7 @@ open class ActorWithBody : Actor {
                  *     This body is NON-STATIC and the other body is STATIC
                  */
                 if (!isNoCollideWorld) {
-                    val (collisionStatus, collisionDamage) = displaceHitbox()
+                    val (collisionStatus, collisionDamage) = displaceHitbox(true)
 
 
                     if (collisionStatus != 0 && collisionDamage >= 1.0) {
@@ -634,6 +644,15 @@ open class ActorWithBody : Actor {
 
             }
 
+            // --> Apply more forces <-- //
+            // Actors are subject to the gravity and the buoyancy if they are not levitating
+            if (!isNoSubjectToGrav) {
+                val buoyancy = applyBuoyancy() * speedMultByTile
+                hitbox.translate(buoyancy)
+                clampHitbox()
+            }
+
+
 
             // update all the other variables //
 
@@ -670,6 +689,14 @@ open class ActorWithBody : Actor {
             feetPosVector.set(hitbox.centeredX, hitbox.endY)
             feetPosPoint.set(hitbox.centeredX, hitbox.endY)
             feetPosTile.set(hIntTilewiseHitbox.centeredX.floorToInt(), hIntTilewiseHitbox.endY.floorToInt())
+
+            submergedHeight = max(
+                getContactingAreaFluid(COLLIDING_LEFT),
+                getContactingAreaFluid(COLLIDING_RIGHT)
+            ).toDouble()
+            submergedVolume = submergedHeight * hitbox.width * hitbox.width
+            submergedRatio = if (hitbox.height == 0.0) throw RuntimeException("Hitbox.height is zero")
+                    else submergedHeight / hitbox.height
 
 
             if (mouseUp && tooltipText != null && tooltipShowing[tooltipHash] != true) {
@@ -720,7 +747,7 @@ open class ActorWithBody : Actor {
 
         if (!isNoSubjectToGrav && !(gravitation.y > 0 && walledBottom || gravitation.y < 0 && walledTop)) {
             //if (!isWalled(hitbox, COLLIDING_BOTTOM)) {
-            applyForce(getDrag(externalV))
+            applyAcceleration(getDrag(externalV))
             //}
         }
     }
@@ -728,7 +755,7 @@ open class ActorWithBody : Actor {
     /**
      * @return Collision Status, Collision damage in Newtons
      */
-    private fun displaceHitbox(): Pair<Int, Double> {
+    private fun displaceHitbox(useControllerV: Boolean): Pair<Int, Double> {
         var collisionDamage = 0.0
         val printdbg1 = false && App.IS_DEVELOPMENT_BUILD
         // // HOW IT SHOULD WORK // //
@@ -763,7 +790,7 @@ open class ActorWithBody : Actor {
 
 
 
-            if (controllerV != null && stairPenaltyCounter < stairPenaltyMax) {
+            if (useControllerV && controllerV != null && stairPenaltyCounter < stairPenaltyMax) {
                 controllerV!!.x  *= stairPenaltyVector
             }
 
@@ -771,7 +798,7 @@ open class ActorWithBody : Actor {
 
             // the job of the ccd is that the "next hitbox" would not dig into the terrain greater than the tile size,
             // in which the modTileDelta returns a wrong value
-            val vectorSum = (externalV + controllerV)
+            val vectorSum = (externalV + (if (useControllerV) controllerV else Vector2()))
             val ccdSteps = (vectorSum.magnitude / TILE_SIZE).ceilToInt().plus(1).times(2).coerceIn(0, 64) // adaptive
 
 
@@ -1050,7 +1077,7 @@ open class ActorWithBody : Actor {
                             // that when player happens to be "walled" (which zeroes the x velo) they can keep
                             // move left/right as long as "buried depth" <= stairheight
                             // so we also zero the same exact value here for perfect hiding
-                            if (controllerV != null) {
+                            if (useControllerV && controllerV != null) {
                                 val stairRatio = stairHeight / hitbox.height
                                 stairPenaltyVector =
                                     Math.pow(1.0 - (stairRatio), 90 * stairRatio).times(10).coerceIn(0.00005, 1.0)
@@ -1079,19 +1106,19 @@ open class ActorWithBody : Actor {
                     // bounce X/Y
                     if (bounceX) {
                         externalV.x *= elasticity
-                        controllerV?.let { controllerV!!.x *= elasticity }
+                        if (useControllerV) controllerV?.let { controllerV!!.x *= elasticity }
                     }
                     if (bounceY) {
                         externalV.y *= elasticity
-                        controllerV?.let { controllerV!!.y *= elasticity }
+                        if (useControllerV) controllerV?.let { controllerV!!.y *= elasticity }
                     }
                     if (zeroX) {
                         externalV.x = 0.0
-                        controllerV?.let { controllerV!!.x = 0.0 }
+                        if (useControllerV) controllerV?.let { controllerV!!.x = 0.0 }
                     }
                     if (zeroY) {
                         externalV.y = 0.0
-                        controllerV?.let { controllerV!!.y = 0.0 }
+                        if (useControllerV) controllerV?.let { controllerV!!.y = 0.0 }
                     }
 
 
@@ -1485,7 +1512,7 @@ open class ActorWithBody : Actor {
         if (world == null) return 0
 
         var contactAreaCounter = 0
-        for (i in 0..(if (side % 2 == 0) hitbox.width else hitbox.height).roundToInt() - 1) {
+        for (i in 0 until (if (side % 2 == 0) hitbox.width else hitbox.height).roundToInt()) {
             // set tile positions
             val tileX: Int
             val tileY: Int
@@ -1593,32 +1620,19 @@ open class ActorWithBody : Actor {
      * [N] = [kg * m / s^2]
      * F(bo) = density * submerged_volume * gravitational_acceleration [N]
      */
-    /*private fun applyBuoyancy() {
-        val fluidDensity = tileDensity
-        val submergedVolume = submergedVolume
+    private fun applyBuoyancy(): Vector2 {
+        val rho = FluidCodex[Fluid.WATER].density //tileDensityFluid // kg / m^3
+        val V = submergedVolume / (METER.pow(3)) // m^3
+        val g = world?.gravitation ?: Vector2() // m / s^2
+        val F = g * (rho * V / SI_TO_GAME_VELO) // Newtons = kg * m / s^2
 
-        if (!isNoClip && !grounded) {
-            // System.out.println("density: "+density);
-            veloY -= ((fluidDensity - this.density).toDouble()
-                    * map.gravitation.toDouble() * submergedVolume.toDouble()
-                    * Math.pow(mass.toDouble(), -1.0)
-                    * SI_TO_GAME_ACC.toDouble()).toDouble()
-        }
-    }*/
+        val acc = (-F / mass) // (kg * m / s^2) / kg = m / s^2
+        return acc * SI_TO_GAME_ACC
+    }
 
-    private val submergedRatio: Double
-        get() {
-            if (hitbox.height == 0.0) throw RuntimeException("Hitbox.height is zero")
-            return submergedHeight / hitbox.height
-        }
-    private val submergedVolume: Double
-        get() = submergedHeight * hitbox.width * hitbox.width
-
-    private val submergedHeight: Double
-        get() = Math.max(
-                getContactingAreaFluid(COLLIDING_LEFT),
-                getContactingAreaFluid(COLLIDING_RIGHT)
-        ).toDouble()
+    @Transient private var submergedRatio: Double = 0.0
+    @Transient private var submergedVolume: Double = 0.0
+    @Transient private var submergedHeight: Double = 0.0
 
 
     // body friction is always as same as the air. Fluid doesn't matter, they use viscosity
@@ -1655,10 +1669,11 @@ open class ActorWithBody : Actor {
     internal inline val bodyViscosity: Int
         get() {
             var viscosity = 0
-            forEachOccupyingTile {
+            forEachOccupyingFluid {
                 // get max viscosity
-                if (it?.viscosity ?: 0 > viscosity)
-                    viscosity = it?.viscosity ?: 0
+                if (it != null) {
+                    viscosity = max(viscosity, FluidCodex[it.type].viscosity)
+                }
             }
 
             return viscosity
@@ -1666,10 +1681,11 @@ open class ActorWithBody : Actor {
     internal inline val feetViscosity: Int
         get() {
             var viscosity = 0
-            forEachFeetTile {
+            forEachFeetFluid {
                 // get max viscosity
-                if (it?.viscosity ?: 0 > viscosity)
-                    viscosity = it?.viscosity ?: 0
+                if (it != null) {
+                    viscosity = max(viscosity, FluidCodex[it.type].viscosity)
+                }
             }
 
             return viscosity
@@ -1718,7 +1734,7 @@ open class ActorWithBody : Actor {
     /**
      * Get highest tile density from occupying tiles, fluid only
      */
-    /*private inline val tileDensityFluid: Int
+    private inline val tileDensityFluid: Int
         get() {
             var density = 0
             forEachOccupyingFluid {
@@ -1729,7 +1745,7 @@ open class ActorWithBody : Actor {
             }
 
             return density
-        }*/
+        }
 
     /**
      * Get highest density (specific gravity) value from tiles that the body occupies.
@@ -1990,6 +2006,23 @@ open class ActorWithBody : Actor {
 
         val fluids = ArrayList<GameWorld.FluidInfo?>()
 
+        // offset 1 pixel to the down so that friction would work
+//        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorToInt()
+        val y = intTilewiseHitbox.startY.toInt() + intTilewiseHitbox.height.toInt() + 1
+
+        for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
+            fluids.add(world!!.getFluid(x, y))
+        }
+
+        return fluids.forEach(consumer)
+    }
+
+    fun forEachFeetFluid(consumer: (GameWorld.FluidInfo?) -> Unit) {
+        if (world == null) return
+
+
+        val fluids = ArrayList<GameWorld.FluidInfo?>()
+
         for (y in hIntTilewiseHitbox.startY.toInt()..hIntTilewiseHitbox.endY.toInt()) {
             for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
                 fluids.add(world!!.getFluid(x, y))
@@ -2067,34 +2100,29 @@ open class ActorWithBody : Actor {
 
         // offset 1 pixel to the down so that friction would work
 //        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorToInt()
-        val y = intTilewiseHitbox.height.toInt() + 1
+        val y = intTilewiseHitbox.startY.toInt() + intTilewiseHitbox.height.toInt() + 1
 
-        for (x in 0..intTilewiseHitbox.width.toInt()) {
-            tileProps.add(BlockCodex[world!!.getTileFromTerrain(x + intTilewiseHitbox.startX.toInt(), y + intTilewiseHitbox.startY.toInt())])
+        for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
+            tileProps.add(BlockCodex[world!!.getTileFromTerrain(x, y)])
         }
 
         return tileProps.forEach(consumer)
     }
 
     fun forEachFeetTileWithPos(consumer: (Point2i, ItemID) -> Unit) {
-        val y = intTilewiseHitbox.height.toInt() + 1
-        (0..intTilewiseHitbox.width.toInt()).map { x ->
-            val px = x + intTilewiseHitbox.startX.toInt()
-            val py = y + intTilewiseHitbox.startY.toInt()
-
-            val point = Point2i(px, py)
-            val item = world!!.getTileFromTerrain(px, py)
+        val y = intTilewiseHitbox.startY.toInt() + intTilewiseHitbox.height.toInt() + 1
+        (hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()).map { x ->
+            val point = Point2i(x, y)
+            val item = world!!.getTileFromTerrain(x, y)
 
             consumer(point, item)
         }
     }
 
     fun getFeetTiles(): List<Pair<Point2i, ItemID>> {
-        val y = intTilewiseHitbox.height.toInt() + 1
-        return (0..intTilewiseHitbox.width.toInt()).map { x ->
-            val px = x + intTilewiseHitbox.startX.toInt()
-            val py = y + intTilewiseHitbox.startY.toInt()
-            Point2i(px, py) to world!!.getTileFromTerrain(px, py)
+        val y = intTilewiseHitbox.startY.toInt() + intTilewiseHitbox.height.toInt() + 1
+        return (hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()).map { x ->
+            Point2i(x, y) to world!!.getTileFromTerrain(x, y)
         }
     }
 
