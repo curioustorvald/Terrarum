@@ -580,11 +580,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             ingameController.gamepad = App.gamepad
         }
 
-        // init console window
-        // TODO test put it on the IngameInstance.(init)
-        //consoleHandler = ConsoleWindow()
-        //consoleHandler.setPosition(0, 0)
-
         val drawWidth = Toolkit.drawWidth
 
 

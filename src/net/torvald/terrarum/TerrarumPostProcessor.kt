@@ -175,9 +175,9 @@ object TerrarumPostProcessor : Disposable {
                     if (!debugUI.isClosed && !debugUI.isClosing) debugUI.setAsClose()
                 }
 
-                if (App.scr.isFullscreen) {
+//                if (App.scr.isFullscreen) {
                     drawFullscreenComplications()
-                }
+//                }
 
                 // draw dev build notifiers
                 // omitting this screws up HQ2X render for some reason
@@ -393,6 +393,15 @@ object TerrarumPostProcessor : Disposable {
         hasBattery = battStatus.hasBattery
         isCharging = battStatus.isCharging
         batteryPercentage = battStatus.percentage
+
+        val timeNow = App.getTIME_T()
+        val ptime_t = timeNow - INGAME.loadedTime_t
+
+        val ptimeMin = ptime_t / 60
+        val ptimeHr = ptime_t / 3600
+
+        ptimeH = ptimeHr.toString().padStart(2,'0')
+        ptimeM = ptimeMin.toString().padStart(2,'0')
     }
 
     private var clockH = "00"
@@ -400,6 +409,9 @@ object TerrarumPostProcessor : Disposable {
     private var hasBattery = false
     private var isCharging = false
     private var batteryPercentage = 0
+
+    private var ptimeH = "00"
+    private var ptimeM = "00"
 
     private val shadowCol = Color(1f, 1f, 1f, 0.6666667f)
 
@@ -413,6 +425,11 @@ object TerrarumPostProcessor : Disposable {
         val wy = marginEach.ceilToFloat()
         val watchStr = "$clockH:$clockM"
         val batteryPercentageStr = "$batteryPercentage%"
+
+        val ptimex = (marginEach * 1.5f).ceilToFloat()
+        val ptimey = wy
+        val ptimew = 7*6 + 4f
+        val ptimestr = "$ptimeH:$ptimeM"
 
         val percIndex = (batteryPercentage.toFloat() * 0.01 * 64).toInt() // 0-63
         val btx = percIndex % 4
@@ -428,6 +445,8 @@ object TerrarumPostProcessor : Disposable {
             if (hasBattery) {
                 Toolkit.drawBlurShadowBack(batch, wx - watchHeight - batteryTex.tileW - App.fontSmallNumbers.getWidth(batteryPercentageStr) - 4, wy + 2, App.fontSmallNumbers.getWidth(batteryPercentageStr) + 28f, 9f)
             }
+
+            Toolkit.drawBlurShadowBack(batch, ptimex, ptimey + 2, ptimew, 9f)
 
 
 
@@ -445,6 +464,10 @@ object TerrarumPostProcessor : Disposable {
                     wy
                 )
             }
+
+            App.fontSmallNumbers.draw(batch, "\u00DD", ptimex, ptimey)
+            App.fontSmallNumbers.draw(batch, ptimestr, ptimex + 11, ptimey)
+
         }
     }
 

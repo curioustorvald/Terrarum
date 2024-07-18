@@ -105,6 +105,8 @@ class ConsoleWindow : UICanvas() {
     }
 
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
+        posY = App.scr.tvSafeActionHeight // move away from the top area
+
         // background
         batch.color = UIColour
         Toolkit.fillArea(batch, drawOffX, drawOffY, width.toFloat(), height.toFloat())
