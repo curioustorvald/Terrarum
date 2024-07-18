@@ -8,12 +8,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
+import net.torvald.getbatterystatus.GetBatteryStatus
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.savegame.toHex
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unsafe.UnsafeHelper
 import java.time.ZonedDateTime
 
@@ -48,6 +50,7 @@ object TerrarumPostProcessor : Disposable {
 
     private val functionRowHelper = Texture(Gdx.files.internal("assets/graphics/function_row_help.png"))
 
+    private val batteryTex = TextureRegionPack(Gdx.files.internal("assets/graphics/gui/fullscreen_bat_ind.tga"), 23, 14)
 
     private val shaderPostDither = App.loadShaderFromClasspath("shaders/default.vert", "shaders/postproc_dither.frag")
     private val shaderPostNoDither = App.loadShaderFromClasspath("shaders/default.vert", "shaders/postproc_nodither.frag")
@@ -384,31 +387,59 @@ object TerrarumPostProcessor : Disposable {
         val time = ZonedDateTime.now()
         clockH = time.hour.toString().padStart(2,'0')
         clockM = time.minute.toString().padStart(2,'0')
-        clockS = time.second.toString().padStart(2,'0')
-        clockN = time.nano.toString()
+
+        val battStatus = GetBatteryStatus.get()
+
+        hasBattery = battStatus.hasBattery
+        isCharging = battStatus.isCharging
+        batteryPercentage = battStatus.percentage
     }
 
     private var clockH = "00"
     private var clockM = "00"
-    private var clockS = "00"
-    private var clockN = "0"
     private var hasBattery = false
     private var isCharging = false
-    private var batteryPercentage = "0%"
+    private var batteryPercentage = 0
 
     private fun drawFullscreenComplications() {
         val tvSafeArea2H = App.scr.tvSafeActionHeight.toFloat()
         val dockHeight = tvSafeArea2H
-        val watchWidth = App.fontSmallNumbers.W * 15
+        val watchWidth = App.fontSmallNumbers.W * 5
         val watchHeight = 14
         val marginEach = (dockHeight - watchHeight) / 2f
         val wx = (App.scr.width - marginEach * 1.5f - watchWidth).floorToFloat()
         val wy = marginEach.ceilToFloat()
-        val watchStr = "$clockH:$clockM:$clockS.$clockN"
+        val watchStr = "$clockH:$clockM"
+        val batteryPercentageStr = "$batteryPercentage%"
 
         batch.inUse {
             batch.color = Color.WHITE
             App.fontSmallNumbers.draw(batch, watchStr, wx, wy)
+
+            if (hasBattery) {
+                val batCell = batteryTex.get(0, isCharging.toInt())
+                batch.draw(batCell, wx - watchHeight - batCell.regionWidth, wy)
+
+                App.fontSmallNumbers.draw(
+                    batch, batteryPercentageStr,
+                    wx - watchHeight - batCell.regionWidth - App.fontSmallNumbers.getWidth(batteryPercentageStr) - 4,
+                    wy
+                )
+            }
+        }
+
+        val magn = App.scr.magn
+
+        shapeRenderer.inUse(ShapeRenderer.ShapeType.Filled) {
+            if (hasBattery && !isCharging) {
+                val w = magn * (16f * batteryPercentage / 100f)
+                val h = magn * 6f
+                val x = magn * (wx - watchHeight - batteryTex.tileW + 2)
+                val y = magn * (wy + 3)
+
+                shapeRenderer.color = Color(1f, 1f, 1f, 1f)
+                shapeRenderer.rect(x, y, w, h)
+            }
         }
     }
 
