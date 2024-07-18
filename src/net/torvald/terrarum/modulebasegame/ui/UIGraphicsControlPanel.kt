@@ -25,44 +25,23 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     init {
         handler.allowESCtoClose = false
 
-        if (App.operationSystem == "OSX") {
-            ControlPanelCommon.register(this, width, "basegame.graphicscontrolpanel", arrayOf(
-            arrayOf("", { Lang["CREDITS_VFX", true] }, "h1"),
-                arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER", true] }, "toggle"),
-                arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR", true] }, "toggle"),
-                arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES", true] }, "spinner,256,1024,256"),
-                arrayOf("lightpasses", { Lang["MENU_OPTIONS_LIGHT_UPDATE_PASSES", true] }, "spinner,2,4,1"),
-            arrayOf("", { Lang["MENU_OPTIONS_DISPLAY", true] }, "h1"),
-                arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
-                arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC", true] }, "spinner,0,300,2"),
-                arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC", true] }, "toggle"),
-                arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION", true] }, "typeinres"),
-                /* begone, fullscreen toggle for macOS! For thou constantly lieth on your size! */
-                arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM", true] }, "spinnerd,1.0,2.0,0.05"),
-                arrayOf("screenmagnifyingfilter", { Lang["MENU_OPTIONS_FILTERING_MODE", true] }, "textsel,none=MENU_OPTIONS_NONE,bilinear=MENU_OPTIONS_FILTERING_BILINEAR,hq2x=MENU_OPTIONS_FILTERING_HQ2X_DNT"),
-            arrayOf("", { Lang["MENU_LABEL_STREAMING", true] }, "h1"),
-                arrayOf("fx_streamerslayout", { Lang["MENU_OPTIONS_STREAMERS_LAYOUT", true] }, "toggle"),
-            ))
-        }
-        else {
-            ControlPanelCommon.register(this, width, "basegame.graphicscontrolpanel", arrayOf(
-            arrayOf("", { Lang["CREDITS_VFX", true] }, "h1"),
-                arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER", true] }, "toggle"),
-                arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR", true] }, "toggle"),
-                arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES", true] }, "spinner,256,1024,256"),
-                arrayOf("lightpasses", { Lang["MENU_OPTIONS_LIGHT_UPDATE_PASSES", true] }, "spinner,2,4,1"),
-            arrayOf("", { Lang["MENU_OPTIONS_DISPLAY", true] }, "h1"),
-                arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
-                arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC", true] }, "spinner,0,300,2"),
-                arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC", true] }, "toggle"),
-                arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION", true] }, "typeinres"),
-                arrayOf("fullscreen", { Lang["MENU_OPTIONS_FULLSCREEN", true] }, "toggle"),
-                arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM", true] }, "spinnerd,1.0,2.0,0.05"),
-                arrayOf("screenmagnifyingfilter", { Lang["MENU_OPTIONS_FILTERING_MODE", true] }, "textsel,none=MENU_OPTIONS_NONE,bilinear=MENU_OPTIONS_FILTERING_BILINEAR,hq2x=MENU_OPTIONS_FILTERING_HQ2X_DNT"),
-            arrayOf("", { Lang["MENU_LABEL_STREAMING", true] }, "h1"),
-                arrayOf("fx_streamerslayout", { Lang["MENU_OPTIONS_STREAMERS_LAYOUT", true] }, "toggle"),
-            ))
-        }
+        ControlPanelCommon.register(this, width, "basegame.graphicscontrolpanel", arrayOf(
+        arrayOf("", { Lang["CREDITS_VFX", true] }, "h1"),
+            arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER", true] }, "toggle"),
+            arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR", true] }, "toggle"),
+            arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES", true] }, "spinner,256,1024,256"),
+            arrayOf("lightpasses", { Lang["MENU_OPTIONS_LIGHT_UPDATE_PASSES", true] }, "spinner,2,4,1"),
+        arrayOf("", { Lang["MENU_OPTIONS_DISPLAY", true] }, "h1"),
+            arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
+            arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC", true] }, "spinner,0,300,2"),
+            arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC", true] }, "toggle"),
+            arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION", true] }, "typeinres"),
+            arrayOf("fullscreen", { Lang["MENU_OPTIONS_FULLSCREEN", true] }, "toggle"),
+            arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM", true] }, "spinnerd,1.0,2.0,0.05"),
+            arrayOf("screenmagnifyingfilter", { Lang["MENU_OPTIONS_FILTERING_MODE", true] }, "textsel,none=MENU_OPTIONS_NONE,bilinear=MENU_OPTIONS_FILTERING_BILINEAR,hq2x=MENU_OPTIONS_FILTERING_HQ2X_DNT"),
+        arrayOf("", { Lang["MENU_LABEL_STREAMING", true] }, "h1"),
+            arrayOf("fx_streamerslayout", { Lang["MENU_OPTIONS_STREAMERS_LAYOUT", true] }, "toggle"),
+        ))
     }
 
     override var height = ControlPanelCommon.getMenuHeight("basegame.graphicscontrolpanel")
