@@ -390,9 +390,9 @@ object TerrarumPostProcessor : Disposable {
 
         val battStatus = GetBatteryStatus.get()
 
-        hasBattery = battStatus.hasBattery
-        isCharging = battStatus.isCharging
-        batteryPercentage = battStatus.percentage
+        hasBattery = true//battStatus.hasBattery
+        isCharging = true//battStatus.isCharging
+        batteryPercentage = 85//battStatus.percentage
     }
 
     private var clockH = "00"
@@ -400,6 +400,8 @@ object TerrarumPostProcessor : Disposable {
     private var hasBattery = false
     private var isCharging = false
     private var batteryPercentage = 0
+
+    private val shadowCol = Color(1f, 1f, 1f, 0.6666667f)
 
     private fun drawFullscreenComplications() {
         val tvSafeArea2H = App.scr.tvSafeActionHeight.toFloat()
@@ -418,6 +420,18 @@ object TerrarumPostProcessor : Disposable {
         val btxoff = isCharging.toInt() * 4
 
         batch.inUse {
+
+            // draw blur backs
+            batch.color = shadowCol
+            Toolkit.drawBlurShadowBack(batch, wx, wy + 2, App.fontSmallNumbers.getWidth(watchStr).toFloat(), 9f)
+
+            if (hasBattery) {
+                Toolkit.drawBlurShadowBack(batch, wx - watchHeight - batteryTex.tileW - App.fontSmallNumbers.getWidth(batteryPercentageStr) - 4, wy + 2, App.fontSmallNumbers.getWidth(batteryPercentageStr) + 28f, 9f)
+            }
+
+
+
+            // draw texts
             batch.color = Color.WHITE
             App.fontSmallNumbers.draw(batch, watchStr, wx, wy)
 

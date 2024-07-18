@@ -59,6 +59,7 @@ object Toolkit : Disposable {
     private lateinit var blurWriteQuad4: Mesh
 
 //    val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36)
+    val shadowTile = TextureRegionPack("assets/graphics/gui/blur_shadow.tga", 32, 32)
 
     val textureWhiteSquare = Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"))
     val textureWhiteCircle = Texture(Gdx.files.internal("assets/graphics/circle_512.tga"))
@@ -310,6 +311,27 @@ object Toolkit : Disposable {
         fillArea(batch, x - 4, y - 4, w + 8, h + 8)
         batch.color = Theme.COL_INACTIVE.cpy().mul(1f,1f,1f,opacity)
         drawBoxBorder(batch, x - 4, y - 4, w + 8, h + 8)
+    }
+
+    fun drawBlurShadowBack(batch: SpriteBatch, x: Float, y: Float, w: Float, h: Float) {
+        val x = x - 2
+        val y = y + 4
+        val w = w + 4
+
+        // centre area
+        batch.draw(shadowTile.get(1, 1), x, y, w, h)
+
+        // edges
+        batch.draw(shadowTile.get(1, 0), x, y - shadowTile.tileH, w, shadowTile.tileH.toFloat())
+        batch.draw(shadowTile.get(1, 2), x, y + h, w, shadowTile.tileH.toFloat())
+        batch.draw(shadowTile.get(0, 1), x - shadowTile.tileW, y, shadowTile.tileW.toFloat(), h)
+        batch.draw(shadowTile.get(2, 1), x + w, y, shadowTile.tileW.toFloat(), h)
+
+        // corners
+        batch.draw(shadowTile.get(0, 0), x - shadowTile.tileW, y - shadowTile.tileH)
+        batch.draw(shadowTile.get(2, 0), x + w, y - shadowTile.tileH)
+        batch.draw(shadowTile.get(2, 2), x + w, y + h)
+        batch.draw(shadowTile.get(0, 2), x - shadowTile.tileW, y + h)
     }
 
     private var init = false
