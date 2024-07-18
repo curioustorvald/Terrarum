@@ -17,11 +17,11 @@ VS_VERSION_INFO VERSIONINFO
         BLOCK "040904b0"
         {
             VALUE "FileDescription",    "${TerrarumAppConfiguration.GAME_NAME}\0"
-            VALUE "FileVersion",        "${App.getVERSION_STRING()}\0"
+            VALUE "FileVersion",        "$major.$minor.$patch\0"
             VALUE "LegalCopyright",     "${TerrarumAppConfiguration.COPYRIGHT_DATE_NAME}\0"
             VALUE "OriginalFilename",   "${TerrarumAppConfiguration.GAME_NAME}.exe\0"
             VALUE "ProductName",        "${TerrarumAppConfiguration.GAME_NAME}\0"
-            VALUE "ProductVersion",     "${App.getVERSION_STRING()}\0"
+            VALUE "ProductVersion",     "$major.$minor.$patch\0"
         }
     }
     BLOCK "VarFileInfo"
@@ -42,7 +42,8 @@ private fun writeOSXPlist(major: Int, minor: Int, patch: Int) {
 <key>CFBundleDisplayName</key><string>${TerrarumAppConfiguration.GAME_NAME}</string>
 <key>CFBundleName</key><string>${TerrarumAppConfiguration.GAME_NAME}</string>
 <key>CFBundleIconFile</key><string>AppIcon.icns</string>
-<key>CFBundleVersion</key><string>${App.getVERSION_STRING()}</string>
+<key>CFBundleVersion</key><string>$major.$minor.$patch</string>
+<key>LSApplicationCategoryType</key><string>public.app-category.games</string>
 </dict></plist>"""
     val f = File("./out/build_autogen_macos_Info.plist")
     f.delete()
@@ -55,6 +56,7 @@ Name=${TerrarumAppConfiguration.GAME_NAME}
 Exec=AppRun
 Icon=icns
 Type=Application
+Version=1.0
 Categories=Game;"""
     val f = File("./out/build_autogen_linux.desktop")
     f.delete()

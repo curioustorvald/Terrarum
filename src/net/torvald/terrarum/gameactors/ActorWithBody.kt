@@ -13,6 +13,8 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
+import net.torvald.terrarum.blockproperties.FluidCodex
+import net.torvald.terrarum.blockproperties.FluidProp
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.createRandomBlockParticle
@@ -581,6 +583,10 @@ open class ActorWithBody : Actor {
 //                if (this is IngamePlayer) {
 //                    printdbg(this, "BodyViscosity=$bodyViscosity   FeetViscosity=$feetViscosity   BodyFriction=$bodyFriction   FeetFriction=$feetFriction")
 //                }
+
+                controllerV?.let {
+                    it.applyViscoseDrag()
+                }
 
                 val vecSum = (externalV + (controllerV ?: Vector2(0.0, 0.0)))
                 /**
@@ -1512,8 +1518,6 @@ open class ActorWithBody : Actor {
         if (world == null) return 0.0
         val straightGravity = (world!!.gravitation.y > 0)
 
-        val dbgTYLs = HashSet<Int>()
-
         val txL = (hitbox.startX / TILE_SIZED).floorToInt()
         val txR = (hitbox.endX / TILE_SIZED).floorToInt()
         var hL = 0
@@ -1523,7 +1527,6 @@ open class ActorWithBody : Actor {
             val ty = (y / TILE_SIZED).floorToInt()
             if (world!!.getFluid(txL, ty).amount >= FLUID_MIN_MASS) hL += 1
             if (world!!.getFluid(txR, ty).amount >= FLUID_MIN_MASS) hR += 1
-            dbgTYLs.add(ty)
         }
 
         // returns average of two sides
@@ -2026,32 +2029,14 @@ open class ActorWithBody : Actor {
         if (world == null) return
 
 
-        val fluids = ArrayList<GameWorld.FluidInfo?>()
-
-        // offset 1 pixel to the down so that friction would work
-//        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorToInt()
-        val y = intTilewiseHitbox.startY.toInt() + intTilewiseHitbox.height.toInt() + 1
-
-        for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
-            fluids.add(world!!.getFluid(x, y))
-        }
-
-        return fluids.forEach(consumer)
-    }
-
-    fun forEachFeetFluid(consumer: (GameWorld.FluidInfo?) -> Unit) {
-        if (world == null) return
-
-
-        val fluids = ArrayList<GameWorld.FluidInfo?>()
-
+        val tileProps = ArrayList<GameWorld.FluidInfo?>()
         for (y in hIntTilewiseHitbox.startY.toInt()..hIntTilewiseHitbox.endY.toInt()) {
             for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
-                fluids.add(world!!.getFluid(x, y))
+                tileProps.add(world!!.getFluid(x, y))
             }
         }
 
-        return fluids.forEach(consumer)
+        return tileProps.forEach(consumer)
     }
 
     fun forEachOccupyingTilePos(hitbox: Hitbox, consumer: (BlockAddress) -> Unit) {
@@ -2126,6 +2111,23 @@ open class ActorWithBody : Actor {
 
         for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
             tileProps.add(BlockCodex[world!!.getTileFromTerrain(x, y)])
+        }
+
+        return tileProps.forEach(consumer)
+    }
+
+    fun forEachFeetFluid(consumer: (GameWorld.FluidInfo?) -> Unit) {
+        if (world == null) return
+
+
+        val tileProps = ArrayList<GameWorld.FluidInfo?>()
+
+        // offset 1 pixel to the down so that friction would work
+//        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorToInt()
+        val y = intTilewiseHitbox.startY.toInt() + intTilewiseHitbox.height.toInt() + 1
+
+        for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
+            tileProps.add(world!!.getFluid(x, y))
         }
 
         return tileProps.forEach(consumer)
