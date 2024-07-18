@@ -57,6 +57,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static java.lang.Thread.MAX_PRIORITY;
 import static net.torvald.terrarum.TerrarumKt.*;
@@ -491,18 +492,41 @@ public class App implements ApplicationListener {
 
     @Override
     public void create() {
-        boolean useFullscreen = !Objects.equals(operationSystem, "OSX") && getConfigBoolean("fullscreen");
+        boolean useFullscreen = getConfigBoolean("fullscreen");
         float magn = (float) getConfigDouble("screenmagnifying");
 
         if (useFullscreen) {
             // auto resize for fullscreen
-//            var disp = Lwjgl3ApplicationConfiguration.getDisplayMode(Lwjgl3ApplicationConfiguration.getPrimaryMonitor()); // won't work on macOS (reports 1920x1200 no matter what)
-            var disp = Gdx.graphics.getDisplayMode(); // macOS still reports 1920x1200 *facepalm*
-            var newWidth = ((int)(disp.width / magn)) & 0x7FFFFFFE;
-            var newHeight = ((int)(disp.height / magn)) & 0x7FFFFFFE;
+            var currentDispMode = Gdx.graphics.getDisplayMode();
+            var supportedFullModes = Lwjgl3ApplicationConfiguration.getDisplayModes();
+            int[] currentRes = {currentDispMode.width, currentDispMode.height};
+            Stream<int[]> supportedFullRes = Arrays.stream(supportedFullModes).map(
+                    it -> new int[]{it.width, it.height}
+            );
+
+            Graphics.DisplayMode selected;
+            // if supportedFullModes contains currentDispMode, use currentDispMode
+            if (supportedFullRes.anyMatch(it -> it[0] == currentRes[0] && it[1] == currentRes[1])) {
+                selected = currentDispMode;
+                Gdx.graphics.setFullscreenMode(currentDispMode);
+            }
+            // if not, use largest supportedFullModes
+            else {
+                var l = Arrays.stream(supportedFullModes).sorted(
+                        Comparator.comparingInt(it -> it.width * it.height)
+                ).toArray();
+                selected = (Graphics.DisplayMode) l[l.length - 1];
+            }
+
+            var w = selected.width;
+            var h = selected.height;
+
+            printdbg(this, "Fullscreen display resolution: " + w + "x" + h);
+            var newWidth = ((int) (w / magn)) & 0x7FFFFFFE;
+            var newHeight = ((int) (h / magn)) & 0x7FFFFFFE;
             scr.setDimension(newWidth, newHeight, magn);
 
-            Gdx.graphics.setFullscreenMode(disp);
+            Gdx.graphics.setFullscreenMode(selected);
         }
 
 
@@ -700,7 +724,7 @@ public class App implements ApplicationListener {
             postProcessorOutFBO2.getColorBufferTexture().bind(0);
             fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLE_FAN);
         }
-        else if (getConfigDouble("screenmagnifying") < 1.01 || getConfigString("screenmagnifyingfilter").equals("none")) {
+        else if (getConfigString("screenmagnifyingfilter").equals("none")) {
             shaderPassthruRGBA.bind();
             shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined);
             shaderPassthruRGBA.setUniformi("u_texture", 0);
