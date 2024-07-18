@@ -412,12 +412,17 @@ object TerrarumPostProcessor : Disposable {
         val watchStr = "$clockH:$clockM"
         val batteryPercentageStr = "$batteryPercentage%"
 
+        val percIndex = (batteryPercentage.toFloat() * 0.01 * 64).toInt() // 0-63
+        val btx = percIndex % 4
+        val bty = percIndex / 4
+        val btxoff = isCharging.toInt() * 4
+
         batch.inUse {
             batch.color = Color.WHITE
             App.fontSmallNumbers.draw(batch, watchStr, wx, wy)
 
             if (hasBattery) {
-                val batCell = batteryTex.get(0, isCharging.toInt())
+                val batCell = batteryTex.get(btxoff + btx, bty)
                 batch.draw(batCell, wx - watchHeight - batCell.regionWidth, wy)
 
                 App.fontSmallNumbers.draw(
@@ -425,20 +430,6 @@ object TerrarumPostProcessor : Disposable {
                     wx - watchHeight - batCell.regionWidth - App.fontSmallNumbers.getWidth(batteryPercentageStr) - 4,
                     wy
                 )
-            }
-        }
-
-        val magn = App.scr.magn
-
-        shapeRenderer.inUse(ShapeRenderer.ShapeType.Filled) {
-            if (hasBattery && !isCharging) {
-                val w = magn * (16f * batteryPercentage / 100f)
-                val h = magn * 6f
-                val x = magn * (wx - watchHeight - batteryTex.tileW + 2)
-                val y = magn * (wy + 3)
-
-                shapeRenderer.color = Color(1f, 1f, 1f, 1f)
-                shapeRenderer.rect(x, y, w, h)
             }
         }
     }
