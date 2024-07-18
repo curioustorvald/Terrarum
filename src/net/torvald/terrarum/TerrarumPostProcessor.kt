@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
+import net.torvald.terrarum.TerrarumScreenSize.Companion.TV_SAFE_ACTION
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.savegame.toHex
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
@@ -41,6 +42,7 @@ object TerrarumPostProcessor : Disposable {
     private val safeAreaCol = Color(0xffffff66.toInt())
     private val safeAreaCol2 = Color(0xffffff44.toInt())
     private val currentResCol = Color(0xfff066_88.toInt())
+    private val noGoAreaCol = Color(0xff444466.toInt())
 
     internal val debugUI = BasicDebugInfoWindow()
 
@@ -286,12 +288,33 @@ object TerrarumPostProcessor : Disposable {
         val rectW = tvSafeAreaW * magn
         val rectH = tvSafeAreaH * magn
 
+        val macbookNotchRatio = 35f / 290f
+        val macbookNotchWidth = scrw * macbookNotchRatio
+        val macbookNotchHeight = rect2H
+
         shapeRenderer.inUse(ShapeRenderer.ShapeType.Line) {
 
             // centre ind
             shapeRenderer.color = safeAreaCol2
             shapeRenderer.line(0f, 0f, scrw, scrh)
             shapeRenderer.line(0f, scrh, scrw, 0f)
+
+            // macos notch border
+            shapeRenderer.color = noGoAreaCol
+            shapeRenderer.rect(
+                (scrw - macbookNotchWidth) / 2f,
+                0f,
+                macbookNotchWidth,
+                macbookNotchHeight,
+            )
+
+            for (k in 0 until 8) {
+                val y1 = macbookNotchHeight * (k / 8f)
+                val y2 = y1
+                val x1 = (scrw - macbookNotchWidth) / 2f
+                val x2 = (scrw - macbookNotchWidth) / 2f + macbookNotchWidth
+                shapeRenderer.line(x1, y1, x2, y2)
+            }
 
             // safe action area
             shapeRenderer.color = safeAreaCol2

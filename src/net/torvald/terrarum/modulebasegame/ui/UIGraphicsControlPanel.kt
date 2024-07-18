@@ -29,7 +29,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         arrayOf("", { Lang["CREDITS_VFX", true] }, "h1"),
             arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER", true] }, "toggle"),
             arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR", true] }, "toggle"),
-            arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES", true] }, "spinner,256,1024,256"),
+            arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES", true] }, "spinner,512,2048,512"),
             arrayOf("lightpasses", { Lang["MENU_OPTIONS_LIGHT_UPDATE_PASSES", true] }, "spinner,2,4,1"),
         arrayOf("", { Lang["MENU_OPTIONS_DISPLAY", true] }, "h1"),
             arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),

@@ -102,10 +102,7 @@ object DefaultConfig {
             //"safetywarning" to true,
 
 
-            "maxparticles" to 768,
-
-            "temperatureunit" to 1, // -1: american, 0: kelvin, 1: celcius
-
+            "maxparticles" to 1024,
 
             // "fancy" graphics settings
             "fx_dither" to true,
