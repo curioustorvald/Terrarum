@@ -352,7 +352,11 @@ public class App implements ApplicationListener {
 
     public static Thread audioManagerThread;
 
+    public static long loadedTime_t;
+
     public static void main(String[] args) {
+        loadedTime_t = getTIME_T();
+
 
         long st = System.nanoTime();
         long sc = st;

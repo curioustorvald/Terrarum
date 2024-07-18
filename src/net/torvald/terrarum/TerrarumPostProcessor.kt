@@ -395,7 +395,7 @@ object TerrarumPostProcessor : Disposable {
         batteryPercentage = battStatus.percentage
 
         val timeNow = App.getTIME_T()
-        val ptime_t = timeNow - INGAME.loadedTime_t
+        val ptime_t = timeNow - App.loadedTime_t
 
         val ptimeMin = ptime_t / 60
         val ptimeHr = ptime_t / 3600
