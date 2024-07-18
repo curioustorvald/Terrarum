@@ -390,9 +390,9 @@ object TerrarumPostProcessor : Disposable {
 
         val battStatus = GetBatteryStatus.get()
 
-        hasBattery = true//battStatus.hasBattery
-        isCharging = true//battStatus.isCharging
-        batteryPercentage = 85//battStatus.percentage
+        hasBattery = battStatus.hasBattery
+        isCharging = battStatus.isCharging
+        batteryPercentage = battStatus.percentage
     }
 
     private var clockH = "00"
