@@ -432,7 +432,6 @@ public class App implements ApplicationListener {
             scr = new TerrarumScreenSize(getConfigInt("screenwidth"), getConfigInt("screenheight"));
             int width = scr.getWindowW();
             int height = scr.getWindowH();
-            boolean useFullscreen = getConfigBoolean("fullscreen");
             float magn = (float) getConfigDouble("screenmagnifying");
 
             Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
@@ -524,7 +523,7 @@ public class App implements ApplicationListener {
             printdbg(this, "Fullscreen display resolution: " + w + "x" + h);
             var newWidth = ((int) (w / magn)) & 0x7FFFFFFE;
             var newHeight = ((int) (h / magn)) & 0x7FFFFFFE;
-            scr.setDimension(newWidth, newHeight, magn);
+            scr.setDimension(newWidth, newHeight, magn, useFullscreen);
 
             Gdx.graphics.setFullscreenMode(selected);
         }
@@ -915,7 +914,7 @@ public class App implements ApplicationListener {
 
         //initViewPort(width, height);
 
-        scr.setDimension(width, height, magn);
+        scr.setDimension(width, height, magn, scr.isFullscreen());
 
         if (currentScreen != null) currentScreen.resize(scr.getWidth(), scr.getHeight());
         TerrarumPostProcessor.INSTANCE.resize(scr.getWidth(), scr.getHeight());

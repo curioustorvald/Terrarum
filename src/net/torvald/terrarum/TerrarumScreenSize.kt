@@ -39,11 +39,16 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
     /** Apparent window size. `roundToEven(height * magn)` */
     var windowH: Int = 0; private set
 
+    var isFullscreen: Boolean = false; private set
+
     init {
-        setDimension(max(minimumW, scrw), max(minimumH, scrh), App.getConfigDouble("screenmagnifying").toFloat())
+        setDimension(max(minimumW, scrw), max(minimumH, scrh),
+            App.getConfigDouble("screenmagnifying").toFloat(),
+            App.getConfigBoolean("fullscreen")
+        )
     }
 
-    fun setDimension(scrw: Int, scrh: Int, magn: Float,) {
+    fun setDimension(scrw: Int, scrh: Int, magn: Float, isFullscreen: Boolean) {
         width = scrw and 0x7FFFFFFE
         height = scrh and 0x7FFFFFFE
         wf = scrw.toFloat()
@@ -60,6 +65,7 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
         windowW = (scrw * magn + 1).ceilToInt() and 0x7FFFFFFE
         windowH = (scrh * magn + 1).ceilToInt() and 0x7FFFFFFE
 
+        this.isFullscreen = isFullscreen
 
         printdbg(this, "Window dim: $windowW x $windowH, called by:")
         printStackTrace(this)

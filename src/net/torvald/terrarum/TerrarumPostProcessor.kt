@@ -10,12 +10,12 @@ import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
-import net.torvald.terrarum.TerrarumScreenSize.Companion.TV_SAFE_ACTION
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.savegame.toHex
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.unsafe.UnsafeHelper
+import java.time.ZonedDateTime
 
 /**
  * Must be called by the App Loader
@@ -109,7 +109,13 @@ object TerrarumPostProcessor : Disposable {
             Gdx.gl20.glViewport(0, 0, App.scr.width, App.scr.height)
 
             resize(App.scr.width, App.scr.height)
+
+            update()
         }
+
+        // update every 1 second or so
+        if (App.GLOBAL_RENDER_TIMER % Gdx.graphics.framesPerSecond.coerceAtLeast(20) == 1L)
+            update()
 
 
         debugUI.update(Gdx.graphics.deltaTime)
@@ -164,6 +170,10 @@ object TerrarumPostProcessor : Disposable {
                 }
                 else {
                     if (!debugUI.isClosed && !debugUI.isClosing) debugUI.setAsClose()
+                }
+
+                if (App.scr.isFullscreen) {
+                    drawFullscreenComplications()
                 }
 
                 // draw dev build notifiers
@@ -367,6 +377,38 @@ object TerrarumPostProcessor : Disposable {
             if (batch.isDrawing) {
                 batch.end()
             }
+        }
+    }
+
+    fun update() {
+        val time = ZonedDateTime.now()
+        clockH = time.hour.toString().padStart(2,'0')
+        clockM = time.minute.toString().padStart(2,'0')
+        clockS = time.second.toString().padStart(2,'0')
+        clockN = time.nano.toString()
+    }
+
+    private var clockH = "00"
+    private var clockM = "00"
+    private var clockS = "00"
+    private var clockN = "0"
+    private var hasBattery = false
+    private var isCharging = false
+    private var batteryPercentage = "0%"
+
+    private fun drawFullscreenComplications() {
+        val tvSafeArea2H = App.scr.tvSafeActionHeight.toFloat()
+        val dockHeight = tvSafeArea2H
+        val watchWidth = App.fontSmallNumbers.W * 15
+        val watchHeight = 14
+        val marginEach = (dockHeight - watchHeight) / 2f
+        val wx = (App.scr.width - marginEach * 1.5f - watchWidth).floorToFloat()
+        val wy = marginEach.ceilToFloat()
+        val watchStr = "$clockH:$clockM:$clockS.$clockN"
+
+        batch.inUse {
+            batch.color = Color.WHITE
+            App.fontSmallNumbers.draw(batch, watchStr, wx, wy)
         }
     }
 
