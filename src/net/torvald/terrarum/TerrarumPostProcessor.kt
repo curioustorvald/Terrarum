@@ -431,7 +431,7 @@ object TerrarumPostProcessor : Disposable {
         val ptimew = 7*6 + 4f
         val ptimestr = "$ptimeH:$ptimeM"
 
-        val percIndex = (batteryPercentage.toFloat() * 0.01 * 64).toInt() // 0-63
+        val percIndex = (batteryPercentage.toFloat() * 0.01 * 63).toInt() // 0-63
         val btx = percIndex % 4
         val bty = percIndex / 4
         val btxoff = isCharging.toInt() * 4
