@@ -39,8 +39,9 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             arrayOf("fullscreen", { Lang["MENU_OPTIONS_FULLSCREEN", true] }, "toggle"),
             arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM", true] }, "spinnerd,1.0,2.0,0.05"),
             arrayOf("screenmagnifyingfilter", { Lang["MENU_OPTIONS_FILTERING_MODE", true] }, "textsel,none=MENU_OPTIONS_NONE,bilinear=MENU_OPTIONS_FILTERING_BILINEAR,hq2x=MENU_OPTIONS_FILTERING_HQ2X_DNT"),
-        arrayOf("", { Lang["MENU_LABEL_STREAMING", true] }, "h1"),
+        arrayOf("", { Lang["GAME_GENRE_MISC", true] }, "h1"),
             arrayOf("fx_streamerslayout", { Lang["MENU_OPTIONS_STREAMERS_LAYOUT", true] }, "toggle"),
+            arrayOf("show_timepiece_overlay", { Lang["MENU_OPTIONS_SHOW_TIMEPIECE", true] }, "textsel,hide=MENU_OPTIONS_HIDE,fullscreen=MENU_OPTIONS_FULLSCREEN,always=MENU_OPTIONS_ALWAYS"),
         ))
     }
 

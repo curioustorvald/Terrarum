@@ -134,6 +134,8 @@ object DefaultConfig {
 
             "enablescriptmods" to false,
 
+            "show_timepiece_overlay" to "fullscreen", // "hide", "fullscreen", "always"
+
 
 
             // settings regarding debugger

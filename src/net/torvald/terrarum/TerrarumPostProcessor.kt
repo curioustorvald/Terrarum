@@ -94,6 +94,13 @@ object TerrarumPostProcessor : Disposable {
 
     fun draw(frameDelta: Float, projMat: Matrix4, fbo: FrameBuffer): FrameBuffer {
 
+        val showTimepieceOption = App.getConfigString("show_timepiece_overlay")
+        val showTimepiece = when (showTimepieceOption) {
+            "hide" -> false
+            "always" -> true
+            else -> App.scr.isFullscreen
+        }
+
         // init
         if (!init) {
             init = true
@@ -175,9 +182,9 @@ object TerrarumPostProcessor : Disposable {
                     if (!debugUI.isClosed && !debugUI.isClosing) debugUI.setAsClose()
                 }
 
-//                if (App.scr.isFullscreen) {
+                if (showTimepiece) {
                     drawFullscreenComplications()
-//                }
+                }
 
                 // draw dev build notifiers
                 // omitting this screws up HQ2X render for some reason
