@@ -13,13 +13,10 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
-import net.torvald.terrarum.blockproperties.FluidCodex
-import net.torvald.terrarum.blockproperties.FluidProp
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.createRandomBlockParticle
 import net.torvald.terrarum.gameworld.BlockAddress
-import net.torvald.terrarum.gameworld.FLUID_MIN_MASS
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -536,8 +533,11 @@ open class ActorWithBody : Actor {
         // it's just much better to poll them than use perfectly-timed setter because latter simply cannot exist
         hitbox.canonicalResize(baseHitboxW * scale, baseHitboxH * scale)
 
-
         val oldHitbox = hitbox.clone()
+
+        if (this is IngamePlayer) {
+            density = 980.0
+        }
 
         if (isUpdate && !flagDespawn) {
             if (!assertPrinted) assertInit()
@@ -584,9 +584,11 @@ open class ActorWithBody : Actor {
 //                    printdbg(this, "BodyViscosity=$bodyViscosity   FeetViscosity=$feetViscosity   BodyFriction=$bodyFriction   FeetFriction=$feetFriction")
 //                }
 
-                controllerV?.let {
-                    it.applyViscoseDrag()
-                }
+                externalV.applyViscoseDrag()
+
+//                controllerV?.let {
+//                    it.applyViscoseDrag()
+//                }
 
                 val vecSum = (externalV + (controllerV ?: Vector2(0.0, 0.0)))
                 /**
@@ -651,8 +653,8 @@ open class ActorWithBody : Actor {
 
             // --> Apply more forces <-- //
             // Actors are subject to the gravity and the buoyancy if they are not levitating
+            val buoyancy = applyBuoyancy() * speedMultByTile
             if (!isNoSubjectToGrav) {
-                val buoyancy = applyBuoyancy() * speedMultByTile
                 hitbox.translate(buoyancy)
                 clampHitbox()
             }
@@ -695,8 +697,7 @@ open class ActorWithBody : Actor {
             feetPosPoint.set(hitbox.centeredX, hitbox.endY)
             feetPosTile.set(hIntTilewiseHitbox.centeredX.floorToInt(), hIntTilewiseHitbox.endY.floorToInt())
 
-            submergedHeight = getSubmergedHeight()
-            submergedVolume = submergedHeight * hitbox.width * hitbox.width
+            submergedHeight = getSubmergedHeight() // pixels
             submergedRatio = if (hitbox.height == 0.0) throw RuntimeException("Hitbox.height is zero")
                     else submergedHeight / hitbox.height
 
@@ -717,7 +718,7 @@ open class ActorWithBody : Actor {
 
 
         if (this is IngamePlayer) {
-            printdbg(this, "Submerged=$submergedVolume   rho=$tileDensityFluid")
+//            printdbg(this, "Submerged=$submergedVolume   rho=$tileDensityFluid")
         }
     }
 
@@ -1518,15 +1519,44 @@ open class ActorWithBody : Actor {
         if (world == null) return 0.0
         val straightGravity = (world!!.gravitation.y > 0)
 
+        if (!straightGravity) TODO()
+
         val txL = (hitbox.startX / TILE_SIZED).floorToInt()
         val txR = (hitbox.endX / TILE_SIZED).floorToInt()
-        var hL = 0
-        var hR = 0
-        for (q in 0 until hitbox.height.toInt()) {
-            val y = if (straightGravity) hitbox.endY - q else hitbox.startX + q
-            val ty = (y / TILE_SIZED).floorToInt()
-            if (world!!.getFluid(txL, ty).amount >= FLUID_MIN_MASS) hL += 1
-            if (world!!.getFluid(txR, ty).amount >= FLUID_MIN_MASS) hR += 1
+        var hL = 0.0
+        var hR = 0.0
+
+        val rec = ArrayList<Double>()
+
+        for (ty in intTilewiseHitbox.startY.toInt()..intTilewiseHitbox.endY.toInt()) {
+            val fL = world!!.getFluid(txL, ty).amount.coerceAtMost(1f) * TILE_SIZED // 0-16
+            val fR = world!!.getFluid(txR, ty).amount.coerceAtMost(1f) * TILE_SIZED // 0-16
+
+            // if head
+            if (ty == intTilewiseHitbox.startY.toInt()) {
+                val actorHs = hitbox.startY % TILE_SIZED // 0-16
+                val yp = TILE_SIZED - actorHs // 0-16
+
+                hL += min(yp, fL)
+                hR += min(yp, fR)
+
+                rec.add(min(yp, fL))
+            }
+            // if tail
+            else if (ty == intTilewiseHitbox.endY.toInt()) {
+                val actorHe = hitbox.endY % TILE_SIZED // 0-16
+
+                hL += (actorHe - TILE_SIZED + fL).coerceAtLeast(0.0)
+                hR += (actorHe - TILE_SIZED + fR).coerceAtLeast(0.0)
+
+                rec.add((actorHe - TILE_SIZED + fL).coerceAtLeast(0.0))
+            }
+            else {
+                hL += fL
+                hR += fR
+
+                rec.add(fL)
+            }
         }
 
         // returns average of two sides
@@ -1644,19 +1674,45 @@ open class ActorWithBody : Actor {
     /**
      * [N] = [kg * m / s^2]
      * F(bo) = density * submerged_volume * gravitational_acceleration [N]
+     *
+     * @return the resultant buoyant force, F(k) + F(bo)
      */
     private fun applyBuoyancy(): Vector2 {
-        val rho = tileDensityFluid // kg / m^3
-        val V = submergedVolume / (METER.pow(3)) // m^3
-        val g = world?.gravitation ?: Vector2() // m / s^2
-        val F = g * (rho * V / SI_TO_GAME_VELO) // Newtons = kg * m / s^2
+        if (world == null) return Vector2()
 
-        val acc = (-F / mass) // (kg * m / s^2) / kg = m / s^2
-        return acc * SI_TO_GAME_ACC
+        val rho = tileDensityFluid // kg / m^3
+        // V = submergedHeight in meters * f(object density)
+        val V = mass * density // m^3
+        val g = world!!.gravitation // m / s^2
+        val F_k = g * mass // Newtons = kg * m / s^2
+        val F_bo = (g * mass) * (rho / density) * submergedRatio
+
+        // mh'' = mg - rho*gv
+        // h'' = (mg - rho*gv) / m
+
+        // on density=1000, F_k = F_bo
+        printdbg(this, "F_k=$F_k [N] \t F_bo=${F_bo} [N] \t density=$density")
+
+        val F = F_k - F_bo
+
+        val acc = F / mass // (kg * m / s^2) / kg = m / s^2
+        return acc.let { Vector2(it.x, it.y.coerceAtMost(0.0)) } * SI_TO_GAME_ACC
+    }
+
+    private fun Vector2.ff(): Vector2 {
+        val x0 = this.x
+        val y0 = this.y
+
+        val x1 = x0.pow(2) * x0.sign
+        val y1 = y0.pow(2) * y0.sign
+
+        return Vector2(x1, y1)
     }
 
     @Transient private var submergedRatio: Double = 0.0
-    @Transient private var submergedVolume: Double = 0.0
+    /** unit: m^3 */
+//    @Transient private var submergedVolume: Double = 0.0
+    /** unit : pixels */
     @Transient private var submergedHeight: Double = 0.0
 
 
