@@ -535,9 +535,7 @@ open class ActorWithBody : Actor {
 
         val oldHitbox = hitbox.clone()
 
-        if (this is IngamePlayer) {
-            density = 980.0
-        }
+        if (density < 100.0) density = 100.0
 
         if (isUpdate && !flagDespawn) {
             if (!assertPrinted) assertInit()
@@ -568,6 +566,7 @@ open class ActorWithBody : Actor {
             // Actors are subject to the gravity and the buoyancy if they are not levitating
             if (!isNoSubjectToGrav) {
                 applyGravitation()
+                applyBuoyancy()
             }
 
 
@@ -580,17 +579,7 @@ open class ActorWithBody : Actor {
                 // Codes that (SHOULD) displaces hitbox directly //
                 ///////////////////////////////////////////////////
 
-//                if (this is IngamePlayer) {
-//                    printdbg(this, "BodyViscosity=$bodyViscosity   FeetViscosity=$feetViscosity   BodyFriction=$bodyFriction   FeetFriction=$feetFriction")
-//                }
-
-//                externalV.applyViscoseDrag()
-
-                controllerV?.let {
-                    it.applyViscoseDrag()
-                }
-
-                val vecSum = (externalV + (controllerV ?: Vector2(0.0, 0.0)))
+                val vecSum = externalV + controllerV
                 /**
                  * solveCollision()?
                  * If and only if:
@@ -650,15 +639,6 @@ open class ActorWithBody : Actor {
 
 
             }
-
-            // --> Apply more forces <-- //
-            // Actors are subject to the gravity and the buoyancy if they are not levitating
-            val buoyancy = applyBuoyancy()
-            if (!isNoSubjectToGrav) {
-                hitbox.translate(buoyancy)
-                clampHitbox()
-            }
-
 
 
             // update all the other variables //
@@ -1250,7 +1230,7 @@ open class ActorWithBody : Actor {
         IMPORTANT AF NOTE: things are ASYMMETRIC!
          */
 
-        val canUseStairs = option and COLLIDING_LR != 0 && (externalV + (controllerV ?: Vector2())).y.absoluteValue < 1.0
+        val canUseStairs = option and COLLIDING_LR != 0 && (externalV + controllerV).y.absoluteValue < 1.0
 
         if (option.popcnt() == 1) {
             val (x1, x2, y1, y2) = hitbox.getWallDetection(option)
@@ -1518,22 +1498,25 @@ open class ActorWithBody : Actor {
     private fun getSubmergedHeight(): Double {
         if (world == null) return 0.0
         val straightGravity = (world!!.gravitation.y > 0)
-
+        // TODO reverse gravity
         if (!straightGravity) TODO()
 
+        val itsY = (hitbox.startY / TILE_SIZED).toInt()
+        val iteY = (hitbox.endY / TILE_SIZED).toInt()
         val txL = (hitbox.startX / TILE_SIZED).floorToInt()
         val txR = (hitbox.endX / TILE_SIZED).floorToInt()
+
         var hL = 0.0
         var hR = 0.0
 
         val rec = ArrayList<Double>()
 
-        for (ty in intTilewiseHitbox.startY.toInt()..intTilewiseHitbox.endY.toInt()) {
+        for (ty in itsY..iteY) {
             val fL = world!!.getFluid(txL, ty).amount.coerceAtMost(1f) * TILE_SIZED // 0-16
             val fR = world!!.getFluid(txR, ty).amount.coerceAtMost(1f) * TILE_SIZED // 0-16
 
             // if head
-            if (ty == intTilewiseHitbox.startY.toInt()) {
+            if (ty == itsY) {
                 val actorHs = hitbox.startY % TILE_SIZED // 0-16
                 val yp = TILE_SIZED - actorHs // 0-16
 
@@ -1543,7 +1526,7 @@ open class ActorWithBody : Actor {
                 rec.add(min(yp, fL))
             }
             // if tail
-            else if (ty == intTilewiseHitbox.endY.toInt()) {
+            else if (ty == iteY) {
                 val actorHe = hitbox.endY % TILE_SIZED // 0-16
 
                 hL += (actorHe - TILE_SIZED + fL).coerceAtLeast(0.0)
@@ -1561,47 +1544,6 @@ open class ActorWithBody : Actor {
 
         // returns average of two sides
         return (hL + hR) / 2.0
-    }
-
-    private fun xxxxgetContactingAreaFluid(side: Int, translateX: Int = 0, translateY: Int = 0): Int {
-        if (world == null) return 0
-
-        var contactAreaCounter = 0
-        for (i in 0 until (if (side % 2 == 0) hitbox.width else hitbox.height).roundToInt()) {
-            // set tile positions
-            val tileX: Int
-            val tileY: Int
-            if (side == COLLIDING_LEFT) {
-                tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundToInt()
-                                                + i + translateX)
-                tileY = div16TruncateToMapHeight(hitbox.hitboxEnd.y.roundToInt() + translateY)
-            }
-            else if (side == COLLIDING_TOP) {
-                tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundToInt()
-                                                + i + translateX)
-                tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundToInt() + translateY)
-            }
-            else if (side == COLLIDING_RIGHT) {
-                tileX = div16TruncateToMapWidth(hitbox.hitboxEnd.x.roundToInt() + translateX)
-                tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundToInt()
-                                                 + i + translateY)
-            }
-            else if (side == COLLIDING_LEFT) {
-                tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundToInt() + translateX)
-                tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundToInt()
-                                                 + i + translateY)
-            }
-            else {
-                throw IllegalArgumentException(side.toString() + ": Wrong side input")
-            }
-
-            // evaluate
-            if (world!!.getFluid(tileX, tileY).isFluid()) {
-                contactAreaCounter += 1
-            }
-        }
-
-        return contactAreaCounter
     }
 
     private fun getTileFriction(tile: ItemID) =
@@ -1677,11 +1619,11 @@ open class ActorWithBody : Actor {
      *
      * @return the resultant buoyant force, F(k) + F(bo)
      */
-    private fun applyBuoyancy(): Vector2 {
-        if (world == null) return Vector2()
+    private fun applyBuoyancy() {
+        if (world == null) return
 
         val rho = tileDensityFluid // kg / m^3
-        val V_full = mass / density // density = mass / volume, simply rearrange this
+        val V_full = mass / density * 2.0 // density = mass / volume, simply rearrange this. Multiplier of 2.0 is a hack!
         val V = V_full * submergedRatio
         val g = world!!.gravitation // m / s^2
         val F_k = g * mass // Newtons = kg * m / s^2
@@ -1690,28 +1632,19 @@ open class ActorWithBody : Actor {
         // mh'' = mg - rho*gv
         // h'' = (mg - rho*gv) / m
 
-        // on density=1000, F_k = F_bo
-        printdbg(this, "F_k=$F_k [N] \t F_bo=${F_bo} [N] \t density=$density")
+        // on density=1000, F_k = F_bo (this will be the case if there was no hack)
+//        printdbg(this, "F_k=$F_k [N] \t F_bo=${F_bo} [N] \t density=$density")
 
         val F = F_k - F_bo
 
         val acc = F / mass // (kg * m / s^2) / kg = m / s^2
-        return acc.let { Vector2(it.x, it.y.coerceAtMost(0.0)) } * SI_TO_GAME_ACC
+        val acc_game = acc.let { Vector2(it.x, it.y.coerceAtMost(0.0)) } * SI_TO_GAME_ACC
+
+        applyAcceleration(acc_game)
     }
 
-    private fun Vector2.ff(): Vector2 {
-        val x0 = this.x
-        val y0 = this.y
-
-        val x1 = x0.pow(2) * x0.sign
-        val y1 = y0.pow(2) * y0.sign
-
-        return Vector2(x1, y1)
-    }
 
     @Transient private var submergedRatio: Double = 0.0
-    /** unit: m^3 */
-//    @Transient private var submergedVolume: Double = 0.0
     /** unit : pixels */
     @Transient private var submergedHeight: Double = 0.0
 
@@ -1722,14 +1655,6 @@ open class ActorWithBody : Actor {
     // going down the platform won't show abnormal slowing (it's because of the friction prop!)
     internal inline val bodyFriction: Double
         get() {
-            /*var friction = 0.0
-            forEachOccupyingTileNum {
-                // get max friction
-                if (getTileFriction(it ?: Block.AIR) > friction)
-                    friction = getTileFriction(it ?: Block.AIR)
-            }
-
-            return friction*/
             return getTileFriction(Block.AIR)
         }
     // after all, feet friction is what it matters
@@ -1827,23 +1752,6 @@ open class ActorWithBody : Actor {
 
             return density
         }
-
-    /**
-     * Get highest density (specific gravity) value from tiles that the body occupies.
-     * @return
-     */
-    /*private inline val tileDensity: Int
-        get() {
-            var density = 0
-            forEachOccupyingTile {
-                // get max density for each tile
-                if (it?.density ?: 0 > density) {
-                    density = it?.density ?: 0
-                }
-            }
-
-            return density
-        }*/
 
     private fun clampHitbox() {
         if (world == null) return

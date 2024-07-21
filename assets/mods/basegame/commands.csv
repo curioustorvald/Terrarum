@@ -25,6 +25,7 @@ PrintWorld
 Seed
 SetAV
 SetBulletin
+SetDensity
 SetScale
 SetSol
 SetTurb

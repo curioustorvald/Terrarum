@@ -26,7 +26,7 @@ internal object SetAV : ConsoleCommand {
             var inputval: Any
 
             try {
-                inputval = Integer(arg) // try for integer
+                inputval = arg.toInt() // try for integer
             }
             catch (e: NumberFormatException) {
 

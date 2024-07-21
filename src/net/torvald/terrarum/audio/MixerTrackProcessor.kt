@@ -173,8 +173,8 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
                             (SAMPLING_RATED*0.5) / (24.0 * (distFromActor / distFalloff).sqr() + 1.0)
                         )
 
-                        val sourceVec = (trackingTarget as ActorWithBody).let { it.externalV + (it.controllerV ?: Vector2()) }
-                        val listenerVec = App.audioMixer.actorNowPlaying!!.let { it.externalV + (it.controllerV ?: Vector2()) }
+                        val sourceVec = (trackingTarget as ActorWithBody).let { it.externalV + it.controllerV }
+                        val listenerVec = App.audioMixer.actorNowPlaying!!.let { it.externalV + it.controllerV }
                         val distFromActorNext = distBetweenPoints(
                             App.audioMixer.actorNowPlaying!!.centrePosVector + listenerVec,
                             (trackingTarget as ActorWithBody).centrePosVector + sourceVec

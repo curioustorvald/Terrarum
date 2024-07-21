@@ -115,7 +115,7 @@ object WorldCamera {
         val newX = if (Math.abs(newX1 - oldX) < Math.abs(newX2 - oldX)) newX1 else newX2
         val newY = player.hitbox.centeredY - (height / 2)
 
-        val pVecMagn = (player.externalV + (player.controllerV ?: nullVec)).magnitude
+        val pVecMagn = (player.externalV + player.controllerV).magnitude
         val cVecMagn = Math.sqrt((newX - oldX).sqr() + (newY - oldY).sqr()) * fpsRatio
 
 //        println("$cVecMagn\t$pVecMagn\t${cVecMagn / pVecMagn}")
