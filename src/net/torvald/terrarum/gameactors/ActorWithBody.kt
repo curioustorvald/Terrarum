@@ -481,7 +481,7 @@ open class ActorWithBody : Actor {
      * @param acc acceleration in Vector2, the unit is [px / InternalFrame^2]
      */
     fun applyAcceleration(acc: Vector2) {
-        externalV += acc * speedMultByTile
+        externalV += acc
     }
 
     private fun Vector2.applyViscoseDrag() {
@@ -584,11 +584,11 @@ open class ActorWithBody : Actor {
 //                    printdbg(this, "BodyViscosity=$bodyViscosity   FeetViscosity=$feetViscosity   BodyFriction=$bodyFriction   FeetFriction=$feetFriction")
 //                }
 
-                externalV.applyViscoseDrag()
+//                externalV.applyViscoseDrag()
 
-//                controllerV?.let {
-//                    it.applyViscoseDrag()
-//                }
+                controllerV?.let {
+                    it.applyViscoseDrag()
+                }
 
                 val vecSum = (externalV + (controllerV ?: Vector2(0.0, 0.0)))
                 /**
@@ -653,7 +653,7 @@ open class ActorWithBody : Actor {
 
             // --> Apply more forces <-- //
             // Actors are subject to the gravity and the buoyancy if they are not levitating
-            val buoyancy = applyBuoyancy() * speedMultByTile
+            val buoyancy = applyBuoyancy()
             if (!isNoSubjectToGrav) {
                 hitbox.translate(buoyancy)
                 clampHitbox()
@@ -1681,11 +1681,11 @@ open class ActorWithBody : Actor {
         if (world == null) return Vector2()
 
         val rho = tileDensityFluid // kg / m^3
-        // V = submergedHeight in meters * f(object density)
-        val V = mass * density // m^3
+        val V_full = mass / density // density = mass / volume, simply rearrange this
+        val V = V_full * submergedRatio
         val g = world!!.gravitation // m / s^2
         val F_k = g * mass // Newtons = kg * m / s^2
-        val F_bo = (g * mass) * (rho / density) * submergedRatio
+        val F_bo = g * (rho * V) // Newtons
 
         // mh'' = mg - rho*gv
         // h'' = (mg - rho*gv) / m

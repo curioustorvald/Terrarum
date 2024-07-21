@@ -499,7 +499,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         else {
             isWalkingH = true
 
-            readonly_totalX =
+            readonly_totalX = speedMultByTile *
                 if (absAxisVal == AXIS_KEYBOARD)
                     avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f)
                 else

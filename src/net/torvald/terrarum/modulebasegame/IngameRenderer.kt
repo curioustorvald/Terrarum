@@ -866,7 +866,6 @@ object IngameRenderer : Disposable {
     }
 
     private val bodyFriction = BlockCodex[Block.AIR].friction.frictionToMult()
-    private val bodyViscosity = FluidCodex[Block.AIR].viscosity.viscosityToMult()
 
 
     private fun applyGravitation(gravitation: Vector2, hitboxWidth: Double) {
@@ -877,8 +876,7 @@ object IngameRenderer : Disposable {
     private fun Int.viscosityToMult(): Double = 16.0 / (16.0 + this)
 
     private fun applyForce(acc: Vector2) {
-        val speedMultByTile = bodyViscosity
-        externalV += acc * speedMultByTile
+        externalV += acc
     }
 
     private fun getDrag(externalForce: Vector2, gravitation: Vector2, hitboxWidth: Double): Vector2 {
