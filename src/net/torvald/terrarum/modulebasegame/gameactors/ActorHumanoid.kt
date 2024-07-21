@@ -145,6 +145,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     /** how long the jump button has down, in frames */
     internal var jumpCounter = 0
     internal var jumpAcc = 0.0
+    internal var swimAcc = 0.0
     /** how long the walk button has down, in frames */
     internal var walkCounterX = 0
     internal var walkCounterY = 0
@@ -402,6 +403,22 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
                 }
             }*/
         }
+        else {
+            if (hasController) {
+                if (axisY != 0f) {
+                    swimVertJoypad(axisY > 0, axisY.abs())
+                }
+            }
+            // ↑E, ↓D
+            if (isDownDown && !isUpDown) {
+                swimDown()
+                prevVMoveKey = ControlPresets.getKey("control_key_down")
+            } // ↓E, ↑D
+            else if (isUpDown && !isDownDown) {
+                swimUp()
+                prevVMoveKey = ControlPresets.getKey("control_key_up")
+            }
+        }
 
         /**
          * Jump-key control
@@ -435,6 +452,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
                 // acutally launch the player in the air
                 jump()
+                swimUp()
             }
             else {
                 walkVertical(true, AXIS_KEYBOARD)
@@ -452,6 +470,11 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             if (walledBottom) {
                 airJumpingCount = 0
             }
+        }
+
+        // un-release swimAcc
+        if (!isDownDown && !isUpDown && !isJumpDown) {
+            swimAcc = 0.0
         }
 
     }
@@ -606,7 +629,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 //        platformToIgnore = null
     }
 
-    private fun getJumpAcc(pwr: Double, timedJumpCharge: Double): Double {
+    fun getJumpAcc(pwr: Double, timedJumpCharge: Double): Double {
         return pwr * timedJumpCharge * JUMP_ACCELERATION_MOD
     }
 
@@ -621,9 +644,10 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             // compare all the affecting variables
             if (oldMAX_JUMP_LENGTH == MAX_JUMP_LENGTH &&
                 oldJUMPPOWER == actorValue.getAsDouble(AVKey.JUMPPOWER)!! &&
-                oldJUMPPOWERBUFF == actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0 &&
+                oldJUMPPOWERBUFF == (actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0) &&
                 oldScale == scale &&
-                oldDragCoefficient == dragCoefficient) {
+                oldDragCoefficient == dragCoefficient
+            ) {
                 return field
             }
             // if variables are changed, get new value, store it and return it
@@ -673,16 +697,39 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
                 scale.pow(0.25) *
                 ((encumberment / avStrengthNormalised).pow(-1.0/3.0)).coerceIn(0.48, 1.0) // encumbered actors move slower
 
+    private val jumpPower1: Double
+        get() = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * // base stat
+                (actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0) * // buffed stat
+                scale.pow(0.25) *
+                ((encumberment / avStrengthNormalised).pow(-1.0/3.0)).coerceIn(0.48, 1.0) // encumbered actors move slower
+
+
     private fun jumpFunc(len: Int, counter: Int): Double {
         // linear time mode
         val init = (len + 1) / 2.0
-        var timedJumpCharge = init - init / len * counter
-        if (timedJumpCharge < 0) timedJumpCharge = 0.0
-        return timedJumpCharge
+        return (init - init / len * counter).coerceAtLeast(0.0)
+    }
+
+    @Transient private val SWIM_ACC_MULT = 4.0
+
+    private fun swimUp() {
+        val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, 0)
+        swimAcc = -getJumpAcc(jumpPower1, timedJumpCharge) * SWIM_ACC_MULT
+    }
+
+    private fun swimDown() {
+        val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, 0)
+        swimAcc = getJumpAcc(jumpPower1, timedJumpCharge) * SWIM_ACC_MULT
+    }
+
+    private fun swimVertJoypad(up: Boolean, absAxisVal: Float) {
+        val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, 0)
+        val sign = if (up) -1.0 else 1.0
+        swimAcc = sign * getJumpAcc(jumpPower1, timedJumpCharge) * absAxisVal * SWIM_ACC_MULT
     }
 
 
-    /**
+        /**
      * See ./work_files/Jump power by pressing time.gcx
      */
     private fun jump() {

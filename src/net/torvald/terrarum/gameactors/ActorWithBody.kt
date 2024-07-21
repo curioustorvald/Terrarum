@@ -1622,12 +1622,18 @@ open class ActorWithBody : Actor {
     private fun applyBuoyancy() {
         if (world == null) return
 
+        // this term allows swimming. Model: you're opening a thruster pointing downwards
+        val jumpAcc = if (this is ActorHumanoid)
+            Vector2(0.0, swimAcc)
+        else
+            Vector2()
+
         val rho = tileDensityFluid // kg / m^3
         val V_full = mass / density * 2.0 // density = mass / volume, simply rearrange this. Multiplier of 2.0 is a hack!
         val V = V_full * submergedRatio
-        val g = world!!.gravitation // m / s^2
-        val F_k = g * mass // Newtons = kg * m / s^2
-        val F_bo = g * (rho * V) // Newtons
+        val grav = world!!.gravitation // m / s^2
+        val F_k = (grav + jumpAcc) * mass // F = ma where a is g; TODO add jump-accel into 'a' to allow better jumping under water
+        val F_bo = grav * (rho * V) // Newtons
 
         // mh'' = mg - rho*gv
         // h'' = (mg - rho*gv) / m
