@@ -392,7 +392,7 @@ class CreateTileAtlas {
             drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_FLUID)
         }
         // predefined by the image dimension: 288x16
-        else if (tilesPixmap.width == TILE_SIZE * 18 && tilesPixmap.height == TILE_SIZE) {
+        else if (tilesPixmap.width == TILE_SIZE * 18 && tilesPixmap.height == TILE_SIZE * 3) {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X16)
             drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_16X16)
         }

@@ -346,7 +346,7 @@ internal object BlocksDrawer {
 
                 val (wx, wy) = world.coerceXY(x, y)
 
-                val thisTile: Int = when (mode) {
+                var thisTile: Int = when (mode) {
                     WALL -> world.layerWall.unsafeGetTile(wx, wy)
                     TERRAIN -> world.layerTerrain.unsafeGetTile(wx, wy)
                     ORES -> world.layerOres.unsafeGetTile(wx, wy)//.also { println(it) }
@@ -370,12 +370,36 @@ internal object BlocksDrawer {
                     0
                 }
                 else if (mode == FLUID) {
-                    if (thisTile == 0)
-                        0
-                    else {
-                        val fill = world.layerFluids.unsafeGetTile1(wx, wy).second.let { if (it.isNaN()) 0f else it }
-                        (fill * 15f).roundToInt().coerceIn(0, 15)
+                    val solids = getNearbyTilesInfoTileCnx(x, y)
+                    val notSolid = 15 - solids
+                    val fluids = getNearbyFluidsInfo(x, y)
+                    val fmask = getFluidMaskStatus(fluids)
+
+                    val tileToUse = fluidCornerLut[notSolid and fmask] and fluidCornerLut[solids]
+
+
+                    val nearbyFluidType = fluids.filter { it.amount >= 0.5f / 16f }.map { it.type }.filter { it.startsWith("fluid@") }.sorted().firstOrNull()
+
+                    val fillThis =
+                        world.layerFluids.unsafeGetTile1(wx, wy).second.let { if (it.isNaN()) 0f else it }
+
+                    val tile =
+                        world.getTileFromTerrain(wx, wy)
+
+                    if (/*fluidCornerLut[solids] != 0 &&*/ BlockCodex[tile].isSolidForTileCnx && nearbyFluidType != null) {
+                        thisTile = world.tileNameToNumberMap[nearbyFluidType]!!
+                        18 + tileToUse
                     }
+                    else if (thisTile == 0)
+                        0
+                    else if (fluids[3].amount >= 1.5f / 16f)
+                        17
+                    else if (fluids[3].amount >= 0.5f / 16f)
+                        16
+                    else if (fillThis < 0.5f / 16f)
+                        0
+                    else
+                        (fillThis * 16f - 0.5f).roundToInt().coerceIn(0, 15)
                 }
                 else if (treeLeavesTiles.binarySearch(thisTile) >= 0) {
                     getNearbyTilesInfoTrees(x, y, mode).swizzle8(thisTile, hash)
@@ -469,6 +493,8 @@ internal object BlocksDrawer {
         arrayOf(0,2,1,5,6,3,4,7),
     )
 
+    private val fluidCornerLut = arrayOf(15,12,9,8,3,0,1,0,6,4,0,0,2,0,0,0)
+
     private fun Int.swizzleH2(tile: Int, hash: Int): Int {
         return h2lut[hash][this]
     }
@@ -483,6 +509,15 @@ internal object BlocksDrawer {
             Point2i(x - 1, y - 1),
             Point2i(x, y - 1),
             Point2i(x + 1, y - 1)
+        )
+    }
+
+    private fun getNearbyTilesPos4(x: Int, y: Int): Array<Point2i> {
+        return arrayOf(
+            Point2i(x + 1, y),
+            Point2i(x, y + 1),
+            Point2i(x - 1, y),
+            Point2i(x, y - 1),
         )
     }
 
@@ -553,6 +588,36 @@ internal object BlocksDrawer {
         return ret
     }
 
+    private fun getNearbyTilesInfoTileCnx(x: Int, y: Int): Int {
+        val nearbyTiles: List<ItemID> = getNearbyTilesPos4(x, y).map { world.getTileFromTerrain(it.x, it.y) }
+
+        var ret = 0
+        for (i in nearbyTiles.indices) {
+            if (BlockCodex[nearbyTiles[i]].isSolidForTileCnx) {
+                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+            }
+        }
+
+        return ret
+    }
+
+    private fun getNearbyFluidsInfo(x: Int, y: Int): List<GameWorld.FluidInfo> {
+        val nearbyTiles: List<GameWorld.FluidInfo> = getNearbyTilesPos4(x, y).map { world.getFluid(it.x, it.y) }
+        return nearbyTiles
+    }
+
+    private val fluidSolidMaskLut = arrayOf(0b1010, 0b1000, 0b0010, 0b0000)
+    private fun getFluidMaskStatus(nearbyFluids: List<GameWorld.FluidInfo>): Int {
+        // TODO reverse gravity
+
+        val D = (nearbyFluids[1].amount >= 15.5f / 16f)
+        val U = (nearbyFluids[3].amount >= 0.5f / 16f)
+
+        val i = D.toInt(0) or U.toInt(1)
+
+        return fluidSolidMaskLut[i]
+    }
+
     private fun getNearbyTilesInfoTrees(x: Int, y: Int, mode: Int): Int {
         val tileThis = world.getTileFromTerrain(x, y)
         val nearbyTiles: List<ItemID> = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) }
@@ -575,6 +640,8 @@ internal object BlocksDrawer {
 
         return ret
     }
+
+    private fun Int.popcnt() = Integer.bitCount(this)
 
     /**
      * Basically getNearbyTilesInfoConMutual() but connects mutually with all the fluids
