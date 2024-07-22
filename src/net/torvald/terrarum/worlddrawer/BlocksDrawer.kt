@@ -21,6 +21,7 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.unsafe.UnsafeInt2D
 import kotlin.math.roundToInt
 
 
@@ -87,11 +88,12 @@ internal object BlocksDrawer {
     private const val GZIP_READBUF_SIZE = 8192
 
 
-    private lateinit var terrainTilesBuffer: Array<IntArray>
-    private lateinit var wallTilesBuffer: Array<IntArray>
-    private lateinit var oreTilesBuffer: Array<IntArray>
-    private lateinit var fluidTilesBuffer: Array<IntArray>
-    private lateinit var occlusionBuffer: Array<IntArray>
+    private lateinit var terrainTilesBuffer: UnsafeInt2D
+    private lateinit var wallTilesBuffer: UnsafeInt2D
+    private lateinit var oreTilesBuffer: UnsafeInt2D
+    private lateinit var fluidTilesBuffer: UnsafeInt2D
+    private lateinit var occlusionBuffer: UnsafeInt2D
+    private lateinit var tempRenderTypeBuffer: UnsafeInt2D // 0x tttt 00 ii; where t=rawTileNum, i=nearbyTilesInfo
     private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
     private lateinit var tilesQuad: Mesh
@@ -312,6 +314,8 @@ internal object BlocksDrawer {
         return (XXHash64.hash(LandUtil.getBlockAddr(world, x, y).toBig64(), ((x*16777619) xor (y+1+layer)).toLong()) fmod mod.toLong()).toInt()
     }
 
+
+
     /**
      * Autotiling; writes to buffer. Actual draw code must be called after this operation.
      *
@@ -346,7 +350,7 @@ internal object BlocksDrawer {
 
                 val (wx, wy) = world.coerceXY(x, y)
 
-                var thisTile: Int = when (mode) {
+                var rawTileNum: Int = when (mode) {
                     WALL -> world.layerWall.unsafeGetTile(wx, wy)
                     TERRAIN -> world.layerTerrain.unsafeGetTile(wx, wy)
                     ORES -> world.layerOres.unsafeGetTile(wx, wy)//.also { println(it) }
@@ -358,7 +362,7 @@ internal object BlocksDrawer {
                     else -> throw IllegalArgumentException()
                 }
 
-                var hash = if ((mode == WALL || mode == TERRAIN) && !BlockCodex[world.tileNumberToNameMap[thisTile.toLong()]].hasTag("NORANDTILE"))
+                var hash = if ((mode == WALL || mode == TERRAIN) && !BlockCodex[world.tileNumberToNameMap[rawTileNum.toLong()]].hasTag("NORANDTILE"))
                     getHashCoord(x, y, 8, mode)
                 else 0
 
@@ -387,51 +391,59 @@ internal object BlocksDrawer {
                         world.getTileFromTerrain(wx, wy)
 
                     if (/*fluidCornerLut[solids] != 0 &&*/ BlockCodex[tile].isSolidForTileCnx && nearbyFluidType != null) {
-                        thisTile = world.tileNameToNumberMap[nearbyFluidType]!!
+                        rawTileNum = world.tileNameToNumberMap[nearbyFluidType]!!
                         18 + tileToUse
                     }
-                    else if (thisTile == 0)
+                    else if (rawTileNum == 0)
                         0
                     else if (fluids[3].amount >= 1.5f / 16f)
                         17
-                    else if (fluids[3].amount >= 0.5f / 16f)
-                        16
+                    else if (fluids[3].amount >= 0.5f / 16f) {
+                        //if tile above is fluid tile which use 16, use 17
+                        if (bufferY > 0 && tempRenderTypeBuffer[bufferY - 1, bufferX].let {
+                                (it.ushr(16) == rawTileNum && it.and(255) >= 16) ||
+                                (it.ushr(16) == rawTileNum && it.and(255) == 1)
+                        })
+                            17
+                        // else, use 16
+                        else 16
+                    }
                     else if (fillThis < 0.5f / 16f)
                         0
                     else
                         (fillThis * 16f - 0.5f).roundToInt().coerceIn(0, 15)
                 }
-                else if (treeLeavesTiles.binarySearch(thisTile) >= 0) {
-                    getNearbyTilesInfoTrees(x, y, mode).swizzle8(thisTile, hash)
+                else if (treeLeavesTiles.binarySearch(rawTileNum) >= 0) {
+                    getNearbyTilesInfoTrees(x, y, mode).swizzle8(rawTileNum, hash)
                 }
-                else if (treeTrunkTiles.binarySearch(thisTile) >= 0) {
+                else if (treeTrunkTiles.binarySearch(rawTileNum) >= 0) {
                     hash = 0
                     getNearbyTilesInfoTrees(x, y, mode)
                 }
-                else if (platformTiles.binarySearch(thisTile) >= 0) {
+                else if (platformTiles.binarySearch(rawTileNum) >= 0) {
                     hash %= 2
-                    getNearbyTilesInfoPlatform(x, y).swizzleH2(thisTile, hash)
+                    getNearbyTilesInfoPlatform(x, y).swizzleH2(rawTileNum, hash)
                 }
-                else if (wallStickerTiles.binarySearch(thisTile) >= 0) {
+                else if (wallStickerTiles.binarySearch(rawTileNum) >= 0) {
                     hash = 0
                     getNearbyTilesInfoWallSticker(x, y)
                 }
-                else if (connectMutualTiles.binarySearch(thisTile) >= 0) {
-                    getNearbyTilesInfoConMutual(x, y, mode).swizzle8(thisTile, hash)
+                else if (connectMutualTiles.binarySearch(rawTileNum) >= 0) {
+                    getNearbyTilesInfoConMutual(x, y, mode).swizzle8(rawTileNum, hash)
                 }
-                else if (connectSelfTiles.binarySearch(thisTile) >= 0) {
-                    getNearbyTilesInfoConSelf(x, y, mode, thisTile).swizzle8(thisTile, hash)
+                else if (connectSelfTiles.binarySearch(rawTileNum) >= 0) {
+                    getNearbyTilesInfoConSelf(x, y, mode, rawTileNum).swizzle8(rawTileNum, hash)
                 }
                 else {
                     0
                 }
 
-                val renderTag = if (mode == OCCLUSION) occlusionRenderTag else App.tileMaker.getRenderTag(thisTile)
+                val renderTag = if (mode == OCCLUSION) occlusionRenderTag else App.tileMaker.getRenderTag(rawTileNum)
 
                 val tileNumberBase = renderTag.tileNumber
-                var tileNumber = if (thisTile == 0 && mode != OCCLUSION) 0
+                var tileNumber = if (rawTileNum == 0 && mode != OCCLUSION) 0
                     // special case: actorblocks and F3 key
-                    else if (renderOnF3Only.binarySearch(thisTile) >= 0 && !KeyToggler.isOn(Keys.F3))
+                    else if (renderOnF3Only.binarySearch(rawTileNum) >= 0 && !KeyToggler.isOn(Keys.F3))
                         0
                     // special case: fluids
                     else if (mode == FLUID)
@@ -464,6 +476,7 @@ internal object BlocksDrawer {
 
                 // draw a tile
                 writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage, hash)
+                tempRenderTypeBuffer[bufferY, bufferX] = nearbyTilesInfo or rawTileNum.shl(16)
             }
         }
     }
@@ -763,7 +776,7 @@ internal object BlocksDrawer {
         }
 
 
-        sourceBuffer[bufferPosY][bufferPosX] = sheetXYToTilemapColour(mode, sheetX, sheetY, breakage, hash)
+        sourceBuffer[bufferPosY, bufferPosX] = sheetXYToTilemapColour(mode, sheetX, sheetY, breakage, hash)
     }
 
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
@@ -801,7 +814,7 @@ internal object BlocksDrawer {
         // As the texture size is very small, multithreading it would be less effective
         for (y in 0 until tilesBuffer.height) {
             for (x in 0 until tilesBuffer.width) {
-                val color = sourceBuffer[y][x]
+                val color = sourceBuffer[y, x]
                 tilesBuffer.setColor(color)
                 tilesBuffer.drawPixel(x, y)
             }
@@ -871,11 +884,19 @@ internal object BlocksDrawer {
 
         // only update if it's really necessary
         if (oldTH != tilesInHorizontal || oldTV != tilesInVertical) {
-            terrainTilesBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
-            wallTilesBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
-            oreTilesBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
-            fluidTilesBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
-            occlusionBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
+            if (::terrainTilesBuffer.isInitialized) terrainTilesBuffer.destroy()
+            if (::wallTilesBuffer.isInitialized) wallTilesBuffer.destroy()
+            if (::oreTilesBuffer.isInitialized) oreTilesBuffer.destroy()
+            if (::fluidTilesBuffer.isInitialized) fluidTilesBuffer.destroy()
+            if (::occlusionBuffer.isInitialized) occlusionBuffer.destroy()
+            if (::tempRenderTypeBuffer.isInitialized) tempRenderTypeBuffer.destroy()
+
+            terrainTilesBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
+            wallTilesBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
+            oreTilesBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
+            fluidTilesBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
+            occlusionBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
+            tempRenderTypeBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
 
             tilesBuffer.dispose()
             tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
@@ -953,6 +974,14 @@ internal object BlocksDrawer {
         _tilesBufferAsTex.dispose()
         tilesQuad.tryDispose()
         shader.dispose()
+
+        if (::terrainTilesBuffer.isInitialized) terrainTilesBuffer.destroy()
+        if (::wallTilesBuffer.isInitialized) wallTilesBuffer.destroy()
+        if (::oreTilesBuffer.isInitialized) oreTilesBuffer.destroy()
+        if (::fluidTilesBuffer.isInitialized) fluidTilesBuffer.destroy()
+        if (::occlusionBuffer.isInitialized) occlusionBuffer.destroy()
+        if (::tempRenderTypeBuffer.isInitialized) tempRenderTypeBuffer.destroy()
+
 
         App.tileMaker.dispose()
     }
