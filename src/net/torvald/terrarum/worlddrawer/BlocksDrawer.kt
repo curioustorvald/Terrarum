@@ -382,15 +382,14 @@ internal object BlocksDrawer {
                     val tileToUse = fluidCornerLut[notSolid and fmask] and fluidCornerLut[solids]
 
 
-                    val nearbyFluidType = fluids.filter { it.amount >= 0.5f / 16f }.map { it.type }.filter { it.startsWith("fluid@") }.sorted().firstOrNull()
+                    val nearbyFluidType = fluids.asSequence().filter { it.amount >= 0.5f / 16f }.map { it.type }.filter { it.startsWith("fluid@") }.sorted().firstOrNull()
 
                     val fillThis =
-                        world.layerFluids.unsafeGetTile1(wx, wy).second.let { if (it.isNaN()) 0f else it }
+                        world.layerFluids.unsafeGetTile1(wx, wy).second.let { if (it.isNaN()) 0f else it.coerceAtMost(1f) }
 
-                    val tile =
-                        world.getTileFromTerrain(wx, wy)
+                    val tile = world.getTileFromTerrain(wx, wy)
 
-                    if (/*fluidCornerLut[solids] != 0 &&*/ BlockCodex[tile].isSolidForTileCnx && nearbyFluidType != null) {
+                    if (BlockCodex[tile].isSolidForTileCnx && nearbyFluidType != null) {
                         rawTileNum = world.tileNameToNumberMap[nearbyFluidType]!!
                         18 + tileToUse
                     }
@@ -410,6 +409,29 @@ internal object BlocksDrawer {
                     }
                     else if (fillThis < 0.5f / 16f)
                         0
+                    else if (fillThis >= 15.5f / 16f) {
+                        // wy > 0 and tileUp is solid
+                        if (wy > 0 && bufferY > 0 && solids and 0b1000 != 0) {
+                            val tileUpTag = tempRenderTypeBuffer[bufferY - 1, bufferX]
+                            val tileNum = tileUpTag ushr 16
+                            val tileTag = tileUpTag and 255
+
+                            if (tileNum == rawTileNum && tileTag in 18..33) {
+                                if (tileTag - 18 and 0b0110 == 0b0110)
+                                    38
+                                else if (tileTag - 18 and 0b0100 == 0b0100)
+                                    37
+                                else if (tileTag - 18 and 0b0010 == 0b0010)
+                                    36
+                                else
+                                    15
+                            }
+                            else
+                                15
+                        }
+                        else
+                            15
+                    }
                     else
                         (fillThis * 16f - 0.5f).roundToInt().coerceIn(0, 15)
                 }
