@@ -91,8 +91,6 @@ object LightmapRenderer {
     private var _mapThisTileOpacity = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
     private var _mapThisTileOpacity2 = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
 
-    private const val AIR = Block.AIR
-
     const val DRAW_TILE_SIZE: Float = TILE_SIZE / IngameRenderer.lightmapDownsample
 
     internal var for_x_start = 0
@@ -540,7 +538,9 @@ object LightmapRenderer {
         }*/
 
         if (_thisFluid.type != Fluid.NULL) {
-            _fluidAmountToCol.set(_thisFluid.amount, _thisFluid.amount, _thisFluid.amount, _thisFluid.amount)
+            _thisFluid.amount.coerceAtMost(1f).let {
+                _fluidAmountToCol.set(it, it, it, it)
+            }
 
             _thisTileLuminosity.set(_thisTerrainProp.getLumCol(worldX, worldY))
             _thisTileLuminosity.maxAndAssign(_thisFluidProp.lumCol.mul(_fluidAmountToCol))
@@ -647,36 +647,6 @@ object LightmapRenderer {
 
         // brighten if solid
         return if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) 1.2f else 1f
-    }
-
-    internal class Ivec4 {
-
-        var r = 0
-        var g = 0
-        var b = 0
-        var a = 0
-
-        fun broadcast(scalar: Int) {
-            r=scalar
-            g=scalar
-            b=scalar
-            a=scalar
-        }
-        fun add(scalar: Int) {
-            r+=scalar
-            g+=scalar
-            b+=scalar
-            a+=scalar
-        }
-
-        fun lane(index: Int) = when(index) {
-            0 -> r
-            1 -> g
-            2 -> b
-            3 -> a
-            else -> throw IndexOutOfBoundsException("Invalid index $index")
-        }
-
     }
 
     var lightBuffer: Pixmap = Pixmap(64, 64, Pixmap.Format.RGBA8888) // must not be too small

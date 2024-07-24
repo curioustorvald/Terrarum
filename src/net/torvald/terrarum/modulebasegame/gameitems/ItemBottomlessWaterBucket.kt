@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Fluid
@@ -29,7 +30,12 @@ class ItemBottomlessWaterBucket(originalID: ItemID) : GameItem(originalID) {
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
         val mx = Terrarum.mouseTileX; val my =Terrarum.mouseTileY
-        INGAME.world.setFluid(mx, my, Fluid.WATER, 1f)
-        return 0L
+        if (!BlockCodex[INGAME.world.getTileFromTerrain(mx, my)].isSolid) {
+            INGAME.world.setFluid(mx, my, Fluid.WATER, 1f)
+            return 0L
+        }
+        else {
+            return -1L
+        }
     }
 }

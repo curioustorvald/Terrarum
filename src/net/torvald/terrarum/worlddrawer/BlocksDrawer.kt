@@ -377,10 +377,7 @@ internal object BlocksDrawer {
                     val solids = getNearbyTilesInfoTileCnx(x, y)
                     val notSolid = 15 - solids
                     val fluids = getNearbyFluidsInfo(x, y)
-                    val fmask = getFluidMaskStatus(fluids)
-
-                    val tileToUse = fluidCornerLut[notSolid and fmask] and fluidCornerLut[solids]
-
+                    val fluidU = fluids[3].amount
 
                     val nearbyFluidType = fluids.asSequence().filter { it.amount >= 0.5f / 16f }.map { it.type }.filter { it.startsWith("fluid@") }.sorted().firstOrNull()
 
@@ -390,23 +387,48 @@ internal object BlocksDrawer {
                     val tile = world.getTileFromTerrain(wx, wy)
 
                     if (BlockCodex[tile].isSolidForTileCnx && nearbyFluidType != null) {
+                        val fmask = getFluidMaskStatus(fluids)
+                        var tileToUse = fluidCornerLut[notSolid and fmask] and fluidCornerLut[solids]
+
                         rawTileNum = world.tileNameToNumberMap[nearbyFluidType]!!
+
+                        // upper points and lower points use different maths
+                        // in either case, LR fluids are to be checked
+
+                        val fluidR = fluids[0].amount
+                        val fluidL = fluids[2].amount
+
+                        // check LR for down points
+                        if (tileToUse and 0b0110 != 0) {
+                            if (fluidR < 0.5f / 16f)
+                                tileToUse = tileToUse and 0b1101
+                            if (fluidL < 0.5f / 16f)
+                                tileToUse = tileToUse and 0b1011
+                        }
+                        // check R
+                        else if (tileToUse and 0b0010 != 0) {
+                            if (fluidR < 0.5f / 16f )
+                                tileToUse = 0
+                        }
+                        // check L
+                        else if (tileToUse and 0b0100 != 0) {
+                            if (fluidL < 0.5f / 16f)
+                                tileToUse = 0
+                        }
+
+
                         18 + tileToUse
                     }
                     else if (rawTileNum == 0)
                         0
-                    else if (fluids[3].amount >= 1.5f / 16f)
+                    else if (bufferY > 0 && tempRenderTypeBuffer[bufferY - 1, bufferX].let {
+                        it.ushr(16) == rawTileNum && it.and(255) == 0
+                    })
+                        16
+                    else if (bufferY > 0 && tempRenderTypeBuffer[bufferY - 1, bufferX].let {
+                        it.ushr(16) == rawTileNum && it.and(255) < 18
+                    })
                         17
-                    else if (fluids[3].amount >= 0.5f / 16f) {
-                        //if tile above is fluid tile which use 16, use 17
-                        if (bufferY > 0 && tempRenderTypeBuffer[bufferY - 1, bufferX].let {
-                                (it.ushr(16) == rawTileNum && it.and(255) >= 16) ||
-                                (it.ushr(16) == rawTileNum && it.and(255) == 1)
-                        })
-                            17
-                        // else, use 16
-                        else 16
-                    }
                     else if (fillThis < 0.5f / 16f)
                         0
                     else if (fillThis >= 15.5f / 16f) {
@@ -433,7 +455,7 @@ internal object BlocksDrawer {
                             15
                     }
                     else
-                        (fillThis * 16f - 0.5f).roundToInt().coerceIn(0, 15)
+                        (fillThis * 16f - 0.5f).floorToInt().coerceIn(0, 15)
                 }
                 else if (treeLeavesTiles.binarySearch(rawTileNum) >= 0) {
                     getNearbyTilesInfoTrees(x, y, mode).swizzle8(rawTileNum, hash)

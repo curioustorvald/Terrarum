@@ -33,13 +33,13 @@ import kotlin.system.measureTimeMillis
  */
 class BTeXTest : ApplicationAdapter() {
 
-//    val filePath = "btex.btxbook"
+    val filePath = "btex.xml"
 //    val filePath = "btex_ko.xml"
 //    val filePath = "test.xml"
 //    val filePath = "literature/en/daniel_defoe_robinson_crusoe.xml"
 //    val filePath = "literature/ruRU/anton_chekhov_palata_no_6.xml"
 //    val filePath = "literature/koKR/yisang_nalgae.xml"
-    val filePath = "literature/koKR/yisang_geonchukmuhanyukmyeongakche.xml"
+//    val filePath = "literature/koKR/yisang_geonchukmuhanyukmyeongakche.xml"
 
     private var serialise = true
 
