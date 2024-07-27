@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import net.torvald.unicode.BULLET
 import net.torvald.unicode.EMDASH
 import net.torvald.unicode.ENDASH
+import net.torvald.unicode.MIDDOT
 
 object CreditSingleton {
 
@@ -318,15 +319,6 @@ limitations under the License.
 
 $BULLET Music:
 
-    - music/discs/3_over_4.ogg
-    - music/discs/cyllindrical.ogg
-    - music/discs/fog.ogg
-    - music/discs/geometry.ogg
-    - music/discs/hangdrum.ogg
-    - music/discs/hdma.ogg
-    - music/discs/lucid_dream.ogg
-    - music/discs/railway.ogg
-    - music/discs/welded.ogg
 ℗ 2021, 2022, 2023, 2024 Orstphone
 Check out the original tracks on:
 Apple Music: <https://music.apple.com/kr/artist/orstphone/1587723053>
@@ -335,68 +327,18 @@ YouTube: <https://www.youtube.com/@Orstphone>
 
 
 
+$BULLET Ambients:
+
+℗ 2011, 2013, 2015, 2020, 2021 Klankbeeld
+Sounds from <https://www.freesound.org/people/klankbeeld>
+
+
+
 $BULLET Foleys:
 
-    - ambient/season/crepuscular.*.ogg
-    - ambient/season/diurnal_autumn.*.ogg
-    - ambient/season/diurnal_spring.*.ogg
-    - ambient/season/diurnal_summer.*.ogg
-    - ambient/season/diurnal_winter.*.ogg
-    - ambient/season/matutinal.*.ogg
-    - ambient/season/nocturnal.*.ogg
-℗ 2011, 2013, 2015, 2020, 2021 Klankbeeld
-Sound from <https://www.freesound.org/people/klankbeeld>
-
-    - effects/{mining|steps}/GRSS.*.wav
-    - effects/{mining|steps}/GRVL.*.wav
-    - effects/{mining|steps}/ROCK.*.wav
-    - effects/{mining|steps}/SAND.*.wav
-    - effects/{mining|steps}/WOOD.*.wav
-    - effects/door/wooden_open.*.ogg
-    - effects/door/wooden_close.*.ogg
-℗ 2020, 2021, 2022 Nox Sound
-Sound from <https://freesound.org/people/Nox_Sound>
-
-    - effects/static/phono_pops.ogg
-℗ 2011 Veezay
-Sound from <https://freesound.org/people/veezay>
-
-    - effects/static/tape_hiss.ogg
-℗ 2017 Stephen Holdaway
-Sound from <https://freesound.org/people/stecman>
-
-    - effects/static/film_pops_lowpass.ogg
-℗ 2015 Joe DeShon
-Sound from <https://freesound.org/people/joedeshon>
-
-    - effects/static/bonfire.ogg
-℗ 2019 DrinkingWindGames
-Sound from <https://freesound.org/people/DrinkingWindGames>
-
-    - effects/explosion/bang_bomb.wav
-℗ 2019 Richwise
-Remixed sound from <https://freesound.org/people/richwise>
-
-    - effects/explosion/fuse.wav
-    - effects/explosion/fuse_continue.wav
-℗ 2012, 2015 j1987 and ScouseMouseJB
-Remixed sound from <https://freesound.org/people/j1987> and <https://freesound.org/people/ScouseMouseJB>
-
-    - effects/accessibility/pickaxe_valuable.ogg
-℗ 2009 Benboncan
-Sound from <https://freesound.org/people/Benboncan/>
-
-    - effects/haptic_*.ogg
-℗ 2024 CuriousTorvald
-Sound from <https://freesound.org/people/CuriousTorvald/>
-
-    - effects/notes/spieluhr.ogg
-℗ 2013 Ubikphonik
-Sound from <https://freesound.org/people/UbikPhonik/>
-
-    - effects/throwing/throw_low_short.wav
-℗ 2023 Killerkipler
-Remixed sound from <https://freesound.org/people/killerkipler/>
+Benboncan $MIDDOT CuriousTorvald $MIDDOT DrinkingWindGames $MIDDOT j1987 $MIDDOT Joe DeShon $MIDDOT Killerkipler
+Nox Sound $MIDDOT Richwise $MIDDOT ScouseMouseJB $MIDDOT Stephen Holdaway $MIDDOT Ubikphonik $MIDDOT Veezay
+Sounds from <https://www.freesound.org>
 
 
 
