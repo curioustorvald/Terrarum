@@ -1638,7 +1638,7 @@ open class ActorWithBody : Actor {
         // mh'' = mg - rho*gv
         // h'' = (mg - rho*gv) / m
 
-        // on density=1000, F_k = F_bo (this will be the case if there was no hack)
+        // if tileDensity = actorDensity, F_k = F_bo (this will be the case if there was no hack)
 //        printdbg(this, "F_k=$F_k [N] \t F_bo=${F_bo} [N] \t density=$density")
 
         val F = F_k - F_bo
