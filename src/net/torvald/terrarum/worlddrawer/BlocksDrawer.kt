@@ -426,7 +426,7 @@ internal object BlocksDrawer {
                     })
                         16
                     else if (bufferY > 0 && tempRenderTypeBuffer[bufferY - 1, bufferX].let {
-                        it.ushr(16) == rawTileNum && it.and(255) < 18
+                        it.ushr(16) == rawTileNum && (it.and(255) < 18 || it.and(255) >= 36)
                     })
                         17
                     else if (fillThis < 0.5f / 16f)
