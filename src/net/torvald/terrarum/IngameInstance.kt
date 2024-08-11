@@ -135,6 +135,9 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     open var gameFullyLoaded = false
         internal set
 
+    var worldGenVer: Long? = null
+        protected set
+
     val ACTORCONTAINER_INITIAL_SIZE = 64
     val actorContainerActive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)

@@ -387,6 +387,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
         loadCallback = codices.callbackAfterLoad
+        worldGenVer = codices.worldGenver
     }
 
     /** Load rest of the game with GL context */
@@ -560,6 +561,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         KeyToggler.forceSet(Input.Keys.Q, false)
 
         loadCallback = newGameParams.callbackAfterLoad
+        worldGenVer = null
     }
 
     val ingameController = IngameController(this)

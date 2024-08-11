@@ -62,8 +62,10 @@ Worlds must overwrite new Actor's position to make them spawn in right place.
 
 ### Remarks
 
-Making `inventory` transient is impossible as it would render Storage Chests unusable.
-
+* Making `inventory` transient is impossible as it would render Storage Chests unusable.
+* `genver` used in World and Player have different meaning
+   * in World, the value is the version of the game the world is generated first, so that the future version of the game with different worldgen algorithm would still use old algorithm for the savegames made from the old version
+   * in Player, the value is the version the game has been saved, should be equal to or larger than the World genver
 ## Prerequisites
 
 1. Player ID must not be strictly 9545698 (0x91A7E2)

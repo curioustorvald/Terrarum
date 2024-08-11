@@ -20,7 +20,9 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.FluidCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.METER
+import net.torvald.terrarum.gameactors.ActorWithBody.Companion.PHYS_EPSILON_DIST
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.SI_TO_GAME_ACC
+import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
@@ -38,6 +40,7 @@ import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import org.dyn4j.geometry.Vector2
+import kotlin.math.min
 import kotlin.system.exitProcess
 
 
@@ -786,9 +789,80 @@ object IngameRenderer : Disposable {
         }
     }
     private val cubeSize = 7.0
+    private val hcubeSize = cubeSize / 2
     private val externalV = Vector2()
     private val maxStep = 56
     private val trajectoryFlow = 30
+
+    private fun getSubmergedHeight(gravitation: Vector2, hitbox: Hitbox): Double {
+        val straightGravity = (gravitation.y > 0)
+        // TODO reverse gravity
+        if (!straightGravity) TODO()
+
+        val itsY = (hitbox.startY / TILE_SIZED).toInt()
+        val iteY = (hitbox.endY / TILE_SIZED).toInt()
+        val txL = (hitbox.startX / TILE_SIZED).floorToInt()
+        val txR = (hitbox.endX / TILE_SIZED).floorToInt()
+
+        var hL = 0.0
+        var hR = 0.0
+
+        val rec = java.util.ArrayList<Double>()
+
+        for (ty in itsY..iteY) {
+            val fL = world.getFluid(txL, ty).amount.coerceAtMost(1f) * TILE_SIZED // 0-16
+            val fR = world.getFluid(txR, ty).amount.coerceAtMost(1f) * TILE_SIZED // 0-16
+
+            // if head
+            if (ty == itsY) {
+                val actorHs = hitbox.startY % TILE_SIZED // 0-16
+                val yp = TILE_SIZED - actorHs // 0-16
+
+                hL += min(yp, fL)
+                hR += min(yp, fR)
+
+                rec.add(min(yp, fL))
+            }
+            // if tail
+            else if (ty == iteY) {
+                val actorHe = hitbox.endY % TILE_SIZED // 0-16
+
+                hL += (actorHe - TILE_SIZED + fL).coerceAtLeast(0.0)
+                hR += (actorHe - TILE_SIZED + fR).coerceAtLeast(0.0)
+
+                rec.add((actorHe - TILE_SIZED + fL).coerceAtLeast(0.0))
+            }
+            else {
+                hL += fL
+                hR += fR
+
+                rec.add(fL)
+            }
+        }
+
+        // returns average of two sides
+        return (hL + hR) / 2.0
+    }
+
+
+    private fun forEachOccupyingFluid(hitbox: Hitbox, consumer: (GameWorld.FluidInfo?) -> Unit) {
+        val hIntTilewiseHitbox = Hitbox(0.0, 0.0, 1.0, 1.0).setFromTwoPoints(
+            hitbox.startX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5,
+            hitbox.startY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5,
+            hitbox.endX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5,
+            hitbox.endY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5
+        )
+        val tileProps = java.util.ArrayList<GameWorld.FluidInfo?>()
+        for (y in hIntTilewiseHitbox.startY.toInt()..hIntTilewiseHitbox.endY.toInt()) {
+            for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
+                tileProps.add(world.getFluid(x, y))
+            }
+        }
+
+        return tileProps.forEach(consumer)
+    }
+
+
     private fun drawTrajectoryForThrowable(frameBuffer: FrameBuffer, batch: SpriteBatch, frameDelta: Float, player: ActorWithBody, world: GameWorld, item: ItemThrowable) {
         val ww = world.width * TILE_SIZEF
 
@@ -809,6 +883,17 @@ object IngameRenderer : Disposable {
 
                 // simulate physics
                 applyGravitation(grav, cubeSize) // TODO use actual value instead of `cubeSize`
+                val hb = Hitbox(throwPos.x  - hcubeSize, throwPos.y - hcubeSize, cubeSize, cubeSize)
+                var tileDensityFluid = 0
+                forEachOccupyingFluid(hb) {
+                    // get max density for each tile
+                    if (it?.isFluid() == true && it.getProp().density > tileDensityFluid) {
+                        tileDensityFluid = it.getProp().density
+                    }
+                }
+                val submergedHeight = getSubmergedHeight(grav, hb)
+                val submergedRatio = submergedHeight / cubeSize
+                applyBuoyancy(grav, item.mass, item.material.density.toDouble(), tileDensityFluid, submergedRatio)
                 // move the point
                 throwPos += externalV
                 // more physics
@@ -818,10 +903,10 @@ object IngameRenderer : Disposable {
 
                 // break if colliding with a tile
                 val hitSolid = listOf(
-                    throwPos + Vector2(-cubeSize/2, -cubeSize/2),
-                    throwPos + Vector2(-cubeSize/2, +cubeSize/2),
-                    throwPos + Vector2(+cubeSize/2, +cubeSize/2),
-                    throwPos + Vector2(+cubeSize/2, -cubeSize/2),
+                    throwPos + Vector2(-hcubeSize, -hcubeSize),
+                    throwPos + Vector2(-hcubeSize, +hcubeSize),
+                    throwPos + Vector2(+hcubeSize, +hcubeSize),
+                    throwPos + Vector2(+hcubeSize, -hcubeSize),
                 ).any {
                     val wx = (it.x / TILE_SIZED).toInt()
                     val wy = (it.y / TILE_SIZED).toInt()
@@ -870,6 +955,29 @@ object IngameRenderer : Disposable {
 
     private fun applyGravitation(gravitation: Vector2, hitboxWidth: Double) {
         applyForce(getDrag(externalV, gravitation, hitboxWidth))
+    }
+
+    private fun applyBuoyancy(grav: Vector2, mass: Double, density: Double, tileDensityFluid: Int, submergedRatio: Double) {
+
+
+        val rho = tileDensityFluid // kg / m^3
+        val V_full = mass / density * 2.0 // density = mass / volume, simply rearrange this. Multiplier of 2.0 is a hack!
+        val V = V_full * submergedRatio
+        val F_k = grav * mass // F = ma where a is g; TODO add jump-accel into 'a' to allow better jumping under water
+        val F_bo = grav * (rho * V) // Newtons
+
+        // mh'' = mg - rho*gv
+        // h'' = (mg - rho*gv) / m
+
+        // if tileDensity = actorDensity, F_k = F_bo (this will be the case if there was no hack)
+//        printdbg(this, "F_k=$F_k [N] \t F_bo=${F_bo} [N] \t density=$density")
+
+        val F = F_k - F_bo
+
+        val acc = F / mass // (kg * m / s^2) / kg = m / s^2
+        val acc_game = acc.let { Vector2(it.x, it.y.coerceAtMost(0.0)) } * SI_TO_GAME_ACC
+
+        applyForce(acc_game)
     }
 
     private fun Int.frictionToMult(): Double = this / 16.0

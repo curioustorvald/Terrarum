@@ -51,15 +51,15 @@ object WriteWorld {
     }
 
     // genver must be found on fixed location of the JSON string
-    operator fun invoke(ingame: TerrarumIngame, time_t: Long, actorsList: List<Actor>, playersList: List<IngamePlayer>): String {
+    operator fun invoke(oldGenVer: Long?, ingame: TerrarumIngame, time_t: Long, actorsList: List<Actor>, playersList: List<IngamePlayer>): String {
         val s = Common.jsoner.toJson(preWrite(ingame, time_t, actorsList, playersList))
-        return """{"genver":${Common.GENVER},${s.substring(1)}"""
+        return """{"genver":${oldGenVer ?: Common.GENVER},${s.substring(1)}"""
     }
 
-    fun encodeToByteArray64(ingame: TerrarumIngame, time_t: Long, actorsList: List<Actor>, playersList: List<IngamePlayer>): ByteArray64 {
+    fun encodeToByteArray64(oldGenVer: Long?, ingame: TerrarumIngame, time_t: Long, actorsList: List<Actor>, playersList: List<IngamePlayer>): ByteArray64 {
         val baw = ByteArray64Writer(Common.CHARSET)
 
-        val header = """{"genver":${Common.GENVER}"""
+        val header = """{"genver":${oldGenVer ?: Common.GENVER}"""
         baw.write(header)
         Common.jsoner.toJson(preWrite(ingame, time_t, actorsList, playersList), baw)
         baw.flush(); baw.close()

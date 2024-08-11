@@ -121,7 +121,7 @@ class WorldSavingThread(
 
         // Write World //
 
-        val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t, actorsList, playersList))
+        val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame.worldGenVer, ingame, time_t, actorsList, playersList))
         val world = DiskEntry(VDFileID.SAVEGAMEINFO, VDFileID.ROOT, creation_t, time_t, worldMeta)
         addFile(disk, world)
 
