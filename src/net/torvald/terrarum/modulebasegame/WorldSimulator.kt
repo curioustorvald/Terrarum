@@ -11,9 +11,12 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Controllable
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.GameWorld.Companion.FLUID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameitems.AxeCore
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
+import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import org.dyn4j.geometry.Vector2
 import kotlin.math.cosh
 import kotlin.math.min
@@ -369,6 +372,9 @@ object WorldSimulator {
                     fluidNewMap[y + 1][x] += flow
                     fluidNewTypeMap[y + 1][x] = remainingType
                     remainingMass -= flow
+
+                    INGAME.modified(FLUID, x / CHUNK_W, y / CHUNK_H)
+                    INGAME.modified(FLUID, x / CHUNK_W, (y + 1) / CHUNK_H)
                 }
 
                 if (remainingMass <= 0) continue
@@ -386,6 +392,9 @@ object WorldSimulator {
                     fluidNewMap[y][x - 1] += flow
                     fluidNewTypeMap[y][x - 1] = remainingType
                     remainingMass -= flow
+
+                    INGAME.modified(FLUID, x / CHUNK_W, y / CHUNK_H)
+                    INGAME.modified(FLUID, (x - 1) / CHUNK_W, y / CHUNK_H)
                 }
 
                 if (remainingMass <= 0) continue
@@ -403,6 +412,9 @@ object WorldSimulator {
                     fluidNewMap[y][x + 1] += flow
                     fluidNewTypeMap[y][x + 1] = remainingType
                     remainingMass -= flow
+
+                    INGAME.modified(FLUID, x / CHUNK_W, y / CHUNK_H)
+                    INGAME.modified(FLUID, (x + 1) / CHUNK_W, y / CHUNK_H)
                 }
 
                 if (remainingMass <= 0) continue
@@ -419,6 +431,9 @@ object WorldSimulator {
                     fluidNewMap[y - 1][x] += flow
                     fluidNewTypeMap[y - 1][x] = remainingType
                     remainingMass -= flow
+
+                    INGAME.modified(FLUID, x / CHUNK_W, y / CHUNK_H)
+                    INGAME.modified(FLUID, x / CHUNK_W, (y - 1) / CHUNK_H)
                 }
 
 
