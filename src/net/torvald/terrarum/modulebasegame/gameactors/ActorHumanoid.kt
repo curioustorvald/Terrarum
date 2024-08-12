@@ -839,18 +839,6 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
                     throw e
                 }
             }
-
-            // flipping the sprite
-            if (walkHeading == LEFT) {
-                sprite?.flip(true, false)
-                spriteGlow?.flip(true, false)
-                spriteEmissive?.flip(true, false)
-            }
-            else {
-                sprite?.flip(false, false)
-                spriteGlow?.flip(false, false)
-                spriteEmissive?.flip(false, false)
-            }
         }
         else {
 
@@ -867,6 +855,18 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
                 (spriteGlow as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_IDLE)
                 (spriteEmissive as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_IDLE)
             }
+        }
+
+        // flipping the sprite
+        if (walkHeading == LEFT) {
+            sprite?.flip(true, false)
+            spriteGlow?.flip(true, false)
+            spriteEmissive?.flip(true, false)
+        }
+        else {
+            sprite?.flip(false, false)
+            spriteGlow?.flip(false, false)
+            spriteEmissive?.flip(false, false)
         }
     }
 

@@ -63,9 +63,9 @@ Worlds must overwrite new Actor's position to make them spawn in right place.
 ### Remarks
 
 * Making `inventory` transient is impossible as it would render Storage Chests unusable.
-* `genver` used in World and Player have different meaning
-   * in World, the value is the version of the game the world is generated first, so that the future version of the game with different worldgen algorithm would still use old algorithm for the savegames made from the old version
-   * in Player, the value is the version the game has been saved, should be equal to or larger than the World genver
+* `genver` used in World and Player JSON has different meaning:
+   * in World, the value is the version of the game **the world was generated with**, so that the future version of the game with different worldgen algorithm would still use old algorithm for the world made from the old version
+   * in Player, the value is the version the game **the player was recently saved with**, should be equal to or larger than the World genver
 ## Prerequisites
 
 1. Player ID must not be strictly 9545698 (0x91A7E2)
@@ -75,8 +75,8 @@ Worlds must overwrite new Actor's position to make them spawn in right place.
 
 ## To-dos After the Initial Implementation
 
-1. Modify Savegame Crackers and Disk Crackers to work with the new scheme
-2. Create Player Creator Tool for avatar-makers
+[x] Modify Savegame Crackers and Disk Crackers to work with the new scheme  
+[ ] Create Player Creator Tool for avatar-makers
 
 ## Goals
 
