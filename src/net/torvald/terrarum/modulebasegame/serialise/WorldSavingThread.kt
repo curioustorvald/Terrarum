@@ -3,6 +3,10 @@ package net.torvald.terrarum.modulebasegame.serialise
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.GameWorld.Companion.CHUNK_LOADED
+import net.torvald.terrarum.gameworld.GameWorld.Companion.FLUID
+import net.torvald.terrarum.gameworld.GameWorld.Companion.ORES
+import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
+import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
@@ -25,7 +29,7 @@ class WorldSavingThread(
     val ingame: TerrarumIngame,
     val isAuto: Boolean,
     val callback: () -> Unit,
-    val errorHandler: (Throwable) -> Unit
+    errorHandler: (Throwable) -> Unit
 ) : SavingThread(errorHandler) {
     /**
      * Will happily overwrite existing entry
@@ -59,7 +63,7 @@ class WorldSavingThread(
 
         val playersList: List<IngamePlayer> = allTheActors.filterIsInstance<IngamePlayer>()
         val actorsList = allTheActors.filter { WriteWorld.actorAcceptable(it) }
-        val layers = intArrayOf(0,1,2).map { ingame.world.getLayer(it) }
+        val layers = intArrayOf(TERRAIN, WALL, ORES, FLUID).map { ingame.world.getLayer(it) }
         val cw = ingame.world.width / LandUtil.CHUNK_W
         val ch = ingame.world.height / LandUtil.CHUNK_H
 

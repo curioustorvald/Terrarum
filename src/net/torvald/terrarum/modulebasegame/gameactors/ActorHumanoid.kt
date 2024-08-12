@@ -858,16 +858,10 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         }
 
         // flipping the sprite
-        if (walkHeading == LEFT) {
-            sprite?.flip(true, false)
-            spriteGlow?.flip(true, false)
-            spriteEmissive?.flip(true, false)
-        }
-        else {
-            sprite?.flip(false, false)
-            spriteGlow?.flip(false, false)
-            spriteEmissive?.flip(false, false)
-        }
+        val flip = (walkHeading == LEFT)
+        sprite?.flip(flip, false)
+        spriteGlow?.flip(flip, false)
+        spriteEmissive?.flip(flip, false)
     }
 
     override fun reload() {

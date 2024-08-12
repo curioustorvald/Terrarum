@@ -9,6 +9,10 @@ import net.torvald.terrarum.gameworld.BlockLayerI16F16
 import net.torvald.terrarum.gameworld.BlockLayerOresI16I8
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.GameWorld.Companion.CHUNK_LOADED
+import net.torvald.terrarum.gameworld.GameWorld.Companion.FLUID
+import net.torvald.terrarum.gameworld.GameWorld.Companion.ORES
+import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
+import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.FancyWorldReadLoadScreen
 import net.torvald.terrarum.modulebasegame.IngameRenderer
@@ -193,7 +197,7 @@ object LoadSavegame {
             val cw = LandUtil.CHUNK_W
             val ch = LandUtil.CHUNK_H
             val chunkCount = world.width * world.height / (cw * ch)
-            val worldLayer = intArrayOf(0,1,2).map { world.getLayer(it) }
+            val worldLayer = intArrayOf(TERRAIN, WALL, ORES, FLUID).map { world.getLayer(it) }
             for (chunk in 0L until chunkCount) {
                 for (layer in worldLayer.indices) {
                     loadscreen.addMessage(Lang["MENU_IO_LOADING"])

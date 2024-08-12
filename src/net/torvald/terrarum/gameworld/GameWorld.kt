@@ -324,6 +324,7 @@ open class GameWorld(
         TERRAIN -> layerTerrain
         WALL -> layerWall
         ORES -> layerOres
+        FLUID -> layerFluids
         else -> null//throw IllegalArgumentException("Unknown layer index: $index")
     }
 
@@ -860,6 +861,7 @@ open class GameWorld(
         @Transient const val TERRAIN = 0
         @Transient const val WALL = 1
         @Transient const val ORES = 2
+        @Transient const val FLUID = 3
 
         @Transient val TILES_SUPPORTED = ReferencingRanges.TILES.last + 1
         //@Transient val SIZEOF: Byte = 2
