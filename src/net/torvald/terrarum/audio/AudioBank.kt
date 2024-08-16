@@ -19,9 +19,9 @@ abstract class AudioBank : Disposable {
 
     abstract val name: String
 
-    abstract val samplingRate: Float
-    abstract val channels: Int
-    abstract val totalSizeInSamples: Long
+    abstract var samplingRate: Float
+    abstract var channels: Int
+    abstract var totalSizeInSamples: Long
     abstract fun currentPositionInSamples(): Long
 
     open fun sendMessage(msg: String) {}
@@ -30,5 +30,5 @@ abstract class AudioBank : Disposable {
     abstract fun readSamples(bufferL: FloatArray, bufferR: FloatArray): Int
     abstract fun reset()
 
-    abstract val songFinishedHook: (AudioBank) -> Unit
+    abstract var songFinishedHook: (AudioBank) -> Unit
 }

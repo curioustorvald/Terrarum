@@ -382,33 +382,19 @@ class FeedSamplesToAdev(val bufferSize: Int, val rate: Int, val track: TerrarumA
         if (track.trackType != TrackType.MASTER) throw IllegalArgumentException("Track is not master")
     }
 
-    val sleepTime = (1000000000.0 * ((bufferSize / 4.0) / TerrarumAudioMixerTrack.SAMPLING_RATED)).toLong()
-    val sleepMS = sleepTime / 1000000
-    val sleepNS = (sleepTime % 1000000).toInt()
-
-    private fun printdbg(msg: Any) {
-        if (true) println("[AudioAdapter ${track.name}] $msg")
-    }
-    @Volatile private var exit = false
     override fun run() {
-        while (!exit) {
-
-            val writeQueue = track.pcmQueue
-            val queueSize = writeQueue.size
-            if (queueSize > 0) {
-//                printdbg("PULL; Queue size: $queueSize")
-                val samples = writeQueue.removeFirst()
-                track.adev!!.writeSamples(samples)
+        while (!Thread.currentThread().isInterrupted) {
+            try {
+                val writeQueue = track.pcmQueue
+                val queueSize = writeQueue.size
+                if (queueSize > 0) {
+                    val samples = writeQueue.removeFirst()
+                    track.adev!!.writeSamples(samples)
+                }
             }
-//            else {
-//                printdbg("QUEUE EMPTY QUEUE EMPTY QUEUE EMPTY ")
-//            }
-
-//            Thread.sleep(sleepMS, sleepNS)
+            catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+            }
         }
-    }
-
-    fun stop() {
-        exit = true
     }
 }

@@ -30,8 +30,8 @@ class MusicContainer(
     val samplingRateOverride: Float?, // this is FIXED sampling rate
     override var songFinishedHook: (AudioBank) -> Unit = {}
 ): AudioBank() {
-    override val samplingRate: Float
-    override val channels: Int
+    override var samplingRate: Float
+    override var channels: Int
     val codec: String
 
     // make Java code shorter
@@ -58,7 +58,7 @@ class MusicContainer(
 
 
     var samplesReadCount = 0L; internal set
-    override val totalSizeInSamples: Long
+    override var totalSizeInSamples: Long
     private val totalSizeInBytes: Long
 
     private val gdxMusic: Music = Gdx.audio.newMusic(FileHandle(file))

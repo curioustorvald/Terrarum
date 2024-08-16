@@ -19,15 +19,15 @@ class AudioBankMusicBox(override var songFinishedHook: (AudioBank) -> Unit = {})
     }
 
     override val name = "spieluhr"
-    override val samplingRate = 48000f // 122880 // use 122880 to make each tick is 2048 samples
-    override val channels = 1
+    override var samplingRate = 48000f // 122880 // use 122880 to make each tick is 2048 samples
+    override var channels = 1
 
     private val getSample = // usage: getSample(noteNum 0..60)
         InstrumentLoader.load("spieluhr", "basegame", "audio/effects/notes/spieluhr.ogg", 41)
 
     private val SAMPLES_PER_TICK = samplingRate / App.TICK_SPEED // should be 800 on default setting
 
-    override val totalSizeInSamples = getSample(0).first.size.toLong() // length of lowest-pitch note
+    override var totalSizeInSamples = getSample(0).first.size.toLong() // length of lowest-pitch note
 
     private val messageQueue = ArrayList<Msg>()
 

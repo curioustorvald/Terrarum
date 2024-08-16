@@ -120,7 +120,7 @@ object WorldSimulator {
 
     fun growOrKillGrass() {
         // season-dependent growth rate
-        // https://www.desmos.com/calculator/ivxyxuj0bm
+        // https://www.desmos.com/calculator/4u5npfxgak
         val baseCount = 2 * world.worldTime.timeDelta
         val season = world.worldTime.ecologicalSeason.coerceIn(0f, 5f) // 1->1.0,  2.5->3.0, 4->1.0
         val seasonalMult = 1f + sech2((season - 2.5f)) * 2f
