@@ -7,8 +7,7 @@
 precision mediump float;
 #endif
 
-//layout(origin_upper_left) in vec4 gl_FragCoord; // commented; requires #version 150 or later
-// gl_FragCoord is origin to bottom-left
+layout(origin_upper_left,pixel_center_integer) in vec4 gl_FragCoord;
 
 in vec4 v_color;
 in vec2 v_texCoords;
@@ -16,7 +15,6 @@ in vec2 v_texCoords;
 uniform sampler2D u_texture;
 
 
-uniform vec2 screenDimension;
 uniform vec2 tilesInAxes; // size of the tilemap texture; vec2(tiles_in_horizontal, tiles_in_vertical)
 
 uniform sampler2D tilemap; // RGBA8888
@@ -41,6 +39,7 @@ uniform float drawBreakage = 1.0; // set it to 0f to not draw breakage, 1f to dr
 uniform float mulBlendIntensity = 1.0; // used my MUL-blending drawings; works about the same way as the Layer Opacity slider of Photoshop/Krita/etc.
 
 const vec2 bc = vec2(1.0, 0.0); //binary constant
+const vec2 haalf = vec2(0.5, 0.5);
 
 out vec4 fragColor;
 
@@ -50,7 +49,7 @@ ivec2 getTileXY(int tileNumber) {
 
 // return: int=0x(aa)rrggbb
 int _colToInt(vec4 color) {
-    return int(color.b * 255) | (int(color.g * 255) << 8) | (int(color.r * 255) << 16);// | (int(color.a * 255) << 24);
+    return int(color.b * 255) | (int(color.g * 255) << 8) | (int(color.r * 255) << 16) | (int(color.a * 255) << 24);
 }
 
 // 0x00ggbb where int=0xaarrggbb
@@ -69,6 +68,13 @@ int getBreakageFromColor(vec4 color) {
 // return: [0..15]
 int getTileFlipRotFromColor(vec4 color) {
     return (_colToInt(color) >> 16) & 0xF;
+}
+
+// 0baaaa_aaa0_0[24] where int=0baaaaaaaa_rrrrrrrr_...
+// in other words, least significant bit of the alpha value is unused.
+// return: [0..127]
+int getSubtileFromColor(vec4 color) {
+    return (_colToInt(color) >> 25) & 0x7F;
 }
 
 
@@ -98,11 +104,11 @@ void main() {
     // default gl_FragCoord takes half-integer (represeting centre of the pixel) -- could be useful for phys solver?
     // This one, however, takes exact integer by rounding down. //
     vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx; // how many tiles will fit into a screen; one used by the tileFromMap; we need this because screen size is not integer multiple of the tile size
-    vec2 flippedFragCoord = vec2(gl_FragCoord.x, screenDimension.y - gl_FragCoord.y) + cameraTranslation; // NO IVEC2!!; this flips Y
+    vec2 fragCoord = gl_FragCoord.xy + cameraTranslation + haalf; // NO IVEC2!!; this flips Y
 
     // get required tile numbers //
 
-    vec4 tileFromMap = texture(tilemap, flippedFragCoord / overscannedScreenDimension); // raw tile number
+    vec4 tileFromMap = texture(tilemap, fragCoord / overscannedScreenDimension); // raw tile number
     int tile = getTileFromColor(tileFromMap);
     int breakage = getBreakageFromColor(tileFromMap);
     int flipRot = getTileFlipRotFromColor(tileFromMap);
@@ -112,7 +118,7 @@ void main() {
     // calculate the UV coord value for texture sampling //
 
     // don't really need highp here; read the GLES spec
-    vec2 uvCoordForTile = uvFlipRot(flipRot, mod(flippedFragCoord, tileSizeInPx)) * _tileSizeInPx * _tilesInAtlas; // 0..0.00390625 regardless of tile position in atlas
+    vec2 uvCoordForTile = uvFlipRot(flipRot, mod(fragCoord, tileSizeInPx)) * _tileSizeInPx * _tilesInAtlas; // 0..0.00390625 regardless of tile position in atlas
     vec2 uvCoordOffsetTile = tileXY * _tilesInAtlas; // where the tile starts in the atlas, using uv coord (0..1)
     vec2 uvCoordOffsetBreakage = breakageXY * _tilesInAtlas;
 

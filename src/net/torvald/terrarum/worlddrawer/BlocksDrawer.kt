@@ -892,7 +892,6 @@ internal object BlocksDrawer {
         shader.setUniform2fv("tilesInAtlas", App.tileMaker.SHADER_SIZE_KEYS, 2, 2)
         shader.setUniform2fv("atlasTexSize", App.tileMaker.SHADER_SIZE_KEYS, 0, 2)
         shader.setUniformf("colourFilter", vertexColour)
-        shader.setUniformf("screenDimension", Gdx.graphics.width / magn, Gdx.graphics.height / magn)
         shader.setUniformi("tilesAtlas", 0)
         shader.setUniformi("tilesBlendAtlas", 2)
         shader.setUniformi("tilemap", 1)
