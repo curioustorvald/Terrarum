@@ -7,7 +7,7 @@
 precision mediump float;
 #endif
 
-layout(origin_upper_left,pixel_center_integer) in vec4 gl_FragCoord;
+layout(origin_upper_left,pixel_center_integer) in vec4 gl_FragCoord; // is now top-down and strictly integer
 
 in vec4 v_color;
 in vec2 v_texCoords;
@@ -18,6 +18,7 @@ uniform sampler2D u_texture;
 uniform vec2 tilesInAxes; // size of the tilemap texture; vec2(tiles_in_horizontal, tiles_in_vertical)
 
 uniform sampler2D tilemap; // RGBA8888
+uniform sampler2D tilemap2; // RGBA8888
 
 uniform sampler2D tilesAtlas; // terrain, wire, fluids, etc.
 uniform sampler2D tilesBlendAtlas; // alternative terrain for the weather mix (e.g. yellowed grass)
@@ -47,36 +48,24 @@ ivec2 getTileXY(int tileNumber) {
     return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));
 }
 
-// return: int=0x(aa)rrggbb
-int _colToInt(vec4 color) {
-    return int(color.b * 255) | (int(color.g * 255) << 8) | (int(color.r * 255) << 16) | (int(color.a * 255) << 24);
-}
+// return: ivec3(tileID, breakage, fliprot)
+ivec3 _colToInt(vec4 map1, vec4 map2) {
+    ivec3 col1 = ivec3(
+        int(map1.r * 255),
+        int(map1.g * 255),
+        int(map1.b * 255));
 
-// 0x00ggbb where int=0xaarrggbb
-// return: [0..65535]
-int getTileFromColor(vec4 color) {
-    return _colToInt(color) & 0xFFFF;
-}
+    ivec3 col2 = ivec3(
+        int(map2.r * 255),
+        int(map2.g * 255),
+        int(map2.b * 255));
 
-// 0x00r00000 where int=0xaarrggbb
-// return: [0..15]
-int getBreakageFromColor(vec4 color) {
-    return (_colToInt(color) >> 20) & 0xF;
+    return ivec3(
+        (col1.r << 16) | (col1.g << 8) | col1.b, // tile
+        col2.b, // breakage
+        col2.g // fliprot
+    );
 }
-
-// 0x000r0000 where int=0xaarrggbb
-// return: [0..15]
-int getTileFlipRotFromColor(vec4 color) {
-    return (_colToInt(color) >> 16) & 0xF;
-}
-
-// 0baaaa_aaa0_0[24] where int=0baaaaaaaa_rrrrrrrr_...
-// in other words, least significant bit of the alpha value is unused.
-// return: [0..127]
-int getSubtileFromColor(vec4 color) {
-    return (_colToInt(color) >> 25) & 0x7F;
-}
-
 
 mat3x2[] flipRotMat = mat3x2[](
 mat3x2( 1.0,  0.0,  0.0,  1.0, tileSizeInPx.x*0.0, tileSizeInPx.y*0.0),
@@ -104,14 +93,16 @@ void main() {
     // default gl_FragCoord takes half-integer (represeting centre of the pixel) -- could be useful for phys solver?
     // This one, however, takes exact integer by rounding down. //
     vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx; // how many tiles will fit into a screen; one used by the tileFromMap; we need this because screen size is not integer multiple of the tile size
-    vec2 fragCoord = gl_FragCoord.xy + cameraTranslation + haalf; // NO IVEC2!!; this flips Y
+    vec2 fragCoord = gl_FragCoord.xy + cameraTranslation + haalf; // manually adding half-int to the flipped gl_FragCoord: this avoids driver bug present on the Asahi Linux and possibly (but unlikely) others
 
     // get required tile numbers //
 
     vec4 tileFromMap = texture(tilemap, fragCoord / overscannedScreenDimension); // raw tile number
-    int tile = getTileFromColor(tileFromMap);
-    int breakage = getBreakageFromColor(tileFromMap);
-    int flipRot = getTileFlipRotFromColor(tileFromMap);
+    vec4 tileFromMap2 = texture(tilemap2, fragCoord / overscannedScreenDimension); // raw tile number
+    ivec3 tbf = _colToInt(tileFromMap, tileFromMap2);
+    int tile = tbf.x;
+    int breakage = tbf.y;
+    int flipRot = tbf.z;
     ivec2 tileXY = getTileXY(tile);
     ivec2 breakageXY = getTileXY(breakage + 5); // +5 is hard-coded constant that depends on the contents of the atlas
 

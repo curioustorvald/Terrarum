@@ -1,6 +1,5 @@
 package net.torvald.terrarum.worlddrawer
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.math.Matrix4
@@ -21,7 +20,7 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import net.torvald.unsafe.UnsafeInt2D
+import net.torvald.unsafe.UnsafeLong2D
 import kotlin.math.roundToInt
 
 
@@ -88,13 +87,14 @@ internal object BlocksDrawer {
     private const val GZIP_READBUF_SIZE = 8192
 
 
-    private lateinit var terrainTilesBuffer: UnsafeInt2D
-    private lateinit var wallTilesBuffer: UnsafeInt2D
-    private lateinit var oreTilesBuffer: UnsafeInt2D
-    private lateinit var fluidTilesBuffer: UnsafeInt2D
-    private lateinit var occlusionBuffer: UnsafeInt2D
-    private lateinit var tempRenderTypeBuffer: UnsafeInt2D // 0x tttt 00 ii; where t=rawTileNum, i=nearbyTilesInfo
+    private lateinit var terrainTilesBuffer: UnsafeLong2D
+    private lateinit var wallTilesBuffer: UnsafeLong2D
+    private lateinit var oreTilesBuffer: UnsafeLong2D
+    private lateinit var fluidTilesBuffer: UnsafeLong2D
+    private lateinit var occlusionBuffer: UnsafeLong2D
+    private lateinit var tempRenderTypeBuffer: UnsafeLong2D // 0x tttt 00 ii; where t=rawTileNum, i=nearbyTilesInfo
     private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var tilesBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
     private lateinit var tilesQuad: Mesh
     private val shader = App.loadShaderFromClasspath("shaders/default.vert", "shaders/tiling.frag")
@@ -422,11 +422,11 @@ internal object BlocksDrawer {
                     else if (rawTileNum == 0)
                         0
                     else if (bufferY > 0 && tempRenderTypeBuffer[bufferY - 1, bufferX].let {
-                        it.ushr(16) == rawTileNum && it.and(255) == 0
+                        it.ushr(16).toInt() == rawTileNum && it.and(255) == 0L
                     })
                         16
                     else if (bufferY > 0 && tempRenderTypeBuffer[bufferY - 1, bufferX].let {
-                        it.ushr(16) == rawTileNum && (it.and(255) < 18 || it.and(255) >= 36)
+                        it.ushr(16).toInt() == rawTileNum && (it.and(255) < 18 || it.and(255) >= 36)
                     })
                         17
                     else if (fillThis < 0.5f / 16f)
@@ -438,12 +438,12 @@ internal object BlocksDrawer {
                             val tileNum = tileUpTag ushr 16
                             val tileTag = tileUpTag and 255
 
-                            if (tileNum == rawTileNum && tileTag in 18..33) {
-                                if (tileTag - 18 and 0b0110 == 0b0110)
+                            if (tileNum.toInt() == rawTileNum && tileTag in 18..33) {
+                                if ((tileTag - 18 and 0b0110).toInt() == 0b0110)
                                     38
-                                else if (tileTag - 18 and 0b0100 == 0b0100)
+                                else if ((tileTag - 18 and 0b0100).toInt() == 0b0100)
                                     37
-                                else if (tileTag - 18 and 0b0010 == 0b0010)
+                                else if ((tileTag - 18 and 0b0010).toInt() == 0b0010)
                                     36
                                 else
                                     15
@@ -520,7 +520,7 @@ internal object BlocksDrawer {
 
                 // draw a tile
                 writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage, hash)
-                tempRenderTypeBuffer[bufferY, bufferX] = nearbyTilesInfo or rawTileNum.shl(16)
+                tempRenderTypeBuffer[bufferY, bufferX] = (nearbyTilesInfo or rawTileNum.shl(16)).toLong()
             }
         }
     }
@@ -795,18 +795,18 @@ internal object BlocksDrawer {
     }
 
     /**
-     * Raw format of RGBA8888, where RGB portion actually encodes the absolute tile number and A is always 255.
+     * Raw format of RGBA8888.
      *
      * @return Raw colour bits in RGBA8888 format
      */
-    private fun sheetXYToTilemapColour(mode: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int): Int =
-            // the tail ".or(255)" is there to write 1.0 to the A channel (remember, return type is RGBA)
+    private fun sheetXYToTilemapColour1(mode: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int): Int =
+        (tilesTerrain.horizontalCount * sheetY + sheetX).shl(8) or // the actual tile bits
+                255 // does it premultiply the alpha?!?!!!?!?!
 
-            // this code is synced to the tilesTerrain's tile configuration, but everything else is hard-coded
-            // right now.
-            (tilesTerrain.horizontalCount * sheetY + sheetX).shl(8).or(255) or // the actual tile bits
-                breakage.and(15).shl(28) or // breakage bits
-                hash.and(15).shl(24) // flip-rot
+    private fun sheetXYToTilemapColour2(mode: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int): Int =
+        breakage.and(15).shl(8) or // breakage bits on B
+            hash.and(15).shl(16) or // fliprot on G
+                255 // does it premultiply the alpha?!?!!!?!?!
 
 
     private fun writeToBuffer(mode: Int, bufferPosX: Int, bufferPosY: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int) {
@@ -820,10 +820,13 @@ internal object BlocksDrawer {
         }
 
 
-        sourceBuffer[bufferPosY, bufferPosX] = sheetXYToTilemapColour(mode, sheetX, sheetY, breakage, hash)
+        sourceBuffer[bufferPosY, bufferPosX] =
+            sheetXYToTilemapColour1(mode, sheetX, sheetY, breakage, hash).toLong().and(0xFFFFFFFFL) or
+            sheetXYToTilemapColour2(mode, sheetX, sheetY, breakage, hash).toLong().and(0xFFFFFFFFL).shl(32)
     }
 
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
+    private var _tilesBufferAsTex2: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
     private val occlusionIntensity = 0.22222222f // too low value and dark-coloured walls won't darken enough
 
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean) {
@@ -858,9 +861,15 @@ internal object BlocksDrawer {
         // As the texture size is very small, multithreading it would be less effective
         for (y in 0 until tilesBuffer.height) {
             for (x in 0 until tilesBuffer.width) {
-                val color = sourceBuffer[y, x]
-                tilesBuffer.setColor(color)
+                val colRaw = sourceBuffer[y, x]
+                val colMain = colRaw.toInt()
+                val colSub = colRaw.ushr(32).toInt()
+
+                tilesBuffer.setColor(colMain)
                 tilesBuffer.drawPixel(x, y)
+
+                tilesBuffer2.setColor(colSub)
+                tilesBuffer2.drawPixel(x, y)
             }
         }
 
@@ -869,23 +878,29 @@ internal object BlocksDrawer {
         _tilesBufferAsTex = Texture(tilesBuffer)
         _tilesBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
+        _tilesBufferAsTex2.dispose()
+        _tilesBufferAsTex2 = Texture(tilesBuffer2)
+        _tilesBufferAsTex2.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
+
         if (drawEmissive) {
-            tilesEmissive.texture.bind(2)
-            _tilesBufferAsTex.bind(1) // trying 1 and 0...
+            _tilesBufferAsTex2.bind(3)
+            _tilesBufferAsTex.bind(2)
+            tilesEmissive.texture.bind(1)
             tilesEmissive.texture.bind(0) // for some fuck reason, it must be bound as last
         }
         else if (drawGlow) {
-            tilesGlow.texture.bind(2)
-            _tilesBufferAsTex.bind(1) // trying 1 and 0...
+            _tilesBufferAsTex2.bind(3)
+            _tilesBufferAsTex.bind(2)
+            tilesGlow.texture.bind(1)
             tilesGlow.texture.bind(0) // for some fuck reason, it must be bound as last
         }
         else {
-            tilesTerrainNext.texture.bind(2)
-            _tilesBufferAsTex.bind(1) // trying 1 and 0...
+            _tilesBufferAsTex2.bind(3)
+            _tilesBufferAsTex.bind(2)
+            tilesTerrainNext.texture.bind(1)
             tileAtlas.texture.bind(0) // for some fuck reason, it must be bound as last
         }
-
-        val magn = App.scr.magn.toFloat()
 
         shader.bind()
         shader.setUniformMatrix("u_projTrans", projectionMatrix)//camera.combined)
@@ -893,8 +908,9 @@ internal object BlocksDrawer {
         shader.setUniform2fv("atlasTexSize", App.tileMaker.SHADER_SIZE_KEYS, 0, 2)
         shader.setUniformf("colourFilter", vertexColour)
         shader.setUniformi("tilesAtlas", 0)
-        shader.setUniformi("tilesBlendAtlas", 2)
-        shader.setUniformi("tilemap", 1)
+        shader.setUniformi("tilesBlendAtlas", 1)
+        shader.setUniformi("tilemap", 2)
+        shader.setUniformi("tilemap2", 3)
         shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shader.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
         shader.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div
@@ -934,15 +950,17 @@ internal object BlocksDrawer {
             if (::occlusionBuffer.isInitialized) occlusionBuffer.destroy()
             if (::tempRenderTypeBuffer.isInitialized) tempRenderTypeBuffer.destroy()
 
-            terrainTilesBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
-            wallTilesBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
-            oreTilesBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
-            fluidTilesBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
-            occlusionBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
-            tempRenderTypeBuffer = UnsafeInt2D(tilesInHorizontal, tilesInVertical)
+            terrainTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
+            wallTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
+            oreTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
+            fluidTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
+            occlusionBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
+            tempRenderTypeBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
 
             tilesBuffer.dispose()
             tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            tilesBuffer2.dispose()
+            tilesBuffer2 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
         }
 
         if (oldScreenW != screenW || oldScreenH != screenH) {
@@ -1014,7 +1032,9 @@ internal object BlocksDrawer {
         tileItemWallGlow.dispose()
         tileItemWallEmissive.dispose()
         tilesBuffer.dispose()
+        tilesBuffer2.dispose()
         _tilesBufferAsTex.dispose()
+        _tilesBufferAsTex2.dispose()
         tilesQuad.tryDispose()
         shader.dispose()
 
