@@ -18,8 +18,8 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.utils.HashArray
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.AtlasSource.*
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_47
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_SUBTITLE_GENERIC
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_SUBTITLE_GRASS
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_SUBTILE_GENERIC
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_SUBTILE_GRASS
 import kotlin.math.sqrt
 
 /**
@@ -36,6 +36,10 @@ class CreateTileAtlas {
 
     companion object {
         val WALL_OVERLAY_COLOUR = Color(.65f, .65f, .65f, 1f)
+
+        val W_SUBTILE_GENERIC = 104
+        val W_SUBTILE_GRASS = 168
+        val H_SUBTILE = 136
     }
 
     var MAX_TEX_SIZE = App.getConfigInt("atlastexsize").coerceIn(1024, App.glInfo.GL_MAX_TEXTURE_SIZE); private set
@@ -402,9 +406,17 @@ class CreateTileAtlas {
             drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_16X16)
         }
         // subtitle generic
-        else if (tilesPixmap.width == SUBTILE_SIZE * 13 && tilesPixmap.height == SUBTILE_SIZE * 17) {
-            addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_SUBTITLE_GENERIC)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_SUBTITLE_GENERIC)
+        else if (tilesPixmap.width == W_SUBTILE_GENERIC && tilesPixmap.height == H_SUBTILE ||
+            tilesPixmap.width == W_SUBTILE_GRASS && tilesPixmap.height == H_SUBTILE ||
+            tilesPixmap.width == 3*W_SUBTILE_GENERIC && tilesPixmap.height == 2*H_SUBTILE ||
+            tilesPixmap.width == 3*W_SUBTILE_GRASS && tilesPixmap.height == 2*H_SUBTILE) {
+
+            // TODO figure out the tags
+            var connectionType = 0
+            var maskType = if (tilesPixmap.width >= 3*W_SUBTILE_GENERIC) MASK_SUBTILE_GRASS else MASK_SUBTILE_GENERIC
+
+            addTag(blockID, connectionType, maskType)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, maskType)
         }
         // 112x112 or 336x224
         else {
@@ -462,16 +474,16 @@ class CreateTileAtlas {
             expandAtlantes()
         }
 
-        val wSubtileSheet = if (renderMask == MASK_SUBTITLE_GRASS) 168 else 104
-        val hSubtileSheet = 136
+        val wSubtileSheet = if (renderMask >= MASK_SUBTILE_GRASS) W_SUBTILE_GRASS else W_SUBTILE_GENERIC
+        val hSubtileSheet = H_SUBTILE
 
-        val sixSeasonal = (renderMask >= MASK_SUBTITLE_GENERIC && diffuse.width == 3 * wSubtileSheet && diffuse.height == 2 * hSubtileSheet) ||
-                (renderMask < MASK_SUBTITLE_GENERIC && diffuse.width == 21 * TILE_SIZE && diffuse.height == 14 * TILE_SIZE)
+        val sixSeasonal = (renderMask >= MASK_SUBTILE_GENERIC && diffuse.width == 3 * wSubtileSheet && diffuse.height == 2 * hSubtileSheet) ||
+                (renderMask < MASK_SUBTILE_GENERIC && diffuse.width == 336 && diffuse.height == 224)
         val txOfPixmap = diffuse.width / TILE_SIZE
         val txOfPixmapGlow = glow.width / TILE_SIZE
         val txOfPixmapEmissive = emissive.width / TILE_SIZE
 
-        if (renderMask >= MASK_SUBTITLE_GENERIC) {
+        if (renderMask >= MASK_SUBTILE_GENERIC) {
             for (i in 0 until tilesCount) {
                 val srcX = SUBTILE_SIZE * (i / 4)
                 val srcY = SUBTILE_SIZE * 4 * (i % 4) + SUBTILE_SIZE
@@ -616,8 +628,10 @@ class CreateTileAtlas {
             const val MASK_16X8 = 6
             const val MASK_16X16 = 7
             const val MASK_FLUID = 8
-            const val MASK_SUBTITLE_GENERIC = 16
-            const val MASK_SUBTITLE_GRASS = 17
+            const val MASK_SUBTILE_GENERIC = 16
+            const val MASK_SUBTILE_BRICK_TILING = 17
+            const val MASK_SUBTILE_GRASS = 32
+            const val MASK_SUBTILE_GRASS_BRICK_TILING = 32
 
             fun maskTypeToTileCount(maskType: Int) = when (maskType) {
                 MASK_NA -> 1
@@ -629,8 +643,8 @@ class CreateTileAtlas {
                 MASK_16X8 -> 128
                 MASK_16X16 -> 256
                 MASK_FLUID -> 18
-                MASK_SUBTITLE_GENERIC -> 52
-                MASK_SUBTITLE_GRASS -> 84
+                MASK_SUBTILE_GENERIC, MASK_SUBTILE_BRICK_TILING -> 52
+                MASK_SUBTILE_GRASS, MASK_SUBTILE_GRASS_BRICK_TILING -> 84
                 else -> throw IllegalArgumentException("Unknown maskType: $maskType")
             }
         }
