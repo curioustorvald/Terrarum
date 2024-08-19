@@ -44,7 +44,7 @@ const vec2 haalf = vec2(0.5, 0.5);
 
 out vec4 fragColor;
 
-ivec2 getTileXY(int tileNumber) {
+ivec2 tileNumberToXY(int tileNumber) {
     return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));
 }
 
@@ -103,8 +103,8 @@ void main() {
     int tile = tbf.x;
     int breakage = tbf.y;
     int flipRot = tbf.z;
-    ivec2 tileXY = getTileXY(tile);
-    ivec2 breakageXY = getTileXY(breakage + 5); // +5 is hard-coded constant that depends on the contents of the atlas
+    ivec2 tileXY = tileNumberToXY(tile);
+    ivec2 breakageXY = tileNumberToXY(breakage + 5); // +5 is hard-coded constant that depends on the contents of the atlas
 
     // calculate the UV coord value for texture sampling //
 

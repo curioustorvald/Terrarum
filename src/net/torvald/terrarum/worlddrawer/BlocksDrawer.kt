@@ -42,12 +42,12 @@ internal object BlocksDrawer {
 
 
     /**
-     * Widths of the tile atlases must have exactly the same width (height doesn't matter)
+     * Widths of the tile atlantes must have exactly the same width (height doesn't matter)
      * If not, the engine will choose wrong tile for a number you provided.
      */
 
     /** Index zero: spring */
-    val weatherTerrains: Array<TextureRegionPack>
+    val seasonalTerrains: Array<TextureRegionPack>
     lateinit var tilesTerrain: TextureRegionPack; private set
     lateinit var tilesTerrainNext: TextureRegionPack; private set
     private var tilesTerrainBlendDegree = 0f
@@ -87,12 +87,12 @@ internal object BlocksDrawer {
     private const val GZIP_READBUF_SIZE = 8192
 
 
-    private lateinit var terrainTilesBuffer: UnsafeLong2D
-    private lateinit var wallTilesBuffer: UnsafeLong2D
-    private lateinit var oreTilesBuffer: UnsafeLong2D
-    private lateinit var fluidTilesBuffer: UnsafeLong2D
-    private lateinit var occlusionBuffer: UnsafeLong2D
-    private lateinit var tempRenderTypeBuffer: UnsafeLong2D // 0x tttt 00 ii; where t=rawTileNum, i=nearbyTilesInfo
+    private lateinit var terrainTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
+    private lateinit var wallTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
+    private lateinit var oreTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
+    private lateinit var fluidTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
+    private lateinit var occlusionBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
+    private lateinit var tempRenderTypeBuffer: UnsafeLong2D // this one is NOT dimension doubled; 0x tttt 00 ii where t=rawTileNum, i=nearbyTilesInfo
     private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
     private var tilesBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
@@ -110,7 +110,7 @@ internal object BlocksDrawer {
         // CreateTileAtlas.invoke() has been moved to the AppLoader.create() //
 
         // create terrain texture from pixmaps
-        weatherTerrains = arrayOf(
+        seasonalTerrains = arrayOf(
             TextureRegionPack(Texture(App.tileMaker.atlasPrevernal), TILE_SIZE, TILE_SIZE),
             TextureRegionPack(Texture(App.tileMaker.atlasVernal), TILE_SIZE, TILE_SIZE),
             TextureRegionPack(Texture(App.tileMaker.atlasAestival), TILE_SIZE, TILE_SIZE),
@@ -147,7 +147,7 @@ internal object BlocksDrawer {
 
 
         // finally
-        tilesTerrain = weatherTerrains[1]
+        tilesTerrain = seasonalTerrains[1]
 
 
         printdbg(this, "init() exit")
@@ -203,8 +203,8 @@ internal object BlocksDrawer {
         try {
             val seasonalMonth = world.worldTime.ecologicalSeason
 
-            tilesTerrain = weatherTerrains[seasonalMonth.floorToInt()]
-            tilesTerrainNext = weatherTerrains[(seasonalMonth + 1).floorToInt() fmod weatherTerrains.size]
+            tilesTerrain = seasonalTerrains[seasonalMonth.floorToInt()]
+            tilesTerrainNext = seasonalTerrains[(seasonalMonth + 1).floorToInt() fmod seasonalTerrains.size]
             tilesTerrainBlendDegree = seasonalMonth % 1f
         }
         catch (e: ClassCastException) { }
@@ -336,17 +336,17 @@ internal object BlocksDrawer {
 
 
         val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorToInt()
-        val for_y_end = for_y_start + tilesBuffer.height - 1
+        val for_y_end = for_y_start + hTilesInVertical - 1
 
         val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorToInt()
-        val for_x_end = for_x_start + tilesBuffer.width - 1
+        val for_x_end = for_x_start + hTilesInHorizontal - 1
 
         // loop
         for (y in for_y_start..for_y_end) {
             for (x in for_x_start..for_x_end) {
 
-                val bufferX = x - for_x_start
-                val bufferY = y - for_y_start
+                val bufferBaseX = x - for_x_start
+                val bufferBaseY = y - for_y_start
 
                 val (wx, wy) = world.coerceXY(x, y)
 
@@ -421,11 +421,11 @@ internal object BlocksDrawer {
                     }
                     else if (rawTileNum == 0)
                         0
-                    else if (bufferY > 0 && tempRenderTypeBuffer[bufferY - 1, bufferX].let {
+                    else if (bufferBaseY > 0 && tempRenderTypeBuffer[bufferBaseY - 1, bufferBaseX].let {
                         it.ushr(16).toInt() == rawTileNum && it.and(255) == 0L
                     })
                         16
-                    else if (bufferY > 0 && tempRenderTypeBuffer[bufferY - 1, bufferX].let {
+                    else if (bufferBaseY > 0 && tempRenderTypeBuffer[bufferBaseY - 1, bufferBaseX].let {
                         it.ushr(16).toInt() == rawTileNum && (it.and(255) < 18 || it.and(255) >= 36)
                     })
                         17
@@ -433,8 +433,8 @@ internal object BlocksDrawer {
                         0
                     else if (fillThis >= 15.5f / 16f) {
                         // wy > 0 and tileUp is solid
-                        if (wy > 0 && bufferY > 0 && solids and 0b1000 != 0) {
-                            val tileUpTag = tempRenderTypeBuffer[bufferY - 1, bufferX]
+                        if (wy > 0 && bufferBaseY > 0 && solids and 0b1000 != 0) {
+                            val tileUpTag = tempRenderTypeBuffer[bufferBaseY - 1, bufferBaseX]
                             val tileNum = tileUpTag ushr 16
                             val tileTag = tileUpTag and 255
 
@@ -519,8 +519,11 @@ internal object BlocksDrawer {
                 val breakingStage = if (mode == TERRAIN || mode == WALL || mode == ORES) (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt() else 0
 
                 // draw a tile
-                writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage, hash)
-                tempRenderTypeBuffer[bufferY, bufferX] = (nearbyTilesInfo or rawTileNum.shl(16)).toLong()
+                writeToBuffer(mode, bufferBaseX*2+0, bufferBaseY*2+0, thisTileX, thisTileY, breakingStage, hash)
+                writeToBuffer(mode, bufferBaseX*2+1, bufferBaseY*2+0, thisTileX, thisTileY, breakingStage, hash)
+                writeToBuffer(mode, bufferBaseX*2+0, bufferBaseY*2+1, thisTileX, thisTileY, breakingStage, hash)
+                writeToBuffer(mode, bufferBaseX*2+1, bufferBaseY*2+1, thisTileX, thisTileY, breakingStage, hash)
+                tempRenderTypeBuffer[bufferBaseY, bufferBaseX] = (nearbyTilesInfo or rawTileNum.shl(16)).toLong()
             }
         }
     }
@@ -904,8 +907,6 @@ internal object BlocksDrawer {
 
         shader.bind()
         shader.setUniformMatrix("u_projTrans", projectionMatrix)//camera.combined)
-        shader.setUniform2fv("tilesInAtlas", App.tileMaker.SHADER_SIZE_KEYS, 2, 2)
-        shader.setUniform2fv("atlasTexSize", App.tileMaker.SHADER_SIZE_KEYS, 0, 2)
         shader.setUniformf("colourFilter", vertexColour)
         shader.setUniformi("tilesAtlas", 0)
         shader.setUniformi("tilesBlendAtlas", 1)
@@ -914,7 +915,7 @@ internal object BlocksDrawer {
         shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shader.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
         shader.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div
-        shader.setUniformf("tilesInAtlas", tileAtlas.horizontalCount.toFloat(), tileAtlas.verticalCount.toFloat()) //depends on the tile atlas
+        shader.setUniformf("tilesInAtlas", tileAtlas.horizontalCount * 2f, tileAtlas.verticalCount * 2f) //depends on the tile atlas
         shader.setUniformf("atlasTexSize", tileAtlas.texture.width.toFloat(), tileAtlas.texture.height.toFloat()) //depends on the tile atlas
         // set the blend value as world's time progresses, in linear fashion
         shader.setUniformf("tilesBlend", if (mode == TERRAIN || mode == WALL)
@@ -933,13 +934,18 @@ internal object BlocksDrawer {
 
     var tilesInHorizontal = -1; private set
     var tilesInVertical = -1; private set
+    var hTilesInHorizontal = -1; private set
+    var hTilesInVertical = -1; private set
 
     fun resize(screenW: Int, screenH: Int) {
-        tilesInHorizontal = (App.scr.wf / TILE_SIZE).ceilToInt() + 1
-        tilesInVertical = (App.scr.hf / TILE_SIZE).ceilToInt() + 1
+        tilesInHorizontal = (App.scr.wf / TILE_SIZE).ceilToInt().times(2) + 2
+        tilesInVertical = (App.scr.hf / TILE_SIZE).ceilToInt().times(2) + 2
 
-        val oldTH = (oldScreenW.toFloat() / TILE_SIZE).ceilToInt() + 1
-        val oldTV = (oldScreenH.toFloat() / TILE_SIZE).ceilToInt() + 1
+        hTilesInHorizontal = (App.scr.wf / TILE_SIZE).ceilToInt() + 1
+        hTilesInVertical = (App.scr.hf / TILE_SIZE).ceilToInt() + 1
+
+        val oldTH = (oldScreenW.toFloat() / TILE_SIZE).ceilToInt().times(2) + 1
+        val oldTV = (oldScreenH.toFloat() / TILE_SIZE).ceilToInt().times(2) + 1
 
         // only update if it's really necessary
         if (oldTH != tilesInHorizontal || oldTV != tilesInVertical) {
@@ -955,7 +961,7 @@ internal object BlocksDrawer {
             oreTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             fluidTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             occlusionBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
-            tempRenderTypeBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
+            tempRenderTypeBuffer = UnsafeLong2D(hTilesInHorizontal, hTilesInVertical)
 
             tilesBuffer.dispose()
             tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
@@ -988,16 +994,6 @@ internal object BlocksDrawer {
 
     }
 
-    fun clampH(x: Int): Int {
-        if (x < 0) {
-            return 0
-        } else if (x > world.height * TILE_SIZE) {
-            return world.height * TILE_SIZE
-        } else {
-            return x
-        }
-    }
-
     fun clampWTile(x: Int): Int {
         if (x < 0) {
             return 0
@@ -1022,7 +1018,7 @@ internal object BlocksDrawer {
         printdbg(this, "dispose called by")
         printStackTrace(this)
 
-        weatherTerrains.forEach { it.dispose() }
+        seasonalTerrains.forEach { it.dispose() }
         tilesGlow.dispose()
         tilesEmissive.dispose()
         tileItemTerrain.dispose()

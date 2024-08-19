@@ -46,7 +46,7 @@ class CreateTileAtlas {
     var TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE; private set
     var SUBTILES_IN_X = MAX_TEX_SIZE / SUBTILE_SIZE; private set
 
-    var SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat()); private set
+//    var SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat()); private set
 
     private var TOTAL_TILES = TILES_IN_X * TILES_IN_X
 
@@ -686,7 +686,7 @@ class CreateTileAtlas {
         MAX_TEX_SIZE = newTexSize
         TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE
         SUBTILES_IN_X = MAX_TEX_SIZE / SUBTILE_SIZE
-        SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat())
+//        SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat())
         TOTAL_TILES = TILES_IN_X * TILES_IN_X
 
 

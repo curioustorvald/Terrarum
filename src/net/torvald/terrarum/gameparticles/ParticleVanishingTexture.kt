@@ -2,14 +2,9 @@ package net.torvald.terrarum.gameparticles
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.App
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.drawBodyInGoodPosition
-import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
@@ -47,10 +42,10 @@ fun createRandomBlockParticle(tileNum: Int, position: Vector2, velocityMult: Vec
         -velocityMult.y
     ) // triangular distribution with mean of 1.0 * velocityMult
 
-    val atlasX = tileNum % BlocksDrawer.weatherTerrains[1].horizontalCount
-    val atlasY = tileNum / BlocksDrawer.weatherTerrains[1].horizontalCount
+    val atlasX = tileNum % BlocksDrawer.seasonalTerrains[1].horizontalCount
+    val atlasY = tileNum / BlocksDrawer.seasonalTerrains[1].horizontalCount
     // take base texture
-    val texBody = BlocksDrawer.weatherTerrains[1].get(atlasX, atlasY)
+    val texBody = BlocksDrawer.seasonalTerrains[1].get(atlasX, atlasY)
     val texGlow = BlocksDrawer.tilesGlow.get(atlasX, atlasY)
 
     // take random square part
