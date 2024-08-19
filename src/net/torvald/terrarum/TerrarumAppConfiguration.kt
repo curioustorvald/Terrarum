@@ -167,7 +167,8 @@ basegame
     //             CONFIGURATION FOR TILE MAKER             //
     // MAKE SURE THESE VALUES ARE UNIQUE IN THE SOURCE CODE //
     //////////////////////////////////////////////////////////
-    const val TILE_SIZE = 16
+    const val SUBTILE_SIZE = 8
+    const val TILE_SIZE = SUBTILE_SIZE * 2
     const val TILE_SIZEF = TILE_SIZE.toFloat()
     const val TILE_SIZED = TILE_SIZE.toDouble()
 

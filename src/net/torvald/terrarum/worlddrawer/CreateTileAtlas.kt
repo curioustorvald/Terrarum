@@ -8,14 +8,18 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.SUBTILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.utils.HashArray
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.AtlasSource.*
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_47
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_SUBTITLE_GENERIC
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_SUBTITLE_GRASS
 import kotlin.math.sqrt
 
 /**
@@ -36,6 +40,7 @@ class CreateTileAtlas {
 
     var MAX_TEX_SIZE = App.getConfigInt("atlastexsize").coerceIn(1024, App.glInfo.GL_MAX_TEXTURE_SIZE); private set
     var TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE; private set
+    var SUBTILES_IN_X = MAX_TEX_SIZE / SUBTILE_SIZE; private set
 
     var SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat()); private set
 
@@ -396,7 +401,12 @@ class CreateTileAtlas {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X16)
             drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_16X16)
         }
-        // 112x112 or 224x224
+        // subtitle generic
+        else if (tilesPixmap.width == SUBTILE_SIZE * 13 && tilesPixmap.height == SUBTILE_SIZE * 17) {
+            addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_SUBTITLE_GENERIC)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_SUBTITLE_GENERIC)
+        }
+        // 112x112 or 336x224
         else {
             if (tilesPixmap.width != tilesPixmap.height && tilesPixmap.width % (7 * TILE_SIZE) >= 2) {
                 throw IllegalArgumentException("Unrecognized image dimension ${tilesPixmap.width}x${tilesPixmap.height} from ${diffuse.path()}")
@@ -452,35 +462,102 @@ class CreateTileAtlas {
             expandAtlantes()
         }
 
-        val sixSeasonal = diffuse.width == 21 * TILE_SIZE && diffuse.height == 14 * TILE_SIZE
+        val wSubtileSheet = if (renderMask == MASK_SUBTITLE_GRASS) 168 else 104
+        val hSubtileSheet = 136
+
+        val sixSeasonal = (renderMask >= MASK_SUBTITLE_GENERIC && diffuse.width == 3 * wSubtileSheet && diffuse.height == 2 * hSubtileSheet) ||
+                (renderMask < MASK_SUBTITLE_GENERIC && diffuse.width == 21 * TILE_SIZE && diffuse.height == 14 * TILE_SIZE)
         val txOfPixmap = diffuse.width / TILE_SIZE
         val txOfPixmapGlow = glow.width / TILE_SIZE
         val txOfPixmapEmissive = emissive.width / TILE_SIZE
-        for (i in 0 until tilesCount) {
-            //printdbg(this, "Rendering to atlas, tile# $atlasCursor, tilesCount = $tilesCount, seasonal = $seasonal")
 
-            // different texture for different seasons (224x224)
-            if (sixSeasonal) {
-                val i = if (renderMask == MASK_47) (if (i < 41) i else i + 1) else i // to compensate the discontinuity between 40th and 41st tile
-                _drawToAtlantes(diffuse, atlasCursor, i % 7     , i / 7, PREVERNAL)
-                _drawToAtlantes(diffuse, atlasCursor, i % 7 + 7 , i / 7, VERNAL)
-                _drawToAtlantes(diffuse, atlasCursor, i % 7 + 14, i / 7, AESTIVAL)
+        if (renderMask >= MASK_SUBTITLE_GENERIC) {
+            for (i in 0 until tilesCount) {
+                val srcX = SUBTILE_SIZE * (i / 4)
+                val srcY = SUBTILE_SIZE * 4 * (i % 4) + SUBTILE_SIZE
 
-                _drawToAtlantes(diffuse, atlasCursor, i % 7 + 14, i / 7 + 7, SEROTINAL)
-                _drawToAtlantes(diffuse, atlasCursor, i % 7 + 7 , i / 7 + 7, AUTUMNAL)
-                _drawToAtlantes(diffuse, atlasCursor, i % 7     , i / 7 + 7, HIBERNAL)
+                if (sixSeasonal) {
+                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 0*wSubtileSheet, srcY, PREVERNAL)
+                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 1*wSubtileSheet, srcY, VERNAL)
+                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 2*wSubtileSheet, srcY, AESTIVAL)
 
-                _drawToAtlantes(glow, atlasCursor, i % 7, i / 7, GLOW)
-                _drawToAtlantes(emissive, atlasCursor, i % 7, i / 7, EMISSIVE)
+                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 2*wSubtileSheet, srcY + hSubtileSheet, SEROTINAL)
+                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 1*wSubtileSheet, srcY + hSubtileSheet, AUTUMNAL)
+                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 0*wSubtileSheet, srcY + hSubtileSheet, HIBERNAL)
+
+                    _drawToAtlantesFourSubtiles(glow, atlasCursor, srcX, srcY, GLOW)
+                    _drawToAtlantesFourSubtiles(emissive, atlasCursor, srcX, srcY, EMISSIVE)
+                }
+                else {
+                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX, srcY, SIX_SEASONS)
+                    _drawToAtlantesFourSubtiles(glow, atlasCursor, srcX, srcY, GLOW)
+                    _drawToAtlantesFourSubtiles(emissive, atlasCursor, srcX, srcY, EMISSIVE)
+                }
+
                 atlasCursor += 1
             }
-            else {
+        }
+        else {
+            for (i in 0 until tilesCount) {
+                //printdbg(this, "Rendering to atlas, tile# $atlasCursor, tilesCount = $tilesCount, seasonal = $seasonal")
                 val i = if (renderMask == MASK_47) (if (i < 41) i else i + 1) else i // to compensate the discontinuity between 40th and 41st tile
-                _drawToAtlantes(diffuse, atlasCursor, i % txOfPixmap, i / txOfPixmap, SIX_SEASONS)
-                _drawToAtlantes(glow, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, GLOW)
-                _drawToAtlantes(emissive, atlasCursor, i % txOfPixmapEmissive, i / txOfPixmapEmissive, EMISSIVE)
+
+                // different texture for different seasons (336x224)
+                if (sixSeasonal) {
+                    _drawToAtlantes(diffuse, atlasCursor, i % 7, i / 7, PREVERNAL)
+                    _drawToAtlantes(diffuse, atlasCursor, i % 7 + 7, i / 7, VERNAL)
+                    _drawToAtlantes(diffuse, atlasCursor, i % 7 + 14, i / 7, AESTIVAL)
+
+                    _drawToAtlantes(diffuse, atlasCursor, i % 7 + 14, i / 7 + 7, SEROTINAL)
+                    _drawToAtlantes(diffuse, atlasCursor, i % 7 + 7, i / 7 + 7, AUTUMNAL)
+                    _drawToAtlantes(diffuse, atlasCursor, i % 7, i / 7 + 7, HIBERNAL)
+
+                    _drawToAtlantes(glow, atlasCursor, i % 7, i / 7, GLOW)
+                    _drawToAtlantes(emissive, atlasCursor, i % 7, i / 7, EMISSIVE)
+                }
+                else {
+                    _drawToAtlantes(diffuse, atlasCursor, i % txOfPixmap, i / txOfPixmap, SIX_SEASONS)
+                    _drawToAtlantes(glow, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, GLOW)
+                    _drawToAtlantes(emissive, atlasCursor, i % txOfPixmapEmissive, i / txOfPixmapEmissive, EMISSIVE)
+                }
+
                 atlasCursor += 1
             }
+        }
+    }
+
+    /**
+     * This function will draw 8x16 (two subtiles) onto the atlas
+     */
+    private fun _drawToAtlantesFourSubtiles(pixmap: Pixmap, destTileNum: Int, sourceX: Int, sourceY: Int, source: AtlasSource) {
+        if (source == SIX_SEASONS) {
+            _drawToAtlantesFourSubtiles(pixmap, destTileNum, sourceX, sourceY, PREVERNAL)
+            _drawToAtlantesFourSubtiles(pixmap, destTileNum, sourceX, sourceY, VERNAL)
+            _drawToAtlantesFourSubtiles(pixmap, destTileNum, sourceX, sourceY, AESTIVAL)
+            _drawToAtlantesFourSubtiles(pixmap, destTileNum, sourceX, sourceY, SEROTINAL)
+            _drawToAtlantesFourSubtiles(pixmap, destTileNum, sourceX, sourceY, AUTUMNAL)
+            _drawToAtlantesFourSubtiles(pixmap, destTileNum, sourceX, sourceY, HIBERNAL)
+        }
+        else {
+            // destTileNum increments by one, which means FOUR SUBTILES
+
+            val atlasX = (destTileNum % SUBTILES_IN_X) * TILE_SIZE
+            val atlasY = (destTileNum / SUBTILES_IN_X) * TILE_SIZE
+
+            val target = when (source) {
+                PREVERNAL -> atlasPrevernal
+                VERNAL -> atlasVernal
+                AESTIVAL -> atlasAestival
+                SEROTINAL -> atlasSerotinal
+                AUTUMNAL -> atlasAutumnal
+                HIBERNAL -> atlasHibernal
+                GLOW -> atlasGlow
+                EMISSIVE -> atlasEmissive
+                else -> throw IllegalArgumentException("Unknown draw source $source")
+            }
+
+            target.drawPixmap(pixmap, sourceX, sourceY, SUBTILE_SIZE, TILE_SIZE, atlasX, atlasY, SUBTILE_SIZE, TILE_SIZE)
+            target.drawPixmap(pixmap, sourceX, sourceY + TILE_SIZE, SUBTILE_SIZE, TILE_SIZE, atlasX + SUBTILE_SIZE, atlasY, SUBTILE_SIZE, TILE_SIZE)
         }
     }
 
@@ -504,17 +581,19 @@ class CreateTileAtlas {
 
             //if (mode == 1) printdbg(this, "atlaspos: ($atlasX, $atlasY), srcpos: ($sourceX, $sourceY), srcpixmap = $pixmap")
 
-            when (source) {
-                PREVERNAL -> atlasPrevernal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                VERNAL -> atlasVernal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                AESTIVAL -> atlasAestival.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                SEROTINAL -> atlasSerotinal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                AUTUMNAL -> atlasAutumnal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                HIBERNAL -> atlasHibernal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                GLOW -> atlasGlow.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                EMISSIVE -> atlasEmissive.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+            val target = when (source) {
+                PREVERNAL -> atlasPrevernal
+                VERNAL -> atlasVernal
+                AESTIVAL -> atlasAestival
+                SEROTINAL -> atlasSerotinal
+                AUTUMNAL -> atlasAutumnal
+                HIBERNAL -> atlasHibernal
+                GLOW -> atlasGlow
+                EMISSIVE -> atlasEmissive
                 else -> throw IllegalArgumentException("Unknown draw source $source")
             }
+
+            target.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
         }
     }
 
@@ -537,6 +616,8 @@ class CreateTileAtlas {
             const val MASK_16X8 = 6
             const val MASK_16X16 = 7
             const val MASK_FLUID = 8
+            const val MASK_SUBTITLE_GENERIC = 16
+            const val MASK_SUBTITLE_GRASS = 17
 
             fun maskTypeToTileCount(maskType: Int) = when (maskType) {
                 MASK_NA -> 1
@@ -548,6 +629,8 @@ class CreateTileAtlas {
                 MASK_16X8 -> 128
                 MASK_16X16 -> 256
                 MASK_FLUID -> 18
+                MASK_SUBTITLE_GENERIC -> 52
+                MASK_SUBTITLE_GRASS -> 84
                 else -> throw IllegalArgumentException("Unknown maskType: $maskType")
             }
         }
@@ -588,6 +671,7 @@ class CreateTileAtlas {
 
         MAX_TEX_SIZE = newTexSize
         TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE
+        SUBTILES_IN_X = MAX_TEX_SIZE / SUBTILE_SIZE
         SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat())
         TOTAL_TILES = TILES_IN_X * TILES_IN_X
 
