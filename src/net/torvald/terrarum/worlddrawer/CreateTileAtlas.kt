@@ -243,7 +243,7 @@ class CreateTileAtlas {
         }
 
         // test print
-//        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas.tga"), atlas, false)
+        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas.tga"), atlas, false)
 //        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasGlow.tga"), atlasGlow, false)
 
 
@@ -397,13 +397,13 @@ class CreateTileAtlas {
         }
         // predefined by the image dimension: 256x256
         else if (tilesPixmap.width == TILE_SIZE * 16 && tilesPixmap.height == TILE_SIZE * 16) {
-            addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_FLUID)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_FLUID)
+            addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X16)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_16X16)
         }
         // predefined by the image dimension: 288x16
         else if (tilesPixmap.width == TILE_SIZE * 18 && tilesPixmap.height == TILE_SIZE * 3) {
-            addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_16X16)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_16X16)
+            addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_FLUID)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_FLUID)
         }
         // subtitle generic
         else if (tilesPixmap.width == W_SUBTILE_GENERIC && tilesPixmap.height == H_SUBTILE ||
@@ -642,7 +642,7 @@ class CreateTileAtlas {
                 MASK_16X4 -> 64
                 MASK_16X8 -> 128
                 MASK_16X16 -> 256
-                MASK_FLUID -> 18
+                MASK_FLUID -> 18*3
                 MASK_SUBTILE_GENERIC, MASK_SUBTILE_BRICK_TILING -> 52
                 MASK_SUBTILE_GRASS, MASK_SUBTILE_GRASS_BRICK_TILING -> 84
                 else -> throw IllegalArgumentException("Unknown maskType: $maskType")

@@ -12,7 +12,6 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.isFluid
 import net.torvald.terrarum.itemproperties.ItemRemapTable
 import net.torvald.terrarum.itemproperties.ItemTable
-import net.torvald.terrarum.modulebasegame.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
@@ -272,10 +271,16 @@ open class GameWorld(
         // before the renaming, update the name maps
         val oldTileNumberToNameMap: Map<Long, ItemID> = tileNumberToNameMap.toMap()
 
+        tileNumberToNameMap.forEach { l, s ->
+            printdbg(this, "  afterload oldMapping tileNumber $l <-> $s")
+        }
+
+        printdbg(this, "")
+
         tileNumberToNameMap.clear()
         tileNameToNumberMap.clear()
         App.tileMaker.tags.forEach {
-            printdbg(this, "afterload tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
+            printdbg(this, "  afterload tileMaker tileNumber ${it.value.tileNumber} <-> ${it.key}")
 
             tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key
             tileNameToNumberMap[it.key] = it.value.tileNumber
@@ -299,12 +304,19 @@ open class GameWorld(
         // perform renaming of tile layers
         for (y in 0 until layerTerrain.height) {
             for (x in 0 until layerTerrain.width) {
+                // renumber terrain and wall
                 layerTerrain.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerTerrain.unsafeGetTile(x, y).toLong()]]!!)
                 layerWall.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerWall.unsafeGetTile(x, y).toLong()]]!!)
 
-                val oldNum = layerOres.unsafeGetTile(x, y).toLong()
-                val oldName = oldTileNumberToNameMap[oldNum]
-                layerOres.unsafeSetTileKeepPlacement(x, y, oldName.let { tileNameToNumberMap[it] ?: throw NullPointerException("Unknown tile name: $oldName (<- $oldNum)") })
+                // renumber ores
+                val oldOreNum = layerOres.unsafeGetTile(x, y).toLong()
+                val oldOreName = oldTileNumberToNameMap[oldOreNum]
+                layerOres.unsafeSetTileKeepPlacement(x, y, oldOreName.let { tileNameToNumberMap[it] ?: throw NullPointerException("Unknown tile name: $oldOreName (<- $oldOreNum)") })
+
+                // renumber fluids
+                val (oldFluidNum, oldFluidFill) = layerFluids.unsafeGetTile1(x, y)
+                val oldFluidName = oldTileNumberToNameMap[oldFluidNum.toLong()]
+                layerFluids.unsafeSetTile(x, y, oldFluidName.let { tileNameToNumberMap[it] ?: throw NullPointerException("Unknown tile name: $oldFluidName (<- $oldFluidNum)") }, oldFluidFill)
             }
         }
 
