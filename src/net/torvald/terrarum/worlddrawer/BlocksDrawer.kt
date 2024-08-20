@@ -458,7 +458,7 @@ internal object BlocksDrawer {
                         (fillThis * 16f - 0.5f).floorToInt().coerceIn(0, 15)
                 }
                 else if (treeLeavesTiles.binarySearch(rawTileNum) >= 0) {
-                    getNearbyTilesInfoTrees(x, y, mode).swizzle8(rawTileNum, hash)
+                    getNearbyTilesInfoTrees(x, y, mode)//.swizzle8(rawTileNum, hash)
                 }
                 else if (treeTrunkTiles.binarySearch(rawTileNum) >= 0) {
                     hash = 0
@@ -466,17 +466,17 @@ internal object BlocksDrawer {
                 }
                 else if (platformTiles.binarySearch(rawTileNum) >= 0) {
                     hash %= 2
-                    getNearbyTilesInfoPlatform(x, y).swizzleH2(rawTileNum, hash)
+                    getNearbyTilesInfoPlatform(x, y)//.swizzleH2(rawTileNum, hash)
                 }
                 else if (wallStickerTiles.binarySearch(rawTileNum) >= 0) {
                     hash = 0
                     getNearbyTilesInfoWallSticker(x, y)
                 }
                 else if (connectMutualTiles.binarySearch(rawTileNum) >= 0) {
-                    getNearbyTilesInfoConMutual(x, y, mode).swizzle8(rawTileNum, hash)
+                    getNearbyTilesInfoConMutual(x, y, mode)//.swizzle8(rawTileNum, hash)
                 }
                 else if (connectSelfTiles.binarySearch(rawTileNum) >= 0) {
-                    getNearbyTilesInfoConSelf(x, y, mode, rawTileNum).swizzle8(rawTileNum, hash)
+                    getNearbyTilesInfoConSelf(x, y, mode, rawTileNum)//.swizzle8(rawTileNum, hash)
                 }
                 else {
                     0
@@ -510,8 +510,10 @@ internal object BlocksDrawer {
                     tileNumber = 2 // black solid
                 }
 
-                val thisTileX = tileNumber % App.tileMaker.TILES_IN_X
-                val thisTileY = tileNumber / App.tileMaker.TILES_IN_X
+                val subtileNum = tileNumber.tileToSubtile()
+
+                val thisTileX = subtileNum % App.tileMaker.TILES_IN_X
+                val thisTileY = subtileNum / App.tileMaker.TILES_IN_X
 
                 val breakage =  if (mode == TERRAIN || mode == ORES) world.getTerrainDamage(x, y) else if (mode == WALL) world.getWallDamage(x, y) else 0f
                 if (breakage.isNaN()) throw IllegalStateException("Block breakage at ($x, $y) is NaN (mode=$mode)")
@@ -519,14 +521,19 @@ internal object BlocksDrawer {
                 val breakingStage = if (mode == TERRAIN || mode == WALL || mode == ORES) (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt() else 0
 
                 // draw a tile
-                writeToBuffer(mode, bufferBaseX*2+0, bufferBaseY*2+0, thisTileX, thisTileY, breakingStage, hash)
-                writeToBuffer(mode, bufferBaseX*2+1, bufferBaseY*2+0, thisTileX, thisTileY, breakingStage, hash)
-                writeToBuffer(mode, bufferBaseX*2+0, bufferBaseY*2+1, thisTileX, thisTileY, breakingStage, hash)
-                writeToBuffer(mode, bufferBaseX*2+1, bufferBaseY*2+1, thisTileX, thisTileY, breakingStage, hash)
+                writeToBuffer(mode, bufferBaseX*2+0, bufferBaseY*2+0, thisTileX+0, thisTileY+0, breakingStage, hash)
+                writeToBuffer(mode, bufferBaseX*2+1, bufferBaseY*2+0, thisTileX+1, thisTileY+0, breakingStage, hash)
+                writeToBuffer(mode, bufferBaseX*2+0, bufferBaseY*2+1, thisTileX+0, thisTileY+2, breakingStage, hash)
+                writeToBuffer(mode, bufferBaseX*2+1, bufferBaseY*2+1, thisTileX+1, thisTileY+2, breakingStage, hash)
                 tempRenderTypeBuffer[bufferBaseY, bufferBaseX] = (nearbyTilesInfo or rawTileNum.shl(16)).toLong()
             }
         }
+//        println("App.tileMaker.TILES_IN_X = ${App.tileMaker.TILES_IN_X}\tApp.tileMaker.atlas.width = ${App.tileMaker.atlas.width}")
+//        println("tilesTerrain.horizontalCount = ${tilesTerrain.horizontalCount}")
     }
+
+    private fun Int.tileToSubtile() = (this / App.tileMaker.TILES_IN_X) * 4*App.tileMaker.TILES_IN_X +
+            (this % App.tileMaker.TILES_IN_X) * 2
 
     private val swizzleMap8 = arrayOf(
         arrayOf(0,1,2,3,4,5,6,7), /* normal */
@@ -798,7 +805,8 @@ internal object BlocksDrawer {
     }
 
     /**
-     * Raw format of RGBA8888.
+     * @param sheetX x-coord of the SUBTILE in an atlas
+     * @param sheetY y-coord of the SUBTILE in an atlas
      *
      * @return Raw colour bits in RGBA8888 format
      */
@@ -938,14 +946,14 @@ internal object BlocksDrawer {
     var hTilesInVertical = -1; private set
 
     fun resize(screenW: Int, screenH: Int) {
-        tilesInHorizontal = (App.scr.wf / TILE_SIZE).ceilToInt().times(2) + 2
-        tilesInVertical = (App.scr.hf / TILE_SIZE).ceilToInt().times(2) + 2
-
         hTilesInHorizontal = (App.scr.wf / TILE_SIZE).ceilToInt() + 1
         hTilesInVertical = (App.scr.hf / TILE_SIZE).ceilToInt() + 1
 
-        val oldTH = (oldScreenW.toFloat() / TILE_SIZE).ceilToInt().times(2) + 1
-        val oldTV = (oldScreenH.toFloat() / TILE_SIZE).ceilToInt().times(2) + 1
+        tilesInHorizontal = hTilesInHorizontal * 2
+        tilesInVertical = hTilesInVertical * 2
+
+        val oldTH = (oldScreenW.toFloat() / TILE_SIZE).ceilToInt().times(2) + 2
+        val oldTV = (oldScreenH.toFloat() / TILE_SIZE).ceilToInt().times(2) + 2
 
         // only update if it's really necessary
         if (oldTH != tilesInHorizontal || oldTV != tilesInVertical) {

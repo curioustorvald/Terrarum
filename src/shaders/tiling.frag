@@ -15,7 +15,7 @@ in vec2 v_texCoords;
 uniform sampler2D u_texture;
 
 
-uniform vec2 tilesInAxes; // size of the tilemap texture; vec2(tiles_in_horizontal, tiles_in_vertical)
+uniform vec2 tilesInAxes; // 8x8
 
 uniform sampler2D tilemap; // RGBA8888
 uniform sampler2D tilemap2; // RGBA8888
@@ -25,11 +25,11 @@ uniform sampler2D tilesBlendAtlas; // alternative terrain for the weather mix (e
 uniform float tilesBlend = 0.0; // percentage of blending [0f..1f]. 0: draws tilesAtlas, 1: draws tilesBlendAtlas
 
 uniform vec2 tilesInAtlas = vec2(256.0, 256.0);
-uniform vec2 atlasTexSize = vec2(4096.0, 4096.0);
+uniform vec2 atlasTexSize = vec2(2048.0, 2048.0);
 
 vec2 _tilesInAtlas = vec2(1.0, 1.0) / tilesInAtlas;
-vec2 tileSizeInPx = atlasTexSize * _tilesInAtlas; // should be like ivec2(16.0, 16.0)
-vec2 _tileSizeInPx = vec2(1.0, 1.0) / tileSizeInPx; // should be like ivec2(0.06125, 0.06125)
+vec2 tileSizeInPx = atlasTexSize * _tilesInAtlas; // should be like ivec2(8.0, 8.0)
+vec2 _tileSizeInPx = vec2(1.0, 1.0) / tileSizeInPx; // should be like ivec2(0.125, 0.125)
 
 uniform vec4 colourFilter = vec4(1, 1, 1, 1); // used by WALL to darken it
 
@@ -62,8 +62,8 @@ ivec3 _colToInt(vec4 map1, vec4 map2) {
 
     return ivec3(
         (col1.r << 16) | (col1.g << 8) | col1.b, // tile
-        col2.b, // breakage
-        col2.g // fliprot
+        0,//col2.b, // breakage
+        0//col2.g // fliprot
     );
 }
 
@@ -129,6 +129,12 @@ void main() {
 
     vec4 finalColor = fma(mix(finalTile, finalBreakage, finalBreakage.a), bc.xxxy, finalTile * bc.yyyx);
 
-    fragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
+//    fragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
+    fragColor = finalTile;
+
+
+    // SUBTILE fixme:
+    // - breakage tile samples wrong coord -- needs bigtile-to-subtile adaptation
+    // - somehow make fliprot work again -- needs bigtile-to-subtile adaptation
 
 }
