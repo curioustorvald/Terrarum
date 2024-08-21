@@ -6,6 +6,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.*
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATED
+import net.torvald.terrarum.sqrt
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.BasicDebugInfoWindow.Companion.STRIP_W
 import net.torvald.terrarum.ui.Toolkit
@@ -77,7 +78,7 @@ class Spectro(var gain: Float = 1f) : TerrarumAudioFilter() {
         for (bin in 0 until FFTSIZE / 2) {
             val freqL = (SAMPLING_RATED / FFTSIZE) * bin
             val freqR = (SAMPLING_RATED / FFTSIZE) * (bin + 1)
-            val magn0 = fftOut.reim[2 * bin].absoluteValue / FFTSIZE * (freqR / 20.0) // apply slope
+            val magn0 = fftOut.reim[2 * bin].absoluteValue / FFTSIZE * freqR.sqrt() // apply slope
             val magn = FastMath.interpolateLinear(BasicDebugInfoWindow.FFT_SMOOTHING_FACTOR, magn0, oldFFTmagn[bin])
             val magnLog = fullscaleToDecibels(magn)
 

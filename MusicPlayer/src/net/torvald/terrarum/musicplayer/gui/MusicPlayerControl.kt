@@ -1203,7 +1203,7 @@ class MusicPlayerControl(private val ingame: TerrarumIngame) : UICanvas() {
         // apply slope to the fft bins, also converts fullscale to decibels
         for (bin in binHeights.indices) {
             val freqR = (TerrarumAudioMixerTrack.SAMPLING_RATED / FFTSIZE) * (bin + 1)
-            val magn0 = fftOut.reim[2 * bin].absoluteValue / FFTSIZE * (freqR / 20.0) // apply slope
+            val magn0 = fftOut.reim[2 * bin].absoluteValue / FFTSIZE * freqR.sqrt() // apply slope
             val magn = FastMath.interpolateLinear(FFT_SMOOTHING_FACTOR, magn0, oldFFTmagn[bin])
             val magnLog = fullscaleToDecibels(magn) - dbOffset
 
