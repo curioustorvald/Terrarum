@@ -1,7 +1,3 @@
-/*
-
-*/
-
 
 #ifdef GL_ES
 precision mediump float;
@@ -44,8 +40,15 @@ const vec2 haalf = vec2(0.5, 0.5);
 
 out vec4 fragColor;
 
-ivec2 tileNumberToXY(int tileNumber) {
-    return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));
+ivec4 tileNumberToXY(int tileNumber) {
+    int tileX = tileNumber % int(tilesInAtlas.x);
+    int tileY = tileNumber / int(tilesInAtlas.x);
+    return ivec4(
+        tileX, // tileX
+        tileY, // tileY
+        tileX % 2, // quadrant-x (0, 1)
+        tileY % 2 // quadrant-y (0, 1)
+    );
 }
 
 // return: ivec3(tileID, breakage, fliprot)
@@ -62,8 +65,8 @@ ivec3 _colToInt(vec4 map1, vec4 map2) {
 
     return ivec3(
         (col1.r << 16) | (col1.g << 8) | col1.b, // tile
-        0,//col2.b, // breakage
-        0//col2.g // fliprot
+        col2.b, // breakage
+        col2.g // fliprot
     );
 }
 
@@ -103,8 +106,12 @@ void main() {
     int tile = tbf.x;
     int breakage = tbf.y;
     int flipRot = tbf.z;
-    ivec2 tileXY = tileNumberToXY(tile);
-    ivec2 breakageXY = tileNumberToXY(breakage + 5); // +5 is hard-coded constant that depends on the contents of the atlas
+    ivec4 tileXYnQ = tileNumberToXY(tile);
+    ivec4 breakageXYnQ = tileNumberToXY(breakage + 5); // +5 is hard-coded constant that depends on the contents of the atlas
+    ivec2 tileXY = tileXYnQ.xy;
+    ivec2 tileQ = tileXYnQ.zw;
+    ivec2 breakageXY = breakageXYnQ.xy;
+    ivec2 breakageQ = breakageXYnQ.zw;
 
     // calculate the UV coord value for texture sampling //
 
@@ -130,11 +137,13 @@ void main() {
     vec4 finalColor = fma(mix(finalTile, finalBreakage, finalBreakage.a), bc.xxxy, finalTile * bc.yyyx);
 
 //    fragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
-    fragColor = finalTile;
+
+    vec4 quadrantOverlay = vec4(tileQ.x, tileQ.y, 0.0, 1.0);
+    fragColor = finalTile;// * quadrantOverlay;
 
 
     // SUBTILE fixme:
     // - breakage tile samples wrong coord -- needs bigtile-to-subtile adaptation
-    // - somehow make fliprot work again -- needs bigtile-to-subtile adaptation
+    // - figure out which quadrant the tile is in -- legacy support
 
 }

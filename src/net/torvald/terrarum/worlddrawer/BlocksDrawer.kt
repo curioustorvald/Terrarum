@@ -458,7 +458,7 @@ internal object BlocksDrawer {
                         (fillThis * 16f - 0.5f).floorToInt().coerceIn(0, 15)
                 }
                 else if (treeLeavesTiles.binarySearch(rawTileNum) >= 0) {
-                    getNearbyTilesInfoTrees(x, y, mode)//.swizzle8(rawTileNum, hash)
+                    getNearbyTilesInfoTrees(x, y, mode).swizzle8(rawTileNum, hash)
                 }
                 else if (treeTrunkTiles.binarySearch(rawTileNum) >= 0) {
                     hash = 0
@@ -466,17 +466,17 @@ internal object BlocksDrawer {
                 }
                 else if (platformTiles.binarySearch(rawTileNum) >= 0) {
                     hash %= 2
-                    getNearbyTilesInfoPlatform(x, y)//.swizzleH2(rawTileNum, hash)
+                    getNearbyTilesInfoPlatform(x, y).swizzleH2(rawTileNum, hash)
                 }
                 else if (wallStickerTiles.binarySearch(rawTileNum) >= 0) {
                     hash = 0
                     getNearbyTilesInfoWallSticker(x, y)
                 }
                 else if (connectMutualTiles.binarySearch(rawTileNum) >= 0) {
-                    getNearbyTilesInfoConMutual(x, y, mode)//.swizzle8(rawTileNum, hash)
+                    getNearbyTilesInfoConMutual(x, y, mode).swizzle8(rawTileNum, hash)
                 }
                 else if (connectSelfTiles.binarySearch(rawTileNum) >= 0) {
-                    getNearbyTilesInfoConSelf(x, y, mode, rawTileNum)//.swizzle8(rawTileNum, hash)
+                    getNearbyTilesInfoConSelf(x, y, mode, rawTileNum).swizzle8(rawTileNum, hash)
                 }
                 else {
                     0
@@ -521,10 +521,13 @@ internal object BlocksDrawer {
                 val breakingStage = if (mode == TERRAIN || mode == WALL || mode == ORES) (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt() else 0
 
                 // draw a tile
-                writeToBuffer(mode, bufferBaseX*2+0, bufferBaseY*2+0, thisTileX+0, thisTileY+0, breakingStage, hash)
-                writeToBuffer(mode, bufferBaseX*2+1, bufferBaseY*2+0, thisTileX+1, thisTileY+0, breakingStage, hash)
-                writeToBuffer(mode, bufferBaseX*2+0, bufferBaseY*2+1, thisTileX+0, thisTileY+2, breakingStage, hash)
-                writeToBuffer(mode, bufferBaseX*2+1, bufferBaseY*2+1, thisTileX+1, thisTileY+2, breakingStage, hash)
+                val offsets = subtileOffsetsBySwizzleIndex[hash]
+                /*TL*/writeToBuffer(mode, bufferBaseX*2+offsets[0].x, bufferBaseY*2+offsets[0].y, thisTileX+0, thisTileY+0, breakingStage, hash)
+                /*TR*/writeToBuffer(mode, bufferBaseX*2+offsets[1].x, bufferBaseY*2+offsets[1].y, thisTileX+1, thisTileY+0, breakingStage, hash)
+                /*BR*/writeToBuffer(mode, bufferBaseX*2+offsets[2].x, bufferBaseY*2+offsets[2].y, thisTileX+1, thisTileY+2, breakingStage, hash)
+                /*BL*/writeToBuffer(mode, bufferBaseX*2+offsets[3].x, bufferBaseY*2+offsets[3].y, thisTileX+0, thisTileY+2, breakingStage, hash)
+
+
                 tempRenderTypeBuffer[bufferBaseY, bufferBaseX] = (nearbyTilesInfo or rawTileNum.shl(16)).toLong()
             }
         }
@@ -545,6 +548,30 @@ internal object BlocksDrawer {
         arrayOf(6,7,0,1,2,3,4,5), /* CW 270 */
         arrayOf(6,5,4,3,2,1,0,7), /* hfCW 270 */
     )
+
+    private val subtileOffsetsBySwizzleIndex = arrayOf(
+        // index: TL->TR->BR->BL
+        arrayOf(Point2i(0,0),Point2i(1,0),Point2i(1,1),Point2i(0,1)), /* normal */
+        arrayOf(Point2i(1,0),Point2i(0,0),Point2i(0,1),Point2i(1,1)), /* horz flip */
+        arrayOf(Point2i(1,0),Point2i(1,1),Point2i(0,1),Point2i(0,0)), /* CW 90 */
+        arrayOf(Point2i(0,0),Point2i(0,1),Point2i(1,1),Point2i(1,0)), /* hfCW 90 */
+        arrayOf(Point2i(1,1),Point2i(0,1),Point2i(0,0),Point2i(1,0)), /* CW 180 */
+        arrayOf(Point2i(0,1),Point2i(1,1),Point2i(1,0),Point2i(0,0)), /* hfCW 180 */
+        arrayOf(Point2i(0,1),Point2i(0,0),Point2i(1,0),Point2i(1,1)), /* CW 270 */
+        arrayOf(Point2i(1,1),Point2i(1,0),Point2i(0,0),Point2i(0,1)), /* hfCW 270 */
+    )
+
+    /*private val subtileOffsetsBySwizzleIndex = arrayOf(
+        // index: TL->TR->BR->BL
+        arrayOf(Point2i(0,0),Point2i(1,0),Point2i(1,1),Point2i(0,1)), /* normal */
+        arrayOf(Point2i(1,0),Point2i(0,0),Point2i(0,1),Point2i(1,1)), /* horz flip */
+        arrayOf(Point2i(0,1),Point2i(0,0),Point2i(1,0),Point2i(1,1)), /* CW 90 */
+        arrayOf(Point2i(1,1),Point2i(1,0),Point2i(0,0),Point2i(0,1)), /* hfCW 90 */
+        arrayOf(Point2i(1,1),Point2i(0,1),Point2i(0,0),Point2i(1,0)), /* CW 180 */
+        arrayOf(Point2i(0,1),Point2i(1,1),Point2i(1,0),Point2i(0,0)), /* hfCW 180 */
+        arrayOf(Point2i(1,0),Point2i(1,1),Point2i(0,1),Point2i(0,0)), /* CW 270 */
+        arrayOf(Point2i(0,0),Point2i(0,1),Point2i(1,1),Point2i(1,0)), /* hfCW 270 */
+    )*/
 
     private fun Int.swizzle8(tile: Int, hash: Int): Int {
         var ret = 0
