@@ -144,6 +144,5 @@ void main() {
 
     // SUBTILE fixme:
     // - breakage tile samples wrong coord -- needs bigtile-to-subtile adaptation
-    // - figure out which quadrant the tile is in -- legacy support
 
 }

@@ -167,6 +167,14 @@ internal object BlocksDrawer {
     val connectLut47 = intArrayOf(17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,8,10,8,10,0,12,0,43,8,10,8,10,0,12,0,43,11,13,11,13,6,20,6,34,11,13,11,13,36,33,36,46,8,10,8,10,0,12,0,43,8,10,8,10,0,12,0,43,30,42,30,42,38,26,38,18,30,42,30,42,23,45,23,31,17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,8,28,8,28,0,41,0,21,8,28,8,28,0,41,0,21,11,44,11,44,6,27,6,40,11,44,11,44,36,19,36,32,8,28,8,28,0,41,0,21,8,28,8,28,0,41,0,21,30,29,30,29,38,39,38,25,30,29,30,29,23,24,23,22)
     val connectLut16 = intArrayOf(0,2,0,2,4,6,4,6,0,2,0,2,4,6,4,6,8,10,8,10,12,14,12,14,8,10,8,10,12,14,12,14,0,2,0,2,4,6,4,6,0,2,0,2,4,6,4,6,8,10,8,10,12,14,12,14,8,10,8,10,12,14,12,14,1,3,1,3,5,7,5,7,1,3,1,3,5,7,5,7,9,11,9,11,13,15,13,15,9,11,9,11,13,15,13,15,1,3,1,3,5,7,5,7,1,3,1,3,5,7,5,7,9,11,9,11,13,15,13,15,9,11,9,11,13,15,13,15,0,2,0,2,4,6,4,6,0,2,0,2,4,6,4,6,8,10,8,10,12,14,12,14,8,10,8,10,12,14,12,14,0,2,0,2,4,6,4,6,0,2,0,2,4,6,4,6,8,10,8,10,12,14,12,14,8,10,8,10,12,14,12,14,1,3,1,3,5,7,5,7,1,3,1,3,5,7,5,7,9,11,9,11,13,15,13,15,9,11,9,11,13,15,13,15,1,3,1,3,5,7,5,7,1,3,1,3,5,7,5,7,9,11,9,11,13,15,13,15,9,11,9,11,13,15,13,15)
 
+    // order: TL, TR, BR, BL
+    val subtileVarBaseLuts = listOf(
+        intArrayOf(10,2,2,2,1,1,3,1,10,1,10,3,10,3,2,1,1,2,0,3,3,10,0,0,0,0,0,3,10,0,0,0,3,3,3,1,3,1,0,0,3,10,0,10,3,0,3),
+        intArrayOf(4,1,5,1,5,1,4,1,4,5,6,4,6,6,1,1,5,5,6,0,6,0,0,4,0,0,6,0,0,0,4,6,0,6,6,1,4,1,4,0,0,0,6,6,0,6,6),
+        intArrayOf(4,7,4,9,4,9,4,7,8,8,7,8,9,7,0,0,4,8,0,9,9,0,0,4,9,0,9,9,7,7,8,0,0,9,0,0,4,9,4,9,0,9,7,0,7,9,0),
+        intArrayOf(10,11,10,10,12,12,12,7,11,7,11,7,10,7,10,0,0,11,12,0,12,10,0,0,0,12,12,12,11,7,7,0,0,0,12,12,0,0,12,12,12,10,7,10,7,0,0),
+    )
+
     init {
         assert(256 == connectLut47.size)
         assert(256 == connectLut16.size)
@@ -362,6 +370,8 @@ internal object BlocksDrawer {
                     else -> throw IllegalArgumentException()
                 }
 
+                val renderTag = if (mode == OCCLUSION) occlusionRenderTag else App.tileMaker.getRenderTag(rawTileNum)
+
                 var hash = if ((mode == WALL || mode == TERRAIN) && !BlockCodex[world.tileNumberToNameMap[rawTileNum.toLong()]].hasTag("NORANDTILE"))
                     getHashCoord(x, y, 8, mode)
                 else 0
@@ -457,8 +467,11 @@ internal object BlocksDrawer {
                     else
                         (fillThis * 16f - 0.5f).floorToInt().coerceIn(0, 15)
                 }
+                else if (world.tileNumberToNameMap[renderTag.tileNumber.toLong()] == Block.STONE) {
+                    getNearbyTilesInfoConSelf(x, y, mode, rawTileNum).swizzle8(renderTag.maskType, hash)
+                }
                 else if (treeLeavesTiles.binarySearch(rawTileNum) >= 0) {
-                    getNearbyTilesInfoTrees(x, y, mode).swizzle8(rawTileNum, hash)
+                    getNearbyTilesInfoTrees(x, y, mode).swizzle8(renderTag.maskType, hash)
                 }
                 else if (treeTrunkTiles.binarySearch(rawTileNum) >= 0) {
                     hash = 0
@@ -466,26 +479,54 @@ internal object BlocksDrawer {
                 }
                 else if (platformTiles.binarySearch(rawTileNum) >= 0) {
                     hash %= 2
-                    getNearbyTilesInfoPlatform(x, y).swizzleH2(rawTileNum, hash)
+                    getNearbyTilesInfoPlatform(x, y).swizzleH2(renderTag.maskType, hash)
                 }
                 else if (wallStickerTiles.binarySearch(rawTileNum) >= 0) {
                     hash = 0
                     getNearbyTilesInfoWallSticker(x, y)
                 }
                 else if (connectMutualTiles.binarySearch(rawTileNum) >= 0) {
-                    getNearbyTilesInfoConMutual(x, y, mode).swizzle8(rawTileNum, hash)
+                    getNearbyTilesInfoConMutual(x, y, mode).swizzle8(renderTag.maskType, hash)
                 }
                 else if (connectSelfTiles.binarySearch(rawTileNum) >= 0) {
-                    getNearbyTilesInfoConSelf(x, y, mode, rawTileNum).swizzle8(rawTileNum, hash)
+                    getNearbyTilesInfoConSelf(x, y, mode, rawTileNum).swizzle8(renderTag.maskType, hash)
                 }
                 else {
                     0
                 }
 
-                val renderTag = if (mode == OCCLUSION) occlusionRenderTag else App.tileMaker.getRenderTag(rawTileNum)
-
                 val tileNumberBase = renderTag.tileNumber
-                var tileNumber = if (rawTileNum == 0 && mode != OCCLUSION) 0
+
+                val breakage = if (mode == TERRAIN || mode == ORES)
+                    world.getTerrainDamage(x, y)
+                else if (mode == WALL)
+                    world.getWallDamage(x, y)
+                else 0f
+
+                if (breakage.isNaN()) throw IllegalStateException("Block breakage at ($x, $y) is NaN (mode=$mode)")
+
+                val maxHealth = if (mode == TERRAIN || mode == ORES)
+                    BlockCodex[world.getTileFromTerrain(x, y)].strength
+                else if (mode == WALL)
+                    BlockCodex[world.getTileFromWall(x, y)].strength
+                else 1
+
+                val breakingStage =
+                    if (mode == TERRAIN || mode == WALL || mode == ORES) (breakage / maxHealth).coerceIn(0f, 1f)
+                        .times(BREAKAGE_STEPS).roundToInt()
+                    else 0
+
+                if (renderTag.maskType >= CreateTileAtlas.RenderTag.MASK_SUBTILE_GENERIC) {
+                    hash = getHashCoord(x, y, 65536, mode)
+
+                    val subtiles = getSubtileIndexOf(tileNumberBase, nearbyTilesInfo, hash, renderTag.maskType % 2 == 1)
+                    /*TL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, breakingStage, 0)
+                    /*TR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, breakingStage, 0)
+                    /*BR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 1, subtiles[2].x, subtiles[2].y, breakingStage, 0)
+                    /*BL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 1, subtiles[3].x, subtiles[3].y, breakingStage, 0)
+                }
+                else {
+                    var tileNumber = if (rawTileNum == 0 && mode != OCCLUSION) 0
                     // special case: actorblocks and F3 key
                     else if (renderOnF3Only.binarySearch(rawTileNum) >= 0 && !KeyToggler.isOn(Keys.F3))
                         0
@@ -497,36 +538,31 @@ internal object BlocksDrawer {
                         tileNumberBase + world.layerOres.unsafeGetTile1(wx, wy).second
                     // rest of the cases: terrain and walls
                     else tileNumberBase + when (renderTag.maskType) {
-                            CreateTileAtlas.RenderTag.MASK_NA -> 0
-                            CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
-                            CreateTileAtlas.RenderTag.MASK_47 -> connectLut47[nearbyTilesInfo]
-                            CreateTileAtlas.RenderTag.MASK_TORCH, CreateTileAtlas.RenderTag.MASK_PLATFORM -> nearbyTilesInfo
-                            else -> throw IllegalArgumentException("Unknown mask type: ${renderTag.maskType}")
-                        }
+                        CreateTileAtlas.RenderTag.MASK_NA -> 0
+                        CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
+                        CreateTileAtlas.RenderTag.MASK_47 -> connectLut47[nearbyTilesInfo]
+                        CreateTileAtlas.RenderTag.MASK_TORCH, CreateTileAtlas.RenderTag.MASK_PLATFORM -> nearbyTilesInfo
+                        else -> throw IllegalArgumentException("Unknown mask type: ${renderTag.maskType}")
+                    }
 
-                // hide tiles with super low lights, kinda like Minecraft's Orebfuscator
-                val lightAtXY = LightmapRenderer.getLight(x, y) ?: Cvec(0)
-                if (mode != FLUID && mode != OCCLUSION && maxOf(lightAtXY.fastLum(), lightAtXY.a) <= 1.5f / 255f) {
-                    tileNumber = 2 // black solid
+                    // hide tiles with super low lights, kinda like Minecraft's Orebfuscator
+                    val lightAtXY = LightmapRenderer.getLight(x, y) ?: Cvec(0)
+                    if (mode != FLUID && mode != OCCLUSION && maxOf(lightAtXY.fastLum(), lightAtXY.a) <= 1.5f / 255f) {
+                        tileNumber = 2 // black solid
+                    }
+
+                    val subtileNum = tileNumber.tileToSubtile()
+
+                    val thisTileX = subtileNum % App.tileMaker.TILES_IN_X
+                    val thisTileY = subtileNum / App.tileMaker.TILES_IN_X
+
+                    // draw a tile
+                    val offsets = subtileOffsetsBySwizzleIndex[hash]
+                    /*TL*/writeToBuffer(mode, bufferBaseX * 2 + offsets[0].x, bufferBaseY * 2 + offsets[0].y, thisTileX + 0, thisTileY + 0, breakingStage, hash)
+                    /*TR*/writeToBuffer(mode, bufferBaseX * 2 + offsets[1].x, bufferBaseY * 2 + offsets[1].y, thisTileX + 1, thisTileY + 0, breakingStage, hash)
+                    /*BR*/writeToBuffer(mode, bufferBaseX * 2 + offsets[2].x, bufferBaseY * 2 + offsets[2].y, thisTileX + 1, thisTileY + 2, breakingStage, hash)
+                    /*BL*/writeToBuffer(mode, bufferBaseX * 2 + offsets[3].x, bufferBaseY * 2 + offsets[3].y, thisTileX + 0, thisTileY + 2, breakingStage, hash)
                 }
-
-                val subtileNum = tileNumber.tileToSubtile()
-
-                val thisTileX = subtileNum % App.tileMaker.TILES_IN_X
-                val thisTileY = subtileNum / App.tileMaker.TILES_IN_X
-
-                val breakage =  if (mode == TERRAIN || mode == ORES) world.getTerrainDamage(x, y) else if (mode == WALL) world.getWallDamage(x, y) else 0f
-                if (breakage.isNaN()) throw IllegalStateException("Block breakage at ($x, $y) is NaN (mode=$mode)")
-                val maxHealth = if (mode == TERRAIN || mode == ORES) BlockCodex[world.getTileFromTerrain(x, y)].strength else if (mode == WALL) BlockCodex[world.getTileFromWall(x, y)].strength else 1
-                val breakingStage = if (mode == TERRAIN || mode == WALL || mode == ORES) (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt() else 0
-
-                // draw a tile
-                val offsets = subtileOffsetsBySwizzleIndex[hash]
-                /*TL*/writeToBuffer(mode, bufferBaseX*2+offsets[0].x, bufferBaseY*2+offsets[0].y, thisTileX+0, thisTileY+0, breakingStage, hash)
-                /*TR*/writeToBuffer(mode, bufferBaseX*2+offsets[1].x, bufferBaseY*2+offsets[1].y, thisTileX+1, thisTileY+0, breakingStage, hash)
-                /*BR*/writeToBuffer(mode, bufferBaseX*2+offsets[2].x, bufferBaseY*2+offsets[2].y, thisTileX+1, thisTileY+2, breakingStage, hash)
-                /*BL*/writeToBuffer(mode, bufferBaseX*2+offsets[3].x, bufferBaseY*2+offsets[3].y, thisTileX+0, thisTileY+2, breakingStage, hash)
-
 
                 tempRenderTypeBuffer[bufferBaseY, bufferBaseX] = (nearbyTilesInfo or rawTileNum.shl(16)).toLong()
             }
@@ -561,19 +597,8 @@ internal object BlocksDrawer {
         arrayOf(Point2i(1,1),Point2i(1,0),Point2i(0,0),Point2i(0,1)), /* hfCW 270 */
     )
 
-    /*private val subtileOffsetsBySwizzleIndex = arrayOf(
-        // index: TL->TR->BR->BL
-        arrayOf(Point2i(0,0),Point2i(1,0),Point2i(1,1),Point2i(0,1)), /* normal */
-        arrayOf(Point2i(1,0),Point2i(0,0),Point2i(0,1),Point2i(1,1)), /* horz flip */
-        arrayOf(Point2i(0,1),Point2i(0,0),Point2i(1,0),Point2i(1,1)), /* CW 90 */
-        arrayOf(Point2i(1,1),Point2i(1,0),Point2i(0,0),Point2i(0,1)), /* hfCW 90 */
-        arrayOf(Point2i(1,1),Point2i(0,1),Point2i(0,0),Point2i(1,0)), /* CW 180 */
-        arrayOf(Point2i(0,1),Point2i(1,1),Point2i(1,0),Point2i(0,0)), /* hfCW 180 */
-        arrayOf(Point2i(1,0),Point2i(1,1),Point2i(0,1),Point2i(0,0)), /* CW 270 */
-        arrayOf(Point2i(0,0),Point2i(0,1),Point2i(1,1),Point2i(1,0)), /* hfCW 270 */
-    )*/
-
-    private fun Int.swizzle8(tile: Int, hash: Int): Int {
+    private fun Int.swizzle8(maskType: Int, hash: Int): Int {
+        if (maskType >= CreateTileAtlas.RenderTag.MASK_SUBTILE_GENERIC) return this
         var ret = 0
         swizzleMap8[hash].forEachIndexed { index, ord ->
             ret = ret or this.ushr(ord).and(1).shl(index)
@@ -589,7 +614,8 @@ internal object BlocksDrawer {
 
     private val fluidCornerLut = arrayOf(15,12,9,8,3,0,1,0,6,4,0,0,2,0,0,0)
 
-    private fun Int.swizzleH2(tile: Int, hash: Int): Int {
+    private fun Int.swizzleH2(maskType: Int, hash: Int): Int {
+        if (maskType >= CreateTileAtlas.RenderTag.MASK_SUBTILE_GENERIC) return this
         return h2lut[hash][this]
     }
 
@@ -832,14 +858,46 @@ internal object BlocksDrawer {
     }
 
     /**
-     * @param sheetX x-coord of the SUBTILE in an atlas
-     * @param sheetY y-coord of the SUBTILE in an atlas
+     * @param variants 0-65535
+     *
+     * @return subtile indices on the atlas, in the following order: TL, TR, BR, BL
+     */
+    private fun getSubtileIndexOf(base: Int, nearbyTilesInfo: Int, variants: Int, brickTiling: Boolean): List<Point2i> {
+        val variants = (0..3).map { variants.ushr(it * 4) and 15 }
+        val tilenumInAtlas = (0..3).map { base.tileToSubtile() + 8*subtileVarBaseLuts[it][connectLut47[nearbyTilesInfo]] }
+        val baseXY = tilenumInAtlas.map { Point2i(
+            it % (App.tileMaker.TILES_IN_X * 2),
+            it / (App.tileMaker.TILES_IN_X * 2),
+        ) }
+
+        // apply variants
+        return (baseXY zip variants).map { (base, va) -> Point2i(
+            base.x + va / 2,
+            base.y + va % 2,
+        ) }
+    }
+
+    /**
+     * @param sheetX x-coord of the FULL TILE in an atlas
+     * @param sheetY y-coord of the FULL TILE in an atlas
      *
      * @return Raw colour bits in RGBA8888 format
      */
     private fun sheetXYToTilemapColour1(mode: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int): Int =
         (tilesTerrain.horizontalCount * sheetY + sheetX).shl(8) or // the actual tile bits
                 255 // does it premultiply the alpha?!?!!!?!?!
+
+
+    /**
+     * @param sheetX x-coord of the SUBTILE in an atlas
+     * @param sheetY y-coord of the SUBTILE in an atlas
+     *
+     * @return Raw colour bits in RGBA8888 format
+     */
+    private fun sheetXYToTilemapColour1Subtile(mode: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int): Int =
+        (2 * tilesTerrain.horizontalCount * sheetY + sheetX).shl(8) or // the actual tile bits
+                255 // does it premultiply the alpha?!?!!!?!?!
+
 
     private fun sheetXYToTilemapColour2(mode: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int): Int =
         breakage.and(15).shl(8) or // breakage bits on B
@@ -860,6 +918,22 @@ internal object BlocksDrawer {
 
         sourceBuffer[bufferPosY, bufferPosX] =
             sheetXYToTilemapColour1(mode, sheetX, sheetY, breakage, hash).toLong().and(0xFFFFFFFFL) or
+            sheetXYToTilemapColour2(mode, sheetX, sheetY, breakage, hash).toLong().and(0xFFFFFFFFL).shl(32)
+    }
+
+    private fun writeToBufferSubtile(mode: Int, bufferPosX: Int, bufferPosY: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int) {
+        val sourceBuffer = when(mode) {
+            TERRAIN -> terrainTilesBuffer
+            WALL -> wallTilesBuffer
+            ORES -> oreTilesBuffer
+            FLUID -> fluidTilesBuffer
+            OCCLUSION -> occlusionBuffer
+            else -> throw IllegalArgumentException()
+        }
+
+
+        sourceBuffer[bufferPosY, bufferPosX] =
+            sheetXYToTilemapColour1Subtile(mode, sheetX, sheetY, breakage, hash).toLong().and(0xFFFFFFFFL) or
             sheetXYToTilemapColour2(mode, sheetX, sheetY, breakage, hash).toLong().and(0xFFFFFFFFL).shl(32)
     }
 

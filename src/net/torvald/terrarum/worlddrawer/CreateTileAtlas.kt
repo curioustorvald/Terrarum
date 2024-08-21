@@ -631,7 +631,7 @@ class CreateTileAtlas {
             const val MASK_SUBTILE_GENERIC = 16
             const val MASK_SUBTILE_BRICK_TILING = 17
             const val MASK_SUBTILE_GRASS = 32
-            const val MASK_SUBTILE_GRASS_BRICK_TILING = 32
+            const val MASK_SUBTILE_GRASS_BRICK_TILING = 3
 
             fun maskTypeToTileCount(maskType: Int) = when (maskType) {
                 MASK_NA -> 1
