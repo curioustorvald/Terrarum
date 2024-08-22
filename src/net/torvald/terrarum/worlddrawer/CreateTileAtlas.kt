@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.SUBTILE_SIZE
@@ -17,9 +16,12 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.utils.HashArray
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.AtlasSource.*
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.CONNECT_MUTUAL
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.CONNECT_SELF
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_47
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_SUBTILE_GENERIC
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_SUBTILE_GRASS
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.TILING_FULL
 import kotlin.math.sqrt
 
 /**
@@ -70,7 +72,7 @@ class CreateTileAtlas {
     lateinit var tagsByTileNum: HashArray<RenderTag>; private set
     lateinit var itemSheetNumbers: HashMap<ItemID, Int> // TileID, Int
         private set
-    private val defaultRenderTag = RenderTag(3, RenderTag.CONNECT_SELF, RenderTag.MASK_NA) // 'update' block
+    private val defaultRenderTag = RenderTag(3, RenderTag.CONNECT_SELF, RenderTag.MASK_NA, 0) // 'update' block
     var initialised = false
         private set
 
@@ -412,10 +414,32 @@ class CreateTileAtlas {
             tilesPixmap.width == 3*W_SUBTILE_GRASS && tilesPixmap.height == 2*H_SUBTILE) {
 
             // TODO figure out the tags
-            var connectionType = 0
-            var maskType = if (tilesPixmap.width >= 3*W_SUBTILE_GENERIC) MASK_SUBTILE_GRASS else MASK_SUBTILE_GENERIC
+            // tags are arranged horizontally, left-to-right, starting from (0,0)
+            // Line 0: (reserved for manual subtile allocation)
+            // Line 1: Tiling Mode
+            //     0000 (0): Full Tiling
+            //     1000 (1): Brick Tiling
+            // Line 2: Connection Type
+            //     0000 (0): INVALID
+            //     1000 (1): connect-mutual
+            //     0100 (2): connect-self
+            val maskType = if (tilesPixmap.width >= 3*W_SUBTILE_GENERIC) MASK_SUBTILE_GRASS else MASK_SUBTILE_GENERIC
+            var connectionType0 = 0
+            var tilingMode = 0
+            for (x in 0 until 4) {
+//                val pixelY0 = (tilesPixmap.getPixel(x, 0).and(255) >= 128).toInt(x)
+                val pixelY1 = (tilesPixmap.getPixel(x, 1).and(255) >= 128).toInt(x)
+                val pixelY2 = (tilesPixmap.getPixel(x, 2).and(255) >= 128).toInt(x)
 
-            addTag(blockID, connectionType, maskType)
+                tilingMode += pixelY1
+                connectionType0 += pixelY2
+            }
+            val connectionType = when (connectionType0) {
+                1 -> CONNECT_MUTUAL
+                2 -> CONNECT_SELF
+                else -> throw IllegalArgumentException("$connectionType0")
+            }
+            addTag(blockID, connectionType, maskType, tilingMode)
             drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, maskType)
         }
         // 112x112 or 336x224
@@ -424,20 +448,24 @@ class CreateTileAtlas {
                 throw IllegalArgumentException("Unrecognized image dimension ${tilesPixmap.width}x${tilesPixmap.height} from ${diffuse.path()}")
             }
             // figure out the tags
+            // tags are arranged horizontally, right-to-left, starting from (111, 80)
+            // Line 0: Connection Type
+            //     not marked: connect-mutual
+            //     marked: connect-self
             var connectionType = 0
-            var maskType = 0
+//            var maskType = 0
             for (bit in 0 until TILE_SIZE) {
                 val x = (7 * TILE_SIZE - 1) - bit
                 val y1 = 5 * TILE_SIZE; val y2 = y1 + 1
-                val pixel1 = (tilesPixmap.getPixel(x, y1).and(255) >= 128).toInt()
-                val pixel2 = (tilesPixmap.getPixel(x, y2).and(255) >= 128).toInt()
+                val pixel1 = (tilesPixmap.getPixel(x, y1).and(255) >= 128).toInt(bit)
+//                val pixel2 = (tilesPixmap.getPixel(x, y2).and(255) >= 128).toInt(bit)
 
-                connectionType += pixel1 shl bit
-                maskType += pixel2 shl bit
+                connectionType += pixel1
+//                maskType += pixel2
             }
 
-            addTag(blockID, connectionType, maskType)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, maskType)
+            addTag(blockID, connectionType, RenderTag.MASK_47)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_47)
         }
 
         itemSheetNumbers[blockID] = itemSheetCursor
@@ -455,13 +483,13 @@ class CreateTileAtlas {
      * This function must precede the drawToAtlantes() function, as the marking requires the variable
      * 'atlasCursor' and the draw function modifies it!
      */
-    private fun addTag(id: ItemID, connectionType: Int, maskType: Int) {
+    private fun addTag(id: ItemID, connectionType: Int, maskType: Int, tilingMode: Int = TILING_FULL) {
         if (tags.containsKey(id)) {
             throw Error("Block $id already exists")
         }
 
-        tags[id] = RenderTag(atlasCursor, connectionType, maskType)
-        tagsByTileNum[atlasCursor.toLong()] = RenderTag(atlasCursor, connectionType, maskType)
+        tags[id] = RenderTag(atlasCursor, connectionType, maskType, tilingMode)
+        tagsByTileNum[atlasCursor.toLong()] = RenderTag(atlasCursor, connectionType, maskType, tilingMode)
 
         printdbg(this, "tileName ${id} ->> tileNumber ${atlasCursor}")
     }
@@ -612,7 +640,7 @@ class CreateTileAtlas {
     /**
      * @param tileNumber ordinal number of a tile in the texture atlas
      */
-    data class RenderTag(val tileNumber: Int, val connectionType: Int, val maskType: Int) {
+    data class RenderTag(val tileNumber: Int, val connectionType: Int, val maskType: Int, val tilingMode: Int) {
         companion object {
             const val CONNECT_MUTUAL = 0
             const val CONNECT_SELF = 1
@@ -632,6 +660,9 @@ class CreateTileAtlas {
             const val MASK_SUBTILE_BRICK_TILING = 17
             const val MASK_SUBTILE_GRASS = 32
             const val MASK_SUBTILE_GRASS_BRICK_TILING = 3
+
+            const val TILING_FULL = 0
+            const val TILING_BRICK = 1
 
             fun maskTypeToTileCount(maskType: Int) = when (maskType) {
                 MASK_NA -> 1

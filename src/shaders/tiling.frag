@@ -139,7 +139,7 @@ void main() {
 //    fragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
 
     vec4 quadrantOverlay = vec4(tileQ.x, tileQ.y, 0.0, 1.0);
-    fragColor = finalTile;// * quadrantOverlay;
+    fragColor = mix(colourFilter, colourFilter * finalTile, mulBlendIntensity);// * quadrantOverlay;
 
 
     // SUBTILE fixme:

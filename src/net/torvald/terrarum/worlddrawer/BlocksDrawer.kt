@@ -16,6 +16,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.FLUID_MIN_MASS
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.modulebasegame.worldgenerator.shake
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
@@ -265,7 +266,7 @@ internal object BlocksDrawer {
     }
 
     private val occlusionRenderTag = CreateTileAtlas.RenderTag(
-        OCCLUSION_TILE_NUM_BASE, CreateTileAtlas.RenderTag.CONNECT_SELF, CreateTileAtlas.RenderTag.MASK_47
+        OCCLUSION_TILE_NUM_BASE, CreateTileAtlas.RenderTag.CONNECT_SELF, CreateTileAtlas.RenderTag.MASK_47, 0
     )
 
     private lateinit var renderOnF3Only: Array<Int>
@@ -317,12 +318,19 @@ internal object BlocksDrawer {
     }
 
 
-    private fun getHashCoord(x: Int, y: Int, mod: Int, layer: Int): Int {
+    private fun getHashCoord(x: Int, y: Int, mod: Long, layer: String): Int {
         val (x, y) = world.coerceXY(x, y)
-        return (XXHash64.hash(LandUtil.getBlockAddr(world, x, y).toBig64(), ((x*16777619) xor (y+1+layer)).toLong()) fmod mod.toLong()).toInt()
+        return (XXHash64.hash(LandUtil.getBlockAddr(world, x, y).toBig64(), world.generatorSeed shake layer) fmod mod).toInt()
     }
 
-
+    private fun Int.modeToString() = when (this) {
+        TERRAIN -> "terrain"
+        WALL -> "wall"
+        ORES -> "ores"
+        FLUID -> "fluid"
+        OCCLUSION -> "occlusion"
+        else -> throw IllegalArgumentException("$this")
+    }
 
     /**
      * Autotiling; writes to buffer. Actual draw code must be called after this operation.
@@ -373,7 +381,7 @@ internal object BlocksDrawer {
                 val renderTag = if (mode == OCCLUSION) occlusionRenderTag else App.tileMaker.getRenderTag(rawTileNum)
 
                 var hash = if ((mode == WALL || mode == TERRAIN) && !BlockCodex[world.tileNumberToNameMap[rawTileNum.toLong()]].hasTag("NORANDTILE"))
-                    getHashCoord(x, y, 8, mode)
+                    getHashCoord(x, y, 8, mode.modeToString())
                 else 0
 
                 // draw a tile
@@ -467,9 +475,6 @@ internal object BlocksDrawer {
                     else
                         (fillThis * 16f - 0.5f).floorToInt().coerceIn(0, 15)
                 }
-                else if (world.tileNumberToNameMap[renderTag.tileNumber.toLong()] == Block.STONE) {
-                    getNearbyTilesInfoConSelf(x, y, mode, rawTileNum).swizzle8(renderTag.maskType, hash)
-                }
                 else if (treeLeavesTiles.binarySearch(rawTileNum) >= 0) {
                     getNearbyTilesInfoTrees(x, y, mode).swizzle8(renderTag.maskType, hash)
                 }
@@ -517,13 +522,13 @@ internal object BlocksDrawer {
                     else 0
 
                 if (renderTag.maskType >= CreateTileAtlas.RenderTag.MASK_SUBTILE_GENERIC) {
-                    hash = getHashCoord(x, y, 65536, mode)
+                    hash = getHashCoord(x, y, 268435456, mode.modeToString())
 
                     val subtiles = getSubtileIndexOf(tileNumberBase, nearbyTilesInfo, hash, renderTag.maskType % 2 == 1)
-                    /*TL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, breakingStage, 0)
-                    /*TR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, breakingStage, 0)
-                    /*BR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 1, subtiles[2].x, subtiles[2].y, breakingStage, 0)
-                    /*BL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 1, subtiles[3].x, subtiles[3].y, breakingStage, 0)
+                    /*TL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, breakingStage, (hash ushr 16) and 7)
+                    /*TR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, breakingStage, (hash ushr 19) and 7)
+                    /*BR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 1, subtiles[2].x, subtiles[2].y, breakingStage, (hash ushr 22) and 7)
+                    /*BL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 1, subtiles[3].x, subtiles[3].y, breakingStage, (hash ushr 25) and 7)
                 }
                 else {
                     var tileNumber = if (rawTileNum == 0 && mode != OCCLUSION) 0
