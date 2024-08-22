@@ -524,11 +524,18 @@ internal object BlocksDrawer {
                 if (renderTag.maskType >= CreateTileAtlas.RenderTag.MASK_SUBTILE_GENERIC) {
                     hash = getHashCoord(x, y, 268435456, mode.modeToString())
 
-                    val subtiles = getSubtileIndexOf(tileNumberBase, nearbyTilesInfo, hash, renderTag.maskType % 2 == 1)
-                    /*TL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, breakingStage, (hash ushr 16) and 7)
-                    /*TR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, breakingStage, (hash ushr 19) and 7)
-                    /*BR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 1, subtiles[2].x, subtiles[2].y, breakingStage, (hash ushr 22) and 7)
-                    /*BL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 1, subtiles[3].x, subtiles[3].y, breakingStage, (hash ushr 25) and 7)
+                    val subtileSwizzlers = listOf(
+                        (hash ushr 16) and 7,
+                        (hash ushr 19) and 7,
+                        (hash ushr 22) and 7,
+                        (hash ushr 25) and 7,
+                    )
+                    val subtiles = getSubtileIndexOf(tileNumberBase, nearbyTilesInfo, hash, subtileSwizzlers, renderTag.maskType % 2 == 1)
+
+                    /*TL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, breakingStage, subtileSwizzlers[0])
+                    /*TR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, breakingStage, subtileSwizzlers[1])
+                    /*BR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 1, subtiles[2].x, subtiles[2].y, breakingStage, subtileSwizzlers[2])
+                    /*BL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 1, subtiles[3].x, subtiles[3].y, breakingStage, subtileSwizzlers[3])
                 }
                 else {
                     var tileNumber = if (rawTileNum == 0 && mode != OCCLUSION) 0
@@ -867,9 +874,13 @@ internal object BlocksDrawer {
      *
      * @return subtile indices on the atlas, in the following order: TL, TR, BR, BL
      */
-    private fun getSubtileIndexOf(base: Int, nearbyTilesInfo: Int, variants: Int, brickTiling: Boolean): List<Point2i> {
+    private fun getSubtileIndexOf(base: Int, nearbyTilesInfo: Int, variants: Int, subtileSwizzlers: List<Int>, brickTiling: Boolean): List<Point2i> {
         val variants = (0..3).map { variants.ushr(it * 4) and 15 }
-        val tilenumInAtlas = (0..3).map { base.tileToSubtile() + 8*subtileVarBaseLuts[it][connectLut47[nearbyTilesInfo]] }
+        val tilenumInAtlas = (0..3).map {
+            base.tileToSubtile() + 8*subtileVarBaseLuts[it][connectLut47[nearbyTilesInfo]].reorientSubtileUsingFliprotIdx(
+                subtileSwizzlers[it]
+            )
+        }
         val baseXY = tilenumInAtlas.map { Point2i(
             it % (App.tileMaker.TILES_IN_X * 2),
             it / (App.tileMaker.TILES_IN_X * 2),
@@ -881,6 +892,21 @@ internal object BlocksDrawer {
             base.y + va % 2,
         ) }
     }
+
+    private fun Int.reorientSubtileUsingFliprotIdx(fliprotIndex: Int): Int {
+        return subtileReorientLUT[fliprotIndex][this]
+    }
+
+    private val subtileReorientLUT = arrayOf(
+        intArrayOf(0 ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10,11,12,13,14,15,16,17,18,19,20), /* normal */
+        intArrayOf(0 ,1 ,5 ,6 ,10,2 ,3 ,7 ,11,12,4 ,8 ,9 ,14,13,20,19,18,17,16,15), /* horz flip */
+        intArrayOf(0 ,10,11,12,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,19,20,13,14,15,16,17,18), /* CW 90 */
+        intArrayOf(0 ,10,2 ,3 ,7 ,11,12,4 ,8 ,9 ,1 ,5 ,6 ,20,19,18,17,16,15,14,13), /* hfCW 90 */
+        intArrayOf(0 ,7 ,8 ,9 ,10,11,12,1 ,2 ,3 ,4 ,5 ,6 ,17,18,19,20,13,14,15,16), /* CW 180 */
+        intArrayOf(0 ,7 ,11,12,4 ,8 ,9 ,1 ,5 ,6 ,10,2 ,3 ,18,17,16,15,14,13,20,19), /* hfCW 180 */
+        intArrayOf(0 ,4 ,5 ,6 ,7 ,8 ,9 ,10,11,12,1 ,2 ,3 ,15,16,17,18,19,20,13,14), /* CW 270 */
+        intArrayOf(0 ,4 ,8 ,9 ,1 ,5 ,6 ,10,2 ,3 ,7 ,11,12,16,15,14,13,20,19,18,17), /* hfCW 270 */
+    )
 
     /**
      * @param sheetX x-coord of the FULL TILE in an atlas
