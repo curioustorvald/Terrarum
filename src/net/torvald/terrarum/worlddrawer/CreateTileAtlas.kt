@@ -45,7 +45,7 @@ class CreateTileAtlas {
         val H_SUBTILE = 136
     }
 
-    var MAX_TEX_SIZE = App.getConfigInt("atlastexsize").coerceIn(1024, App.glInfo.GL_MAX_TEXTURE_SIZE); private set
+    var MAX_TEX_SIZE = 1024; private set
     var TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE; private set
     var SUBTILES_IN_X = MAX_TEX_SIZE / SUBTILE_SIZE; private set
 
@@ -246,7 +246,7 @@ class CreateTileAtlas {
         }
 
         // test print
-//        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas.tga"), atlas, false)
+        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas.tga"), atlas, false)
 //        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasGlow.tga"), atlasGlow, false)
 
 
