@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.SUBTILE_SIZE
@@ -407,13 +408,13 @@ class CreateTileAtlas {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_FLUID)
             drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_FLUID)
         }
-        // subtitle generic
+        // subtitles
         else if (tilesPixmap.width == W_SUBTILE_GENERIC && tilesPixmap.height == H_SUBTILE ||
             tilesPixmap.width == W_SUBTILE_GRASS && tilesPixmap.height == H_SUBTILE ||
             tilesPixmap.width == 3*W_SUBTILE_GENERIC && tilesPixmap.height == 2*H_SUBTILE ||
             tilesPixmap.width == 3*W_SUBTILE_GRASS && tilesPixmap.height == 2*H_SUBTILE) {
 
-            // TODO figure out the tags
+            // figure out the tags
             // tags are arranged horizontally, left-to-right, starting from (0,0)
             // Line 0: (reserved for manual subtile allocation)
             // Line 1: Tiling Mode
@@ -440,6 +441,7 @@ class CreateTileAtlas {
                 else -> throw IllegalArgumentException("$connectionType0")
             }
             addTag(blockID, connectionType, maskType, tilingMode)
+//            println("drawToAtlantes tile: $blockID")
             drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, maskType)
         }
         // 112x112 or 336x224
@@ -453,19 +455,19 @@ class CreateTileAtlas {
             //     not marked: connect-mutual
             //     marked: connect-self
             var connectionType = 0
-//            var maskType = 0
+            var maskType = 0
             for (bit in 0 until TILE_SIZE) {
                 val x = (7 * TILE_SIZE - 1) - bit
                 val y1 = 5 * TILE_SIZE; val y2 = y1 + 1
                 val pixel1 = (tilesPixmap.getPixel(x, y1).and(255) >= 128).toInt(bit)
-//                val pixel2 = (tilesPixmap.getPixel(x, y2).and(255) >= 128).toInt(bit)
+                val pixel2 = (tilesPixmap.getPixel(x, y2).and(255) >= 128).toInt(bit)
 
                 connectionType += pixel1
-//                maskType += pixel2
+                maskType += pixel2
             }
 
-            addTag(blockID, connectionType, RenderTag.MASK_47)
-            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, RenderTag.MASK_47)
+            addTag(blockID, connectionType, maskType)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, maskType)
         }
 
         itemSheetNumbers[blockID] = itemSheetCursor
@@ -512,9 +514,15 @@ class CreateTileAtlas {
         val txOfPixmapEmissive = emissive.width / TILE_SIZE
 
         if (renderMask >= MASK_SUBTILE_GENERIC) {
+
             for (i in 0 until tilesCount) {
                 val srcX = SUBTILE_SIZE * (i / 4)
                 val srcY = SUBTILE_SIZE * 4 * (i % 4) + SUBTILE_SIZE
+
+                // snippet straight from the _drawToAtlantesFourSubtiles
+//                val atlasX = (atlasCursor % TILES_IN_X) * TILE_SIZE
+//                val atlasY = (atlasCursor / TILES_IN_X) * TILE_SIZE
+//                println("Drawing tile to the atlas: atlasCursor=${atlasCursor}, atlasXY=($atlasX,$atlasY)")
 
                 if (sixSeasonal) {
                     _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 0*wSubtileSheet, srcY, PREVERNAL)
@@ -581,8 +589,8 @@ class CreateTileAtlas {
         else {
             // destTileNum increments by one, which means FOUR SUBTILES
 
-            val atlasX = (destTileNum % SUBTILES_IN_X) * TILE_SIZE
-            val atlasY = (destTileNum / SUBTILES_IN_X) * TILE_SIZE
+            val atlasX = (destTileNum % TILES_IN_X) * TILE_SIZE
+            val atlasY = (destTileNum / TILES_IN_X) * TILE_SIZE
 
             val target = when (source) {
                 PREVERNAL -> atlasPrevernal
@@ -596,8 +604,18 @@ class CreateTileAtlas {
                 else -> throw IllegalArgumentException("Unknown draw source $source")
             }
 
-            target.drawPixmap(pixmap, sourceX, sourceY, SUBTILE_SIZE, TILE_SIZE, atlasX, atlasY, SUBTILE_SIZE, TILE_SIZE)
-            target.drawPixmap(pixmap, sourceX, sourceY + TILE_SIZE, SUBTILE_SIZE, TILE_SIZE, atlasX + SUBTILE_SIZE, atlasY, SUBTILE_SIZE, TILE_SIZE)
+            target.drawPixmap(pixmap,
+                sourceX, sourceY,
+                SUBTILE_SIZE, TILE_SIZE,
+                atlasX, atlasY,
+                SUBTILE_SIZE, TILE_SIZE
+            )
+            target.drawPixmap(pixmap,
+                sourceX, sourceY + TILE_SIZE,
+                SUBTILE_SIZE, TILE_SIZE,
+                atlasX + SUBTILE_SIZE, atlasY,
+                SUBTILE_SIZE, TILE_SIZE
+            )
         }
     }
 

@@ -883,14 +883,19 @@ internal object BlocksDrawer {
         }
         val baseXY = tilenumInAtlas.map { Point2i(
             it % (App.tileMaker.TILES_IN_X * 2),
-            it / (App.tileMaker.TILES_IN_X * 2),
+            (it / (App.tileMaker.TILES_IN_X * 2)).let {
+                if (it % 2 == 1) it + 1 else it
+            },
         ) }
 
         // apply variants
         return (baseXY zip variants).map { (base, va) -> Point2i(
             base.x + va / 2,
             base.y + va % 2,
-        ) }
+        ) }.also {
+//            println("Base: $base")
+//            println("Tiles: $it")
+        }
     }
 
     private fun Int.reorientSubtileUsingFliprotIdx(fliprotIndex: Int): Int {
