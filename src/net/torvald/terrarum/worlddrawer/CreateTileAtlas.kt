@@ -419,7 +419,9 @@ class CreateTileAtlas {
             // Line 0: (reserved for manual subtile allocation)
             // Line 1: Tiling Mode
             //     0000 (0): Full Tiling
-            //     1000 (1): Brick Tiling
+            //     1000 (1): Full Tiling with No Fliprot
+            //     1100 (3): Brick Tiling Small (4 rows per full tile; indices: 0-7, 8-15, 8-15, 0-7) implies no fliprot
+            //     1010 (5): Brick Tiling Large (2 rows per full tile; indices: 0-7, 8-15, 0-7, 8-15) implies no fliprot
             // Line 2: Connection Type
             //     0000 (0): INVALID
             //     1000 (1): connect-mutual
@@ -441,7 +443,7 @@ class CreateTileAtlas {
                 else -> throw IllegalArgumentException("$connectionType0")
             }
             addTag(blockID, connectionType, maskType, tilingMode)
-//            println("drawToAtlantes tile: $blockID")
+//            println("drawToAtlantes tile: $blockID with mode $tilingMode")
             drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, maskType)
         }
         // 112x112 or 336x224
@@ -454,6 +456,10 @@ class CreateTileAtlas {
             // Line 0: Connection Type
             //     not marked: connect-mutual
             //     marked: connect-self
+            // Line 1: Mask Type
+            //     0000 (0): INVALID
+            //     0001 (1): 16-tiles tiling [Deprecated]
+            //     0010 (2): 47-tiles tiling
             var connectionType = 0
             var maskType = 0
             for (bit in 0 until TILE_SIZE) {
@@ -680,7 +686,11 @@ class CreateTileAtlas {
             const val MASK_SUBTILE_GRASS_BRICK_TILING = 3
 
             const val TILING_FULL = 0
-            const val TILING_BRICK = 1
+            const val TILING_FULL_NOFLIP = 1
+            const val TILING_BRICK_SMALL = 2
+            const val TILING_BRICK_SMALL_NOFLIP = 3
+            const val TILING_BRICK_LARGE = 4
+            const val TILING_BRICK_LARGE_NOFLIP = 5
 
             fun maskTypeToTileCount(maskType: Int) = when (maskType) {
                 MASK_NA -> 1
