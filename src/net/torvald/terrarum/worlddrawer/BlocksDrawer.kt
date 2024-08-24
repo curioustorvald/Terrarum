@@ -187,15 +187,26 @@ internal object BlocksDrawer {
         intArrayOf(0 ,4 ,8 ,9 ,1 ,5 ,6 ,10,2 ,3 ,7 ,11,12,16,15,14,13,20,19,18,17), /* hfCW 270 */
     )
     // order: TL, TR, BR, BL
-    private val variantOpsLUT = arrayOf(
+    private val variantOpsLUT_terr = arrayOf(
         // newIndex = (oldIndex % A) + B for (a to b)
         arrayOf(16 to 0,16 to 0,16 to 0,16 to 0), // TILING_FULL
         arrayOf(16 to 0,16 to 0,16 to 0,16 to 0), // TILING_FULL_NOFLIP
         arrayOf(8 to 0,8 to 8,8 to 8,8 to 0), // TILING_BRICK_SMALL
         arrayOf(8 to 0,8 to 8,8 to 8,8 to 0), // TILING_BRICK_SMALL_NOFLIP
+        arrayOf(8 to 8,8 to 0,8 to 8,8 to 0), // TILING_BRICK_LARGE
+        arrayOf(8 to 8,8 to 0,8 to 8,8 to 0), // TILING_BRICK_LARGE_NOFLIP
+    )
+    // order: TL, TR, BR, BL
+    private val variantOpsLUT_wall = arrayOf(
+        // newIndex = (oldIndex % A) + B for (a to b)
+        arrayOf(16 to 0,16 to 0,16 to 0,16 to 0), // TILING_FULL
+        arrayOf(16 to 0,16 to 0,16 to 0,16 to 0), // TILING_FULL_NOFLIP
+        arrayOf(8 to 8,8 to 0,8 to 0,8 to 8), // TILING_BRICK_SMALL
+        arrayOf(8 to 8,8 to 0,8 to 0,8 to 8), // TILING_BRICK_SMALL_NOFLIP
         arrayOf(8 to 0,8 to 8,8 to 0,8 to 8), // TILING_BRICK_LARGE
         arrayOf(8 to 0,8 to 8,8 to 0,8 to 8), // TILING_BRICK_LARGE_NOFLIP
     )
+    private val variantOpsLUT = arrayOf(variantOpsLUT_terr, variantOpsLUT_wall)
 
     init {
         assert(256 == connectLut47.size)
@@ -554,7 +565,7 @@ internal object BlocksDrawer {
                             (hash ushr 22) and 7,
                             (hash ushr 25) and 7,
                         )
-                    val variantOps = variantOpsLUT[renderTag.tilingMode]
+                    val variantOps = variantOpsLUT[mode][renderTag.tilingMode]
                     val subtiles = getSubtileIndexOf(tileNumberBase, nearbyTilesInfo, hash, subtileSwizzlers, variantOps)
 
                     /*TL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, breakingStage, subtileSwizzlers[0])
@@ -911,8 +922,8 @@ internal object BlocksDrawer {
             )
         }
         val baseXY = tilenumInAtlas.map { Point2i(
-            it % (App.tileMaker.TILES_IN_X * 2),
-            (it / (App.tileMaker.TILES_IN_X * 2)).let {
+            it % App.tileMaker.SUBTILES_IN_X,
+            (it / App.tileMaker.SUBTILES_IN_X).let {
                 if (it % 2 == 1) it + 1 else it
             },
         ) }
@@ -921,14 +932,18 @@ internal object BlocksDrawer {
         return (baseXY zip variants).map { (base, va) -> Point2i(
             base.x + va / 2,
             base.y + va % 2,
-        ) }.also {
-//            println("Base: $base")
-//            println("Tiles: $it")
-        }
+        ).wrapAroundAtlasBySubtile() }
     }
 
     private fun Int.reorientSubtileUsingFliprotIdx(fliprotIndex: Int): Int {
         return subtileReorientLUT[fliprotIndex][this]
+    }
+
+    private fun Point2i.wrapAroundAtlasBySubtile(): Point2i {
+        return Point2i(
+            this.x % App.tileMaker.SUBTILES_IN_X,
+            this.y + 2 * (this.x / App.tileMaker.SUBTILES_IN_X)
+        )
     }
 
 
