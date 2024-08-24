@@ -20,6 +20,7 @@ import net.torvald.terrarum.worlddrawer.CreateTileAtlas.AtlasSource.*
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.CONNECT_MUTUAL
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.CONNECT_SELF
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_47
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_PLATFORM
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_SUBTILE_GENERIC
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.MASK_SUBTILE_GRASS
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag.Companion.TILING_FULL
@@ -43,6 +44,19 @@ class CreateTileAtlas {
         val W_SUBTILE_GENERIC = 104
         val W_SUBTILE_GRASS = 168
         val H_SUBTILE = 136
+
+        val tileOffsetsForItemImageFromSubtile = arrayOf(
+            intArrayOf(4*2  ,4*5  ,4*8  ,4*11), // TILING_FULL
+            intArrayOf(4*2  ,4*5+2,4*8+2,4*11), // TILING_BRICK_SMALL
+            intArrayOf(4*2+2,4*5  ,4*8+2,4*11), // TILING_BRICK_LARGE
+        )
+
+        val subtileOffsetVectors = arrayOf(
+            Point2i(0,0),
+            Point2i(SUBTILE_SIZE,0),
+            Point2i(SUBTILE_SIZE,SUBTILE_SIZE),
+            Point2i(0,SUBTILE_SIZE),
+        )
     }
 
     var MAX_TEX_SIZE = 1024; private set
@@ -264,8 +278,8 @@ class CreateTileAtlas {
         // create item_wall images
 
         fun maskTypetoTileIDForItemImage(maskType: Int) = when(maskType) {
-            CreateTileAtlas.RenderTag.MASK_47 -> 17
-            CreateTileAtlas.RenderTag.MASK_PLATFORM -> 7
+            MASK_47 -> 17
+            MASK_PLATFORM -> 7
             else -> 0
         }
 
@@ -280,18 +294,42 @@ class CreateTileAtlas {
         itemWallPixmapEmissive = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
         tags.toMap().forEach { id, tag ->
-            val tilePosFromAtlas = tag.tileNumber + maskTypetoTileIDForItemImage(tag.maskType)
-            val srcX = (tilePosFromAtlas % TILES_IN_X) * TILE_SIZE
-            val srcY = (tilePosFromAtlas / TILES_IN_X) * TILE_SIZE
             val t = tileIDtoItemSheetNumber(id)
-            val destX = (t % TILES_IN_X) * TILE_SIZE
-            val destY = (t / TILES_IN_X) * TILE_SIZE
-            itemTerrainPixmap.drawPixmap(atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
-            itemTerrainPixmapGlow.drawPixmap(atlasGlow, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
-            itemTerrainPixmapEmissive.drawPixmap(atlasEmissive, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
-            itemWallPixmap.drawPixmap(atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
-            itemWallPixmapGlow.drawPixmap(atlasGlow, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
-            itemWallPixmapEmissive.drawPixmap(atlasEmissive, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+
+            if (tag.maskType >= 16) {
+                val tilePosFromAtlas = tileOffsetsForItemImageFromSubtile[tag.tilingMode / 2].map {
+                    it + tag.tileNumber
+                }
+                val srcXYs = (tilePosFromAtlas zip subtileOffsetVectors).map { (pos, off) -> off + Point2i(
+                    (pos % TILES_IN_X) * TILE_SIZE,
+                    (pos / TILES_IN_X) * TILE_SIZE,
+                ) }
+                val destXYs = subtileOffsetVectors.map { it + Point2i(
+                    (t % TILES_IN_X) * TILE_SIZE,
+                    (t / TILES_IN_X) * TILE_SIZE,
+                ) }
+
+                (srcXYs zip destXYs).forEach { (src, dest) ->
+                    itemTerrainPixmap.drawPixmap(atlas, src.x, src.y, SUBTILE_SIZE, SUBTILE_SIZE, dest.x, dest.y, SUBTILE_SIZE, SUBTILE_SIZE)
+                    itemTerrainPixmapGlow.drawPixmap(atlasGlow, src.x, src.y, SUBTILE_SIZE, SUBTILE_SIZE, dest.x, dest.y, SUBTILE_SIZE, SUBTILE_SIZE)
+                    itemTerrainPixmapEmissive.drawPixmap(atlasEmissive, src.x, src.y, SUBTILE_SIZE, SUBTILE_SIZE, dest.x, dest.y, SUBTILE_SIZE, SUBTILE_SIZE)
+                    itemWallPixmap.drawPixmap(atlas, src.x, src.y, SUBTILE_SIZE, SUBTILE_SIZE, dest.x, dest.y, SUBTILE_SIZE, SUBTILE_SIZE)
+                    itemWallPixmapGlow.drawPixmap(atlasGlow, src.x, src.y, SUBTILE_SIZE, SUBTILE_SIZE, dest.x, dest.y, SUBTILE_SIZE, SUBTILE_SIZE)
+                    itemWallPixmapEmissive.drawPixmap(atlasEmissive, src.x, src.y, SUBTILE_SIZE, SUBTILE_SIZE, dest.x, dest.y, SUBTILE_SIZE, SUBTILE_SIZE)
+                }
+            }
+            else {
+                val tilePosFromAtlas = tag.tileNumber + maskTypetoTileIDForItemImage(tag.maskType)
+                val src = Point2i((tilePosFromAtlas % TILES_IN_X) * TILE_SIZE, (tilePosFromAtlas / TILES_IN_X) * TILE_SIZE)
+                val dest = Point2i((t % TILES_IN_X) * TILE_SIZE, (t / TILES_IN_X) * TILE_SIZE)
+
+                itemTerrainPixmap.drawPixmap(atlas, src.x, src.y, TILE_SIZE, TILE_SIZE, dest.x, dest.y, TILE_SIZE, TILE_SIZE)
+                itemTerrainPixmapGlow.drawPixmap(atlasGlow, src.x, src.y, TILE_SIZE, TILE_SIZE, dest.x, dest.y, TILE_SIZE, TILE_SIZE)
+                itemTerrainPixmapEmissive.drawPixmap(atlasEmissive, src.x, src.y, TILE_SIZE, TILE_SIZE, dest.x, dest.y, TILE_SIZE, TILE_SIZE)
+                itemWallPixmap.drawPixmap(atlas, src.x, src.y, TILE_SIZE, TILE_SIZE, dest.x, dest.y, TILE_SIZE, TILE_SIZE)
+                itemWallPixmapGlow.drawPixmap(atlasGlow, src.x, src.y, TILE_SIZE, TILE_SIZE, dest.x, dest.y, TILE_SIZE, TILE_SIZE)
+                itemWallPixmapEmissive.drawPixmap(atlasEmissive, src.x, src.y, TILE_SIZE, TILE_SIZE, dest.x, dest.y, TILE_SIZE, TILE_SIZE)
+            }
         }
         // darken things for the wall
         for (y in 0 until itemWallPixmap.height) {
@@ -681,9 +719,7 @@ class CreateTileAtlas {
             const val MASK_16X16 = 7
             const val MASK_FLUID = 8
             const val MASK_SUBTILE_GENERIC = 16
-            const val MASK_SUBTILE_BRICK_TILING = 17
             const val MASK_SUBTILE_GRASS = 32
-            const val MASK_SUBTILE_GRASS_BRICK_TILING = 3
 
             const val TILING_FULL = 0
             const val TILING_FULL_NOFLIP = 1
@@ -702,8 +738,8 @@ class CreateTileAtlas {
                 MASK_16X8 -> 128
                 MASK_16X16 -> 256
                 MASK_FLUID -> 18*3
-                MASK_SUBTILE_GENERIC, MASK_SUBTILE_BRICK_TILING -> 52
-                MASK_SUBTILE_GRASS, MASK_SUBTILE_GRASS_BRICK_TILING -> 84
+                in 16..31 -> 52
+                in 32..47 -> 84
                 else -> throw IllegalArgumentException("Unknown maskType: $maskType")
             }
         }

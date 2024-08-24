@@ -187,7 +187,7 @@ internal object BlocksDrawer {
         intArrayOf(0 ,4 ,8 ,9 ,1 ,5 ,6 ,10,2 ,3 ,7 ,11,12,16,15,14,13,20,19,18,17), /* hfCW 270 */
     )
     // order: TL, TR, BR, BL
-    private val variantOpsLUT_terr = arrayOf(
+    private val variantOpsLUT = arrayOf(
         // newIndex = (oldIndex % A) + B for (a to b)
         arrayOf(16 to 0,16 to 0,16 to 0,16 to 0), // TILING_FULL
         arrayOf(16 to 0,16 to 0,16 to 0,16 to 0), // TILING_FULL_NOFLIP
@@ -196,17 +196,6 @@ internal object BlocksDrawer {
         arrayOf(8 to 8,8 to 0,8 to 8,8 to 0), // TILING_BRICK_LARGE
         arrayOf(8 to 8,8 to 0,8 to 8,8 to 0), // TILING_BRICK_LARGE_NOFLIP
     )
-    // order: TL, TR, BR, BL
-    private val variantOpsLUT_wall = arrayOf(
-        // newIndex = (oldIndex % A) + B for (a to b)
-        arrayOf(16 to 0,16 to 0,16 to 0,16 to 0), // TILING_FULL
-        arrayOf(16 to 0,16 to 0,16 to 0,16 to 0), // TILING_FULL_NOFLIP
-        arrayOf(8 to 8,8 to 0,8 to 0,8 to 8), // TILING_BRICK_SMALL
-        arrayOf(8 to 8,8 to 0,8 to 0,8 to 8), // TILING_BRICK_SMALL_NOFLIP
-        arrayOf(8 to 0,8 to 8,8 to 0,8 to 8), // TILING_BRICK_LARGE
-        arrayOf(8 to 0,8 to 8,8 to 0,8 to 8), // TILING_BRICK_LARGE_NOFLIP
-    )
-    private val variantOpsLUT = arrayOf(variantOpsLUT_terr, variantOpsLUT_wall)
 
     init {
         assert(256 == connectLut47.size)
@@ -565,7 +554,7 @@ internal object BlocksDrawer {
                             (hash ushr 22) and 7,
                             (hash ushr 25) and 7,
                         )
-                    val variantOps = variantOpsLUT[mode][renderTag.tilingMode]
+                    val variantOps = variantOpsLUT[renderTag.tilingMode]
                     val subtiles = getSubtileIndexOf(tileNumberBase, nearbyTilesInfo, hash, subtileSwizzlers, variantOps)
 
                     /*TL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, breakingStage, subtileSwizzlers[0])
