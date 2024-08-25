@@ -464,6 +464,7 @@ class CreateTileAtlas {
             //     0000 (0): INVALID
             //     1000 (1): connect-mutual
             //     0100 (2): connect-self
+            // NOTE: For this system, the "NORANDTILE" tag is ignored
             val maskType = if (tilesPixmap.width >= 3*W_SUBTILE_GENERIC) MASK_SUBTILE_GRASS else MASK_SUBTILE_GENERIC
             var connectionType0 = 0
             var tilingMode = 0
@@ -498,6 +499,7 @@ class CreateTileAtlas {
             //     0000 (0): INVALID
             //     0001 (1): 16-tiles tiling [Deprecated]
             //     0010 (2): 47-tiles tiling
+            // NOTE: For this system ONLY, the FlipRot can be disabled by adding "NORANDTILE" tag on the blocks.csv
             var connectionType = 0
             var maskType = 0
             for (bit in 0 until TILE_SIZE) {

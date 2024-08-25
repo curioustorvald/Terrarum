@@ -403,7 +403,7 @@ internal object BlocksDrawer {
 
                 var hash = if ((mode == WALL || mode == TERRAIN) && !BlockCodex[world.tileNumberToNameMap[rawTileNum.toLong()]].hasTag("NORANDTILE"))
                     getHashCoord(x, y, 8, mode.modeToString())
-                else 0
+                else 0 // this zero is completely ignored if the block uses Subtiling
 
                 // draw a tile
                 val nearbyTilesInfo = if (mode == OCCLUSION) {
@@ -538,8 +538,8 @@ internal object BlocksDrawer {
                 else 1
 
                 val breakingStage =
-                    if (mode == TERRAIN || mode == WALL || mode == ORES) (breakage / maxHealth).coerceIn(0f, 1f)
-                        .times(BREAKAGE_STEPS).roundToInt()
+                    if (mode == TERRAIN || mode == WALL || mode == ORES)
+                            (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt()
                     else 0
 
                 if (renderTag.maskType >= CreateTileAtlas.RenderTag.MASK_SUBTILE_GENERIC) {
