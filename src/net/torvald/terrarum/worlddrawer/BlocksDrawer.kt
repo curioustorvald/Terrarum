@@ -339,18 +339,12 @@ internal object BlocksDrawer {
     }
 
 
-    private fun getHashCoord(x: Int, y: Int, mod: Long, layer: String): Int {
+    private fun getHashCoord(x: Int, y: Int, mod: Long, layer: Int, tileNumber: Int): Int {
         val (x, y) = world.coerceXY(x, y)
-        return (XXHash64.hash(LandUtil.getBlockAddr(world, x, y).toBig64(), world.generatorSeed shake layer) fmod mod).toInt()
-    }
-
-    private fun Int.modeToString() = when (this) {
-        TERRAIN -> "terrain"
-        WALL -> "wall"
-        ORES -> "ores"
-        FLUID -> "fluid"
-        OCCLUSION -> "occlusion"
-        else -> throw IllegalArgumentException("$this")
+        return (XXHash64.hash(
+            LandUtil.getBlockAddr(world, x, y).toBig64(),
+            world.generatorSeed shake tileNumber.toLong() shake layer.toLong()
+        ) fmod mod).toInt()
     }
 
     /**
@@ -402,7 +396,7 @@ internal object BlocksDrawer {
                 val renderTag = if (mode == OCCLUSION) occlusionRenderTag else App.tileMaker.getRenderTag(rawTileNum)
 
                 var hash = if ((mode == WALL || mode == TERRAIN) && !BlockCodex[world.tileNumberToNameMap[rawTileNum.toLong()]].hasTag("NORANDTILE"))
-                    getHashCoord(x, y, 8, mode.modeToString())
+                    getHashCoord(x, y, 8, mode, renderTag.tileNumber)
                 else 0 // this zero is completely ignored if the block uses Subtiling
 
                 // draw a tile
@@ -543,7 +537,7 @@ internal object BlocksDrawer {
                     else 0
 
                 if (renderTag.maskType >= CreateTileAtlas.RenderTag.MASK_SUBTILE_GENERIC) {
-                    hash = getHashCoord(x, y, 268435456, mode.modeToString())
+                    hash = getHashCoord(x, y, 268435456, mode, renderTag.tileNumber)
 
                     val subtileSwizzlers = if (renderTag.tilingMode and 1 == 1)
                         intArrayOf(0,0,0,0)
