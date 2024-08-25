@@ -770,6 +770,8 @@ open class GameWorld(
             wallDamages[LandUtil.getBlockAddr(this, x, y)] ?: 0f
 
     fun setFluid(x: Int, y: Int, fluidType: ItemID, fill: Float) {
+        val (x, y) = coerceXY(x, y)
+
         if (!fluidType.isFluid() && fluidType != Block.AIR) throw IllegalArgumentException("Fluid type is not actually fluid: $fluidType")
 
         /*if (x == 60 && y == 256) {
