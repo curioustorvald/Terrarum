@@ -33,12 +33,16 @@ object ExplosionManager {
         val CALC_RADIUS = power.ceilToInt() + 2
         val CALC_WIDTH = CALC_RADIUS * 2 + 1
 
+        val lineMin = CALC_RADIUS - ty
+        val lineMax = world.height - ty + CALC_RADIUS
+
         // create a copy of the tilemap
         val tilemap = BlockLayerI16(CALC_WIDTH, CALC_WIDTH)
         val breakmap = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH)
 
         // fill in the tilemap copy
-        for (line in 0 until CALC_WIDTH) {
+        for (line0 in 0 until CALC_WIDTH) {
+            val line = line0.coerceIn(lineMin until lineMax)
             memcpyFromWorldTiles(CALC_RADIUS, CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, tilemap)
             memcpyFromWorldBreakage(CALC_WIDTH, world, tx - CALC_RADIUS, ty - CALC_RADIUS, line, breakmap)
         }
