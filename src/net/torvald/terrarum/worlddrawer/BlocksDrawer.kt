@@ -549,7 +549,15 @@ internal object BlocksDrawer {
                             (hash ushr 25) and 7,
                         )
                     val variantOps = variantOpsLUT[renderTag.tilingMode]
-                    val subtiles = getSubtileIndexOf(tileNumberBase, nearbyTilesInfo, hash, subtileSwizzlers, variantOps)
+                    val isGrass = (renderTag.maskType == CreateTileAtlas.RenderTag.MASK_SUBTILE_GRASS)
+                    val nearbyGrasses = if (isGrass) {
+                        // indices: R D L U
+                        getNearbyTilesPos4(x, y).mapIndexed { i, it ->
+                            BlockCodex[world.getTileFromTerrain(it.x, it.y)].hasTag("GRASS").toInt(i)
+                        }.fold(0) { acc, it -> acc or it }
+                    }
+                    else null
+                    val subtiles = getSubtileIndexOf(tileNumberBase, nearbyTilesInfo, hash, subtileSwizzlers, variantOps, nearbyGrasses)
 
                     /*TL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, breakingStage, subtileSwizzlers[0])
                     /*TR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, breakingStage, subtileSwizzlers[1])
@@ -889,20 +897,24 @@ internal object BlocksDrawer {
     }
 
     /**
+     * @param base base full tile number in atlas
+     * @param nearbyTilesInfo nearbyTilesInfo (0-255)
      * @param variants 0-65535
+     * @param subtileSwizzlers flip-rotation indices (4-element array of 0-7)
+     * @param variantOps operations for variant selection
+     * @param nearbyGrasses bitmask of nearby grasses. Marked = is grass. Indices: (RIGHT-DOWN-LEFT-UP)
      *
      * @return subtile indices on the atlas, in the following order: TL, TR, BR, BL
      */
-    private fun getSubtileIndexOf(base: Int, nearbyTilesInfo: Int, variants: Int, subtileSwizzlers: IntArray, variantOps: Array<Pair<Int, Int>>): List<Point2i> {
+    private fun getSubtileIndexOf(base: Int, nearbyTilesInfo: Int, variants: Int, subtileSwizzlers: IntArray, variantOps: Array<Pair<Int, Int>>, nearbyGrasses: Int? = null): List<Point2i> {
         val variants = (0..3).map { quadrant ->
             (variants.ushr(quadrant * 4) and 15).let { oldIdx ->
                 variantOps[quadrant].let { (mod, add) -> (oldIdx % mod) + add }
             }
         }
         val tilenumInAtlas = (0..3).map {
-            base.tileToSubtile() + 8*subtileVarBaseLuts[it][connectLut47[nearbyTilesInfo]].reorientSubtileUsingFliprotIdx(
-                subtileSwizzlers[it]
-            )
+            val subtile = subtileVarBaseLuts[it][connectLut47[nearbyTilesInfo]].alterUsingGrassMap(it, nearbyGrasses)
+            base.tileToSubtile() + 8 * subtile.reorientUsingFliprotIdx(subtileSwizzlers[it])
         }
         val baseXY = tilenumInAtlas.map { Point2i(
             it % App.tileMaker.SUBTILES_IN_X,
@@ -918,7 +930,38 @@ internal object BlocksDrawer {
         ).wrapAroundAtlasBySubtile() }
     }
 
-    private fun Int.reorientSubtileUsingFliprotIdx(fliprotIndex: Int): Int {
+    private fun Int.alterUsingGrassMap(quadrant: Int, nearbyGrasses: Int?): Int {
+        return if (nearbyGrasses == null) this
+        else when (this) {
+            1 ->
+                if (quadrant == 0)
+                    if (nearbyGrasses and 0b0100 != 0) this else 13
+                else if (quadrant == 1)
+                    if (nearbyGrasses and 0b0001 != 0) this else 14
+                else this
+            7 ->
+                if (quadrant == 3)
+                    if (nearbyGrasses and 0b0100 != 0) this else 18
+                else if (quadrant == 2)
+                    if (nearbyGrasses and 0b0001 != 0) this else 17
+                else this
+            4 ->
+                if (quadrant == 1)
+                    if (nearbyGrasses and 0b1000 != 0) this else 15
+                else if (quadrant == 2)
+                    if (nearbyGrasses and 0b0010 != 0) this else 16
+                else this
+            10 ->
+                if (quadrant == 0)
+                    if (nearbyGrasses and 0b1000 != 0) this else 20
+                else if (quadrant == 3)
+                    if (nearbyGrasses and 0b0010 != 0) this else 19
+                else this
+            else -> this
+        }
+    }
+
+    private fun Int.reorientUsingFliprotIdx(fliprotIndex: Int): Int {
         return subtileReorientLUT[fliprotIndex][this]
     }
 

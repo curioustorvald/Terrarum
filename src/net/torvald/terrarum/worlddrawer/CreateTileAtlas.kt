@@ -263,6 +263,13 @@ class CreateTileAtlas {
 //        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas.tga"), atlas, false)
 //        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasGlow.tga"), atlasGlow, false)
 
+//        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas_0.tga"), atlasPrevernal, false)
+//        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas_1.tga"), atlasVernal, false)
+//        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas_2.tga"), atlasAestival, false)
+//        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas_3.tga"), atlasSerotinal, false)
+//        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas_4.tga"), atlasAutumnal, false)
+//        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas_5.tga"), atlasHibernal, false)
+
 
 
         // Sift throuth the file list, second TGA.GZ
@@ -449,8 +456,8 @@ class CreateTileAtlas {
         // subtitles
         else if (tilesPixmap.width == W_SUBTILE_GENERIC && tilesPixmap.height == H_SUBTILE ||
             tilesPixmap.width == W_SUBTILE_GRASS && tilesPixmap.height == H_SUBTILE ||
-            tilesPixmap.width == 3*W_SUBTILE_GENERIC && tilesPixmap.height == 2*H_SUBTILE ||
-            tilesPixmap.width == 3*W_SUBTILE_GRASS && tilesPixmap.height == 2*H_SUBTILE) {
+            tilesPixmap.width == 3*W_SUBTILE_GENERIC && tilesPixmap.height == 2*H_SUBTILE-SUBTILE_SIZE ||
+            tilesPixmap.width == 3*W_SUBTILE_GRASS && tilesPixmap.height == 2*H_SUBTILE-SUBTILE_SIZE) {
 
             // figure out the tags
             // tags are arranged horizontally, left-to-right, starting from (0,0)
@@ -553,7 +560,7 @@ class CreateTileAtlas {
         val wSubtileSheet = if (renderMask >= MASK_SUBTILE_GRASS) W_SUBTILE_GRASS else W_SUBTILE_GENERIC
         val hSubtileSheet = H_SUBTILE
 
-        val sixSeasonal = (renderMask >= MASK_SUBTILE_GENERIC && diffuse.width == 3 * wSubtileSheet && diffuse.height == 2 * hSubtileSheet) ||
+        val sixSeasonal = (renderMask >= MASK_SUBTILE_GENERIC && diffuse.width == 3 * wSubtileSheet && diffuse.height == 2 * hSubtileSheet - SUBTILE_SIZE) ||
                 (renderMask < MASK_SUBTILE_GENERIC && diffuse.width == 336 && diffuse.height == 224)
         val txOfPixmap = diffuse.width / TILE_SIZE
         val txOfPixmapGlow = glow.width / TILE_SIZE
@@ -575,9 +582,9 @@ class CreateTileAtlas {
                     _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 1*wSubtileSheet, srcY, VERNAL)
                     _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 2*wSubtileSheet, srcY, AESTIVAL)
 
-                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 2*wSubtileSheet, srcY + hSubtileSheet, SEROTINAL)
-                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 1*wSubtileSheet, srcY + hSubtileSheet, AUTUMNAL)
-                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 0*wSubtileSheet, srcY + hSubtileSheet, HIBERNAL)
+                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 2*wSubtileSheet, srcY + hSubtileSheet - SUBTILE_SIZE, SEROTINAL)
+                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 1*wSubtileSheet, srcY + hSubtileSheet - SUBTILE_SIZE, AUTUMNAL)
+                    _drawToAtlantesFourSubtiles(diffuse, atlasCursor, srcX + 0*wSubtileSheet, srcY + hSubtileSheet - SUBTILE_SIZE, HIBERNAL)
 
                     _drawToAtlantesFourSubtiles(glow, atlasCursor, srcX, srcY, GLOW)
                     _drawToAtlantesFourSubtiles(emissive, atlasCursor, srcX, srcY, EMISSIVE)
