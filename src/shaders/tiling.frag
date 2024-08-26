@@ -107,18 +107,16 @@ void main() {
     int breakage = tbf.y;
     int flipRot = tbf.z;
     ivec4 tileXYnQ = tileNumberToXY(tile);
-    ivec4 breakageXYnQ = tileNumberToXY(breakage + 5); // +5 is hard-coded constant that depends on the contents of the atlas
     ivec2 tileXY = tileXYnQ.xy;
     ivec2 tileQ = tileXYnQ.zw;
-    ivec2 breakageXY = breakageXYnQ.xy;
-    ivec2 breakageQ = breakageXYnQ.zw;
+    ivec2 breakageXY = tileNumberToXY(2*(breakage + 5)).xy; // +5 is hard-coded constant that depends on the contents of the atlas
 
     // calculate the UV coord value for texture sampling //
 
     // don't really need highp here; read the GLES spec
     vec2 uvCoordForTile = uvFlipRot(flipRot, mod(fragCoord, tileSizeInPx)) * _tileSizeInPx * _tilesInAtlas; // 0..0.00390625 regardless of tile position in atlas
     vec2 uvCoordOffsetTile = tileXY * _tilesInAtlas; // where the tile starts in the atlas, using uv coord (0..1)
-    vec2 uvCoordOffsetBreakage = breakageXY * _tilesInAtlas;
+    vec2 uvCoordOffsetBreakage = (breakageXY + tileQ) * _tilesInAtlas;
 
     // get final UV coord for the actual sampling //
 
@@ -136,13 +134,5 @@ void main() {
 
     vec4 finalColor = fma(mix(finalTile, finalBreakage, finalBreakage.a), bc.xxxy, finalTile * bc.yyyx);
 
-//    fragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
-
-    vec4 quadrantOverlay = vec4(tileQ.x, tileQ.y, 0.0, 1.0);
-    fragColor = mix(colourFilter, colourFilter * finalTile, mulBlendIntensity);// * quadrantOverlay;
-
-
-    // SUBTILE fixme:
-    // - breakage tile samples wrong coord -- needs bigtile-to-subtile adaptation
-
+    fragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
 }
