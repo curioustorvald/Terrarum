@@ -15,9 +15,10 @@ uniform vec2 tilesInAxes; // 8x8
 
 uniform sampler2D tilemap; // RGBA8888
 uniform sampler2D tilemap2; // RGBA8888
-
 uniform sampler2D tilesAtlas; // terrain, wire, fluids, etc.
 uniform sampler2D tilesBlendAtlas; // alternative terrain for the weather mix (e.g. yellowed grass)
+uniform sampler2D deblockingMap;
+
 uniform float tilesBlend = 0.0; // percentage of blending [0f..1f]. 0: draws tilesAtlas, 1: draws tilesBlendAtlas
 
 uniform vec2 tilesInAtlas = vec2(256.0, 256.0);
@@ -85,24 +86,26 @@ vec2 uvFlipRot(int op, vec2 uv) {
     return (flipRotMat[op] * vec3(uv, 1.0)).xy;
 }
 
-void main() {
+const vec4 _four = vec4(1.0 / 4.0);
+const vec4 _three = vec4(1.0 / 3.0);
+const vec4 _two = vec4(1.0 / 2.0);
+const float blur = 1.0;
+vec2 blurU = vec2(0.0, -blur);
+vec2 blurD = vec2(0.0, +blur);
+vec2 blurL = vec2(-blur, 0.0);
+vec2 blurR = vec2(+blur, 0.0);
 
-    // READ THE FUCKING MANUAL, YOU DONKEY !! //
-    // This code purposedly uses flipped fragcoord. //
-    // Make sure you don't use gl_FragCoord unknowingly! //
-    // Remember, if there's a compile error, shader SILENTLY won't do anything //
+vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx; // how many tiles will fit into a screen; one used by the tileFromMap; we need this because screen size is not integer multiple of the tile size
 
-
-    // default gl_FragCoord takes half-integer (represeting centre of the pixel) -- could be useful for phys solver?
-    // This one, however, takes exact integer by rounding down. //
-    vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx; // how many tiles will fit into a screen; one used by the tileFromMap; we need this because screen size is not integer multiple of the tile size
-    vec2 fragCoord = gl_FragCoord.xy + cameraTranslation + haalf; // manually adding half-int to the flipped gl_FragCoord: this avoids driver bug present on the Asahi Linux and possibly (but unlikely) others
-
-    // get required tile numbers //
-
+vec4[2] getTileNumbersFromMap(vec2 fragCoord) {
     vec4 tileFromMap = texture(tilemap, fragCoord / overscannedScreenDimension); // raw tile number
     vec4 tileFromMap2 = texture(tilemap2, fragCoord / overscannedScreenDimension); // raw tile number
-    ivec3 tbf = _colToInt(tileFromMap, tileFromMap2);
+    return vec4[2](tileFromMap, tileFromMap2);
+}
+
+vec4[2] getFragColorForOnscreenCoord(vec2 fragCoord) {
+    vec4[] tileFromMap = getTileNumbersFromMap(fragCoord);
+    ivec3 tbf = _colToInt(tileFromMap[0], tileFromMap[1]);
     int tile = tbf.x;
     int breakage = tbf.y;
     int flipRot = tbf.z;
@@ -115,20 +118,76 @@ void main() {
 
     // don't really need highp here; read the GLES spec
     vec2 uvCoordForTile = uvFlipRot(flipRot, mod(fragCoord, tileSizeInPx)) * _tileSizeInPx * _tilesInAtlas; // 0..0.00390625 regardless of tile position in atlas
+    vec2 uvCoordForTile1 = mod(fragCoord, tileSizeInPx) * _tileSizeInPx * _tilesInAtlas;// 0..0.00390625 regardless of tile position in atlas
     vec2 uvCoordOffsetTile = tileXY * _tilesInAtlas; // where the tile starts in the atlas, using uv coord (0..1)
     vec2 uvCoordOffsetBreakage = (breakageXY + tileQ) * _tilesInAtlas;
 
     // get final UV coord for the actual sampling //
 
     vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffsetTile;// where we should be actually looking for in atlas, using UV coord (0..1)
-    vec2 finalUVCoordForBreakage = uvCoordForTile + uvCoordOffsetBreakage;
+    vec2 finalUVCoordForBreakage = uvCoordForTile1 + uvCoordOffsetBreakage;
 
     // blending a breakage tex with main tex //
 
     vec4 tileCol = texture(tilesAtlas, finalUVCoordForTile);
     vec4 tileAltCol = texture(tilesBlendAtlas, finalUVCoordForTile);
 
-    vec4 finalTile = mix(tileCol, tileAltCol, tilesBlend);
+    return vec4[](
+        mix(tileCol, tileAltCol, tilesBlend),
+        finalUVCoordForBreakage.xyxy
+    );
+}
+
+vec4 getFragColorForOnscreenCoord1(vec2 fragCoord) {
+    vec4[] tileFromMap = getTileNumbersFromMap(fragCoord);
+    ivec3 tbf = _colToInt(tileFromMap[0], tileFromMap[1]);
+    int tile = tbf.x;
+    int breakage = tbf.y;
+    int flipRot = tbf.z;
+    ivec4 tileXYnQ = tileNumberToXY(tile);
+    ivec2 tileXY = tileXYnQ.xy;
+    ivec2 tileQ = tileXYnQ.zw;
+
+    // calculate the UV coord value for texture sampling //
+
+    // don't really need highp here; read the GLES spec
+    vec2 uvCoordForTile = uvFlipRot(flipRot, mod(fragCoord, tileSizeInPx)) * _tileSizeInPx * _tilesInAtlas; // 0..0.00390625 regardless of tile position in atlas
+    vec2 uvCoordOffsetTile = tileXY * _tilesInAtlas; // where the tile starts in the atlas, using uv coord (0..1)
+
+    // get final UV coord for the actual sampling //
+
+    vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffsetTile;// where we should be actually looking for in atlas, using UV coord (0..1)
+
+    // blending a breakage tex with main tex //
+
+    vec4 tileCol = texture(tilesAtlas, finalUVCoordForTile);
+    vec4 tileAltCol = texture(tilesBlendAtlas, finalUVCoordForTile);
+
+    return mix(tileCol, tileAltCol, tilesBlend);
+}
+
+void main() {
+    vec2 fragCoord = gl_FragCoord.xy + cameraTranslation + haalf; // manually adding half-int to the flipped gl_FragCoord: this avoids driver bug present on the Asahi Linux and possibly (but unlikely) others
+
+    vec4[] fv = getFragColorForOnscreenCoord(fragCoord);
+    vec2 finalUVCoordForBreakage = fv[1].xy;
+
+    vec4 finalTileC = fv[0];
+    vec4 finalTileL = getFragColorForOnscreenCoord1(fragCoord + blurL);
+    vec4 finalTileR = getFragColorForOnscreenCoord1(fragCoord + blurR);
+    vec4 finalTileU = getFragColorForOnscreenCoord1(fragCoord + blurU);
+    vec4 finalTileD = getFragColorForOnscreenCoord1(fragCoord + blurD);
+
+    vec4 blurH = (finalTileC + finalTileL + finalTileR) * _three;
+    vec4 blurV = (finalTileC + finalTileU + finalTileD) * _three;
+
+    vec4 mapCol = vec4(1.0, 0.0, 1.0, finalTileC.a);//texture(u_blurmap, v_texCoords);
+
+    vec4 finalTile = mix(
+        mix(finalTileC, blurH, mapCol.x),
+        mix(finalTileC, blurV, mapCol.y),
+        0.5
+    );
 
     vec4 finalBreakage = drawBreakage * texture(tilesAtlas, finalUVCoordForBreakage); // drawBreakeage = 0 to not draw, = 1 to draw
 

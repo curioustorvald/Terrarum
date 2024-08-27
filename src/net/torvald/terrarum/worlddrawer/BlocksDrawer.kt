@@ -1,7 +1,10 @@
 package net.torvald.terrarum.worlddrawer
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.glutils.Float16FrameBuffer
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Matrix4
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
@@ -98,7 +101,14 @@ internal object BlocksDrawer {
     private var tilesBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
     private lateinit var tilesQuad: Mesh
-    private val shader = App.loadShaderFromClasspath("shaders/default.vert", "shaders/tiling.frag")
+    private val shaderTiling = App.loadShaderFromClasspath("shaders/default.vert", "shaders/tiling.frag")
+    private val shaderDeblock = App.loadShaderFromClasspath("shaders/default.vert", "shaders/deblocking.frag")
+
+    private lateinit var deblockingFBO: Float16FrameBuffer
+    private lateinit var blurmapFBO: Float16FrameBuffer
+
+    lateinit var batch: FlippingSpriteBatch
+    private lateinit var camera: OrthographicCamera
 
     init {
 
@@ -149,6 +159,10 @@ internal object BlocksDrawer {
 
         // finally
         tilesTerrain = seasonalTerrains[1]
+
+
+        batch = FlippingSpriteBatch()
+        camera = OrthographicCamera(App.scr.width.toFloat(), App.scr.height.toFloat())
 
 
         printdbg(this, "init() exit")
@@ -258,6 +272,19 @@ internal object BlocksDrawer {
         renderUsingBuffer(OCCLUSION, projectionMatrix, false, drawEmissive)
     }
 
+
+    private fun clearBuffer() {
+        gdxClearAndEnableBlend(0f,0f,0f,0f)
+    }
+
+    private fun setCameraPosition(newX: Float, newY: Float) {
+        camera.position.set((-newX + App.scr.halfw).roundToFloat(), (-newY + App.scr.halfh).roundToFloat(), 0f)
+        camera.update()
+        batch.projectionMatrix = camera.combined
+    }
+
+    private val testTexture = Texture(Gdx.files.internal("./assets/test_texture.tga"))
+
     internal fun drawTerrain(projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean = false) {
         gdxBlendNormalStraightAlpha()
 
@@ -275,6 +302,24 @@ internal object BlocksDrawer {
 
 
         gdxBlendNormalStraightAlpha()
+    }
+
+
+    private fun deblockAndWriteTexture(projectionMatrix: Matrix4, dest: FrameBuffer, blurmap: FrameBuffer) {
+        blurmap.colorBufferTexture.bind(1)
+        dest.colorBufferTexture.bind(0)
+
+
+
+        // basically this part is correct, test with any test texture
+        shaderDeblock.bind()
+        shaderDeblock.setUniformMatrix("u_projTrans", projectionMatrix)
+        shaderDeblock.setUniformf("resolution", oldScreenW.toFloat(), oldScreenH.toFloat())
+        shaderDeblock.setUniformi("u_blurmap", 1)
+        shaderDeblock.setUniformi("u_texture", 0)
+        tilesQuad.render(shaderDeblock, GL20.GL_TRIANGLE_FAN)
+
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
     }
 
     /**
@@ -491,11 +536,10 @@ internal object BlocksDrawer {
                         (fillThis * 16f - 0.5f).floorToInt().coerceIn(0, 15)
                 }
                 else if (treeLeavesTiles.binarySearch(rawTileNum) >= 0) {
-                    getNearbyTilesInfoTrees(x, y, mode).swizzle8(renderTag.maskType, hash)
+                    getNearbyTilesInfoTreeLeaves(x, y, mode).swizzle8(renderTag.maskType, hash)
                 }
                 else if (treeTrunkTiles.binarySearch(rawTileNum) >= 0) {
-                    hash = 0
-                    getNearbyTilesInfoTrees(x, y, mode)
+                    getNearbyTilesInfoTreeTrunks(x, y, mode)
                 }
                 else if (platformTiles.binarySearch(rawTileNum) >= 0) {
                     hash %= 2
@@ -777,23 +821,28 @@ internal object BlocksDrawer {
         return fluidSolidMaskLut[i]
     }
 
-    private fun getNearbyTilesInfoTrees(x: Int, y: Int, mode: Int): Int {
-        val tileThis = world.getTileFromTerrain(x, y)
+    private fun getNearbyTilesInfoTreeLeaves(x: Int, y: Int, mode: Int): Int {
         val nearbyTiles: List<ItemID> = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) }
 
         var ret = 0
-        if (isTreeFoliage(tileThis)) {
-            for (i in nearbyTiles.indices) {
-                if (isTreeFoliage(nearbyTiles[i])) { // foliage "shadow" should not connect to the tree trunk
-                    ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
-                }
+        for (i in nearbyTiles.indices) {
+            if (isTreeFoliage(nearbyTiles[i])) { // foliage "shadow" should not connect to the tree trunk
+                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
-        else if (isTreeTrunk(tileThis)) {
-            for (i in nearbyTiles.indices) {
-                if (isTreeTrunk(nearbyTiles[i]) || i == 6 && isTreeFoliage(nearbyTiles[6])) { // if tile above is leaves, connect to it
-                    ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
-                }
+
+        return ret
+    }
+
+    private fun getNearbyTilesInfoTreeTrunks(x: Int, y: Int, mode: Int): Int {
+        val nearbyTiles: List<ItemID> = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) }
+
+        var ret = 0
+        for (i in nearbyTiles.indices) {
+            if (isTreeTrunk(nearbyTiles[i]) ||
+                i == 6 && isTreeFoliage(nearbyTiles[i]) ||
+                i == 2 && isCultivable(nearbyTiles[i])) { // if tile above is leaves or tile below is cultivable, connect to it
+                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
 
@@ -1104,32 +1153,38 @@ internal object BlocksDrawer {
             tilesGlow.texture.bind(0) // for some fuck reason, it must be bound as last
         }
         else {
+            // bind map for deblocking
+            if (mode == TERRAIN || mode == WALL) {
+                blurmapFBO.colorBufferTexture.bind(4)
+            }
+
             _tilesBufferAsTex2.bind(3)
             _tilesBufferAsTex.bind(2)
             tilesTerrainNext.texture.bind(1)
             tileAtlas.texture.bind(0) // for some fuck reason, it must be bound as last
         }
 
-        shader.bind()
-        shader.setUniformMatrix("u_projTrans", projectionMatrix)//camera.combined)
-        shader.setUniformf("colourFilter", vertexColour)
-        shader.setUniformi("tilesAtlas", 0)
-        shader.setUniformi("tilesBlendAtlas", 1)
-        shader.setUniformi("tilemap", 2)
-        shader.setUniformi("tilemap2", 3)
-        shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
-        shader.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
-        shader.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div
-        shader.setUniformf("tilesInAtlas", tileAtlas.horizontalCount * 2f, tileAtlas.verticalCount * 2f) //depends on the tile atlas
-        shader.setUniformf("atlasTexSize", tileAtlas.texture.width.toFloat(), tileAtlas.texture.height.toFloat()) //depends on the tile atlas
+        shaderTiling.bind()
+        shaderTiling.setUniformMatrix("u_projTrans", projectionMatrix)//camera.combined)
+        shaderTiling.setUniformf("colourFilter", vertexColour)
+        shaderTiling.setUniformi("tilesAtlas", 0)
+        shaderTiling.setUniformi("tilesBlendAtlas", 1)
+        shaderTiling.setUniformi("tilemap", 2)
+        shaderTiling.setUniformi("tilemap2", 3)
+        shaderTiling.setUniformi("deblockingMap", 4)
+        shaderTiling.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
+        shaderTiling.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
+        shaderTiling.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div
+        shaderTiling.setUniformf("tilesInAtlas", tileAtlas.horizontalCount * 2f, tileAtlas.verticalCount * 2f) //depends on the tile atlas
+        shaderTiling.setUniformf("atlasTexSize", tileAtlas.texture.width.toFloat(), tileAtlas.texture.height.toFloat()) //depends on the tile atlas
         // set the blend value as world's time progresses, in linear fashion
-        shader.setUniformf("tilesBlend", if (mode == TERRAIN || mode == WALL)
+        shaderTiling.setUniformf("tilesBlend", if (mode == TERRAIN || mode == WALL)
             tilesTerrainBlendDegree
         else
             0f
         )
-        shader.setUniformf("mulBlendIntensity", if (mode == OCCLUSION) occlusionIntensity else 1f)
-        tilesQuad.render(shader, GL20.GL_TRIANGLE_FAN)
+        shaderTiling.setUniformf("mulBlendIntensity", if (mode == OCCLUSION) occlusionIntensity else 1f)
+        tilesQuad.render(shaderTiling, GL20.GL_TRIANGLE_FAN)
 
         //tilesBufferAsTex.dispose()
     }
@@ -1191,6 +1246,11 @@ internal object BlocksDrawer {
             tilesQuad.setIndices(shortArrayOf(0, 1, 2, 3))
         }
 
+        if (::deblockingFBO.isInitialized) deblockingFBO.dispose()
+        deblockingFBO = Float16FrameBuffer(screenW, screenH, false)
+        if (::blurmapFBO.isInitialized) deblockingFBO.dispose()
+        blurmapFBO = Float16FrameBuffer(screenW, screenH, false)
+
         oldScreenW = screenW
         oldScreenH = screenH
 
@@ -1237,7 +1297,8 @@ internal object BlocksDrawer {
         _tilesBufferAsTex.dispose()
         _tilesBufferAsTex2.dispose()
         tilesQuad.tryDispose()
-        shader.dispose()
+        shaderTiling.dispose()
+        shaderDeblock.dispose()
 
         if (::terrainTilesBuffer.isInitialized) terrainTilesBuffer.destroy()
         if (::wallTilesBuffer.isInitialized) wallTilesBuffer.destroy()
@@ -1246,6 +1307,7 @@ internal object BlocksDrawer {
         if (::occlusionBuffer.isInitialized) occlusionBuffer.destroy()
         if (::tempRenderTypeBuffer.isInitialized) tempRenderTypeBuffer.destroy()
 
+        if (::batch.isInitialized) batch.tryDispose()
 
         App.tileMaker.dispose()
     }
@@ -1263,6 +1325,7 @@ internal object BlocksDrawer {
     //fun isBlendMul(b: Int) = TILES_BLEND_MUL.contains(b)
     fun isTreeFoliage(b: ItemID) = BlockCodex[b].hasAllTagsOf("TREE", "LEAVES")
     fun isTreeTrunk(b: ItemID) = BlockCodex[b].hasAllTagsOf("TREE", "TREETRUNK")
+    fun isCultivable(b: ItemID) = BlockCodex[b].hasAllTagsOf("NATURAL", "CULTIVABLE")
 
     fun tileInCamera(x: Int, y: Int) =
             x >= WorldCamera.x.div(TILE_SIZE) && y >= WorldCamera.y.div(TILE_SIZE) &&
