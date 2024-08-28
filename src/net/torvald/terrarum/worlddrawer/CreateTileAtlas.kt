@@ -39,7 +39,7 @@ import kotlin.math.sqrt
 class CreateTileAtlas {
 
     companion object {
-        val WALL_OVERLAY_COLOUR = Color(.65f, .65f, .65f, 1f)
+        val WALL_OVERLAY_COLOUR = Color(.72f, .72f, .72f, 1f)
 
         val W_SUBTILE_GENERIC = 104
         val W_SUBTILE_GRASS = 168
@@ -59,7 +59,7 @@ class CreateTileAtlas {
         )
     }
 
-    var MAX_TEX_SIZE = 1024; private set
+    var MAX_TEX_SIZE = 2048; private set
     var TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE; private set
     var SUBTILES_IN_X = MAX_TEX_SIZE / SUBTILE_SIZE; private set
 
@@ -96,7 +96,7 @@ class CreateTileAtlas {
 
     // 16 tiles are reserved for internal use: solid black, solid white, breakage stages.
     // 0th tile is complete transparent tile and is also a BlockID of zero: air.
-    private var atlasCursor = 64 // 64 predefined tiles. The normal blocks (e.g. Air) should start from this number
+    private var atlasCursor = 66 // 66 predefined tiles. The normal blocks (e.g. Air) should start from this number
     private val atlasInit = "./assets/graphics/blocks/init.tga"
     private var itemSheetCursor = 16
 
@@ -260,7 +260,7 @@ class CreateTileAtlas {
         }
 
         // test print
-//        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas.tga"), atlas, false)
+        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas.tga"), atlas, false)
 //        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasGlow.tga"), atlasGlow, false)
 
 //        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas_0.tga"), atlasPrevernal, false)

@@ -64,6 +64,7 @@ internal object BlocksDrawer {
     val tileItemWallEmissive: TextureRegionPack
     val tilesGlow: TextureRegionPack
     val tilesEmissive: TextureRegionPack
+    val nullTex = Texture(1, 1, Pixmap.Format.RGBA8888);
 
     //val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
 
@@ -74,6 +75,7 @@ internal object BlocksDrawer {
     val ORES = GameWorld.ORES
     val FLUID = -2
     val OCCLUSION = 31337
+    val BLURMAP = 31338
 
     private const val OCCLUSION_TILE_NUM_BASE = 16
 
@@ -96,9 +98,11 @@ internal object BlocksDrawer {
     private lateinit var oreTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var fluidTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var occlusionBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
+    private lateinit var blurMap: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var tempRenderTypeBuffer: UnsafeLong2D // this one is NOT dimension doubled; 0x tttt 00 ii where t=rawTileNum, i=nearbyTilesInfo
     private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
     private var tilesBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var blurTilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
     private lateinit var tilesQuad: Mesh
     private val shaderTiling = App.loadShaderFromClasspath("shaders/default.vert", "shaders/tiling.frag")
@@ -282,8 +286,6 @@ internal object BlocksDrawer {
         camera.update()
         batch.projectionMatrix = camera.combined
     }
-
-    private val testTexture = Texture(Gdx.files.internal("./assets/test_texture.tga"))
 
     internal fun drawTerrain(projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean = false) {
         gdxBlendNormalStraightAlpha()
@@ -579,6 +581,22 @@ internal object BlocksDrawer {
                     if (mode == TERRAIN || mode == WALL || mode == ORES)
                             (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt()
                     else 0
+
+                if (mode == TERRAIN || mode == WALL) {
+                    // TODO translate nearbyTilesInfo into proper subtile number
+
+                    // TEST CODE
+                    val subtiles = arrayOf(
+                        Point2i(130, 0),
+                        Point2i(131, 0),
+                        Point2i(131, 1),
+                        Point2i(130, 1),
+                    )
+                    /*TL*/writeToBufferSubtile(BLURMAP, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, 0, 0)
+                    /*TR*/writeToBufferSubtile(BLURMAP, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, 0, 0)
+                    /*BR*/writeToBufferSubtile(BLURMAP, bufferBaseX * 2 + 1, bufferBaseY * 2 + 1, subtiles[2].x, subtiles[2].y, 0, 0)
+                    /*BL*/writeToBufferSubtile(BLURMAP, bufferBaseX * 2 + 0, bufferBaseY * 2 + 1, subtiles[3].x, subtiles[3].y, 0, 0)
+                }
 
                 if (renderTag.maskType >= CreateTileAtlas.RenderTag.MASK_SUBTILE_GENERIC) {
                     hash = getHashCoord(x, y, 268435456, mode, renderTag.tileNumber)
@@ -1057,6 +1075,7 @@ internal object BlocksDrawer {
             ORES -> oreTilesBuffer
             FLUID -> fluidTilesBuffer
             OCCLUSION -> occlusionBuffer
+            BLURMAP -> blurMap
             else -> throw IllegalArgumentException()
         }
 
@@ -1073,6 +1092,7 @@ internal object BlocksDrawer {
             ORES -> oreTilesBuffer
             FLUID -> fluidTilesBuffer
             OCCLUSION -> occlusionBuffer
+            BLURMAP -> blurMap
             else -> throw IllegalArgumentException()
         }
 
@@ -1084,7 +1104,8 @@ internal object BlocksDrawer {
 
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
     private var _tilesBufferAsTex2: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
-    private val occlusionIntensity = 0.22222222f // too low value and dark-coloured walls won't darken enough
+    private var _blurTilesBuffer: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
+    private val occlusionIntensity = 0.25f // too low value and dark-coloured walls won't darken enough
 
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
@@ -1096,7 +1117,7 @@ internal object BlocksDrawer {
 
 
         val tileAtlas = when (mode) {
-            TERRAIN, ORES, WALL, OCCLUSION, FLUID -> tilesTerrain
+            TERRAIN, ORES, WALL, OCCLUSION, FLUID, BLURMAP -> tilesTerrain
             else -> throw IllegalArgumentException()
         }
         val sourceBuffer = when(mode) {
@@ -1108,9 +1129,8 @@ internal object BlocksDrawer {
             else -> throw IllegalArgumentException()
         }
         val vertexColour = when (mode) {
-            TERRAIN, ORES, FLUID, OCCLUSION -> Color.WHITE
             WALL -> WALL_OVERLAY_COLOUR
-            else -> throw IllegalArgumentException()
+            else -> Color.WHITE
         }
 
 
@@ -1130,6 +1150,19 @@ internal object BlocksDrawer {
             }
         }
 
+        // write blurmap to its own buffer for TERRAIN and WALL
+        if (mode == TERRAIN || mode == WALL) {
+            for (y in 0 until tilesBuffer.height) {
+                for (x in 0 until tilesBuffer.width) {
+                    val colRaw = blurMap[y, x]
+                    val colMain = colRaw.toInt()
+
+                    blurTilesBuffer.setColor(colMain)
+                    blurTilesBuffer.drawPixel(x, y)
+                }
+            }
+        }
+
 
         _tilesBufferAsTex.dispose()
         _tilesBufferAsTex = Texture(tilesBuffer)
@@ -1139,25 +1172,27 @@ internal object BlocksDrawer {
         _tilesBufferAsTex2 = Texture(tilesBuffer2)
         _tilesBufferAsTex2.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
+        _blurTilesBuffer.dispose()
+        _blurTilesBuffer = Texture(blurTilesBuffer)
+        _blurTilesBuffer.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
 
         if (drawEmissive) {
+            nullTex.bind(4)
             _tilesBufferAsTex2.bind(3)
             _tilesBufferAsTex.bind(2)
             tilesEmissive.texture.bind(1)
             tilesEmissive.texture.bind(0) // for some fuck reason, it must be bound as last
         }
         else if (drawGlow) {
+            nullTex.bind(4)
             _tilesBufferAsTex2.bind(3)
             _tilesBufferAsTex.bind(2)
             tilesGlow.texture.bind(1)
             tilesGlow.texture.bind(0) // for some fuck reason, it must be bound as last
         }
         else {
-            // bind map for deblocking
-            if (mode == TERRAIN || mode == WALL) {
-                blurmapFBO.colorBufferTexture.bind(4)
-            }
-
+            _blurTilesBuffer.bind(4)
             _tilesBufferAsTex2.bind(3)
             _tilesBufferAsTex.bind(2)
             tilesTerrainNext.texture.bind(1)
@@ -1221,12 +1256,15 @@ internal object BlocksDrawer {
             oreTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             fluidTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             occlusionBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
+            blurMap = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             tempRenderTypeBuffer = UnsafeLong2D(hTilesInHorizontal, hTilesInVertical)
 
             tilesBuffer.dispose()
             tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
             tilesBuffer2.dispose()
             tilesBuffer2 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            blurTilesBuffer.dispose()
+            blurTilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
         }
 
         if (oldScreenW != screenW || oldScreenH != screenH) {
@@ -1294,17 +1332,21 @@ internal object BlocksDrawer {
         tileItemWallEmissive.dispose()
         tilesBuffer.dispose()
         tilesBuffer2.dispose()
+        blurTilesBuffer.dispose()
         _tilesBufferAsTex.dispose()
         _tilesBufferAsTex2.dispose()
+        _blurTilesBuffer.dispose()
         tilesQuad.tryDispose()
         shaderTiling.dispose()
         shaderDeblock.dispose()
+        nullTex.dispose()
 
         if (::terrainTilesBuffer.isInitialized) terrainTilesBuffer.destroy()
         if (::wallTilesBuffer.isInitialized) wallTilesBuffer.destroy()
         if (::oreTilesBuffer.isInitialized) oreTilesBuffer.destroy()
         if (::fluidTilesBuffer.isInitialized) fluidTilesBuffer.destroy()
         if (::occlusionBuffer.isInitialized) occlusionBuffer.destroy()
+        if (::blurMap.isInitialized) blurMap.destroy()
         if (::tempRenderTypeBuffer.isInitialized) tempRenderTypeBuffer.destroy()
 
         if (::batch.isInitialized) batch.tryDispose()

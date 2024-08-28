@@ -89,6 +89,7 @@ vec2 uvFlipRot(int op, vec2 uv) {
 const vec4 _four = vec4(1.0 / 4.0);
 const vec4 _three = vec4(1.0 / 3.0);
 const vec4 _two = vec4(1.0 / 2.0);
+const vec4 zero = vec4(0.0);
 const float blur = 1.0;
 vec2 blurU = vec2(0.0, -blur);
 vec2 blurD = vec2(0.0, +blur);
@@ -103,7 +104,11 @@ vec4[2] getTileNumbersFromMap(vec2 fragCoord) {
     return vec4[2](tileFromMap, tileFromMap2);
 }
 
-vec4[2] getFragColorForOnscreenCoord(vec2 fragCoord) {
+vec4 getBlurmapNumbersFromMap(vec2 fragCoord) {
+    return texture(deblockingMap, fragCoord / overscannedScreenDimension);// raw tile number
+}
+
+vec4[3] getFragColorForOnscreenCoord(vec2 fragCoord) {
     vec4[] tileFromMap = getTileNumbersFromMap(fragCoord);
     ivec3 tbf = _colToInt(tileFromMap[0], tileFromMap[1]);
     int tile = tbf.x;
@@ -114,6 +119,12 @@ vec4[2] getFragColorForOnscreenCoord(vec2 fragCoord) {
     ivec2 tileQ = tileXYnQ.zw;
     ivec2 breakageXY = tileNumberToXY(2*(breakage + 5)).xy; // +5 is hard-coded constant that depends on the contents of the atlas
 
+    vec4 blurFromMap = getBlurmapNumbersFromMap(fragCoord);
+    ivec3 tbf2 = _colToInt(blurFromMap, zero);
+    int blurTileNum = tbf2.x;
+    ivec4 blurXYnQ = tileNumberToXY(blurTileNum);
+    ivec2 blurXY = blurXYnQ.xy;
+
     // calculate the UV coord value for texture sampling //
 
     // don't really need highp here; read the GLES spec
@@ -121,11 +132,13 @@ vec4[2] getFragColorForOnscreenCoord(vec2 fragCoord) {
     vec2 uvCoordForTile1 = mod(fragCoord, tileSizeInPx) * _tileSizeInPx * _tilesInAtlas;// 0..0.00390625 regardless of tile position in atlas
     vec2 uvCoordOffsetTile = tileXY * _tilesInAtlas; // where the tile starts in the atlas, using uv coord (0..1)
     vec2 uvCoordOffsetBreakage = (breakageXY + tileQ) * _tilesInAtlas;
+    vec2 uvCoordOffsetBlurmap = blurXY * _tilesInAtlas;
 
     // get final UV coord for the actual sampling //
 
     vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffsetTile;// where we should be actually looking for in atlas, using UV coord (0..1)
     vec2 finalUVCoordForBreakage = uvCoordForTile1 + uvCoordOffsetBreakage;
+    vec2 finalUVCoordForBlurmap = uvCoordForTile1 + uvCoordOffsetBlurmap;
 
     // blending a breakage tex with main tex //
 
@@ -134,7 +147,8 @@ vec4[2] getFragColorForOnscreenCoord(vec2 fragCoord) {
 
     return vec4[](
         mix(tileCol, tileAltCol, tilesBlend),
-        finalUVCoordForBreakage.xyxy
+        texture(tilesAtlas, finalUVCoordForBreakage),
+        texture(tilesAtlas, finalUVCoordForBlurmap)
     );
 }
 
@@ -169,29 +183,28 @@ vec4 getFragColorForOnscreenCoord1(vec2 fragCoord) {
 void main() {
     vec2 fragCoord = gl_FragCoord.xy + cameraTranslation + haalf; // manually adding half-int to the flipped gl_FragCoord: this avoids driver bug present on the Asahi Linux and possibly (but unlikely) others
 
-    vec4[] fv = getFragColorForOnscreenCoord(fragCoord);
-    vec2 finalUVCoordForBreakage = fv[1].xy;
+    vec4[] tile_breakage_blur = getFragColorForOnscreenCoord(fragCoord);
 
-    vec4 finalTileC = fv[0];
-    vec4 finalTileL = getFragColorForOnscreenCoord1(fragCoord + blurL);
-    vec4 finalTileR = getFragColorForOnscreenCoord1(fragCoord + blurR);
-    vec4 finalTileU = getFragColorForOnscreenCoord1(fragCoord + blurU);
-    vec4 finalTileD = getFragColorForOnscreenCoord1(fragCoord + blurD);
+    vec4 tileC = tile_breakage_blur[0];
+    vec4 tileL = getFragColorForOnscreenCoord1(fragCoord + blurL);
+    vec4 tileR = getFragColorForOnscreenCoord1(fragCoord + blurR);
+    vec4 tileU = getFragColorForOnscreenCoord1(fragCoord + blurU);
+    vec4 tileD = getFragColorForOnscreenCoord1(fragCoord + blurD);
 
-    vec4 blurH = (finalTileC + finalTileL + finalTileR) * _three;
-    vec4 blurV = (finalTileC + finalTileU + finalTileD) * _three;
-
-    vec4 mapCol = vec4(1.0, 0.0, 1.0, finalTileC.a);//texture(u_blurmap, v_texCoords);
+    vec4 blurH = (tileC + tileC + tileL + tileR) * _four;
+    vec4 blurV = (tileC + tileC + tileU + tileD) * _four;
+    vec4 blurPower = tile_breakage_blur[2];
 
     vec4 finalTile = mix(
-        mix(finalTileC, blurH, mapCol.x),
-        mix(finalTileC, blurV, mapCol.y),
+        mix(tileC, blurH, blurPower.x),
+        mix(tileC, blurV, blurPower.y),
         0.5
     );
 
-    vec4 finalBreakage = drawBreakage * texture(tilesAtlas, finalUVCoordForBreakage); // drawBreakeage = 0 to not draw, = 1 to draw
+    vec4 finalBreakage = drawBreakage * tile_breakage_blur[1]; // drawBreakeage = 0 to not draw, = 1 to draw
 
     vec4 finalColor = fma(mix(finalTile, finalBreakage, finalBreakage.a), bc.xxxy, finalTile * bc.yyyx);
 
     fragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
+//    fragColor = blurPower;
 }
