@@ -191,8 +191,8 @@ void main() {
     vec4 tileU = getFragColorForOnscreenCoord1(fragCoord + blurU);
     vec4 tileD = getFragColorForOnscreenCoord1(fragCoord + blurD);
 
-    vec4 blurH = (tileC + tileC + tileL + tileR) * _four;
-    vec4 blurV = (tileC + tileC + tileU + tileD) * _four;
+    vec4 blurH = (tileC + tileL + tileR) * _three;
+    vec4 blurV = (tileC + tileU + tileD) * _three;
     vec4 blurPower = tile_breakage_blur[2];
 
     vec4 finalTile = mix(
@@ -206,5 +206,5 @@ void main() {
     vec4 finalColor = fma(mix(finalTile, finalBreakage, finalBreakage.a), bc.xxxy, finalTile * bc.yyyx);
 
     fragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
-//    fragColor = blurPower;
+//    fragColor = mix(fragColor, blurPower, 0.18); // debug overlay
 }

@@ -87,7 +87,7 @@ class CreateTileAtlas {
     lateinit var tagsByTileNum: HashArray<RenderTag>; private set
     lateinit var itemSheetNumbers: HashMap<ItemID, Int> // TileID, Int
         private set
-    private val defaultRenderTag = RenderTag(3, RenderTag.CONNECT_SELF, RenderTag.MASK_NA, 0) // 'update' block
+    private val defaultRenderTag = RenderTag(3, RenderTag.CONNECT_SELF, RenderTag.MASK_NA, 0, 0) // 'update' block
     var initialised = false
         private set
 
@@ -478,20 +478,23 @@ class CreateTileAtlas {
             val maskType = if (tilesPixmap.width >= 3*W_SUBTILE_GENERIC) MASK_SUBTILE_GRASS else MASK_SUBTILE_GENERIC
             var connectionType0 = 0
             var tilingMode = 0
+            var postProcessing = 0
             for (x in 0 until 4) {
 //                val pixelY0 = (tilesPixmap.getPixel(x, 0).and(255) >= 128).toInt(x)
                 val pixelY1 = (tilesPixmap.getPixel(x, 1).and(255) >= 128).toInt(x)
                 val pixelY2 = (tilesPixmap.getPixel(x, 2).and(255) >= 128).toInt(x)
+                val pixelY3 = (tilesPixmap.getPixel(x, 3).and(255) >= 128).toInt(x)
 
                 tilingMode += pixelY1
                 connectionType0 += pixelY2
+                postProcessing += pixelY3
             }
             val connectionType = when (connectionType0) {
                 1 -> CONNECT_MUTUAL
                 2 -> CONNECT_SELF
                 else -> throw IllegalArgumentException("$connectionType0")
             }
-            addTag(blockID, connectionType, maskType, tilingMode)
+            addTag(blockID, connectionType, maskType, tilingMode, postProcessing)
 //            println("drawToAtlantes tile: $blockID with mode $tilingMode")
             drawToAtlantes(tilesPixmap, tilesGlowPixmap, tilesEmissivePixmap, maskType)
         }
@@ -541,13 +544,13 @@ class CreateTileAtlas {
      * This function must precede the drawToAtlantes() function, as the marking requires the variable
      * 'atlasCursor' and the draw function modifies it!
      */
-    private fun addTag(id: ItemID, connectionType: Int, maskType: Int, tilingMode: Int = TILING_FULL) {
+    private fun addTag(id: ItemID, connectionType: Int, maskType: Int, tilingMode: Int = TILING_FULL, postProcessing: Int = 0) {
         if (tags.containsKey(id)) {
             throw Error("Block $id already exists")
         }
 
-        tags[id] = RenderTag(atlasCursor, connectionType, maskType, tilingMode)
-        tagsByTileNum[atlasCursor.toLong()] = RenderTag(atlasCursor, connectionType, maskType, tilingMode)
+        tags[id] = RenderTag(atlasCursor, connectionType, maskType, tilingMode, postProcessing)
+        tagsByTileNum[atlasCursor.toLong()] = RenderTag(atlasCursor, connectionType, maskType, tilingMode, postProcessing)
 
         printdbg(this, "tileName ${id} ->> tileNumber ${atlasCursor}")
     }
@@ -714,7 +717,7 @@ class CreateTileAtlas {
     /**
      * @param tileNumber ordinal number of a tile in the texture atlas
      */
-    data class RenderTag(val tileNumber: Int, val connectionType: Int, val maskType: Int, val tilingMode: Int) {
+    data class RenderTag(val tileNumber: Int, val connectionType: Int, val maskType: Int, val tilingMode: Int, val postProcessing: Int) {
         companion object {
             const val CONNECT_MUTUAL = 0
             const val CONNECT_SELF = 1
@@ -739,6 +742,9 @@ class CreateTileAtlas {
             const val TILING_BRICK_SMALL_NOFLIP = 3
             const val TILING_BRICK_LARGE = 4
             const val TILING_BRICK_LARGE_NOFLIP = 5
+
+            const val POSTPROCESS_NONE = 0
+            const val POSTPROCESS_DEBLOCKING = 1
 
             fun maskTypeToTileCount(maskType: Int) = when (maskType) {
                 MASK_NA -> 1

@@ -75,7 +75,9 @@ internal object BlocksDrawer {
     val ORES = GameWorld.ORES
     val FLUID = -2
     val OCCLUSION = 31337
-    val BLURMAP = 31338
+    val BLURMAP_BASE = 31338
+    val BLURMAP_TERR = BLURMAP_BASE + TERRAIN
+    val BLURMAP_WALL = BLURMAP_BASE + WALL
 
     private const val OCCLUSION_TILE_NUM_BASE = 16
 
@@ -98,7 +100,8 @@ internal object BlocksDrawer {
     private lateinit var oreTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var fluidTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var occlusionBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
-    private lateinit var blurMap: UnsafeLong2D // stores subtiles (dimension is doubled)
+    private lateinit var blurMapTerr: UnsafeLong2D // stores subtiles (dimension is doubled)
+    private lateinit var blurMapWall: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var tempRenderTypeBuffer: UnsafeLong2D // this one is NOT dimension doubled; 0x tttt 00 ii where t=rawTileNum, i=nearbyTilesInfo
     private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
     private var tilesBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
@@ -257,8 +260,9 @@ internal object BlocksDrawer {
         }
         catch (e: ClassCastException) { }
 
-        if (!world.layerTerrain.ptrDestroyed) {
-            measureDebugTime("Renderer.Tiling") {
+        if (doTilemapUpdate) {
+            // rendering tilemap only updates every three frame
+            measureDebugTime("Renderer.Tiling*") {
                 drawTiles(WALL)
                 drawTiles(TERRAIN) // regular tiles
                 drawTiles(ORES)
@@ -334,7 +338,7 @@ internal object BlocksDrawer {
     }
 
     private val occlusionRenderTag = CreateTileAtlas.RenderTag(
-        OCCLUSION_TILE_NUM_BASE, CreateTileAtlas.RenderTag.CONNECT_SELF, CreateTileAtlas.RenderTag.MASK_47, 0
+        OCCLUSION_TILE_NUM_BASE, CreateTileAtlas.RenderTag.CONNECT_SELF, CreateTileAtlas.RenderTag.MASK_47, 0, 0
     )
 
     private lateinit var renderOnF3Only: Array<Int>
@@ -583,19 +587,21 @@ internal object BlocksDrawer {
                     else 0
 
                 if (mode == TERRAIN || mode == WALL) {
-                    // TODO translate nearbyTilesInfo into proper subtile number
+                    // translate nearbyTilesInfo into proper subtile number
+                    val nearbyTilesInfo = getNearbyTilesInfoDeblocking(mode, x, y)
+                    val subtiles = if (nearbyTilesInfo == null)
+                        listOf(
+                            Point2i(130, 1), Point2i(130, 1), Point2i(130, 1), Point2i(130, 1)
+                        )
+                    else
+                        (0..3).map {
+                            Point2i(126, 0) + deblockerNearbyTilesToSubtile[it][nearbyTilesInfo]
+                        }
 
-                    // TEST CODE
-                    val subtiles = arrayOf(
-                        Point2i(130, 0),
-                        Point2i(131, 0),
-                        Point2i(131, 1),
-                        Point2i(130, 1),
-                    )
-                    /*TL*/writeToBufferSubtile(BLURMAP, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, 0, 0)
-                    /*TR*/writeToBufferSubtile(BLURMAP, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, 0, 0)
-                    /*BR*/writeToBufferSubtile(BLURMAP, bufferBaseX * 2 + 1, bufferBaseY * 2 + 1, subtiles[2].x, subtiles[2].y, 0, 0)
-                    /*BL*/writeToBufferSubtile(BLURMAP, bufferBaseX * 2 + 0, bufferBaseY * 2 + 1, subtiles[3].x, subtiles[3].y, 0, 0)
+                    /*TL*/writeToBufferSubtile(BLURMAP_BASE + mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, 0, 0)
+                    /*TR*/writeToBufferSubtile(BLURMAP_BASE + mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, 0, 0)
+                    /*BR*/writeToBufferSubtile(BLURMAP_BASE + mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 1, subtiles[2].x, subtiles[2].y, 0, 0)
+                    /*BL*/writeToBufferSubtile(BLURMAP_BASE + mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 1, subtiles[3].x, subtiles[3].y, 0, 0)
                 }
 
                 if (renderTag.maskType >= CreateTileAtlas.RenderTag.MASK_SUBTILE_GENERIC) {
@@ -795,6 +801,48 @@ internal object BlocksDrawer {
 
         return ret
     }
+
+    private fun getNearbyTilesInfoDeblocking(mode: Int, x: Int, y: Int): Int? {
+        val tileThis = world.getTileFrom(mode, x, y)
+        val nearbyTiles = getNearbyTilesPos4(x, y).map { world.getTileFrom(mode, it.x, it.y) }
+
+        val renderTagThis = App.tileMaker.getRenderTag(tileThis)
+
+        if (renderTagThis.postProcessing != CreateTileAtlas.RenderTag.POSTPROCESS_DEBLOCKING) return null
+
+        when (renderTagThis.connectionType) {
+            CreateTileAtlas.RenderTag.CONNECT_SELF -> {
+                var ret = 0
+                for (i in nearbyTiles.indices) {
+                    if (nearbyTiles[i] == tileThis) {
+                        ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+                    }
+                }
+                return ret
+            }
+            CreateTileAtlas.RenderTag.CONNECT_MUTUAL -> {
+                // make sure to not connect to tiles with no deblocking
+                var ret = 0
+                for (i in nearbyTiles.indices) {
+                    if (BlockCodex[nearbyTiles[i]].isSolidForTileCnx && isConnectMutual(nearbyTiles[i]) &&
+                        App.tileMaker.getRenderTag(nearbyTiles[i]).postProcessing == CreateTileAtlas.RenderTag.POSTPROCESS_DEBLOCKING
+                    ) {
+                        ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+                    }
+                }
+
+                return ret
+            }
+            else -> return null
+        }
+    }
+
+    private val deblockerNearbyTilesToSubtile: Array<Array<Point2i>> = arrayOf(
+        arrayOf(Point2i(0,0),Point2i(0,0),Point2i(0,0),Point2i(0,0),Point2i(3,0),Point2i(3,0),Point2i(3,0),Point2i(3,0),Point2i(2,0),Point2i(2,0),Point2i(2,0),Point2i(2,0),Point2i(4,0),Point2i(4,0),Point2i(4,0),Point2i(4,0)), /*TL*/
+        arrayOf(Point2i(1,0),Point2i(3,0),Point2i(1,0),Point2i(3,0),Point2i(1,0),Point2i(3,0),Point2i(1,0),Point2i(3,0),Point2i(3,1),Point2i(4,0),Point2i(3,1),Point2i(4,0),Point2i(3,1),Point2i(4,0),Point2i(3,1),Point2i(4,0)), /*TR*/
+        arrayOf(Point2i(1,1),Point2i(2,1),Point2i(3,1),Point2i(4,0),Point2i(1,1),Point2i(2,1),Point2i(3,1),Point2i(4,0),Point2i(1,1),Point2i(2,1),Point2i(3,1),Point2i(4,0),Point2i(1,1),Point2i(2,1),Point2i(3,1),Point2i(4,0)), /*BR*/
+        arrayOf(Point2i(0,1),Point2i(0,1),Point2i(2,0),Point2i(2,0),Point2i(2,1),Point2i(2,1),Point2i(4,0),Point2i(4,0),Point2i(0,1),Point2i(0,1),Point2i(2,0),Point2i(2,0),Point2i(2,1),Point2i(2,1),Point2i(4,0),Point2i(4,0)), /*BL*/
+    )
 
     private fun getNearbyTilesInfoConMutual(x: Int, y: Int, mode: Int): Int {
         val nearbyTiles: List<ItemID> = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) }
@@ -1075,7 +1123,6 @@ internal object BlocksDrawer {
             ORES -> oreTilesBuffer
             FLUID -> fluidTilesBuffer
             OCCLUSION -> occlusionBuffer
-            BLURMAP -> blurMap
             else -> throw IllegalArgumentException()
         }
 
@@ -1092,7 +1139,8 @@ internal object BlocksDrawer {
             ORES -> oreTilesBuffer
             FLUID -> fluidTilesBuffer
             OCCLUSION -> occlusionBuffer
-            BLURMAP -> blurMap
+            BLURMAP_TERR -> blurMapTerr
+            BLURMAP_WALL -> blurMapWall
             else -> throw IllegalArgumentException()
         }
 
@@ -1107,6 +1155,9 @@ internal object BlocksDrawer {
     private var _blurTilesBuffer: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
     private val occlusionIntensity = 0.25f // too low value and dark-coloured walls won't darken enough
 
+    private val doTilemapUpdate: Boolean
+        get() = (!world.layerTerrain.ptrDestroyed && App.GLOBAL_RENDER_TIMER % 3 == 0L)
+
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -1117,7 +1168,7 @@ internal object BlocksDrawer {
 
 
         val tileAtlas = when (mode) {
-            TERRAIN, ORES, WALL, OCCLUSION, FLUID, BLURMAP -> tilesTerrain
+            TERRAIN, ORES, WALL, OCCLUSION, FLUID, BLURMAP_TERR, BLURMAP_WALL -> tilesTerrain
             else -> throw IllegalArgumentException()
         }
         val sourceBuffer = when(mode) {
@@ -1133,35 +1184,33 @@ internal object BlocksDrawer {
             else -> Color.WHITE
         }
 
-
         // write to colour buffer
         // As the texture size is very small, multithreading it would be less effective
-        for (y in 0 until tilesBuffer.height) {
-            for (x in 0 until tilesBuffer.width) {
-                val colRaw = sourceBuffer[y, x]
-                val colMain = colRaw.toInt()
-                val colSub = colRaw.ushr(32).toInt()
-
-                tilesBuffer.setColor(colMain)
-                tilesBuffer.drawPixel(x, y)
-
-                tilesBuffer2.setColor(colSub)
-                tilesBuffer2.drawPixel(x, y)
-            }
-        }
-
-        // write blurmap to its own buffer for TERRAIN and WALL
-        if (mode == TERRAIN || mode == WALL) {
+        // TODO making it run sporadically without graphical issue would improve the tiling performance
+//        if (doTilemapUpdate) {
             for (y in 0 until tilesBuffer.height) {
                 for (x in 0 until tilesBuffer.width) {
-                    val colRaw = blurMap[y, x]
+                    val colRaw = sourceBuffer[y, x]
                     val colMain = colRaw.toInt()
+                    val colSub = colRaw.ushr(32).toInt()
 
-                    blurTilesBuffer.setColor(colMain)
-                    blurTilesBuffer.drawPixel(x, y)
+                    tilesBuffer.setColor(colMain)
+                    tilesBuffer.drawPixel(x, y)
+
+                    tilesBuffer2.setColor(colSub)
+                    tilesBuffer2.drawPixel(x, y)
+
+                    // write blurmap to its own buffer for TERRAIN and WALL
+                    if (mode == TERRAIN || mode == WALL) {
+                        val colRaw = (if (mode == TERRAIN) blurMapTerr else blurMapWall)[y, x]
+                        val colMain = colRaw.toInt()
+
+                        blurTilesBuffer.setColor(colMain)
+                        blurTilesBuffer.drawPixel(x, y)
+                    }
                 }
             }
-        }
+//        }
 
 
         _tilesBufferAsTex.dispose()
@@ -1256,7 +1305,8 @@ internal object BlocksDrawer {
             oreTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             fluidTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             occlusionBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
-            blurMap = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
+            blurMapTerr = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
+            blurMapWall = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             tempRenderTypeBuffer = UnsafeLong2D(hTilesInHorizontal, hTilesInVertical)
 
             tilesBuffer.dispose()
@@ -1346,7 +1396,8 @@ internal object BlocksDrawer {
         if (::oreTilesBuffer.isInitialized) oreTilesBuffer.destroy()
         if (::fluidTilesBuffer.isInitialized) fluidTilesBuffer.destroy()
         if (::occlusionBuffer.isInitialized) occlusionBuffer.destroy()
-        if (::blurMap.isInitialized) blurMap.destroy()
+        if (::blurMapTerr.isInitialized) blurMapTerr.destroy()
+        if (::blurMapWall.isInitialized) blurMapWall.destroy()
         if (::tempRenderTypeBuffer.isInitialized) tempRenderTypeBuffer.destroy()
 
         if (::batch.isInitialized) batch.tryDispose()
