@@ -250,7 +250,6 @@ internal object BlocksDrawer {
 //    var selectedWireRenderClass = ""
 
     internal fun renderData() {
-
         try {
             val seasonalMonth = world.worldTime.ecologicalSeason
 
@@ -259,6 +258,16 @@ internal object BlocksDrawer {
             tilesTerrainBlendDegree = seasonalMonth % 1f
         }
         catch (e: ClassCastException) { }
+
+
+
+
+        if (doTilemapUpdate) {
+            wrapCamera()
+        }
+
+        camTransX = WorldCamera.x - camX
+        camTransY = WorldCamera.y - camY
 
         if (doTilemapUpdate) {
             // rendering tilemap only updates every three frame
@@ -398,6 +407,28 @@ internal object BlocksDrawer {
         ) fmod mod).toInt()
     }
 
+    private var for_y_start = 0
+    private var for_y_end = 0
+    private var for_x_start = 0
+    private var for_x_end = 0
+    private var camX = 0
+    private var camY = 0
+
+    private fun wrapCamera() {
+        camX = WorldCamera.x
+        camY = WorldCamera.y
+
+        // can't be "WorldCamera.y / TILE_SIZE":
+        //      ( 3 / 16) == 0
+        //      (-3 / 16) == -1  <-- We want it to be '-1', not zero
+        // using cast and floor instead of IF on ints: the other way causes jitter artefact, which I don't fucking know why
+
+        for_y_start = (camY.toFloat() / TILE_SIZE).floorToInt()
+        for_y_end = for_y_start + hTilesInVertical - 1
+        for_x_start = (camX.toFloat() / TILE_SIZE).floorToInt()
+        for_x_end = for_x_start + hTilesInHorizontal - 1
+    }
+
     /**
      * Autotiling; writes to buffer. Actual draw code must be called after this operation.
      *
@@ -405,23 +436,12 @@ internal object BlocksDrawer {
      * @param wire coduitTypes bit that is selected to be drawn. Must be the power of two.
      */
     private fun drawTiles(mode: Int) {
-        // can't be "WorldCamera.y / TILE_SIZE":
-        //      ( 3 / 16) == 0
-        //      (-3 / 16) == -1  <-- We want it to be '-1', not zero
-        // using cast and floor instead of IF on ints: the other way causes jitter artefact, which I don't fucking know why
 
         // TODO the real fluid rendering must use separate function, but its code should be similar to this.
         //      shader's tileAtlas will be fluid.tga, pixels written to the buffer is in accordance with the new
         //      atlas. IngameRenderer must be modified so that fluid-draw call is separated from drawing tiles.
         //      The MUL draw mode can be removed from this (it turns out drawing tinted glass is tricky because of
         //      the window frame which should NOT be MUL'd)
-
-
-        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorToInt()
-        val for_y_end = for_y_start + hTilesInVertical - 1
-
-        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorToInt()
-        val for_x_end = for_x_start + hTilesInHorizontal - 1
 
         // loop
         for (y in for_y_start..for_y_end) {
@@ -1156,7 +1176,10 @@ internal object BlocksDrawer {
     private val occlusionIntensity = 0.25f // too low value and dark-coloured walls won't darken enough
 
     private val doTilemapUpdate: Boolean
-        get() = (!world.layerTerrain.ptrDestroyed && App.GLOBAL_RENDER_TIMER % 3 == 0L)
+        get() = (!world.layerTerrain.ptrDestroyed && App.GLOBAL_RENDER_TIMER % 30 == 0L)
+
+    private var camTransX = 0
+    private var camTransY = 0
 
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
@@ -1258,7 +1281,7 @@ internal object BlocksDrawer {
         shaderTiling.setUniformi("deblockingMap", 4)
         shaderTiling.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shaderTiling.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
-        shaderTiling.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div
+        shaderTiling.setUniformi("cameraTranslation", camTransX, camTransY) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div
         shaderTiling.setUniformf("tilesInAtlas", tileAtlas.horizontalCount * 2f, tileAtlas.verticalCount * 2f) //depends on the tile atlas
         shaderTiling.setUniformf("atlasTexSize", tileAtlas.texture.width.toFloat(), tileAtlas.texture.height.toFloat()) //depends on the tile atlas
         // set the blend value as world's time progresses, in linear fashion
@@ -1405,12 +1428,6 @@ internal object BlocksDrawer {
         App.tileMaker.dispose()
     }
 
-    fun getRenderStartX(): Int = WorldCamera.x / TILE_SIZE
-    fun getRenderStartY(): Int = WorldCamera.y / TILE_SIZE
-
-    fun getRenderEndX(): Int = clampWTile(getRenderStartX() + (WorldCamera.width / TILE_SIZE) + 2)
-    fun getRenderEndY(): Int = clampHTile(getRenderStartY() + (WorldCamera.height / TILE_SIZE) + 2)
-
     fun isConnectSelf(b: ItemID) = App.tileMaker.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_SELF
     fun isConnectMutual(b: ItemID) = App.tileMaker.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_MUTUAL
     fun isWallSticker(b: ItemID) = App.tileMaker.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER
@@ -1420,7 +1437,4 @@ internal object BlocksDrawer {
     fun isTreeTrunk(b: ItemID) = BlockCodex[b].hasAllTagsOf("TREE", "TREETRUNK")
     fun isCultivable(b: ItemID) = BlockCodex[b].hasAllTagsOf("NATURAL", "CULTIVABLE")
 
-    fun tileInCamera(x: Int, y: Int) =
-            x >= WorldCamera.x.div(TILE_SIZE) && y >= WorldCamera.y.div(TILE_SIZE) &&
-            x <= WorldCamera.x.plus(WorldCamera.width).div(TILE_SIZE) && y <= WorldCamera.y.plus(WorldCamera.width).div(TILE_SIZE)
 }

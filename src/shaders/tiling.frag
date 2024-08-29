@@ -8,34 +8,26 @@ layout(origin_upper_left,pixel_center_integer) in vec4 gl_FragCoord; // is now t
 in vec4 v_color;
 in vec2 v_texCoords;
 
-uniform sampler2D u_texture;
-
-
-uniform vec2 tilesInAxes; // 8x8
-
 uniform sampler2D tilemap; // RGBA8888
 uniform sampler2D tilemap2; // RGBA8888
 uniform sampler2D tilesAtlas; // terrain, wire, fluids, etc.
 uniform sampler2D tilesBlendAtlas; // alternative terrain for the weather mix (e.g. yellowed grass)
 uniform sampler2D deblockingMap;
 
+uniform vec2 tilesInAxes; // 8x8
 uniform float tilesBlend = 0.0; // percentage of blending [0f..1f]. 0: draws tilesAtlas, 1: draws tilesBlendAtlas
 
 uniform vec2 tilesInAtlas = vec2(256.0, 256.0);
 uniform vec2 atlasTexSize = vec2(2048.0, 2048.0);
 
+uniform vec4 colourFilter = vec4(1, 1, 1, 1); // used by WALL to darken it
+uniform ivec2 cameraTranslation = ivec2(0, 0); // used to offset the drawing; it's integer because we want the drawing to be pixel-aligned
+uniform float drawBreakage = 1.0; // set it to 0f to not draw breakage, 1f to draw it; NEVER set to any other values.
+uniform float mulBlendIntensity = 1.0; // used my MUL-blending drawings; works about the same way as the Layer Opacity slider of Photoshop/Krita/etc.
+
 vec2 _tilesInAtlas = vec2(1.0, 1.0) / tilesInAtlas;
 vec2 tileSizeInPx = atlasTexSize * _tilesInAtlas; // should be like ivec2(8.0, 8.0)
 vec2 _tileSizeInPx = vec2(1.0, 1.0) / tileSizeInPx; // should be like ivec2(0.125, 0.125)
-
-uniform vec4 colourFilter = vec4(1, 1, 1, 1); // used by WALL to darken it
-
-uniform ivec2 cameraTranslation = ivec2(0, 0); // used to offset the drawing; it's integer because we want the drawing to be pixel-aligned
-
-uniform float drawBreakage = 1.0; // set it to 0f to not draw breakage, 1f to draw it; NEVER set to any other values.
-
-uniform float mulBlendIntensity = 1.0; // used my MUL-blending drawings; works about the same way as the Layer Opacity slider of Photoshop/Krita/etc.
-
 const vec2 bc = vec2(1.0, 0.0); //binary constant
 const vec2 haalf = vec2(0.5, 0.5);
 
@@ -91,10 +83,10 @@ const vec4 _three = vec4(1.0 / 3.0);
 const vec4 _two = vec4(1.0 / 2.0);
 const vec4 zero = vec4(0.0);
 const float blur = 1.0;
-vec2 blurU = vec2(0.0, -blur);
-vec2 blurD = vec2(0.0, +blur);
-vec2 blurL = vec2(-blur, 0.0);
-vec2 blurR = vec2(+blur, 0.0);
+const vec2 blurU = vec2(0.0, -blur);
+const vec2 blurD = vec2(0.0, +blur);
+const vec2 blurL = vec2(-blur, 0.0);
+const vec2 blurR = vec2(+blur, 0.0);
 
 vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx; // how many tiles will fit into a screen; one used by the tileFromMap; we need this because screen size is not integer multiple of the tile size
 
