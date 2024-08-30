@@ -264,11 +264,14 @@ internal object BlocksDrawer {
 
         if (doTilemapUpdate) {
             wrapCamera()
+
+            camTransX = WorldCamera.x fmod TILE_SIZE
+            camTransY = WorldCamera.y fmod TILE_SIZE
         }
-
-        camTransX = WorldCamera.x - camX
-        camTransY = WorldCamera.y - camY
-
+        else {
+            camTransX += WorldCamera.deltaX
+            camTransY += WorldCamera.deltaY
+        }
         if (doTilemapUpdate) {
             // rendering tilemap only updates every three frame
             measureDebugTime("Renderer.Tiling*") {
@@ -1176,7 +1179,7 @@ internal object BlocksDrawer {
     private val occlusionIntensity = 0.25f // too low value and dark-coloured walls won't darken enough
 
     private val doTilemapUpdate: Boolean
-        get() = (!world.layerTerrain.ptrDestroyed && App.GLOBAL_RENDER_TIMER % 30 == 0L)
+        get() = (!world.layerTerrain.ptrDestroyed && App.GLOBAL_RENDER_TIMER % 3 == 0L)
 
     private var camTransX = 0
     private var camTransY = 0

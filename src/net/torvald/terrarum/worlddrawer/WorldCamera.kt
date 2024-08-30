@@ -64,6 +64,9 @@ object WorldCamera {
     inline val yCentre: Int
         get() = y + height.ushr(1)
 
+    var deltaX: Int = 0; private set
+    var deltaY: Int = 0; private set
+
     private val nullVec = Vector2(0.0, 0.0)
 
     /** World width in pixels */
@@ -106,7 +109,7 @@ object WorldCamera {
 
 
 //        val fpsRatio = App.UPDATE_RATE / Gdx.graphics.deltaTime // if FPS=32 & RATE=64, ratio will be 0.5
-        val fpsRatio = 64f / Gdx.graphics.framesPerSecond
+        val fpsRatio = App.TICK_SPEED.toFloat() / Gdx.graphics.framesPerSecond
         val oldX = x.toDouble()
         val oldY = y.toDouble()
         val newX1 = (player.hitbox.centeredX) - (width / 2) +
@@ -124,8 +127,17 @@ object WorldCamera {
 
         val camSpeed = (1f - (1f / (2f * fpsRatio))).coerceIn(0.5f, 1f)
 
-        x = FastMath.interpolateLinear(camSpeed, oldX.toFloat(), newX.toFloat()).roundToInt() fmod worldWidth
-        y = FastMath.interpolateLinear(camSpeed, oldY.toFloat(), newY.toFloat()).roundToInt().clampCameraY(world)
+        val finalXnowrap = FastMath.interpolateLinear(camSpeed, oldX.toFloat(), newX.toFloat()).roundToInt()
+        val finalX = FastMath.interpolateLinear(camSpeed, oldX.toFloat(), newX.toFloat()).roundToInt() fmod worldWidth
+        val finalY = FastMath.interpolateLinear(camSpeed, oldY.toFloat(), newY.toFloat()).roundToInt().clampCameraY(world)
+
+//        println("finalX=$finalX, finalXnowrap=$finalXnowrap")
+
+        deltaX = if (finalX != finalXnowrap) finalXnowrap - x else finalX - x
+        deltaY = finalY - y
+
+        x = finalX
+        y = finalY
 
         xEnd = x + width
         yEnd = y + height
