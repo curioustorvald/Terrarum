@@ -2,7 +2,6 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
-import net.torvald.terrarum.App
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameworld.GameWorld
@@ -15,11 +14,6 @@ import kotlin.math.sin
  * Created by minjaesong on 2023-11-04.
  */
 class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
-
-    companion object {
-        const val YHEIGHT_MAGIC = 2800.0 / 3.0
-        const val YHEIGHT_DIVISOR = 2.0 / 7.0
-    }
 
     override fun getDone(loadscreen: LoadScreenBase?) {
         loadscreen?.let {
@@ -41,7 +35,7 @@ class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache
             for (y in yStart until yStart + CHUNK_H) {
                 val sx = sin(st) * soff + soff // plus sampleOffset to make only
                 val sz = cos(st) * soff + soff // positive points are to be sampled
-                val sy = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+                val sy = Worldgen.getSY(y)
                 // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
                 val noiseValue = noises.map { it.get(sx, sy, sz) }
 
@@ -73,10 +67,17 @@ class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache
             it.seed = seed shake caveMagic
         }
 
-        val caveAttenuateBias = ModuleCache().also {it.setSource(ModuleBias().also {
+        val caveAttenuateBias0 = ModuleCache().also {it.setSource(ModuleBias().also {
             it.setSource(highlandLowlandSelectCache)
             it.setBias(params.caveAttenuateBias) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
         })}
+
+        val caveAttenuateBias = caveAttenuateBias0.let {
+            ModuleScaleOffset().also {
+                it.setSource(caveAttenuateBias0)
+                it.setScale(params.caveAttenuateScale)
+            }
+        }
 
         val caveShapeAttenuate = ModuleCombiner().also {
             it.setType(ModuleCombiner.CombinerType.MULT)
@@ -132,7 +133,7 @@ class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache
             it.setLowSource(0.0)
             it.setHighSource(1.0)
             it.setControlSource(caveBlockageAttenuate)
-            it.setThreshold(params.caveBlockageSelectThre) // adjust cave cloing-up strength. Larger = more closing
+            it.setThreshold(params.caveBlockageSelectThre) // adjust cave cloing-up strength. Lower = more closing
             it.setFalloff(0.0)
         }
 

@@ -24,14 +24,14 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.RunnableFun
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.*
 import net.torvald.terrarum.worlddrawer.toRGBA
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import java.util.concurrent.Future
 import kotlin.math.*
 import kotlin.random.Random
-import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen
+import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_DIVISOR
+import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_MAGIC
 import java.io.PrintStream
 
 const val NOISEBOX_WIDTH = 1200
@@ -81,7 +81,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     private var generationTime = 0f
 
-    private val NM_TERR = TerragenTest to TerragenParams()
+    private val NM_TERR = TerragenTest to TerragenParamsAlpha2()
     private val NM_BIOME = BiomeMaker to BiomegenParams()
 
     private val NOISEMAKER = NM_TERR
@@ -164,6 +164,23 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         }
     }
 
+
+    fun getClampedHeight(): Int {
+        return 3200
+    }
+
+    private fun Int.addSY(): Int {
+        val offset =  90 * 8
+        return this + offset
+    }
+
+    private fun Int.subtractSY(): Int {
+        val offset =  90 * 8
+        return this - offset
+    }
+
+    private fun getSY(y: Int): Double = y - (getClampedHeight() - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+
     private fun renderNoise(noiseMaker: Pair<NoiseMaker, Any>, callback: () -> Unit = {}) {
         generationStartTime = System.nanoTime()
 
@@ -187,8 +204,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
                                 sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
                             val sampleZ =
                                 cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                            val sampleY =
-                                y - (NOISEBOX_HEIGHT - Terragen.YHEIGHT_MAGIC) * Terragen.YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+                            val sampleY = getSY(y)
 
                             noiseMaker.first.draw(x, y, localJoise.mapIndexed { index, it ->
                                 it.get(sampleX, sampleY, sampleZ)
@@ -350,7 +366,7 @@ internal object TerragenTest : NoiseMaker {
     )
 
     private val terragenYscaling = (NOISEBOX_HEIGHT / 2400.0).pow(0.75)
-    private val terragenTiers = listOf(.0, .5, 1.0, 2.5).map { it * terragenYscaling } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
+    private val terragenTiers = listOf(.0, .5, 1.5, 4.0).map { it * terragenYscaling } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
 
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val terr = noiseValue[0].tiered(terragenTiers)
@@ -564,10 +580,17 @@ internal object TerragenTest : NoiseMaker {
             it.seed = seed shake caveMagic
         }
 
-        val caveAttenuateBias = ModuleCache().also { it.setSource(ModuleBias().also {
+        val caveAttenuateBias0 = ModuleCache().also { it.setSource(ModuleBias().also {
             it.setSource(highlandLowlandSelectCache)
             it.setBias(params.caveAttenuateBias) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
         })}
+
+        val caveAttenuateBias = caveAttenuateBias0.let {
+            ModuleScaleOffset().also {
+                it.setSource(caveAttenuateBias0)
+                it.setScale(params.caveAttenuateScale)
+            }
+        }
 
         val caveShapeAttenuate = ModuleCombiner().also {
             it.setType(ModuleCombiner.CombinerType.MULT)

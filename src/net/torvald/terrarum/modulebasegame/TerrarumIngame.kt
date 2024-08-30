@@ -168,10 +168,11 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                  // x: neither
                  (this.hitbox.endX >= WorldCamera.x && this.hitbox.startX <= WorldCamera.xEnd))
 
-        val SIZE_SMALL = Point2i(6030, 4500)
-        val SIZE_NORMAL = Point2i(9000, 6750)
-        val SIZE_LARGE = Point2i(13500, 10080)
-        val SIZE_HUGE = Point2i(22500, 16920) // world ratio: 4:3
+        // Vchunks = (10 * Hchunks)^0.6, rounded towards nearest even number
+        val SIZE_SMALL = Point2i(CHUNK_W*67, CHUNK_H*50)
+        val SIZE_NORMAL = Point2i(CHUNK_W*100, CHUNK_H*64)
+        val SIZE_LARGE = Point2i(CHUNK_W*150, CHUNK_H*80)
+        val SIZE_HUGE = Point2i(CHUNK_W*250, CHUNK_H*110) // world ratio: 4:3
         val NEW_WORLD_SIZE = arrayOf(SIZE_SMALL, SIZE_NORMAL, SIZE_LARGE, SIZE_HUGE)
         val WORLDPORTAL_NEW_WORLD_SIZE = arrayOf(SIZE_SMALL, SIZE_NORMAL, SIZE_LARGE, SIZE_HUGE)
 
@@ -383,7 +384,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
             // feed info to the worldgen
-            Worldgen.attachMap(world, WorldgenParams(world.generatorSeed))
+            Worldgen.attachMap(world, WorldgenParams.getParamsByVersion(codices.worldGenver, world.generatorSeed))
         }
 
         loadCallback = codices.callbackAfterLoad
@@ -535,7 +536,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             //WorldGenerator.attachMap(world)
             //WorldGenerator.SEED = worldParams.worldGenSeed
             //WorldGenerator.generateMap()
-            Worldgen.attachMap(world, WorldgenParams(worldParams.worldGenSeed))
+            Worldgen.attachMap(world, WorldgenParams.getParamsByVersion(null, worldParams.worldGenSeed))
             Worldgen.generateMap(App.getLoadScreen())
 
 

@@ -4,8 +4,6 @@ import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_DIVISOR
-import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_MAGIC
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import kotlin.math.cos
@@ -46,7 +44,7 @@ class Oregen(world: GameWorld, isFinal: Boolean, private val caveAttenuateBiasSc
             for (y in yStart until yStart + CHUNK_H) {
                 val sx = sin(st) * soff + soff // plus sampleOffset to make only
                 val sz = cos(st) * soff + soff // positive points are to be sampled
-                val sy = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+                val sy = Worldgen.getSY(y)
                 // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
 
                 // get the actual noise values

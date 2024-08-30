@@ -8,7 +8,8 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.worldgenerator.Terragen.Companion.YHEIGHT_DIVISOR
+import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_DIVISOR
+import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.getClampedHeight
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.toUint
 
@@ -43,11 +44,11 @@ class Treegen(world: GameWorld, isFinal: Boolean, seed: Long, val terragenParams
 
     private fun makeGrassMap(xs: IntProgression): Array<List<Int>> {
         val r = Array<List<Int>>(xs.last - xs.first + 1) { emptyList() }
-        val ymax = (world.height * YHEIGHT_DIVISOR + terragenParams.featureSize).ceilToInt()
+        val ymax = (world.getClampedHeight() * YHEIGHT_DIVISOR + terragenParams.featureSize).ceilToInt()
 
         for (x in xs) {
             val ys = ArrayList<Int>()
-            var y = (world.height * YHEIGHT_DIVISOR - terragenParams.featureSize).floorToInt().coerceAtLeast(1)
+            var y = (world.getClampedHeight() * YHEIGHT_DIVISOR - terragenParams.featureSize).floorToInt().coerceAtLeast(1)
             var tileUp = world.getTileFromTerrain(x, y - 1)
             var tile = world.getTileFromTerrain(x, y)
             while (y < ymax) {

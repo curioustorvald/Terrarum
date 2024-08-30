@@ -27,6 +27,24 @@ import kotlin.math.roundToLong
  */
 object Worldgen {
 
+    const val YHEIGHT_MAGIC = 2800.0 / 3.0
+    const val YHEIGHT_DIVISOR = 2.0 / 7.0
+
+    private const val ALPHA_1_2 = 0x0000_000004_000002
+
+    fun GameWorld.getClampedHeight(): Int {
+        val clampNum = when (INGAME.worldGenVer) {
+            in 0L..ALPHA_1_2 -> 4500 // 4500 is the height on the HUGE setting until Alpha 1.2
+            else -> 3200
+        }
+        return this.height.coerceAtMost(clampNum)
+    }
+
+
+    /** Will modify the Terragen as if the height of the world is strictly 3200 (see [GameWorld.getClampedHeight]) */
+    fun getSY(y: Int): Double = y - (world.getClampedHeight() - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+
+
     private lateinit var world: GameWorld
     lateinit var params: WorldgenParams
         private set
@@ -164,7 +182,7 @@ object Worldgen {
      * @return starting chunk Y index, ending chunk Y index (inclusive)
      */
     fun getChunkGenStrip(world: GameWorld): Pair<Int, Int> {
-        val start = (0.00342f * world.height - 3.22f).floorToInt().coerceAtLeast(1)
+        val start = (0.00342f * world.getClampedHeight() - 3.22f).floorToInt().coerceAtLeast(1)
         // this value has to extend up, otherwise the player may spawn into the chopped-off mountaintop
         // this value has to extend down into the rock layer, otherwise, if the bottom of the bottom chunk is dirt, they will turn into grasses
         //     - the second condition is nullified with the new NOT-GENERATED markers on the terrain
@@ -408,9 +426,16 @@ object Worldgen {
     }
 
     private fun getCaveAttenuateBiasScaled(highlandLowlandSelectCache: ModuleCache, params: TerragenParams): ModuleCache {
-        val caveAttenuateBias = ModuleBias().also {
+        val caveAttenuateBias0 = ModuleBias().also {
             it.setSource(highlandLowlandSelectCache)
             it.setBias(params.caveAttenuateBias) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
+        }
+
+        val caveAttenuateBias = caveAttenuateBias0.let {
+            ModuleScaleOffset().also {
+                it.setSource(caveAttenuateBias0)
+                it.setScale(params.caveAttenuateScale)
+            }
         }
 
         val scale =  ModuleScaleDomain().also {
@@ -461,12 +486,29 @@ abstract class Gen(val world: GameWorld, val isFinal: Boolean, val seed: Long, v
     }
 }
 
-data class WorldgenParams(
+sealed class WorldgenParams(
     val seed: Long,
     // optional parameters
-    val terragenParams: TerragenParams = TerragenParams(),
-    val biomegenParams: BiomegenParams = BiomegenParams(),
-    val treegenParams: TreegenParams = TreegenParams(),
+    val terragenParams: TerragenParams,
+    val biomegenParams: BiomegenParams,
+    val treegenParams: TreegenParams,
+) {
+    companion object {
+        fun getParamsByVersion(versionRaw: Long?, seed: Long): WorldgenParams {
+            val versionRaw = versionRaw ?: 0x7FFF_FFFFFF_FFFFFF // use current version for null
+            when (versionRaw) {
+                in 0..0x0000_000004_000003 -> return WorldgenParamsAlpha1(seed) // 0.4.3 is a dev-only version
+                in 0x0000_000004_000004..0x7FFF_FFFFFF_FFFFFF -> return WorldgenParamsAlpha2(seed) // 0.4.4 is also a dev-only version
+                else -> throw IllegalArgumentException("Unknown version: $versionRaw")
+            }
+        }
+    }
+}
+class WorldgenParamsAlpha1(seed: Long) : WorldgenParams(
+    seed, TerragenParamsAlpha1(), BiomegenParams(), TreegenParams(),
+)
+class WorldgenParamsAlpha2(seed: Long) : WorldgenParams(
+    seed, TerragenParamsAlpha2(), BiomegenParams(), TreegenParams(),
 )
 
 infix fun Long.shake(other: Long): Long {

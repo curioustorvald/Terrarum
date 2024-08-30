@@ -2,7 +2,6 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
-import net.torvald.terrarum.App
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
@@ -99,7 +98,7 @@ class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val 
             val sx = sin(sampleTheta) * soff + soff // plus sampleOffset to make only
             val sz = cos(sampleTheta) * soff + soff // positive points are to be sampled
             for (y in yStart until yStart + CHUNK_H) {
-                val sy = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+                val sy = Worldgen.getSY(y)
 
                 val control1 =
                     noises[0].get(sx, sy, sz).coerceIn(0.0, 0.99999).times(slices).toInt().coerceAtMost(slices - 1)
