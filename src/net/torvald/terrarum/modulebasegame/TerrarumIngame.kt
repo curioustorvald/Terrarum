@@ -168,10 +168,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                  // x: neither
                  (this.hitbox.endX >= WorldCamera.x && this.hitbox.startX <= WorldCamera.xEnd))
 
-        val SIZE_SMALL = Point2i(6030, 1800)
-        val SIZE_NORMAL = Point2i(9000, 2250)
-        val SIZE_LARGE = Point2i(13500, 2970)
-        val SIZE_HUGE = Point2i(22500, 4500)
+        val SIZE_SMALL = Point2i(6030, 4500)
+        val SIZE_NORMAL = Point2i(9000, 6750)
+        val SIZE_LARGE = Point2i(13500, 10080)
+        val SIZE_HUGE = Point2i(22500, 16920) // world ratio: 4:3
         val NEW_WORLD_SIZE = arrayOf(SIZE_SMALL, SIZE_NORMAL, SIZE_LARGE, SIZE_HUGE)
         val WORLDPORTAL_NEW_WORLD_SIZE = arrayOf(SIZE_SMALL, SIZE_NORMAL, SIZE_LARGE, SIZE_HUGE)
 

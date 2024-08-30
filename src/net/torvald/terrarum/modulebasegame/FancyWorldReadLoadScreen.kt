@@ -42,11 +42,11 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
 
     val ratio = worldwidth * sqrt(2.0 / (worldwidth.sqr() + worldheight.sqr())) // world size is always wider than tall
     val htilesCount = worldwidth / CHUNK_W
-    val vtilesCount = worldheight / CHUNK_H
+//    val vtilesCount = worldheight / CHUNK_H
 
     val unitSize = ((540 * ratio) / htilesCount).roundToInt() // (visible tilesize + gapSize)
     val previewWidth = unitSize * htilesCount
-    val previewHeight = unitSize * vtilesCount
+    val previewHeight = (previewWidth / 5f).roundToInt()
 
     val xoff = (Math.random() * (1024-764)/2).toInt()
 

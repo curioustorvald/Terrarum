@@ -299,7 +299,7 @@ object ModMgr {
                             }
                         }
                         catch (e: Throwable) {
-                            printdbgerr(this, "$moduleName failed to load, skipping...")
+                            printdbgerr(this, "Module failed to load, skipping: $moduleName")
                             printdbgerr(this, "\t$e")
                             print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
 
@@ -316,20 +316,20 @@ object ModMgr {
                             entryPointClasses.add(newClassInstance as ModuleEntryPoint)
                             (newClassInstance as ModuleEntryPoint).invoke()
 
-                            printdbg(this, "$moduleName loaded successfully")
+                            printdbg(this, "Module loaded successfully: $moduleName")
                         }
                         else {
                             moduleInfo.remove(moduleName)
                             moduleInfoErrored[moduleName] = module
-                            printdbg(this, "$moduleName did not load...")
+                            printdbg(this, "Module did not load: $moduleName")
                         }
 
                     }
 
-                    printmsg(this, "Module $moduleName processed")
+                    printmsg(this, "Module processed: $moduleName")
                 }
                 catch (noSuchModule: FileNotFoundException) {
-                    printmsgerr(this, "No such module: $moduleName, skipping...")
+                    printmsgerr(this, "No such module, skipping: $moduleName")
 
                     logError(LoadErrorType.NOT_EVEN_THERE, moduleName, noSuchModule)
 

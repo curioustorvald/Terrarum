@@ -161,7 +161,7 @@ class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val 
                         0 -> {
                             if (tileThis == Block.DIRT && hasNoFloor) {
                                 if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_GRAVELS
-                                Block.STONE_QUARRIED to null
+                                Block.STONE to null
                             }
                             else if (tileThis == Block.DIRT) {
                                 if (exposedToAir) biomeMapOut[ba] = BIOME_KEY_GRAVELS
