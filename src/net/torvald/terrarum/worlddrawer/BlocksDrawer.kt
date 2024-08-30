@@ -86,15 +86,6 @@ internal object BlocksDrawer {
     private const val NEARBY_TILE_KEY_DOWN = 2
     private const val NEARBY_TILE_KEY_LEFT = 3
 
-    private const val NEARBY_TILE_CODE_UP = 1
-    private const val NEARBY_TILE_CODE_RIGHT = 2
-    private const val NEARBY_TILE_CODE_DOWN = 4
-    private const val NEARBY_TILE_CODE_LEFT = 8
-
-
-    private const val GZIP_READBUF_SIZE = 8192
-
-
     private lateinit var terrainTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var wallTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var oreTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
@@ -103,9 +94,15 @@ internal object BlocksDrawer {
     private lateinit var blurMapTerr: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var blurMapWall: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var tempRenderTypeBuffer: UnsafeLong2D // this one is NOT dimension doubled; 0x tttt 00 ii where t=rawTileNum, i=nearbyTilesInfo
-    private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
-    private var tilesBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var terrainDrawBuffer1: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var terrainDrawBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var wallDrawBuffer1: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var wallDrawBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var oresDrawBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var fluidDrawBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var occlusionDrawBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
     private var blurTilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var nullBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
     private lateinit var tilesQuad: Mesh
     private val shaderTiling = App.loadShaderFromClasspath("shaders/default.vert", "shaders/tiling.frag")
@@ -272,14 +269,16 @@ internal object BlocksDrawer {
             camTransX += WorldCamera.deltaX
             camTransY += WorldCamera.deltaY
         }
+
         if (doTilemapUpdate) {
             // rendering tilemap only updates every three frame
             measureDebugTime("Renderer.Tiling*") {
-                drawTiles(WALL)
-                drawTiles(TERRAIN) // regular tiles
-                drawTiles(ORES)
-                drawTiles(FLUID)
-                drawTiles(OCCLUSION)
+                fillInTileBuffer(WALL)
+                fillInTileBuffer(TERRAIN) // regular tiles
+                fillInTileBuffer(ORES)
+                fillInTileBuffer(FLUID)
+                fillInTileBuffer(OCCLUSION)
+                prepareDrawBuffers()
             }
         }
     }
@@ -438,7 +437,7 @@ internal object BlocksDrawer {
      * @param drawModeTilesBlendMul If current drawing mode is MULTIPLY. Doesn't matter if mode is FLUID.
      * @param wire coduitTypes bit that is selected to be drawn. Must be the power of two.
      */
-    private fun drawTiles(mode: Int) {
+    private fun fillInTileBuffer(mode: Int) {
 
         // TODO the real fluid rendering must use separate function, but its code should be similar to this.
         //      shader's tileAtlas will be fluid.tga, pixels written to the buffer is in accordance with the new
@@ -1184,6 +1183,57 @@ internal object BlocksDrawer {
     private var camTransX = 0
     private var camTransY = 0
 
+    private fun prepareDrawBuffers() {
+        listOf(TERRAIN, WALL, ORES, FLUID, OCCLUSION).forEach { mode ->
+            val sourceBuffer = when(mode) {
+                TERRAIN -> terrainTilesBuffer
+                WALL -> wallTilesBuffer
+                ORES -> oreTilesBuffer
+                FLUID -> fluidTilesBuffer
+                OCCLUSION -> occlusionBuffer
+                else -> throw IllegalArgumentException()
+            }
+
+            val drawBuffer1 = when(mode) {
+                TERRAIN -> terrainDrawBuffer1
+                WALL -> wallDrawBuffer1
+                ORES -> oresDrawBuffer
+                FLUID -> fluidDrawBuffer
+                OCCLUSION -> occlusionDrawBuffer
+                else -> throw IllegalArgumentException()
+            }
+
+            val drawBuffer2 = when(mode) {
+                TERRAIN -> terrainDrawBuffer2
+                WALL -> wallDrawBuffer2
+                else -> null
+            }
+
+            for (y in 0 until drawBuffer1.height) {
+                for (x in 0 until drawBuffer1.width) {
+                    val colRaw = sourceBuffer[y, x]
+                    val colMain = colRaw.toInt()
+                    val colSub = colRaw.ushr(32).toInt()
+
+                    drawBuffer1.setColor(colMain)
+                    drawBuffer1.drawPixel(x, y)
+
+                    drawBuffer2?.setColor(colSub)
+                    drawBuffer2?.drawPixel(x, y)
+
+                    // write blurmap to its own buffer for TERRAIN and WALL
+                    if (mode == TERRAIN || mode == WALL) {
+                        val colRaw = (if (mode == TERRAIN) blurMapTerr else blurMapWall)[y, x]
+                        val colMain = colRaw.toInt()
+
+                        blurTilesBuffer.setColor(colMain)
+                        blurTilesBuffer.drawPixel(x, y)
+                    }
+                }
+            }
+        }
+    }
+
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -1197,60 +1247,38 @@ internal object BlocksDrawer {
             TERRAIN, ORES, WALL, OCCLUSION, FLUID, BLURMAP_TERR, BLURMAP_WALL -> tilesTerrain
             else -> throw IllegalArgumentException()
         }
-        val sourceBuffer = when(mode) {
-            TERRAIN -> terrainTilesBuffer
-            WALL -> wallTilesBuffer
-            ORES -> oreTilesBuffer
-            FLUID -> fluidTilesBuffer
-            OCCLUSION -> occlusionBuffer
-            else -> throw IllegalArgumentException()
-        }
+
         val vertexColour = when (mode) {
             WALL -> WALL_OVERLAY_COLOUR
             else -> Color.WHITE
         }
 
-        // write to colour buffer
-        // As the texture size is very small, multithreading it would be less effective
-        // TODO making it run sporadically without graphical issue would improve the tiling performance
-//        if (doTilemapUpdate) {
-            for (y in 0 until tilesBuffer.height) {
-                for (x in 0 until tilesBuffer.width) {
-                    val colRaw = sourceBuffer[y, x]
-                    val colMain = colRaw.toInt()
-                    val colSub = colRaw.ushr(32).toInt()
+        val drawBuffer1 = when(mode) {
+            TERRAIN -> terrainDrawBuffer1
+            WALL -> wallDrawBuffer1
+            ORES -> oresDrawBuffer
+            FLUID -> fluidDrawBuffer
+            OCCLUSION -> occlusionDrawBuffer
+            else -> throw IllegalArgumentException()
+        }
 
-                    tilesBuffer.setColor(colMain)
-                    tilesBuffer.drawPixel(x, y)
-
-                    tilesBuffer2.setColor(colSub)
-                    tilesBuffer2.drawPixel(x, y)
-
-                    // write blurmap to its own buffer for TERRAIN and WALL
-                    if (mode == TERRAIN || mode == WALL) {
-                        val colRaw = (if (mode == TERRAIN) blurMapTerr else blurMapWall)[y, x]
-                        val colMain = colRaw.toInt()
-
-                        blurTilesBuffer.setColor(colMain)
-                        blurTilesBuffer.drawPixel(x, y)
-                    }
-                }
-            }
-//        }
-
+        val drawBuffer2 = when(mode) {
+            TERRAIN -> terrainDrawBuffer2
+            WALL -> wallDrawBuffer2
+            else -> nullBuffer
+        }
 
         _tilesBufferAsTex.dispose()
-        _tilesBufferAsTex = Texture(tilesBuffer)
+        _tilesBufferAsTex = Texture(drawBuffer1)
         _tilesBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         _tilesBufferAsTex2.dispose()
-        _tilesBufferAsTex2 = Texture(tilesBuffer2)
+        _tilesBufferAsTex2 = Texture(drawBuffer2)
         _tilesBufferAsTex2.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         _blurTilesBuffer.dispose()
         _blurTilesBuffer = Texture(blurTilesBuffer)
         _blurTilesBuffer.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-
 
         if (drawEmissive) {
             nullTex.bind(4)
@@ -1282,7 +1310,7 @@ internal object BlocksDrawer {
         shaderTiling.setUniformi("tilemap", 2)
         shaderTiling.setUniformi("tilemap2", 3)
         shaderTiling.setUniformi("deblockingMap", 4)
-        shaderTiling.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
+        shaderTiling.setUniformi("tilemapDimension", drawBuffer1.width, drawBuffer1.height)
         shaderTiling.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
         shaderTiling.setUniformi("cameraTranslation", camTransX, camTransY) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div
         shaderTiling.setUniformf("tilesInAtlas", tileAtlas.horizontalCount * 2f, tileAtlas.verticalCount * 2f) //depends on the tile atlas
@@ -1335,10 +1363,20 @@ internal object BlocksDrawer {
             blurMapWall = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             tempRenderTypeBuffer = UnsafeLong2D(hTilesInHorizontal, hTilesInVertical)
 
-            tilesBuffer.dispose()
-            tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
-            tilesBuffer2.dispose()
-            tilesBuffer2 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            terrainDrawBuffer1.dispose()
+            terrainDrawBuffer1 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            terrainDrawBuffer2.dispose()
+            terrainDrawBuffer2 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            wallDrawBuffer1.dispose()
+            wallDrawBuffer1 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            wallDrawBuffer2.dispose()
+            wallDrawBuffer2 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            oresDrawBuffer.dispose()
+            oresDrawBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            fluidDrawBuffer.dispose()
+            fluidDrawBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            occlusionDrawBuffer.dispose()
+            occlusionDrawBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
             blurTilesBuffer.dispose()
             blurTilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
         }
@@ -1406,8 +1444,13 @@ internal object BlocksDrawer {
         tileItemWall.dispose()
         tileItemWallGlow.dispose()
         tileItemWallEmissive.dispose()
-        tilesBuffer.dispose()
-        tilesBuffer2.dispose()
+        terrainDrawBuffer1.dispose()
+        terrainDrawBuffer2.dispose()
+        wallDrawBuffer1.dispose()
+        wallDrawBuffer2.dispose()
+        oresDrawBuffer.dispose()
+        fluidDrawBuffer.dispose()
+        occlusionDrawBuffer.dispose()
         blurTilesBuffer.dispose()
         _tilesBufferAsTex.dispose()
         _tilesBufferAsTex2.dispose()
@@ -1416,6 +1459,7 @@ internal object BlocksDrawer {
         shaderTiling.dispose()
         shaderDeblock.dispose()
         nullTex.dispose()
+        nullBuffer.dispose()
 
         if (::terrainTilesBuffer.isInitialized) terrainTilesBuffer.destroy()
         if (::wallTilesBuffer.isInitialized) wallTilesBuffer.destroy()
