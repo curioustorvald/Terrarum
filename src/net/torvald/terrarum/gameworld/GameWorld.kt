@@ -7,6 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.isFluid
@@ -23,6 +24,7 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
 import java.util.*
+import java.util.concurrent.Executors.callable
 
 typealias BlockAddress = Long
 
@@ -301,8 +303,11 @@ open class GameWorld(
 //        fluidNumberToNameMap[65535] = Fluid.NULL
 //        fluidNameToNumberMap[Fluid.NULL] = 0
 
+
+        BlocksDrawer.rebuildInternalPrecalculations()
+
         // perform renaming of tile layers
-        for (y in 0 until layerTerrain.height) {
+        /*for (y in 0 until layerTerrain.height) {
             for (x in 0 until layerTerrain.width) {
                 // renumber terrain and wall
                 layerTerrain.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerTerrain.unsafeGetTile(x, y).toLong()]]!!)
@@ -318,9 +323,61 @@ open class GameWorld(
                 val oldFluidName = oldTileNumberToNameMap[oldFluidNum.toLong()]
                 layerFluids.unsafeSetTile(x, y, oldFluidName.let { tileNameToNumberMap[it] ?: throw NullPointerException("Unknown tile name: $oldFluidName (<- $oldFluidNum)") }, oldFluidFill)
             }
-        }
+        }*/
+        // will use as much threads you have on the system
+        printdbg(this, "starting renumbering thread")
+        try {
+            val te = ThreadExecutor()
+            te.renew()
+            te.submitAll1(
+                (0 until layerTerrain.width step CHUNK_W).map { xorigin ->
+                    callable {
+                        for (y in 0 until layerTerrain.height) {
+                            for (x in xorigin until (xorigin + CHUNK_W).coerceAtMost(layerTerrain.width)) {
+                                // renumber terrain and wall
+                                layerTerrain.unsafeSetTile(
+                                    x, y,
+                                    tileNameToNumberMap[oldTileNumberToNameMap[layerTerrain.unsafeGetTile(x, y)
+                                        .toLong()]]!!
+                                )
+                                layerWall.unsafeSetTile(
+                                    x, y,
+                                    tileNameToNumberMap[oldTileNumberToNameMap[layerWall.unsafeGetTile(x, y)
+                                        .toLong()]]!!
+                                )
 
-        BlocksDrawer.rebuildInternalPrecalculations()
+                                // renumber ores
+                                val oldOreNum = layerOres.unsafeGetTile(x, y).toLong()
+                                val oldOreName = oldTileNumberToNameMap[oldOreNum]
+                                layerOres.unsafeSetTileKeepPlacement(x, y,
+                                    oldOreName.let {
+                                        tileNameToNumberMap[it]
+                                            ?: throw NullPointerException("Unknown tile name: $oldOreName (<- $oldOreNum)")
+                                    })
+
+                                // renumber fluids
+                                val (oldFluidNum, oldFluidFill) = layerFluids.unsafeGetTile1(x, y)
+                                val oldFluidName = oldTileNumberToNameMap[oldFluidNum.toLong()]
+                                layerFluids.unsafeSetTile(
+                                    x, y,
+                                    oldFluidName.let {
+                                        tileNameToNumberMap[it]
+                                            ?: throw NullPointerException("Unknown tile name: $oldFluidName (<- $oldFluidNum)")
+                                    },
+                                    oldFluidFill
+                                )
+                            }
+                        }
+                    }
+                }
+            )
+            te.join()
+        }
+        catch (e: Throwable) {
+            e.printStackTrace()
+            throw e
+        }
+        printdbg(this, "renumbering thread finished")
 
         printdbg(this, "renumberTilesAfterLoad done!")
     }

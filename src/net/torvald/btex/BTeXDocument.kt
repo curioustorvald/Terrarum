@@ -240,7 +240,6 @@ class BTeXDocument : Disposable {
                     printPageNumber(pixmap, pageNum, 0, 0)
                     pagePixmaps[pageNum] = pixmap
                     progressIndicator.getAndAdd(1)
-                    Unit
                 } } }
 
                 ThreadExecutor(THREAD_COUNT).also {

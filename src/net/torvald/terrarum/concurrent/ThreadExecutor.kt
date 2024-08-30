@@ -21,6 +21,8 @@ class ThreadExecutor(
     var allFinished = true
         private set
 
+    private var init = false
+
     init {
         App.disposables.add(Disposable { this.killAll() })
     }
@@ -35,6 +37,12 @@ class ThreadExecutor(
         catch (e: UninitializedPropertyAccessException) {}
     }
 
+    private fun checkInit() {
+        if (!init) {
+            throw IllegalStateException("ThreadExecuter not initialised; run renew() first!")
+        }
+    }
+
     fun renew() {
         try {
             if (!executor.isTerminated && !executor.isShutdown) throw IllegalStateException("Pool is still running")
@@ -45,6 +53,7 @@ class ThreadExecutor(
         futures.clear()
         isOpen = true
         allFinished = false
+        init = true
     }
 
     /*fun invokeAll(ts: List<Callable<Unit>>) {
@@ -52,17 +61,30 @@ class ThreadExecutor(
         executor.invokeAll(ts)
     }*/
 
+    fun submit1(t: Callable<Any?>) { // is JetBrain's fault, not mine
+        checkInit()
+        checkShutdown()
+        futures.add(executor.submit(t))
+    }
+    fun submitAll1(ts: List<Callable<Any?>>) { // is JetBrain's fault, not mine
+        checkInit()
+        checkShutdown()
+        ts.forEach { futures.add(executor.submit(it)) }
+    }
     fun submit(t: Callable<Unit>) {
+        checkInit()
         checkShutdown()
         futures.add(executor.submit(t))
     }
     fun submitAll(ts: List<Callable<Unit>>) {
+        checkInit()
         checkShutdown()
         ts.forEach { futures.add(executor.submit(it)) }
     }
 
     // https://stackoverflow.com/questions/28818494/threads-stopping-prematurely-for-certain-values
     fun join() {
+        checkInit()
         //println("ThreadExecutor.join")
         isOpen = false
         futures.forEach {
@@ -70,7 +92,8 @@ class ThreadExecutor(
                 it.get()
             }
             catch (e: ExecutionException) {
-                throw e
+                e.cause!!.printStackTrace()
+                throw e.cause!!
             }
         }
         executor.shutdown() // thread status of completed ones will be WAIT instead of TERMINATED without this line...
