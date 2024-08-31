@@ -33,8 +33,9 @@ import kotlin.random.Random
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_DIVISOR
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_MAGIC
 import java.io.PrintStream
+import java.util.Calendar
 
-const val NOISEBOX_WIDTH = 1200
+const val NOISEBOX_WIDTH = 1600
 const val NOISEBOX_HEIGHT = 2400
 const val TWO_PI = Math.PI * 2
 
@@ -53,7 +54,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private lateinit var tempTex: Texture
 
     private val RNG = HQRNG()
-    private var seed = 10000L
+    private var seed = 373231L // old default seed: 10000L
 
     private var initialGenDone = false
 
@@ -80,6 +81,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     }
 
     private var generationTime = 0f
+    private var today = ""
 
     private val NM_TERR = TerragenTest to TerragenParamsAlpha2()
     private val NM_BIOME = BiomeMaker to BiomegenParams()
@@ -110,11 +112,17 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         // draw timer
         batch.inUse {
             if (worldgenDone) {
-                font.draw(batch, "Generation time: ${generationTime} seconds", 8f, 8f)
+                font.draw(batch, "Generation time: ${generationTime} seconds    Time: $today", 8f, 8f)
             }
             else {
                 font.draw(batch, "Generating...", 8f, 8f)
             }
+
+            font.draw(batch, "Seed: $seed", 8f, 8f + 1*20)
+
+            font.draw(batch, "caveAttenuateScale=${NM_TERR.second.caveAttenuateScale}", 8f, 8f + 2*20)
+            font.draw(batch, "caveAttenuateBias=${NM_TERR.second.caveAttenuateBias}", 8f, 8f + 3*20)
+            font.draw(batch, "caveSelectThre=${NM_TERR.second.caveSelectThre}", 8f, 8f + 4*20)
         }
     }
 
@@ -223,8 +231,21 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
             worldgenDone = true
 
-            val time = System.nanoTime() - generationStartTime
+            val timeNow = System.nanoTime()
+            val time = timeNow - generationStartTime
             generationTime = time / 1000000000f
+
+            Calendar.getInstance().apply {
+                today =
+                    "${get(Calendar.YEAR)}-" +
+                    "${get(Calendar.MONTH).plus(1).toString().padStart(2,'0')}-" +
+                    "${get(Calendar.DAY_OF_MONTH).toString().padStart(2,'0')}T" +
+
+                    "${get(Calendar.HOUR_OF_DAY).toString().padStart(2,'0')}:" +
+                    "${get(Calendar.MINUTE).toString().padStart(2,'0')}:" +
+                    "${get(Calendar.SECOND).toString().padStart(2,'0')}"
+            }
+
             callback()
         }.start()
 

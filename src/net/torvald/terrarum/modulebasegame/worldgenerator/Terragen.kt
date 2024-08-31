@@ -287,7 +287,7 @@ data class TerragenParamsAlpha2(
     override val mountainDisturbance: Double = 0.7, // greater = more distortion, overhangs
 
     override val caveShapeFreq: Double = 4.0, //adjust the "density" of the caves
-    override val caveAttenuateScale: Double = 0.98, // used with the caveAttenuateBias, controls the "concentration" of the cave gen
+    override val caveAttenuateScale: Double = 0.95, // used with the caveAttenuateBias, controls the "concentration" of the cave gen
     override val caveAttenuateBias: Double = 0.93, // 1.0: flattens the gradient (deep voids are less tend to be larger). Also controls the distribution of ores. Equation: x^(log(bias) / log(0.5))
     override val caveSelectThre: Double = 0.918, // also adjust this if you've touched the bias value. Number can be greater than 1.0
     override val caveBlockageFractalFreq: Double = 8.88,

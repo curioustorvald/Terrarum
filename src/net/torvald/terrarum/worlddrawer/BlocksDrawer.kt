@@ -462,7 +462,7 @@ internal object BlocksDrawer {
                         if (number == 65535 || fill < 1f/30f) 0
                         else number
                     }
-                    OCCLUSION -> 0
+                    OCCLUSION -> occlusionRenderTag.tileNumber
                     else -> throw IllegalArgumentException()
                 }
 
@@ -587,8 +587,6 @@ internal object BlocksDrawer {
                     0
                 }
 
-                val tileNumberBase = renderTag.tileNumber
-
                 val breakage = if (mode == TERRAIN || mode == ORES)
                     world.getTerrainDamage(x, y)
                 else if (mode == WALL)
@@ -647,7 +645,7 @@ internal object BlocksDrawer {
                         }.fold(0) { acc, it -> acc or it }
                     }
                     else null
-                    val subtiles = getSubtileIndexOf(tileNumberBase, nearbyTilesInfo, hash, subtileSwizzlers, variantOps, nearbyGrasses)
+                    val subtiles = getSubtileIndexOf(rawTileNum, nearbyTilesInfo, hash, subtileSwizzlers, variantOps, nearbyGrasses)
 
                     /*TL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, breakingStage, subtileSwizzlers[0])
                     /*TR*/writeToBufferSubtile(mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, breakingStage, subtileSwizzlers[1])
@@ -661,12 +659,12 @@ internal object BlocksDrawer {
                         0
                     // special case: fluids
                     else if (mode == FLUID)
-                        tileNumberBase + nearbyTilesInfo
+                        rawTileNum + nearbyTilesInfo
                     // special case: ores
                     else if (mode == ORES)
-                        tileNumberBase + world.layerOres.unsafeGetTile1(wx, wy).second
+                        rawTileNum + world.layerOres.unsafeGetTile1(wx, wy).second
                     // rest of the cases: terrain and walls
-                    else tileNumberBase + when (renderTag.maskType) {
+                    else rawTileNum + when (renderTag.maskType) {
                         CreateTileAtlas.RenderTag.MASK_NA -> 0
                         CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
                         CreateTileAtlas.RenderTag.MASK_47 -> connectLut47[nearbyTilesInfo]
