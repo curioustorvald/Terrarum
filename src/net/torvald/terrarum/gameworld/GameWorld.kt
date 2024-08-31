@@ -45,6 +45,10 @@ class SimpleGameWorld(width: Int, height: Int) : GameWorld(width, height) {
     override lateinit var layerWall: BlockLayerI16
     override lateinit var layerTerrain: BlockLayerI16
     constructor() : this(0, 0)
+    override fun dispose() {
+        layerWall.dispose()
+        layerTerrain.dispose()
+    }
 }
 
 open class GameWorld(
@@ -921,6 +925,8 @@ open class GameWorld(
     override fun dispose() {
         layerWall.dispose()
         layerTerrain.dispose()
+        layerOres.dispose()
+        layerFluids.dispose()
         //nullWorldInstance?.dispose() // must be called ONLY ONCE; preferably when the app exits
 
         disposed = true
