@@ -606,9 +606,21 @@ internal object TerragenTest : NoiseMaker {
             it.setBias(params.caveAttenuateBias) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
         })}
 
-        val caveAttenuateBias = caveAttenuateBias0.let {
+        val caveAttenuateBias1 = ModuleCache().also { it.setSource(ModuleBias().also {
+            it.setSource(highlandLowlandSelectCache)
+            it.setBias(params.caveAttenuateBias1) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
+        })}
+
+        val caveAttenuateBiasForTerr = caveAttenuateBias0.let {
             ModuleScaleOffset().also {
                 it.setSource(caveAttenuateBias0)
+                it.setScale(params.caveAttenuateScale)
+            }
+        }
+
+        val caveAttenuateBiasForOres = caveAttenuateBias0.let {
+            ModuleScaleOffset().also {
+                it.setSource(caveAttenuateBias1)
                 it.setScale(params.caveAttenuateScale)
             }
         }
@@ -616,7 +628,7 @@ internal object TerragenTest : NoiseMaker {
         val caveShapeAttenuate = ModuleCombiner().also {
             it.setType(ModuleCombiner.CombinerType.MULT)
             it.setSource(0, caveShape)
-            it.setSource(1, caveAttenuateBias)
+            it.setSource(1, caveAttenuateBiasForTerr)
         }
 
         val cavePerturbFractal = ModuleFractal().also {
@@ -660,7 +672,7 @@ internal object TerragenTest : NoiseMaker {
         val caveBlockageAttenuate = ModuleCombiner().also {
             it.setType(ModuleCombiner.CombinerType.MULT)
             it.setSource(0, caveBlockageFractal)
-            it.setSource(1, caveAttenuateBias)
+            it.setSource(1, caveAttenuateBiasForTerr)
         }
 
         val caveBlockageSelect = ModuleSelect().also {
@@ -711,7 +723,7 @@ internal object TerragenTest : NoiseMaker {
             it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
             it.setScaleY(1.0 / params.featureSize)
             it.setScaleZ(1.0 / params.featureSize)
-            it.setSource(caveAttenuateBias)
+            it.setSource(caveAttenuateBiasForOres)
         }
 
 
