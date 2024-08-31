@@ -426,23 +426,23 @@ object Worldgen {
     }
 
     private fun getCaveAttenuateBiasScaled(highlandLowlandSelectCache: ModuleCache, params: TerragenParams): ModuleCache {
-        val caveAttenuateBias0 = ModuleBias().also {
+        val caveAttenuateBias1 = ModuleCache().also { it.setSource(ModuleBias().also {
             it.setSource(highlandLowlandSelectCache)
-            it.setBias(params.caveAttenuateBias) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
-        }
+            it.setBias(params.caveAttenuateBias1) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
+        })}
 
-        val caveAttenuateBias = caveAttenuateBias0.let {
+        val caveAttenuateBiasForOres = caveAttenuateBias1.let {
             ModuleScaleOffset().also {
-                it.setSource(caveAttenuateBias0)
+                it.setSource(caveAttenuateBias1)
                 it.setScale(params.caveAttenuateScale)
             }
         }
 
-        val scale =  ModuleScaleDomain().also {
+        val scale = ModuleScaleDomain().also {
             it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
             it.setScaleY(1.0 / params.featureSize)
             it.setScaleZ(1.0 / params.featureSize)
-            it.setSource(caveAttenuateBias)
+            it.setSource(caveAttenuateBiasForOres)
         }
 
         return ModuleCache().also {
