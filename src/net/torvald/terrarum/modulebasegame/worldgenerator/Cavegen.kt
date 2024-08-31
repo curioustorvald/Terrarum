@@ -72,12 +72,11 @@ class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache
             it.setBias(params.caveAttenuateBias) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
         })}
 
-        val caveAttenuateBias = caveAttenuateBias0.let {
-            ModuleScaleOffset().also {
-                it.setSource(caveAttenuateBias0)
-                it.setScale(params.caveAttenuateScale)
-            }
+        val caveAttenuateBias = ModuleScaleOffset().also {
+            it.setSource(caveAttenuateBias0)
+            it.setScale(params.caveAttenuateScale)
         }
+
 
         val caveShapeAttenuate = ModuleCombiner().also {
             it.setType(ModuleCombiner.CombinerType.MULT)

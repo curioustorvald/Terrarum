@@ -250,6 +250,7 @@ interface TerragenParams {
     val caveShapeFreq: Double //adjust the "density" of the caves
     val caveAttenuateScale: Double // used with the caveAttenuateBias, controls the "concentration" of the cave gen
     val caveAttenuateBias: Double // 1.0: flattens the gradient (deep voids are less tend to be larger). Also controls the distribution of ores. Equation: x^(log(bias) / log(0.5))
+    val caveAttenuateScale1: Double // used with the caveAttenuateBias, controls the "concentration" of the cave gen
     val caveAttenuateBias1: Double // 1.0: flattens the gradient (deep voids are less tend to be larger). Also controls the distribution of ores. Equation: x^(log(bias) / log(0.5))
     val caveSelectThre: Double // also adjust this if you've touched the bias value. Number can be greater than 1.0
     val caveBlockageFractalFreq: Double
@@ -269,6 +270,7 @@ data class TerragenParamsAlpha1(
     override val caveShapeFreq: Double = 4.0, //adjust the "density" of the caves
     override val caveAttenuateScale: Double = 1.0, // used with the caveAttenuateBias, controls the "concentration" of the cave gen
     override val caveAttenuateBias: Double = 0.90, // 1.0: flattens the gradient (deep voids are less tend to be larger). Also controls the distribution of ores. Equation: x^(log(bias) / log(0.5))
+    override val caveAttenuateScale1: Double = 1.0, // used with the caveAttenuateBias, controls the "concentration" of the cave gen
     override val caveAttenuateBias1: Double = 0.90, // 1.0: flattens the gradient (deep voids are less tend to be larger). Also controls the distribution of ores. Equation: x^(log(bias) / log(0.5))
     override val caveSelectThre: Double = 0.918, // also adjust this if you've touched the bias value. Number can be greater than 1.0
     override val caveBlockageFractalFreq: Double = 8.88,
@@ -291,6 +293,7 @@ data class TerragenParamsAlpha2(
     override val caveShapeFreq: Double = 4.0, //adjust the "density" of the caves
     override val caveAttenuateScale: Double = 0.94, // used with the caveAttenuateBias, controls the "concentration" of the cave gen
     override val caveAttenuateBias: Double = 0.95, // 1.0: flattens the gradient (deep voids are less tend to be larger). Also controls the distribution of ores. Equation: x^(log(bias) / log(0.5))
+    override val caveAttenuateScale1: Double = 0.90, // used with the caveAttenuateBias, controls the "concentration" of the cave gen
     override val caveAttenuateBias1: Double = 0.90, // 1.0: flattens the gradient (deep voids are less tend to be larger). Also controls the distribution of ores. Equation: x^(log(bias) / log(0.5))
     override val caveSelectThre: Double = 0.915, // also adjust this if you've touched the bias value. Number can be greater than 1.0
     override val caveBlockageFractalFreq: Double = 8.88,

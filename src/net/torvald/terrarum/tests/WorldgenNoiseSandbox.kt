@@ -83,7 +83,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private var generationTime = 0f
     private var today = ""
 
-    private val NM_TERR = TerragenTest to TerragenParamsAlpha2()
+    private val NM_TERR = TerragenTest(TerragenParamsAlpha2())
     private val NM_BIOME = BiomeMaker to BiomegenParams()
 
     private val NOISEMAKER = NM_TERR
@@ -120,9 +120,11 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
             font.draw(batch, "Seed: $seed", 8f, 8f + 1*20)
 
-            font.draw(batch, "caveAttenuateScale=${NM_TERR.second.caveAttenuateScale}", 8f, 8f + 2*20)
-            font.draw(batch, "caveAttenuateBias=${NM_TERR.second.caveAttenuateBias}", 8f, 8f + 3*20)
-            font.draw(batch, "caveSelectThre=${NM_TERR.second.caveSelectThre}", 8f, 8f + 4*20)
+            font.draw(batch, "caveAttenuateScale=${NM_TERR.params.caveAttenuateScale}", 8f, 8f + 2*20)
+            font.draw(batch, "caveAttenuateScale1=${NM_TERR.params.caveAttenuateScale1}", 8f, 8f + 3*20)
+            font.draw(batch, "caveAttenuateBias=${NM_TERR.params.caveAttenuateBias}", 8f, 8f + 4*20)
+            font.draw(batch, "caveAttenuateBias1=${NM_TERR.params.caveAttenuateBias1}", 8f, 8f +5*20)
+            font.draw(batch, "caveSelectThre=${NM_TERR.params.caveSelectThre}", 8f, 8f + 6*20)
         }
     }
 
@@ -189,7 +191,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     private fun getSY(y: Int): Double = y - (getClampedHeight() - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
 
-    private fun renderNoise(noiseMaker: Pair<NoiseMaker, Any>, callback: () -> Unit = {}) {
+    private fun renderNoise(noiseMaker: NoiseMaker, callback: () -> Unit = {}) {
         generationStartTime = System.nanoTime()
 
         // erase first
@@ -204,7 +206,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         Thread {
             val runnables: List<RunnableFun> = (0 until testTex.width).sliceEvenly(genSlices).map { range ->
                 {
-                    val localJoise = noiseMaker.first.getGenerator(seed, noiseMaker.second)
+                    val localJoise = noiseMaker.getGenerator(seed, 0)
                     for (x in range) {
                         for (y in 0 until NOISEBOX_HEIGHT) {
                             val sampleTheta = (x.toDouble() / NOISEBOX_WIDTH) * TWO_PI
@@ -212,9 +214,9 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
                                 sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
                             val sampleZ =
                                 cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                            val sampleY = getSY(y)
+                            val sampleY = getSY(y) //+ 10000
 
-                            noiseMaker.first.draw(x, y, localJoise.mapIndexed { index, it ->
+                            noiseMaker.draw(x, y, localJoise.mapIndexed { index, it ->
                                 it.get(sampleX, sampleY, sampleZ)
                             }, testTex)
                         }
@@ -335,7 +337,7 @@ internal object BiomeMaker : NoiseMaker {
 }
 
 // http://accidentalnoise.sourceforge.net/minecraftworlds.html
-internal object TerragenTest : NoiseMaker {
+internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
 
     private infix fun Color.mul(other: Color) = this.mul(other)
 
@@ -387,7 +389,7 @@ internal object TerragenTest : NoiseMaker {
     )
 
     private val terragenYscaling = (NOISEBOX_HEIGHT / 2400.0).pow(0.75)
-    private val terragenTiers = listOf(.0, .5, 1.5, 4.0).map { it * terragenYscaling } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
+    private val terragenTiers = (params.terragenTiers).map { it * terragenYscaling } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
 
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val terr = noiseValue[0].tiered(terragenTiers)
@@ -432,8 +434,7 @@ internal object TerragenTest : NoiseMaker {
     }
 
 
-    override fun getGenerator(seed: Long, params: Any): List<Joise> {
-        val params = params as TerragenParams
+    override fun getGenerator(seed: Long, wtf: Any): List<Joise> {
         val lowlandMagic: Long = 0x41A21A114DBE56 // Maria Lindberg
         val highlandMagic: Long = 0x0114E091      // Olive Oyl
         val mountainMagic: Long = 0x115AA4DE2504  // Lisa Anderson
@@ -611,19 +612,17 @@ internal object TerragenTest : NoiseMaker {
             it.setBias(params.caveAttenuateBias1) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
         })}
 
-        val caveAttenuateBiasForTerr = caveAttenuateBias0.let {
-            ModuleScaleOffset().also {
-                it.setSource(caveAttenuateBias0)
-                it.setScale(params.caveAttenuateScale)
-            }
+        val caveAttenuateBiasForTerr = ModuleScaleOffset().also {
+            it.setSource(caveAttenuateBias0)
+            it.setScale(params.caveAttenuateScale)
         }
 
-        val caveAttenuateBiasForOres = caveAttenuateBias0.let {
-            ModuleScaleOffset().also {
-                it.setSource(caveAttenuateBias1)
-                it.setScale(params.caveAttenuateScale)
-            }
+
+        val caveAttenuateBiasForOres = ModuleScaleOffset().also {
+            it.setSource(caveAttenuateBias1)
+            it.setScale(params.caveAttenuateScale1)
         }
+
 
         val caveShapeAttenuate = ModuleCombiner().also {
             it.setType(ModuleCombiner.CombinerType.MULT)

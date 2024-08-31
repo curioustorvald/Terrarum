@@ -431,11 +431,9 @@ object Worldgen {
             it.setBias(params.caveAttenuateBias1) // (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
         })}
 
-        val caveAttenuateBiasForOres = caveAttenuateBias1.let {
-            ModuleScaleOffset().also {
-                it.setSource(caveAttenuateBias1)
-                it.setScale(params.caveAttenuateScale)
-            }
+        val caveAttenuateBiasForOres = ModuleScaleOffset().also {
+            it.setSource(caveAttenuateBias1)
+            it.setScale(params.caveAttenuateScale1)
         }
 
         val scale = ModuleScaleDomain().also {
