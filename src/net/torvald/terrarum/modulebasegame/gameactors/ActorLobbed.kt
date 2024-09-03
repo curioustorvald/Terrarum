@@ -40,7 +40,7 @@ open class ActorLobbed(throwPitch: Float) : ActorWithBody() {
         super.updateImpl(delta)
         if (!soundFired) {
             soundFired = true
-            val amp = 1.65 * (pitch - 0.495)
+            val amp = 6.0 * (pitch.sqrt() - 0.495)
             startAudio(whooshSound, amp)
         }
     }

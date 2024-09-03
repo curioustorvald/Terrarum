@@ -919,6 +919,15 @@ class YamlCommandNewFlatTerrain : YamlInvokable {
         val timeNow = System.currentTimeMillis() / 1000
         ui.gameWorld = GameWorld(90*12, 90*4, timeNow, timeNow)
 
+        // remove null tiles
+        for (y in 0 until ui.gameWorld.height) {
+            for (x in 0 until ui.gameWorld.width) {
+                ui.gameWorld.setTileWall(x, y, Block.AIR, true)
+                ui.gameWorld.setTileTerrain(x, y, Block.AIR, true)
+            }
+        }
+
+        // fill with stuffs
         for (y in 0 until ui.gameWorld.height) {
             ui.gameWorld.setTileWall(0, y, Block.ILLUMINATOR_RED, true)
             ui.gameWorld.setTileWall(ui.gameWorld.width - 1, y, Block.ILLUMINATOR_RED, true)
