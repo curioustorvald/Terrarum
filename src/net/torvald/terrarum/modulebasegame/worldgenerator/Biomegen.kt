@@ -55,7 +55,7 @@ class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val 
 
     companion object {
         private const val slices = 5
-        private val nearbyArr = arrayOf(
+        private val nearbyArr8 = arrayOf(
             (-1 to -1), // tileTL
             (+1 to -1), // tileTR
             (-1 to +1), // tileBL
@@ -65,14 +65,25 @@ class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val 
             (-1 to 0), // tileL
             (+1 to 0) // tileR
         )
-        private const val TL = 0
-        private const val TR = 1
-        private const val BL = 2
-        private const val BR = 3
-        private const val TP = 4
-        private const val BT = 5
-        private const val LF = 6
-        private const val RH = 7
+        private val nearbyArr4 = arrayOf(
+            (0 to -1), // tileT
+            (0 to +1), // tileB
+            (-1 to 0), // tileL
+            (+1 to 0) // tileR
+        )
+        private const val TL8 = 0
+        private const val TR8 = 1
+        private const val BL8 = 2
+        private const val BR8 = 3
+        private const val TP8 = 4
+        private const val BT8 = 5
+        private const val LF8 = 6
+        private const val RH8 = 7
+
+        private const val TP4 = 0
+        private const val BT4 = 1
+        private const val LF4 = 2
+        private const val RH4 = 3
 
         /* Biome key format:
 
@@ -109,10 +120,10 @@ class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val 
                 if (y > 0) {
                     val tileThis = world.getTileFromTerrain(x, y)
                     val wallThis = world.getTileFromWall(x, y)
-                    val nearbyTerr = nearbyArr.map { world.getTileFromTerrain(x + it.first, y + it.second) }
-                    val nearbyWall = nearbyArr.map { world.getTileFromWall(x + it.first, y + it.second) }
+                    val nearbyTerr = nearbyArr8.map { world.getTileFromTerrain(x + it.first, y + it.second) }
+                    val nearbyWall = nearbyArr8.map { world.getTileFromWall(x + it.first, y + it.second) }
                     val exposedToAir = nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }
-                    val hasNoFloor = (nearbyTerr[BT] == Block.AIR)
+                    val hasNoFloor = (nearbyTerr[BT8] == Block.AIR)
 
                     val grassRock = when (control1) {
                         0 -> { // woodlands

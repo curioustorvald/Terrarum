@@ -215,6 +215,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         IngameRenderer.setRenderedWorld(demoWorld)
         WeatherMixer.internalReset(this)
         WeatherMixer.titleScreenInitWeather(demoWorld.weatherbox)
+        WeatherMixer.forceTimeAt = 23456
 
 
         // load a half-gradient texture that would be used throughout the titlescreen and its sub UIs

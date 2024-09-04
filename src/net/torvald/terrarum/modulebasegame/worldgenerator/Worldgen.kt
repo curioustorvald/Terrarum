@@ -16,6 +16,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
+import java.util.concurrent.Callable
 import kotlin.experimental.and
 import kotlin.math.pow
 import kotlin.math.roundToLong
@@ -119,7 +120,8 @@ object Worldgen {
         val pcx = spawnX / CHUNK_W
         val pcy = spawnY / CHUNK_H
         App.getLoadScreen().addMessage(Lang["MENU_IO_WORLDGEN_CLEANING_UP"])
-        listOf(
+
+        val chunkgenJobs = listOf(
             Point2iMod(pcx - 1, pcy - 2), Point2iMod(pcx, pcy - 2), Point2iMod(pcx + 1, pcy - 2),
             Point2iMod(pcx - 2, pcy - 1), Point2iMod(pcx - 1, pcy - 1), Point2iMod(pcx, pcy - 1), Point2iMod(pcx + 1, pcy - 1),  Point2iMod(pcx + 2, pcy - 1),
             Point2iMod(pcx - 2, pcy), Point2iMod(pcx - 1, pcy), Point2iMod(pcx + 1, pcy),  Point2iMod(pcx + 2, pcy),
@@ -128,9 +130,13 @@ object Worldgen {
         ).filter { it.y in 0 until world.height }.filter {  (cx, cy) ->
             if (cy !in 0 until world.height / CHUNK_H) false
             else (world.chunkFlags[cy][cx].and(0x7F) == 0.toByte())
-        }.forEach { (cx, cy) ->
-            Worldgen.generateChunkIngame(cx, cy, true) { cx, cy -> }
+        }.map { (cx, cy) ->
+            Callable { generateChunkIngame(cx, cy, true) { cx, cy -> } }
         }
+
+        Worldgen.threadExecutor.renew()
+        threadExecutor.submitAll(chunkgenJobs)
+        Worldgen.threadExecutor.join()
 
 
         val tDiff = System.nanoTime() - t1
