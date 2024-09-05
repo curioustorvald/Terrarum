@@ -79,6 +79,9 @@ object WorldCamera {
     inline val camVector: com.badlogic.gdx.math.Vector2
         get() = com.badlogic.gdx.math.Vector2(gdxCamX, gdxCamY)
 
+    /**
+     * Must be called on RENDER, not UPDATE, before the IngameRenderer invocation.
+     */
     fun update(world: GameWorld, player: ActorWithBody?) {
         if (player == null) return
 

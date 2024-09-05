@@ -1176,7 +1176,11 @@ internal object BlocksDrawer {
     private val occlusionIntensity = 0.25f // too low value and dark-coloured walls won't darken enough
 
     private val doTilemapUpdate: Boolean
-        get() = (!world.layerTerrain.ptrDestroyed && App.GLOBAL_RENDER_TIMER % 3 == 0L)
+        get() {
+            // TODO adaptive rate control via cam delta
+            val rate = 4
+            return (!world.layerTerrain.ptrDestroyed && App.GLOBAL_RENDER_TIMER % rate == 0L)
+        }
 
     private var camTransX = 0
     private var camTransY = 0

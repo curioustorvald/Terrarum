@@ -328,9 +328,6 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         WeatherMixer.update(delta, cameraPlayer, demoWorld)
         cameraPlayer.update(delta)
 
-        // worldcamera update AFTER cameraplayer in this case; the other way is just an exception for actual ingame SFX
-        WorldCamera.update(demoWorld, cameraPlayer)
-
         // update UIs //
         uiContainer.forEach { it?.update(delta) }
 
@@ -369,6 +366,8 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         if (!demoWorld.layerTerrain.ptr.destroyed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
+            WorldCamera.update(demoWorld, cameraPlayer)
+
             IngameRenderer.invoke(
                 delta,
                 false,

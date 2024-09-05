@@ -359,9 +359,6 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         mouseOnUI = (overwriteMouseOnUI || uiPenMenu.isVisible /*|| uiPalette.isVisible*/ || uiGetPoiName.isVisible)
 
 
-        WorldCamera.update(world, actorNowPlaying)
-
-
         // make pen work HERE
         // when LEFT mouse is down
         if (!tappedOnUI && Terrarum.mouseDown && !mouseOnUI) {
@@ -456,6 +453,8 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private val renderGame = { delta: Float ->
         _testMarkerDrawCalls = 0L
+
+        WorldCamera.update(world, actorNowPlaying)
 
         IngameRenderer.invoke(delta, false,
             screenZoom,
