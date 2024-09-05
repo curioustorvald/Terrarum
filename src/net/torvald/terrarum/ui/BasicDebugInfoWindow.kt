@@ -286,6 +286,8 @@ class BasicDebugInfoWindow : UICanvas() {
         batch.draw(icons.get(0,0), gap + 7f*cxyX, line(cxyY))
         App.fontSmallNumbers.draw(batch, "X$ccG${WorldCamera.x.toString().padStart(7)}", gap + 7f*(cxyX + 3), line(cxyY))
         App.fontSmallNumbers.draw(batch, "Y$ccG${WorldCamera.y.toString().padStart(7)}", gap + 7f*(cxyX + 3), line(cxyY+1))
+//        App.fontSmallNumbers.draw(batch, "X$ccG${WorldCamera.deltaX.toString().padStart(7)}", gap + 7f*(cxyX + 3), line(cxyY))
+//        App.fontSmallNumbers.draw(batch, "Y$ccG${WorldCamera.deltaY.toString().padStart(7)}", gap + 7f*(cxyX + 3), line(cxyY+1))
 
 
         // sun and weather

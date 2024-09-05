@@ -13,6 +13,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
@@ -1177,8 +1178,8 @@ internal object BlocksDrawer {
 
     private val doTilemapUpdate: Boolean
         get() {
-            // TODO adaptive rate control via cam delta
-            val rate = 4
+            val rate = ((2f * TILE_SIZEF) / maxOf(WorldCamera.deltaX.abs(), WorldCamera.deltaY.abs()).coerceAtLeast(1)).roundToInt().coerceIn(1, 4)
+//            App.debugTimers.put("Renderer.tilemapUpdateDivider", rate.toLong())
             return (!world.layerTerrain.ptrDestroyed && App.GLOBAL_RENDER_TIMER % rate == 0L)
         }
 
