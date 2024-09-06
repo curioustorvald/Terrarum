@@ -259,7 +259,7 @@ interface TerragenParams {
 }
 
 data class TerragenParamsAlpha1(
-    override val terragenTiers: List<Double> = listOf(.0, .5, 1.0, 2.5),
+    override val terragenTiers: List<Double> = listOf(.0, .5, 1.0, 2.5, 11.0),
 
     override val featureSize: Double = 333.0,
     override val lowlandScaleOffset: Double = -0.65, // linearly alters the height
@@ -277,12 +277,10 @@ data class TerragenParamsAlpha1(
     override val caveBlockageSelectThre: Double = 1.40, // adjust cave closing-up strength. Lower = more closing
 
     override val rockBandCutoffFreq: Double = 4.0,
-
-
 ) : TerragenParams
 
 data class TerragenParamsAlpha2(
-    override val terragenTiers: List<Double> = listOf(.0, .5, 1.5, 3.75),
+    override val terragenTiers: List<Double> = listOf(.0, .5, 1.5, 3.75, 11.0),
 
     override val featureSize: Double = 333.0,
     override val lowlandScaleOffset: Double = -0.65, // linearly alters the height

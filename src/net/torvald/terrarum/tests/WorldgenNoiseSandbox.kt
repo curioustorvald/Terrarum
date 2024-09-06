@@ -21,9 +21,7 @@ import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.concurrent.RunnableFun
 import net.torvald.terrarum.concurrent.ThreadExecutor
-import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.modulebasegame.worldgenerator.*
 import net.torvald.terrarum.worlddrawer.toRGBA
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
@@ -34,10 +32,13 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_DIVIS
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_MAGIC
 import java.io.PrintStream
 import java.util.Calendar
+import java.util.concurrent.Callable
 
-const val NOISEBOX_WIDTH = 1600
-const val NOISEBOX_HEIGHT = 2400
+const val NOISEBOX_WIDTH = 90 * 18
+const val NOISEBOX_HEIGHT = 90 * 26
 const val TWO_PI = Math.PI * 2
+
+const val WORLDGEN_YOFF = 5400 - NOISEBOX_HEIGHT
 
 /**
  * Created by minjaesong on 2019-07-23.
@@ -204,28 +205,29 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         worldgenDone = false
 
         Thread {
-            val runnables: List<RunnableFun> = (0 until testTex.width).sliceEvenly(genSlices).map { range ->
-                {
-                    val localJoise = noiseMaker.getGenerator(seed, 0)
-                    for (x in range) {
-                        for (y in 0 until NOISEBOX_HEIGHT) {
-                            val sampleTheta = (x.toDouble() / NOISEBOX_WIDTH) * TWO_PI
-                            val sampleX =
-                                sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-                            val sampleZ =
-                                cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                            val sampleY = getSY(y) //+ 10000
+            val callables = ArrayList<Callable<Unit>>()
 
-                            noiseMaker.draw(x, y, localJoise.mapIndexed { index, it ->
-                                it.get(sampleX, sampleY, sampleZ)
-                            }, testTex)
-                        }
+            for (cy in 0 until NOISEBOX_HEIGHT / 90) { for (cx in 0 until NOISEBOX_WIDTH / 90) {
+                val localJoise = noiseMaker.getGenerator(seed, 0)
+                callables.add(Callable { for (x in cx * 90 until (cx + 1) * 90) {
+                    for (y in cy * 90 until (cy + 1) * 90) {
+                        val sampleTheta = (x.toDouble() / NOISEBOX_WIDTH) * TWO_PI
+                        val sampleX =
+                            sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
+                        val sampleZ =
+                            cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+                        val sampleY = getSY(y) + WORLDGEN_YOFF
+
+                        noiseMaker.draw(x, y, localJoise.mapIndexed { index, joise ->
+                            joise.get(sampleX, sampleY, sampleZ)
+                        }, testTex)
                     }
-                }
-            }
+                } })
+            } }
+
 
             threadExecutor.renew()
-            runnables.forEach {
+            callables.forEach {
                 threadExecutor.submit(it)
             }
 
@@ -350,9 +352,12 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             Color(0.97f, 0.6f, 0.56f, 1f)
     )
 
-    private val groundDepthBlock = listOf(
-        Block.AIR, Block.DIRT, Block.STONE, Block.STONE_SLATE
+    private val groundDepthBlockWall = listOf(
+        Block.AIR, Block.DIRT, Block.STONE, Block.STONE_SLATE, Block.STONE_SLATE
     )
+    private val groundDepthBlockTERR = ArrayList(groundDepthBlockWall).also {
+        it[it.lastIndex] = Block.AIR
+    }
 
     private fun Double.tiered(tiers: List<Double>): Int {
         tiers.reversed().forEachIndexed { index, it ->
@@ -398,8 +403,8 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
 
         val isMarble = false // noiseValue[13] > 0.5
 
-        val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
-        val terrBlock = if (cave == 0) Block.AIR else if (isMarble) Block.STONE_MARBLE else wallBlock
+        val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlockWall[terr]
+        val terrBlock = if (cave == 0) Block.AIR else if (isMarble) Block.STONE_MARBLE else groundDepthBlockTERR[terr]
 
 
         outTex.drawPixel(x, y,
