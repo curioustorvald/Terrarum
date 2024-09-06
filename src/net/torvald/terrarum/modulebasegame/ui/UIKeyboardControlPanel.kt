@@ -523,6 +523,9 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
 
 private object Keebsym {
     private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")
+    private var IME_icon_cache = labels.get(7, 2)
+    private var oldImeName = ""
+
     val CLOSE = labels.get(22,0)
     val LEFT = labels.get(0,2)
     val UP = labels.get(1,2)
@@ -536,10 +539,20 @@ private object Keebsym {
     val MENU = labels.get(6,2)
     val IME = {
         App.getConfigString("inputmethod").let { imeName ->
-            if (imeName == "none") labels.get(7, 2)
-            else net.torvald.terrarum.gamecontroller.IME.icons[net.torvald.terrarum.gamecontroller.IME.getHighLayerByName(
-                App.getConfigString("inputmethod")
-            ).config.lang] ?: labels.get(7, 2)
+            if (oldImeName != imeName) {
+                if (imeName == "none") {
+                    IME_icon_cache = labels.get(7, 2)
+                }
+                else {
+                    IME_icon_cache =
+                        net.torvald.terrarum.gamecontroller.IME.icons[net.torvald.terrarum.gamecontroller.IME.getHighLayerByName(
+                            imeName
+                        ).config.lang] ?: labels.get(7, 2)
+                }
+                oldImeName = imeName
+            }
+
+            IME_icon_cache
         }
 
     }
