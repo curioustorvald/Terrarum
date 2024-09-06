@@ -1501,8 +1501,8 @@ open class ActorWithBody : Actor {
         // TODO reverse gravity
         if (!straightGravity) TODO()
 
-        val itsY = (hitbox.startY / TILE_SIZED).toInt()
-        val iteY = (hitbox.endY / TILE_SIZED).toInt()
+        val itsY = ((hitbox.startY - PHYS_EPSILON_DIST) / TILE_SIZED).toInt()
+        val iteY = ((hitbox.endY - PHYS_EPSILON_DIST) / TILE_SIZED).toInt()
         val txL = (hitbox.startX / TILE_SIZED).floorToInt()
         val txR = (hitbox.endX / TILE_SIZED).floorToInt()
 
@@ -1622,9 +1622,11 @@ open class ActorWithBody : Actor {
     private fun applyBuoyancy() {
         if (world == null) return
 
+        val submergedRatioForOutOfWaterManoeuvre = submergedRatio.coerceAtLeast(PHYS_EPSILON_SUBMERSION_RATIO).pow(0.75)
+
         // this term allows swimming. Model: you're opening a thruster pointing downwards
         val jumpAcc = if (this is ActorHumanoid)
-            Vector2(0.0, swimAcc)
+            Vector2(0.0, if (submergedRatio >= PHYS_EPSILON_SUBMERSION_RATIO) (swimAcc / submergedRatioForOutOfWaterManoeuvre) else 0.0)
         else
             Vector2()
 
@@ -2238,6 +2240,7 @@ open class ActorWithBody : Actor {
 
         @Transient const val PHYS_EPSILON_DIST = 1.0 / 4096.0
         @Transient const val PHYS_EPSILON_VELO = 1.0 / 65536.0
+        @Transient const val PHYS_EPSILON_SUBMERSION_RATIO = 1.0 / 8.0
 
 
         /**
