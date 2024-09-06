@@ -204,6 +204,15 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         presetSelector.update(delta)
 
         controlPalette.update(delta)
+
+        // TEST CODE
+        /*val pushedKeys = ArrayList<Int>()
+        for (k in 0..255) {
+            if (Gdx.input.isKeyPressed(k))
+                pushedKeys.add(k)
+        }
+        println("Pushed Keys: $pushedKeys")
+        */
     }
 
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
