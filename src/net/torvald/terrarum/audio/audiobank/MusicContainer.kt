@@ -140,7 +140,7 @@ class MusicContainer(
                 gdxMusic.forceInvoke<Int>("read", arrayOf(readBuf))!!.toLong() // its return value will be useless for looping=true
                 val read = minOf(readSize.toLong(), (totalSizeInBytes - readCount))
 
-                UnsafeHelper.memcpyRaw(readBuf, UnsafeHelper.getArrayOffset(readBuf), null, soundBuf!!.ptr + readCount, read)
+                UnsafeHelper.memcpyFromArrToPtr(readBuf, 0, soundBuf!!.ptr + readCount, read)
 
                 readCount += read
 

@@ -401,6 +401,22 @@ open class ActorWithBody : Actor {
     private var stairPenaltyCounter = 0 // unit: update count. 1 second is roughly 64 updates.
     private var stairPenaltyVector = 1.0
 
+
+    /**
+     * 0: None
+     * 1: 1x1
+     * 2: 3x3
+     * 3: 5x5
+     * ...
+     * n: (2n-1)x(2n-1)
+     */
+    @Transient val chunkAnchorRange: Int = 0
+
+    /**
+     * Should nearby chunks be kept in the chunk pool even if the player is far away.
+     */
+    @Transient var chunkAnchoring = false
+
     init {
         // some initialiser goes here...
     }

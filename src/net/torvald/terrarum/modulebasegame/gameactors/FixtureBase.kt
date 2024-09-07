@@ -47,6 +47,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     @Transient var mainUI: UICanvas? = null
     var inventory: FixtureInventory? = null
 
+    @Transient var inOperation = false
+
 //    @Transient var mainUIopenFun: ((UICanvas) -> Unit)? = null
 
     internal var actorThatInstalledThisFixture: UUID? = null
@@ -424,6 +426,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      */
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
+        chunkAnchoring = inOperation
     }
 
     /**

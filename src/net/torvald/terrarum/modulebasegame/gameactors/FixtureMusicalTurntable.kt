@@ -90,6 +90,7 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
     }
 
     override fun updateImpl(delta: Float) {
+        inOperation = musicIsPlaying
         super.updateImpl(delta)
     }
 

@@ -365,6 +365,8 @@ class FixtureSmelterBasic : FixtureBase {
             }
         }
 
+        inOperation = (temperature > 0.001f)
+        chunkAnchoring = inOperation // update immediately instead of waiting for the next update
     }
 
     @Transient private val filterIndex = 0

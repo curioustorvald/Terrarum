@@ -101,6 +101,7 @@ class FixtureJukebox : Electric, PlaysMusic {
         get() = discInventory.isEmpty()
 
     override fun updateImpl(delta: Float) {
+        inOperation = musicIsPlaying
         super.updateImpl(delta)
     }
 
