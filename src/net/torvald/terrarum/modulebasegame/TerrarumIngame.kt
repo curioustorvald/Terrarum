@@ -1365,7 +1365,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         var i = 0
         while (i < actorContainerSize) { // loop through actorContainerInactive
             val actor = actorContainerInactive[i]
-            if (actor is ActorWithBody && actor.inUpdateRange(world) && !actor.forceDormant) {
+            if (actor is ActorWithBody && (actor.chunkAnchoring || actor.inUpdateRange(world)) && !actor.forceDormant) {
                 activateDormantActor(actor) // duplicates are checked here
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1
@@ -1392,7 +1392,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 i-- // array removed 1 elem, so we also decrement counter by 1
             }
             // inactivate distant actors
-            else if (actor is ActorWithBody && (!actor.inUpdateRange(world) || actor.forceDormant)) {
+            else if (actor is ActorWithBody && (!actor.chunkAnchoring && !actor.inUpdateRange(world) || actor.forceDormant)) {
                 if (actor !is Projectile) { // if it's a projectile, don't inactivate it; just kill it.
                     actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
                 }

@@ -320,7 +320,9 @@ open class ActorWithBody : Actor {
     var isChronostasis = false
 
     /**
-     * if set to TRUE, the ingame will not move the actor into the active list
+     * if set to TRUE, the ingame will not move the actor into the active list.
+     *
+     * This flag will override `chunkAnchoring` flag (in this case, the chunk will be anchored but the actor will be dormant)
      */
     var forceDormant = false
 
@@ -410,12 +412,14 @@ open class ActorWithBody : Actor {
      * ...
      * n: (2n-1)x(2n-1)
      */
-    @Transient val chunkAnchorRange: Int = 0
+    @Transient open val chunkAnchorRange: Int = 0
 
     /**
      * Should nearby chunks be kept in the chunk pool even if the player is far away.
+     *
+     * `ActorWithBody.forceDormant` will IGNORE this flag.
      */
-    @Transient var chunkAnchoring = false
+    @Transient open var chunkAnchoring = false
 
     init {
         // some initialiser goes here...

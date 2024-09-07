@@ -111,4 +111,36 @@ open class ChunkPool(
         return numIn
     }
 
+    companion object {
+        fun getRenameFunTerrain(world: GameWorld): (Int) -> Int {
+            // word size: 2
+            return { oldTileNum ->
+                val oldOreName = world.oldTileNumberToNameMap[oldTileNum.toLong()]
+
+                world.tileNameToNumberMap[oldOreName]!!
+            }
+        }
+
+        fun getRenameFunOres(world: GameWorld): (Int) -> Int {
+            // word size: 3
+            return { oldTileNumRaw ->
+                val oldOreNum = oldTileNumRaw and 0x0000FFFF
+                val oldOrePlacement = oldTileNumRaw and 0xFFFF0000.toInt()
+                val oldOreName = world.oldTileNumberToNameMap[oldOreNum.toLong()]!!
+
+                world.tileNameToNumberMap[oldOreName]!! or oldOrePlacement
+            }
+        }
+
+        fun getRenameFunFluids(world: GameWorld): (Int) -> Int {
+            // word size: 4
+            return { oldTileNumRaw ->
+                val oldFluidNum = oldTileNumRaw and 0x0000FFFF
+                val oldFluidFill = oldTileNumRaw and 0xFFFF0000.toInt()
+                val oldFluidName = world.oldTileNumberToNameMap[oldFluidNum.toLong()]
+
+                world.tileNameToNumberMap[oldFluidName]!! or oldFluidFill
+            }
+        }
+    }
 }

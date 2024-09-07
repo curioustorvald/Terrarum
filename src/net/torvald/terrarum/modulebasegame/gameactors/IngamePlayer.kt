@@ -42,6 +42,8 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite, NoSerialise {
     /** ADL for glow sprite. Optional. */
     @Transient override var animDescEmissive: ADProperties? = null
 
+    @Transient override val chunkAnchorRange = 3
+    @Transient override var chunkAnchoring = true
 
     private constructor()
 

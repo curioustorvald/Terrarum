@@ -163,6 +163,7 @@ open class GameWorld(
         it[1] = Block.UPDATE
         it[65535] = Block.NOT_GENERATED // unlike Block.NULL, this one is solid
     }
+    @Transient internal lateinit var oldTileNumberToNameMap: Map<Long, ItemID> // this is a caching variable, refreshed on every (initial) load
     /*val fluidNumberToNameMap = HashArray<ItemID>().also {
         it[0] = Fluid.NULL
         it[65535] = Fluid.NULL // 65535 denotes "not generated"
@@ -275,7 +276,7 @@ open class GameWorld(
         tileNumberToNameMap[1] = Block.UPDATE
         tileNumberToNameMap[65535] = Block.NOT_GENERATED
         // before the renaming, update the name maps
-        val oldTileNumberToNameMap: Map<Long, ItemID> = tileNumberToNameMap.toMap()
+        oldTileNumberToNameMap = tileNumberToNameMap.toMap()
 
         tileNumberToNameMap.forEach { l, s ->
             printdbg(this, "  afterload oldMapping tileNumber $l <-> $s")
