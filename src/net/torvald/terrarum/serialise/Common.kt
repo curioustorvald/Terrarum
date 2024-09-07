@@ -20,10 +20,7 @@ import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.utils.*
 import net.torvald.terrarum.weather.*
 import org.apache.commons.codec.digest.DigestUtils
-import java.io.File
-import java.io.InputStream
-import java.io.Reader
-import java.io.StringReader
+import java.io.*
 import java.math.BigInteger
 import java.util.*
 import java.util.zip.GZIPInputStream
@@ -562,6 +559,18 @@ object Common {
         return unzipdBytes
     }
 
+    private fun unzipG(bytes: ByteArray): ByteArray {
+        val unzipdBytes = ByteArray64()
+        val zi = GZIPInputStream(ByteArrayInputStream(bytes))
+        while (true) {
+            val byte = zi.read()
+            if (byte == -1) break
+            unzipdBytes.appendByte(byte.toByte())
+        }
+        zi.close()
+        return unzipdBytes.toByteArray()
+    }
+
     private fun unzipZ(bytes: ByteArray64): ByteArray64 {
         val unzipdBytes = ByteArray64()
         val zi = ZstdInputStream(ByteArray64InputStream(bytes))
@@ -572,6 +581,18 @@ object Common {
         }
         zi.close()
         return unzipdBytes
+    }
+
+    private fun unzipZ(bytes: ByteArray): ByteArray {
+        val unzipdBytes = ByteArray64()
+        val zi = ZstdInputStream(ByteArrayInputStream(bytes))
+        while (true) {
+            val byte = zi.read()
+            if (byte == -1) break
+            unzipdBytes.appendByte(byte.toByte())
+        }
+        zi.close()
+        return unzipdBytes.toByteArray()
     }
 
     private fun unzipS(bytes: ByteArray64): ByteArray64 {
@@ -586,11 +607,37 @@ object Common {
         return unzipdBytes
     }
 
+    private fun unzipS(bytes: ByteArray): ByteArray {
+        val unzipdBytes = ByteArray64()
+        val zi = SnappyFramedInputStream(ByteArrayInputStream(bytes))
+        while (true) {
+            val byte = zi.read()
+            if (byte == -1) break
+            unzipdBytes.appendByte(byte.toByte())
+        }
+        zi.close()
+        return unzipdBytes.toByteArray()
+    }
+
     /*private fun unzipNull(bytes: ByteArray64): ByteArray64 {
         return bytes.sliceArray64(4 until bytes.size)
     }*/
 
     fun unzip(bytes: ByteArray64): ByteArray64 {
+        val header = bytes[0].toUint().shl(24) or bytes[1].toUint().shl(16) or bytes[2].toUint().shl(8) or bytes[3].toUint()
+
+        // to save yourself from the curiosity: load time of the null compression is no faster than the snappy
+
+        return when (header) {
+            in 0x1F8B0800..0x1F8B08FF -> unzipG(bytes)
+            0x28B52FFD -> unzipZ(bytes)
+            0xFF060000.toInt() -> unzipS(bytes)
+//            0xFEEDDA7A.toInt() -> unzipNull(bytes)
+            else -> throw IllegalArgumentException("Unknown archive with header ${header.toHex()}")
+        }
+    }
+
+    fun unzip(bytes: ByteArray): ByteArray {
         val header = bytes[0].toUint().shl(24) or bytes[1].toUint().shl(16) or bytes[2].toUint().shl(8) or bytes[3].toUint()
 
         // to save yourself from the curiosity: load time of the null compression is no faster than the snappy
