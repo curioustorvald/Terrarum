@@ -50,7 +50,6 @@ object WorldSimulator {
     const val FLUID_MAX_COMP = 0.02f // How much excess water a cell can store, compared to the cell above it. A tile of fluid can contain more than MaxMass water.
 //    const val FLUID_MIN_MASS = net.torvald.terrarum.gameworld.FLUID_MIN_MASS //Ignore cells that are almost dry (smaller than epsilon of float16)
     const val minFlow = 1f / 512f
-    const val maxSpeed = 1f // max units of water moved out of one block to another, per timestamp
 
     // END OF FLUID-RELATED STUFFS
 
@@ -348,6 +347,8 @@ object WorldSimulator {
                 val worldY = y + updateYFrom
                 val remainingType = fluidTypeMap[y][x]
 
+                val maxSpeed = 1f / FluidCodex[remainingType].viscosity.sqr()
+
                 // check solidity
                 if (!isFlowable(remainingType, worldX, worldY)) continue
                 // check if the fluid is a same kind
@@ -386,7 +387,7 @@ object WorldSimulator {
                     if (flow > minFlow) {
                         flow *= 0.5f
                     }
-                    flow = flow.coerceIn(0f, remainingMass)
+                    flow = flow.coerceIn(0f, min(maxSpeed, remainingMass))
 
                     fluidNewMap[y][x] -= flow
                     fluidNewMap[y][x - 1] += flow
@@ -406,7 +407,7 @@ object WorldSimulator {
                     if (flow > minFlow) {
                         flow *= 0.5f
                     }
-                    flow = flow.coerceIn(0f, remainingMass)
+                    flow = flow.coerceIn(0f, min(maxSpeed, remainingMass))
 
                     fluidNewMap[y][x] -= flow
                     fluidNewMap[y][x + 1] += flow

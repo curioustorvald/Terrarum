@@ -160,3 +160,4 @@ id;classname;tags
 
 # reserved for debug items
 16777216;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessWaterBucket;DEBUG,TOOL
+16777217;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessLavaBucket;DEBUG,TOOL

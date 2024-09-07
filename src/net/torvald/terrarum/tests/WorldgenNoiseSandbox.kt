@@ -19,20 +19,25 @@ import com.sudoplay.joise.ModuleMap
 import com.sudoplay.joise.ModulePropertyMap
 import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.*
+import net.torvald.terrarum.FlippingSpriteBatch
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadExecutor
-import net.torvald.terrarum.modulebasegame.worldgenerator.*
+import net.torvald.terrarum.inUse
+import net.torvald.terrarum.modulebasegame.worldgenerator.BiomegenParams
+import net.torvald.terrarum.modulebasegame.worldgenerator.TerragenParams
+import net.torvald.terrarum.modulebasegame.worldgenerator.TerragenParamsAlpha2
+import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_DIVISOR
+import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_MAGIC
+import net.torvald.terrarum.modulebasegame.worldgenerator.shake
+import net.torvald.terrarum.sqr
 import net.torvald.terrarum.worlddrawer.toRGBA
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
+import java.io.PrintStream
+import java.util.*
+import java.util.concurrent.Callable
 import java.util.concurrent.Future
 import kotlin.math.*
 import kotlin.random.Random
-import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_DIVISOR
-import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_MAGIC
-import java.io.PrintStream
-import java.util.Calendar
-import java.util.concurrent.Callable
 
 const val NOISEBOX_WIDTH = 90 * 18
 const val NOISEBOX_HEIGHT = 90 * 26
@@ -227,10 +232,8 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
 
             threadExecutor.renew()
-            callables.forEach {
-                threadExecutor.submit(it)
-            }
-
+            callables.shuffle()
+            threadExecutor.submitAll(callables)
             threadExecutor.join()
 
             worldgenDone = true
@@ -388,6 +391,7 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
     private val AMETHYST = 0xee77ffff.toInt()
     private val ROCKSALT = 0xff00ffff.toInt()
     private val NITRE = 0xdbd6a1ff.toInt()
+    private val LAVA = 0xff5900ff.toInt()
 
     private val oreCols = listOf(
         COPPER_ORE, IRON_ORE, COAL_ORE, ZINC_ORE, TIN_ORE, GOLD_ORE, SILVER_ORE, LEAD_ORE, ROCKSALT, QUARTZ, AMETHYST, NITRE
@@ -399,16 +403,19 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val terr = noiseValue[0].tiered(terragenTiers)
         val cave = if (noiseValue[1] < 0.5) 0 else 1
-        val ore = (noiseValue.subList(2, noiseValue.size)).zip(oreCols).firstNotNullOfOrNull { (n, colour) -> if (n > 0.5) colour else null }
+        val ore = (noiseValue.subList(2, noiseValue.size - 1)).zip(oreCols).firstNotNullOfOrNull { (n, colour) -> if (n > 0.5) colour else null }
 
         val isMarble = false // noiseValue[13] > 0.5
 
         val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlockWall[terr]
         val terrBlock = if (cave == 0) Block.AIR else if (isMarble) Block.STONE_MARBLE else groundDepthBlockTERR[terr]
 
+        val lavaVal = noiseValue.last()
+        val lava = (lavaVal >= 0.5)
 
         outTex.drawPixel(x, y,
-            if (ore != null && (terrBlock == Block.STONE || terrBlock == Block.STONE_SLATE)) ore
+            if (lava) LAVA
+            else if (ore != null && (terrBlock == Block.STONE || terrBlock == Block.STONE_SLATE)) ore
             else if (wallBlock == Block.AIR && terrBlock == Block.AIR) BACK
             else blockToCol[terrBlock]!!.toRGBA()
         )
@@ -650,9 +657,17 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             it.setOffset(0.0)
         }
 
-        val cavePerturb = ModuleTranslateDomain().also {
+        val cavePerturb0 = ModuleTranslateDomain().also {
             it.setSource(caveShapeAttenuate)
             it.setAxisXSource(cavePerturbScale)
+        }
+
+        val caveTerminalClosureGrad = TerrarumModuleCaveLayerClosureGrad()
+
+        val cavePerturb = ModuleCombiner().also { // 0: rock, 1: air
+            it.setType(ModuleCombiner.CombinerType.MULT)
+            it.setSource(0, cavePerturb0)
+            it.setSource(1, caveTerminalClosureGrad)
         }
 
         val caveSelect = ModuleSelect().also {
@@ -663,13 +678,18 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             it.setFalloff(0.0)
         }
 
-        val caveBlockageFractal = ModuleFractal().also {
+        val caveBlockageFractal0 = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.RIDGEMULTI)
             it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
             it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
             it.setNumOctaves(2)
             it.setFrequency(params.caveBlockageFractalFreq) // same as caveShape frequency?
             it.seed = seed shake caveBlockageMagic
+        }
+
+        val caveBlockageFractal = ModuleCombiner().also { // 0: air, 1: rock
+            it.setType(ModuleCombiner.CombinerType.MULT)
+            it.setSource(0, caveBlockageFractal0)
         }
 
         // will only close-up deeper caves. Shallow caves will be less likely to be closed up
@@ -759,6 +779,8 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             Joise(generateRockLayer(groundScalingCached, seed, params, (0..7).map {
                 thicknesses[it] + marblerng.nextTriangularBal() * 0.006 to (2.6 * terragenYscaling) + it * 0.18 + marblerng.nextTriangularBal() * 0.09
             })),
+
+            Joise(generateSeaOfLava(seed)),
         )
     }
 
@@ -903,6 +925,59 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
         }
 
         return oreSelect
+    }
+
+    private fun generateSeaOfLava(seed: Long): Module {
+        val lavaPipe = ModuleScaleDomain().also {
+            it.setSource(ModuleFractal().also {
+                it.setType(ModuleFractal.FractalType.RIDGEMULTI)
+                it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+                it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+                it.setNumOctaves(1)
+                it.setFrequency(params.lavaShapeFreg) // adjust the "density" of the caves
+                it.seed = seed shake "LattiaOnLavaa"
+            })
+            it.setScaleY(1.0 / 6.0)
+        }
+
+
+        val lavaPerturbFractal = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.FBM)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            it.setNumOctaves(6)
+            it.setFrequency(params.lavaShapeFreg * 3.0 / 4.0)
+            it.seed = seed shake "FloorIsLava"
+        }
+
+        val lavaPerturbScale = ModuleScaleOffset().also {
+            it.setSource(lavaPerturbFractal)
+            it.setScale(23.0)
+            it.setOffset(0.0)
+        }
+
+        val lavaPerturb = ModuleTranslateDomain().also {
+            it.setSource(lavaPipe)
+            it.setAxisXSource(lavaPerturbScale)
+        }
+        // val = sqrt((y-H+L) / L); where H=5300 (world height-100), L=620;
+        // 100 is the height of the "base lava sheet", 600 is the height of the "transitional layer"
+        // in this setup, the entire lava layer never exceeds 8 chunks (720 tiles) in height
+        val lavaGrad = TerrarumModuleLavaFloorGrad().also {
+            it.setH(5300.0)
+            it.setL(620.0)
+        }
+
+        val lavaSelect = ModuleSelect().also {
+            it.setLowSource(1.0)
+            it.setHighSource(0.0)
+            it.setControlSource(lavaPerturb)
+            it.setThreshold(lavaGrad)
+            it.setFalloff(0.0)
+        }
+
+
+        return lavaSelect
     }
 
     private object DummyModule : Module() {
