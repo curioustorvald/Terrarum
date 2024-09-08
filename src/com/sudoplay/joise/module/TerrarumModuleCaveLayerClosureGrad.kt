@@ -3,14 +3,8 @@ package com.sudoplay.joise.module
 import com.sudoplay.joise.ModuleInstanceMap
 import com.sudoplay.joise.ModuleMap
 import com.sudoplay.joise.ModulePropertyMap
-import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_DIVISOR
-import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_MAGIC
 
 /**
- * Params:
- * - H: World height MINUS 100
- * - L: 620
- *
  * Created by minjaesong on 2024-09-07.
  */
 class TerrarumModuleCaveLayerClosureGrad : Module() {

@@ -283,7 +283,7 @@ data class TerragenParamsAlpha1(
 ) : TerragenParams
 
 data class TerragenParamsAlpha2(
-    override val terragenTiers: List<Double> = listOf(.0, .5, 1.5, 3.75, 11.0 * 9999),
+    override val terragenTiers: List<Double> = listOf(.0, .5, 1.5, 4.2, 11.0 * 9999),
 
     override val featureSize: Double = 333.0,
     override val lowlandScaleOffset: Double = -0.65, // linearly alters the height
