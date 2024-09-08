@@ -43,7 +43,7 @@ const val NOISEBOX_WIDTH = 90 * 18
 const val NOISEBOX_HEIGHT = 90 * 26
 const val TWO_PI = Math.PI * 2
 
-const val WORLDGEN_YOFF = 3000//5400 - NOISEBOX_HEIGHT
+const val WORLDGEN_YOFF = 5400 - NOISEBOX_HEIGHT
 
 /**
  * Created by minjaesong on 2019-07-23.
@@ -361,11 +361,12 @@ val aquiferGrad = TerrarumModuleCacheY().also {
     })
 }
 
-lateinit var crudeOilGradStart: ModuleCache
+lateinit var crudeOilGradStart: TerrarumModuleCacheY
+lateinit var crudeOilGrad: TerrarumModuleCacheY
 
 val crudeOilGradEnd = TerrarumModuleCacheY().also {
     it.setSource(TerrarumModuleCaveLayerClosureGrad().also {
-        it.setH(4940.0)
+        it.setH(4800.0)
         it.setL(620.0)
     })
 }
@@ -435,6 +436,7 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
     private val NITRE = 0xdbd6a1ff.toInt()
     private val LAVA = 0xff5900ff.toInt()
     private val WATER = 0x0059ffff.toInt()
+    private val OIL = 0xd8e088ff.toInt()
 
     private val oreCols = listOf(
         COPPER_ORE, IRON_ORE, COAL_ORE, ZINC_ORE, TIN_ORE, GOLD_ORE, SILVER_ORE, LEAD_ORE, ROCKSALT, QUARTZ, AMETHYST, NITRE
@@ -454,16 +456,27 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
         val terrBlock = if (cave == 0) Block.AIR else if (isMarble) Block.STONE_MARBLE else groundDepthBlockTERR[terr]
         val terrBlockNoAir = if (isMarble) Block.STONE_MARBLE else groundDepthBlockTERR[terr]
 
-        val lavaVal = noiseValue[noiseValue.lastIndex - 1]
+        val lavaVal = noiseValue[noiseValue.lastIndex - 2]
         val lava = (lavaVal >= 0.5)
 
-        val waterVal = noiseValue[noiseValue.lastIndex]
-        val waterShell = (waterVal >= 0.40)
+        val waterVal = noiseValue[noiseValue.lastIndex - 1]
+        val waterShell = (waterVal >= 0.32)
         val water = (waterVal >= 0.5)
+
+        val oilVal = noiseValue[noiseValue.lastIndex]
+        val oilShell = (oilVal >= 0.38)
+        val oil = (oilVal >= 0.5)
 
         outTex.drawPixel(x, y,
             if (water) WATER
             else if (waterShell) {
+                if ((terrBlockNoAir == Block.STONE || terrBlockNoAir == Block.STONE_SLATE))
+                    ore ?: blockToCol[terrBlockNoAir]!!.toRGBA()
+                else
+                    blockToCol[terrBlockNoAir]!!.toRGBA()
+            }
+            else if (oil) OIL
+            else if (oilShell) {
                 if ((terrBlockNoAir == Block.STONE || terrBlockNoAir == Block.STONE_SLATE))
                     ore ?: blockToCol[terrBlockNoAir]!!.toRGBA()
                 else
@@ -834,7 +847,8 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             })),
 
             Joise(generateSeaOfLava(seed)),
-            Joise(generateAquifer(seed, groundScalingCached))
+            Joise(generateAquifer(seed, groundScalingCached)),
+            Joise(generateCrudeOil(seed, groundScalingCached)),
         )
     }
 
@@ -1037,9 +1051,9 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
                 it.setFrequency(params.rockBandCutoffFreq / params.featureSize)
                 it.seed = seed shake "WaterPocket"
             })
-            it.setScaleX(0.6)
-            it.setScaleZ(0.6)
-            it.setScaleY(0.4)
+            it.setScaleX(0.5)
+            it.setScaleZ(0.5)
+            it.setScaleY(0.8)
         }
 
         val terrainBool = ModuleSelect().also {
@@ -1050,7 +1064,7 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             it.setFalloff(0.1)
         }
 
-        val waterGradMult = ModuleCombiner().also {
+        val aquifer = ModuleCombiner().also {
             it.setType(ModuleCombiner.CombinerType.MULT)
             it.setSource(0, waterPocket)
             it.setSource(1, terrainBool)
@@ -1058,25 +1072,25 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
         }
 
 
-        return waterGradMult
+        return aquifer
     }
 
     private fun generateCrudeOil(seed: Long, groundScalingCached: Module): Module {
-        val waterPocket = ModuleScaleDomain().also {
+        val oilPocket = ModuleScaleDomain().also {
             it.setSource(ModuleFractal().also {
                 it.setType(ModuleFractal.FractalType.BILLOW)
                 it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
                 it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
                 it.setNumOctaves(4)
                 it.setFrequency(params.rockBandCutoffFreq / params.featureSize)
-                it.seed = seed shake "WaterPocket"
+                it.seed = seed shake "CrudeOil"
             })
-            it.setScaleX(0.6)
-            it.setScaleZ(0.6)
-            it.setScaleY(0.4)
+            it.setScaleX(0.16)
+            it.setScaleZ(0.16)
+            it.setScaleY(1.4)
         }
 
-        crudeOilGradStart = ModuleCache().also {
+        crudeOilGradStart = TerrarumModuleCacheY().also {
             it.setSource(ModuleClamp().also {
                 it.setSource(ModuleScaleOffset().also {
                     it.setSource(groundScalingCached)
@@ -1086,24 +1100,23 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             })
         }
 
-
-        val terrainBool = ModuleSelect().also {
-            it.setLowSource(0.0)
-            it.setHighSource(1.0)
-            it.setControlSource(groundScalingCached)
-            it.setThreshold(0.5)
-            it.setFalloff(0.1)
+        crudeOilGrad = TerrarumModuleCacheY().also {
+            it.setSource(ModuleCombiner().also {
+                it.setType(ModuleCombiner.CombinerType.ADD)
+                it.setSource(0, crudeOilGradStart)
+                it.setSource(1, crudeOilGradEnd)
+                it.setSource(2, ModuleConstant().also { it.setConstant(-1.0) })
+            })
         }
 
-        val waterGradMult = ModuleCombiner().also {
+        val oilLayer = ModuleCombiner().also {
             it.setType(ModuleCombiner.CombinerType.MULT)
-            it.setSource(0, waterPocket)
-            it.setSource(1, terrainBool)
-            it.setSource(2, aquiferGrad)
+            it.setSource(0, oilPocket)
+            it.setSource(1, crudeOilGrad)
         }
 
 
-        return waterGradMult
+        return oilLayer
     }
 
     private object DummyModule : Module() {
