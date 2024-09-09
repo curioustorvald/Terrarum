@@ -59,12 +59,14 @@ object Worldgen {
         params = genParams
 
         highlandLowlandSelectCache = getHighlandLowlandSelectCache(params.terragenParams, params.seed)
-        caveAttenuateBiasScaledCache = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
+        caveAttenuateBiasScaledForOresCache = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
+        groundScalingCached = getGroundScalingCached(highlandLowlandSelectCache, params.terragenParams)
         biomeMap = HashMap()
     }
 
+    internal lateinit var groundScalingCached: ModuleCache
     internal lateinit var highlandLowlandSelectCache: ModuleCache
-    internal lateinit var caveAttenuateBiasScaledCache: ModuleCache
+    internal lateinit var caveAttenuateBiasScaledForOresCache: ModuleCache
     internal lateinit var biomeMap: HashMap<BlockAddress, Byte>
 
 
@@ -86,11 +88,12 @@ object Worldgen {
         else { work: Work -> (work.tags union tags).isNotEmpty() }
 
         return listOf(
-            Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, false, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN")), // also generates marble veins
-            Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, false, caveAttenuateBiasScaledCache, params.seed, oreRegistry), listOf("ORES")),
+            Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, false, groundScalingCached, params.seed, params.terragenParams), listOf("TERRAIN")), // also generates marble veins
+            Work(Lang["MENU_IO_WORLDGEN_CARVING_EARTH"], Cavegen(world, false, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
+            Work(Lang["MENU_IO_WORLDGEN_FLOODING_UNDERGROUND"], Aquagen(world, false, groundScalingCached, params.seed, params.terragenParams), listOf("WATER")),
+            Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, false, caveAttenuateBiasScaledForOresCache, params.seed, oreRegistry), listOf("ORES")),
             Work(Lang["MENU_IO_WORLDGEN_POSITIONING_ROCKS"], OregenAutotiling(world, false, params.seed, oreTilingModes), listOf("ORES")),
             // TODO generate gemstones
-            Work(Lang["MENU_IO_WORLDGEN_CARVING_EARTH"], Cavegen(world, false, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
             Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Biomegen(world, false, params.seed, params.biomegenParams, biomeMap), listOf("BIOME")),
             Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Treegen(world, true, params.seed, params.terragenParams, params.treegenParams, biomeMap), listOf("TREES")),
         ).filter(tagFilter)
@@ -451,6 +454,24 @@ object Worldgen {
 
         return ModuleCache().also {
             it.setSource(scale)
+        }
+    }
+
+    private fun getGroundScalingCached(highlandLowlandSelectCache: ModuleCache, params: TerragenParams): ModuleCache {
+        val groundClamp = ModuleClamp().also {
+            it.setRange(0.0, 100.0)
+            it.setSource(highlandLowlandSelectCache)
+        }
+
+        val groundScaling = ModuleScaleDomain().also {
+            it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
+            it.setScaleY(1.0 / params.featureSize)
+            it.setScaleZ(1.0 / params.featureSize)
+            it.setSource(groundClamp)
+        }
+
+        return ModuleCache().also {
+            it.setSource(groundScaling)
         }
     }
 

@@ -11,5 +11,6 @@ object Fluid {
     val NULL = Block.AIR
     val WATER = "fluid@basegame:1"
     val LAVA = "fluid@basegame:2"
+    val CRUDE_OIL = "fluid@basegame:3"
 
 }

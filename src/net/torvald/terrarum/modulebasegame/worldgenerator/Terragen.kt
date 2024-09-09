@@ -16,7 +16,7 @@ import kotlin.math.sin
 /**
  * Created by minjaesong on 2019-07-23.
  */
-class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCache: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
+class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
 
     private val dirtStoneDitherSize = 3 // actual dither size will be double of this value
     private val stoneSlateDitherSize = 4
@@ -151,24 +151,12 @@ class Terragen(world: GameWorld, isFinal: Boolean , val highlandLowlandSelectCac
         // they should be treated properly when you actually generate the world out of the noisemap
         // for the visualisation, no treatment will be done in this demo app.
 
-        val groundClamp = ModuleClamp().also {
-            it.setRange(0.0, 100.0)
-            it.setSource(highlandLowlandSelectCache)
-        }
-
-        val groundScaling = ModuleScaleDomain().also {
-            it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
-            it.setScaleY(1.0 / params.featureSize)
-            it.setScaleZ(1.0 / params.featureSize)
-            it.setSource(groundClamp)
-        }
-
         val marblerng = HQRNG(seed) // this must be here: every slice must get identical series of random numbers
 
         return listOf(
-            Joise(groundScaling),
+            Joise(groundScalingCached),
 
-            Joise(generateRockLayer(groundScaling, seed, params, (0..7).map {
+            Joise(generateRockLayer(groundScalingCached, seed, params, (0..7).map {
                 thicknesses[it] + marblerng.nextTriangularBal() * 0.006 to (1.04 * params.terragenTiers[3] * terragenYscaling) + it * 0.18 + marblerng.nextTriangularBal() * 0.09
             })),
         )

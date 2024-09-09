@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameworld.GameWorld
@@ -99,9 +100,17 @@ class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache
             it.setOffset(0.0)
         }
 
-        val cavePerturb = ModuleTranslateDomain().also {
+        val cavePerturb0 = ModuleTranslateDomain().also {
             it.setSource(caveShapeAttenuate)
             it.setAxisXSource(cavePerturbScale)
+        }
+
+        val cavePerturb = ModuleCombiner().also { // 0: rock, 1: air
+            it.setType(ModuleCombiner.CombinerType.MULT)
+            it.setSource(0, cavePerturb0)
+            // basically disabling terminal closure for the world generated from the old version
+            if (INGAME.worldGenVer != null && INGAME.worldGenVer!! <= 0x0000_000004_000003)
+                it.setSource(1, caveTerminalClosureGrad)
         }
 
         val caveSelect = ModuleSelect().also {
@@ -160,5 +169,14 @@ class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache
         return listOf(
             Joise(caveScaling)
         )
+    }
+
+    companion object {
+        val caveTerminalClosureGrad = TerrarumModuleCacheY().also {
+            it.setSource(TerrarumModuleCaveLayerClosureGrad().also {
+                it.setH(17.2)
+                it.setL(3.0)
+            })
+        }
     }
 }

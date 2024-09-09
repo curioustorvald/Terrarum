@@ -53,6 +53,7 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
         target.g = array.getFloat(a + 1)
         target.b = array.getFloat(a + 2)
         target.a = array.getFloat(a + 3)
+        checkNaN(target)
     }
     /**
      * `getAndSet(cvec, x, y, func)` is equivalent to
@@ -80,6 +81,7 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
 //    fun setA(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 3, value) }
 //    operator fun set(i: Long, value: Float) = array.setFloat(i, value)
     fun setVec(x: Int, y: Int, value: Cvec) {
+        checkNaN(value)
         val a = toAddr(x, y)
         array.setFloat(a + 0, value.r)
         array.setFloat(a + 1, value.g)
@@ -87,6 +89,8 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
         array.setFloat(a + 3, value.a)
     }
     fun setScalar(x: Int, y: Int, value: Float) {
+        checkNaN(value)
+
         val a = toAddr(x, y)
 
         array.setFloat(a + 0, value)
@@ -103,6 +107,7 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
 
     // operators
     fun max(x: Int, y: Int, other: Cvec) {
+        checkNaN(other)
         val a = toAddr(x, y)
         array.setFloat(a + 0, kotlin.math.max(array.getFloat(a + 0), other.r))
         array.setFloat(a + 1, kotlin.math.max(array.getFloat(a + 1), other.g))
@@ -110,6 +115,7 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
         array.setFloat(a + 3, kotlin.math.max(array.getFloat(a + 3), other.a))
     }
     fun mul(x: Int, y: Int, scalar: Float) {
+        checkNaN(scalar)
         val a = toAddr(x, y)
         array.setFloat(a + 0, (array.getFloat(a + 0) * scalar))
         array.setFloat(a + 1, (array.getFloat(a + 1) * scalar))
@@ -118,6 +124,7 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
     }
 
     fun mulAndAssign(x: Int, y: Int, scalar: Float) {
+        checkNaN(scalar)
         val addr = toAddr(x, y)
         array.setFloat(addr + 0, (array.getFloat(addr + 0) * scalar))
         array.setFloat(addr + 1, (array.getFloat(addr + 1) * scalar))
@@ -141,6 +148,12 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
 
     fun destroy() = this.array.destroy()
 
+    private inline fun checkNaN(vec: Cvec) {
+//        if (vec.r.isNaN() || vec.g.isNaN() || vec.b.isNaN() || vec.a.isNaN()) throw Error("Vector contains NaN (${vec.r},${vec.g},${vec.b},${vec.a})")
+    }
+    private inline fun checkNaN(scalar: Float) {
+//        if (scalar.isNaN()) throw Error("Scalar value is NaN ($scalar)")
+    }
 }
 
 

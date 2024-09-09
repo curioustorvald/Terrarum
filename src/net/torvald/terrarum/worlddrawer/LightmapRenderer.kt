@@ -538,14 +538,12 @@ object LightmapRenderer {
         }*/
 
         if (_thisFluid.type != Fluid.NULL) {
-            _thisFluid.amount.coerceAtMost(1f).let {
-                _fluidAmountToCol.set(it, it, it, it)
-            }
+            val fluidAmount = _thisFluid.amount.coerceIn(0f, 1f)
 
             _thisTileLuminosity.set(_thisTerrainProp.getLumCol(worldX, worldY))
-            _thisTileLuminosity.maxAndAssign(_thisFluidProp.lumCol.mul(_fluidAmountToCol))
+            _thisTileLuminosity.maxAndAssign(_thisFluidProp.lumCol.cpy().mul(fluidAmount))
             _mapThisTileOpacity.setVec(lx, ly, _thisTerrainProp.opacity)
-            _mapThisTileOpacity.max(lx, ly, _thisFluidProp.opacity.mul(_fluidAmountToCol))
+            _mapThisTileOpacity.max(lx, ly, _thisFluidProp.opacity.cpy().mul(fluidAmount))
         }
         else {
             _thisTileLuminosity.set(_thisTerrainProp.getLumCol(worldX, worldY))
@@ -569,9 +567,8 @@ object LightmapRenderer {
         }
 
         // blend lantern
-        _mapLightLevelThis.max(lx, ly, _thisTileLuminosity.maxAndAssign(
-                lanternMap[LandUtil.getBlockAddr(world, worldX, worldY)] ?: colourNull
-        ))
+        _mapLightLevelThis.max(lx, ly, _thisTileLuminosity)
+        _mapLightLevelThis.max(lx, ly, lanternMap[LandUtil.getBlockAddr(world, worldX, worldY)] ?: colourNull)
     }
 
     private fun precalculate2(lightmap: UnsafeCvecArray, rawx: Int, rawy: Int) {
@@ -697,6 +694,8 @@ object LightmapRenderer {
 //                        val uvlwr = (uvl.sqrt() - 1f) * (1f / 947f)
 //                        val uvlwg = (uvl.sqrt() - 1f) * (1f / 1279f)
 //                        val uvlwb = (uvl.sqrt() - 1f) * (1f / 319f)
+
+                        if (red.isNaN() || grn.isNaN() || blu.isNaN() || uvl.isNaN()) throw IllegalArgumentException("Light vector contains NaN ($red,$grn,$blu,$uvl)")
 
                         if (solidMultMagic == null)
                             lightBuffer.drawPixel(
@@ -867,6 +866,8 @@ object LightmapRenderer {
      * @return -0.5..0.5
      */
     private fun clipfun0(x0: Float): Float {
+        if (x0.isNaN()) throw IllegalArgumentException("Cannot clip NaN value.")
+
         val x = x0 * (1.0f + clip_p1) / 2.0f
         val t = 0.5f * clip_p1
 

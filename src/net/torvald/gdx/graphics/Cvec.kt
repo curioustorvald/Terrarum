@@ -323,11 +323,12 @@ class Cvec {
 
     /** Returns the color encoded as hex string with the format RRGGBBAA.  */
     override fun toString(): String {
-        var value = Integer
+        /*var value = Integer
                 .toHexString((255 * r).toInt() shl 24 or ((255 * g).toInt() shl 16) or ((255 * b).toInt() shl 8) or (255 * a).toInt())
         while (value.length < 8)
             value = "0$value"
-        return value
+        return value*/
+        return "($r,$g,$b,$a)"
     }
 
     /** Sets the RGB Cvec components using the specified Hue-Saturation-Value. Note that HSV components are voluntary not clamped

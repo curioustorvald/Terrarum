@@ -744,18 +744,13 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             it.setFalloff(0.0)
         }
 
-        val caveBlockageFractal0 = ModuleFractal().also {
+        val caveBlockageFractal = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.RIDGEMULTI)
             it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
             it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
             it.setNumOctaves(2)
             it.setFrequency(params.caveBlockageFractalFreq) // same as caveShape frequency?
             it.seed = seed shake caveBlockageMagic
-        }
-
-        val caveBlockageFractal = ModuleCombiner().also { // 0: air, 1: rock
-            it.setType(ModuleCombiner.CombinerType.MULT)
-            it.setSource(0, caveBlockageFractal0)
         }
 
         // will only close-up deeper caves. Shallow caves will be less likely to be closed up
