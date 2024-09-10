@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -49,12 +50,23 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
     @Transient var inOperation = false
 
+    @Transient private val tooltipObjects = ArrayList<Pair<String?, ()-> String>>()
+
 //    @Transient var mainUIopenFun: ((UICanvas) -> Unit)? = null
 
     internal var actorThatInstalledThisFixture: UUID? = null
 
     protected constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE(), null)
     protected constructor(renderOrder: RenderOrder, physProp: PhysProperties, id: ActorID?) : super(renderOrder, physProp, id)
+
+    // call on init()
+    fun addQuickLookupParam(name: String?, valueFun: () -> String) {
+        tooltipObjects.add(name to valueFun)
+    }
+    // call on init()
+    fun addQuickLookupParam(valueFun: () -> String) {
+        tooltipObjects.add(null to valueFun)
+    }
 
     /**
      * Callend whenever the fixture was spawned successfully.
@@ -427,6 +439,18 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
         chunkAnchoring = inOperation
+
+        tooltipObjects.map { (name, valueFun) ->
+            if (name != null)
+                "${Lang[name]}: ${valueFun()}"
+            else
+                "${valueFun()}"
+        }.filter { it.isNotBlank() }.let {
+            tooltipText = if (it.isNotEmpty())
+                it.joinToString("\n")
+            else
+                null
+        }
     }
 
     /**

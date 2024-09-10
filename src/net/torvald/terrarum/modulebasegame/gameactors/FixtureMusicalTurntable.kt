@@ -57,6 +57,12 @@ class FixtureMusicalTurntable : Electric, PlaysMusic {
         despawnHook = {
             stopGracefully()
         }
+
+        addQuickLookupParam {
+            musicNowPlaying.let {
+                if (it == null) "" else "♫ ${App.fontGame.toColorCode(5,15,5)}${it.name}${App.fontGame.noColorCode}"
+            }
+        }
     }
 
     internal var disc: ItemID? = null

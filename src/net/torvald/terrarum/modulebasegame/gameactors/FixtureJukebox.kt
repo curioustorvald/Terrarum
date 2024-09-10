@@ -93,6 +93,12 @@ class FixtureJukebox : Electric, PlaysMusic {
         despawnHook = {
             stopGracefully()
         }
+
+        addQuickLookupParam {
+            musicNowPlaying.let {
+                if (it == null) "" else "♫ ${App.fontGame.toColorCode(5,15,5)}${it.name}${App.fontGame.noColorCode}"
+            }
+        }
     }
 
     @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 0.0, TILE_SIZED * 2, TILE_SIZED * 3), Cvec(0.44f, 0.41f, 0.40f, 0.2f)))
