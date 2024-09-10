@@ -1178,7 +1178,7 @@ internal object BlocksDrawer {
 
     private val doTilemapUpdate: Boolean
         get() {
-            val rate = (((Gdx.graphics.framesPerSecond / 60f) * TILE_SIZEF) / maxOf(WorldCamera.deltaX.abs(), WorldCamera.deltaY.abs()).coerceAtLeast(1)).roundToInt().coerceIn(1, 4)
+            val rate = (((Gdx.graphics.framesPerSecond / 50f) * TILE_SIZEF) / maxOf(WorldCamera.deltaX.abs(), WorldCamera.deltaY.abs()).coerceAtLeast(1)).roundToInt().coerceIn(1, 4)
             App.debugTimers.put("Renderer.tilemapUpdateDivider", rate.toLong())
             return (!world.layerTerrain.ptrDestroyed && App.GLOBAL_RENDER_TIMER % rate == 0L)
         }
