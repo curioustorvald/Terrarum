@@ -52,8 +52,9 @@ open class FancyWorldReadLoadScreen(screenToBeLoaded: IngameInstance, private va
 
     val baseTileTex = arrayOf(
         CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer01"),
-        CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer02"),
         CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer03"),
+        CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer03"),
+        CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer02"),
         CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer04"),
         CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer05"),
         CommonResourcePool.getAsTexture("basegame.gui/loadscrlayer05"),

@@ -538,7 +538,7 @@ object LightmapRenderer {
         }*/
 
         if (_thisFluid.type != Fluid.NULL) {
-            val fluidAmount = _thisFluid.amount.coerceIn(0f, 1f)
+            val fluidAmount = _thisFluid.amount.coerceIn(0f, 1f).pow(0.5f)
 
             _thisTileLuminosity.set(_thisTerrainProp.getLumCol(worldX, worldY))
             _thisTileLuminosity.maxAndAssign(_thisFluidProp.lumCol.cpy().mul(fluidAmount))
