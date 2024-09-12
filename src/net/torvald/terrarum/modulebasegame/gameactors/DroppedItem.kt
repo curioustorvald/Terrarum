@@ -179,9 +179,10 @@ class DroppedItem : ActorWithBody {
         ItemCodex[itemID]!!.effectOnPickup(actor)
 
         // if actor did not have the same item AND holding nothing, equip it
-        val qs = actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)
-        if (!actorHadTheSameItem && qs != null && (actor as Pocketed).inventory.getQuickslotItem(qs) == null) {
-            (actor as Pocketed).inventory.setQuickslotItem(qs, itemID)
-        }
+//        val qs = actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)
+//        if (!actorHadTheSameItem && qs != null && (actor as Pocketed).inventory.getQuickslotItem(qs) == null) {
+//            (actor as Pocketed).inventory.setQuickslotItem(qs, itemID)
+//        }
+        // disabled: this behaviour can be annoying sometimes
     }
 }
