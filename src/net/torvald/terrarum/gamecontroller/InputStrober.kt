@@ -83,7 +83,7 @@ object InputStrober {
 
             if (!keyChanged) {
 //                println("KEY_DOWN '$keysym' ($headKeyCode) $repeatCount")
-                App.inputStrobed(TerrarumKeyboardEvent(KEY_DOWN, keysym, headKeyCode, repeatCount, keybuf))
+                App.inputStrobed(TerrarumKeyboardEvent(KEY_DOWN, keysym ?: "", headKeyCode, repeatCount, keybuf))
             }
             else if (newKeysym != null) {
 //                println("KEY_DOWC '$newKeysym' ($headKeyCode) $repeatCount")
@@ -159,7 +159,7 @@ object InputStrober {
 
 data class TerrarumKeyboardEvent(
         val type: Int,
-        val character: String?, // representative key symbol
+        val character: String, // representative key symbol
         val headkey: Int, // representative keycode
         val repeatCount: Int,
         val keycodes: IntArray

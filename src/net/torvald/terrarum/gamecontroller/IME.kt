@@ -257,7 +257,7 @@ object IME {
                 { headkey, shifted, alted, lowLayerKeysym ->
                     val a = jsval.invokeMember("accept", headkey, shifted, alted, lowLayerKeysym)
 //                    println(a.getArrayElement(0).asString().map { it.code.toString(16) })
-                    a.getArrayElement(0).asString().toCanditates() to a.getArrayElement(1).asString()
+                    a.getArrayElement(0).asString().toCanditates() to a.getArrayElement(1).let { if (it.isNull) "" else it.asString() }
                 }, {
                     jsval.invokeMember("backspace").asString().toCanditates()
                 }, {

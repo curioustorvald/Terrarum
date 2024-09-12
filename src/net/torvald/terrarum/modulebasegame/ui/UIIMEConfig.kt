@@ -453,7 +453,7 @@ open private class UIItemInputKeycap(
                 else if (parent.shiftin && keysym0[1]?.isNotEmpty() == true) keysym0[1]
                 else keysym0[0]) ?: keysymLow
 
-            if (keysym.isEmpty()) {
+            if (keysym.isEmpty() || keysym.length == 8 && keysym.contains("null")) {
                 return
             }
 
