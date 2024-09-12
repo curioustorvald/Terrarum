@@ -15,9 +15,10 @@ typealias Keysymfun = Map<String, String>
 
 
 data class TerrarumKeyLayout(
-        val name: String,
-        val capsMode: TerrarumKeyCapsMode,
-        val symbols: Keysyms
+    val name: String,
+    val capsMode: TerrarumKeyCapsMode,
+    val symbols: Keysyms,
+    val physicalLayout: String
 )
 
 enum class TerrarumKeyCapsMode {
@@ -25,24 +26,24 @@ enum class TerrarumKeyCapsMode {
 }
 
 data class TerrarumIME(
-        val name: String,
-        val config: TerrarumIMEConf,
-        // (headkey, shiftin, altgrin, lowLayerKeysym)
-        val acceptChar: (Int, Boolean, Boolean, String) -> Pair<IMECandidates, IMEOutput>,
-        val backspace: () -> IMECandidates,
-        val endCompose: () -> IMEOutput,
-        val reset: () -> Unit,
-        val composing: () -> Boolean
+    val name: String,
+    val config: TerrarumIMEConf,
+    // (headkey, shiftin, altgrin, lowLayerKeysym)
+    val acceptChar: (Int, Boolean, Boolean, String) -> Pair<IMECandidates, IMEOutput>,
+    val backspace: () -> IMECandidates,
+    val endCompose: () -> IMEOutput,
+    val reset: () -> Unit,
+    val composing: () -> Boolean
 )
 
 data class TerrarumIMEConf(
-        val name: String,
-        val copying: String,
-        val lang: String,
-        val candidates: TerrarumIMEViewCount,
-        val symbols: Keysyms?,
-        val symbolsfun: Keysymfun?,
-        val mode: TerrarumIMEMode
+    val name: String,
+    val copying: String,
+    val lang: String,
+    val candidates: TerrarumIMEViewCount,
+    val symbols: Keysyms?,
+    val symbolsfun: Keysymfun?,
+    val mode: TerrarumIMEMode
 )
 
 enum class TerrarumIMEViewCount {
@@ -177,6 +178,12 @@ object IME {
         val jsval = context.eval("js", "'use strict';Object.freeze($src)")
         val name = jsval.getMember("n").asString()
         val capsmode = jsval.getMember("capslock").asString().toCapsMode()
+        val physicalLayout = try {
+            jsval.getMember("l").asString().lowercase()
+        }
+        catch (e: NullPointerException) {
+            "ansi"
+        }
 
         val out = Array(256) { Array<String?>(4) { null } }
 
@@ -196,7 +203,7 @@ object IME {
 
 //        println("[IME] Test Keymap print for $name:"); for (keycode in 0 until 256) { print("$keycode:\t"); println(out[keycode].joinToString("\t")) }
 
-        return TerrarumKeyLayout(name, capsmode, out)
+        return TerrarumKeyLayout(name, capsmode, out, physicalLayout)
     }
 
     private fun String.toCanditates(): List<String> =

@@ -66,7 +66,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             Input.Keys.P to UIItemKeycap(this, 337,33,  Input.Keys.P, oneu, "15,4"),
             Input.Keys.LEFT_BRACKET to UIItemKeycap(this, 369,33,  Input.Keys.LEFT_BRACKET, oneu, "12,3"),
             Input.Keys.RIGHT_BRACKET to UIItemKeycap(this, 401,33,  Input.Keys.RIGHT_BRACKET, oneu, "13,3"),
-            Input.Keys.BACKSLASH to UIItemKeycap(this, 433,33,  Input.Keys.BACKSLASH, onehalfu, "20,3"),
+            Input.Keys.BACKSLASH to UIItemKeycap(this, 433,33,  Input.Keys.BACKSLASH, onehalfu, "14,3"),
 
             -5 to UIItemKeycap(this, 1,65,  null, twou, "24,3"),
             Input.Keys.A to UIItemKeycap(this, 57,65,  Input.Keys.A, oneu, "0,4"),
@@ -82,7 +82,8 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             Input.Keys.APOSTROPHE to UIItemKeycap(this, 377,65,  Input.Keys.APOSTROPHE, oneu, "16,3"),
             Input.Keys.ENTER to UIItemKeycap(this, 409,65,  Input.Keys.ENTER, twohalfu, "17,3"),
 
-            Input.Keys.SHIFT_LEFT to UIItemKeycap(this, 1,97,  Input.Keys.SHIFT_LEFT, twohalfu, "23,3"),
+            Input.Keys.SHIFT_LEFT to UIItemKeycap(this, 1,97,  Input.Keys.SHIFT_LEFT, 36, "23,3"),
+            Input.Keys.WORLD_1 to UIItemKeycap(this, 41,97,  Input.Keys.WORLD_1, oneu, "1,5"),
             Input.Keys.Z to UIItemKeycap(this, 73,97,  Input.Keys.Z, oneu, "0,5"),
             Input.Keys.X to UIItemKeycap(this, 105,97,  Input.Keys.X, oneu, "23,4"),
             Input.Keys.C to UIItemKeycap(this, 137,97,  Input.Keys.C, oneu, "2,4"),
