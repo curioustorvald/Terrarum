@@ -74,12 +74,13 @@ class ActorInventory() : FixtureInventory() {
      *      e.g. re-assign after this operation */
     override fun remove(item: GameItem, count: Long): Long {
         return super.remove(item, count) { existingItem ->
-
             // unequip, if applicable
             actor.unequipItem(existingItem.itm)
-            // also unequip on the quickslot
-            actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
-                if (quickSlot[it] != null && quickSlot[it] == existingItem.itm)
+            // unregister from the quickslot
+            // if the item is removed and crafted again, the item reappears if you've not equipped the item,
+            // but they don't if you did; unregistering disables the reappearing so that the behaviour would remain consistent
+            quickSlot.indexOfFirst { it == existingItem.itm }.let {
+                if (it >= 0)
                     setQuickslotItem(it, null)
             }
         }
