@@ -74,11 +74,13 @@ class ActorInventory() : FixtureInventory() {
      *      e.g. re-assign after this operation */
     override fun remove(item: GameItem, count: Long): Long {
         return super.remove(item, count) { existingItem ->
+
             // unequip, if applicable
             actor.unequipItem(existingItem.itm)
             // also unequip on the quickslot
             actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
-                setQuickslotItem(it, null)
+                if (quickSlot[it] != null && quickSlot[it] == existingItem.itm)
+                    setQuickslotItem(it, null)
             }
         }
     }
