@@ -1,11 +1,13 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.printStackTrace
 
 /**
  * Created by minjaesong on 2016-01-15.
@@ -41,6 +43,11 @@ interface Pocketed {
             // They're being safely handled by UIItemInventoryElem*.touchDown() and ActorInventory.remove
 
             item.effectOnUnequip(this as ActorWithBody)
+        }
+
+        if (this is IngamePlayer) {
+            printdbg(this, "UNEQUIP ITEM ${item.name}")
+            printStackTrace(this)
         }
     }
 

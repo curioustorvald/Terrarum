@@ -144,6 +144,12 @@ class OreLead(originalID: ItemID) : OreItemBase(originalID, true) {
         itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(8,6)
     }
 }
+class OreUranium(originalID: ItemID) : OreItemBase(originalID, true) {
+    override var originalName = "ITEM_ORE_URANINITE"
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(0,7)
+    }
+}
 
 class GemQuartz(originalID: ItemID) : OreItemBase(originalID, true) {
     override var originalName = "ITEM_GEM_QUARTZ"

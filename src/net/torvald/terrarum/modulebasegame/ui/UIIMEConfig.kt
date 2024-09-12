@@ -192,6 +192,8 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
             "ansi" -> getKeycapsANSI(this)
             "iso" -> getKeycapsISO(this)
             else -> throw IllegalArgumentException("Unknown physical layout: $layout")
+            // the JIS "Ro" key is not even recognised as a key by GLFW so JIS layout cannot be supported even if I wanted to
+            // besides, nobody in Japan types in Kana layout any more
         }
 
         keycaps.values.forEach { addUIitemAtHead(it) }

@@ -75,7 +75,7 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
     private fun purgeStreamBuf() {
         track.stop()
         streamBuf = null
-        printdbg("StreamBuf is now null")
+//        printdbg("StreamBuf is now null")
     }
 
     private var breakBomb = false
@@ -87,7 +87,7 @@ class MixerTrackProcessor(bufferSize: Int, val rate: Int, val track: TerrarumAud
     }
 
     private fun allocateStreamBuf(track: TerrarumAudioMixerTrack) {
-        printdbg("Allocating a StreamBuf with rate ${track.currentTrack!!.samplingRate}")
+//        printdbg("Allocating a StreamBuf with rate ${track.currentTrack!!.samplingRate}")
         streamBuf = AudioProcessBuf(track.currentTrack!!.samplingRate, { bufL, bufR ->
             var samplesRead = track.currentTrack?.readSamples(bufL, bufR) ?: 0
 

@@ -75,6 +75,7 @@ id;classname;tags
 133;net.torvald.terrarum.modulebasegame.gameitems.OreGold;SMELTABLE
 134;net.torvald.terrarum.modulebasegame.gameitems.OreSilver;SMELTABLE
 135;net.torvald.terrarum.modulebasegame.gameitems.OreLead;SMELTABLE
+136;net.torvald.terrarum.modulebasegame.gameitems.OreUranium;RADIOACTIVE,RADIATION_LOW
 
 # gemstones
 144;net.torvald.terrarum.modulebasegame.gameitems.GemQuartz;SMELTABLE,SIO2

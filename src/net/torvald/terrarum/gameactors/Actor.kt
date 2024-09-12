@@ -181,10 +181,10 @@ abstract class Actor : Comparable<Actor>, Runnable {
     open fun startAudio(music: MusicContainer, volume: TrackVolume = 1.0, doSomethingWithTrack: (TerrarumAudioMixerTrack) -> Unit = {}) {
         getTrackByAudio(music).let {
             if (it == null) {
-                printdbg(this, "cannot startAudio $music")
+//                printdbg(this, "cannot startAudio $music")
             }
             else {
-                printdbg(this, "startAudio $music")
+//                printdbg(this, "startAudio $music")
                 it.trackingTarget = this
                 it.currentTrack = music
                 it.maxVolumeFun = { volume }

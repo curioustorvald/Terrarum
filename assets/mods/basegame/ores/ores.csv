@@ -7,7 +7,8 @@
 "6";"item@basegame:133";"GOLD,NATURAL_GOLD"
 "7";"item@basegame:134";"SILVER,NATURAL_SILVER"
 "8";"item@basegame:135";"LEAD,GALENA"
-#"9";"item@basegame:143";"TITANIUM,RUTILE"
+"9";"item@basegame:136";"URANIUM,URANINITE"
+#"10";"item@basegame:143";"TITANIUM,RUTILE"
 
 "256";"item@basegame:146";"SALT"
 "257";"item@basegame:145";"GEM,SIO2,AMETHYST"
