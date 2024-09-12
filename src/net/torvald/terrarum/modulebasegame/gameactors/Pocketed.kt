@@ -44,11 +44,6 @@ interface Pocketed {
 
             item.effectOnUnequip(this as ActorWithBody)
         }
-
-        if (this is IngamePlayer) {
-            printdbg(this, "UNEQUIP ITEM ${item.name}")
-            printStackTrace(this)
-        }
     }
 
     fun unequipItem(itemID: ItemID?) {
