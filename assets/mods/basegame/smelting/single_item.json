@@ -44,5 +44,9 @@
   "item@basegame:135": { /* lead ore -> ingot */
     "difficulty": 1.0,
     "product": [1, "item@basegame:119"]
+  },
+  "item@basegame:25": { /* clay ball -> a brick */
+    "difficulty": 1.0,
+    "product": [1, "item@basegame:56"]
   }
 }

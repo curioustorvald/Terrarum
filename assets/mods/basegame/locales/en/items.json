@@ -1,5 +1,6 @@
 {
   "ITEM_ALLOYING_FURNACE": "Alloying Furnace",
+  "ITEM_BRICK_SINGULAR": "Brick", /* always singular */
   "ITEM_CALENDAR": "Calendar",
   "ITEM_CHARCOAL": "Charcoal",
   "ITEM_CHERRY_BOMB": "Bomb",

@@ -50,6 +50,16 @@ class ItemClayBall(originalID: ItemID) : LightIngredientBase(originalID) {
 }
 
 /**
+ * Created by minjaesong on 2024-09-13.
+ */
+class ItemClayBrick(originalID: ItemID) : LightIngredientBase(originalID) {
+    override var originalName = "ITEM_BRICK_SINGULAR"
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(7,2)
+    }
+}
+
+/**
  * Created by minjaesong on 2024-02-14.
  */
 class ItemGunpowder(originalID: ItemID) : LightIngredientBase(originalID) {

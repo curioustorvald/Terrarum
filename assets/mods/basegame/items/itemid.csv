@@ -23,7 +23,7 @@ id;classname;tags
 22;net.torvald.terrarum.modulebasegame.gameitems.AxeWood;TOOL,AXE
 23;net.torvald.terrarum.modulebasegame.gameitems.PickaxeStone;TOOL,PICK
 24;net.torvald.terrarum.modulebasegame.gameitems.AxeStone;TOOL,AXE
-25;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBall;
+25;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBall;SMELTABLE
 
 27;net.torvald.terrarum.modulebasegame.gameitems.ItemFurnaceAndAnvil;FIXTURE,CRAFTING
 28;net.torvald.terrarum.modulebasegame.gameitems.ItemJukebox;FIXTURE,MUSIC
@@ -54,6 +54,8 @@ id;classname;tags
 53;net.torvald.terrarum.modulebasegame.gameitems.ItemEngravingWorkbench;FIXTURE,CRAFTING
 54;net.torvald.terrarum.modulebasegame.gameitems.ItemMechanicalTines;FIXTURE,MUSIC,SIGNAL
 55;net.torvald.terrarum.modulebasegame.gameitems.ItemGlowOrb;LIGHT,THROWABLE
+56;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBrick;
+
 
 
 # ingots

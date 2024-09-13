@@ -10,6 +10,7 @@
   "BLOCK_STONE_BRICKS": "Stone Bricks",
   "BLOCK_STONE_DEEP": "Deepstone",
   "BLOCK_STONE_MARBLE": "Marble",
+  "BLOCK_BRICKS": "Bricks", /* always plural */
 
   "BLOCK_DIRT": "Dirt",
   "BLOCK_GRASS": "Grass",
