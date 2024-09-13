@@ -12,7 +12,7 @@ uniform sampler2D tilemap; // RGBA8888
 uniform sampler2D tilemap2; // RGBA8888
 uniform sampler2D tilesAtlas; // terrain, wire, fluids, etc.
 uniform sampler2D tilesBlendAtlas; // alternative terrain for the weather mix (e.g. yellowed grass)
-uniform sampler2D deblockingMap;
+//uniform sampler2D deblockingMap;
 
 uniform vec2 tilesInAxes; // 8x8
 uniform float tilesBlend = 0.0; // percentage of blending [0f..1f]. 0: draws tilesAtlas, 1: draws tilesBlendAtlas
@@ -78,15 +78,15 @@ vec2 uvFlipRot(int op, vec2 uv) {
     return (flipRotMat[op] * vec3(uv, 1.0)).xy;
 }
 
-const vec4 _four = vec4(1.0 / 4.0);
-const vec4 _three = vec4(1.0 / 3.0);
-const vec4 _two = vec4(1.0 / 2.0);
-const vec4 zero = vec4(0.0);
-const float blur = 1.0;
-const vec2 blurU = vec2(0.0, -blur);
-const vec2 blurD = vec2(0.0, +blur);
-const vec2 blurL = vec2(-blur, 0.0);
-const vec2 blurR = vec2(+blur, 0.0);
+//const vec4 _four = vec4(1.0 / 4.0);
+//const vec4 _three = vec4(1.0 / 3.0);
+//const vec4 _two = vec4(1.0 / 2.0);
+//const vec4 zero = vec4(0.0);
+//const float blur = 1.0;
+//const vec2 blurU = vec2(0.0, -blur);
+//const vec2 blurD = vec2(0.0, +blur);
+//const vec2 blurL = vec2(-blur, 0.0);
+//const vec2 blurR = vec2(+blur, 0.0);
 
 vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx; // how many tiles will fit into a screen; one used by the tileFromMap; we need this because screen size is not integer multiple of the tile size
 
@@ -96,11 +96,11 @@ vec4[2] getTileNumbersFromMap(vec2 fragCoord) {
     return vec4[2](tileFromMap, tileFromMap2);
 }
 
-vec4 getBlurmapNumbersFromMap(vec2 fragCoord) {
-    return texture(deblockingMap, fragCoord / overscannedScreenDimension);// raw tile number
-}
+//vec4 getBlurmapNumbersFromMap(vec2 fragCoord) {
+//    return texture(deblockingMap, fragCoord / overscannedScreenDimension);// raw tile number
+//}
 
-vec4[3] getFragColorForOnscreenCoord(vec2 fragCoord) {
+vec4[2] getFragColorForOnscreenCoord(vec2 fragCoord) {
     vec4[] tileFromMap = getTileNumbersFromMap(fragCoord);
     ivec3 tbf = _colToInt(tileFromMap[0], tileFromMap[1]);
     int tile = tbf.x;
@@ -111,11 +111,11 @@ vec4[3] getFragColorForOnscreenCoord(vec2 fragCoord) {
     ivec2 tileQ = tileXYnQ.zw;
     ivec2 breakageXY = tileNumberToXY(2*(breakage + 5)).xy; // +5 is hard-coded constant that depends on the contents of the atlas
 
-    vec4 blurFromMap = getBlurmapNumbersFromMap(fragCoord);
-    ivec3 tbf2 = _colToInt(blurFromMap, zero);
-    int blurTileNum = tbf2.x;
-    ivec4 blurXYnQ = tileNumberToXY(blurTileNum);
-    ivec2 blurXY = blurXYnQ.xy;
+//    vec4 blurFromMap = getBlurmapNumbersFromMap(fragCoord);
+//    ivec3 tbf2 = _colToInt(blurFromMap, zero);
+//    int blurTileNum = tbf2.x;
+//    ivec4 blurXYnQ = tileNumberToXY(blurTileNum);
+//    ivec2 blurXY = blurXYnQ.xy;
 
     // calculate the UV coord value for texture sampling //
 
@@ -124,13 +124,13 @@ vec4[3] getFragColorForOnscreenCoord(vec2 fragCoord) {
     vec2 uvCoordForTile1 = mod(fragCoord, tileSizeInPx) * _tileSizeInPx * _tilesInAtlas;// 0..0.00390625 regardless of tile position in atlas
     vec2 uvCoordOffsetTile = tileXY * _tilesInAtlas; // where the tile starts in the atlas, using uv coord (0..1)
     vec2 uvCoordOffsetBreakage = (breakageXY + tileQ) * _tilesInAtlas;
-    vec2 uvCoordOffsetBlurmap = blurXY * _tilesInAtlas;
+//    vec2 uvCoordOffsetBlurmap = blurXY * _tilesInAtlas;
 
     // get final UV coord for the actual sampling //
 
     vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffsetTile;// where we should be actually looking for in atlas, using UV coord (0..1)
     vec2 finalUVCoordForBreakage = uvCoordForTile1 + uvCoordOffsetBreakage;
-    vec2 finalUVCoordForBlurmap = uvCoordForTile1 + uvCoordOffsetBlurmap;
+//    vec2 finalUVCoordForBlurmap = uvCoordForTile1 + uvCoordOffsetBlurmap;
 
     // blending a breakage tex with main tex //
 
@@ -139,8 +139,8 @@ vec4[3] getFragColorForOnscreenCoord(vec2 fragCoord) {
 
     return vec4[](
         mix(tileCol, tileAltCol, tilesBlend),
-        texture(tilesAtlas, finalUVCoordForBreakage),
-        texture(tilesAtlas, finalUVCoordForBlurmap)
+        texture(tilesAtlas, finalUVCoordForBreakage)
+//        texture(tilesAtlas, finalUVCoordForBlurmap)
     );
 }
 
@@ -178,20 +178,20 @@ void main() {
     vec4[] tile_breakage_blur = getFragColorForOnscreenCoord(fragCoord);
 
     vec4 tileC = tile_breakage_blur[0];
-    vec4 tileL = getFragColorForOnscreenCoord1(fragCoord + blurL);
-    vec4 tileR = getFragColorForOnscreenCoord1(fragCoord + blurR);
-    vec4 tileU = getFragColorForOnscreenCoord1(fragCoord + blurU);
-    vec4 tileD = getFragColorForOnscreenCoord1(fragCoord + blurD);
+//    vec4 tileL = getFragColorForOnscreenCoord1(fragCoord + blurL);
+//    vec4 tileR = getFragColorForOnscreenCoord1(fragCoord + blurR);
+//    vec4 tileU = getFragColorForOnscreenCoord1(fragCoord + blurU);
+//    vec4 tileD = getFragColorForOnscreenCoord1(fragCoord + blurD);
 
-    vec4 blurH = (tileC + tileL + tileR) * _three;
-    vec4 blurV = (tileC + tileU + tileD) * _three;
-    vec4 blurPower = tile_breakage_blur[2];
+//    vec4 blurH = (tileC + tileL + tileR) * _three;
+//    vec4 blurV = (tileC + tileU + tileD) * _three;
+//    vec4 blurPower = tile_breakage_blur[2];
 
-    vec4 finalTile = mix(
-        mix(tileC, blurH, blurPower.x),
-        mix(tileC, blurV, blurPower.y),
-        0.5
-    );
+    vec4 finalTile = tileC;//mix(
+//        mix(tileC, blurH, blurPower.x),
+//        mix(tileC, blurV, blurPower.y),
+//        0.5
+//    );
 
     vec4 finalBreakage = drawBreakage * tile_breakage_blur[1]; // drawBreakeage = 0 to not draw, = 1 to draw
 

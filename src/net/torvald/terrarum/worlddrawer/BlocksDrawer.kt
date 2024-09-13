@@ -607,7 +607,7 @@ internal object BlocksDrawer {
                             (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt()
                     else 0
 
-                if (mode == TERRAIN || mode == WALL) {
+                /*if (mode == TERRAIN || mode == WALL) {
                     // translate nearbyTilesInfo into proper subtile number
                     val nearbyTilesInfo = getNearbyTilesInfoDeblocking(mode, x, y)
                     val subtiles = if (nearbyTilesInfo == null)
@@ -623,7 +623,7 @@ internal object BlocksDrawer {
                     /*TR*/writeToBufferSubtile(BLURMAP_BASE + mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, 0, 0)
                     /*BR*/writeToBufferSubtile(BLURMAP_BASE + mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 1, subtiles[2].x, subtiles[2].y, 0, 0)
                     /*BL*/writeToBufferSubtile(BLURMAP_BASE + mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 1, subtiles[3].x, subtiles[3].y, 0, 0)
-                }
+                }*/
 
                 if (renderTag.maskType >= CreateTileAtlas.RenderTag.MASK_SUBTILE_GENERIC) {
                     hash = getHashCoord(x, y, 268435456, mode, renderTag.tileNumber)
@@ -1173,7 +1173,7 @@ internal object BlocksDrawer {
 
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
     private var _tilesBufferAsTex2: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
-    private var _blurTilesBuffer: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
+//    private var _blurTilesBuffer: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
     private val occlusionIntensity = 0.25f // too low value and dark-coloured walls won't darken enough
 
     private val doTilemapUpdate: Boolean
@@ -1279,26 +1279,26 @@ internal object BlocksDrawer {
         _tilesBufferAsTex2 = Texture(drawBuffer2)
         _tilesBufferAsTex2.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
-        _blurTilesBuffer.dispose()
-        _blurTilesBuffer = Texture(blurTilesBuffer)
-        _blurTilesBuffer.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+//        _blurTilesBuffer.dispose()
+//        _blurTilesBuffer = Texture(blurTilesBuffer)
+//        _blurTilesBuffer.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         if (drawEmissive) {
-            nullTex.bind(4)
+//            nullTex.bind(4)
             _tilesBufferAsTex2.bind(3)
             _tilesBufferAsTex.bind(2)
             tilesEmissive.texture.bind(1)
             tilesEmissive.texture.bind(0) // for some fuck reason, it must be bound as last
         }
         else if (drawGlow) {
-            nullTex.bind(4)
+//            nullTex.bind(4)
             _tilesBufferAsTex2.bind(3)
             _tilesBufferAsTex.bind(2)
             tilesGlow.texture.bind(1)
             tilesGlow.texture.bind(0) // for some fuck reason, it must be bound as last
         }
         else {
-            _blurTilesBuffer.bind(4)
+//            _blurTilesBuffer.bind(4)
             _tilesBufferAsTex2.bind(3)
             _tilesBufferAsTex.bind(2)
             tilesTerrainNext.texture.bind(1)
@@ -1312,7 +1312,7 @@ internal object BlocksDrawer {
         shaderTiling.setUniformi("tilesBlendAtlas", 1)
         shaderTiling.setUniformi("tilemap", 2)
         shaderTiling.setUniformi("tilemap2", 3)
-        shaderTiling.setUniformi("deblockingMap", 4)
+//        shaderTiling.setUniformi("deblockingMap", 4)
         shaderTiling.setUniformi("tilemapDimension", drawBuffer1.width, drawBuffer1.height)
         shaderTiling.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
         shaderTiling.setUniformi("cameraTranslation", camTransX, camTransY) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div
@@ -1457,7 +1457,7 @@ internal object BlocksDrawer {
         blurTilesBuffer.dispose()
         _tilesBufferAsTex.dispose()
         _tilesBufferAsTex2.dispose()
-        _blurTilesBuffer.dispose()
+//        _blurTilesBuffer.dispose()
         tilesQuad.tryDispose()
         shaderTiling.dispose()
         shaderDeblock.dispose()

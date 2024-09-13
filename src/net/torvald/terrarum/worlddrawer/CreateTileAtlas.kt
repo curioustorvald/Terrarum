@@ -471,9 +471,8 @@ class CreateTileAtlas {
             //     0000 (0): INVALID
             //     1000 (1): connect-mutual
             //     0100 (2): connect-self
-            // Line 3: Request for Post-Processing
+            // Line 3: Request for Post-Processing (currently does nothing)
             //     0000 (0): do nothing
-            //     1000 (1): subtile deblocking
             // NOTE: For this system, the "NORANDTILE" tag is ignored
             val maskType = if (tilesPixmap.width >= 3*W_SUBTILE_GENERIC) MASK_SUBTILE_GRASS else MASK_SUBTILE_GENERIC
             var connectionType0 = 0
