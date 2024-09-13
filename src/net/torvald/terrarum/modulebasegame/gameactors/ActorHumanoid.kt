@@ -714,18 +714,18 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
     private fun swimUp() {
         val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, 0)
-        swimAcc = -getJumpAcc(jumpPower1, timedJumpCharge) * SWIM_ACC_MULT
+        swimAcc = -getJumpAcc(jumpPower1, timedJumpCharge) * SWIM_ACC_MULT * speedMultByTile
     }
 
     private fun swimDown() {
         val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, 0)
-        swimAcc = getJumpAcc(jumpPower1, timedJumpCharge) * SWIM_ACC_MULT
+        swimAcc = getJumpAcc(jumpPower1, timedJumpCharge) * SWIM_ACC_MULT * speedMultByTile
     }
 
     private fun swimVertJoypad(up: Boolean, absAxisVal: Float) {
         val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, 0)
         val sign = if (up) -1.0 else 1.0
-        swimAcc = sign * getJumpAcc(jumpPower1, timedJumpCharge) * absAxisVal * SWIM_ACC_MULT
+        swimAcc = sign * getJumpAcc(jumpPower1, timedJumpCharge) * absAxisVal * SWIM_ACC_MULT * speedMultByTile
     }
 
 

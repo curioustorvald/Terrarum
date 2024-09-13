@@ -241,7 +241,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private lateinit var uiBasicInfo: UICanvas
     private lateinit var uiWatchTierOne: UICanvas
     lateinit var uiAutosaveNotifier: UIAutosaveNotifier
-    lateinit var uiCheatMotherfuckerNootNoot: UICheatDetected
+    lateinit var uiCheatDetected: UICheatDetected
 
 
     var particlesActive = 0
@@ -628,7 +628,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiBasicInfo.setPosition((uiQuickBar.posX - uiBasicInfo.width - App.scr.tvSafeActionWidth) / 2 + App.scr.tvSafeActionWidth, uiWatchTierOne.posY)
 
 
-        uiCheatMotherfuckerNootNoot = UICheatDetected()
+        uiCheatDetected = UICheatDetected()
 
 
         // batch-process uiAliases
@@ -654,7 +654,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             getUIFixture,
             uiTooltip,
             consoleHandler,
-            uiCheatMotherfuckerNootNoot
+            uiPaused,
+            uiCheatDetected,
             // drawn last
         )
 

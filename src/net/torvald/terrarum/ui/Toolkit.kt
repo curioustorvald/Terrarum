@@ -209,11 +209,11 @@ object Toolkit : Disposable {
     fun blurEntireScreen(batch: SpriteBatch, camera: OrthographicCamera, blurRadius0: Float, x: Int, y: Int, w: Int, h: Int) {
         batch.end()
 
-        val blurRadius = FastMath.pow(blurRadius0, 0.5f)
+//        val blurRadius = FastMath.pow(blurRadius0, 0.5f)
         val renderTarget = FrameBufferManager.peek()
 
-        /*if (blurRadius > 3f) {
-            val radius3 = (blurRadius - 3f) / 8f
+        //if (blurRadius > 3f) {
+            val radius3 = FastMath.pow(blurRadius0 / 2, 0.5f)//(blurRadius - 3f) / 8f
             fboBlurHalf.inAction(camera, batch) {
                 blurtex0 = renderTarget.colorBufferTexture
                 blurtex0.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
@@ -257,9 +257,9 @@ object Toolkit : Disposable {
                 shaderKawaseUp.setUniformf("halfpixel", radius3 / fboBlurHalf.width, radius3 / fboBlurHalf.height)
                 blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLE_FAN)
             }
-        }*/
+        //}
 
-        fboBlurHalf.inAction(camera, batch) {
+        /*fboBlurHalf.inAction(camera, batch) {
             blurtex2 = renderTarget.colorBufferTexture
             blurtex2.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             blurtex2.bind(0)
@@ -279,7 +279,7 @@ object Toolkit : Disposable {
             shaderKawaseUp.setUniformi("u_texture", 0)
             shaderKawaseUp.setUniformf("halfpixel", blurRadius / fboBlurHalf.width, blurRadius / fboBlurHalf.height)
             blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLE_FAN)
-        }
+        }*/
 
 
 

@@ -215,6 +215,10 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             terrarumIngame.consoleHandler.toggleOpening()
         }
 
+        if (keycode == Input.Keys.PAUSE) {
+            terrarumIngame.uiPaused.toggleOpening()
+        }
+
 
         // screenshot key
         if (keycode == Input.Keys.F12 && !f12Down) {

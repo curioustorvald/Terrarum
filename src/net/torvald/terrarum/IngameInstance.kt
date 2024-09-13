@@ -17,6 +17,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.ui.Noticelet
 import net.torvald.terrarum.modulebasegame.ui.Notification
+import net.torvald.terrarum.modulebasegame.ui.UIPauseTheGame
 import net.torvald.terrarum.modulebasegame.ui.UITooltip
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.VirtualDisk
@@ -74,6 +75,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     val ZOOM_MINIMUM = 1.0f
 
     open var consoleHandler: ConsoleWindow = ConsoleWindow()
+    open var uiPaused: UIPauseTheGame = UIPauseTheGame()
 
     var paused: Boolean = false; protected set
     var playerControlDisabled = false; protected set

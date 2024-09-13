@@ -7,7 +7,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 object CheatWarnTest : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
-        (Terrarum.ingame as? TerrarumIngame)?.uiCheatMotherfuckerNootNoot?.setAsOpen()
+        (Terrarum.ingame as? TerrarumIngame)?.uiCheatDetected?.setAsOpen()
     }
 
     override fun printUsage() {
