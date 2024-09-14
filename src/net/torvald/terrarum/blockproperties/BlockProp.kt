@@ -16,7 +16,6 @@ class BlockProp : TaggedProp {
 
     var nameKey: String = ""
 
-    /** 1.0f for 1023, 0.25f for 255 */
     var shadeColR = 0f
     var shadeColG = 0f
     var shadeColB = 0f
@@ -46,7 +45,6 @@ class BlockProp : TaggedProp {
     var isVertFriction: Boolean = false
 
 
-    /** 1.0f for 1023, 0.25f for 255 */
     internal var baseLumColR = 0f // base value used to calculate dynamic luminosity
     internal var baseLumColG = 0f // base value used to calculate dynamic luminosity
     internal var baseLumColB = 0f // base value used to calculate dynamic luminosity
