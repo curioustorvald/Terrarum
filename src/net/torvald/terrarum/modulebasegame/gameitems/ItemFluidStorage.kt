@@ -39,9 +39,9 @@ open class ItemFluidStoragePrototype(originalID: ItemID, sheetX: Int, sheetY: In
     @Transient private val fluid = if (sheetX == 0) null else "fluid@$module:$sheetX"
 
     override var originalName = if (fluid != null)
-        "${FluidCodex[fluid].nameKey}>>=${keyInLang}_WITH"
+        "${FluidCodex[fluid].nameKey}>>=ITEM_BUCKET_TEMPLATE>>=$keyInLang"
     else
-        keyInLang
+        "NULSTR>>=$keyInLang"
 
     init {
         itemImage = CommonResourcePool.getAsItemSheet(sheetName).get(sheetX,sheetY)

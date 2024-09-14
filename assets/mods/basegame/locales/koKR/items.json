@@ -1,10 +1,9 @@
 {
   "ITEM_ALLOYING_FURNACE": "합금 화로",
   "ITEM_BRICK_SINGULAR": "벽돌", /* always singular */
-  "ITEM_BUCKET_IRON": "철 양동이",
-  "ITEM_BUCKET_IRON_WITH": "%1$s 담은 철 양동이",
-  "ITEM_BUCKET_WOODEN": "나무 양동이",
-  "ITEM_BUCKET_WOODEN_WITH": "%1$s 담은 나무 양동이",
+  "ITEM_BUCKET_IRON": "%1$s 철 양동이",
+  "ITEM_BUCKET_WOODEN": "%1$s 나무 양동이",
+  "ITEM_BUCKET_TEMPLATE": "%1$s 담은",
   "ITEM_CALENDAR": "달력",
   "ITEM_CHARCOAL": "목탄",
   "ITEM_CHERRY_BOMB": "폭탄",

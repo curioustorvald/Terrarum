@@ -92,7 +92,7 @@ object Lang {
          */
         //println(json.entrySet())
         JsonFetcher.forEachSiblings(json) { key, value ->
-            langpack.put("${key}_$lang", value.asString())
+            langpack.put("${key}_$lang", value.asString().trim())
         }
 
     }
@@ -119,7 +119,7 @@ object Lang {
         JsonFetcher.forEachSiblings(json.get("resources").get("data")) { _, entry ->
             langpack.put(
                     "${entry.getString("n")}_$lang",
-                    entry.getString("s")
+                    entry.getString("s").trim()
             )
         }
 
@@ -154,7 +154,7 @@ object Lang {
 
                 sb.append(getstr(args[0]))
                 args.subList(1, args.size).forEach {
-                    val oldstr = sb.toString()
+                    val oldstr = sb.toString().trim()
                     sb.clear()
                     formatter.format(getstr(it), oldstr)
                 }
@@ -162,9 +162,9 @@ object Lang {
                 if (decodeCache[App.GAME_LOCALE] == null) {
                     decodeCache[App.GAME_LOCALE] = HashMap()
                 }
-                decodeCache[App.GAME_LOCALE]!!["$key+$capitalise"] = sb.toString()
+                decodeCache[App.GAME_LOCALE]!!["$key+$capitalise"] = sb.toString().trim()
 
-                return sb.toString()
+                return sb.toString().trim()
             }
         }
 
@@ -175,9 +175,9 @@ object Lang {
 
         arguments.forEachIndexed { index, it0 ->
             val it = if (capitalise) it0.toString().capitalize() else it0.toString()
-            raw = raw.replace("{${index}}", it)
+            raw = raw.replace("{${index}}", it.trim())
         }
-        return raw
+        return raw.trim()
     }
 
     /**
@@ -200,7 +200,7 @@ object Lang {
             capCache[locale] = HashMap<String, String>()
 
         if (!capCache[locale]!!.containsKey(key)) {
-            capCache[locale]!![key] = TitlecaseConverter(ret, locale)
+            capCache[locale]!![key] = TitlecaseConverter(ret, locale).trim()
         }
 
         return capCache[locale]!![key]!!
@@ -251,7 +251,7 @@ object Lang {
 
             ret = ret.replace(matched0, resolved)
         }
-        return ret
+        return ret.trim()
     }
 
     private fun String.getEndTag() = this.split("_").last()
