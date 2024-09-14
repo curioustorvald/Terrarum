@@ -855,7 +855,7 @@ open class GameWorld(
             layerFluids.unsafeSetTile(x, y, fluidNumber, fill)
         }
         else {
-            layerFluids.unsafeSetTile(x, y, fluidNumber, 0f)
+            layerFluids.unsafeSetTile(x, y, tileNameToNumberMap[Fluid.NULL]!!, 0f)
         }
 
 

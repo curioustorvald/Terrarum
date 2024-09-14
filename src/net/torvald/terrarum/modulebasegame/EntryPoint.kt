@@ -27,6 +27,9 @@ class EntryPoint : ModuleEntryPoint() {
         CommonResourcePool.addToLoadingList("$moduleName.items") {
             ItemSheet(ModMgr.getGdxFile(moduleName, "items/items.tga"))
         }
+        CommonResourcePool.addToLoadingList("$moduleName.buckets") {
+            ItemSheet(ModMgr.getGdxFile(moduleName, "items/buckets.tga"))
+        }
         CommonResourcePool.loadAll()
 
 

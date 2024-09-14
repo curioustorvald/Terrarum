@@ -53,7 +53,14 @@ class Oregen(world: GameWorld, isFinal: Boolean, private val caveAttenuateBiasSc
                 val oreTiles = ores.map { it.tile }
 
                 val tileToPut =
-                    noiseValues.zip(oreTiles).firstNotNullOfOrNull { (n, tile) -> if (n > 0.5) tile else null }
+                    noiseValues.zip(oreTiles).firstNotNullOfOrNull { (n, tile) ->
+                        // don't generate it if versionSince of the ore is newer than the world
+                        if (INGAME.worldGenVer != null && INGAME.worldGenVer!! < OreCodex[tile].versionSince)
+                            null
+                        else if (n > 0.5) tile else null
+                    }
+
+
                 val backingTile = world.getTileFromTerrain(x, y)
 
                 val blockTagNonGrata = ores.firstOrNull { it.tile == tileToPut }?.blockTagNonGrata ?: hashSetOf()

@@ -56,6 +56,7 @@ class OreCodex {
         prop.id = "ores@$modname:$key"
         prop.tags = record.get("tags").split(',').map { it.trim().toUpperCase() }.toHashSet()
         prop.item = record.get("item").let { if (it == null) "" else if (it.contains(':')) it else "$modname:$it" }
+        prop.versionSince = record.get("versionsince").toLong()
 
         oreProps[prop.id] = prop
 
@@ -83,6 +84,7 @@ class OreProp : TaggedProp {
     var id: String = ""
     var item: ItemID = ""
     var tags = HashSet<String>()
+    var versionSince: Long = 0L
 
     override fun hasTag(s: String) = tags.contains(s)
 

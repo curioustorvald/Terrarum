@@ -1,25 +1,25 @@
-"id";"item";"tags"
-"1";"item@basegame:128";"COPPER,MALACHITE"
-"2";"item@basegame:129";"IRON,HAEMATITE"
-"3";"item@basegame:130";"COAL,CARBON"
-"4";"item@basegame:131";"ZINC,SPHALERITE"
-"5";"item@basegame:132";"TIN,CASSITERITE"
-"6";"item@basegame:133";"GOLD,NATURAL_GOLD"
-"7";"item@basegame:134";"SILVER,NATURAL_SILVER"
-"8";"item@basegame:135";"LEAD,GALENA"
-"9";"item@basegame:136";"URANIUM,URANINITE"
-#"10";"item@basegame:143";"TITANIUM,RUTILE"
+"id";"item";"tags";"versionsince"
+"1";"item@basegame:128";"COPPER,MALACHITE";0
+"2";"item@basegame:129";"IRON,HAEMATITE";0
+"3";"item@basegame:130";"COAL,CARBON";0
+"4";"item@basegame:131";"ZINC,SPHALERITE";0
+"5";"item@basegame:132";"TIN,CASSITERITE";0
+"6";"item@basegame:133";"GOLD,NATURAL_GOLD";0
+"7";"item@basegame:134";"SILVER,NATURAL_SILVER";0
+"8";"item@basegame:135";"LEAD,GALENA";0
+"9";"item@basegame:136";"URANIUM,PITCHBLENDE";67108868
+#"10";"item@basegame:143";"TITANIUM,RUTILE";100663296
 
-"256";"item@basegame:146";"SALT"
-"257";"item@basegame:145";"GEM,SIO2,AMETHYST"
-"258";"item@basegame:144";"GEM,SIO2,QUARTZ"
-"259";"item@basegame:147";"GEM,NITRE"
+"256";"item@basegame:146";"SALT";0
+"257";"item@basegame:145";"GEM,SIO2,AMETHYST";0
+"258";"item@basegame:144";"GEM,SIO2,QUARTZ";0
+"259";"item@basegame:147";"GEM,NITRE";0
 
-#"260";"item@basegame:136";"GEM,RUBY"
-#"261";"item@basegame:137";"GEM,EMERALD"
-#"262";"item@basegame:138";"GEM,SAPPHIRE"
-#"263";"item@basegame:139";"GEM,TOPAZ"
-#"264";"item@basegame:140";"GEM,DIAMOND"
+#"260";"item@basegame:136";"GEM,RUBY";100663296
+#"261";"item@basegame:137";"GEM,EMERALD";100663296
+#"262";"item@basegame:138";"GEM,SAPPHIRE";100663296
+#"263";"item@basegame:139";"GEM,TOPAZ";100663296
+#"264";"item@basegame:140";"GEM,DIAMOND";100663296
 
-#"512";"macro@BASETILE";"GRASS"
-#"513";"macro@BASETILE";"MOSS"
+#"512";"macro@BASETILE";"GRASS";100663296
+#"513";"macro@BASETILE";"MOSS";100663296
