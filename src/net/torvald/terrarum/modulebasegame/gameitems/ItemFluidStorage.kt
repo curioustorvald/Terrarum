@@ -2,11 +2,13 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.blockproperties.FluidCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameworld.FLUID_MIN_MASS
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 
 /**
@@ -23,7 +25,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
  *
  * Created by minjaesong on 2024-09-14.
  */
-open class ItemFluidStoragePrototype(originalID: ItemID, sheetX: Int, sheetY: Int, sheetName: String) : GameItem(originalID) {
+open class ItemFluidStoragePrototype(originalID: ItemID, sheetX: Int, sheetY: Int, sheetName: String, keyInLang: String) : GameItem(originalID) {
 
     private val module = originalID.substringAfter('@').substringBefore(':')
 
@@ -35,6 +37,11 @@ open class ItemFluidStoragePrototype(originalID: ItemID, sheetX: Int, sheetY: In
     override var equipPosition = EquipPosition.HAND_GRIP
 
     @Transient private val fluid = if (sheetX == 0) null else "fluid@$module:$sheetX"
+
+    override var originalName = if (fluid != null)
+        "${FluidCodex[fluid].nameKey}>>=${keyInLang}_WITH"
+    else
+        keyInLang
 
     init {
         itemImage = CommonResourcePool.getAsItemSheet(sheetName).get(sheetX,sheetY)
@@ -75,13 +82,13 @@ open class ItemFluidStoragePrototype(originalID: ItemID, sheetX: Int, sheetY: In
 }
 
 
-class ItemBucketWooden00(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 0, 0, "basegame.buckets")
-class ItemBucketWooden01(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 1, 0, "basegame.buckets")
-class ItemBucketWooden02(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 2, 0, "basegame.buckets")
-class ItemBucketWooden03(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 3, 0, "basegame.buckets")
+class ItemBucketWooden00(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 0, 0, "basegame.buckets", "ITEM_BUCKET_WOODEN")
+class ItemBucketWooden01(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 1, 0, "basegame.buckets", "ITEM_BUCKET_WOODEN")
+class ItemBucketWooden02(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 2, 0, "basegame.buckets", "ITEM_BUCKET_WOODEN")
+class ItemBucketWooden03(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 3, 0, "basegame.buckets", "ITEM_BUCKET_WOODEN")
 
 
-class ItemBucketIron00(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 0, 1, "basegame.buckets")
-class ItemBucketIron01(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 1, 1, "basegame.buckets")
-class ItemBucketIron02(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 2, 1, "basegame.buckets")
-class ItemBucketIron03(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 3, 1, "basegame.buckets")
+class ItemBucketIron00(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 0, 1, "basegame.buckets", "ITEM_BUCKET_IRON")
+class ItemBucketIron01(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 1, 1, "basegame.buckets", "ITEM_BUCKET_IRON")
+class ItemBucketIron02(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 2, 1, "basegame.buckets", "ITEM_BUCKET_IRON")
+class ItemBucketIron03(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 3, 1, "basegame.buckets", "ITEM_BUCKET_IRON")

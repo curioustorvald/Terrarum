@@ -34,13 +34,17 @@ class EntryPoint : ModuleEntryPoint() {
 
 
         // the order of invocation is important! Material should be the first as blocks and items are depend on it.
+        // group 0
         ModMgr.GameMaterialLoader.invoke(moduleName)
+        ModMgr.GameFluidLoader.invoke(moduleName)
+        // group 1
         ModMgr.GameItemLoader.invoke(moduleName)
+        // group 2
         ModMgr.GameBlockLoader.invoke(moduleName)
         ModMgr.GameOreLoader.invoke(moduleName)
-        ModMgr.GameFluidLoader.invoke(moduleName)
-        ModMgr.GameLanguageLoader.invoke(moduleName)
+        // group 3
         ModMgr.GameCraftingRecipeLoader.invoke(moduleName)
+        ModMgr.GameLanguageLoader.invoke(moduleName)
         ModMgr.GameAudioLoader.invoke(moduleName)
         ModMgr.GameWeatherLoader.invoke(moduleName)
 

@@ -1,6 +1,10 @@
 {
   "ITEM_ALLOYING_FURNACE": "Alloying Furnace",
   "ITEM_BRICK_SINGULAR": "Brick", /* always singular */
+  "ITEM_BUCKET_IRON": "Iron Bucket",
+  "ITEM_BUCKET_IRON_WITH": "Iron Bucket with %1$s",
+  "ITEM_BUCKET_WOODEN": "Wooden Bucket",
+  "ITEM_BUCKET_WOODEN_WITH": "Wooden Bucket with %1$s",
   "ITEM_CALENDAR": "Calendar",
   "ITEM_CHARCOAL": "Charcoal",
   "ITEM_CHERRY_BOMB": "Bomb",

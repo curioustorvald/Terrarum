@@ -10,5 +10,9 @@
   "item@basegame:34": { /* signal switch */
     "workbench": "",
     "ingredients": [[2, 1, "item@basegame:112", 1, "$ROCK", 1, "$WOOD"]] /* 1 copper ingot, 1 rock, 1 planks */
+  },
+  "item@basegame:1048576": { /* wooden bucket */
+    "workbench": "basiccrafting",
+    "ingredients": [[1, 3, "$WOOD"]] /* 3 planks */
   }
 }
