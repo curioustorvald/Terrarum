@@ -1,8 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
-import net.torvald.terrarum.BlockCodex
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
@@ -54,6 +52,7 @@ open class ItemFluidStoragePrototype(originalID: ItemID, sheetX: Int, sheetY: In
 
         // empty bucket -> filled bucket
         if (fluid == null) {
+            if (ItemCodex[originalID]!!.hasTag("NOEXTREMETHERM") && FluidCodex[fluidAtWorld.type].therm !in 0..1) return@mouseInInteractableRange -1L
             if (fluidAtWorld.amount < 1f - FLUID_MIN_MASS) return@mouseInInteractableRange -1L
 
             // TODO respect the FLUIDROOMTEMP tag

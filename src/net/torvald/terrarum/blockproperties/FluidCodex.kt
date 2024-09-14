@@ -86,6 +86,8 @@ class FluidCodex {
 
         prop.material = record.get("mate")
 
+        prop.therm = record.intVal("therm")
+
         fluidProps[prop.id] = prop
 
         printdbg(this, "Setting fluid prop ${prop.id} ->>\t${prop.nameKey}")
@@ -125,6 +127,8 @@ class FluidProp {
     var viscosity: Int = 0
 
     var reflectance = 0f // the exact colour of the reflected light depends on the texture
+
+    var therm = 0
 
     @Transient var tags = HashSet<String>()
 
