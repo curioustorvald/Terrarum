@@ -416,19 +416,27 @@ internal object BlocksDrawer {
     private var for_x_end = 0
     private var camX = 0
     private var camY = 0
+    private var camTx = 0
+    private var camTy = 0
+    private var camDeltaTx = 0
+    private var camDeltaTy = 0
 
     private fun wrapCamera() {
         camX = WorldCamera.x
         camY = WorldCamera.y
+        camTx = WorldCamera.tx
+        camTy = WorldCamera.ty
+        camDeltaTx = WorldCamera.deltaTx
+        camDeltaTy = WorldCamera.deltaTy
 
         // can't be "WorldCamera.y / TILE_SIZE":
         //      ( 3 / 16) == 0
         //      (-3 / 16) == -1  <-- We want it to be '-1', not zero
         // using cast and floor instead of IF on ints: the other way causes jitter artefact, which I don't fucking know why
 
-        for_y_start = (camY.toFloat() / TILE_SIZE).floorToInt()
+        for_y_start = camTy
         for_y_end = for_y_start + hTilesInVertical - 1
-        for_x_start = (camX.toFloat() / TILE_SIZE).floorToInt()
+        for_x_start = camTx
         for_x_end = for_x_start + hTilesInHorizontal - 1
     }
 

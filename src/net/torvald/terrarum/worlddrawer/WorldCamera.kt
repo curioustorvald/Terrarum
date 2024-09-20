@@ -2,14 +2,11 @@ package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.Gdx
 import com.jme3.math.FastMath
-import net.torvald.terrarum.App
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.sqr
 import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
 
@@ -24,6 +21,11 @@ object WorldCamera {
     var x: Int = 0 // left position
         private set
     var y: Int = 0 // top position
+        private set
+
+    var tx: Int = 0 // tilewise left position
+        private set
+    var ty: Int = 0 // tilewise top position
         private set
 
     var width: Int = 0
@@ -66,6 +68,9 @@ object WorldCamera {
 
     var deltaX: Int = 0; private set
     var deltaY: Int = 0; private set
+
+    var deltaTx: Int = 0; private set
+    var deltaTy: Int = 0; private set
 
     private val nullVec = Vector2(0.0, 0.0)
 
@@ -114,11 +119,14 @@ object WorldCamera {
 //        val fpsRatio = App.UPDATE_RATE / Gdx.graphics.deltaTime // if FPS=32 & RATE=64, ratio will be 0.5
         val fpsRatio = App.TICK_SPEED.toFloat() / Gdx.graphics.framesPerSecond
         val oldX = x.toDouble()
+        val oldTx = tx.toDouble()
         val oldY = y.toDouble()
-        val newX1 = (player.hitbox.centeredX) - (width / 2) +
-                    if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0
+        val newX1 = (player.hitbox.centeredX) - (width / 2) + if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0
         val newX2 = newX1 + worldWidth
+        val newTx1 = newX1 / TILE_SIZE
+        val newTx2 = newX2 / TILE_SIZE
         val newX = if (Math.abs(newX1 - oldX) < Math.abs(newX2 - oldX)) newX1 else newX2
+        val newTx = if (Math.abs(newTx1 - oldTx) < Math.abs(newTx2 - oldTx)) newTx1 else newTx2
         val newY = player.hitbox.centeredY - (height / 2)
 
         val pVecMagn = (player.externalV + player.controllerV).magnitude
@@ -134,13 +142,22 @@ object WorldCamera {
         val finalX = FastMath.interpolateLinear(camSpeed, oldX.toFloat(), newX.toFloat()).roundToInt() fmod worldWidth
         val finalY = FastMath.interpolateLinear(camSpeed, oldY.toFloat(), newY.toFloat()).roundToInt().clampCameraY(world)
 
+        val finalTxnowrap = FastMath.interpolateLinear(camSpeed, oldTx.toFloat(), newTx.toFloat()).roundToInt()
+        val finalTx = (finalX.toFloat() / TILE_SIZE).floorToInt()
+        val finalTy = (finalY.toFloat() / TILE_SIZE).floorToInt()
 //        println("finalX=$finalX, finalXnowrap=$finalXnowrap")
 
         deltaX = if (finalX != finalXnowrap) finalXnowrap - x else finalX - x
         deltaY = finalY - y
 
+        deltaTx = if (finalTx != finalTxnowrap) finalTxnowrap - tx else finalTx - tx
+        deltaTy = finalTy - ty
+
         x = finalX
         y = finalY
+
+        tx = finalTx
+        ty = finalTy
 
         xEnd = x + width
         yEnd = y + height
