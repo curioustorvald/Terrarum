@@ -5,6 +5,7 @@ import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.getClampedHeight
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
@@ -34,7 +35,7 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
 
 
     private val groundDepthBlock = listOf(
-            Block.AIR, Block.DIRT, Block.STONE, Block.STONE_SLATE
+            Block.AIR, Block.DIRT, Block.STONE, Block.STONE_GNEISS
     )
 
     private fun Double.tiered(tiers: List<Double>): Int {
@@ -229,7 +230,10 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
 }
 
 interface TerragenParams {
+    val version: Long
+
     val terragenTiers: List<Double>
+    val terragenTiles: List<ItemID>
     val featureSize: Double
     val lowlandScaleOffset: Double // linearly alters the height
     val highlandScaleOffset: Double // linearly alters the height
@@ -245,10 +249,15 @@ interface TerragenParams {
     val caveBlockageSelectThre: Double // adjust cave closing-up strength. Lower = more closing
     val rockBandCutoffFreq: Double
 
-    val lavaShapeFreg: Double }
+    val lavaShapeFreg: Double
+
+}
 
 data class TerragenParamsAlpha1(
-    override val terragenTiers: List<Double> = listOf(.0, .5, 1.0, 2.5, 11.0 * 9999),
+    override val version: Long = 0L,
+
+    override val terragenTiers: List<Double> = listOf(.0, .5, 1.0, 2.5),
+    override val terragenTiles: List<ItemID> = listOf(Block.AIR, Block.DIRT, Block.STONE, Block.STONE_GNEISS),
 
     override val featureSize: Double = 333.0,
     override val lowlandScaleOffset: Double = -0.65, // linearly alters the height
@@ -268,10 +277,36 @@ data class TerragenParamsAlpha1(
     override val rockBandCutoffFreq: Double = 4.0,
 
     override val lavaShapeFreg: Double = 0.03,
+
 ) : TerragenParams
 
 data class TerragenParamsAlpha2(
-    override val terragenTiers: List<Double> = listOf(.0, .5, 1.5, 4.2, 11.0 * 9999),
+    override val version: Long = 0x0000_000004_000004,
+
+//    override val terragenTiers: List<Double> = listOf(.0, .5, 1.5, 4.2),
+    override val terragenTiers: List<Double> = listOf(.0, .5, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 6.25, 6.50, 6.75, 7.0, 8.0, 9.0, 10.0, 11.0),
+    override val terragenTiles: List<ItemID> = listOf(Block.AIR, Block.DIRT,
+        Block.STONE, // 1.0
+        Block.SANDSTONE, // 1.1
+        Block.STONE_MICROCLINE, // 1.2
+        Block.STONE_ORTHOCLASE, // 1.3
+        Block.STONE_MARBLE, // 1.4
+        Block.STONE, // 1.5
+        Block.STONE_MICROCLINE, // 2.0
+        Block.STONE_PLAGIOCLASE, // 3.0
+        Block.STONE, // 4.0
+        Block.STONE_ORTHOCLASE, // 5.0
+        Block.STONE_MICROCLINE, // 6.0
+
+        Block.STONE_MARBLE, // 6.25
+        Block.STONE, // 6.50
+        Block.STONE_MARBLE, // 6.75
+        Block.STONE_PLAGIOCLASE, // 7.0
+        Block.STONE, // 8.0
+        Block.STONE_BASALT, // 9.0
+        Block.STONE, // 10.0
+        Block.STONE_GNEISS, // 11.0
+        ),
 
     override val featureSize: Double = 333.0,
     override val lowlandScaleOffset: Double = -0.65, // linearly alters the height

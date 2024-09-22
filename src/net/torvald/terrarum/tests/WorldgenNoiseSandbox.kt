@@ -22,6 +22,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.FlippingSpriteBatch
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadExecutor
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.worldgenerator.BiomegenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.TerragenParams
@@ -43,6 +44,8 @@ const val NOISEBOX_WIDTH = 90 * 18
 const val NOISEBOX_HEIGHT = 90 * 26
 const val TWO_PI = Math.PI * 2
 
+//const val WORLDGEN_YOFF = 0
+//const val WORLDGEN_YOFF = 1500
 const val WORLDGEN_YOFF = 5400 - NOISEBOX_HEIGHT
 
 /**
@@ -398,12 +401,15 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             Color(0.97f, 0.6f, 0.56f, 1f)
     )
 
-    private val groundDepthBlockWall = listOf(
+    /*private val groundDepthBlockWall = listOf(
         Block.AIR, Block.DIRT, Block.STONE, Block.STONE_SLATE, Block.STONE_SLATE
     )
     private val groundDepthBlockTERR = ArrayList(groundDepthBlockWall).also {
         it[it.lastIndex] = Block.AIR
-    }
+    }*/
+
+    private val groundDepthBlockWall = params.terragenTiles
+    private val groundDepthBlockTERR = groundDepthBlockWall
 
     private fun Double.tiered(tiers: List<Double>): Int {
         tiers.reversed().forEachIndexed { index, it ->
@@ -418,8 +424,13 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
         Block.AIR to Color(0f, 0f, 0f, 1f),
         Block.DIRT to Color(0.588f, 0.45f, 0.3f, 1f),
         Block.STONE to Color(0.4f, 0.4f, 0.4f, 1f),
-        Block.STONE_SLATE to Color(0.2f, 0.2f, 0.2f, 1f),
-        Block.STONE_MARBLE to Color(0.8f, 0.8f, 0.8f, 1f)
+        Block.STONE_GNEISS to Color(0.2f, 0.2f, 0.2f, 1f),
+        Block.STONE_MARBLE to Color(0.8f, 0.8f, 0.8f, 1f),
+        Block.STONE_ORTHOCLASE to Color(0xa3836bff.toInt()),
+        Block.STONE_PLAGIOCLASE to Color(0xaa998fff.toInt()),
+        Block.STONE_MICROCLINE to Color(0x9ea3adff.toInt()),
+        Block.STONE_BASALT to Color(0x3f3e3fff.toInt()),
+        Block.SANDSTONE to Color(0xe0c688ff.toInt())
     )
 
     private val COPPER_ORE = 0x00e9c8ff.toInt()
@@ -444,6 +455,8 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
 
     private val terragenYscaling = (NOISEBOX_HEIGHT / 2400.0).pow(0.75)
     private val terragenTiers = (params.terragenTiers).map { it * terragenYscaling } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
+
+    private fun ItemID.isRock() = this.substringAfter(':').toInt() in 16 until 32
 
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val terr = noiseValue[0].tiered(terragenTiers)
@@ -470,20 +483,20 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
         outTex.drawPixel(x, y,
             if (water) WATER
             else if (waterShell) {
-                if ((terrBlockNoAir == Block.STONE || terrBlockNoAir == Block.STONE_SLATE))
+                if (terrBlockNoAir.isRock())
                     ore ?: blockToCol[terrBlockNoAir]!!.toRGBA()
                 else
                     blockToCol[terrBlockNoAir]!!.toRGBA()
             }
             else if (oil) OIL
             else if (oilShell) {
-                if ((terrBlockNoAir == Block.STONE || terrBlockNoAir == Block.STONE_SLATE))
+                if (terrBlockNoAir.isRock())
                     ore ?: blockToCol[terrBlockNoAir]!!.toRGBA()
                 else
                     blockToCol[terrBlockNoAir]!!.toRGBA()
             }
             else if (lava) LAVA
-            else if (ore != null && (terrBlock == Block.STONE || terrBlock == Block.STONE_SLATE)) ore
+            else if (ore != null && (terrBlock.isRock())) ore
             else if (wallBlock == Block.AIR && terrBlock == Block.AIR) BACK
             else blockToCol[terrBlock]!!.toRGBA()
         )
