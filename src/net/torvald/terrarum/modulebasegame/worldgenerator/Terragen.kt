@@ -358,13 +358,13 @@ data class TerragenParamsAlpha2(
         Stratum(Hv(5.0, 0.3), Block.STONE, Block.STONE_MICROCLINE, Block.STONE_LIMESTONE),
         Stratum(Hv(6.0, 0.3), Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE),
 
-        Stratum(Hv(6.1, 0.03), Block.STONE_MARBLE),
+        Stratum(Hv(6.1, 0.03), Block.STONE_MARBLE, Block.STONE_SLATE),
         Stratum(Hv(6.2, 0.03), Block.STONE, Block.STONE_PLAGIOCLASE, Block.STONE_MICROCLINE),
-        Stratum(Hv(6.3, 0.03), Block.STONE_SLATE),
+        Stratum(Hv(6.3, 0.03), Block.STONE_MARBLE, Block.STONE_SLATE),
         Stratum(Hv(6.4, 0.03), Block.STONE, Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE, Block.STONE_MICROCLINE),
-        Stratum(Hv(6.5, 0.03), Block.STONE_MARBLE),
+        Stratum(Hv(6.5, 0.03), Block.STONE_MARBLE, Block.STONE_SLATE),
         Stratum(Hv(6.6, 0.03), Block.STONE, Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE, Block.STONE_MICROCLINE),
-        Stratum(Hv(6.7, 0.03), Block.STONE_SLATE),
+        Stratum(Hv(6.7, 0.03), Block.STONE_MARBLE, Block.STONE_SLATE),
 
         Stratum(Hv(6.9, 0.06), Block.STONE, Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE, Block.STONE_MICROCLINE),
 

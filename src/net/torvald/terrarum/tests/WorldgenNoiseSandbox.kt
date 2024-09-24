@@ -44,9 +44,9 @@ const val NOISEBOX_WIDTH = 90 * 18
 const val NOISEBOX_HEIGHT = 90 * 26
 const val TWO_PI = Math.PI * 2
 
-const val WORLDGEN_YOFF = 0
+//const val WORLDGEN_YOFF = 0
 //const val WORLDGEN_YOFF = 1500
-//const val WORLDGEN_YOFF = 5400 - NOISEBOX_HEIGHT
+const val WORLDGEN_YOFF = 5400 - NOISEBOX_HEIGHT
 
 /**
  * Created by minjaesong on 2019-07-23.
