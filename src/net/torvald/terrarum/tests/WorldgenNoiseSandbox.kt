@@ -44,9 +44,9 @@ const val NOISEBOX_WIDTH = 90 * 18
 const val NOISEBOX_HEIGHT = 90 * 26
 const val TWO_PI = Math.PI * 2
 
-//const val WORLDGEN_YOFF = 0
+const val WORLDGEN_YOFF = 0
 //const val WORLDGEN_YOFF = 1500
-const val WORLDGEN_YOFF = 5400 - NOISEBOX_HEIGHT
+//const val WORLDGEN_YOFF = 5400 - NOISEBOX_HEIGHT
 
 /**
  * Created by minjaesong on 2019-07-23.
@@ -92,7 +92,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private var generationTime = 0f
     private var today = ""
 
-    private val NM_TERR = TerragenTest(TerragenParamsAlpha2())
+    private val NM_TERR = TerragenTest(seed, TerragenParamsAlpha2())
     private val NM_BIOME = BiomeMaker to BiomegenParams()
 
     private val NOISEMAKER = NM_TERR
@@ -202,6 +202,8 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     private fun renderNoise(noiseMaker: NoiseMaker, callback: () -> Unit = {}) {
         generationStartTime = System.nanoTime()
+
+        NM_TERR.params.pregenerateStrataCache(seed)
 
         // erase first
         testTex.setColor(colourNull)
@@ -391,7 +393,7 @@ val aquiferTerminalClosureGrad = TerrarumModuleCacheY().also {
 }
 
 // http://accidentalnoise.sourceforge.net/minecraftworlds.html
-internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
+internal class TerragenTest(val seed: Long, val params: TerragenParams) : NoiseMaker {
 
     private infix fun Color.mul(other: Color) = this.mul(other)
 
@@ -460,9 +462,9 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
     private fun ItemID.isRock() = this.substringAfter(':').toInt() in 16 until 32
 
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
-        val strataMode = 1//TODO
+        val strataMode = noiseValue[noiseValue.lastIndex].times(params.LANDBLOCK_VAR_COUNTS).toInt().coerceIn(0, params.LANDBLOCK_VAR_COUNTS - 1)
 
-        val strata = params.getStrataForMode(strataMode)
+        val strata = params.getStrataForMode(seed, strataMode)
         val groundDepthBlock = strata.map { it.tiles }
         val terragenTiers = strata.map { it.yheight * terragenYscaling }
 
@@ -476,18 +478,18 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
         val terrBlock = if (cave == 0) Block.AIR else if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
         val terrBlockNoAir = if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
 
-        val lavaVal = noiseValue[noiseValue.lastIndex - 3]
+        val lavaVal = noiseValue[noiseValue.lastIndex - 4]
         val lava = (lavaVal >= 0.5)
 
-        val waterVal = noiseValue[noiseValue.lastIndex - 2]
+        val waterVal = noiseValue[noiseValue.lastIndex - 3]
         val waterShell = (waterVal >= 0.32)
         val water = (waterVal >= 0.5)
 
-        val oilVal = noiseValue[noiseValue.lastIndex - 1]
+        val oilVal = noiseValue[noiseValue.lastIndex - 2]
         val oilShell = (oilVal >= 0.36)
         val oil = (oilVal >= 0.7)
 
-        val lavaPocketVal = noiseValue[noiseValue.lastIndex]
+        val lavaPocketVal = noiseValue[noiseValue.lastIndex - 1]
         val lavaPocketShell = (lavaPocketVal >= 0.30)
         val lavaPocket = (lavaPocketVal >= 0.5)
 
@@ -519,7 +521,7 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             else blockToCol[terrBlock]!!.toRGBA()
         )
 
-//        outTex.drawPixel(x, y, noiseValue[2].toColour())
+//        outTex.drawPixel(x, y, noiseValue[noiseValue.lastIndex].toColour())
     }
 
     private fun Double.toColour(): Int {
@@ -759,6 +761,7 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
         val cavePerturb0 = ModuleTranslateDomain().also {
             it.setSource(caveShapeAttenuate)
             it.setAxisXSource(cavePerturbScale)
+            it.setAxisZSource(cavePerturbScale)
         }
 
         val cavePerturb = ModuleCombiner().also { // 0: rock, 1: air
@@ -876,6 +879,7 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             Joise(generateAquifer(seed, groundScalingCached)),
             Joise(generateCrudeOil(seed, groundScalingCached)),
             Joise(generateLavaPocket(seed, groundScalingCached)),
+            Joise(generateLandBlock(seed))
         )
     }
 
@@ -996,6 +1000,7 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
         val orePerturb = ModuleTranslateDomain().also {
             it.setSource(oreShapeAttenuate)
             it.setAxisXSource(orePerturbScale)
+            it.setAxisZSource(orePerturbScale)
         }
 
         val oreStrecth = ModuleScaleDomain().also {
@@ -1035,13 +1040,12 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             it.setScaleY(1.0 / 6.0)
         }
 
-
         val lavaPerturbFractal = ModuleFractal().also {
             it.setType(ModuleFractal.FractalType.FBM)
             it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
             it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
             it.setNumOctaves(6)
-            it.setFrequency(params.lavaShapeFreg * 3.0 / 4.0)
+            it.setFrequency(params.lavaShapeFreg * 0.75)
             it.seed = seed shake "FloorIsLava"
         }
 
@@ -1054,6 +1058,7 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
         val lavaPerturb = ModuleTranslateDomain().also {
             it.setSource(lavaPipe)
             it.setAxisXSource(lavaPerturbScale)
+            it.setAxisZSource(lavaPerturbScale)
         }
 
         val lavaSelect = ModuleSelect().also {
@@ -1188,6 +1193,51 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
 
 
         return oilLayer
+    }
+
+    private fun generateLandBlock(seed: Long): Module {
+        val landBlock = ModuleScaleDomain().also {
+            it.setSource(ModuleFractal().also {
+                it.setType(ModuleFractal.FractalType.DECARPENTIERSWISS)
+                it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+                it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+                it.setNumOctaves(2)
+                it.setFrequency(params.landBlockScale / params.featureSize)
+                it.seed = seed shake "LandBlock"
+            })
+            it.setScaleX(1.0 / 4.0)
+            it.setScaleZ(1.0 / 4.0)
+            it.setScaleY(1.0 / 18.0)
+        }
+
+        val landBlockPerturbFractal = ModuleScaleOffset().also {
+            it.setSource(ModuleFractal().also {
+                it.setType(ModuleFractal.FractalType.FBM)
+                it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+                it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+                it.setNumOctaves(6)
+                it.setFrequency((params.landBlockScale * 3.0) / params.featureSize)
+                it.seed = seed shake "MassiveMassif"
+            })
+            it.setScale(24.0)
+        }
+
+        val landBlockPerturb = ModuleTranslateDomain().also {
+            it.setSource(landBlock)
+            it.setAxisXSource(landBlockPerturbFractal)
+            it.setAxisZSource(landBlockPerturbFractal)
+        }
+
+        val landBlockClamp = ModuleClamp().also {
+            it.setSource(ModuleScaleOffset().also {
+                it.setSource(landBlockPerturb)
+                it.setScale(1.0)
+                it.setOffset(-1.0)
+            })
+            it.setRange(0.0, 1.0)
+        }
+
+        return landBlockClamp
     }
 
     private object DummyModule : Module() {

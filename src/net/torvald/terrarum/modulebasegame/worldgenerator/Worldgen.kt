@@ -62,6 +62,8 @@ object Worldgen {
         caveAttenuateBiasScaledForOresCache = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
         groundScalingCached = getGroundScalingCached(highlandLowlandSelectCache, params.terragenParams)
         biomeMap = HashMap()
+
+        prepareWorldgen(params.seed, params.terragenParams)
     }
 
     internal lateinit var groundScalingCached: ModuleCache
@@ -78,6 +80,11 @@ object Worldgen {
     }
 
     private val oreRegistry = ArrayList<OregenParams>()
+
+    // called by attachMap, which in turn called by enterCreateNewWorld and enterLoadFromSave
+    fun prepareWorldgen(seed: Long, terragenParams: TerragenParams) {
+        terragenParams.pregenerateStrataCache(seed)
+    }
 
     fun getJobs(tags: List<String> = emptyList()): List<Work> {
         val oreTilingModes = HashMap<ItemID, String>().also {

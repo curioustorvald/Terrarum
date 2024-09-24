@@ -105,6 +105,8 @@ class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache
         val cavePerturb0 = ModuleTranslateDomain().also {
             it.setSource(caveShapeAttenuate)
             it.setAxisXSource(cavePerturbScale)
+            if (isAlpha2)
+                it.setAxisZSource(cavePerturbScale)
         }
 
         val cavePerturb = ModuleCombiner().also { // 0: rock, 1: air

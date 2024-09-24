@@ -7,7 +7,6 @@ import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.getClampedHeight
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import kotlin.math.cos
@@ -53,7 +52,7 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
         else
             1// TODO
 
-        val strata = (params as TerragenParams).getStrataForMode(strataMode)
+        val strata = (params as TerragenParams).getStrataForMode(seed, strataMode)
         val groundDepthBlock = strata.map { it.tiles }
         val terragenTiers = strata.map { it.yheight * terragenYscaling }
 
@@ -222,6 +221,8 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
 }
 
 abstract class TerragenParams {
+    val LANDBLOCK_VAR_COUNTS = 16
+
     abstract val version: Long
     abstract val strata: List<Stratum>
     abstract val featureSize: Double
@@ -239,13 +240,14 @@ abstract class TerragenParams {
     abstract val caveBlockageSelectThre: Double // adjust cave closing-up strength. Lower = more closing
     abstract val rockBandCutoffFreq: Double
     abstract val lavaShapeFreg: Double
+    abstract val landBlockScale: Double
 
-    private val strataCache = Array<List<StratumObj>?>(16) { null }
+    private val strataCache = HashMap<Long, List<StratumObj>?>()
 
-    private fun generateStrataCache(mode: Int) {
-        if (strataCache[mode] != null) return
+    private fun generateStrataCache(generatorSeed: Long, mode: Int): Long {
+        val index = generatorSeed shake mode.toLong()
 
-        val rng = HQRNG(0x572A7AL shake mode.toLong())
+        val rng = HQRNG(index)
 
         val tilebuf = Array(2) { "" }
         fun shiftTilebuf(item: String) {
@@ -274,13 +276,20 @@ abstract class TerragenParams {
                 selectedTile
             )
         }.let {
-            strataCache[mode] = it
+            strataCache[index] = it
+        }
+
+        return index
+    }
+
+    fun pregenerateStrataCache(generatorSeed: Long) {
+        for (i in 0 until LANDBLOCK_VAR_COUNTS) {
+            generateStrataCache(generatorSeed, i)
         }
     }
 
-    fun getStrataForMode(mode: Int): List<StratumObj> {
-        generateStrataCache(mode)
-        return strataCache[mode]!!
+    fun getStrataForMode(generatorSeed: Long, mode: Int): List<StratumObj> {
+        return strataCache[generatorSeed shake mode.toLong()]!!
     }
 }
 
@@ -326,6 +335,8 @@ data class TerragenParamsAlpha1(
 
     override val lavaShapeFreg: Double = 0.03,
 
+    override val landBlockScale: Double = 1.0,
+
     ) : TerragenParams()
 
 data class TerragenParamsAlpha2(
@@ -334,7 +345,7 @@ data class TerragenParamsAlpha2(
     override val strata: List<Stratum> = listOf(
         Stratum(Hv(.0, .0), Block.AIR),
         Stratum(Hv(.5, .0), Block.DIRT),
-        Stratum(Hv(1.0, 0.03), Block.STONE, Block.STONE_LIMESTONE),
+        Stratum(Hv(1.0, 0.01), Block.STONE, Block.STONE_LIMESTONE), // 0.01 represents less-eroded faults
         Stratum(Hv(1.1, 0.03), Block.STONE, Block.SANDSTONE, Block.STONE_LIMESTONE),
         Stratum(Hv(1.2, 0.03), Block.STONE, Block.SANDSTONE, Block.STONE_LIMESTONE),
         Stratum(Hv(1.3, 0.03), Block.SANDSTONE, Block.STONE_LIMESTONE, Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE),
@@ -382,5 +393,7 @@ data class TerragenParamsAlpha2(
     override val rockBandCutoffFreq: Double = 4.0,
 
     override val lavaShapeFreg: Double = 0.03,
+
+    override val landBlockScale: Double = 0.5,
 
 ) : TerragenParams()
