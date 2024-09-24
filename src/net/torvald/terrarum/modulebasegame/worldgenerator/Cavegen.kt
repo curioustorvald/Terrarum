@@ -16,6 +16,8 @@ import kotlin.math.sin
  */
 class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
 
+    private val isAlpha2 = ((params as TerragenParams).version >= 0x0000_000004_000004)
+
     override fun getDone(loadscreen: LoadScreenBase?) {
         loadscreen?.let {
             it.stageValue += 1
@@ -108,8 +110,8 @@ class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache
         val cavePerturb = ModuleCombiner().also { // 0: rock, 1: air
             it.setType(ModuleCombiner.CombinerType.MULT)
             it.setSource(0, cavePerturb0)
-            // basically disabling terminal closure for the world generated from the old version
-            if (INGAME.worldGenVer != null && INGAME.worldGenVer!! <= 0x0000_000004_000003)
+            // enable terminal closure for new worlds or ones generated from recent versions
+            if (INGAME.worldGenVer == null || isAlpha2)
                 it.setSource(1, caveTerminalClosureGrad)
         }
 

@@ -19,8 +19,7 @@ import kotlin.math.sin
  */
 class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
 
-    private val dirtStoneDitherSize = 3 // actual dither size will be double of this value
-    private val stoneSlateDitherSize = 4
+    private val isAlpha2 = ((params as TerragenParams).version >= 0x0000_000004_000004)
 
     override fun getDone(loadscreen: LoadScreenBase?) {
         loadscreen?.let {
@@ -34,10 +33,6 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
     }
 
 
-    private val groundDepthBlock = listOf(
-            Block.AIR, Block.DIRT, Block.STONE, Block.STONE_GNEISS
-    )
-
     private fun Double.tiered(tiers: List<Double>): Int {
         tiers.reversed().forEachIndexed { index, it ->
             if (this >= it) return (tiers.lastIndex - index) // why??
@@ -45,16 +40,25 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
         return tiers.lastIndex
     }
 
-    private val terragenYscaling = (world.getClampedHeight() / 2400.0).pow(0.75)
-    private val terragenTiers = (params as TerragenParams).terragenTiers.map { it * terragenYscaling } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
+    private val terragenYscaling =
+        if (isAlpha2)
+            1.0
+        else
+            (world.height / 2400.0).pow(0.75)
 
     //private fun draw(x: Int, y: Int, width: Int, height: Int, noiseValue: List<Double>, world: GameWorld) {
     override fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double) {
+        val strataMode = if (!isAlpha2)
+            0
+        else
+            1// TODO
+
+        val strata = (params as TerragenParams).getStrataForMode(strataMode)
+        val groundDepthBlock = strata.map { it.tiles }
+        val terragenTiers = strata.map { it.yheight * terragenYscaling }
+
         for (x in xStart until xStart + CHUNK_W) {
             val st = (x.toDouble() / world.width) * TWO_PI
-
-            var dirtStoneTransition = -1
-            var stoneSlateTransition = -1
 
             for (y in yStart until yStart + CHUNK_H) {
                 val sx = sin(st) * soff + soff // plus sampleOffset to make only
@@ -65,21 +69,7 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
 
                 val terr = noiseValue[0].tiered(terragenTiers)
 
-
-                // disable the marker if relativeY=0 already has rock
-                if (y == yStart && terr == 2)
-                    dirtStoneTransition = -2
-                else if (y == yStart && terr == 3)
-                    stoneSlateTransition = -2
-                // mark off the position where the transition occurred
-                else {
-                    if (dirtStoneTransition == -1 && terr == 2)
-                        dirtStoneTransition = y
-                    if (stoneSlateTransition == -1 && terr == 3)
-                        stoneSlateTransition = y
-                }
-
-                val isMarble = noiseValue[1] > 0.5
+                val isMarble = if (!isAlpha2) noiseValue[1] > 0.5 else false
 
                 val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
                 val terrBlock = if (isMarble) Block.STONE_MARBLE else wallBlock
@@ -152,15 +142,17 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
         // they should be treated properly when you actually generate the world out of the noisemap
         // for the visualisation, no treatment will be done in this demo app.
 
-        val marblerng = HQRNG(seed) // this must be here: every slice must get identical series of random numbers
-
-        return listOf(
-            Joise(groundScalingCached),
-
-            Joise(generateRockLayer(groundScalingCached, seed, params, (0..7).map {
-                thicknesses[it] + marblerng.nextTriangularBal() * 0.006 to (1.04 * params.terragenTiers[3] * terragenYscaling) + it * 0.18 + marblerng.nextTriangularBal() * 0.09
-            })),
-        )
+        return if (!isAlpha2) {
+            val marblerng = HQRNG(seed) // this must be here: every slice must get identical series of random numbers
+            listOf(
+                Joise(groundScalingCached),
+                Joise(generateRockLayer(groundScalingCached, seed, params, (0..7).map {
+                    thicknesses[it] + marblerng.nextTriangularBal() * 0.006 to (1.04 * params.strata[3].yheight.h * terragenYscaling) + it * 0.18 + marblerng.nextTriangularBal() * 0.09
+                })),
+            )
+        }
+        else
+            listOf(Joise(groundScalingCached))
     }
 
     private fun generateRockLayer(ground: Module, seed: Long, params: TerragenParams, thicknessAndRange: List<Pair<Double, Double>>): Module {
@@ -229,35 +221,91 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
     }
 }
 
-interface TerragenParams {
-    val version: Long
+abstract class TerragenParams {
+    abstract val version: Long
+    abstract val strata: List<Stratum>
+    abstract val featureSize: Double
+    abstract val lowlandScaleOffset: Double // linearly alters the height
+    abstract val highlandScaleOffset: Double // linearly alters the height
+    abstract val mountainScaleOffset: Double // linearly alters the height
+    abstract val mountainDisturbance: Double // greater = more distortion, overhangs
+    abstract val caveShapeFreq: Double //adjust the "density" of the caves
+    abstract val caveAttenuateScale: Double // used with the caveAttenuateBias, controls the "concentration" of the cave gen
+    abstract val caveAttenuateBias: Double // 1.0: flattens the gradient (deep voids are less tend to be larger). Also controls the distribution of ores. Equation: x^(log(bias) / log(0.5))
+    abstract val caveAttenuateScale1: Double // used with the caveAttenuateBias, controls the "concentration" of the cave gen
+    abstract val caveAttenuateBias1: Double // 1.0: flattens the gradient (deep voids are less tend to be larger). Also controls the distribution of ores. Equation: x^(log(bias) / log(0.5))
+    abstract val caveSelectThre: Double // also adjust this if you've touched the bias value. Number can be greater than 1.0
+    abstract val caveBlockageFractalFreq: Double
+    abstract val caveBlockageSelectThre: Double // adjust cave closing-up strength. Lower = more closing
+    abstract val rockBandCutoffFreq: Double
+    abstract val lavaShapeFreg: Double
 
-    val terragenTiers: List<Double>
-    val terragenTiles: List<ItemID>
-    val featureSize: Double
-    val lowlandScaleOffset: Double // linearly alters the height
-    val highlandScaleOffset: Double // linearly alters the height
-    val mountainScaleOffset: Double // linearly alters the height
-    val mountainDisturbance: Double // greater = more distortion, overhangs
-    val caveShapeFreq: Double //adjust the "density" of the caves
-    val caveAttenuateScale: Double // used with the caveAttenuateBias, controls the "concentration" of the cave gen
-    val caveAttenuateBias: Double // 1.0: flattens the gradient (deep voids are less tend to be larger). Also controls the distribution of ores. Equation: x^(log(bias) / log(0.5))
-    val caveAttenuateScale1: Double // used with the caveAttenuateBias, controls the "concentration" of the cave gen
-    val caveAttenuateBias1: Double // 1.0: flattens the gradient (deep voids are less tend to be larger). Also controls the distribution of ores. Equation: x^(log(bias) / log(0.5))
-    val caveSelectThre: Double // also adjust this if you've touched the bias value. Number can be greater than 1.0
-    val caveBlockageFractalFreq: Double
-    val caveBlockageSelectThre: Double // adjust cave closing-up strength. Lower = more closing
-    val rockBandCutoffFreq: Double
+    private val strataCache = Array<List<StratumObj>?>(16) { null }
 
-    val lavaShapeFreg: Double
+    private fun generateStrataCache(mode: Int) {
+        if (strataCache[mode] != null) return
 
+        val rng = HQRNG(0x572A7AL shake mode.toLong())
+
+        val tilebuf = Array(2) { "" }
+        fun shiftTilebuf(item: String) {
+            tilebuf[0] = tilebuf[1]
+            tilebuf[1] = item
+        }
+
+        strata.map {
+            // 0. randomiser gets two-element buffer
+            // 1. randomiser consults the buffer and removes matching elements from the random pool
+            // 2. if the pool is empty, pool is reset with the original candidates
+            // 3. randomiser makes random choices
+            // 4. if the size of the ORIGINAL candidates > 1, the chosen element gets queued into the buffer
+
+            var tilePool = it.tiles.toMutableList() // toList makes copies, asList keeps original pointers
+            tilebuf.forEach { tilePool.remove(it) }
+            if (tilePool.isEmpty()) tilePool = it.tiles.toMutableList()
+            val selectedTile = tilePool[rng.nextInt(tilePool.size)]
+            if (it.tiles.size > 1) shiftTilebuf(selectedTile)
+
+            StratumObj(
+                (if (it.yheight.v > 1.0 / 1024.0)
+                    rng.nextDouble(it.yheight.h - it.yheight.v, it.yheight.h + it.yheight.v)
+                else
+                    it.yheight.h),
+                selectedTile
+            )
+        }.let {
+            strataCache[mode] = it
+        }
+    }
+
+    fun getStrataForMode(mode: Int): List<StratumObj> {
+        generateStrataCache(mode)
+        return strataCache[mode]!!
+    }
 }
+
+/**
+ * @param h: STARTING height of the strata relative to the ground select gradient
+ * @param v: linear ± to the `h`
+ */
+data class Hv(val h: Double, val v: Double)
+class Stratum(val yheight: Hv, vararg val tiles: ItemID)
+class StratumObj(val yheight: Double, val tiles: ItemID)
 
 data class TerragenParamsAlpha1(
     override val version: Long = 0L,
 
-    override val terragenTiers: List<Double> = listOf(.0, .5, 1.0, 2.5),
-    override val terragenTiles: List<ItemID> = listOf(Block.AIR, Block.DIRT, Block.STONE, Block.STONE_GNEISS),
+    // 0. randomiser gets two-element buffer
+    // 1. randomiser consults the buffer and removes matching elements from the random pool
+    // 2. if the pool is empty, pool is reset with the original candidates
+    // 3. randomiser makes random choices
+    // 4. if the size of the ORIGINAL candidates > 1, the chosen element gets queued into the buffer
+    override val strata: List<Stratum> = listOf(
+        Stratum(Hv(.0, .0), Block.AIR),
+        Stratum(Hv(.5, .0), Block.DIRT),
+        Stratum(Hv(1.0, .0), Block.STONE),
+        Stratum(Hv(2.5, .0), Block.STONE_GABBRO),
+    ),
 
     override val featureSize: Double = 333.0,
     override val lowlandScaleOffset: Double = -0.65, // linearly alters the height
@@ -278,35 +326,43 @@ data class TerragenParamsAlpha1(
 
     override val lavaShapeFreg: Double = 0.03,
 
-) : TerragenParams
+    ) : TerragenParams()
 
 data class TerragenParamsAlpha2(
     override val version: Long = 0x0000_000004_000004,
 
-//    override val terragenTiers: List<Double> = listOf(.0, .5, 1.5, 4.2),
-    override val terragenTiers: List<Double> = listOf(.0, .5, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 6.25, 6.50, 6.75, 7.0, 8.0, 9.0, 10.0, 11.0),
-    override val terragenTiles: List<ItemID> = listOf(Block.AIR, Block.DIRT,
-        Block.STONE, // 1.0
-        Block.SANDSTONE, // 1.1
-        Block.STONE_MICROCLINE, // 1.2
-        Block.STONE_ORTHOCLASE, // 1.3
-        Block.STONE_MARBLE, // 1.4
-        Block.STONE, // 1.5
-        Block.STONE_MICROCLINE, // 2.0
-        Block.STONE_PLAGIOCLASE, // 3.0
-        Block.STONE, // 4.0
-        Block.STONE_ORTHOCLASE, // 5.0
-        Block.STONE_MICROCLINE, // 6.0
+    override val strata: List<Stratum> = listOf(
+        Stratum(Hv(.0, .0), Block.AIR),
+        Stratum(Hv(.5, .0), Block.DIRT),
+        Stratum(Hv(1.0, 0.03), Block.STONE, Block.STONE_LIMESTONE),
+        Stratum(Hv(1.1, 0.03), Block.STONE, Block.SANDSTONE, Block.STONE_LIMESTONE),
+        Stratum(Hv(1.2, 0.03), Block.STONE, Block.SANDSTONE, Block.STONE_LIMESTONE),
+        Stratum(Hv(1.3, 0.03), Block.SANDSTONE, Block.STONE_LIMESTONE, Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE),
+        Stratum(Hv(1.4, 0.03), Block.STONE_LIMESTONE, Block.STONE_PLAGIOCLASE, Block.SANDSTONE),
+        Stratum(Hv(1.5, 0.03), Block.STONE, Block.STONE_MICROCLINE, Block.STONE_LIMESTONE),
 
-        Block.STONE_MARBLE, // 6.25
-        Block.STONE, // 6.50
-        Block.STONE_MARBLE, // 6.75
-        Block.STONE_PLAGIOCLASE, // 7.0
-        Block.STONE, // 8.0
-        Block.STONE_BASALT, // 9.0
-        Block.STONE, // 10.0
-        Block.STONE_GNEISS, // 11.0
-        ),
+        Stratum(Hv(2.0, 0.3), Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE),
+        Stratum(Hv(3.0, 0.3), Block.STONE, Block.STONE_MICROCLINE, Block.STONE_LIMESTONE),
+        Stratum(Hv(4.0, 0.3), Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE),
+        Stratum(Hv(5.0, 0.3), Block.STONE, Block.STONE_MICROCLINE, Block.STONE_LIMESTONE),
+        Stratum(Hv(6.0, 0.3), Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE),
+
+        Stratum(Hv(6.1, 0.03), Block.STONE_MARBLE),
+        Stratum(Hv(6.2, 0.03), Block.STONE, Block.STONE_PLAGIOCLASE, Block.STONE_MICROCLINE),
+        Stratum(Hv(6.3, 0.03), Block.STONE_SLATE),
+        Stratum(Hv(6.4, 0.03), Block.STONE, Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE, Block.STONE_MICROCLINE),
+        Stratum(Hv(6.5, 0.03), Block.STONE_MARBLE),
+        Stratum(Hv(6.6, 0.03), Block.STONE, Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE, Block.STONE_MICROCLINE),
+        Stratum(Hv(6.7, 0.03), Block.STONE_SLATE),
+
+        Stratum(Hv(6.9, 0.06), Block.STONE, Block.STONE_ORTHOCLASE, Block.STONE_PLAGIOCLASE, Block.STONE_MICROCLINE),
+
+        Stratum(Hv(7.0, 0.3), Block.STONE, Block.STONE_MICROCLINE),
+        Stratum(Hv(8.0, 0.3), Block.STONE_BASALT),
+        Stratum(Hv(9.0, 0.3), Block.STONE),
+        Stratum(Hv(10.0, 0.3), Block.STONE, Block.STONE_GABBRO),
+        Stratum(Hv(11.0, 0.3), Block.STONE_GABBRO),
+    ),
 
     override val featureSize: Double = 333.0,
     override val lowlandScaleOffset: Double = -0.65, // linearly alters the height
@@ -327,4 +383,4 @@ data class TerragenParamsAlpha2(
 
     override val lavaShapeFreg: Double = 0.03,
 
-) : TerragenParams
+) : TerragenParams()

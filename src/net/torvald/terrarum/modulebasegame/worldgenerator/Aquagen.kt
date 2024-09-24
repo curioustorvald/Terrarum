@@ -19,6 +19,8 @@ import kotlin.math.sin
  */
 class Aquagen(world: GameWorld, isFinal: Boolean, val groundScalingCached: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
 
+    private val isAlpha2 = ((params as TerragenParams).version >= 0x0000_000004_000004)
+
     private val FLUID_FILL = 1.2f
 
     override fun getDone(loadscreen: LoadScreenBase?) {
@@ -33,7 +35,7 @@ class Aquagen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modul
     }
 
     override fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double) {
-        if (INGAME.worldGenVer != null && INGAME.worldGenVer!! <= 0x0000_000004_000003) return
+        if (INGAME.worldGenVer != null && !isAlpha2) return
 
         for (x in xStart until xStart + CHUNK_W) {
             val st = (x.toDouble() / world.width) * TWO_PI

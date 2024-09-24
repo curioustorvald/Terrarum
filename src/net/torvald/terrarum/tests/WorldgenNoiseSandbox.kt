@@ -367,6 +367,9 @@ val aquiferGrad = TerrarumModuleCacheY().also {
 lateinit var crudeOilGradStart: TerrarumModuleCacheY
 lateinit var crudeOilGrad: TerrarumModuleCacheY
 
+lateinit var lavaPocketGradStart: TerrarumModuleCacheY
+lateinit var lavaPocketGrad: TerrarumModuleCacheY
+
 val crudeOilGradEnd = TerrarumModuleCacheY().also {
     it.setSource(TerrarumModuleCaveLayerClosureGrad().also {
         it.setH(4800.0)
@@ -408,9 +411,6 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
         it[it.lastIndex] = Block.AIR
     }*/
 
-    private val groundDepthBlockWall = params.terragenTiles
-    private val groundDepthBlockTERR = groundDepthBlockWall
-
     private fun Double.tiered(tiers: List<Double>): Int {
         tiers.reversed().forEachIndexed { index, it ->
             if (this >= it) return (tiers.lastIndex - index) // why??
@@ -424,12 +424,14 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
         Block.AIR to Color(0f, 0f, 0f, 1f),
         Block.DIRT to Color(0.588f, 0.45f, 0.3f, 1f),
         Block.STONE to Color(0.4f, 0.4f, 0.4f, 1f),
-        Block.STONE_GNEISS to Color(0.2f, 0.2f, 0.2f, 1f),
+        Block.STONE_GABBRO to Color(0.2f, 0.2f, 0.2f, 1f),
         Block.STONE_MARBLE to Color(0.8f, 0.8f, 0.8f, 1f),
         Block.STONE_ORTHOCLASE to Color(0xa3836bff.toInt()),
         Block.STONE_PLAGIOCLASE to Color(0xaa998fff.toInt()),
         Block.STONE_MICROCLINE to Color(0x9ea3adff.toInt()),
         Block.STONE_BASALT to Color(0x3f3e3fff.toInt()),
+        Block.STONE_SLATE to Color(0x242730ff.toInt()),
+        Block.STONE_LIMESTONE to Color(0xcdcbc9ff.toInt()),
         Block.SANDSTONE to Color(0xe0c688ff.toInt())
     )
 
@@ -454,31 +456,40 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
     )
 
     private val terragenYscaling = (NOISEBOX_HEIGHT / 2400.0).pow(0.75)
-    private val terragenTiers = (params.terragenTiers).map { it * terragenYscaling } // pow 1.0 for 1-to-1 scaling; 0.75 is used to make deep-rock layers actually deep for huge world size
 
     private fun ItemID.isRock() = this.substringAfter(':').toInt() in 16 until 32
 
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
+        val strataMode = 1//TODO
+
+        val strata = params.getStrataForMode(strataMode)
+        val groundDepthBlock = strata.map { it.tiles }
+        val terragenTiers = strata.map { it.yheight * terragenYscaling }
+
         val terr = noiseValue[0].tiered(terragenTiers)
         val cave = if (noiseValue[1] < 0.5) 0 else 1
         val ore = (noiseValue.subList(2, noiseValue.size - 1)).zip(oreCols).firstNotNullOfOrNull { (n, colour) -> if (n > 0.5) colour else null }
 
         val isMarble = false // noiseValue[13] > 0.5
 
-        val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlockWall[terr]
-        val terrBlock = if (cave == 0) Block.AIR else if (isMarble) Block.STONE_MARBLE else groundDepthBlockTERR[terr]
-        val terrBlockNoAir = if (isMarble) Block.STONE_MARBLE else groundDepthBlockTERR[terr]
+        val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
+        val terrBlock = if (cave == 0) Block.AIR else if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
+        val terrBlockNoAir = if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
 
-        val lavaVal = noiseValue[noiseValue.lastIndex - 2]
+        val lavaVal = noiseValue[noiseValue.lastIndex - 3]
         val lava = (lavaVal >= 0.5)
 
-        val waterVal = noiseValue[noiseValue.lastIndex - 1]
+        val waterVal = noiseValue[noiseValue.lastIndex - 2]
         val waterShell = (waterVal >= 0.32)
         val water = (waterVal >= 0.5)
 
-        val oilVal = noiseValue[noiseValue.lastIndex]
-        val oilShell = (oilVal >= 0.38)
-        val oil = (oilVal >= 0.5)
+        val oilVal = noiseValue[noiseValue.lastIndex - 1]
+        val oilShell = (oilVal >= 0.36)
+        val oil = (oilVal >= 0.7)
+
+        val lavaPocketVal = noiseValue[noiseValue.lastIndex]
+        val lavaPocketShell = (lavaPocketVal >= 0.30)
+        val lavaPocket = (lavaPocketVal >= 0.5)
 
         outTex.drawPixel(x, y,
             if (water) WATER
@@ -492,6 +503,13 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             else if (oilShell) {
                 if (terrBlockNoAir.isRock())
                     ore ?: blockToCol[terrBlockNoAir]!!.toRGBA()
+                else
+                    blockToCol[terrBlockNoAir]!!.toRGBA()
+            }
+            else if (lavaPocket) LAVA
+            else if (lavaPocketShell) {
+                if (terrBlockNoAir.isRock())
+                    ore ?: blockToCol[Block.STONE_BASALT]!!.toRGBA()
                 else
                     blockToCol[terrBlockNoAir]!!.toRGBA()
             }
@@ -857,6 +875,7 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             Joise(generateSeaOfLava(seed)),
             Joise(generateAquifer(seed, groundScalingCached)),
             Joise(generateCrudeOil(seed, groundScalingCached)),
+            Joise(generateLavaPocket(seed, groundScalingCached)),
         )
     }
 
@@ -1090,12 +1109,12 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
                 it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
                 it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
                 it.setNumOctaves(4)
-                it.setFrequency(params.rockBandCutoffFreq / params.featureSize)
+                it.setFrequency(params.rockBandCutoffFreq / (params.featureSize * 1.4142))
                 it.seed = seed shake "CrudeOil"
             })
-            it.setScaleX(0.16)
-            it.setScaleZ(0.16)
-            it.setScaleY(1.4)
+            it.setScaleX(0.23)
+            it.setScaleZ(0.23)
+            it.setScaleY(1.0)
         }
 
         crudeOilGradStart = TerrarumModuleCacheY().also {
@@ -1121,6 +1140,50 @@ internal class TerragenTest(val params: TerragenParams) : NoiseMaker {
             it.setType(ModuleCombiner.CombinerType.MULT)
             it.setSource(0, oilPocket)
             it.setSource(1, crudeOilGrad)
+        }
+
+
+        return oilLayer
+    }
+
+    private fun generateLavaPocket(seed: Long, groundScalingCached: Module): Module {
+        val oilPocket = ModuleScaleDomain().also {
+            it.setSource(ModuleFractal().also {
+                it.setType(ModuleFractal.FractalType.BILLOW)
+                it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
+                it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+                it.setNumOctaves(4)
+                it.setFrequency(params.rockBandCutoffFreq / params.featureSize)
+                it.seed = seed shake "LavaPocket"
+            })
+            it.setScaleX(0.5)
+            it.setScaleZ(0.5)
+            it.setScaleY(0.8)
+        }
+
+        lavaPocketGradStart = TerrarumModuleCacheY().also {
+            it.setSource(ModuleClamp().also {
+                it.setSource(ModuleScaleOffset().also {
+                    it.setSource(groundScalingCached)
+                    it.setOffset(-4.0)
+                })
+                it.setRange(0.0, 1.0)
+            })
+        }
+
+        lavaPocketGrad = TerrarumModuleCacheY().also {
+            it.setSource(ModuleCombiner().also {
+                it.setType(ModuleCombiner.CombinerType.ADD)
+                it.setSource(0, lavaPocketGradStart)
+                it.setSource(1, crudeOilGradEnd)
+                it.setSource(2, ModuleConstant().also { it.setConstant(-1.0) })
+            })
+        }
+
+        val oilLayer = ModuleCombiner().also {
+            it.setType(ModuleCombiner.CombinerType.MULT)
+            it.setSource(0, oilPocket)
+            it.setSource(1, lavaPocketGrad)
         }
 
 
