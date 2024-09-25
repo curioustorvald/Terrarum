@@ -47,7 +47,7 @@ object WorldSimulator {
     private val fluidNewTypeMap = Array(DOUBLE_RADIUS) { Array(DOUBLE_RADIUS) { Fluid.NULL } }
 
     const val FLUID_MAX_MASS = 1f // The normal, un-pressurized mass of a full water cell
-    const val FLUID_MAX_COMP = 0.02f // How much excess water a cell can store, compared to the cell above it. A tile of fluid can contain more than MaxMass water.
+    const val FLUID_MAX_COMP = 0.01f // How much excess water a cell can store, compared to the cell above it. A tile of fluid can contain more than MaxMass water.
 //    const val FLUID_MIN_MASS = net.torvald.terrarum.gameworld.FLUID_MIN_MASS //Ignore cells that are almost dry (smaller than epsilon of float16)
     const val minFlow = 1f / 512f
 
@@ -204,12 +204,17 @@ object WorldSimulator {
         fluidmapToWorld()
     }
 
+    fun isSolid(worldX: Int, worldY: Int): Boolean {
+        val tile = world.getTileFromTerrain(worldX, worldY)
+        return BlockCodex[tile].isSolid
+    }
+
     fun isFlowable(type: ItemID, worldX: Int, worldY: Int): Boolean {
         val fluid = world.getFluid(worldX, worldY)
         val tile = world.getTileFromTerrain(worldX, worldY)
 
         // true if target's type is the same as mine, or it's NULL (air)
-        return ((fluid.type == type || fluid.type == Fluid.NULL) && !BlockCodex[tile].isSolid)
+        return (((fluid.type == type && fluid.amount < FLUID_MAX_MASS + FLUID_MAX_COMP) || fluid.type == Fluid.NULL) && !BlockCodex[tile].isSolid)
     }
 
     /**
@@ -350,10 +355,7 @@ object WorldSimulator {
                 val maxSpeed = 1f / FluidCodex[remainingType].viscosity.sqr()
 
                 // check solidity
-                if (!isFlowable(remainingType, worldX, worldY)) continue
-                // check if the fluid is a same kind
-                //if (!isFlowable(type, worldX, worldY))) continue
-
+                if (isSolid(worldX, worldY)) continue
 
                 // Custom push-only flow
                 var flow = 0f

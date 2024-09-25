@@ -5,11 +5,16 @@
   "BLOCK_AIR": "Air",
 
   "BLOCK_STONE": "Stone",
-  "BLOCK_STONE_QUARRIED": "Quarried Stone",
-  "BLOCK_STONE_TILE_WHITE": "Stone Tile",
+  "BLOCK_STONE_BASALT": "Basalt",
   "BLOCK_STONE_BRICKS": "Stone Bricks",
   "BLOCK_STONE_DEEP": "Deepstone",
+  "BLOCK_STONE_LIMESTONE": "Limestone",
   "BLOCK_STONE_MARBLE": "Marble",
+  "BLOCK_STONE_QUARRIED": "Quarried Stone",
+  "BLOCK_STONE_SLATE": "Slate",
+  "BLOCK_STONE_TILE_WHITE": "White Stone Tile",
+  "BLOCK_STONE_TILE_BLACK": "Black Stone Tile",
+
   "BLOCK_BRICKS": "Bricks", /* always plural */
 
   "BLOCK_DIRT": "Dirt",
