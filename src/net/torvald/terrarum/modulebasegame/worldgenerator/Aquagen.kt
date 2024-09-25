@@ -49,24 +49,30 @@ class Aquagen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modul
                 // the size of the two lists are guaranteed to be identical as they all derive from the same `ores`
                 val noiseValues = noises.map { it.get(sx, sy, sz) }
 
-                val lavaVal = noiseValues[noiseValues.lastIndex - 2]
+                val lavaVal = noiseValues[0]
                 val lava = (lavaVal >= 0.5)
 
-                val waterVal = noiseValues[noiseValues.lastIndex - 1]
+                val waterVal = noiseValues[1]
                 val waterShell = (waterVal >= 0.32)
                 val water = (waterVal >= 0.5)
 
-                val oilVal = noiseValues[noiseValues.lastIndex]
+                val oilVal = noiseValues[2]
                 val oilShell = (oilVal >= 0.38)
                 val oil = (oilVal >= 0.5)
+
+                val lavaPocketVal = noiseValues[3]
+                val lavaPocketShell = (lavaPocketVal >= 0.30)
+                val lavaPocket = (lavaPocketVal >= 0.5)
 
                 val backingTile = world.getTileFromWall(x, y)
 
                 val outFluid = if (water) Fluid.WATER
-                else if (oil) Fluid.CRUDE_OIL
-                else if (lava) Fluid.LAVA
                 else if (waterShell) backingTile
+                else if (oil) Fluid.CRUDE_OIL
                 else if (oilShell) backingTile
+                else if (lavaPocket) Fluid.LAVA
+                else if (lavaPocketShell) Block.STONE_BASALT
+                else if (lava) Fluid.LAVA
                 else null
 
                 outFluid?.let {
@@ -88,6 +94,7 @@ class Aquagen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modul
             Joise(generateSeaOfLava(seed)),
             Joise(generateAquifer(seed, groundScalingCached)),
             Joise(generateCrudeOil(seed, groundScalingCached)),
+            Joise(generateLavaPocket(seed, groundScalingCached)),
         )
     }
 
@@ -112,7 +119,7 @@ class Aquagen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modul
             it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
             it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
             it.setNumOctaves(6)
-            it.setFrequency(params.lavaShapeFreg * 3.0 / 4.0)
+            it.setFrequency(params.lavaShapeFreg * 0.75)
             it.seed = seed shake "FloorIsLava"
         }
 
@@ -184,12 +191,12 @@ class Aquagen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modul
                 it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
                 it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
                 it.setNumOctaves(4)
-                it.setFrequency(params.rockBandCutoffFreq / params.featureSize)
+                it.setFrequency(params.rockBandCutoffFreq / (params.featureSize * 1.4142))
                 it.seed = seed shake "CrudeOil"
             })
-            it.setScaleX(0.16)
-            it.setScaleZ(0.16)
-            it.setScaleY(1.4)
+            it.setScaleX(0.23)
+            it.setScaleZ(0.23)
+            it.setScaleY(1.0)
         }
 
         crudeOilGradStart = TerrarumModuleCacheY().also {
@@ -221,6 +228,52 @@ class Aquagen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modul
         return oilLayer
     }
 
+    private fun generateLavaPocket(seed: Long, groundScalingCached: Module): Module {
+        val params = params as TerragenParams
+
+        val oilPocket = ModuleScaleDomain().also {
+            it.setSource(ModuleFractal().also {
+                it.setType(ModuleFractal.FractalType.BILLOW)
+                it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
+                it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+                it.setNumOctaves(4)
+                it.setFrequency(params.rockBandCutoffFreq / params.featureSize)
+                it.seed = seed shake "LavaPocket"
+            })
+            it.setScaleX(0.5)
+            it.setScaleZ(0.5)
+            it.setScaleY(0.8)
+        }
+
+        lavaPocketGradStart = TerrarumModuleCacheY().also {
+            it.setSource(ModuleClamp().also {
+                it.setSource(ModuleScaleOffset().also {
+                    it.setSource(groundScalingCached)
+                    it.setOffset(-4.0)
+                })
+                it.setRange(0.0, 1.0)
+            })
+        }
+
+        lavaPocketGrad = TerrarumModuleCacheY().also {
+            it.setSource(ModuleCombiner().also {
+                it.setType(ModuleCombiner.CombinerType.ADD)
+                it.setSource(0, lavaPocketGradStart)
+                it.setSource(1, crudeOilGradEnd)
+                it.setSource(2, ModuleConstant().also { it.setConstant(-1.0) })
+            })
+        }
+
+        val oilLayer = ModuleCombiner().also {
+            it.setType(ModuleCombiner.CombinerType.MULT)
+            it.setSource(0, oilPocket)
+            it.setSource(1, lavaPocketGrad)
+        }
+
+
+        return oilLayer
+    }
+
     companion object {
 
         // val = sqrt((y-H+L) / L); where H=5300 (world height-100), L=620;
@@ -242,6 +295,8 @@ class Aquagen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modul
 
         lateinit var crudeOilGradStart: TerrarumModuleCacheY
         lateinit var crudeOilGrad: TerrarumModuleCacheY
+        lateinit var lavaPocketGradStart: TerrarumModuleCacheY
+        lateinit var lavaPocketGrad: TerrarumModuleCacheY
 
         val crudeOilGradEnd = TerrarumModuleCacheY().also {
             it.setSource(TerrarumModuleCaveLayerClosureGrad().also {
