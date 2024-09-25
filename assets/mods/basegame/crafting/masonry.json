@@ -3,15 +3,14 @@
   "basegame:19": {
     "workbench": "masonry",
     "ingredients": [
-      [1, 1, "$BRICKROCK"]
+      [1, 1, "basegame:16"]
     ]
   },
   /* white stone tile */
   "basegame:18": {
     "workbench": "masonry",
     "ingredients": [
-      [1, 1, "basegame:21"],
-      [1, 3, "$BRICKROCK"]
+      [1, 1, "basegame:21"]
     ]
   },
   /* bricks */
