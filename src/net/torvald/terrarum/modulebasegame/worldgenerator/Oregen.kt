@@ -13,9 +13,9 @@ import kotlin.math.sqrt
 /**
  * Created by minjaesong on 2023-10-25.
  */
-class Oregen(world: GameWorld, isFinal: Boolean, private val caveAttenuateBiasScaledCache: ModuleCache, seed: Long, private val ores: List<OregenParams>) : Gen(world, isFinal, seed) {
+class Oregen(world: GameWorld, isFinal: Boolean, private val caveAttenuateBiasScaledCache: ModuleCache, seed: Long, private val ores: List<OregenParams>, terragenParams: TerragenParams) : Gen(world, isFinal, seed, terragenParams) {
 
-    private val isAlpha2 = ((params as TerragenParams).version >= 0x0000_000004_000004)
+    private val isAlpha2 = (terragenParams.versionSince >= 0x0000_000004_000004)
 
     override fun getDone(loadscreen: LoadScreenBase?) {
         loadscreen?.let {

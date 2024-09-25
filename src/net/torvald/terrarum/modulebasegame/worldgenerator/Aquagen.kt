@@ -2,7 +2,6 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
-import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
@@ -19,7 +18,7 @@ import kotlin.math.sin
  */
 class Aquagen(world: GameWorld, isFinal: Boolean, val groundScalingCached: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
 
-    private val isAlpha2 = ((params as TerragenParams).version >= 0x0000_000004_000004)
+    private val isAlpha2 = ((params as TerragenParams).versionSince >= 0x0000_000004_000004)
 
     private val FLUID_FILL = 1.2f
 

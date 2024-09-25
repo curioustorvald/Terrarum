@@ -16,7 +16,7 @@ import kotlin.math.sin
  */
 class Cavegen(world: GameWorld, isFinal: Boolean, val highlandLowlandSelectCache: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
 
-    private val isAlpha2 = ((params as TerragenParams).version >= 0x0000_000004_000004)
+    private val isAlpha2 = ((params as TerragenParams).versionSince >= 0x0000_000004_000004)
 
     override fun getDone(loadscreen: LoadScreenBase?) {
         loadscreen?.let {

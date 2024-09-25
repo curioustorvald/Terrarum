@@ -18,7 +18,7 @@ import kotlin.math.sin
  */
 class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
 
-    private val isAlpha2 = ((params as TerragenParams).version >= 0x0000_000004_000004)
+    private val isAlpha2 = ((params as TerragenParams).versionSince >= 0x0000_000004_000004)
 
     override fun getDone(loadscreen: LoadScreenBase?) {
         loadscreen?.let {
@@ -223,7 +223,7 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
 abstract class TerragenParams {
     val LANDBLOCK_VAR_COUNTS = 16
 
-    abstract val version: Long
+    abstract val versionSince: Long
     abstract val strata: List<Stratum>
     abstract val featureSize: Double
     abstract val lowlandScaleOffset: Double // linearly alters the height
@@ -297,12 +297,15 @@ abstract class TerragenParams {
  * @param h: STARTING height of the strata relative to the ground select gradient
  * @param v: linear ± to the `h`
  */
-data class Hv(val h: Double, val v: Double)
+data class Hv(val h: Double, val v: Double) { init {
+    if (h.isNaN() || h.isInfinite() || h < 0.0) throw IllegalArgumentException("h-value must be zero or positive (got $h)")
+    if (v.isNaN() || v.isInfinite() || v < 0.0) throw IllegalArgumentException("v-value must be zero or positive (got $v)")
+} }
 class Stratum(val yheight: Hv, vararg val tiles: ItemID)
 class StratumObj(val yheight: Double, val tiles: ItemID)
 
 data class TerragenParamsAlpha1(
-    override val version: Long = 0L,
+    override val versionSince: Long = 0L,
 
     // 0. randomiser gets two-element buffer
     // 1. randomiser consults the buffer and removes matching elements from the random pool
@@ -340,7 +343,7 @@ data class TerragenParamsAlpha1(
     ) : TerragenParams()
 
 data class TerragenParamsAlpha2(
-    override val version: Long = 0x0000_000004_000004,
+    override val versionSince: Long = 0x0000_000004_000004,
 
     override val strata: List<Stratum> = listOf(
         Stratum(Hv(.0, .0), Block.AIR),
@@ -396,4 +399,4 @@ data class TerragenParamsAlpha2(
 
     override val landBlockScale: Double = 0.5,
 
-) : TerragenParams()
+    ) : TerragenParams()
