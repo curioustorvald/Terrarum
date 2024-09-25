@@ -10,9 +10,9 @@ import net.torvald.terrarum.gameactors.AVKey
 object PlayerBuilderTestSubject1 {
     operator fun invoke(): IngamePlayer {
         val p: IngamePlayer = IngamePlayer(
-            ModMgr.getGdxFile("basegame", "sprites/test_sprite.properties").path(),
-            ModMgr.getGdxFile("basegame", "sprites/test_sprite_glow.properties").path(),
-            ModMgr.getGdxFile("basegame", "sprites/test_sprite_emsv.properties").path(),
+            ModMgr.getGdxFile("basegame", "sprites/fofu.properties").path(),
+            ModMgr.getGdxFile("basegame", "sprites/fofu_glow.properties").path(),
+            ModMgr.getGdxFile("basegame", "sprites/fofu_emsv.properties").path(),
             0L // random value thrown
         )
         InjectCreatureRaw(p.actorValue, "basegame", "CreaturePlayer.json")

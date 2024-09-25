@@ -65,8 +65,9 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
 
         it.clickOnceListener = { _,_ ->
             if (filenameInput.getText().isNotBlank()) {
-                importReturnCode = doImport()
-                if (importReturnCode == 0) remoCon.openUI(UILoadSavegame(remoCon))
+                val (importReturnCode, avatarDisk) = doImport()
+                this.importReturnCode = importReturnCode
+                if (importReturnCode == 0) remoCon.openUI(UINewWorld(remoCon, avatarDisk!!))
             }
         }
     }
@@ -143,13 +144,15 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
     override fun advanceMode(button: UIItem) {
     }
 
-    private fun doImport(): Int {
+    private fun doImport(): Pair<Int, DiskSkimmer?> {
         val file = File("${App.importDir}/${filenameInput.getText().trim()}")
 
         // check file's existence
         if (!file.exists()) {
-            return 1
+            return 1 to null
         }
+
+        var retDisk: DiskSkimmer? = null
 
         // try to mount the TEVd
         try {
@@ -164,7 +167,7 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
 
             printdbg(this, "Avatar uuid: $uuid")
 
-            if (newFile.exists()) return 2
+            if (newFile.exists()) return 2 to null
 
             // update playerinfo so that:
             // totalPlayTime to zero
@@ -212,6 +215,8 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
                     App.sortedPlayers.add(0, playerUUID)
                     App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
                 }
+
+                retDisk = it
             }
             catch (e: Throwable) {
                 printdbgerr(this, e.stackTraceToString())
@@ -220,10 +225,10 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
         catch (e: Throwable) {
             // format error
             e.printStackTrace()
-            return -1
+            return -1 to null
         }
 
-        return 0
+        return 0 to retDisk
     }
 }
 
