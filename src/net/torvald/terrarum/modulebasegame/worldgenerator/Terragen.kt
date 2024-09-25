@@ -16,9 +16,23 @@ import kotlin.math.sin
 /**
  * Created by minjaesong on 2019-07-23.
  */
-class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
+class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: ModuleCache, val landBlock: ModuleCache, seed: Long, params: Any) : Gen(world, isFinal, seed, params) {
 
     private val isAlpha2 = ((params as TerragenParams).versionSince >= 0x0000_000004_000004)
+
+    private lateinit var strataCache: Array<List<StratumObj>>
+    private lateinit var groundDepthBlocksCache: Array<List<ItemID>>
+    private lateinit var terragenTiersCache: Array<List<Double>>
+
+    private val terragenYscaling =
+        if (isAlpha2)
+            1.0
+        else
+            (world.height / 2400.0).pow(0.75)
+
+    init {
+        populateCaches(seed)
+    }
 
     override fun getDone(loadscreen: LoadScreenBase?) {
         loadscreen?.let {
@@ -31,6 +45,18 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
         Worldgen.threadExecutor.join()
     }
 
+    private fun populateCaches(seed: Long) {
+        val params = params as TerragenParams
+        strataCache = Array(params.LANDBLOCK_VAR_COUNTS) {
+            params.getStrataForMode(seed, it)
+        }
+        groundDepthBlocksCache = Array(params.LANDBLOCK_VAR_COUNTS) {
+            strataCache[it].map { it.tiles }
+        }
+        terragenTiersCache = Array(params.LANDBLOCK_VAR_COUNTS) {
+            strataCache[it].map { it.yheight * terragenYscaling }
+        }
+    }
 
     private fun Double.tiered(tiers: List<Double>): Int {
         tiers.reversed().forEachIndexed { index, it ->
@@ -39,22 +65,9 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
         return tiers.lastIndex
     }
 
-    private val terragenYscaling =
-        if (isAlpha2)
-            1.0
-        else
-            (world.height / 2400.0).pow(0.75)
-
     //private fun draw(x: Int, y: Int, width: Int, height: Int, noiseValue: List<Double>, world: GameWorld) {
     override fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double) {
-        val strataMode = if (!isAlpha2)
-            0
-        else
-            1// TODO
-
-        val strata = (params as TerragenParams).getStrataForMode(seed, strataMode)
-        val groundDepthBlock = strata.map { it.tiles }
-        val terragenTiers = strata.map { it.yheight * terragenYscaling }
+        val params = params as TerragenParams
 
         for (x in xStart until xStart + CHUNK_W) {
             val st = (x.toDouble() / world.width) * TWO_PI
@@ -66,69 +79,21 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
                 // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
                 val noiseValue = noises.map { it.get(sx, sy, sz) }
 
-                val terr = noiseValue[0].tiered(terragenTiers)
+                val strataMode = if (!isAlpha2)
+                    0
+                else
+                    noiseValue[1].times(params.LANDBLOCK_VAR_COUNTS).toInt().coerceIn(0, params.LANDBLOCK_VAR_COUNTS - 1)
+
+                val terrTier = noiseValue[0].tiered(terragenTiersCache[strataMode])
 
                 val isMarble = if (!isAlpha2) noiseValue[1] > 0.5 else false
 
-                val wallBlock = if (isMarble) Block.STONE_MARBLE else groundDepthBlock[terr]
-                val terrBlock = if (isMarble) Block.STONE_MARBLE else wallBlock
+                val block = if (isMarble) Block.STONE_MARBLE else groundDepthBlocksCache[strataMode][terrTier]
+                    //groundDepthBlocksCache[strataMode][terr]
 
-                world.setTileTerrain(x, y, terrBlock, true)
-                world.setTileWall(x, y, wallBlock, true)
+                world.setTileTerrain(x, y, block, true)
+                world.setTileWall(x, y, block, true)
             }
-
-
-            // dither shits
-            /*
-        #
-        # - dirt-to-cobble transition, height = dirtStoneDitherSize
-        #
-        %
-        % - cobble-to-rock transition, height = dirtStoneDitherSize
-        %
-        * - where the stone layer actually begins
-         */
-            /*if (dirtStoneTransition >= 0) {
-                for (pos in 0 until dirtStoneDitherSize * 2) {
-                    val y = pos + dirtStoneTransition - (dirtStoneDitherSize * 2) + 1
-                    if (y >= world.height) break
-                    val hash = XXHash32.hashGeoCoord(x, y).and(0xFFFFFF) / 16777216.0
-//            val fore = world.getTileFromTerrain(x, y)
-//            val back = world.getTileFromWall(x, y)
-                    val newTile = if (pos < dirtStoneDitherSize)
-                        if (hash < pos.toDouble() / dirtStoneDitherSize) Block.STONE_QUARRIED else Block.DIRT
-                    else // don't +1 to pos.toDouble(); I've suffered
-                        if (hash >= (pos.toDouble() - dirtStoneDitherSize) / dirtStoneDitherSize) Block.STONE_QUARRIED else Block.STONE
-
-//            if (fore != Block.AIR)
-                    if (y in yStart until yStart + CHUNK_H) {
-                        world.setTileTerrain(x, y, newTile, true)
-                        world.setTileWall(x, y, newTile, true)
-                    }
-                }
-            }*/
-
-            /*
-        #
-        # - stone-to-slate transition, height = stoneSlateDitherSize
-        #
-         */
-            /*if (stoneSlateTransition >= 0) {
-                for (pos in 0 until stoneSlateDitherSize) {
-                    val y = pos + stoneSlateTransition - stoneSlateDitherSize + 1
-                    if (y >= world.height) break
-                    val hash = XXHash32.hashGeoCoord(x, y).and(0xFFFFFF) / 16777216.0
-//            val fore = world.getTileFromTerrain(x, y)
-//            val back = world.getTileFromWall(x, y)
-                    val newTile = if (hash < pos.toDouble() / stoneSlateDitherSize) Block.STONE_SLATE else Block.STONE
-
-                    if (y in yStart until yStart + CHUNK_H) {
-//            if (fore != Block.AIR)
-                        world.setTileTerrain(x, y, newTile, true)
-                        world.setTileWall(x, y, newTile, true)
-                    }
-                }
-            }*/
         }
     }
 
@@ -151,7 +116,10 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
             )
         }
         else
-            listOf(Joise(groundScalingCached))
+            listOf(
+                Joise(groundScalingCached),
+                Joise(landBlock),
+            )
     }
 
     private fun generateRockLayer(ground: Module, seed: Long, params: TerragenParams, thicknessAndRange: List<Pair<Double, Double>>): Module {

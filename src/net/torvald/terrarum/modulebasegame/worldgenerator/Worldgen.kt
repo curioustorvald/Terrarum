@@ -59,6 +59,7 @@ object Worldgen {
         params = genParams
 
         highlandLowlandSelectCache = getHighlandLowlandSelectCache(params.terragenParams, params.seed)
+        landBlock = getLandBlock(params.terragenParams, params.seed)
         caveAttenuateBiasScaledForOresCache = getCaveAttenuateBiasScaled(highlandLowlandSelectCache, params.terragenParams)
         groundScalingCached = getGroundScalingCached(highlandLowlandSelectCache, params.terragenParams)
         biomeMap = HashMap()
@@ -67,6 +68,7 @@ object Worldgen {
     }
 
     internal lateinit var groundScalingCached: ModuleCache
+    internal lateinit var landBlock: ModuleCache
     internal lateinit var highlandLowlandSelectCache: ModuleCache
     internal lateinit var caveAttenuateBiasScaledForOresCache: ModuleCache
     internal lateinit var biomeMap: HashMap<BlockAddress, Byte>
@@ -95,7 +97,7 @@ object Worldgen {
         else { work: Work -> (work.tags union tags).isNotEmpty() }
 
         return listOf(
-            Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, false, groundScalingCached, params.seed, params.terragenParams), listOf("TERRAIN")), // also generates marble veins
+            Work(Lang["MENU_IO_WORLDGEN_RETICULATING_SPLINES"], Terragen(world, false, groundScalingCached, landBlock, params.seed, params.terragenParams), listOf("TERRAIN")), // also generates marble veins
             Work(Lang["MENU_IO_WORLDGEN_CARVING_EARTH"], Cavegen(world, false, highlandLowlandSelectCache, params.seed, params.terragenParams), listOf("TERRAIN", "CAVE")),
             Work(Lang["MENU_IO_WORLDGEN_FLOODING_UNDERGROUND"], Aquagen(world, false, groundScalingCached, params.seed, params.terragenParams), listOf("WATER")),
             Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, false, caveAttenuateBiasScaledForOresCache, params.seed, oreRegistry, params.terragenParams), listOf("ORES")),
@@ -208,6 +210,16 @@ object Worldgen {
     private val rockScoreMin = 40
     private val treeScoreMin = 25
 
+    private fun Int.inChunk() = (this / CHUNK_W) % 2 == 0
+
+    private fun getRandomX(): Int {
+        var posX = (Math.random() * world.width).toInt()
+        while (!posX.inChunk())
+            posX = (Math.random() * world.width).toInt()
+
+        return posX
+    }
+
     private fun tryForSpawnPoint(world: GameWorld): Point2i {
         val yInit = getChunkGenStrip(world).first
         val tallies = ArrayList<Pair<Point2i, Vector3f>>() // xypos, score (0..1+)
@@ -215,7 +227,7 @@ object Worldgen {
         var found = false
         val ySearchRadius = 30
         while (tries < 99) {
-            val posX = (Math.random() * world.width).toInt()
+            val posX = getRandomX()
             var posY = yInit * CHUNK_H
             // go up?
             if (BlockCodex[world.getTileFromTerrain(posX, posY)].isSolid) {
@@ -439,6 +451,55 @@ object Worldgen {
         }
 
         return highlandLowlandSelectCache
+    }
+
+    private fun getLandBlock(params: TerragenParams, seed: Long): ModuleCache {
+        val landBlock = ModuleScaleDomain().also {
+            it.setSource(ModuleFractal().also {
+                it.setType(ModuleFractal.FractalType.DECARPENTIERSWISS)
+                it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+                it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+                it.setNumOctaves(2)
+                it.setFrequency(params.landBlockScale / params.featureSize)
+                it.seed = seed shake "LandBlock"
+            })
+            it.setScaleX(1.0 / 4.0)
+            it.setScaleZ(1.0 / 4.0)
+            it.setScaleY(1.0 / 18.0)
+        }
+
+        val landBlockPerturbFractal = ModuleScaleOffset().also {
+            it.setSource(ModuleFractal().also {
+                it.setType(ModuleFractal.FractalType.FBM)
+                it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+                it.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+                it.setNumOctaves(6)
+                it.setFrequency((params.landBlockScale * 3.0) / params.featureSize)
+                it.seed = seed shake "MassiveMassif"
+            })
+            it.setScale(24.0)
+        }
+
+        val landBlockPerturb = ModuleTranslateDomain().also {
+            it.setSource(landBlock)
+            it.setAxisXSource(landBlockPerturbFractal)
+            it.setAxisZSource(landBlockPerturbFractal)
+        }
+
+        val landBlockClamp = ModuleClamp().also {
+            it.setSource(ModuleScaleOffset().also {
+                it.setSource(landBlockPerturb)
+                it.setScale(1.0)
+                it.setOffset(-1.0)
+            })
+            it.setRange(0.0, 1.0)
+        }
+
+        val landBlockCache = ModuleCache().also {
+            it.setSource(landBlockClamp)
+        }
+
+        return landBlockCache
     }
 
     private fun getCaveAttenuateBiasScaled(highlandLowlandSelectCache: ModuleCache, params: TerragenParams): ModuleCache {
