@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -642,6 +643,15 @@ class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {
 
     override fun keyUp(keycode: Int): Boolean {
         screen.uiContainer.forEach { it?.keyUp(keycode) }
+        // lift V to revert to brush
+        if (keycode == Keys.V)
+            screen.currentPenMode = screen.currentPenMode.let {
+                if (it == 1 || it == 3)
+                    it - 1
+                else
+                    it
+            }
+
         return true
     }
 
@@ -652,6 +662,15 @@ class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {
 
     override fun keyDown(keycode: Int): Boolean {
         screen.uiContainer.forEach { it?.keyDown(keycode) }
+        // hold V to erase
+        if (keycode == Keys.V)
+            screen.currentPenMode = screen.currentPenMode.let {
+                if (it == 0 || it == 2)
+                    it + 1
+                else
+                    it
+            }
+
         return true
     }
 
