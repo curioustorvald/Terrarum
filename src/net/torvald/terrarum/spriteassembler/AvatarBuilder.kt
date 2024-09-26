@@ -1,6 +1,5 @@
 package net.torvald.terrarum.spriteassembler
 
-import com.badlogic.gdx.Gdx
 import net.torvald.terrarum.App
 import net.torvald.terrarum.savegame.*
 import net.torvald.terrarum.savegame.VDFileID.BODYPARTEMISSIVE_TO_ENTRY_MAP
@@ -28,20 +27,22 @@ class AvatarBuilder : JFrame() {
 
     private val infilePath = JTextField().also { it.preferredSize = Dimension(400, 24) }
     private val outfilePath = JTextField().also { it.preferredSize = Dimension(400, 24) }
+    private val buttonReset = JButton("Clear")
     private val buttonGo = JButton("Export!")
 
     init {
         val panelPlayer = JPanel().also {
-            it.add(JLabel("Player File"))
+            it.add(JLabel("Player File", SwingConstants.RIGHT).also { it.preferredSize = Dimension(80, 24) })
             it.add(infilePath)
         }
 
         val panelOutput = JPanel().also {
-            it.add(JLabel("Output File"))
+            it.add(JLabel("Output File", SwingConstants.RIGHT).also { it.preferredSize = Dimension(80, 24) })
             it.add(outfilePath)
         }
 
         val controlPanel = JPanel().also {
+            it.add(buttonReset)
             it.add(buttonGo)
         }
 
@@ -56,8 +57,15 @@ class AvatarBuilder : JFrame() {
         this.add(controlPanel, BorderLayout.SOUTH)
         this.title = "Terrarum Avatar Generator"
         this.isVisible = true
-        this.setSize(480, 120)
+        this.setSize(512, 128)
         this.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+
+        buttonReset.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent?) {
+                infilePath.text = ""
+                outfilePath.text = ""
+            }
+        })
 
         buttonGo.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
@@ -68,7 +76,7 @@ class AvatarBuilder : JFrame() {
                     }
                     catch (e: Throwable) {
                         e.printStackTrace()
-                        popupError(e.message ?: "null")
+                        popupError(e.toString())
                     }
                 }
             }
