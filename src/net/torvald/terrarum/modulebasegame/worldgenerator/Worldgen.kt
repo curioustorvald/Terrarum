@@ -102,7 +102,6 @@ object Worldgen {
             Work(Lang["MENU_IO_WORLDGEN_FLOODING_UNDERGROUND"], Aquagen(world, false, groundScalingCached, params.seed, params.terragenParams), listOf("WATER")),
             Work(Lang["MENU_IO_WORLDGEN_GROWING_MINERALS"], Oregen(world, false, caveAttenuateBiasScaledForOresCache, params.seed, oreRegistry, params.terragenParams), listOf("ORES")),
             Work(Lang["MENU_IO_WORLDGEN_POSITIONING_ROCKS"], OregenAutotiling(world, false, params.seed, oreTilingModes), listOf("ORES")),
-            // TODO generate gemstones
             Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Biomegen(world, false, params.seed, params.biomegenParams, biomeMap), listOf("BIOME")),
             Work(Lang["MENU_IO_WORLDGEN_PAINTING_GREEN"], Treegen(world, true, params.seed, params.terragenParams, params.treegenParams, biomeMap), listOf("TREES")),
         ).filter(tagFilter)

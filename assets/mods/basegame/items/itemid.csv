@@ -55,6 +55,7 @@ id;classname;tags
 54;net.torvald.terrarum.modulebasegame.gameitems.ItemMechanicalTines;FIXTURE,MUSIC,SIGNAL
 55;net.torvald.terrarum.modulebasegame.gameitems.ItemGlowOrb;LIGHT,THROWABLE
 56;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBrick;
+57;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalPushbutton;FIXTURE,SIGNAL
 
 
 

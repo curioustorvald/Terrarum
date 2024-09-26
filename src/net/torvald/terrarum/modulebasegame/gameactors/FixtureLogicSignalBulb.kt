@@ -23,7 +23,7 @@ class FixtureLogicSignalBulb : Electric {
 
     init {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/copper_bulb.tga")
-        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/copper_bulb_emissive.tga")
+        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/copper_bulb_emsv.tga")
 
         density = 1400.0
         setHitboxDimension(TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE, 0, 1)

@@ -560,7 +560,8 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     fun getActorsAt(worldX: Double, worldY: Double): List<ActorWithBody> {
         val outList = ArrayList<ActorWithBody>()
         try {
-            actorsRTree.find(worldX - 0.5, worldY - 0.5, worldX + 0.5, worldY + 0.5, outList)
+//            actorsRTree.find(worldX - 0.5, worldY - 0.5, worldX + 0.5, worldY + 0.5, outList)
+            actorsRTree.find(worldX, worldY, worldX, worldY, outList)
         }
         catch (e: NullPointerException) {}
         return outList

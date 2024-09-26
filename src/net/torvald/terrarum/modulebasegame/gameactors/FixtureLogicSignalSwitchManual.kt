@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.spriteanimation.SheetSpriteAnimation
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
@@ -53,8 +54,10 @@ class FixtureLogicSignalSwitchManual : Electric {
         super.reload()
 
         (sprite as SheetSpriteAnimation).currentFrame = variant
+        (spriteGlow as SheetSpriteAnimation).currentFrame = variant
 
         (sprite as SheetSpriteAnimation).currentRow = state.toInt()
+        (spriteGlow as SheetSpriteAnimation).currentRow = state.toInt()
         setWireEmissionAt(0, 0, Vector2(state.toInt().toDouble(), 0.0))
     }
 
@@ -62,5 +65,69 @@ class FixtureLogicSignalSwitchManual : Electric {
         state = !state
         (sprite as SheetSpriteAnimation).currentRow = state.toInt()
         setWireEmissionAt(0, 0, Vector2(state.toInt().toDouble(), 0.0))
+    }
+}
+
+/**
+ * Created by minjaesong on 2024-09-27.
+ */
+class FixtureLogicSignalPushbutton : Electric {
+
+    @Transient override val spawnNeedsFloor = true
+    @Transient override val spawnNeedsWall = true
+
+    constructor() : super(
+        BlockBox(BlockBox.NO_COLLISION, 1, 1),
+        nameFun = { Lang["ITEM_LOGIC_SIGNAL_PUSHBUTTON"] }
+    )
+
+    private var triggeredTime: Long? = null // null = off; number: TIME_T that the button was held down
+
+    private val state: Int
+        get() = (triggeredTime != null).toInt()
+
+    init {
+        val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_pushbutton.tga")
+        val itemImage2 = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_pushbutton_emsv.tga")
+
+        density = 1400.0
+        setHitboxDimension(TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE, 0, 1)
+
+        makeNewSprite(TextureRegionPack(itemImage.texture, TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE)).let {
+            it.setRowsAndFrames(2,1)
+            it.delays = floatArrayOf(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+        }
+        makeNewSpriteEmissive(TextureRegionPack(itemImage2.texture, TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE)).let {
+            it.setRowsAndFrames(2,1)
+            it.delays = floatArrayOf(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+        }
+
+        actorValue[AVKey.BASEMASS] = FixtureLogicSignalEmitter.MASS
+
+
+        setWireEmitterAt(0, 0, "digital_bit")
+    }
+
+    override fun updateSignal() {
+        // decide when to un-trigger
+        if (INGAME.world.worldTime.TIME_T - (triggeredTime ?: 0L) >= 60) {
+            triggeredTime = null
+        }
+
+        (sprite as SheetSpriteAnimation).currentRow = state
+        (spriteEmissive as SheetSpriteAnimation).currentRow = state
+        setWireEmissionAt(0, 0, Vector2(state.toDouble(), 0.0))
+    }
+
+    override fun reload() {
+        super.reload()
+
+        (sprite as SheetSpriteAnimation).currentRow = state
+        (spriteEmissive as SheetSpriteAnimation).currentRow = state
+        setWireEmissionAt(0, 0, Vector2(state.toDouble(), 0.0))
+    }
+
+    override fun onInteract(mx: Double, my: Double) {
+        triggeredTime = INGAME.world.worldTime.TIME_T
     }
 }
