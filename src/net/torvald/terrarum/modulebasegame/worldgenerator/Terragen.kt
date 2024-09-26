@@ -7,6 +7,7 @@ import net.torvald.terrarum.LoadScreenBase
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.worldgenerator.Biomegen.Companion.getSandVariation
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import kotlin.math.cos
@@ -30,8 +31,13 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
         else
             (world.height / 2400.0).pow(0.75)
 
+    private val THISWORLD_SANDSTONE: ItemID
+
     init {
         populateCaches(seed)
+
+        val SAND_BASE = getSandVariation(seed)
+        THISWORLD_SANDSTONE = "basegame:" + (Block.SANDSTONE.substringAfter(':').toInt() + SAND_BASE)
     }
 
     override fun getDone(loadscreen: LoadScreenBase?) {
@@ -88,8 +94,13 @@ class Terragen(world: GameWorld, isFinal: Boolean, val groundScalingCached: Modu
 
                 val isMarble = if (!isAlpha2) noiseValue[1] > 0.5 else false
 
-                val block = if (isMarble) Block.STONE_MARBLE else groundDepthBlocksCache[strataMode][terrTier]
+                var block = if (isMarble) Block.STONE_MARBLE else groundDepthBlocksCache[strataMode][terrTier]
                     //groundDepthBlocksCache[strataMode][terr]
+
+                // recolour the sandstone
+                if (block == Block.SANDSTONE) {
+                    block = THISWORLD_SANDSTONE
+                }
 
                 world.setTileTerrain(x, y, block, true)
                 world.setTileWall(x, y, block, true)

@@ -26,14 +26,7 @@ class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val 
     private val THISWORLD_SANDSTONE: ItemID
 
     init {
-        val SAND_RND = (seed shake "SANDYCOLOURS").ushr(7).xor(seed and 255L).and(255L).toInt()
-        val SAND_BASE = when (SAND_RND) {
-            255 -> 5 // green
-            in 252..254 -> 4 // black
-            in 245..251 -> 2 // red
-            in 230..244 -> 1 // white
-            else -> 0
-        }
+        val SAND_BASE = getSandVariation(seed)
         THISWORLD_SAND = "basegame:" + (Block.SAND.substringAfter(':').toInt() + SAND_BASE)
         THISWORLD_SANDSTONE = "basegame:" + (Block.SANDSTONE.substringAfter(':').toInt() + SAND_BASE)
     }
@@ -54,6 +47,19 @@ class Biomegen(world: GameWorld, isFinal: Boolean, seed: Long, params: Any, val 
     }
 
     companion object {
+        fun getSandVariation(seed: Long): Int {
+            val SAND_RND = (seed shake "SANDYCOLOURS").ushr(7).xor(seed and 255L).and(255L).toInt()
+            val SAND_BASE = when (SAND_RND) {
+                255 -> 5 // green
+                in 252..254 -> 4 // black
+                in 245..251 -> 2 // red
+                in 230..244 -> 1 // white
+                else -> 0
+            }
+
+            return SAND_BASE
+        }
+
         private const val slices = 5
         private val nearbyArr8 = arrayOf(
             (-1 to -1), // tileTL
