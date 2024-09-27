@@ -108,6 +108,16 @@ public class Principii {
 
 //            String[] cmd = (runtime+extracmd0+userDefinedExtraCmd0+" -Xms1G -Xmx"+xmx+"G -cp ./out/TerrarumBuild.jar net.torvald.terrarum.App").split(" ");
 
+        // use `_cp` property to load custom application
+        String cp;
+        try {
+            cp = getConfigString("_cp");
+        }
+        catch (NullPointerException e) {
+            cp = "";
+        }
+        if (cp.isBlank()) cp = "net.torvald.terrarum.App";
+
         List<String> extracmds = Arrays.stream(extracmd0.split(" ")).toList();
         List<String> userDefinedExtraCmds = Arrays.stream(userDefinedExtraCmd0.split(" +")).filter((it) -> !it.isBlank()).toList();
         ArrayList<String> cmd0 = new ArrayList<>();
@@ -120,7 +130,7 @@ public class Principii {
         cmd0.add("-Xmx"+xmx+"G");
         cmd0.add("-cp");
         cmd0.add("./out/TerrarumBuild.jar");
-        cmd0.add("net.torvald.terrarum.App");
+        cmd0.add(cp);
         var cmd = cmd0.stream().filter((it) -> !it.isBlank()).toList();
 
         System.out.println(cmd);
