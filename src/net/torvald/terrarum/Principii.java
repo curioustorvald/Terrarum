@@ -79,6 +79,12 @@ public class Principii {
         }
 
         if (OS.contains("WIN")) {
+            if (runtimeArch.equals("arm")) {
+                System.err.println("Windows on Arm is not supported");
+                System.exit(1);
+                return;
+            }
+
             runtimeRoot = "runtime-windows-" + runtimeArch;
         }
         else if (OS.contains("OS X") || OS.contains("MACOS")) { // OpenJDK for mac will still report "Mac OS X" with version number "10.16", "11.x", "12.x", "13.x", ...
