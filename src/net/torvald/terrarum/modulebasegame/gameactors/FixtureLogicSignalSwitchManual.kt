@@ -144,7 +144,7 @@ class FixtureLogicSignalPressurePlate : Electric {
     )
 
     @Transient open val minMass = 2.0 // different types of switches can have different minimal mass?
-    @Transient open val holdTime = 30 // ticks
+    @Transient open val holdTime = 30 // ingame TIME_T
 
 
     private var triggeredTime: Long? = null // null = off; number: TIME_T that the button was held down

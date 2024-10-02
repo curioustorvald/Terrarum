@@ -120,8 +120,8 @@ open class GameWorld(
      * Single block can have multiple conduits, different types of conduits are stored separately.
      */
     public val wirings = HashedWirings()
-
     private val wiringGraph = HashedWiringGraph()
+
     @Transient private val WIRE_POS_MAP = intArrayOf(1,2,4,8)
     @Transient private val WIRE_ANTIPOS_MAP = intArrayOf(4,8,1,2)
 

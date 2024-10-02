@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.Gdx
 import net.torvald.terrarum.*
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -80,10 +81,18 @@ object BlockBase {
     }
 
     private val wireVectorChars = arrayOf(
-            "· · · ·","· · · →","· · ↓ ·","· · ↓ →","· ← · ·","· ← · →","· ← ↓ ·","· ← ↓ →","↑ · · ·","↑ · · →","↑ · ↓ ·","↑ · ↓ →","↑ ← · ·","↑ ← · →","↑ ← ↓ ·","↑ ← ↓ →",
+        "· · · ·","· · · →","· · ↓ ·","· · ↓ →",
+        "· ← · ·","· ← · →","· ← ↓ ·","· ← ↓ →",
+        "↑ · · ·","↑ · · →","↑ · ↓ ·","↑ · ↓ →",
+        "↑ ← · ·","↑ ← · →","↑ ← ↓ ·","↑ ← ↓ →",
     )
     fun Int.toWireVectorBitsStr(): String = "[${wireVectorChars[this]}]($this)"
-    fun Int.wireNodeMirror() = this.shl(4).or(this).ushr(2).and(15)
+    private val wireMirrorLUT = arrayOf(0,4,8,12,1,5,9,13,2,6,10,14,3,7,11,15)
+//    fun Int.wireNodeMirror() = this.shl(4).or(this).ushr(2).and(15)
+    fun Int.wireNodeMirror() = wireMirrorLUT[this]
+    private val wireExtendLUT = arrayOf(0,5,10,15,5,5,15,15,10,15,10,15,15,15,15,15)
+    fun Int.wireNodeExtend() = wireExtendLUT[this]
+    fun Int.isOrthogonalTo(other: Int) = (this.wireNodeExtend() and other.wireNodeExtend() == 0)
     fun wireNodesConnectedEachOther(oldToNewVector: Int, new: Int?, old: Int?): Boolean {
         return if (new == null || old == null || oldToNewVector == 0) false
         else {
@@ -93,7 +102,7 @@ object BlockBase {
             val q = newToOldVector and new
             if (p == 0 && q == 0) false
             else if (p > 0 && q > 0) true
-            else throw IllegalStateException("oldToNewVector = ${oldToNewVector.toWireVectorBitsStr()}, new = ${new.toWireVectorBitsStr()}, old = ${old.toWireVectorBitsStr()}")
+            else throw IllegalStateException("oldToNewVector = ${oldToNewVector.toWireVectorBitsStr()}, newToOldVector = ${newToOldVector.toWireVectorBitsStr()}; old = ${old.toWireVectorBitsStr()}, new = ${new.toWireVectorBitsStr()}")
         }
     }
 
@@ -103,16 +112,25 @@ object BlockBase {
     private var oldTileX = -1
     private var oldTileY = -1
 
-    private fun placeWirePieceTo(world: GameWorld, item: ItemID, x: Int, y: Int) {
-        world.setTileWire(x, y, item, false, 0)
+    private fun placeWirePieceTo(world: GameWorld, item: ItemID, x: Int, y: Int, cnx: Int = 0) {
+        world.setTileWire(x, y, item, false, cnx)
     }
 
     /**
      * This function assumes xy and oxy are neighboured and tiles are correctly placed
      */
-    private fun setConnectivity(world: GameWorld, vec: Int, item: ItemID, x: Int, y: Int, ox: Int, oy: Int) {
-        world.getWireGraphOf(x, y, item)!!.let { world.setWireGraphOf(x, y, item, vec.wireNodeMirror() or it) }
-        world.getWireGraphOf(ox, oy, item)!!.let { world.setWireGraphOf(ox, oy, item, vec or it) }
+    private fun setConnectivity(mode: String, world: GameWorld, vec: Int, item: ItemID, x: Int, y: Int, ox: Int, oy: Int) {
+        when (mode) {
+            "axle" -> {
+                // vec is guaranteed to be 5 or 10
+                world.setWireGraphOf(x, y, item, vec)
+                world.setWireGraphOf(ox, oy, item, vec)
+            }
+            else -> {
+                world.getWireGraphOf(x, y, item)!!.let { world.setWireGraphOf(x, y, item, vec.wireNodeMirror() or it) }
+                world.getWireGraphOf(ox, oy, item)!!.let { world.setWireGraphOf(ox, oy, item, vec or it) }
+            }
+        }
     }
 
     private fun isNeighbouring(ww: Int, x1: Int, y1: Int, x2: Int, y2: Int): Boolean {
@@ -125,7 +143,7 @@ object BlockBase {
           else false
     }
 
-    fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float) = mouseInInteractableRange(actor) { _, _, mtx, mty ->
+    fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float, wirePlaceMode: String) = mouseInInteractableRange(actor) { mx, my, mtx, mty ->
 
         val itemID = gameItem.originalID
         val ingame = Terrarum.ingame!! as TerrarumIngame
@@ -147,15 +165,34 @@ object BlockBase {
         val thisTileOccupied = thisTileWires.first?.searchFor(itemID) != null
         val oldTileOccupied = oldTileWires.first?.searchFor(itemID) != null
 
-        val oldToNewVector = if (mtx == ww - 1 && oldTileX == 0) 4
+        val oldToNewVector = when (wirePlaceMode) {
+            "axle" -> {
+                // determine new vector by dividing the block cell in X-shape
+                val mxt = mx - mtx * TILE_SIZE
+                val myt = my - mty * TILE_SIZE
+                // f(y)=myt
+                // g(y)=-myt+TILE_SIZE
+                // check if ( f(y) < x < g(y) OR f(y) > x > g(y) )
+                // or, check if mouse is in the hourglass-shaped 🮚 area
+                if ((myt < mxt && mxt < -myt+TILE_SIZE) || (myt > mxt && mxt > -myt+TILE_SIZE))
+                    10
+                else
+                    5
+            }
+            else -> {
+                if (mtx == ww - 1 && oldTileX == 0) 4
                 else if (mtx == 0 && oldTileX == ww - 1) 1
                 else if (mtx - oldTileX == 1) 1
                 else if (mtx - oldTileX == -1) 4
                 else if (mty - oldTileY == 1) 2
                 else if (mty - oldTileY == -1) 8
                 else 0 // if xy == oxy, the vector will be 0
-
-        val connectedEachOther = wireNodesConnectedEachOther(oldToNewVector, thisTileWireCnx, oldTileWireCnx)
+            }
+        }
+        val connectedEachOther = when (wirePlaceMode) {
+            "axle" -> thisTileOccupied && oldTileOccupied
+            else -> wireNodesConnectedEachOther(oldToNewVector, thisTileWireCnx, oldTileWireCnx)
+        }
         val thisTileWasDraggedOn = initialMouseDownTileX != mtx || initialMouseDownTileY != mty
 
         var ret = -1L
@@ -173,7 +210,7 @@ object BlockBase {
         if (!thisTileWasDraggedOn) {
             if (thisTileOccupied) return@mouseInInteractableRange -1
             else {
-                placeWirePieceTo(ingame.world, itemID, mtx, mty)
+                placeWirePieceTo(ingame.world, itemID, mtx, mty, oldToNewVector)
                 ret = 1
             }
         }
@@ -182,12 +219,12 @@ object BlockBase {
                 ret -1
             }
             else if (thisTileOccupied && oldTileOccupied) {
-                setConnectivity(ingame.world, oldToNewVector, itemID, mtx, mty, oldTileX, oldTileY)
+                setConnectivity(wirePlaceMode, ingame.world, oldToNewVector, itemID, mtx, mty, oldTileX, oldTileY)
                 ret = 0
             }
             else {
                 placeWirePieceTo(ingame.world, itemID, mtx, mty)
-                setConnectivity(ingame.world, oldToNewVector, itemID, mtx, mty, oldTileX, oldTileY)
+                setConnectivity(wirePlaceMode, ingame.world, oldToNewVector, itemID, mtx, mty, oldTileX, oldTileY)
                 ret = 1
             }
         }
