@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.Gdx
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
@@ -9,7 +8,6 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -191,7 +189,7 @@ open class FixtureSwingingDoorBase : FixtureBase {
     }
 
     override fun canSpawnHere0(posX: Int, posY: Int): Boolean {
-        val everyBlockboxPos = (posX until posX + blockBox.width).toList().cartesianProduct((posY until posY + blockBox.height).toList())
+        val everyBlockboxPos = getBlockBoxPositions(posX, posY)
 
         val xoffToFrame = (tilewiseHitboxWidth - twClosed) / 2
         val everyDoorframePos = (posX + xoffToFrame until posX + blockBox.width - 1).toList().cartesianProduct((posY until posY + blockBox.height).toList())

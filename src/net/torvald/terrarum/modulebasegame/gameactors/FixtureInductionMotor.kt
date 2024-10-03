@@ -17,9 +17,19 @@ class FixtureInductionMotor : Electric {
     @Transient override val spawnNeedsWall = false
 
     constructor() : super(
-        BlockBox(BlockBox.NO_COLLISION, 1, 1),
+        BlockBox(BlockBox.NO_COLLISION, 3, 1),
         nameFun = { Lang["ITEM_INDUCTION_MOTOR"] }
     )
+
+    override fun placeActorBlocks() {
+        worldBlockPos?.let { (x, y) ->
+            world!!.setTileTerrain(x+1, y, blockBox.collisionType, true)
+        }
+    }
+
+    override fun getBlockBoxPositions(posX: Int, posY: Int): List<Pair<Int, Int>> {
+        return listOf(posX+1 to posY)
+    }
 
     init {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/induction_motor.tga")
@@ -34,11 +44,14 @@ class FixtureInductionMotor : Electric {
         actorValue[AVKey.BASEMASS] = MASS
 
         setWireEmitterAt(0, 0, "axle")
+        setWireEmitterAt(2, 0, "axle")
         setWireEmissionAt(0, 0, Vector2(16.0, 1024.0)) // speed and torque
+        setWireEmissionAt(2, 0, Vector2(16.0, 1024.0)) // speed and torque
     }
 
     override fun updateSignal() {
         setWireEmissionAt(0, 0, Vector2(16.0, 1024.0)) // speed and torque
+        setWireEmissionAt(2, 0, Vector2(16.0, 1024.0)) // speed and torque
     }
 
     override fun dispose() {

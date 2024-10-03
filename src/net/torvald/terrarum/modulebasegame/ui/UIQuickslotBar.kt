@@ -48,7 +48,8 @@ class UIQuickslotBar : UICanvas() {
         const val SLOT_COUNT = 10
         const val DISPLAY_OPACITY = 0.92f
         const val COMMON_OPEN_CLOSE = 0.12f
-        val QUICKSLOT_ITEMCOUNT_TEXTCOL = Color(0xde4185ff.toInt())
+//        val QUICKSLOT_ITEMCOUNT_TEXTCOL = Color(0xdb6f00ff.toInt())
+        val QUICKSLOT_ITEMCOUNT_TEXTCOL = Color(0x0099bbff.toInt())
     }
 
 

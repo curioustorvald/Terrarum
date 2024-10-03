@@ -176,20 +176,12 @@ class FixtureAlloyingFurnace : FixtureBase {
 
     @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 0.0, TILE_SIZED * 2, TILE_SIZED * 2), light))
 
-    @Transient private val actorBlocks = arrayOf(
-        arrayOf(Block.ACTORBLOCK_NO_COLLISION, null),
-        arrayOf(Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION),
-    )
-
-    override fun placeActorBlocks() {
-        forEachBlockbox { x, y, ox, oy ->
-            val tile = actorBlocks[oy][ox]
-            if (tile != null) {
-                world!!.setTileTerrain(x, y, tile, true)
-            }
-        }
+    override fun getBlockBoxPositions(posX: Int, posY: Int): List<Pair<Int, Int>> {
+        return listOf(
+            (posX+0 to posY+0),
+            (posX+0 to posY+1), (posX+1 to posY+1),
+        )
     }
-
 
     private var nextDelayBase = 0.25f // use smokiness value of the item
     private var nextDelay = 0.25f // use smokiness value of the item

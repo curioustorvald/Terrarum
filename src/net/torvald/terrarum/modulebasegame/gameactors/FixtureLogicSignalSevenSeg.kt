@@ -21,20 +21,13 @@ class FixtureLogicSignalSevenSeg : Electric {
         nameFun = { Lang["ITEM_LOGIC_SIGNAL_DISPLAY"] }
     )
 
-
-    @Transient private val actorBlocks = arrayOf(
-        arrayOf(null, Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, null),
-        arrayOf(null, Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, null),
-        arrayOf(null, Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, null),
-        arrayOf(Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION, Block.ACTORBLOCK_NO_COLLISION),
-    )
-    override fun placeActorBlocks() {
-        forEachBlockbox { x, y, ox, oy ->
-            val tile = actorBlocks[oy][ox]
-            if (tile != null) {
-                world!!.setTileTerrain(x, y, tile, true)
-            }
-        }
+    override fun getBlockBoxPositions(posX: Int, posY: Int): List<Pair<Int, Int>> {
+        return listOf(
+                                (posX+1 to posY+0), (posX+2 to posY+0),
+                                (posX+1 to posY+1), (posX+2 to posY+1),
+                                (posX+1 to posY+2), (posX+2 to posY+2),
+            (posX+0 to posY+3), (posX+1 to posY+3), (posX+2 to posY+3), (posX+3 to posY+3)
+        )
     }
 
     init {

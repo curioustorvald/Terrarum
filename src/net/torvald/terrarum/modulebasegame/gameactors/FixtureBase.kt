@@ -6,7 +6,6 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
@@ -129,10 +128,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     open fun forEachBlockbox(action: (Int, Int, Int, Int) -> Unit) {
         // TODO scale-aware
         worldBlockPos?.let { (posX, posY) ->
-            for (y in posY until posY + blockBox.height) {
-                for (x in posX until posX + blockBox.width) {
-                    action(x, y, x - posX, y - posY)
-                }
+            getBlockBoxPositions(posX, posY).forEach { (x, y) ->
+                action(x, y, x - posX, y - posY)
             }
         }
     }
@@ -147,7 +144,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     // something like TapestryObject will want to redefine this
-    open protected fun placeActorBlocks() {
+    protected open fun placeActorBlocks() {
         forEachBlockbox { x, y, _, _ ->
             //printdbg(this, "fillerblock ${blockBox.collisionType} at ($x, $y)")
             if (blockBox.collisionType == BlockBox.ALLOW_MOVE_DOWN) {
@@ -175,8 +172,17 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         return canSpawnHere0(posX, posY)
     }
 
+    /**
+     * @param posX start position of the BlockBox, top-left
+     * @param posY start position of the BlockBox, top-left
+     * @return real block positions, in List of Pair(x, y)
+     */
+    open fun getBlockBoxPositions(posX: Int, posY: Int): List<Pair<Int, Int>> {
+        return (posX until posX + blockBox.width).toList().cartesianProduct((posY until posY + blockBox.height).toList())
+    }
+
     open fun canSpawnHere0(posX: Int, posY: Int): Boolean {
-        val everyBlockboxPos = (posX until posX + blockBox.width).toList().cartesianProduct((posY until posY + blockBox.height).toList())
+        val everyBlockboxPos = getBlockBoxPositions(posX, posY)
 
         // check for existing blocks (and fixtures)
         var cannotSpawn = false
@@ -195,10 +201,9 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
         // check for floors, if spawnNeedsFloor == true
         if (spawnNeedsFloor || spawnNeedsCeiling) {
-            val y = posY + if (spawnNeedsFloor) blockBox.height else -1
-            val xs = posX until posX + blockBox.width
-            cannotSpawnNoFloor = xs.any { x ->
-                world!!.getTileFromTerrain(x, y).let {
+            val yOff = if (spawnNeedsFloor) 1 else -1
+            cannotSpawnNoFloor = everyBlockboxPos.filter { if (spawnNeedsFloor) it.second == posY + blockBox.height - 1 else it.second == posY }.any { (x, y) ->
+                world!!.getTileFromTerrain(x, y + yOff).let {
                     !canSpawnOnThisFloor(it)
                 }
             }
