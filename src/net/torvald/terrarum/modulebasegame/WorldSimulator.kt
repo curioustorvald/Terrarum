@@ -531,7 +531,7 @@ object WorldSimulator {
     }
 
     private fun calculateDecay(signal: Vector2, dist: Int, wire: ItemID, signalType: WireEmissionType): Vector2 {
-        val d = WireCodex.wireDecays[wire]!!
+        val d = WireCodex.wireDecays[wire] ?: 1.0
         return signal * d.pow(dist.toDouble())
     }
 

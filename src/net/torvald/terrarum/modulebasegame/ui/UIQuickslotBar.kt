@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINotControllable
 import kotlin.math.roundToInt
@@ -47,6 +48,7 @@ class UIQuickslotBar : UICanvas() {
         const val SLOT_COUNT = 10
         const val DISPLAY_OPACITY = 0.92f
         const val COMMON_OPEN_CLOSE = 0.12f
+        val QUICKSLOT_ITEMCOUNT_TEXTCOL = Color(0xde4185ff.toInt())
     }
 
 
@@ -98,8 +100,6 @@ class UIQuickslotBar : UICanvas() {
 
     private val drawColor = Color(1f, 1f, 1f, 1f)
 
-    private val itemCntTextCol = Color(0x404040ff)
-
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
 
         (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.let { actor ->
@@ -139,7 +139,7 @@ class UIQuickslotBar : UICanvas() {
                     }
                     else if (item.stackable) {
                         val amountString = qs!!.qty.toItemCountText()
-                        batch.color = Color(0xfff066_ff.toInt())
+                        batch.color = QUICKSLOT_ITEMCOUNT_TEXTCOL
                         val textLen = amountString.length * App.fontSmallNumbers.W
                         val y = slotY + 25 - App.fontSmallNumbers.H
                         val x = slotX - 19 + (38 - textLen) / 2

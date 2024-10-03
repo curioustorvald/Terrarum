@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.UPDATE_RATE
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameitems.ItemID
@@ -11,6 +12,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.WireEmissionType
 import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.cos
+import kotlin.math.roundToLong
 
 /**
  * Created by minjaesong on 2024-03-05.
@@ -57,11 +59,33 @@ class WireActor : ActorWithBody, NoSerialise, InternalActor {
         this.worldY = worldY
         setPosition((worldX + 0.5) * TILE_SIZE, (worldY + 1.0) * TILE_SIZE - 1.0) // what the fuck?
 
-        (sprite as SheetSpriteAnimation).currentRow = 0
         (sprite as SheetSpriteAnimation).currentFrame = cnx
     }
 
+
     override fun updateImpl(delta: Float) {
+        // axles: animate by changing currentRow
+        if (WireCodex.wireProps[wireID]?.accepts == "axle") {
+            val speed = world?.getWireEmitStateOf(worldX, worldY, wireID)?.x ?: 0.0
+            val targetTick = (App.TICK_SPEED / speed).let {
+                it.coerceIn(0.0, Long.MAX_VALUE.toDouble())
+            }.roundToLong()
+
+            val sprite = (sprite as SheetSpriteAnimation)
+            val cnx = sprite.currentFrame
+
+            val phaseShift = if (cnx == 5) (worldY % 2 == 0) else (worldX % 2 == 0)
+
+            if (targetTick > 0) {
+                (INGAME.WORLD_UPDATE_TIMER % (targetTick * 2)).let {
+                    sprite.currentRow =
+                        if (phaseShift)
+                            (it < targetTick).toInt()
+                        else
+                            (it >= targetTick).toInt()
+                }
+            }
+        }
     }
 
     private fun essfun0(x: Double) = -cos(Math.PI * x) / 2.0 + 0.5
@@ -84,6 +108,10 @@ class WireActor : ActorWithBody, NoSerialise, InternalActor {
                 val alpha = Color(1f, 1f, 1f, essfun(strength.coerceIn(0.0, 1.0)).toFloat())
                 (sprite as SheetSpriteAnimation).currentRow = 1
                 drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 0, alpha)
+            }
+            // axles?
+            else if (WireCodex.wireProps[wireID]?.accepts == "axle") {
+                drawSpriteInGoodPosition(frameDelta, sprite!!, batch, 0, Color.WHITE)
             }
             else {
                 (sprite as SheetSpriteAnimation).currentRow = 0

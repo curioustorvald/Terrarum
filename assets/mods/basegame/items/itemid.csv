@@ -57,7 +57,7 @@ id;classname;tags
 56;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBrick;
 57;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalPushbutton;FIXTURE,SIGNAL
 58;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalPressurePlate;FIXTURE,SIGNAL
-
+59;net.torvald.terrarum.modulebasegame.gameitems.ItemInductionMotor;FIXTURE,POWER,KINETIC
 
 
 # ingots

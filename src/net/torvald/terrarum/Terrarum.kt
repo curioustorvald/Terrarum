@@ -1055,3 +1055,4 @@ fun <S, T> List<S>.cartesianProduct(other: List<T>) = this.flatMap { thisIt ->
 
 fun Float.ditherToInt() = (this + Math.random() - 0.5).roundToInt()
 fun Double.ditherToInt() = (this + Math.random() - 0.5).roundToInt()
+fun Double.ditherToLong() = (this + Math.random() - 0.5).roundToLong()

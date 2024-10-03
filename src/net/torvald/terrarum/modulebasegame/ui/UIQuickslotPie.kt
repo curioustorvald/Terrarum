@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OPEN_CLOSE
+import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.QUICKSLOT_ITEMCOUNT_TEXTCOL
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.SLOT_COUNT
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -110,7 +111,7 @@ class UIQuickslotPie : UICanvas() {
                 }
                 else if (item.stackable) {
                     val amountString = qs!!.qty.toItemCountText()
-                    batch.color = Color(0xfff066_ff.toInt())
+                    batch.color = QUICKSLOT_ITEMCOUNT_TEXTCOL
                     val textLen = amountString.length * App.fontSmallNumbers.W
                     val y = slotY + 25 - App.fontSmallNumbers.H
                     val x = slotX - 19 + (38 - textLen) / 2
