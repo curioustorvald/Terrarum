@@ -15,6 +15,7 @@ import net.torvald.terrarum.gameworld.GameWorld.Companion.FLUID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameitems.AxeCore
+import net.torvald.terrarum.modulebasegame.gameitems.BlockBase.wireNodeMirror
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
@@ -573,8 +574,24 @@ object WorldSimulator {
 
         fun getAdjacent(cnx: Int, point: WireGraphCursor): List<WireGraphCursor> {
             val r = ArrayList<WireGraphCursor>()
+
+            // check all four direction if I have connection to that direction
             for (dir in intArrayOf(RIGHT, DOWN, LEFT, UP)) {
-                if (cnx and dir != 0) r.add(point.copy().moveOneCell(dir))
+                // if I have a connection...
+                if (cnx and dir != 0) {
+                    // check if the target cell is connected back to this cell
+                    val nextPoint = point.copy().moveOneCell(dir)
+                    val dirMirrored = dir.wireNodeMirror()
+
+                    world.getWireGraphOf(nextPoint.x, nextPoint.y, wire)?.let { dirOfNextPoint ->
+                        // if the other cell is connected back to this cell...
+                        if (dirOfNextPoint and dirMirrored != 0) {
+                            // add the nextPoint to the return list
+                            r.add(nextPoint)
+                        }
+                    }
+
+                }
             }
             return r
         }
@@ -597,7 +614,6 @@ object WorldSimulator {
 
         while (wireSimPoints.notEmpty()) {
             point = deq()
-            // TODO if we found a power receiver, do something to it
             world.getWireGraphOf(point.x, point.y, wire)?.let { connections ->
                 for (x in getAdjacent(connections, point)) {
                     if (!isMarked(x)) {
