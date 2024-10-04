@@ -15,6 +15,7 @@ import net.torvald.terrarum.gameworld.GameWorld.Companion.FLUID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameitems.AxeCore
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import org.dyn4j.geometry.Vector2
@@ -77,6 +78,9 @@ object WorldSimulator {
     /** Must be called BEFORE the actors update -- actors depend on the R-Tree for various things */
     operator fun invoke(player: ActorHumanoid?, delta: Float) {
 
+        if (ingame.WORLD_UPDATE_TIMER % 600L == 0L) {
+            App.measureDebugTime("WorldSimulator.removeIllegalTiles") { removeIllegalTiles() }
+        }
 
         //printdbg(this, "============================")
 
@@ -100,6 +104,34 @@ object WorldSimulator {
     }
 
 
+
+    fun removeIllegalTiles() {
+        // remove actorblocks that has no fixture association
+        ingame.actorNowPlaying?.let { player ->
+            val absoluteBlockBoxes = ingame.actorContainerActive.filter { it is FixtureBase }
+                .mapNotNull { (it as FixtureBase).getBlockBoxPositionsAbsolute() }.flatten().map {
+                    LandUtil.getBlockAddr(world, it.first, it.second)
+                }
+
+            val RADIUS_W = 32
+            val RADIUS_H = 24
+            val px = player.intTilewiseHitbox.centeredX.toInt()
+            val py = player.intTilewiseHitbox.centeredY.toInt()
+
+            for (y in py - RADIUS_H..py + RADIUS_H) {
+                for (x in px - RADIUS_W..px + RADIUS_W) {
+                    // is this block actorblock?
+                    if (BlockCodex[world.getTileFromTerrain(x, y)].isActorBlock) {
+                        // is this actorblock has no fixture association?
+                        if (!absoluteBlockBoxes.contains(LandUtil.getBlockAddr(world, x, y))) {
+                            // then, kill it
+                            world.setTileTerrain(x, y, Block.AIR, false)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     fun buryGrassImmediately() {
         ingame.terrainChangeQueue.toList().forEach {

@@ -173,12 +173,23 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     /**
+     * Returns BlockBox definition as a list of individual blocks, relative to the given coord.
+     *
      * @param posX start position of the BlockBox, top-left
      * @param posY start position of the BlockBox, top-left
-     * @return real block positions, in List of Pair(x, y)
+     * @return block positions, in List of Pair(x, y)
      */
     open fun getBlockBoxPositions(posX: Int, posY: Int): List<Pair<Int, Int>> {
         return (posX until posX + blockBox.width).toList().cartesianProduct((posY until posY + blockBox.height).toList())
+    }
+
+    /**
+     * Returns BlockBox definition as a list of individual blocks, absolute position in the world.
+     *
+     * @return in-world block positions, in List of Pair(x, y); `null` if the actor is not placed on the world
+     */
+    fun getBlockBoxPositionsAbsolute(): List<Pair<Int, Int>>? = worldBlockPos?.let { (posX, posY) ->
+        return getBlockBoxPositions(posX, posY)
     }
 
     open fun canSpawnHere0(posX: Int, posY: Int): Boolean {
