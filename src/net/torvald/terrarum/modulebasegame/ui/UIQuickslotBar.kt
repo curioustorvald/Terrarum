@@ -49,22 +49,24 @@ class UIQuickslotBar : UICanvas() {
         const val DISPLAY_OPACITY = 0.92f
         const val COMMON_OPEN_CLOSE = 0.12f
 //        val QUICKSLOT_ITEMCOUNT_TEXTCOL = Color(0xdb6f00ff.toInt())
-        val QUICKSLOT_ITEMCOUNT_TEXTCOL = Color(0x0099bbff.toInt())
+//        val QUICKSLOT_ITEMCOUNT_TEXTCOL = Color(0x0099bbff.toInt())
+        val QUICKSLOT_ITEMCOUNT_TEXTCOL = Color(0xce773bff.toInt())
     }
 
 
     override fun updateImpl(delta: Float) {
-        var newSelection = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
+        val ingame = Terrarum.ingame!! as TerrarumIngame
+        var newSelection = ingame.actorNowPlaying?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
 
-        // make clicking work
-        if (mouseUp && mousePushed) {
+        // make clicking work only when no fullscreen UI is open
+        if (mouseUp && mousePushed && ingame.uiContainer.hasNoUIsUnderMouse) {
             for (i in 0 until SLOT_COUNT) {
                 val slotX = cellSize / 2 + (cellSize + gutter) * i - ItemSlotImageFactory.TILE_WIDTH/2
                 val slotY = cellSize / 2 - ItemSlotImageFactory.TILE_WIDTH/2
 
                 if (relativeMouseX in slotX until slotX + cellSize && relativeMouseY in slotY until slotY + cellSize) {
                     newSelection = i
-                    (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, i)
+                    ingame.actorNowPlaying?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, i)
                 }
             }
         }
@@ -142,7 +144,7 @@ class UIQuickslotBar : UICanvas() {
                         val amountString = qs!!.qty.toItemCountText()
                         batch.color = QUICKSLOT_ITEMCOUNT_TEXTCOL
                         val textLen = amountString.length * App.fontSmallNumbers.W
-                        val y = slotY + 25 - App.fontSmallNumbers.H
+                        val y = slotY + 25 - App.fontSmallNumbers.H - 1
                         val x = slotX - 19 + (38 - textLen) / 2
                         App.fontSmallNumbers.draw(batch, amountString, x.toFloat(), y.toFloat())
                     }
@@ -160,7 +162,7 @@ class UIQuickslotBar : UICanvas() {
                     drawColor.set(item?.nameColour ?: Color.WHITE)
                     drawColor.a = nameShowupAlpha
                     batch.color = drawColor
-                    App.fontGame.draw(batch, text, (width - textWidth) / 2, height - 20)
+                    App.fontGame.draw(batch, text, (width - textWidth) / 2, height - 24)
                 }
             }
         }

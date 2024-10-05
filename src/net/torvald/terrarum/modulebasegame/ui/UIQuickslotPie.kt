@@ -113,7 +113,7 @@ class UIQuickslotPie : UICanvas() {
                     val amountString = qs!!.qty.toItemCountText()
                     batch.color = QUICKSLOT_ITEMCOUNT_TEXTCOL
                     val textLen = amountString.length * App.fontSmallNumbers.W
-                    val y = slotY + 25 - App.fontSmallNumbers.H
+                    val y = slotY + 25 - App.fontSmallNumbers.H - 1
                     val x = slotX - 19 + (38 - textLen) / 2
                     App.fontSmallNumbers.draw(batch, amountString, x.toFloat(), y.toFloat())
                 }

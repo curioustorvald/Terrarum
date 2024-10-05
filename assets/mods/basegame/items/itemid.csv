@@ -57,7 +57,6 @@ id;classname;tags
 56;net.torvald.terrarum.modulebasegame.gameitems.ItemClayBrick;
 57;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalPushbutton;FIXTURE,SIGNAL
 58;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalPressurePlate;FIXTURE,SIGNAL
-59;net.torvald.terrarum.modulebasegame.gameitems.ItemInductionMotor;FIXTURE,POWER,KINETIC
 
 
 # ingots
@@ -132,6 +131,9 @@ id;classname;tags
 
 320;net.torvald.terrarum.modulebasegame.gameitems.ItemWorldPortal;FIXTURE,STATION
 
+# industrial
+2048;net.torvald.terrarum.modulebasegame.gameitems.ItemInductionMotor;FIXTURE,POWER,KINETIC
+2049;net.torvald.terrarum.modulebasegame.gameitems.ItemGearbox;FIXTURE,POWER,KINETIC
 
 # data storage (discs; 256)
 # 32768 is a reserved number for a blank disc

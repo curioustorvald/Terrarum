@@ -52,6 +52,8 @@ open class Electric : FixtureBase {
         const val ELECTRIC_THRESHOLD_HIGH = 0.6666666666666666
         const val ELECTRIC_THRESHOLD_LOW = 0.3333333333333333
         const val ELECTRIC_THRESHOLD_EDGE_DELTA = 0.33333333333333337
+
+        const val ELECTRIC_EPSILON_GENERIC = 1.0 / 1024.0
     }
 
     fun getWireEmitterAt(blockBoxIndex: BlockBoxIndex) = this.wireEmitterTypes[blockBoxIndex]
@@ -98,7 +100,6 @@ open class Electric : FixtureBase {
     open fun updateSignal() {}
 
     fun getWireStateAt(offsetX: Int, offsetY: Int, sinkType: WireEmissionType): Vector2 {
-        val index = pointToBlockBoxIndex(offsetX, offsetY)
         val wx = offsetX + intTilewiseHitbox.startX.toInt()
         val wy = offsetY + intTilewiseHitbox.startY.toInt()
 

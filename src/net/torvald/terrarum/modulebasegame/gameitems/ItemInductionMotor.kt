@@ -35,3 +35,32 @@ class ItemInductionMotor(originalID: ItemID) : FixtureItemBase(originalID, "net.
     }
 
 }
+
+/**
+ * Created by minjaesong on 2024-10-05.
+ */
+class ItemGearbox(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureGearbox") {
+
+    override var dynamicID: ItemID = originalID
+    override var baseMass = FixtureInductionMotor.MASS
+    override val canBeDynamic = false
+    override val materialId = ""
+    init {
+        itemImage = getItemImageFromSheet("basegame", "sprites/fixtures/gearbox.tga", TILE_SIZE, TILE_SIZE+1)
+    }
+
+    override var baseToolSize: Double? = baseMass
+    override var originalName = "ITEM_GEARBOX"
+    override var inventoryCategory = Category.FIXTURE
+
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
+        super.effectWhileEquipped(actor, delta)
+        (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "axle"
+    }
+
+    override fun effectOnUnequip(actor: ActorWithBody) {
+        super.effectOnUnequip(actor)
+        (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
+    }
+
+}
