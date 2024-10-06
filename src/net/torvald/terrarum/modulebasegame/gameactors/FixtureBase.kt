@@ -195,6 +195,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     open fun canSpawnHere0(posX: Int, posY: Int): Boolean {
+        val (ox, oy) = spawnCustomGetSpawningOffset()
+        val posX = posX + ox; val posY = posY + oy
         val everyBlockboxPos = getBlockBoxPositions(posX, posY)
 
         // check for existing blocks (and fixtures)
@@ -215,7 +217,12 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         // check for floors, if spawnNeedsFloor == true
         if (spawnNeedsFloor || spawnNeedsCeiling) {
             val yOff = if (spawnNeedsFloor) 1 else -1
-            cannotSpawnNoFloor = everyBlockboxPos.filter { if (spawnNeedsFloor) it.second == posY + blockBox.height - 1 else it.second == posY }.any { (x, y) ->
+            cannotSpawnNoFloor = everyBlockboxPos.filter {
+                if (spawnNeedsFloor)
+                    it.second == posY - oy + blockBox.height - 1
+                else
+                    it.second == posY - oy
+            }.any { (x, y) ->
                 world!!.getTileFromTerrain(x, y + yOff).let {
                     !canSpawnOnThisFloor(it)
                 }
@@ -229,7 +236,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         else if (spawnNeedsWall)
             cannotSpawn = cannotSpawn or cannotSpawnNoWall
 
-        return !cannotSpawn
+        return (!cannotSpawn)
     }
 
     /**
@@ -308,19 +315,28 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         //     posY: bottom of the blockBox
         // using the actor's hitbox
 
-        val (ox, oy) = spawnCustomGetSpawningOffset()
-        val posX0 = posX0 + ox
-        val posY0 = posY0 + oy
+        val posXmouse = posX0
+        val posYmouse = posY0
 
-        val posX = ox + (posX0 - blockBox.width.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
-        val posY = oy + posY0 - blockBox.height + 1
+        // `tl` stands for top-left
+        val posXtl = (posXmouse - blockBox.width.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
+        val posYtl = posYmouse - blockBox.height + 1
 
-        if (!canSpawnHere(posX0, posY0)) {
-            printdbg(this, "cannot spawn fixture1 ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
+        if (!canSpawnHere(posXmouse, posYmouse)) {
+            printdbg(this, "cannot spawn fixture1 ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posXtl,$posYtl) tDim=(${blockBox.width},${blockBox.height})")
+
+//            val (ox, oy) = spawnCustomGetSpawningOffset()
+//            val canSpawnHerePosX = (posXmouse - blockBox.width.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
+//            val canSpawnHerePosY = posYmouse - blockBox.height + 1
+//            val canSpawnHere0PosX = canSpawnHerePosX + ox
+//            val canSpawnHere0PosY = canSpawnHerePosY + oy
+//            val everyBlockboxPos = getBlockBoxPositions(canSpawnHere0PosX, canSpawnHere0PosY)
+//            printdbg(this, "posXYmouse=($posXmouse,$posYmouse), everyBlockboxPos=$everyBlockboxPos, canSpawnHere0PosXY=($canSpawnHere0PosX,$canSpawnHere0PosY)")
+
             printStackTrace(this)
             return false
         }
-        printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
+        printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, xy=($posXtl,$posYtl) tDim=(${blockBox.width},${blockBox.height})")
 
 
         // at this point, worldBlockPos was set by the canSpawnHere() function
@@ -331,14 +347,14 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
         this.isVisible = true
         this.hitbox.setFromWidthHeight(
-                posX * TILE_SIZED,
-                posY * TILE_SIZED,
+                posXtl * TILE_SIZED,
+                posYtl * TILE_SIZED,
                 blockBox.width * TILE_SIZED,
                 blockBox.height * TILE_SIZED
         )
         this.intTilewiseHitbox.setFromWidthHeight(
-            posX.toDouble(),
-            posY.toDouble(),
+            posXtl.toDouble(),
+            posYtl.toDouble(),
             blockBox.width.toDouble(),
             blockBox.height.toDouble()
         )
@@ -349,9 +365,9 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
         actorThatInstalledThisFixture = installersUUID
 
-        makeNoiseAndDust(posX, posY)
+        makeNoiseAndDust(posXtl, posYtl)
 
-        onSpawn(posX0, posY0)
+        onSpawn(posXmouse, posYmouse)
 
         return true
     }
