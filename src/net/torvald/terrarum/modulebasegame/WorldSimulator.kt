@@ -630,7 +630,7 @@ object WorldSimulator {
                     INGAME.getActorsAt(point.x * TILE_SIZED, point.y * TILE_SIZED).filterIsInstance<Electric>().firstOrNull().let { found ->
                         if (found != null) {
                             // get offset from the fixture's origin
-                            tileOffsetFromFixture = found.intTilewiseHitbox.let { Point2i(it.startX.toInt(), it.startY.toInt()) } - tilePoint
+                            tileOffsetFromFixture = found.worldBlockPos!! - tilePoint
 
 //                            println("$tilePoint; ${found.javaClass.canonicalName}, $tileOffsetFromFixture, ${found.getWireSinkAt(tileOffsetFromFixture!!)}")
 

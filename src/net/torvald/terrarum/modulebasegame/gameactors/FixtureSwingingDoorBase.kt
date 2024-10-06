@@ -143,7 +143,7 @@ open class FixtureSwingingDoorBase : FixtureBase {
         reload()
     }
 
-    override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawn(posX, posY, installersUUID, tilewiseHitboxWidth, tilewiseHitboxHeight)
+    override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawnUsingCustomBoxSize(posX, posY, installersUUID, tilewiseHitboxWidth, tilewiseHitboxHeight)
 
     override fun makeNoiseAndDust(posX: Int, posY: Int) {
         val posYb = posY + blockBox.height - 1

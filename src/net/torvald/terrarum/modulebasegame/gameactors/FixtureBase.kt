@@ -183,6 +183,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         return (posX until posX + blockBox.width).toList().cartesianProduct((posY until posY + blockBox.height).toList())
     }
 
+    open fun spawnCustomGetSpawningOffset() = 0 to 0
+
     /**
      * Returns BlockBox definition as a list of individual blocks, absolute position in the world.
      *
@@ -306,8 +308,12 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         //     posY: bottom of the blockBox
         // using the actor's hitbox
 
-        val posX = (posX0 - blockBox.width.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
-        val posY = posY0 - blockBox.height + 1
+        val (ox, oy) = spawnCustomGetSpawningOffset()
+        val posX0 = posX0 + ox
+        val posY0 = posY0 + oy
+
+        val posX = ox + (posX0 - blockBox.width.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
+        val posY = oy + posY0 - blockBox.height + 1
 
         if (!canSpawnHere(posX0, posY0)) {
             printdbg(this, "cannot spawn fixture1 ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
@@ -317,9 +323,11 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
 
 
+        // at this point, worldBlockPos was set by the canSpawnHere() function
+
+
         // fill the area with the filler blocks
         placeActorBlocks()
-
 
         this.isVisible = true
         this.hitbox.setFromWidthHeight(
@@ -358,7 +366,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      * @param thbh tile-wise Hitbox height
      * @return true if successfully spawned, false if was not (e.g. space to spawn is occupied by something else)
      */
-    open fun spawn(posX0: Int, posY0: Int, installersUUID: UUID?, thbw: Int, thbh: Int): Boolean {
+    open fun spawnUsingCustomBoxSize(posX0: Int, posY0: Int, installersUUID: UUID?, thbw: Int, thbh: Int): Boolean {
         val posX = (posX0 - thbw.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
         val posY = posY0 - thbh + 1
 
@@ -453,6 +461,9 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      * This function MUST BE super-called for make despawn call to work at all.
      */
     override fun updateImpl(delta: Float) {
+        actorValue.set(AVKey.SCALE, 1.0)
+        actorValue.set(AVKey.SCALEBUFF, 1.0)
+        ////////////////////////////////////////////////////////////
         super.updateImpl(delta)
         chunkAnchoring = inOperation
 

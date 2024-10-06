@@ -1,11 +1,14 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.App
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInductionMotor.Companion.MASS
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
@@ -68,7 +71,7 @@ class FixtureInductionMotor : Electric {
 /**
  * Created by minjaesong on 2024-10-05.
  */
-class FixtureGearbox : Electric {
+class FixtureGearbox : Electric, Reorientable {
 
     @Transient override val spawnNeedsFloor = true
     @Transient override val spawnNeedsWall = false
@@ -82,95 +85,104 @@ class FixtureGearbox : Electric {
         return listOf(posX+1 to posY+1)
     }
 
+    override fun spawnCustomGetSpawningOffset() = 0 to 1
+
+    override fun orientClockwise() {
+        orientation = 1 - orientation
+        reorient(); setEmitterAndSink(); updateSignal()
+    }
+
+    override fun orientAnticlockwise() {
+        orientation = 1 - orientation
+        reorient(); setEmitterAndSink(); updateSignal()
+    }
+
+    override var orientation = 0 // 0 or 1
+
+    private fun reorient() {
+        (sprite as SheetSpriteAnimation).currentRow = orientation
+    }
+
+    private fun setEmitterAndSink() {
+        clearStatus()
+        when (orientation) {
+            0 -> {
+                posVecsIn.forEach { (x, y) ->
+                    setWireSinkAt(x, y, "axle")
+                }
+                posVecsOut.forEach { (x, y) ->
+                    setWireEmitterAt(x, y, "axle")
+                }
+            }
+            1 -> {
+                posVecsIn.forEach { (x, y) ->
+                    setWireEmitterAt(x, y, "axle")
+                }
+                posVecsOut.forEach { (x, y) ->
+                    setWireSinkAt(x, y, "axle")
+                }
+            }
+        }
+    }
+
     init {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/gearbox.tga")
 
         density = 7874.0
-        setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, TILE_SIZE)
+        setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 0)
 
         makeNewSprite(TextureRegionPack(itemImage.texture, TILE_SIZE, TILE_SIZE+1)).let {
-            it.setRowsAndFrames(1,1)
+            it.setRowsAndFrames(2,1)
         }
 
         actorValue[AVKey.BASEMASS] = MASS
 
-        posVecs.forEach { (x, y) ->
-            setWireEmitterAt(x, y, "axle")
-            setWireSinkAt(x, y, "axle")
-        }
+        setEmitterAndSink()
     }
 
+
     override fun updateImpl(delta: Float) {
-        super.updateImpl(delta)
-
-        // animate the sprite
-        val worldX = intTilewiseHitbox.startX.toInt()
-        val worldY = intTilewiseHitbox.startY.toInt()
-
-        val targetTick = (App.TICK_SPEED / speedMax).let {
-            it.coerceIn(0.0, Long.MAX_VALUE.toDouble())
-        }.roundToLong()
-
-        val sprite = (sprite as SheetSpriteAnimation)
-
-        val phaseShift = if (worldY % 2 == 0)
-            (worldX % 2 == 1)
-        else
-            (worldX % 2 == 0)
-
-
-        if (targetTick > 0) {
-            (INGAME.WORLD_UPDATE_TIMER % (targetTick * 2)).let {
-                sprite.currentFrame =
-                    if (phaseShift)
-                        (it < targetTick).toInt()
-                    else
-                        (it >= targetTick).toInt()
-            }
+        // re-position the hitbox because wtf
+        worldBlockPos?.let { (x, y) ->
+            val x = (x+1) * TILE_SIZED; val y = (y+1) * TILE_SIZED
+            hitbox.setFromTwoPoints(x, y, x + TILE_SIZED, y + TILE_SIZED)
         }
+
+        super.updateImpl(delta)
     }
 
     @Transient private var speedMax = 0.0
 
-    private var maxSpeedLoc = ArrayList<Point2i>()
-    private var minTorqueLoc = ArrayList<Point2i>()
-
-    @Transient private val newMaxSpeedLoc = ArrayList<Point2i>()
-    @Transient private val newMinTorqueLoc = ArrayList<Point2i>()
-
     override fun updateSignal() {
+        val a = when (orientation) {
+            0 -> posVecsIn
+            1 -> posVecsOut
+            else -> throw InternalError()
+        }
+        val b = when (orientation) {
+            0 -> posVecsOut
+            1 -> posVecsIn
+            else -> throw InternalError()
+        }
+
+
         var torqueMin = Double.POSITIVE_INFINITY
-        newMaxSpeedLoc.clear()
-        newMinTorqueLoc.clear()
 
         speedMax = 0.0
-        posVecs.forEach {
+        a.forEach {
             val vec = getWireStateAt(it.x, it.y, "axle")
-            if (!maxSpeedLoc.contains(it) && vec.x >= speedMax) {
-                newMaxSpeedLoc.add(Point2i(it.x, it.y))
+            if (vec.x.absoluteValue >= ELECTRIC_EPSILON_GENERIC && vec.x >= speedMax) {
                 speedMax = vec.x
             }
-            if (!minTorqueLoc.contains(it) && vec.y.absoluteValue >= ELECTRIC_EPSILON_GENERIC && vec.y <= torqueMin) {
-                newMinTorqueLoc.add(Point2i(it.x, it.y))
+            if (vec.y.absoluteValue >= ELECTRIC_EPSILON_GENERIC && vec.y <= torqueMin) {
                 torqueMin = if (vec.y == Double.POSITIVE_INFINITY) 0.0 else vec.y
             }
-
-            // FIXME: intTilewiseHitbox discrepancy with spawn position.
-            val wx = it.x + intTilewiseHitbox.startX.toInt()
-            val wy = it.y + intTilewiseHitbox.startY.toInt()
-            print("$wx,$wy\t")
-
-            if (maxSpeedLoc.contains(it))
-                println("$it*\t$vec")
-            else
-                println("$it\t$vec")
         }
-        println("--------")
 
-        maxSpeedLoc.clear(); maxSpeedLoc.addAll(newMaxSpeedLoc)
-        minTorqueLoc.clear(); minTorqueLoc.addAll(newMinTorqueLoc)
+        if (torqueMin == Double.POSITIVE_INFINITY) torqueMin = 0.0
 
-        posVecs.forEach { (x, y) ->
+
+        b.forEach { (x, y) ->
             setWireEmissionAt(x, y, Vector2(speedMax, torqueMin))
         }
     }
@@ -180,10 +192,17 @@ class FixtureGearbox : Electric {
     }
 
     companion object {
-        @Transient val posVecs = listOf(
-            Point2i(1, 0),
+        @Transient val posVecsIn = listOf(
+//            Point2i(1, 0),
             Point2i(0, 1),
             Point2i(2, 1),
+//            Point2i(1, 2),
+        )
+
+        @Transient val posVecsOut = listOf(
+            Point2i(1, 0),
+//            Point2i(0, 1),
+//            Point2i(2, 1),
             Point2i(1, 2),
         )
     }

@@ -100,8 +100,8 @@ open class Electric : FixtureBase {
     open fun updateSignal() {}
 
     fun getWireStateAt(offsetX: Int, offsetY: Int, sinkType: WireEmissionType): Vector2 {
-        val wx = offsetX + intTilewiseHitbox.startX.toInt()
-        val wy = offsetY + intTilewiseHitbox.startY.toInt()
+        val wx = offsetX + worldBlockPos!!.x
+        val wy = offsetY + worldBlockPos!!.y
 
         return WireCodex.getAllWiresThatAccepts(sinkType).fold(Vector2()) { acc, (id, _) ->
             INGAME.world.getWireEmitStateOf(wx, wy, id).let {
@@ -141,8 +141,8 @@ open class Electric : FixtureBase {
 
     open fun updateOnWireGraphTraversal(offsetX: Int, offsetY: Int, sinkType: WireEmissionType) {
         val index = pointToBlockBoxIndex(offsetX, offsetY)
-        val wx = offsetX + intTilewiseHitbox.startX.toInt()
-        val wy = offsetY + intTilewiseHitbox.startY.toInt()
+        val wx = offsetX + worldBlockPos!!.x
+        val wy = offsetY + worldBlockPos!!.y
 
         val new2 = WireCodex.getAllWiresThatAccepts(wireSinkTypes[index] ?: "").fold(Vector2()) { acc, (id, _) ->
             INGAME.world.getWireEmitStateOf(wx, wy, id).let {
@@ -168,8 +168,8 @@ open class Electric : FixtureBase {
                 // get indices of "rising edges"
                 // get indices of "falling edges"
 
-                val wx = x + intTilewiseHitbox.startX.toInt()
-                val wy = y + intTilewiseHitbox.startY.toInt()
+                val wx = x + worldBlockPos!!.x
+                val wy = y + worldBlockPos!!.y
                 val new = WireCodex.getAllWiresThatAccepts(getWireSinkAt(x, y) ?: "").fold(Vector2()) { acc, (id, _) ->
                     INGAME.world.getWireEmitStateOf(wx, wy, id).let {
                         Vector2(acc.x + (it?.x ?: 0.0), acc.y + (it?.y ?: 0.0))

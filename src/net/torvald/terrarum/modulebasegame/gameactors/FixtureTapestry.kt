@@ -50,7 +50,7 @@ internal class FixtureTapestry : FixtureBase {
         reload()
     }
 
-    override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawn(posX, posY, installersUUID, tilewiseHitboxWidth, tilewiseHitboxHeight)
+    override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawnUsingCustomBoxSize(posX, posY, installersUUID, tilewiseHitboxWidth, tilewiseHitboxHeight)
 
     override fun reload() {
         super.reload()
@@ -111,7 +111,7 @@ internal class FixtureTapestry : FixtureBase {
 
 
         // must be re-spawned on reload to make it visible after load
-        spawn(
+        spawnUsingCustomBoxSize(
             intTilewiseHitbox.canonicalX.toInt(),
             intTilewiseHitbox.canonicalY.toInt(),
             actorThatInstalledThisFixture,

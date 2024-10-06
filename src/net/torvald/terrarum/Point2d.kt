@@ -119,6 +119,10 @@ class Point2i() {
     }
 
     override fun hashCode(): Int = XXHash32.hashGeoCoord(x, y)
+    override fun equals(other: Any?) = if (other is Point2i)
+        this.x == other.x && this.y == other.y
+    else
+        false
 
     override fun toString() = "Point2i($x, $y)"
 

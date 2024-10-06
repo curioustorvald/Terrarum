@@ -18,7 +18,6 @@ import net.torvald.terrarum.itemproperties.Item
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.ItemTextSignCopper
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
-import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.TIMES
 import org.dyn4j.geometry.Vector2
@@ -71,7 +70,7 @@ class FixtureTextSignCopper : Electric {
         return item.dynamicID
     }
 
-    override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawn(posX, posY, installersUUID, panelCount.coerceAtLeast(2), 2)
+    override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawnUsingCustomBoxSize(posX, posY, installersUUID, panelCount.coerceAtLeast(2), 2)
 
     override fun reload() {
         super.reload()
@@ -86,7 +85,7 @@ class FixtureTextSignCopper : Electric {
         }
 
         // must be re-spawned on reload to make it visible after load
-        spawn(
+        spawnUsingCustomBoxSize(
             intTilewiseHitbox.canonicalX.toInt(),
             intTilewiseHitbox.canonicalY.toInt(),
             actorThatInstalledThisFixture,
