@@ -69,7 +69,7 @@ class BlockLayerOresI16I8 (override val width: Int, override val height: Int) : 
         val msb = ptr[offset + 1]
         val placement = ptr[offset + 2]
 
-        return lsb.toUint() + msb.toUint().shl(8) to placement.toUint()
+        return lsb.toUint() or msb.toUint().shl(8) to placement.toUint()
     }
 
     override fun unsafeToBytes(x: Int, y: Int): ByteArray {

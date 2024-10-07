@@ -64,7 +64,7 @@ open class BlockLayerI16(override val width: Int, override val height: Int) : Bl
         val lsb = ptr[offset]
         val msb = ptr[offset + 1]
 
-        return lsb.toUint() + msb.toUint().shl(8)
+        return lsb.toUint() or msb.toUint().shl(8)
     }
 
     override fun unsafeToBytes(x: Int, y: Int): ByteArray {

@@ -1,14 +1,35 @@
 package net.torvald.terrarum.gameworld
 
+import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.Point2i
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClusteredFormatDOM
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.Clustfile
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.unsafe.UnsafePtr
+import net.torvald.util.Float16
 import java.util.TreeMap
+
+/**
+ * Created by minjaesong on 2024-10-07.
+ */
+data class ChunkAllocation(
+    val chunkNumber: Int,
+    var classifier: ChunkAllocClass,
+    var lastAccessTime: Long = System.nanoTime()
+)
+
+/**
+ * Created by minjaesong on 2024-10-07.
+ */
+enum class ChunkAllocClass {
+    PERSISTENT, TEMPORARY
+}
 
 /**
  * Single layer gets single Chunk Pool.
@@ -17,20 +38,21 @@ import java.util.TreeMap
  */
 open class ChunkPool(
     val DOM: ClusteredFormatDOM,
-    val wordSizeInBytes: Int,
+    val wordSizeInBytes: Long,
+    val world: GameWorld,
     val chunkNumToFileNum: (Int) -> String,
     val renumberFun: (Int) -> Int,
 ) {
     private val pointers = TreeMap<Int, Long>()
     private var allocCap = 32
-    private var allocMap = ArrayList<Int>(allocCap)
+    private var allocMap = Array<ChunkAllocation?>(allocCap) { null }
     private var allocCounter = 0
 
-    private val chunkSize = (wordSizeInBytes.toLong() * CHUNK_W * CHUNK_H)
+    private val chunkSize = (wordSizeInBytes * CHUNK_W * CHUNK_H)
     private val pool = UnsafeHelper.allocate(chunkSize * allocCap)
 
     init {
-        allocMap.fill(-1)
+        allocMap.fill(null)
     }
 
     private fun createPointerViewOfChunk(chunkNumber: Int): UnsafePtr {
@@ -40,20 +62,72 @@ open class ChunkPool(
 
     private fun createPointerViewOfChunk(chunkNumber: Int, offsetX: Int, offsetY: Int): Pair<UnsafePtr, Long> {
         val baseAddr = pointers[chunkNumber]!!
-        return UnsafePtr(baseAddr, chunkSize) to wordSizeInBytes.toLong() * (offsetY * CHUNK_W + offsetX)
+        return UnsafePtr(baseAddr, chunkSize) to wordSizeInBytes * (offsetY * CHUNK_W + offsetX)
     }
 
-    private fun allocate(chunkNumber: Int): UnsafePtr {
-        // expand the pool if needed
-        if (allocCounter >= allocCap) {
-            allocCap *= 2
-            allocMap.ensureCapacity(allocCap)
-            pool.realloc(chunkSize * allocCap)
+    /**
+     * If the chunk number == playerChunkNum, the result will be `false`
+     */
+    private fun Int.isChunkNearPlayer(playerChunkNum: Int): Boolean {
+        if (this == playerChunkNum) return false
+
+        val pxy = LandUtil.chunkNumToChunkXY(world, playerChunkNum)
+        val validChunknums = chunkOffsetsNearPlayer.map { (it + pxy).also {
+            it.x = it.x fmod (world.width / CHUNK_W) // wrap around X as per ROUNDWORLD
+        } }.filter { it.y in 0 until (world.height / CHUNK_H) }.map { // filter values that is outside of world's Y-range
+            LandUtil.chunkXYtoChunkNum(world, it.x, it.y) // convert back to chunk numbers
+        }
+        return validChunknums.contains(this)
+    }
+
+    /**
+     * Tries to make a spot for one (1) new chunk.
+     *
+     * Procedure:
+     * 1. Check if there are at least one out-of-reach and `TEMPORARY` chunk.
+     * 2. If Check #1 passes, that chunk will be unloaded — end.
+     * 3. Otherwise, the pool will be extended.
+     */
+    private fun updateAllocMapUsingIngamePlayer() {
+        val playerChunkNum = INGAME.actorNowPlaying?.intTilewiseHitbox?.let {
+            val cx = (it.canonicalX.toInt() fmod world.width) / CHUNK_W
+            val cy = (it.canonicalY.toInt() / CHUNK_H).coerceIn(0 until world.height / CHUNK_H)
+            LandUtil.chunkXYtoChunkNum(world, cx, cy)
         }
 
-        // find the empty spot
-        val idx = allocMap.indexOfFirst { it == -1 }
+        if (playerChunkNum != null) {
+            // get list of chunks that passes Check #1
+            val remCandidate: List<ChunkAllocation> = allocMap.filterNotNull().filter {
+                it.chunkNumber.isChunkNearPlayer(playerChunkNum) &&
+                it.classifier == ChunkAllocClass.TEMPORARY
+            }
+
+            if (remCandidate.isNotEmpty()) {
+                // try to deallocate the oldest allocation (having the smallest lastAccessTime)
+                if (deallocate(remCandidate.minByOrNull { it.lastAccessTime }!!))
+                    return // exit the function ONLY IF the deallocation was successful
+            }
+            // if there is no candidate, proceed to the next line
+        }
+
+        // expand the pool and allocMap if needed
+        while (allocCounter >= allocCap) {
+            allocCap *= 2
+            val newAllocMap = Array<ChunkAllocation?>(allocCap) { null }
+            System.arraycopy(allocMap, 0, newAllocMap, 0, allocMap.size)
+            allocMap = newAllocMap
+            pool.realloc(chunkSize * allocCap)
+        }
+    }
+
+    private fun allocate(chunkNumber: Int, allocClass: ChunkAllocClass = ChunkAllocClass.TEMPORARY): UnsafePtr {
+        updateAllocMapUsingIngamePlayer()
+
+        // find the empty spot within the pool
+        val idx = allocMap.indexOfFirst { it == null }
         val ptr = pool.ptr + idx * chunkSize
+
+        allocMap[idx] = ChunkAllocation(chunkNumber, allocClass)
 
         allocCounter += 1
 
@@ -61,21 +135,30 @@ open class ChunkPool(
         return UnsafePtr(ptr, chunkSize)
     }
 
-    private fun deallocate(chunkNumber: Int) {
-        val ptr = pointers[chunkNumber] ?: return
+    private fun deallocate(allocation: ChunkAllocation) = deallocate(allocation.chunkNumber)
+
+    private fun deallocate(chunkNumber: Int): Boolean {
+        val ptr = pointers[chunkNumber] ?: return false
+
         storeToDisk(chunkNumber)
         pointers.remove(chunkNumber)
-        allocMap[chunkNumber] = -1
-        allocCounter -= 1
+        UnsafeHelper.unsafe.freeMemory(ptr)
+
+        allocMap.indexOfFirst { it?.chunkNumber == chunkNumber }.let {
+            allocMap[it] = null
+            allocCounter -= 1
+        }
+
+        return true
     }
 
     private fun renumber(ptr: UnsafePtr) {
-        for (i in 0 until ptr.size step wordSizeInBytes.toLong()) {
-            val numIn = (0 until wordSizeInBytes).fold(0) { acc, off ->
+        for (i in 0 until ptr.size step wordSizeInBytes) {
+            val numIn = (0 until wordSizeInBytes.toInt()).fold(0) { acc, off ->
                 acc or (ptr[i + off].toUint().shl(8 * off))
             }
             val numOut = renumberFun(numIn)
-            (0 until wordSizeInBytes).forEach { off ->
+            (0 until wordSizeInBytes.toInt()).forEach { off ->
                 ptr[i + off] = numOut.ushr(8 * off).toByte()
             }
         }
@@ -102,16 +185,75 @@ open class ChunkPool(
         }
     }
 
+    /**
+     * Given the word-aligned byte sequence of `[B0, B1, B2, B3, ...]`,
+     * Return format:
+     * - word size is 4: Int `B3_B2_B1_B0`
+     * - word size is 3: Int `00_B2_B1_B0`
+     * - word size is 2: Int `00_00_B1_B0`
+     */
     fun getTileRaw(chunkNumber: Int, offX: Int, offY: Int): Int {
         checkForChunk(chunkNumber)
+        allocMap.find { it?.chunkNumber == chunkNumber }!!.let { it.lastAccessTime = System.nanoTime() }
         val (ptr, ptrOff) = createPointerViewOfChunk(chunkNumber, offX, offY)
-        val numIn = (0 until wordSizeInBytes).fold(0) { acc, off ->
+        val numIn = (0 until wordSizeInBytes.toInt()).fold(0) { acc, off ->
             acc or (ptr[ptrOff].toUint().shl(8 * off))
         }
         return numIn
     }
 
+    /**
+     * Given the word-aligned byte sequence of `[B0, B1, B2, B3, ...]`,
+     * Return format:
+     * - First element: Int `00_00_B1_B0`
+     * - Second element: Float16(`B3_B2`).toFloat32
+     */
+    fun getTileI16F16(chunkNumber: Int, offX: Int, offY: Int): Pair<Int, Float> {
+        val raw = getTileRaw(chunkNumber, offX, offY)
+        val ibits = raw.get1SS()
+        val fbits = raw.get2SS().toShort()
+        return ibits to Float16.toFloat(fbits)
+    }
+
+    /**
+     * Given the word-aligned byte sequence of `[B0, B1, B2, B3, ...]`,
+     * Return format:
+     * - Int `00_00_B1_B0`
+     */
+    fun getTileI16(chunkNumber: Int, offX: Int, offY: Int): Int {
+        val raw = getTileRaw(chunkNumber, offX, offY)
+        val ibits = raw.get1SS()
+        return ibits
+    }
+
+    /**
+     * Given the word-aligned byte sequence of `[B0, B1, B2, B3, ...]`,
+     * Return format:
+     * - First element: Int `00_00_B1_B0`
+     * - Second element: Int `00_00_00_B2`
+     */
+    fun getTileI16I8(chunkNumber: Int, offX: Int, offY: Int): Pair<Int, Int> {
+        val raw = getTileRaw(chunkNumber, offX, offY)
+        val ibits = raw.get1SS()
+        val jbits = raw.get2SS() and 255
+        return ibits to jbits
+    }
+
     companion object {
+        private fun Int.get1SS() = this and 65535
+        private fun Int.get2SS() = (this ushr 16) and 65535
+
+
+        private fun Int.getMSB() = (this ushr 24) and 255
+        private fun Int.get2MSB() = (this ushr 16) and 255
+        private fun Int.get3MSB() = (this ushr 8) and 255
+        private fun Int.get4MSB() = this and 255
+
+        private fun Int.get4LSB() = this.getMSB()
+        private fun Int.get3LSB() = this.get2MSB()
+        private fun Int.get2LSB() = this.get3MSB()
+        private fun Int.getLSB() = this.get4MSB()
+
         fun getRenameFunTerrain(world: GameWorld): (Int) -> Int {
             // word size: 2
             return { oldTileNum ->
@@ -142,5 +284,13 @@ open class ChunkPool(
                 world.tileNameToNumberMap[oldFluidName]!! or oldFluidFill
             }
         }
+
+        private val chunkOffsetsNearPlayer = listOf(
+            Point2i(-1,-2), Point2i(0,-2),Point2i(1,-2),
+            Point2i(-2,-1),Point2i(-1,-1),Point2i(0,-1),Point2i(1,-1),Point2i(2,-1),
+            Point2i(-2,0),Point2i(-1,0),Point2i(1,0),Point2i(2,0),
+            Point2i(-2,1),Point2i(-1,1),Point2i(0,1),Point2i(1,1),Point2i(2,1),
+            Point2i(-1,2),Point2i(0,2),Point2i(1,2)
+        )
     }
 }

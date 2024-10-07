@@ -62,10 +62,8 @@ class BlockLayerI16F16(override val width: Int, override val height: Int) : Bloc
         val offset = getOffset(x, y)
         val lsb = ptr[offset]
         val msb = ptr[offset + 1]
-        val hbits = (ptr[offset + 2].toUint() or ptr[offset + 3].toUint().shl(8)).toShort()
-        val fill = Float16.toFloat(hbits)
 
-        return lsb.toUint() + msb.toUint().shl(8)
+        return lsb.toUint() or msb.toUint().shl(8)
     }
 
     internal fun unsafeGetTile1(x: Int, y: Int): Pair<Int, Float> {
@@ -75,7 +73,7 @@ class BlockLayerI16F16(override val width: Int, override val height: Int) : Bloc
         val hbits = (ptr[offset + 2].toUint() or ptr[offset + 3].toUint().shl(8)).toShort()
         val fill = Float16.toFloat(hbits)
 
-        return lsb.toUint() + msb.toUint().shl(8) to fill
+        return lsb.toUint() or msb.toUint().shl(8) to fill
     }
 
     override fun unsafeToBytes(x: Int, y: Int): ByteArray {
