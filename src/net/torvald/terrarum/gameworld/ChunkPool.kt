@@ -1,13 +1,16 @@
 package net.torvald.terrarum.gameworld
 
+import net.torvald.terrarum.App
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Point2i
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClusteredFormatDOM
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.Clustfile
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
+import net.torvald.terrarum.savegame.DiskEntry
+import net.torvald.terrarum.savegame.DiskSkimmer
+import net.torvald.terrarum.savegame.EntryFile
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
@@ -37,7 +40,8 @@ enum class ChunkAllocClass {
  * Created by minjaesong on 2024-09-07.
  */
 open class ChunkPool(
-    val DOM: ClusteredFormatDOM,
+    // `DiskSkimmer` or `ClusteredFormatDOM`
+    val disk: Any,
     val wordSizeInBytes: Long,
     val world: GameWorld,
     val chunkNumToFileNum: (Int) -> String,
@@ -165,18 +169,47 @@ open class ChunkPool(
     }
 
     private fun fetchFromDisk(chunkNumber: Int) {
-        // read data from the disk
         val fileName = chunkNumToFileNum(chunkNumber)
-        Clustfile(DOM, fileName).let {
-            val bytes = Common.unzip(it.readBytes())
-            val ptr = allocate(chunkNumber)
-            UnsafeHelper.memcpyFromArrToPtr(bytes, 0, ptr.ptr, bytes.size)
-            renumber(ptr)
+
+        // read data from the disk
+        if (disk is ClusteredFormatDOM) {
+            Clustfile(disk, fileName).let {
+                val bytes = Common.unzip(it.readBytes())
+                val ptr = allocate(chunkNumber)
+                UnsafeHelper.memcpyFromArrToPtr(bytes, 0, ptr.ptr, bytes.size)
+                renumber(ptr)
+            }
+        }
+        else if (disk is DiskSkimmer) {
+            val fileID = fileName.toLong()
+            disk.getFile(fileID)!!.let {
+                val bytes = Common.unzip(it.bytes)
+                val ptr = allocate(chunkNumber)
+                UnsafeHelper.memcpyFromArrToPtr(bytes, 0, ptr.ptr, bytes.size)
+                renumber(ptr)
+            }
         }
     }
 
     private fun storeToDisk(chunkNumber: Int) {
-        TODO()
+        val fileName = chunkNumToFileNum(chunkNumber)
+
+        // write to the disk (the disk must be an autosaving copy of the original)
+        if (disk is ClusteredFormatDOM) {
+            Clustfile(disk, fileName).let {
+                val bytes = Common.zip(serialise(chunkNumber).iterator())
+                it.overwrite(bytes.toByteArray())
+            }
+        }
+        // append the new entry
+        else if (disk is DiskSkimmer) {
+            val fileID = fileName.toLong()
+
+            val bytes = Common.zip(serialise(chunkNumber).iterator())
+            val oldEntry = disk.getEntry(fileID)
+            val timeNow = App.getTIME_T()
+            disk.appendEntry(DiskEntry(fileID, 0L, oldEntry?.creationDate ?: timeNow, timeNow, EntryFile(bytes)))
+        }
     }
 
     private fun checkForChunk(chunkNumber: Int) {
@@ -184,6 +217,14 @@ open class ChunkPool(
             fetchFromDisk(chunkNumber)
         }
     }
+
+    private fun serialise(chunkNumber: Int): ByteArray {
+        val ptr = pointers[chunkNumber]!!
+        val out = ByteArray(chunkSize.toInt())
+        UnsafeHelper.memcpyFromPtrToArr(ptr, out, 0, chunkSize)
+        return out
+    }
+
 
     /**
      * Given the word-aligned byte sequence of `[B0, B1, B2, B3, ...]`,

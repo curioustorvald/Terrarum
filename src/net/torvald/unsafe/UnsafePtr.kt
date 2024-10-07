@@ -50,6 +50,10 @@ internal object UnsafeHelper {
         unsafe.copyMemory(srcObj, getArrayOffset(srcObj) + startIndex, null, destPos, len.toLong())
     fun memcpyFromArrToPtr(srcObj: Any, startIndex: Int, destPos: Long, len: Long) =
         unsafe.copyMemory(srcObj, getArrayOffset(srcObj) + startIndex, null, destPos, len)
+    fun memcpyFromPtrToArr(srcPos: Long, destObj: Any, startIndex: Int, len: Int) =
+        unsafe.copyMemory(null, srcPos, destObj, getArrayOffset(destObj) + startIndex, len.toLong())
+    fun memcpyFromPtrToArr(srcPos: Long, destObj: Any, startIndex: Int, len: Long) =
+        unsafe.copyMemory(null, srcPos, destObj, getArrayOffset(destObj) + startIndex, len)
 
     /**
      * The array object in JVM is stored in this memory map:

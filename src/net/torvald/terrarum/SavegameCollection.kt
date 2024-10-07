@@ -29,7 +29,7 @@ import kotlin.math.roundToInt
 class SavegameCollection(files0: List<DiskSkimmer>) {
 
     /** Sorted in reverse by the last modified time of the files, index zero being the most recent */
-    val files = files0.sortedBy { it.diskFile.name }.sortedByDescending {
+    val files: List<DiskSkimmer> = files0.sortedBy { it.diskFile.name }.sortedByDescending {
         it.getLastModifiedTime().shl(2) or
         it.diskFile.extension.matches(Regex("^[abc]${'$'}")).toLong(1) or
         it.diskFile.extension.isBlank().toLong(0)
