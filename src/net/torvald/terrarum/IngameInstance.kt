@@ -159,7 +159,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     val wallChangeQueue = ArrayList<BlockChangeQueueItem?>()
     val wireChangeQueue = ArrayList<BlockChangeQueueItem?>() // if 'old' is set and 'new' is blank, it's a wire cutter
 
-    val modifiedChunks = Array(16) { TreeSet<Int>() }
+    val modifiedChunks = Array(16) { TreeSet<Long>() }
 
     var loadedTime_t = App.getTIME_T()
         protected set

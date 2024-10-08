@@ -550,7 +550,7 @@ abstract class Gen(val world: GameWorld, val isFinal: Boolean, val seed: Long, v
     protected abstract fun getGenerator(seed: Long, params: Any?): List<Joise>
     protected abstract fun draw(xStart: Int, yStart: Int, noises: List<Joise>, soff: Double)
 
-    private fun getChunksRange(): List<Int> {
+    private fun getChunksRange(): List<Long> {
         val (yStart, yEnd) = Worldgen.getChunkGenStrip(world)
         return (0 until world.width / CHUNK_W step 2).flatMap { cx -> // skip every other column because we can :smiling_face_with_horns:
             (LandUtil.chunkXYtoChunkNum(world, cx, yStart)..LandUtil.chunkXYtoChunkNum(world, cx, yEnd)).toList()

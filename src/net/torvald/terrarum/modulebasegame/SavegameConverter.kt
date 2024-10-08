@@ -49,11 +49,17 @@ object SavegameConverter {
         val DOM = ClusteredFormatDOM(newDisk)
         val root = DOM.getRootFile()
 
+        var cnt = 0
+
         // do filecopy
         type254DOM.entries.filter { it.key != 0L }.forEach { entryID, diskEntry ->
             val filename = Common.type254EntryIDtoType17Filename(entryID)
+
+            println("Converting file $filename; old cluster size: ${DOM.usedClusterCount}; old ROOT cluster num: ${DOM.getRootDir().entryID}; fileCount: $cnt")
+
             if (diskEntry.contents !is EntryFile) throw IllegalStateException("Entry in the savegame is not a file (${diskEntry.contents.javaClass.simpleName})")
 
+            cnt += 1
             val entry = diskEntry.contents as EntryFile
 
             val oldBytes = entry.bytes.toByteArray()
@@ -72,4 +78,11 @@ object SavegameConverter {
         DOM.dispose()
     }
 
+}
+
+fun main() {
+    val infile = File("/home/torvald/.Terrarum/Worlds/2d3e3aa5-bf5b-45c8-acf6-66ef9f1c2217")
+    val outfile = File("/home/torvald/.Terrarum/Worlds/2d3e3aa5-bf5b-45c8-acf6-66ef9f1c2217.terrarumworld")
+
+    SavegameConverter.type254toType11(infile, outfile)
 }

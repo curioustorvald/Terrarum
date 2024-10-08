@@ -761,7 +761,7 @@ object Common {
 
 
     fun type254EntryIDtoType17Filename(entryID: Long): String {
-        return entryID.toString(16).uppercase().padStart(16,'0')
+        return entryID.toULong().toString(16).uppercase().padStart(16,'0')
     }
 }
 
