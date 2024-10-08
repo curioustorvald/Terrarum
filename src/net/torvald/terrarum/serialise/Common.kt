@@ -755,6 +755,14 @@ object Common {
 
         return UUID(bytes.toBigInt64(0), bytes.toBigInt64(8))
     }
+
+    fun layerAndChunkNumToEntryID(layerNum: Int, chunkNum: Long) =
+        0x1_0000_0000L or layerNum.toLong().shl(24) or chunkNum
+
+
+    fun type254EntryIDtoType17Filename(entryID: Long): String {
+        return entryID.toString(16).uppercase().padStart(16,'0')
+    }
 }
 
 class SaveLoadError(file: File?, cause: Throwable) : RuntimeException("An error occured while loading save file '${file?.absolutePath}'", cause)

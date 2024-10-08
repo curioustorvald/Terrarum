@@ -136,13 +136,13 @@ class WorldSavingThread(
             for (cx in 0 until cw) {
                 for (cy in 0 until ch) {
                     val chunkFlag = ingame.world.chunkFlags[cy][cx]
-                    val chunkNumber = LandUtil.chunkXYtoChunkNum(ingame.world, cx, cy).toLong()
+                    val chunkNumber = LandUtil.chunkXYtoChunkNum(ingame.world, cx, cy)
 
                     if (chunkFlag and 0x7F == CHUNK_LOADED) {
 //                    Echo("Writing chunks... ${(cw*ch*layer) + chunkNumber + 1}/${cw*ch*layers.size}")
 
                         val chunkBytes = WriteWorld.encodeChunk(layers[layer]!!, cx, cy)
-                        val entryID = 0x1_0000_0000L or layer.toLong().shl(24) or chunkNumber
+                        val entryID = Common.layerAndChunkNumToEntryID(layer, chunkNumber)
 
                         val entryContent = EntryFile(chunkBytes)
                         val entry = DiskEntry(entryID, VDFileID.ROOT, creation_t, time_t, entryContent)

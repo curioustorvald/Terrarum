@@ -161,13 +161,13 @@ class VirtualDisk(
     var extraInfoBytes = ByteArray(16)
     val entries = HashMap<EntryID, DiskEntry>()
     val isReadOnly = false
-    var saveMode: Int
+    var saveMode: Int // auto? quick?
         set(value) { extraInfoBytes[1] = value.toByte() }
         get() = extraInfoBytes[1].toUint()
-    var saveKind: Int
+    var saveKind: Int // player? world?
         set(value) { extraInfoBytes[2] = value.toByte() }
         get() = extraInfoBytes[2].toUint()
-    var saveOrigin: Int
+    var saveOrigin: Int // imported? native?
         set(value) { extraInfoBytes[3] = value.toByte() }
         get() = extraInfoBytes[3].toUint()
     var snapshot: Snapshot?

@@ -22,7 +22,7 @@ import java.util.TreeMap
  * Created by minjaesong on 2024-10-07.
  */
 data class ChunkAllocation(
-    val chunkNumber: Int,
+    val chunkNumber: Long,
     var classifier: ChunkAllocClass,
     var lastAccessTime: Long = System.nanoTime()
 )
@@ -42,12 +42,12 @@ enum class ChunkAllocClass {
 open class ChunkPool(
     // `DiskSkimmer` or `ClusteredFormatDOM`
     val disk: Any,
+    val layerIndex: Int,
     val wordSizeInBytes: Long,
     val world: GameWorld,
-    val chunkNumToFileNum: (Int) -> String,
     val renumberFun: (Int) -> Int,
 ) {
-    private val pointers = TreeMap<Int, Long>()
+    private val pointers = TreeMap<Long, Long>()
     private var allocCap = 32
     private var allocMap = Array<ChunkAllocation?>(allocCap) { null }
     private var allocCounter = 0
@@ -59,12 +59,12 @@ open class ChunkPool(
         allocMap.fill(null)
     }
 
-    private fun createPointerViewOfChunk(chunkNumber: Int): UnsafePtr {
+    private fun createPointerViewOfChunk(chunkNumber: Long): UnsafePtr {
         val baseAddr = pointers[chunkNumber]!!
         return UnsafePtr(baseAddr, chunkSize)
     }
 
-    private fun createPointerViewOfChunk(chunkNumber: Int, offsetX: Int, offsetY: Int): Pair<UnsafePtr, Long> {
+    private fun createPointerViewOfChunk(chunkNumber: Long, offsetX: Int, offsetY: Int): Pair<UnsafePtr, Long> {
         val baseAddr = pointers[chunkNumber]!!
         return UnsafePtr(baseAddr, chunkSize) to wordSizeInBytes * (offsetY * CHUNK_W + offsetX)
     }
@@ -72,7 +72,7 @@ open class ChunkPool(
     /**
      * If the chunk number == playerChunkNum, the result will be `false`
      */
-    private fun Int.isChunkNearPlayer(playerChunkNum: Int): Boolean {
+    private fun Long.isChunkNearPlayer(playerChunkNum: Long): Boolean {
         if (this == playerChunkNum) return false
 
         val pxy = LandUtil.chunkNumToChunkXY(world, playerChunkNum)
@@ -124,7 +124,7 @@ open class ChunkPool(
         }
     }
 
-    private fun allocate(chunkNumber: Int, allocClass: ChunkAllocClass = ChunkAllocClass.TEMPORARY): UnsafePtr {
+    private fun allocate(chunkNumber: Long, allocClass: ChunkAllocClass = ChunkAllocClass.TEMPORARY): UnsafePtr {
         updateAllocMapUsingIngamePlayer()
 
         // find the empty spot within the pool
@@ -141,7 +141,7 @@ open class ChunkPool(
 
     private fun deallocate(allocation: ChunkAllocation) = deallocate(allocation.chunkNumber)
 
-    private fun deallocate(chunkNumber: Int): Boolean {
+    private fun deallocate(chunkNumber: Long): Boolean {
         val ptr = pointers[chunkNumber] ?: return false
 
         storeToDisk(chunkNumber)
@@ -168,8 +168,8 @@ open class ChunkPool(
         }
     }
 
-    private fun fetchFromDisk(chunkNumber: Int) {
-        val fileName = chunkNumToFileNum(chunkNumber)
+    private fun fetchFromDisk(chunkNumber: Long) {
+        val fileName = chunkNumToFileNum(layerIndex, chunkNumber)
 
         // read data from the disk
         if (disk is ClusteredFormatDOM) {
@@ -191,8 +191,8 @@ open class ChunkPool(
         }
     }
 
-    private fun storeToDisk(chunkNumber: Int) {
-        val fileName = chunkNumToFileNum(chunkNumber)
+    private fun storeToDisk(chunkNumber: Long) {
+        val fileName = chunkNumToFileNum(layerIndex, chunkNumber)
 
         // write to the disk (the disk must be an autosaving copy of the original)
         if (disk is ClusteredFormatDOM) {
@@ -212,13 +212,13 @@ open class ChunkPool(
         }
     }
 
-    private fun checkForChunk(chunkNumber: Int) {
+    private fun checkForChunk(chunkNumber: Long) {
         if (!pointers.containsKey(chunkNumber)) {
             fetchFromDisk(chunkNumber)
         }
     }
 
-    private fun serialise(chunkNumber: Int): ByteArray {
+    private fun serialise(chunkNumber: Long): ByteArray {
         val ptr = pointers[chunkNumber]!!
         val out = ByteArray(chunkSize.toInt())
         UnsafeHelper.memcpyFromPtrToArr(ptr, out, 0, chunkSize)
@@ -233,7 +233,7 @@ open class ChunkPool(
      * - word size is 3: Int `00_B2_B1_B0`
      * - word size is 2: Int `00_00_B1_B0`
      */
-    fun getTileRaw(chunkNumber: Int, offX: Int, offY: Int): Int {
+    fun getTileRaw(chunkNumber: Long, offX: Int, offY: Int): Int {
         checkForChunk(chunkNumber)
         allocMap.find { it?.chunkNumber == chunkNumber }!!.let { it.lastAccessTime = System.nanoTime() }
         val (ptr, ptrOff) = createPointerViewOfChunk(chunkNumber, offX, offY)
@@ -249,7 +249,7 @@ open class ChunkPool(
      * - First element: Int `00_00_B1_B0`
      * - Second element: Float16(`B3_B2`).toFloat32
      */
-    fun getTileI16F16(chunkNumber: Int, offX: Int, offY: Int): Pair<Int, Float> {
+    fun getTileI16F16(chunkNumber: Long, offX: Int, offY: Int): Pair<Int, Float> {
         val raw = getTileRaw(chunkNumber, offX, offY)
         val ibits = raw.get1SS()
         val fbits = raw.get2SS().toShort()
@@ -261,7 +261,7 @@ open class ChunkPool(
      * Return format:
      * - Int `00_00_B1_B0`
      */
-    fun getTileI16(chunkNumber: Int, offX: Int, offY: Int): Int {
+    fun getTileI16(chunkNumber: Long, offX: Int, offY: Int): Int {
         val raw = getTileRaw(chunkNumber, offX, offY)
         val ibits = raw.get1SS()
         return ibits
@@ -273,7 +273,7 @@ open class ChunkPool(
      * - First element: Int `00_00_B1_B0`
      * - Second element: Int `00_00_00_B2`
      */
-    fun getTileI16I8(chunkNumber: Int, offX: Int, offY: Int): Pair<Int, Int> {
+    fun getTileI16I8(chunkNumber: Long, offX: Int, offY: Int): Pair<Int, Int> {
         val raw = getTileRaw(chunkNumber, offX, offY)
         val ibits = raw.get1SS()
         val jbits = raw.get2SS() and 255
@@ -281,6 +281,11 @@ open class ChunkPool(
     }
 
     companion object {
+        fun chunkNumToFileNum(layerNum: Int, chunkNum: Long): String {
+            val entryID = Common.layerAndChunkNumToEntryID(layerNum, chunkNum)
+            return Common.type254EntryIDtoType17Filename(entryID)
+        }
+        
         private fun Int.get1SS() = this and 65535
         private fun Int.get2SS() = (this ushr 16) and 65535
 

@@ -20,7 +20,7 @@ object LandUtil {
     const val LAYER_WIRE = 20
     const val LAYER_FLUID = 3
 
-    fun toChunkNum(world: GameWorld, x: Int, y: Int): Int {
+    fun toChunkNum(world: GameWorld, x: Int, y: Int): Long {
         // coercing and fmod-ing follows ROUNDWORLD rule. See: GameWorld.coerceXY()
         val (x, y) = world.coerceXY(x, y)
         return chunkXYtoChunkNum(world, x / CHUNK_W, y / CHUNK_H)
@@ -32,13 +32,13 @@ object LandUtil {
         return Point2i(x / CHUNK_W, y / CHUNK_H)
     }
 
-    fun chunkXYtoChunkNum(world: GameWorld, cx: Int, cy: Int): Int {
-        val ch = world.height / CHUNK_H
+    fun chunkXYtoChunkNum(world: GameWorld, cx: Int, cy: Int): Long {
+        val ch = (world.height / CHUNK_H).toLong()
         return cx * ch + cy
     }
-    fun chunkNumToChunkXY(world: GameWorld, chunkNum: Int): Point2i {
+    fun chunkNumToChunkXY(world: GameWorld, chunkNum: Long): Point2i {
         val ch = world.height / CHUNK_H
-        return Point2i(chunkNum / ch, chunkNum % ch)
+        return Point2i((chunkNum / ch).toInt(), (chunkNum % ch).toInt())
     }
 
     fun getBlockAddr(world: GameWorld, x: Int, y: Int): BlockAddress {
