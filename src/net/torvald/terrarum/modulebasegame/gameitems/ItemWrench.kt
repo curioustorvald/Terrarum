@@ -5,6 +5,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameitems.FixtureInteractionBlocked
@@ -13,6 +14,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameactors.Reorientable
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.unicode.getMouseButton
@@ -70,12 +72,25 @@ class ItemWrench(originalID: ItemID) : GameItem(originalID), FixtureInteractionB
         (INGAME as TerrarumIngame).getActorsUnderMouse(mwx, mwy).filterIsInstance<Reorientable>().firstOrNull()?.let { fixture ->
             fixture.orientClockwise()
             0L
+        } ?: (INGAME as TerrarumIngame).world.getWireGraphOf(mtx, mty, "wire@basegame:256")?.let {
+            (INGAME as TerrarumIngame).world.removeTileWireNoReconnect(mtx, mty, "wire@basegame:256", false)
+            (INGAME as TerrarumIngame).queueActorAddition(DroppedItem("wire@basegame:256", mtx * TILE_SIZED, mty * TILE_SIZED))
+            0L
         } ?: -1L
     }
 
     override fun startSecondaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
         (INGAME as TerrarumIngame).getActorsUnderMouse(mwx, mwy).filterIsInstance<Reorientable>().firstOrNull()?.let { fixture ->
             fixture.orientAnticlockwise()
+            0L
+        } ?: (INGAME as TerrarumIngame).world.getWireGraphOf(mtx, mty, "wire@basegame:256")?.let {
+            val old = it
+            val new = when (old) {
+                5 -> 10
+                10 -> 5
+                else -> old
+            }
+            (INGAME as TerrarumIngame).world.setWireGraphOf(mtx, mty, "wire@basegame:256", new)
             0L
         } ?: -1L
     }

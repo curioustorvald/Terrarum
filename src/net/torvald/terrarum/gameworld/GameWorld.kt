@@ -572,6 +572,23 @@ open class GameWorld(
         }
     }
 
+    fun removeTileWireNoReconnect(x: Int, y: Int, tile: ItemID, bypassEvent: Boolean) {
+        val (x, y) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        val wireNode = wirings[blockAddr]
+
+        if (wireNode != null) {
+            if (!bypassEvent) {
+                Terrarum.ingame?.queueWireChangedEvent(tile, true, x, y)
+//                Terrarum.ingame?.modified(LandUtil.LAYER_WIRE, x, y)
+            }
+
+            // remove wire from this tile
+            wiringGraph[blockAddr]!!.remove(tile)
+            wirings[blockAddr]!!.ws.remove(tile)
+        }
+    }
+
     fun getWireGraphOf(x: Int, y: Int, itemID: ItemID): Int? {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
