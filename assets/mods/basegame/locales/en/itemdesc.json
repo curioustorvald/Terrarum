@@ -1,5 +1,5 @@
 {
-  "TOOLTIP_basegame:256": "Provides stable light",
+  "TOOLTIP_basegame:256": "Provides a stable light",
   "TOOLTIP_basegame:257": "Provides a light equal to the sun", /* it literally does -- provides the sunlight of the exact hour (emits "moonlight" at night time) */
   "TOOLTIP_basegame:258": "Provides a light equal to the sun at noon",
 
@@ -11,6 +11,7 @@
   "TOOLTIP_wire@basegame:1": "Carries power",
   "TOOLTIP_wire@basegame:2": "Carries power",
   "TOOLTIP_wire@basegame:16": "Carries information",
+  "TOOLTIP_wire@basegame:256": "Carries rotational force",
 
   "TOOLTIP_item@basegame:1": "Breaks rocks",
   "TOOLTIP_item@basegame:2": "Breaks rocks",
@@ -44,7 +45,7 @@
   "TOOLTIP_item@basegame:28": "A music vending machine (free to play)",
   "TOOLTIP_item@basegame:29": "A coal lookalike that burns just as well and is renewable",
   "TOOLTIP_item@basegame:36": "Creates wires from metal ingots",
-  "TOOLTIP_item@basegame:47": "Reorients gadgets",
+  "TOOLTIP_item@basegame:47": "Reorients gadgets and axles",
   "TOOLTIP_item@basegame:48": "Melts two metal ingots to make a bar of alloy",
   "TOOLTIP_item@basegame:50": "Use it on the Electronics Workbench",
 

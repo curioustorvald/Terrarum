@@ -34,9 +34,9 @@ class WireActor : ActorWithBody, NoSerialise, InternalActor {
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 0)
     }
 
-    private var wireID = ""
-    private var worldX = 0
-    private var worldY = 0
+    var wireID = ""; private set
+    var worldX = 0; private set
+    var worldY = 0; private set
 
     /**
      * @param itemID must start with "wire@"
