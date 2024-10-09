@@ -88,7 +88,7 @@ class UIWireCutterPie(val itemID: ItemID) : UICanvas() {
 
         fun getWireItemID(index: Int): String {
             return when (index) {
-                0 -> "__all__"
+                0 -> "wire@basegame:8192;wire@basegame:8193;wire@basegame:8194;wire@basegame:8195;wire@basegame:8196;wire@basegame:1;wire@basegame:2;wire@basegame:3;wire@basegame:4;wire@basegame:16;wire@basegame:17;wire@basegame:18;wire@basegame:19"
                 1 -> "wire@basegame:8192"
                 2 -> "wire@basegame:8193"
                 3 -> "wire@basegame:8194"

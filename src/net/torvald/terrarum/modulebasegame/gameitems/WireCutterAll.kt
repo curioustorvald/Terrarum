@@ -106,14 +106,9 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID), FixtureInteracti
 
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
-        val itemToRemove = UIWireCutterPie.getWireItemID(actor.actorValue.getAsInt(AVKey.__PLAYER_WIRECUTTERSEL) ?: 0)
+        val itemToRemove = UIWireCutterPie.getWireItemID(actor.actorValue.getAsInt(AVKey.__PLAYER_WIRECUTTERSEL) ?: 0).split(';')
 
-        val filter = if (itemToRemove == "__all__") {
-            { it: ItemID -> true }
-        }
-        else {
-            { it: ItemID -> it == itemToRemove }
-        }
+        val filter = { it: ItemID -> itemToRemove.contains(it) }
 
         return WireCutterBase.startPrimaryUse(this, actor, delta, filter)
     }

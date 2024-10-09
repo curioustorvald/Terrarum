@@ -641,7 +641,9 @@ object WorldSimulator {
                         }
                     }
                 }
-                fixture?.first?.updateOnWireGraphTraversal(tileOffsetFromFixture!!.x, tileOffsetFromFixture!!.y, fixture!!.second)
+
+                if (fixture != null && tileOffsetFromFixture != null)
+                    fixture!!.first.updateOnWireGraphTraversal(tileOffsetFromFixture!!.x, tileOffsetFromFixture!!.y, fixture!!.second)
 
             }
         }
