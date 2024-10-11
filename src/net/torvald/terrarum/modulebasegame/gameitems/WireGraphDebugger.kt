@@ -13,9 +13,6 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 
 class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
-
-    @Transient private val tooltipHash = System.nanoTime()
-
     override var baseToolSize: Double? = PickaxeCore.BASE_MASS_AND_SIZE
     override var inventoryCategory = Category.TOOL
     override val canBeDynamic = false
@@ -65,12 +62,10 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
         }
 
         if (sb.isNotEmpty()) {
-            UIItemInventoryCellCommonRes.tooltipShowing[tooltipHash] = true
-            (Terrarum.ingame!! as TerrarumIngame).setTooltipMessage(sb.toString())
+            acquireTooltip(sb.toString())
         }
         else {
-            UIItemInventoryCellCommonRes.tooltipShowing[tooltipHash] = false
-            (Terrarum.ingame!! as TerrarumIngame).setTooltipMessage(null)
+            releaseTooltip()
         }
     }
 
@@ -78,6 +73,6 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
         (Terrarum.ingame!! as TerrarumIngame).setTooltipMessage(null)
         blockMarker.hideMarker()
-        UIItemInventoryCellCommonRes.tooltipShowing.remove(tooltipHash)
+        removeFromTooltipRecord()
     }
 }

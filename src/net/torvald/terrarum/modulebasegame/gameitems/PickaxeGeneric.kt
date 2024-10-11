@@ -19,7 +19,6 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.TOOL_DURABILITY_BASE
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag
 import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
@@ -27,8 +26,8 @@ import kotlin.math.roundToInt
 /**
  * Created by minjaesong on 2019-03-10.
  */
-object PickaxeCore {
-    private val tooltipHash = 10002L
+object PickaxeCore : TooltipListener() {
+    override val tooltipHash = 10002L
     private val soundPlayedForThisTick = HashMap<ActorWithBody, Long>()
 
     /**
@@ -237,7 +236,7 @@ object PickaxeCore {
         val overlayUIopen = (INGAME as? TerrarumIngame)?.uiBlur?.isVisible ?: false
         var tooltipSet = false
 
-        val tooltipWasShown = tooltipShowing[tooltipHash] ?: false
+        val tooltipWasShown = tooltipAcquired()
 
         mouseInInteractableRangeTools(actor, tool) {
             val tileUnderCursor = INGAME.world.getTileFromOre(mx, my).item
@@ -249,8 +248,7 @@ object PickaxeCore {
                     Lang[ItemCodex[itemForOre]!!.originalName]
                 else "???"
                 if (App.getConfigBoolean("basegame:showpickaxetooltip")) {
-                    INGAME.setTooltipMessage(tileName)
-                    tooltipShowing[tooltipHash] = true
+                    acquireTooltip(tileName)
                 }
                 tooltipSet = true
             }
@@ -269,7 +267,8 @@ object PickaxeCore {
             true // just a placeholder
         }
 
-        if (App.getConfigBoolean("basegame:showpickaxetooltip") && !tooltipSet) tooltipShowing[tooltipHash] = false
+        if (App.getConfigBoolean("basegame:showpickaxetooltip") && !tooltipSet)
+            releaseTooltip()
     }
 
     private val soundCue = MusicContainer(

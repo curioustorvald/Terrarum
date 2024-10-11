@@ -1,23 +1,15 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
-import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.TitleScreen
-import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
-import net.torvald.terrarum.modulebasegame.serialise.WriteSavegame
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.serialise.WriteConfig
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -305,8 +297,6 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
     override fun show() {
         super.show()
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
         toInitScreen()
     }
 
@@ -379,8 +369,6 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
         screen = 0
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun hide() {

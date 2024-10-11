@@ -13,7 +13,6 @@ import net.torvald.terrarum.modulebasegame.ui.InventoryCellColourTheme
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import kotlin.math.roundToInt
 
 /***
@@ -159,7 +158,7 @@ class UIItemInventoryElemWide(
 
 
             // set tooltip accordingly
-            if (tooltipShowing[tooltipHash] != true && item != null && mouseUp) {
+            if (!tooltipAcquired() && item != null && mouseUp) {
 //                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
 
                 val grey = App.fontGame.toColorCode(11, 11, 11)
@@ -170,15 +169,12 @@ class UIItemInventoryElemWide(
 
                 val finalStr = if (descStr != null) "$nameStr\n$grey$descStr" else nameStr
 
-                INGAME.setTooltipMessage(finalStr)
-
-                tooltipShowing[tooltipHash] = true
-//                printdbg(this, tooltipShowing.entries)
+                acquireTooltip(finalStr)
             }
         }
 
         if (item == null || !mouseUp) {
-            tooltipShowing[tooltipHash] = false
+            releaseTooltip()
         }
 
         // see IFs above?
@@ -186,10 +182,10 @@ class UIItemInventoryElemWide(
     }
 
     override fun dispose() {
-        tooltipShowing.remove(tooltipHash)
+        removeFromTooltipRecord()
     }
 
     override fun hide() {
-        tooltipShowing.remove(tooltipHash)
+        removeFromTooltipRecord()
     }
 }

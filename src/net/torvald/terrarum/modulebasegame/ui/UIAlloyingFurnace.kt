@@ -213,9 +213,6 @@ class UIAlloyingFurnace(val smelter: FixtureAlloyingFurnace) : UICanvas(
 
         playerThings.setGetInventoryFun { INGAME.actorNowPlaying!!.inventory }
         itemListUpdate()
-
-        UIItemInventoryCellCommonRes.tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
     }
 
 
@@ -449,8 +446,6 @@ class UIAlloyingFurnace(val smelter: FixtureAlloyingFurnace) : UICanvas(
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
-        UIItemInventoryCellCommonRes.tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
     }
 
     override fun dispose() {

@@ -15,7 +15,6 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.CraftingStation
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 import net.torvald.terrarum.modulebasegame.ui.UITemplateHalfInventory.Companion.INVENTORY_NAME_TEXT_GAP
 import net.torvald.terrarum.ui.*
@@ -455,9 +454,6 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
 
         super.show()
 
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
-
         resetUI()
     }
 
@@ -518,15 +514,11 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
 
     override fun endOpening(delta: Float) {
         super.endOpening(delta)
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
     }
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
         resetUI()
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
     }
 
 

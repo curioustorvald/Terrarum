@@ -23,7 +23,6 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -97,8 +96,6 @@ open class ActorWithBody : Actor {
     open var tooltipText: String? = null // null: display nothing
     val mouseUp: Boolean
         get() = hitbox.containsPoint((world?.width ?: 0) * TILE_SIZED, Terrarum.mouseX, Terrarum.mouseY)
-
-    @Transient protected val tooltipHash = System.nanoTime()
 
     var hitboxTranslateX: Int = 0// relative to spritePosX
     protected set
@@ -702,14 +699,13 @@ open class ActorWithBody : Actor {
                     else submergedHeight / hitbox.height
 
 
-            if (mouseUp && tooltipText != null && tooltipShowing[tooltipHash] != true) {
-                INGAME.setTooltipMessage(tooltipText)
-                tooltipShowing[tooltipHash] = true
+            if (mouseUp && tooltipText != null && !tooltipAcquired()) {
+                acquireTooltip(tooltipText)
             }
         }
 
         if (tooltipText == null || !mouseUp || flagDespawn) {
-            tooltipShowing[tooltipHash] = false
+            releaseTooltip()
         }
 
 //        isStationary = (hitbox - oldHitbox).magnitudeSquared < PHYS_EPSILON_VELO
@@ -1980,7 +1976,7 @@ open class ActorWithBody : Actor {
 
     internal open fun flagDespawn() {
         flagDespawn = true
-        tooltipShowing.remove(tooltipHash)
+        removeFromTooltipRecord()
     }
 
     open fun getSpriteHead(): TextureRegion? {
@@ -2316,7 +2312,7 @@ open class ActorWithBody : Actor {
         App.disposables.add(sprite)
         App.disposables.add(spriteGlow)
         App.disposables.add(spriteEmissive)
-        tooltipShowing.remove(tooltipHash)
+        removeFromTooltipRecord()
     }
 }
 

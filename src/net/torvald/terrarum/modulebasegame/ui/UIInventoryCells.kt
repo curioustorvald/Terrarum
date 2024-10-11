@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
@@ -14,9 +13,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HO
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_VRT
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_X
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.controlHelpHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
 import net.torvald.terrarum.ui.Toolkit
@@ -77,10 +74,10 @@ internal class UIInventoryCells(
                     "${(actorInventory.capacity * 100L).toLong() / 100.0}"
 
                 INGAME.setTooltipMessage("$capaStr/${actorInventory.maxCapacityByActor}")
-                tooltipShowing[10001] = true
+                TooltipManager.tooltipShowing[10001] = true
             }
             else {
-                tooltipShowing[10001] = false
+                TooltipManager.tooltipShowing[10001] = false
             }
         }
     }
@@ -177,19 +174,6 @@ internal class UIInventoryCells(
         val encumbBarYPos = UIInventoryFull.yEnd-20 + 3f
 
         UIInventoryCells.drawEncumbranceBar(batch, encumbBarXPos, encumbBarYPos, encumbrancePerc, full.actor.inventory)
-    }
-
-    override fun show() {
-        super.show()
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
-    }
-
-
-    override fun endClosing(delta: Float) {
-        super.endClosing(delta)
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun dispose() {

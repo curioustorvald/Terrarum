@@ -6,6 +6,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TooltipListener
 import net.torvald.terrarum.audio.AudioBank
 import net.torvald.terrarum.audio.audiobank.MusicContainer
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
@@ -27,7 +28,7 @@ typealias ActorID = Int
  *
  * Created by minjaesong on 2015-12-31.
  */
-abstract class Actor : Comparable<Actor>, Runnable {
+abstract class Actor(): TooltipListener(), Comparable<Actor>, Runnable {
 
     /**
      * Valid RefID is equal to or greater than 16777216.
@@ -42,7 +43,6 @@ abstract class Actor : Comparable<Actor>, Runnable {
      */
     var renderOrder = RenderOrder.MIDDLE
 
-    protected constructor()
 
     // needs zero-arg constructor for serialiser to work
     constructor(renderOrder: RenderOrder, id: ActorID?) : this() {

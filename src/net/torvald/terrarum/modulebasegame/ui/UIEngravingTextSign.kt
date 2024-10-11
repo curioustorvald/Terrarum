@@ -16,7 +16,6 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameitems.ItemTextSignCopper
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.TIMES
@@ -215,8 +214,6 @@ class UIEngravingTextSign : UICanvas(
 
     override fun show() {
         super.show()
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
         resetUI()
     }
 
@@ -286,15 +283,11 @@ class UIEngravingTextSign : UICanvas(
 
     override fun endOpening(delta: Float) {
         super.endOpening(delta)
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
     }
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
         resetUI()
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
     }
 
 }

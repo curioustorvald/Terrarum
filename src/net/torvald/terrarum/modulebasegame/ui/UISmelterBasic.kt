@@ -11,7 +11,6 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureSmelterBasic
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.SmelterGuiEventBuilder.PRODUCT_SLOT
 import net.torvald.terrarum.modulebasegame.ui.SmelterGuiEventBuilder.SLOT_INDEX_STRIDE
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemCatBar.Companion.FILTER_CAT_ALL
 import net.torvald.terrarum.ui.UIItemInventoryElemWide.Companion.UNIQUE_ITEM_HAS_NO_AMOUNT
@@ -207,9 +206,6 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
         playerThings.setGetInventoryFun { INGAME.actorNowPlaying!!.inventory }
         itemListUpdate()
-
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun updateImpl(delta: Float) {
@@ -436,8 +432,7 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
+        clearTooltip()
     }
 
     override fun dispose() {

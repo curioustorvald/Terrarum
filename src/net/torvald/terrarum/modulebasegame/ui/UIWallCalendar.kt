@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -8,7 +7,6 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.MONTH_LENGTH
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.unicode.getKeycapPC
@@ -358,25 +356,11 @@ class UIWallCalendar : UICanvas(
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
         INGAME.pause()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
         INGAME.resume()
-        INGAME.setTooltipMessage(null)
-    }
-
-    override fun endOpening(delta: Float) {
-        super.endOpening(delta)
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
-    }
-
-    override fun endClosing(delta: Float) {
-        super.endClosing(delta)
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
     }
 
     override fun dispose() {

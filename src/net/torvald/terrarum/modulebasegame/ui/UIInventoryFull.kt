@@ -12,7 +12,6 @@ import net.torvald.terrarum.audio.dsp.Lowpass
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.*
@@ -327,12 +326,6 @@ class UIInventoryFull(
         it.setAsOpen()
     }
 
-    override fun show() {
-        super.show()
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
-    }
-
     internal var offsetX = ((width - internalWidth) / 2).toFloat()
         private set
     internal var offsetY = ((App.scr.height - internalHeight) / 2).toFloat()
@@ -426,10 +419,6 @@ class UIInventoryFull(
         transitionPanel.allUIs.forEach { it.opacity = 0f }
         INGAME.setTooltipMessage(null) // required!
 //        MinimapComposer.revalidateAll()
-
-        tooltipShowing.clear()
-
-//        printdbg(this, "Clearing out tooltipShowing")
 
         shouldIFadeIn = null
     }

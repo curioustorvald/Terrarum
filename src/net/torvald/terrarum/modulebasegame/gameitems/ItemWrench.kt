@@ -1,31 +1,26 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.INGAME
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameitems.FixtureInteractionBlocked
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
-import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameactors.Reorientable
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.unicode.getMouseButton
 
 /**
  * Created by minjaesong on 2024-03-08.
  */
 class ItemWrench(originalID: ItemID) : GameItem(originalID), FixtureInteractionBlocked {
+    override val tooltipHash = 10003L
 
     companion object {
-        private val tooltipHash = 10003L
         private val SP = "\u3000"
         private val ML = getMouseButton(App.getConfigInt("config_mouseprimary"))
         private val MR = getMouseButton(App.getConfigInt("config_mousesecondary"))
@@ -55,17 +50,18 @@ class ItemWrench(originalID: ItemID) : GameItem(originalID), FixtureInteractionB
         q = mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
             (INGAME as TerrarumIngame).world.getWireGraphOf(mtx, mty, "wire@basegame:256").let { cnx ->
                 if (cnx != null) {
-                    INGAME.setTooltipMessage("$ML ${Lang["GAME_ACTION_DISMANTLE"]}\n$MR ${Lang["MENU_CONTROLS_ROTATE"]}")
-                    tooltipShowing[tooltipHash] = true
+                    acquireTooltip("$ML ${Lang["GAME_ACTION_DISMANTLE"]}\n$MR ${Lang["MENU_CONTROLS_ROTATE"]}")
+
                 }
                 else {
-                    tooltipShowing[tooltipHash] = false
+                    releaseTooltip()
                 }
             }
             0L
         }
         if (q == -1L)
-            tooltipShowing[tooltipHash] = false*/
+            releaseTooltip()
+        */
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->

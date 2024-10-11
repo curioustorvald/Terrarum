@@ -1,23 +1,16 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SheetSpriteAnimation
-import net.torvald.terrarum.App
-import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInductionMotor.Companion.MASS
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
-import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import kotlin.math.absoluteValue
-import kotlin.math.roundToLong
 
 /**
  * Created by minjaesong on 2024-10-03.
@@ -57,10 +50,6 @@ class FixtureInductionMotor : Electric {
     override fun updateSignal() {
         setWireEmissionAt(0, 0, Vector2(16.0, 1024.0)) // speed and torque
         setWireEmissionAt(2, 0, Vector2(16.0, 1024.0)) // speed and torque
-    }
-
-    override fun dispose() {
-        tooltipShowing.remove(tooltipHash)
     }
 
     companion object {
@@ -185,10 +174,6 @@ class FixtureGearbox : Electric, Reorientable {
         b.forEach { (x, y) ->
             setWireEmissionAt(x, y, Vector2(speedMax, torqueMin))
         }
-    }
-
-    override fun dispose() {
-        tooltipShowing.remove(tooltipHash)
     }
 
     companion object {

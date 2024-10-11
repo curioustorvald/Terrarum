@@ -27,7 +27,7 @@ typealias ItemID = String
  *
  * Created by minjaesong on 2016-01-16.
  */
-abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneable, TaggedProp {
+abstract class GameItem(val originalID: ItemID) : TooltipListener(), Comparable<GameItem>, Cloneable, TaggedProp {
 
     constructor() : this("-uninitialised-")
 

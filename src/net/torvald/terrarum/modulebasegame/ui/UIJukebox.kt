@@ -5,10 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureJukebox
-import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.getKeycapPC
@@ -77,8 +74,6 @@ class UIJukebox : UICanvas(
     override fun show() {
         super.show()
         transitionPanel.show()
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun hide() {
@@ -118,16 +113,6 @@ class UIJukebox : UICanvas(
         super.doClosing(delta)
         INGAME.resumePlayerControl()
         INGAME.setTooltipMessage(null)
-    }
-
-    override fun endOpening(delta: Float) {
-        super.endOpening(delta)
-    }
-
-    override fun endClosing(delta: Float) {
-        super.endClosing(delta)
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
     }
 
     override fun dispose() {

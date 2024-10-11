@@ -1,15 +1,9 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
-import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.INGAME
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
+import net.torvald.terrarum.*
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINotControllable
@@ -105,9 +99,32 @@ class UITooltip : UICanvas() {
     override fun updateImpl(delta: Float) {
         setPosition(Terrarum.mouseScreenX, Terrarum.mouseScreenY)
 
-        if (isVisible && tooltipShowing.values.all { !it }) {
+        if (isVisible && (TooltipManager.tooltipShowing.isEmpty() || TooltipManager.tooltipShowing.values.all { !it })) {
             INGAME.setTooltipMessage(null)
         }
+    }
+
+    override fun endOpening(delta: Float) {
+        handler.opacity = 1f
+        // Tooltip must not acquire control of itself
+    }
+
+    override fun endClosing(delta: Float) {
+        handler.opacity = 0f
+        // Tooltip must not acquire control of itself
+    }
+
+    override fun show() {
+        openingClickLatched = true
+        // Tooltip must not acquire control of itself
+        uiItems.forEach { it.show() }
+        handler.subUIs.forEach { it.show() }
+    }
+
+    override fun hide() {
+        uiItems.forEach { it.hide() }
+        handler.subUIs.forEach { it.hide() }
+        openingClickLatched = true // just in case `justOpened` detection fails
     }
 
     override fun dispose() {

@@ -45,8 +45,6 @@ abstract class UIItemInventoryCellBase(
 
     override var suppressHaptic = false
 
-    protected val tooltipHash = System.nanoTime()
-
     /** Custom highlight rule to highlight tihs button to primary accent colour (blue by default).
      * Set to `null` to use default rule:
      *
@@ -128,13 +126,6 @@ object UIItemInventoryCellCommonRes {
         Color.WHITE,
         Toolkit.Theme.COL_CELL_FILL
     )
-
-    /**
-     * Special hash values:
-     * - 10001: Encumbrance bar
-     * - 10002: Pickaxe
-     */
-    val tooltipShowing = HashMap<Long, Boolean>() // Long: `hash` field on UIItemInventoryItemGrid
 }
 
 data class InventoryCellColourTheme(

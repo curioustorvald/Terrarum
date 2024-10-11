@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TooltipListener
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -63,7 +64,7 @@ abstract class UICanvas(
         // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
         customPositioning: Boolean = false, // mainly used by vital meter
         doNotWarnConstant: Boolean = false
-): Disposable {
+): TooltipListener(), Disposable {
 
     internal var openingClickLatched = false
 
@@ -136,6 +137,7 @@ abstract class UICanvas(
     /** A function that is run ONCE when the UI is requested to be opened; will work identical to [endOpening] if [openCloseTime] is zero */
     open fun show() {
         openingClickLatched = true
+        clearTooltip()
         uiItems.forEach { it.show() }
         handler.subUIs.forEach { it.show() }
     }
@@ -183,6 +185,7 @@ abstract class UICanvas(
      */
     open fun endOpening(delta: Float) {
         handler.opacity = 1f
+        clearTooltip()
     }
 
     /**
@@ -190,6 +193,7 @@ abstract class UICanvas(
      */
     open fun endClosing(delta: Float) {
         handler.opacity = 0f
+        clearTooltip()
     }
 
     abstract override fun dispose()

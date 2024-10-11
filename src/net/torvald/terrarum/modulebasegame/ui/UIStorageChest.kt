@@ -4,19 +4,14 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.getWidthOfCells
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.unicode.getKeycapPC
 import net.torvald.unicode.getMouseButton
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * Created by minjaesong on 2019-07-08.
@@ -190,9 +185,6 @@ internal class UIStorageChest : UICanvas(
         itemListPlayer.itemList.getInventory = { INGAME.actorNowPlaying!!.inventory }
 
         itemListUpdate()
-
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
     }
 
     private fun itemListUpdate() {
@@ -312,17 +304,6 @@ internal class UIStorageChest : UICanvas(
         INGAME.resume()
         INGAME.setTooltipMessage(null)
     }
-
-    override fun endOpening(delta: Float) {
-        super.endOpening(delta)
-    }
-
-    override fun endClosing(delta: Float) {
-        super.endClosing(delta)
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
-    }
-
 
     override fun dispose() {
     }

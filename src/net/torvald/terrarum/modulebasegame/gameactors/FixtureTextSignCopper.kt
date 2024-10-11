@@ -17,7 +17,6 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.Item
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.ItemTextSignCopper
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.TIMES
 import org.dyn4j.geometry.Vector2
@@ -253,7 +252,7 @@ class FixtureTextSignCopper : Electric {
     }
 
     override fun dispose() {
-        tooltipShowing.remove(tooltipHash)
+        removeFromTooltipRecord()
         sprite?.dispose()
         spriteGlow?.dispose()
         spriteEmissive?.dispose()

@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.terrarum.TooltipListener
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 
 /**
@@ -28,7 +29,7 @@ abstract class UITemplate(val parent: UICanvas) : UIItemisable() {
 /**
  * Created by minjaesong on 2024-01-29.
  */
-abstract class UIItemisable : Disposable {
+abstract class UIItemisable : TooltipListener(), Disposable {
     abstract fun update(delta: Float)
     abstract fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera)
     open fun show() {}

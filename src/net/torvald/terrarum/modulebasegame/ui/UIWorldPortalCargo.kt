@@ -9,11 +9,8 @@ import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.ui.*
 import net.torvald.unicode.getKeycapPC
-import kotlin.math.max
-import kotlin.math.min
 
 class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
 
@@ -145,9 +142,6 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
         itemListPlayer.getInventory = { INGAME.actorNowPlaying!!.inventory }
 
         itemListUpdate()
-
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null)
     }
 
     private fun itemListUpdate() {
@@ -242,8 +236,6 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
     }
 
     override fun endClosing(delta: Float) {
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
     }
 
 

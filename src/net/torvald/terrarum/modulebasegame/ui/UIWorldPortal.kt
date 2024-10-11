@@ -1,12 +1,10 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureWorldPortal
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
@@ -14,12 +12,11 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.YPOS_COR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.drawBackground
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.tooltipShowing
 import net.torvald.terrarum.serialise.toAscii85
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.getKeycapPC
-import java.util.UUID
+import java.util.*
 
 /**
  * Structure:
@@ -186,15 +183,11 @@ class UIWorldPortal : UICanvas(
     override fun endOpening(delta: Float) {
         super.endOpening(delta)
         transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f)  }
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
     }
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
         transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
-        tooltipShowing.clear()
-        INGAME.setTooltipMessage(null) // required!
     }
 }
 
