@@ -58,7 +58,7 @@ class Highpass(cutoff0: Float): TerrarumAudioFilter() {
     }
 
     override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
-        val perc = 1f - linToLogPerc(cutoff, 2.0, 24000.0).toFloat()
+        val perc = 1f - linToLogPerc(cutoff, 24.0, 24000.0).toFloat()
         batch.color = COL_METER_GRAD2
         Toolkit.fillArea(batch, x.toFloat() + STRIP_W, y.toFloat(), -STRIP_W * perc, 14f)
         batch.color = COL_METER_GRAD
