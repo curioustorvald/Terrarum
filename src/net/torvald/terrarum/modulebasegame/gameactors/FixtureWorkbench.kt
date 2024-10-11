@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
@@ -51,7 +52,7 @@ class FixtureElectricWorkbench : FixtureBase, CraftingStation {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/electric_workbench.tga")
 
         density = BlockCodex[Block.PLANK_NORMAL].density.toDouble()
-        setHitboxDimension(itemImage.texture.width, itemImage.texture.height, 0, 0)
+        setHitboxDimension(2*TILE_SIZE, 2*TILE_SIZE, 0, 0)
 
         makeNewSprite(TextureRegionPack(itemImage.texture, 32, 32)).let {
             it.setRowsAndFrames(2,1)
