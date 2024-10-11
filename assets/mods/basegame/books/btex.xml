@@ -241,8 +241,8 @@
     <p>The argument key <code>%1$s</code> will be replaced into a number, Roman numerals, etc.
         depending on the value of <code>type</code> attribute.</p>
 
-    <p>These macros can be used to localise the chapter headings for your language. For example,
-        in Korean text, the following idiomatic definition will be useful:</p>
+    <p>These macros can be used to localise the chapter headings into your language. For example,
+        in Korean text, the following idiomatic definition will be desirable:</p>
 
     <callout align="left" class="code">&lt;macrodef&gt;<br/><!--
 -->　　&lt;pair key="thepart" value="제%1$s부"/&gt;<br/><!--

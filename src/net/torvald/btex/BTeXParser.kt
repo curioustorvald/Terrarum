@@ -1577,35 +1577,37 @@ object BTeXParser {
                 // add ornamental column on the left
                 it.first.forEach {
                     it.extraDrawFun = { batch, x, y ->
+                        val yoff = -2
                         val oldCol = batch.color.cpy()
                         batch.color = DEFAULT_ORNAMENTS_COL.cpy().also { it.a *= bodyTextShadowAlpha }
                         Toolkit.fillArea(batch,
                             x - (indent - 2),
-                            y + doc.lineHeightInPx,
+                            y + doc.lineHeightInPx + yoff,
                             7f,
                             1 + (it.lineCount - 1).coerceAtLeast(1) * doc.lineHeightInPx.toFloat()
                         )
                         batch.color = DEFAULT_ORNAMENTS_COL
                         Toolkit.fillArea(batch,
                             x - (indent - 2),
-                            y + doc.lineHeightInPx,
+                            y + doc.lineHeightInPx + yoff,
                             6f,
                             (it.lineCount - 1).coerceAtLeast(1) * doc.lineHeightInPx.toFloat()
                         )
                         batch.color = oldCol
                     }
                     it.extraPixmapDrawFun = { pixmap, x, y ->
+                        val yoff = -2
                         pixmap.setColor(DEFAULT_ORNAMENTS_COL.cpy().also { it.a *= bodyTextShadowAlpha })
                         pixmap.fillRectangle(
                             x - (indent - 2),
-                            y + doc.lineHeightInPx,
+                            y + doc.lineHeightInPx + yoff,
                             7,
                             1 + (it.lineCount - 1).coerceAtLeast(1) * doc.lineHeightInPx
                         )
                         pixmap.setColor(DEFAULT_ORNAMENTS_COL)
                         pixmap.fillRectangle(
                             x - (indent - 2),
-                            y + doc.lineHeightInPx,
+                            y + doc.lineHeightInPx + yoff,
                             6,
                             (it.lineCount - 1).coerceAtLeast(1) * doc.lineHeightInPx
                         )
