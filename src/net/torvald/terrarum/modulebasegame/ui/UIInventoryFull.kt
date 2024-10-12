@@ -312,14 +312,14 @@ class UIInventoryFull(
     }
 
     fun openGamemenu(it: UIHandler) {
-        INGAME.setTooltipMessage(null)
+        clearTooltip()
         transitionPanel.forcePosition(2)
         catBar.setSelectedPanel(2)
         it.setAsOpen()
     }
 
     fun openCrafting(it: UIHandler) {
-        INGAME.setTooltipMessage(null)
+        clearTooltip()
         transitionPanel.forcePosition(0)
         catBar.setSelectedPanel(0)
         transitionalCraftingUI.resetUI()
@@ -352,8 +352,6 @@ class UIInventoryFull(
         // UI items
         catBar.render(frameDelta, batch, camera)
         transitionPanel.render(frameDelta, batch, camera)
-
-//        if (transitionPanel.currentPosition != 1f) INGAME.setTooltipMessage(null)
     }
 
     fun rebuildList() {
@@ -383,7 +381,6 @@ class UIInventoryFull(
         super.doOpening(delta)
         transitionPanel.allUIs.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.pause()
-        INGAME.setTooltipMessage(null)
 
         App.audioMixer.requestLowpassIn(0.25)
         App.audioMixer.requestFadeOut(App.audioMixer.fadeBus, 0.25, decibelsToFullscale(-3.0))
@@ -395,7 +392,6 @@ class UIInventoryFull(
         super.doClosing(delta)
         transitionPanel.allUIs.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.resume()
-        INGAME.setTooltipMessage(null)
 
         if (shouldIFadeIn == null) {
             shouldIFadeIn = (App.audioMixer.fadeBus.getFilter<Lowpass>().cutoff < SAMPLING_RATE / 2)
@@ -417,7 +413,6 @@ class UIInventoryFull(
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
         transitionPanel.allUIs.forEach { it.opacity = 0f }
-        INGAME.setTooltipMessage(null) // required!
 //        MinimapComposer.revalidateAll()
 
         shouldIFadeIn = null

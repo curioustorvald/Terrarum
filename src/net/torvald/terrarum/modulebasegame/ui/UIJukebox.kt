@@ -99,20 +99,14 @@ class UIJukebox : UICanvas(
     private val yEnd = -UIInventoryFull.YPOS_CORRECTION + (App.scr.height + UIInventoryFull.internalHeight).div(2).toFloat()
 
 
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchDown(screenX, screenY, pointer, button)
-    }
-
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
         INGAME.disablePlayerControl()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
         INGAME.resumePlayerControl()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun dispose() {

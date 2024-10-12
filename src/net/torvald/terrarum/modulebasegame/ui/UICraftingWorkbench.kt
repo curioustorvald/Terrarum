@@ -504,16 +504,12 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
 
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
-        INGAME.setTooltipMessage(null)
+        clearTooltip()
     }
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
-        INGAME.setTooltipMessage(null)
-    }
-
-    override fun endOpening(delta: Float) {
-        super.endOpening(delta)
+        clearTooltip()
     }
 
     override fun endClosing(delta: Float) {

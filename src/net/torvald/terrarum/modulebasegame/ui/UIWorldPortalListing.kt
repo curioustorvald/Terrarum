@@ -353,7 +353,10 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         if (::worldCells.isInitialized) worldCells.forEach { it.update(delta) }
 
         if (currentWorldSelected) {
-            INGAME.setTooltipMessage(if (buttonTeleport.mouseUp || buttonDelete.mouseUp) Lang["CONTEXT_THIS_IS_A_WORLD_CURRENTLY_PLAYING"] else null)
+            if (buttonTeleport.mouseUp || buttonDelete.mouseUp)
+                acquireTooltip(Lang["CONTEXT_THIS_IS_A_WORLD_CURRENTLY_PLAYING"])
+            else
+                releaseTooltip()
         }
 
         if (showSpinner) {
@@ -511,13 +514,13 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
         INGAME.pause()
-        INGAME.setTooltipMessage(null)
+        clearTooltip()
     }
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
         INGAME.resume()
-        INGAME.setTooltipMessage(null)
+        clearTooltip()
     }
 
 }

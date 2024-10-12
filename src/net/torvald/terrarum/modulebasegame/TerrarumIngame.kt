@@ -1703,6 +1703,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             val fixtureItem = fixture.itemise()
             printdbg(this, "Fixture pickup at F${WORLD_UPDATE_TIMER}: ${fixture.javaClass.canonicalName} -> $fixtureItem")
             // 0. hide tooltips
+            TooltipManager.tooltipShowing.clear()
             setTooltipMessage(null)
             if (!fixture.flagDespawn) {
                 // 1. put the fixture to the inventory

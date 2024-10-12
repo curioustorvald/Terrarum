@@ -71,7 +71,6 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
 
     override fun effectOnUnequip(actor: ActorWithBody) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
-        (Terrarum.ingame!! as TerrarumIngame).setTooltipMessage(null)
         blockMarker.hideMarker()
         removeFromTooltipRecord()
     }

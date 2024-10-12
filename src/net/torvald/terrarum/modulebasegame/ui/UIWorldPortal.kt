@@ -155,7 +155,6 @@ class UIWorldPortal : UICanvas(
     override fun show() {
         transitionPanel.forcePosition(0)
         super.show()
-        INGAME.setTooltipMessage(null)
 
         // add current world to the player's worldportaldict
         addWorldToPlayersDict(INGAME.world.worldIndex)
@@ -170,14 +169,12 @@ class UIWorldPortal : UICanvas(
         super.doOpening(delta)
         transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.pause()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
         transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.resume()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun endOpening(delta: Float) {

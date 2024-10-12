@@ -155,6 +155,10 @@ internal class UIInventoryCells(
         }
     }
 
+    override fun endOpening(delta: Float) {
+        handler.opacity = 1f
+    }
+
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         //itemList.posX = itemList.initialX + inventoryScrOffX.roundToInt()
         itemList.render(frameDelta, batch, camera)

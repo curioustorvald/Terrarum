@@ -296,13 +296,11 @@ internal class UIStorageChest : UICanvas(
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
         INGAME.pause()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
         INGAME.resume()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun dispose() {

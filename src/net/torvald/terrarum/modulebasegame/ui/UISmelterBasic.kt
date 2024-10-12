@@ -417,22 +417,11 @@ class UISmelterBasic(val smelter: FixtureSmelterBasic) : UICanvas(
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
         INGAME.disablePlayerControl()
-        INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
         INGAME.resumePlayerControl()
-        INGAME.setTooltipMessage(null)
-    }
-
-    override fun endOpening(delta: Float) {
-        super.endOpening(delta)
-    }
-
-    override fun endClosing(delta: Float) {
-        super.endClosing(delta)
-        clearTooltip()
     }
 
     override fun dispose() {

@@ -224,12 +224,12 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
 
     override fun doOpening(delta: Float) {
         INGAME.pause()
-        INGAME.setTooltipMessage(null)
+        clearTooltip()
     }
 
     override fun doClosing(delta: Float) {
         INGAME.resume()
-        INGAME.setTooltipMessage(null)
+        clearTooltip()
     }
 
     override fun endOpening(delta: Float) {

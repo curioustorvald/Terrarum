@@ -271,13 +271,11 @@ class UIEngravingTextSign : UICanvas(
 
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
-        INGAME.setTooltipMessage(null)
         INGAME.pause()
     }
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
-        INGAME.setTooltipMessage(null)
         INGAME.resume()
     }
 

@@ -159,8 +159,6 @@ class UIItemInventoryElemWide(
 
             // set tooltip accordingly
             if (!tooltipAcquired() && item != null && mouseUp) {
-//                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
-
                 val grey = App.fontGame.toColorCode(11, 11, 11)
                 val itemIDstr = "\n$grey(${item?.originalID}${if (item?.isCurrentlyDynamic == true) "/${item?.dynamicID}" else ""})"
                 val nameStr0 = if (item?.nameSecondary?.isNotBlank() == true) "${item?.name}\n$grey${item?.nameSecondary}" else "${item?.name}"

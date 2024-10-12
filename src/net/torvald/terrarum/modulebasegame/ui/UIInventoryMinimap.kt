@@ -247,7 +247,6 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     }
 
     override fun show() {
-        INGAME.setTooltipMessage(null)
     }
 
     override fun doOpening(delta: Float) {}

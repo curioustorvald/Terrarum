@@ -304,7 +304,7 @@ class AxeCopper(originalID: ItemID) : GameItem(originalID) {
         if (AxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = AxeCore.endPrimaryUse(actor, this)
 //    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = AxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
-    override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
+    override fun effectOnUnequip(actor: ActorWithBody) { clearTooltip() }
 
 }
 /**
@@ -334,7 +334,7 @@ class AxeIron(originalID: ItemID) : GameItem(originalID) {
         if (AxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = AxeCore.endPrimaryUse(actor, this)
     //    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = AxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
-    override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
+    override fun effectOnUnequip(actor: ActorWithBody) { clearTooltip() }
 
 }
 /**
@@ -364,7 +364,7 @@ class AxeSteel(originalID: ItemID) : GameItem(originalID) {
         if (AxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = AxeCore.endPrimaryUse(actor, this)
     //    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = AxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
-    override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
+    override fun effectOnUnequip(actor: ActorWithBody) { clearTooltip() }
 
 }
 /**
@@ -394,7 +394,7 @@ class AxeWood(originalID: ItemID) : GameItem(originalID) {
         if (AxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = AxeCore.endPrimaryUse(actor, this)
     //    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = AxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
-    override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
+    override fun effectOnUnequip(actor: ActorWithBody) { clearTooltip() }
 
 }
 /**
@@ -424,6 +424,6 @@ class AxeStone(originalID: ItemID) : GameItem(originalID) {
         if (AxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = AxeCore.endPrimaryUse(actor, this)
     //    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) = AxeCore.showOresTooltip(actor, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
-    override fun effectOnUnequip(actor: ActorWithBody) { INGAME.setTooltipMessage(null) }
+    override fun effectOnUnequip(actor: ActorWithBody) { clearTooltip() }
 
 }

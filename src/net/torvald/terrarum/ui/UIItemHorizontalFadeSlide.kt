@@ -91,7 +91,7 @@ class UIItemHorizontalFadeSlide(
             it.posY = it.initialY
         }
 
-        INGAME.setTooltipMessage(null)
+        releaseTooltip()
     }
 
     override fun show() {

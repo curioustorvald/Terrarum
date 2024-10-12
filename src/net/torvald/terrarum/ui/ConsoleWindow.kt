@@ -81,7 +81,10 @@ class ConsoleWindow : UICanvas() {
                     lb.add("${it.referenceID} (${it.actorValue[AVKey.NAME] ?: "\u03AF-${it.javaClass.simpleName}"})")
                 }
 
-                it.setTooltipMessage(if (lb.size > 0) lb.joinToString("\n") else null)
+                if (lb.size > 0)
+                    acquireTooltip(lb.joinToString("\n"))
+                else
+                    releaseTooltip()
 
                 // click to enter the actor's reference ID
                 if (lb.size > 0 && !clickLatched && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
@@ -90,7 +93,7 @@ class ConsoleWindow : UICanvas() {
                 }
             }
             else {
-                it.setTooltipMessage(null)
+                releaseTooltip()
             }
         }
 
@@ -266,6 +269,7 @@ class ConsoleWindow : UICanvas() {
         drawOffY = MovementInterpolator.fastPullOut(openingTimeCounter.toFloat() / openCloseTime.toFloat(),
                 -height.toFloat(), 0f
         )*/
+        clearTooltip()
     }
 
     override fun doClosing(delta: Float) {
@@ -275,6 +279,7 @@ class ConsoleWindow : UICanvas() {
         )*/
         textinput.isEnabled = false
         textinput.mouseoverUpdateLatch = false
+        clearTooltip()
     }
 
     override fun endOpening(delta: Float) {
@@ -282,6 +287,7 @@ class ConsoleWindow : UICanvas() {
         openingTimeCounter = 0f
         textinput.isEnabled = true
         textinput.mouseoverUpdateLatch = true
+        clearTooltip()
     }
 
     override fun endClosing(delta: Float) {
@@ -291,7 +297,7 @@ class ConsoleWindow : UICanvas() {
 //            printdbg(this, "Close -- resume game")
         }
         iMadeTheGameToPause = false
-        Terrarum.ingame?.setTooltipMessage(null)
+        clearTooltip()
         drawOffY = -height.toFloat()
         openingTimeCounter = 0f
     }

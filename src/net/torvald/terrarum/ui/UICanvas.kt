@@ -137,7 +137,6 @@ abstract class UICanvas(
     /** A function that is run ONCE when the UI is requested to be opened; will work identical to [endOpening] if [openCloseTime] is zero */
     open fun show() {
         openingClickLatched = true
-        clearTooltip()
         uiItems.forEach { it.show() }
         handler.subUIs.forEach { it.show() }
     }
@@ -170,7 +169,7 @@ abstract class UICanvas(
      */
     open fun doOpening(delta: Float) {
         handler.opacity = handler.openCloseCounter / openCloseTime
-
+        clearTooltip()
     }
 
     /**
@@ -178,6 +177,7 @@ abstract class UICanvas(
      */
     open fun doClosing(delta: Float) {
         handler.opacity = (openCloseTime - handler.openCloseCounter) / openCloseTime
+        clearTooltip()
     }
 
     /**

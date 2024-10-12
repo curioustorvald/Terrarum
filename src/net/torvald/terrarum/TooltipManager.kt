@@ -24,7 +24,12 @@ abstract class TooltipListener {
 
     open val tooltipHash = System.nanoTime()
 
+    /**
+     * Acquire a control over the "tooltip bus". If the message is null, `releaseTooltip()` will be invoked instead.
+     */
     fun acquireTooltip(message: String?) {
+        if (message == null) return releaseTooltip()
+
         INGAME.setTooltipMessage(message)
         TooltipManager.tooltipShowing[tooltipHash] = true
     }
@@ -39,6 +44,7 @@ abstract class TooltipListener {
     }
 
     fun clearTooltip() {
+        printStackTrace(this)
         TooltipManager.tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }
