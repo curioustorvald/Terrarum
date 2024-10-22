@@ -1,14 +1,11 @@
 package net.torvald.terrarum.modulebasegame
 
-import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.OreCodex
-import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.ceilToInt
-import net.torvald.terrarum.gameworld.BlockLayerI16
+import net.torvald.terrarum.gameworld.BlockLayerGenericI16
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.gameworld.getOffset
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.unsafe.UnsafeHelper
@@ -37,7 +34,7 @@ object ExplosionManager {
         val lineMax = world.height - ty + CALC_RADIUS
 
         // create a copy of the tilemap
-        val tilemap = BlockLayerI16(CALC_WIDTH, CALC_WIDTH)
+        val tilemap = BlockLayerGenericI16(CALC_WIDTH, CALC_WIDTH)
         val breakmap = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH)
 
         // fill in the tilemap copy
@@ -72,7 +69,7 @@ object ExplosionManager {
         }.start()
     }
 
-    private fun memcpyFromWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerI16) {
+    private fun memcpyFromWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerGenericI16) {
         // if the bounding box must wrap around
         if (xStart > world.width - CALC_RADIUS) {
             val lenLeft = world.width - xStart
@@ -104,7 +101,7 @@ object ExplosionManager {
         }
     }
 
-    private fun memcpyToWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerI16) {
+    private fun memcpyToWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerGenericI16) {
         // if the bounding box must wrap around
         if (xStart > world.width - CALC_RADIUS) {
             val lenLeft = world.width - xStart
@@ -158,7 +155,7 @@ object ExplosionManager {
         CALC_RADIUS: Int, CALC_WIDTH: Int,
         world: GameWorld,
         breakmap: UnsafeFloatArray,
-        tilemap: BlockLayerI16,
+        tilemap: BlockLayerGenericI16,
         tx: Int, ty: Int,
         power: Float,
         dropProbNonOre: Float,

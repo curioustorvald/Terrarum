@@ -14,7 +14,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleBase
-import net.torvald.terrarum.gameworld.BlockLayerI16
+import net.torvald.terrarum.gameworld.BlockLayerGenericI16
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameworld.WorldTime
@@ -877,8 +877,8 @@ class YamlCommandToolExportTest : YamlInvokable {
                 ui.world.tileNameToNumberMap
             )
             val layer = POILayer(name)
-            val terr = BlockLayerI16(poi.w, poi.h)
-            val wall = BlockLayerI16(poi.w, poi.h)
+            val terr = BlockLayerGenericI16(poi.w, poi.h)
+            val wall = BlockLayerGenericI16(poi.w, poi.h)
             layer.blockLayer = arrayListOf(terr, wall)
             poi.layers.add(layer)
 

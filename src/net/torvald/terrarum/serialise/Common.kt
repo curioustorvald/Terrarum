@@ -10,7 +10,7 @@ import io.airlift.compress.zstd.ZstdOutputStream
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.gameworld.BlockLayerI16
+import net.torvald.terrarum.gameworld.BlockLayerGenericI16
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.savegame.ByteArray64
@@ -41,7 +41,7 @@ object Common {
     val CHARSET = Charsets.UTF_8
 
     /** dispose of the `offendingObject` after rejection! */
-    class BlockLayerHashMismatchError(val oldHash: String, val newHash: String, val offendingObject: BlockLayerI16) : Error("Old Hash $oldHash != New Hash $newHash")
+    class BlockLayerHashMismatchError(val oldHash: String, val newHash: String, val offendingObject: BlockLayerGenericI16) : Error("Old Hash $oldHash != New Hash $newHash")
 
     private fun Byte.tostr() = this.toInt().and(255).toString(16).padStart(2,'0')
     private val digester = DigestUtils.getSha256Digest()
@@ -74,8 +74,8 @@ object Common {
                 }
             })
             // BlockLayer
-            it.setSerializer(BlockLayerI16::class.java, object : Json.Serializer<BlockLayerI16> {
-                override fun write(json: Json, obj: BlockLayerI16, knownType: Class<*>?) {
+            it.setSerializer(BlockLayerGenericI16::class.java, object : Json.Serializer<BlockLayerGenericI16> {
+                override fun write(json: Json, obj: BlockLayerGenericI16, knownType: Class<*>?) {
                     digester.reset()
                     obj.bytesIterator().forEachRemaining { digester.update(it) }
                     val hash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
@@ -85,7 +85,7 @@ object Common {
                     json.writeValue(layer)
                 }
 
-                override fun read(json: Json, jsonData: JsonValue, type: Class<*>): BlockLayerI16 {
+                override fun read(json: Json, jsonData: JsonValue, type: Class<*>): BlockLayerGenericI16 {
                     // full manual
                     try {
                         return strToBlockLayer(LayerInfo(
@@ -435,12 +435,12 @@ object Common {
      * @param b a BlockLayer
      * @return Bytes in [b] which are GZip'd then Ascii85-encoded
      */
-    private fun blockLayerToStr(b: BlockLayerI16): String {
+    private fun blockLayerToStr(b: BlockLayerGenericI16): String {
         return bytesToZipdStr(b.bytesIterator())
     }
 
-    private fun strToBlockLayer(layerInfo: LayerInfo): BlockLayerI16 {
-        val layer = BlockLayerI16(layerInfo.x, layerInfo.y)
+    private fun strToBlockLayer(layerInfo: LayerInfo): BlockLayerGenericI16 {
+        val layer = BlockLayerGenericI16(layerInfo.x, layerInfo.y)
         val unzipdBytes = strToBytes(StringReader(layerInfo.b))
 
         // write to blocklayer and the digester

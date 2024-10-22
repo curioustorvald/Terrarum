@@ -42,8 +42,8 @@ class PhysicalStatus() {
  * Special version of GameWorld where everything, including layer data, are saved in a single JSON file (i.e. not chunked)
  */
 class SimpleGameWorld(width: Int, height: Int) : GameWorld(width, height) {
-    override lateinit var layerWall: BlockLayerI16
-    override lateinit var layerTerrain: BlockLayerI16
+    override lateinit var layerWall: BlockLayerGenericI16
+    override lateinit var layerTerrain: BlockLayerGenericI16
     constructor() : this(0, 0)
     override fun dispose() {
         layerWall.dispose()
@@ -89,10 +89,10 @@ open class GameWorld(
     }
 
     //layers
-    @Transient open lateinit var layerWall: BlockLayerI16
-    @Transient open lateinit var layerTerrain: BlockLayerI16
+    @Transient open lateinit var layerWall: BlockLayerGenericI16
+    @Transient open lateinit var layerTerrain: BlockLayerGenericI16
     @Transient open lateinit var layerOres: BlockLayerOresI16I8 // damage to the block follows `terrainDamages`
-    @Transient open lateinit var layerFluids: BlockLayerI16F16
+    @Transient open lateinit var layerFluids: BlockLayerFluidI16F16
     val wallDamages = HashArray<Float>()
     val terrainDamages = HashArray<Float>()
 
@@ -230,10 +230,10 @@ open class GameWorld(
         this.spawnX = width / 2
         this.spawnY = 150
 
-        layerTerrain = BlockLayerI16(width, height)
-        layerWall = BlockLayerI16(width, height)
+        layerTerrain = BlockLayerGenericI16(width, height)
+        layerWall = BlockLayerGenericI16(width, height)
         layerOres = BlockLayerOresI16I8(width, height)
-        layerFluids = BlockLayerI16F16(width, height)
+        layerFluids = BlockLayerFluidI16F16(width, height)
         chunkFlags = Array(height / CHUNK_H) { ByteArray(width / CHUNK_W) }
 
         // temperature layer: 2x2 is one cell
@@ -544,7 +544,7 @@ open class GameWorld(
 
     fun setTileOnLayerUnsafe(layer: Int, x: Int, y: Int, tile: Int) {
         (getLayer(layer) ?: throw IllegalArgumentException("Unknown layer index: $layer")).let {
-            if (it !is BlockLayerI16) throw IllegalArgumentException("Block layers other than BlockLayer16 is not supported yet)")
+            if (it !is BlockLayerGenericI16) throw IllegalArgumentException("Block layers other than BlockLayer16 is not supported yet)")
             it.unsafeSetTile(x, y, tile)
         }
     }

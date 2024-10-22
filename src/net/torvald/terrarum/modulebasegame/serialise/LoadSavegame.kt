@@ -2,8 +2,8 @@ package net.torvald.terrarum.modulebasegame.serialise
 
 import net.torvald.terrarum.*
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.gameworld.BlockLayerI16
-import net.torvald.terrarum.gameworld.BlockLayerI16F16
+import net.torvald.terrarum.gameworld.BlockLayerGenericI16
+import net.torvald.terrarum.gameworld.BlockLayerFluidI16F16
 import net.torvald.terrarum.gameworld.BlockLayerOresI16I8
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
@@ -61,10 +61,10 @@ object LoadSavegame {
         val world = ReadWorld(worldDiskSavegameInfo, worldDisk.diskFile)
 
 
-        world.layerTerrain = BlockLayerI16(world.width, world.height)
-        world.layerWall = BlockLayerI16(world.width, world.height)
+        world.layerTerrain = BlockLayerGenericI16(world.width, world.height)
+        world.layerWall = BlockLayerGenericI16(world.width, world.height)
         world.layerOres = BlockLayerOresI16I8(world.width, world.height)
-        world.layerFluids = BlockLayerI16F16(world.width, world.height)
+        world.layerFluids = BlockLayerFluidI16F16(world.width, world.height)
         world.chunkFlags = Array(world.height / LandUtil.CHUNK_H) { ByteArray(world.width / LandUtil.CHUNK_W) }
 
         newIngame.world = world // must be set before the loadscreen, otherwise the loadscreen will try to read from the NullWorld which is already destroyed

@@ -4,7 +4,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameworld.BlockLayerI16F16
+import net.torvald.terrarum.gameworld.BlockLayerFluidI16F16
 import net.torvald.terrarum.gameworld.BlockLayerOresI16I8
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.SimpleGameWorld
@@ -26,7 +26,7 @@ object ReadSimpleWorld {
             world.tileNameToNumberMap[s] = l.toInt()
         }
         world.layerOres = BlockLayerOresI16I8(world.width, world.height)
-        world.layerFluids = BlockLayerI16F16(world.width, world.height)
+        world.layerFluids = BlockLayerFluidI16F16(world.width, world.height)
 
         ItemCodex.loadFromSave(origin, world.dynamicToStaticTable, world.dynamicItemInventory)
     }
