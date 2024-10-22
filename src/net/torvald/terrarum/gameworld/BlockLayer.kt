@@ -16,6 +16,6 @@ abstract class BlockLayer : Disposable {
 
 }
 
-inline fun BlockLayer.getOffset(x: Int, y: Int): Long {
+/*inline fun BlockLayer.getOffset(x: Int, y: Int): Long {
     return this.bytesPerBlock * (y * this.width + x)
-}
+}*/

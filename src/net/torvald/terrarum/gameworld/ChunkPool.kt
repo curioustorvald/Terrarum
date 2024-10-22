@@ -103,6 +103,9 @@ open class ChunkPool {
         return UnsafePtr(baseAddr, chunkSize)
     }
 
+    /**
+     * Returns a pointer and the offset from the pointer. The offset is given in bytes, but always word-aligned (if block offset is `(2, 0)`, the returning offset will be `8`, assuming word size of 4)
+     */
     private fun createPointerViewOfChunk(chunkNumber: Long, offsetX: Int, offsetY: Int): Pair<UnsafePtr, Long> {
         val baseAddr = pointers[chunkNumber]!!
         return UnsafePtr(baseAddr, chunkSize) to wordSizeInBytes * (offsetY * CHUNK_W + offsetX)
@@ -264,6 +267,19 @@ open class ChunkPool {
         return out
     }
 
+    fun worldXYChunkNumAndOffset(worldx: Int, worldy: Int): Triple<Long, Int, Int> {
+        val chunkX = worldx / CHUNK_W
+        val chunkY = worldy / CHUNK_H
+        val chunkOx = worldx % CHUNK_W
+        val chunkOy = worldy % CHUNK_H
+
+        val chunkNum = LandUtil.chunkXYtoChunkNum(world, chunkX, chunkY)
+        return Triple(chunkNum, chunkOx, chunkOy)
+    }
+
+    private fun updateAccessTime(chunkNumber: Long) {
+        allocMap.find { it?.chunkNumber == chunkNumber }!!.let { it.lastAccessTime = System.nanoTime() }
+    }
 
     /**
      * Given the word-aligned byte sequence of `[B0, B1, B2, B3, ...]`,
@@ -274,12 +290,29 @@ open class ChunkPool {
      */
     fun getTileRaw(chunkNumber: Long, offX: Int, offY: Int): Int {
         checkForChunk(chunkNumber)
-        allocMap.find { it?.chunkNumber == chunkNumber }!!.let { it.lastAccessTime = System.nanoTime() }
+        updateAccessTime(chunkNumber)
         val (ptr, ptrOff) = createPointerViewOfChunk(chunkNumber, offX, offY)
         val numIn = (0 until wordSizeInBytes.toInt()).fold(0) { acc, off ->
             acc or (ptr[ptrOff].toUint().shl(8 * off))
         }
         return numIn
+    }
+
+    /**
+     * Given the bytes of Int `B3_B2_B1_B0`
+     * Saved as:
+     * - word size is 4: `[B0, B1, B2, B3]`
+     * - word size is 3: `[B0, B1, B2]` (B3 is ignored)
+     * - word size is 2: `[B0, B1]` (B2 and B3 are ignored)
+     */
+    fun setTileRaw(chunkNumber: Long, offX: Int, offY: Int, bytes: Int) {
+        checkForChunk(chunkNumber)
+        updateAccessTime(chunkNumber)
+        val (ptr, ptrOff) = createPointerViewOfChunk(chunkNumber, offX, offY)
+        for (i in 0 until wordSizeInBytes.toInt()) {
+            val b = bytes.ushr(8*i).and(255)
+            ptr[ptrOff + i] = b.toByte()
+        }
     }
 
     /**
@@ -317,6 +350,10 @@ open class ChunkPool {
         val ibits = raw.get1SS()
         val jbits = raw.get2SS() and 255
         return ibits to jbits
+    }
+
+    fun dispose() {
+
     }
 
     companion object {
