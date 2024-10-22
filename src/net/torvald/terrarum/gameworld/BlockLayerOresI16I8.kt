@@ -1,6 +1,11 @@
 package net.torvald.terrarum.gameworld
 
 import net.torvald.terrarum.App
+import net.torvald.terrarum.gameworld.BlockLayerFluidI16F16.Companion
+import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
+import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClusteredFormatDOM
+import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.unsafe.UnsafePtr
@@ -13,12 +18,41 @@ import net.torvald.unsafe.UnsafePtr
  * where a_n is a tile number, p_n is a placement index
  * Created by minjaesong on 2023-10-10.
  */
-class BlockLayerOresI16I8 (override val width: Int, override val height: Int) : BlockLayer {
+class BlockLayerOresI16I8 : BlockLayer {
+
+    override val width: Int
+    override val height: Int
+    override val chunkPool: ChunkPool
+
+    constructor(
+        width: Int,
+        height: Int,
+        disk: ClusteredFormatDOM,
+        layerNum: Int,
+        world: GameWorld
+    ) {
+        this.width = width
+        this.height = height
+
+        chunkPool = ChunkPool(disk, layerNum, BlockLayerGenericI16.BYTES_PER_BLOCK, world, 0, ChunkPool.getRenameFunOres(world))
+    }
+
+    constructor(
+        width: Int,
+        height: Int,
+        disk: DiskSkimmer,
+        layerNum: Int,
+        world: GameWorld
+    ) {
+        this.width = width
+        this.height = height
+
+        chunkPool = ChunkPool(disk, layerNum, BlockLayerGenericI16.BYTES_PER_BLOCK, world, 0, ChunkPool.getRenameFunOres(world))
+    }
+
+
     override val bytesPerBlock = BYTES_PER_BLOCK
 
-    // for some reason, all the efforts of saving the memory space were futile.
-
-    // using unsafe pointer gets you 100 fps, whereas using directbytebuffer gets you 90
     internal val ptr: UnsafePtr = UnsafeHelper.allocate(width * height * bytesPerBlock)
 
     val ptrDestroyed: Boolean
@@ -26,14 +60,6 @@ class BlockLayerOresI16I8 (override val width: Int, override val height: Int) : 
 
     init {
         ptr.fillWith(0) // there is no NOT-GENERATED for ores, keep it as 0
-    }
-
-    /**
-     * @param data Byte array representation of the layer
-     */
-    constructor(width: Int, height: Int, data: ByteArray) : this(width, height) {
-        TODO()
-        data.forEachIndexed { index, byte -> UnsafeHelper.unsafe.putByte(ptr.ptr + index, byte) }
     }
 
     /**

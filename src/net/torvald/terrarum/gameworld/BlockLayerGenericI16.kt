@@ -1,10 +1,10 @@
 package net.torvald.terrarum.gameworld
 
-import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
 import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClusteredFormatDOM
+import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.unsafe.UnsafePtr
@@ -21,25 +21,49 @@ import net.torvald.unsafe.UnsafePtr
  *
  * Note to self: refrain from using shorts--just do away with two bytes: different system have different endianness
  */
-class BlockLayerI16(
-    override val width: Int,
-    override val height: Int,
-    disk: ClusteredFormatDOM,
-    layerNum: Int,
-    world: GameWorld
-): BlockLayer() {
+class BlockLayerGenericI16: BlockLayer {
 
-    override val chunkPool = ChunkPool(disk, layerNum, BYTES_PER_BLOCK, world, when (layerNum) {
-        TERRAIN -> ChunkPool.getRenameFunTerrain(world)
-        WALL -> ChunkPool.getRenameFunTerrain(world)
-        else -> throw IllegalArgumentException("Unknown layer number for I16: $layerNum")
-    })
+    override val width: Int
+    override val height: Int
+    override val chunkPool: ChunkPool
+
+    constructor(
+        width: Int,
+        height: Int,
+        disk: ClusteredFormatDOM,
+        layerNum: Int,
+        world: GameWorld
+    ) {
+        this.width = width
+        this.height = height
+
+        chunkPool = ChunkPool(disk, layerNum, BYTES_PER_BLOCK, world, -1, when (layerNum) {
+            TERRAIN -> ChunkPool.getRenameFunTerrain(world)
+            WALL -> ChunkPool.getRenameFunTerrain(world)
+            else -> throw IllegalArgumentException("Unknown layer number for I16: $layerNum")
+        })
+    }
+
+    constructor(
+        width: Int,
+        height: Int,
+        disk: DiskSkimmer,
+        layerNum: Int,
+        world: GameWorld
+    ) {
+        this.width = width
+        this.height = height
+
+        chunkPool = ChunkPool(disk, layerNum, BYTES_PER_BLOCK, world, -1, when (layerNum) {
+            TERRAIN -> ChunkPool.getRenameFunTerrain(world)
+            WALL -> ChunkPool.getRenameFunTerrain(world)
+            else -> throw IllegalArgumentException("Unknown layer number for I16: $layerNum")
+        })
+    }
+
 
     override val bytesPerBlock = BYTES_PER_BLOCK
 
-    // for some reason, all the efforts of saving the memory space were futile.
-
-    // using unsafe pointer gets you 100 fps, whereas using directbytebuffer gets you 90
     internal val ptr: UnsafePtr = UnsafeHelper.allocate(width * height * bytesPerBlock)
 
     val ptrDestroyed: Boolean

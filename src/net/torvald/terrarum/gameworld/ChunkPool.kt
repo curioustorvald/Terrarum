@@ -39,21 +39,60 @@ enum class ChunkAllocClass {
  *
  * Created by minjaesong on 2024-09-07.
  */
-open class ChunkPool(
+open class ChunkPool {
+
     // `DiskSkimmer` or `ClusteredFormatDOM`
-    val disk: Any,
-    val layerIndex: Int,
-    val wordSizeInBytes: Long,
-    val world: GameWorld,
-    val renumberFun: (Int) -> Int,
-) {
+    private val disk: Any
+    private val layerIndex: Int
+    private val wordSizeInBytes: Long
+    private val world: GameWorld
+    private val initialValue: Int // bytes to fill the new chunk
+    private val renumberFun: (Int) -> Int
+
     private val pointers = TreeMap<Long, Long>()
     private var allocCap = 32
     private var allocMap = Array<ChunkAllocation?>(allocCap) { null }
     private var allocCounter = 0
+    private val chunkSize: Long
+    private val pool: UnsafePtr
 
-    private val chunkSize = (wordSizeInBytes * CHUNK_W * CHUNK_H)
-    private val pool = UnsafeHelper.allocate(chunkSize * allocCap)
+    constructor(
+        disk: DiskSkimmer,
+        layerIndex: Int,
+        wordSizeInBytes: Long,
+        world: GameWorld,
+        initialValue: Int,
+        renumberFun: (Int) -> Int,
+    ) {
+        this.disk = disk
+        this.layerIndex = layerIndex
+        this.wordSizeInBytes = wordSizeInBytes
+        this.world = world
+        this.initialValue = initialValue
+        this.renumberFun = renumberFun
+
+        chunkSize = wordSizeInBytes * CHUNK_W * CHUNK_H
+        pool = UnsafeHelper.allocate(chunkSize * allocCap)
+    }
+
+    constructor(
+        disk: ClusteredFormatDOM,
+        layerIndex: Int,
+        wordSizeInBytes: Long,
+        world: GameWorld,
+        initialValue: Int,
+        renumberFun: (Int) -> Int,
+    ) {
+        this.disk = disk
+        this.layerIndex = layerIndex
+        this.wordSizeInBytes = wordSizeInBytes
+        this.world = world
+        this.initialValue = initialValue
+        this.renumberFun = renumberFun
+
+        chunkSize = wordSizeInBytes * CHUNK_W * CHUNK_H
+        pool = UnsafeHelper.allocate(chunkSize * allocCap)
+    }
 
     init {
         allocMap.fill(null)
