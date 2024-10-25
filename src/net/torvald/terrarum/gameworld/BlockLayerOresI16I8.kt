@@ -34,7 +34,7 @@ class BlockLayerOresI16I8 : BlockLayer {
         this.width = width
         this.height = height
 
-        chunkPool = ChunkPool(disk, layerNum, BlockLayerGenericI16.BYTES_PER_BLOCK, world, 0, ChunkPool.getRenameFunOres(world))
+        chunkPool = ChunkPool(disk, layerNum, BYTES_PER_BLOCK, world, 0, ChunkPool.getRenameFunOres(world))
     }
 
     constructor(
@@ -47,95 +47,44 @@ class BlockLayerOresI16I8 : BlockLayer {
         this.width = width
         this.height = height
 
-        chunkPool = ChunkPool(disk, layerNum, BlockLayerGenericI16.BYTES_PER_BLOCK, world, 0, ChunkPool.getRenameFunOres(world))
+        chunkPool = ChunkPool(disk, layerNum, BYTES_PER_BLOCK, world, 0, ChunkPool.getRenameFunOres(world))
     }
 
 
     override val bytesPerBlock = BYTES_PER_BLOCK
 
-    internal val ptr: UnsafePtr = UnsafeHelper.allocate(width * height * bytesPerBlock)
-
-    val ptrDestroyed: Boolean
-        get() = ptr.destroyed
-
-    init {
-        ptr.fillWith(0) // there is no NOT-GENERATED for ores, keep it as 0
-    }
-
-    /**
-     * Returns an iterator over stored bytes.
-     *
-     * @return an Iterator.
-     */
-    fun bytesIterator(): Iterator<Byte> {
-        return object : Iterator<Byte> {
-            private var iteratorCount = 0L
-            override fun hasNext(): Boolean {
-                return iteratorCount < width * height * bytesPerBlock
-            }
-            override fun next(): Byte {
-                iteratorCount += 1
-                return ptr[iteratorCount - 1]
-            }
-        }
-    }
-
     override fun unsafeGetTile(x: Int, y: Int): Int {
-        val offset = getOffset(x, y)
-        val lsb = ptr[offset]
-        val msb = ptr[offset + 1]
-        val placement = ptr[offset + 2]
-
-        return lsb.toUint() + msb.toUint().shl(8)
+        return unsafeGetTile1(x, y).first
     }
 
     internal fun unsafeGetTile1(x: Int, y: Int): Pair<Int, Int> {
-        val offset = getOffset(x, y)
-        val lsb = ptr[offset]
-        val msb = ptr[offset + 1]
-        val placement = ptr[offset + 2]
-
-        return lsb.toUint() or msb.toUint().shl(8) to placement.toUint()
+        val (chunk, ox, oy) = chunkPool.worldXYChunkNumAndOffset(x, y)
+        return chunkPool.getTileI16I8(chunk, ox, oy)
     }
 
     override fun unsafeToBytes(x: Int, y: Int): ByteArray {
-        val offset = getOffset(x, y)
-        return byteArrayOf(ptr[offset + 1], ptr[offset + 0], ptr[offset + 2])
+        val (tile, fill) = unsafeGetTile1(x, y)
+        return byteArrayOf(
+            ((tile ushr 8) and 255).toByte(),
+            (tile and 255).toByte(),
+            (fill and 255).toByte()
+        )
     }
 
     internal fun unsafeSetTile(x: Int, y: Int, tile: Int, placement: Int) {
-        val offset = getOffset(x, y)
-
-        val lsb = tile.and(0xff).toByte()
-        val msb = tile.ushr(8).and(0xff).toByte()
-
-
-//        try {
-        ptr[offset] = lsb
-        ptr[offset + 1] = msb
-        ptr[offset + 2] = placement.toByte()
-//        }
-//        catch (e: IndexOutOfBoundsException) {
-//            printdbgerr(this, "IndexOutOfBoundsException: x = $x, y = $y; offset = $offset")
-//            throw e
-//        }
+        val (chunk, ox, oy) = chunkPool.worldXYChunkNumAndOffset(x, y)
+        chunkPool.setTileRaw(chunk, ox, oy, tile or placement.shl(16))
     }
 
     override fun unsafeSetTile(x: Int, y: Int, bytes: ByteArray) {
-        val offset = getOffset(x, y)
-        ptr[offset] = bytes[1]
-        ptr[offset + 1] = bytes[0]
-        ptr[offset + 2] = bytes[2]
+        val tile = bytes[1].toUint().shl(8) or bytes[0].toUint()
+        val placement = bytes[2].toUint()
+        unsafeSetTile(x, y, tile, placement)
     }
 
     internal fun unsafeSetTileKeepPlacement(x: Int, y: Int, tile: Int) {
-        val offset = getOffset(x, y)
-
-        val lsb = tile.and(0xff).toByte()
-        val msb = tile.ushr(8).and(0xff).toByte()
-
-        ptr[offset] = lsb
-        ptr[offset + 1] = msb
+        val oldPlacement = unsafeGetTile1(x, y).second
+        unsafeSetTile(x, y, tile, oldPlacement)
     }
 
     /**
@@ -154,11 +103,10 @@ class BlockLayerOresI16I8 : BlockLayer {
     fun isInBound(x: Int, y: Int) = (x >= 0 && y >= 0 && x < width && y < height)
 
     override fun dispose() {
-        ptr.destroy()
-        App.printdbg(this, "BlockLayerI16I8 with ptr ($ptr) successfully freed")
+        chunkPool.dispose()
     }
 
-    override fun toString(): String = ptr.toString("BlockLayerI16I8")
+    override fun toString(): String = "BlockLayerI16I8 (${width}x$height)"
 
     companion object {
         @Transient val BYTES_PER_BLOCK = 3L

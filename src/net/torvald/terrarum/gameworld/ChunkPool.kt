@@ -210,12 +210,17 @@ open class ChunkPool {
         }
     }
 
-    private fun fetchFromDisk(chunkNumber: Long) {
+    /**
+     * @return `unit` if IO operation was successful, `null` if failed (e.g. file not exists)
+     */
+    private fun fetchFromDisk(chunkNumber: Long): Unit? {
         val fileName = chunkNumToFileNum(layerIndex, chunkNumber)
 
         // read data from the disk
-        if (disk is ClusteredFormatDOM) {
+        return if (disk is ClusteredFormatDOM) {
             Clustfile(disk, fileName).let {
+                if (!it.exists()) return@let null
+
                 val bytes = Common.unzip(it.readBytes())
                 val ptr = allocate(chunkNumber)
                 UnsafeHelper.memcpyFromArrToPtr(bytes, 0, ptr.ptr, bytes.size)
@@ -224,13 +229,25 @@ open class ChunkPool {
         }
         else if (disk is DiskSkimmer) {
             val fileID = fileName.toLong()
-            disk.getFile(fileID)!!.let {
+            disk.getFile(fileID).let {
+                if (it == null) return@let null
+
                 val bytes = Common.unzip(it.bytes)
                 val ptr = allocate(chunkNumber)
                 UnsafeHelper.memcpyFromArrToPtr(bytes, 0, ptr.ptr, bytes.size)
                 renumber(ptr)
             }
         }
+        else {
+            throw IllegalStateException()
+        }
+    }
+
+    /**
+     * @return `unit` if IO operation was successful, `null` if failed (e.g. file not exists)
+     */
+    private fun createNewChunkFile(chunkNumber: Long): Unit? {
+        TODO()
     }
 
     private fun storeToDisk(chunkNumber: Long) {
@@ -256,7 +273,7 @@ open class ChunkPool {
 
     private fun checkForChunk(chunkNumber: Long) {
         if (!pointers.containsKey(chunkNumber)) {
-            fetchFromDisk(chunkNumber)
+            fetchFromDisk(chunkNumber) ?: createNewChunkFile(chunkNumber) ?: TODO("handle IO error")
         }
     }
 
