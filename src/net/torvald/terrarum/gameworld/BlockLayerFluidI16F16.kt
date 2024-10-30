@@ -17,7 +17,7 @@ const val FLUID_MIN_MASS = 1f / 1024f //Ignore cells that are almost dry (smalle
  *
  * Created by minjaesong on 2023-10-10.
  */
-class BlockLayerI16F16(override val width: Int, override val height: Int) : BlockLayer {
+class BlockLayerFluidI16F16(override val width: Int, override val height: Int) : BlockLayer {
     override val bytesPerBlock = BYTES_PER_BLOCK
 
     // for some reason, all the efforts of saving the memory space were futile.

@@ -21,19 +21,10 @@ import net.torvald.unsafe.UnsafePtr
  *
  * Note to self: refrain from using shorts--just do away with two bytes: different system have different endianness
  */
-class BlockLayerI16(
+class BlockLayerGenericI16(
     override val width: Int,
     override val height: Int,
-    disk: ClusteredFormatDOM,
-    layerNum: Int,
-    world: GameWorld
-): BlockLayer() {
-
-    override val chunkPool = ChunkPool(disk, layerNum, BYTES_PER_BLOCK, world, when (layerNum) {
-        TERRAIN -> ChunkPool.getRenameFunTerrain(world)
-        WALL -> ChunkPool.getRenameFunTerrain(world)
-        else -> throw IllegalArgumentException("Unknown layer number for I16: $layerNum")
-    })
+): BlockLayer {
 
     override val bytesPerBlock = BYTES_PER_BLOCK
 
