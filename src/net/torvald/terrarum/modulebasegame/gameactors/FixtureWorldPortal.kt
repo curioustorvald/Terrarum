@@ -62,12 +62,12 @@ class FixtureWorldPortal : Electric {
     }
 
     override fun onRisingEdge(readFrom: BlockBoxIndex) {
-        printdbg(this, "readFrom=$readFrom; getWireSinkAt(readFrom)=${getWireSinkAt(readFrom)}")
+//        printdbg(this, "readFrom=$readFrom; getWireSinkAt(readFrom)=${getWireSinkAt(readFrom)}")
 
         if (getWireSinkAt(readFrom) != "digital_bit") return
 
 
-        printdbg(this, "teleport! $teleportRequest")
+//        printdbg(this, "teleport! $teleportRequest")
         teleportRequest?.let {
             if (it.worldDiskToLoad != null && it.worldLoadParam != null) {
                 throw InternalError("Contradiction -- worldDiskToLoad and worldLoadParam are both not null: $teleportRequest")

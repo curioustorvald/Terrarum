@@ -33,7 +33,7 @@ object CheckUpdate {
     private val checkUpdateURL = setOf(
         "https://github.com/curioustorvald/Terrarum/releases/tag/v$versionNumOnly",
         "https://github.com/curioustorvald/Terrarum/releases/tag/v$versionNumFull",
-    ).toList()
+    ).map { it.replace(' ', '_') }
 
     private fun wget(url: String): String? {
         printdbg(this, "wget $url")

@@ -80,7 +80,7 @@ class FixtureTextSignCopper : Electric {
             blockBox = BlockBox(BlockBox.NO_COLLISION, panelCount, 2)
             setHitboxDimension(TILE_SIZE * blockBox.width, TILE_SIZE * blockBox.height, 0, 2)
             oldSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
-            newSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
+//            newSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
         }
 
         // must be re-spawned on reload to make it visible after load

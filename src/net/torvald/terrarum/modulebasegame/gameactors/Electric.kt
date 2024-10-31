@@ -17,7 +17,7 @@ open class Electric : FixtureBase {
 
     protected constructor() : super() {
         oldSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
-        newSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
+//        newSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
     }
 
     /**
@@ -46,7 +46,7 @@ open class Electric : FixtureBase {
             App.disposables.add(mainUI)
 
         oldSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
-        newSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
+//        newSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
     }
 
     companion object {
@@ -138,7 +138,7 @@ open class Electric : FixtureBase {
         getWireEmissionAt(offsetX, offsetY).x <= ELECTRIC_THRESHOLD_LOW
 
     protected var oldSinkStatus: Array<Vector2>
-    protected var newSinkStatus: Array<Vector2>
+//    protected var newSinkStatus: Array<Vector2>
 
     open fun updateOnWireGraphTraversal(offsetX: Int, offsetY: Int, sinkType: WireEmissionType) {
         val index = pointToBlockBoxIndex(offsetX, offsetY)
@@ -150,9 +150,6 @@ open class Electric : FixtureBase {
                 Vector2(acc.x + (it?.x ?: 0.0), acc.y + (it?.y ?: 0.0))
             }
         }
-
-
-        oldSinkStatus[index].set(new2)
     }
 
     /**
@@ -170,27 +167,33 @@ open class Electric : FixtureBase {
                 // get indices of "falling edges"
                 val index = pointToBlockBoxIndex(x, y)
                 val type = getWireSinkAt(index) ?: ""
-                val new = getWireStateAt(x, y, type)
 
-                if (new.x - oldSinkStatus[index].x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTRIC_THRESHOLD_HIGH)
-                    risingEdgeIndices.add(index)
-                else if (oldSinkStatus[index].x - new.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x <= ELECTRIC_THRESHOLD_LOW)
-                    fallingEdgeIndices.add(index)
+                if (type.isNotBlank()) {
+                    val old = oldSinkStatus[index]
+                    val new = getWireStateAt(x, y, type)
+
+                    val wx = x + worldBlockPos!!.x
+                    val wy = y + worldBlockPos!!.y
+
+                    println("Wxy($wx,$wy) getWireState($type)=$new, oldState($type)=$old")
+
+                    if (new.x - old.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTRIC_THRESHOLD_HIGH)
+                        risingEdgeIndices.add(index)
+                    else if (old.x - new.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x <= ELECTRIC_THRESHOLD_LOW)
+                        fallingEdgeIndices.add(index)
 
 
-                oldSinkStatus[index].set(new)
+                    oldSinkStatus[index].set(new)
+                }
             }
         }
 
+        if (risingEdgeIndices.isNotEmpty()) {
+            println("risingEdgeIndices=$risingEdgeIndices")
+        }
 
         risingEdgeIndices.forEach { onRisingEdge(it) }
         fallingEdgeIndices.forEach { onFallingEdge(it) }
         updateSignal()
-
-
-
-        /*oldSinkStatus.indices.forEach { index ->
-            oldSinkStatus[index].set(new)
-        }*/
     }
 }
