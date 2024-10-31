@@ -136,6 +136,7 @@ abstract class UICanvas(
 
     /** A function that is run ONCE when the UI is requested to be opened; will work identical to [endOpening] if [openCloseTime] is zero */
     open fun show() {
+        clearTooltip()
         openingClickLatched = true
         uiItems.forEach { it.show() }
         handler.subUIs.forEach { it.show() }

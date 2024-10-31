@@ -62,6 +62,8 @@ class FixtureWorldPortal : Electric {
     }
 
     override fun onRisingEdge(readFrom: BlockBoxIndex) {
+        printdbg(this, "readFrom=$readFrom; getWireSinkAt(readFrom)=${getWireSinkAt(readFrom)}")
+
         if (getWireSinkAt(readFrom) != "digital_bit") return
 
 

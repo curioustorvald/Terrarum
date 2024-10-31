@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.ui.UICanvas
@@ -167,15 +168,9 @@ open class Electric : FixtureBase {
             for (x in 0 until blockBox.width) {
                 // get indices of "rising edges"
                 // get indices of "falling edges"
-
-                val wx = x + worldBlockPos!!.x
-                val wy = y + worldBlockPos!!.y
-                val new = WireCodex.getAllWiresThatAccepts(getWireSinkAt(x, y) ?: "").fold(Vector2()) { acc, (id, _) ->
-                    INGAME.world.getWireEmitStateOf(wx, wy, id).let {
-                        Vector2(acc.x + (it?.x ?: 0.0), acc.y + (it?.y ?: 0.0))
-                    }
-                }
                 val index = pointToBlockBoxIndex(x, y)
+                val type = getWireSinkAt(index) ?: ""
+                val new = getWireStateAt(x, y, type)
 
                 if (new.x - oldSinkStatus[index].x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTRIC_THRESHOLD_HIGH)
                     risingEdgeIndices.add(index)

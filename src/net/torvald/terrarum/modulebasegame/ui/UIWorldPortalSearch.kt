@@ -136,6 +136,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
 
 
     override fun show() {
+        clearTooltip()
         uiItems.forEach { it.show() }
         seedInput.clearText()
         seedInput.refreshPlaceholder()
