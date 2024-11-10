@@ -6,6 +6,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockLayerGenericI16
+import net.torvald.terrarum.gameworld.BlockLayerInMemoryI16
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
 import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
@@ -128,7 +129,7 @@ class POILayer(
     constructor() : this("undefined")
 
     @Transient var name = name
-    @Transient internal lateinit var blockLayer: ArrayList<BlockLayerGenericI16>
+    @Transient internal lateinit var blockLayer: ArrayList<BlockLayerInMemoryI16>
     @Transient internal lateinit var dat: Array<ByteArray>
 
     @Deprecated("Used for debug print", ReplaceWith("name")) @Transient internal var id = ""
@@ -179,10 +180,10 @@ class POILayer(
         if (::blockLayer.isInitialized) {
             blockLayer.forEach { it.dispose() }
         }
-        blockLayer = ArrayList<BlockLayerGenericI16>()
+        blockLayer = ArrayList()
 
         dat.forEachIndexed { layerIndex, layer ->
-            val currentBlockLayer = BlockLayerGenericI16(width, height).also {
+            val currentBlockLayer = BlockLayerInMemoryI16(width, height).also {
                 blockLayer.add(it)
             }
             for (w in 0 until layer.size / byteLength) {

@@ -35,6 +35,8 @@ enum class ChunkAllocClass {
 }
 
 /**
+ * FIXME: loading a chunk from disk will attempt to create a chunk because the chunk-to-be-loaded is not on the pointers map, and this operation will want to create a new chunk file but the file already exists
+ *
  * Single layer gets single Chunk Pool.
  *
  * Created by minjaesong on 2024-09-07.
@@ -45,7 +47,7 @@ open class ChunkPool {
     private val disk: Any
     private val layerIndex: Int
     private val wordSizeInBytes: Long
-    private val world: GameWorld
+    private val world: TheGameWorld
     private val initialValue: Int // bytes to fill the new chunk
     private val renumberFun: (Int) -> Int
 
@@ -60,7 +62,7 @@ open class ChunkPool {
         disk: DiskSkimmer,
         layerIndex: Int,
         wordSizeInBytes: Long,
-        world: GameWorld,
+        world: TheGameWorld,
         initialValue: Int,
         renumberFun: (Int) -> Int,
     ) {
@@ -79,7 +81,7 @@ open class ChunkPool {
         disk: ClusteredFormatDOM,
         layerIndex: Int,
         wordSizeInBytes: Long,
-        world: GameWorld,
+        world: TheGameWorld,
         initialValue: Int,
         renumberFun: (Int) -> Int,
     ) {
@@ -393,7 +395,7 @@ open class ChunkPool {
         private fun Int.get2LSB() = this.get3MSB()
         private fun Int.getLSB() = this.get4MSB()
 
-        fun getRenameFunTerrain(world: GameWorld): (Int) -> Int {
+        fun getRenameFunTerrain(world: TheGameWorld): (Int) -> Int {
             // word size: 2
             return { oldTileNum ->
                 val oldOreName = world.oldTileNumberToNameMap[oldTileNum.toLong()]
@@ -402,7 +404,7 @@ open class ChunkPool {
             }
         }
 
-        fun getRenameFunOres(world: GameWorld): (Int) -> Int {
+        fun getRenameFunOres(world: TheGameWorld): (Int) -> Int {
             // word size: 3
             return { oldTileNumRaw ->
                 val oldOreNum = oldTileNumRaw and 0x0000FFFF
@@ -413,7 +415,7 @@ open class ChunkPool {
             }
         }
 
-        fun getRenameFunFluids(world: GameWorld): (Int) -> Int {
+        fun getRenameFunFluids(world: TheGameWorld): (Int) -> Int {
             // word size: 4
             return { oldTileNumRaw ->
                 val oldFluidNum = oldTileNumRaw and 0x0000FFFF

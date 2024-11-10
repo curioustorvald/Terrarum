@@ -1,6 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.modulebasegame.console.GetAV.isNum
 
 /**
@@ -8,7 +9,7 @@ import net.torvald.terrarum.modulebasegame.console.GetAV.isNum
  */
 internal object GetGR : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        val gameRules = INGAME.world.gameRules
+        val gameRules = (INGAME.world as TheGameWorld).gameRules
 
         // check if args[1] is number or not
         if (args.size > 1 && !args[1].isNum()) { // args[1] is Gamerule name

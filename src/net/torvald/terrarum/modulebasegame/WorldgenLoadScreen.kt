@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.roundToInt
 
@@ -96,7 +97,7 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
 
                 try {
                     // q&d solution for the dangling pointer; i'm doing this only because it's this fucking load screen that's fucking the dead pointer
-                    if (!world.layerTerrain.ptrDestroyed) {
+                    if (!world.layerTerrain.disposed) {
                         val outCol = if (BlockCodex[world.getTileFromTerrain(wx, wy)].isSolid) COL_TERR
                         else if (BlockCodex[world.getTileFromWall(wx, wy)].isSolid) COL_WALLED
                         else COL_AIR

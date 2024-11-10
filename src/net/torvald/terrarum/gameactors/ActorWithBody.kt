@@ -18,6 +18,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.createRandomBlockParticle
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid

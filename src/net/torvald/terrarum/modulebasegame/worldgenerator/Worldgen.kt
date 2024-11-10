@@ -10,6 +10,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -163,14 +164,14 @@ object Worldgen {
         val jobs = getJobs()
         printdbg(this, "Generating chunk on ($cx, $cy)")
         Thread {
-            world.chunkFlags[cy][cx] = GameWorld.CHUNK_GENERATING
+            world.chunkFlags[cy][cx] = TheGameWorld.CHUNK_GENERATING
 
             for (i in jobs.indices) {
                 val it = jobs[i]
                 it.theWork.getChunkDone(cx, cy)
             }
 
-            world.chunkFlags[cy][cx] = GameWorld.CHUNK_LOADED
+            world.chunkFlags[cy][cx] = TheGameWorld.CHUNK_LOADED
             callback(cx, cy)
         }.let {
             it.priority = 2
@@ -566,7 +567,7 @@ abstract class Gen(val world: GameWorld, val isFinal: Boolean, val seed: Long, v
                 draw(chunkX * LandUtil.CHUNK_W, chunkY * CHUNK_H, localJoise, sampleOffset)
                 loadscreen?.progress?.addAndGet(1L)
 
-                world.chunkFlags[chunkY][chunkX] = if (isFinal) GameWorld.CHUNK_LOADED else GameWorld.CHUNK_GENERATING
+                world.chunkFlags[chunkY][chunkX] = if (isFinal) TheGameWorld.CHUNK_LOADED else TheGameWorld.CHUNK_GENERATING
             }
         }
     }

@@ -2,10 +2,11 @@ package net.torvald.terrarum.modulebasegame.serialise
 
 import net.torvald.terrarum.*
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.gameworld.BlockLayerGenericI16
-import net.torvald.terrarum.gameworld.BlockLayerFluidI16F16
-import net.torvald.terrarum.gameworld.BlockLayerOresI16I8
-import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.*
+import net.torvald.terrarum.gameworld.GameWorld.Companion.FLUID
+import net.torvald.terrarum.gameworld.GameWorld.Companion.ORES
+import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
+import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.FancyWorldReadLoadScreen
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -60,11 +61,10 @@ object LoadSavegame {
         val worldDiskSavegameInfo = ByteArray64Reader(worldDisk.getFile(VDFileID.SAVEGAMEINFO)!!.bytes, Common.CHARSET)
         val world = ReadWorld(worldDiskSavegameInfo, worldDisk.diskFile)
 
-
-        world.layerTerrain = BlockLayerGenericI16(world.width, world.height)
-        world.layerWall = BlockLayerGenericI16(world.width, world.height)
-        world.layerOres = BlockLayerOresI16I8(world.width, world.height)
-        world.layerFluids = BlockLayerFluidI16F16(world.width, world.height)
+        world.layerTerrain = BlockLayerGenericI16(world.width, world.height, worldDisk, TERRAIN, world)
+        world.layerWall = BlockLayerGenericI16(world.width, world.height, worldDisk, WALL, world)
+        world.layerOres = BlockLayerOresI16I8(world.width, world.height, worldDisk, ORES, world)
+        world.layerFluids = BlockLayerFluidI16F16(world.width, world.height, worldDisk, FLUID, world)
         world.chunkFlags = Array(world.height / LandUtil.CHUNK_H) { ByteArray(world.width / LandUtil.CHUNK_W) }
 
         newIngame.world = world // must be set before the loadscreen, otherwise the loadscreen will try to read from the NullWorld which is already destroyed
@@ -119,7 +119,7 @@ object LoadSavegame {
                         val (cx, cy) = LandUtil.chunkNumToChunkXY(world, chunk)
 
                         ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer]!!, cx, cy)
-                        world.chunkFlags[cy][cx] = world.chunkFlags[cy][cx] or GameWorld.CHUNK_LOADED
+                        world.chunkFlags[cy][cx] = world.chunkFlags[cy][cx] or TheGameWorld.CHUNK_LOADED
                     }
                 }
                 loadscreen.progress.getAndAdd(1)

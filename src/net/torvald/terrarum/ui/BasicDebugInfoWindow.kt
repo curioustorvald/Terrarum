@@ -18,6 +18,7 @@ import net.torvald.terrarum.audio.AudioMixer.Companion.DS_FLTIDX_PAN
 import net.torvald.terrarum.audio.dsp.*
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulebasegame.IngameRenderer
@@ -315,7 +316,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 val wallNum = it.getTileFromWall(mouseTileX, mouseTileY)
                 val tileNum = it.getTileFromTerrain(mouseTileX, mouseTileY)
                 val (oreNum, orePlacement) = it.getTileFromOre(mouseTileX, mouseTileY)
-                val wires = it.getAllWiresFrom(mouseTileX, mouseTileY)
+                val wires = if (it is TheGameWorld) it.getAllWiresFrom(mouseTileX, mouseTileY) else null to null
                 val fluid = it.getFluid(mouseTileX, mouseTileY)
                 val wireCount = wires.first?.size?.toString() ?: "no"
                 val tdmg = it.getTerrainDamage(mouseTileX, mouseTileY).toIntAndFrac(2,2)

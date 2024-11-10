@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -14,14 +15,14 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleBase
-import net.torvald.terrarum.gameworld.BlockLayerGenericI16
-import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.*
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerPenMenu
 import net.torvald.terrarum.modulebasegame.ui.UIPaletteSelector
 import net.torvald.terrarum.modulebasegame.ui.UIScreenZoom
+import net.torvald.terrarum.savegame.DiskSkimmer
+import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.PointOfInterest
 import net.torvald.terrarum.serialise.POILayer
@@ -61,7 +62,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
  - Set…
     """.trimIndent())
 
-    lateinit var gameWorld: GameWorld
+    lateinit var gameWorld: TheGameWorld
 
     override val musicStreamer = TerrarumMusicAndAmbientStreamer()
 
@@ -419,7 +420,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             for (x in for_x_start..for_x_end) {
                 if (wiringCounter >= maxRenderableWires) break
 
-                val (wires, nodes) = world.getAllWiresFrom(x, y)
+                val (wires, nodes) = gameWorld.getAllWiresFrom(x, y)
 
                 wires?.forEach {
                     val wireActor = wireActorsContainer[wiringCounter]
@@ -553,7 +554,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         )
     }
     private fun getNearbyOres8(x: Int, y: Int): List<OrePlacement> {
-        return getNearbyTilesPos8(x, y).map { world.getTileFromOre(it.x, it.y) }
+        return getNearbyTilesPos8(x, y).map { gameWorld.getTileFromOre(it.x, it.y) }
     }
 
     private fun makePenWork(x: Int, y: Int) {
@@ -877,8 +878,8 @@ class YamlCommandToolExportTest : YamlInvokable {
                 ui.world.tileNameToNumberMap
             )
             val layer = POILayer(name)
-            val terr = BlockLayerGenericI16(poi.w, poi.h)
-            val wall = BlockLayerGenericI16(poi.w, poi.h)
+            val terr = BlockLayerInMemoryI16(poi.w, poi.h)
+            val wall = BlockLayerInMemoryI16(poi.w, poi.h)
             layer.blockLayer = arrayListOf(terr, wall)
             poi.layers.add(layer)
 
@@ -934,8 +935,13 @@ class YamlCommandNewFlatTerrain : YamlInvokable {
 
         println("[BuildingMaker] Generating builder world...")
 
+        val tempFile = FileHandle.tempFile("terrarumbuildingmaker").file()
+        val tempDisk = VDUtil.createNewDisk(1L shl 30, "buildingmaker", Common.CHARSET)
+        VDUtil.dumpToRealMachine(tempDisk, tempFile)
+        val tempDiskSkimmer = DiskSkimmer(tempFile)
+
         val timeNow = System.currentTimeMillis() / 1000
-        ui.gameWorld = GameWorld(90*12, 90*4, timeNow, timeNow)
+        ui.gameWorld = TheGameWorld(90*12, 90*4, tempDiskSkimmer, timeNow, timeNow)
 
         // remove null tiles
         for (y in 0 until ui.gameWorld.height) {

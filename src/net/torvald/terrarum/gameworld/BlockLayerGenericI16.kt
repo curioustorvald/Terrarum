@@ -1,13 +1,10 @@
 package net.torvald.terrarum.gameworld
 
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
 import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClusteredFormatDOM
 import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.serialise.toUint
-import net.torvald.unsafe.UnsafeHelper
-import net.torvald.unsafe.UnsafePtr
 
 /**
  * Memory layout:
@@ -18,21 +15,24 @@ import net.torvald.unsafe.UnsafePtr
  *
  * Original version Created by minjaesong on 2016-01-17.
  * Unsafe version Created by minjaesong on 2019-06-08.
+ * Chunkpool version Created by minjaesong on 2024-10-22.
  *
  * Note to self: refrain from using shorts--just do away with two bytes: different system have different endianness
  */
-class BlockLayerGenericI16: BlockLayer {
+class BlockLayerGenericI16: BlockLayerWithChunkPool {
 
     override val width: Int
     override val height: Int
     override val chunkPool: ChunkPool
+
+    private var _hashcode = 0
 
     constructor(
         width: Int,
         height: Int,
         disk: ClusteredFormatDOM,
         layerNum: Int,
-        world: GameWorld
+        world: TheGameWorld
     ) {
         this.width = width
         this.height = height
@@ -42,6 +42,8 @@ class BlockLayerGenericI16: BlockLayer {
             WALL -> ChunkPool.getRenameFunTerrain(world)
             else -> throw IllegalArgumentException("Unknown layer number for I16: $layerNum")
         })
+
+        _hashcode = disk.uuid.hashCode()
     }
 
     constructor(
@@ -49,7 +51,7 @@ class BlockLayerGenericI16: BlockLayer {
         height: Int,
         disk: DiskSkimmer,
         layerNum: Int,
-        world: GameWorld
+        world: TheGameWorld
     ) {
         this.width = width
         this.height = height
@@ -59,7 +61,11 @@ class BlockLayerGenericI16: BlockLayer {
             WALL -> ChunkPool.getRenameFunTerrain(world)
             else -> throw IllegalArgumentException("Unknown layer number for I16: $layerNum")
         })
+
+        _hashcode = disk.diskFile.hashCode()
     }
+
+    override fun hashCode() = _hashcode
 
     override val bytesPerBlock = BYTES_PER_BLOCK
 
@@ -76,13 +82,21 @@ class BlockLayerGenericI16: BlockLayer {
         )
     }
 
-    internal fun unsafeSetTile(x: Int, y: Int, tile: Int) {
+    override fun unsafeSetTile(x: Int, y: Int, tile: Int) {
         val (chunk, ox, oy) = chunkPool.worldXYChunkNumAndOffset(x, y)
         chunkPool.setTileRaw(chunk, ox, oy, tile)
     }
 
+    override fun unsafeSetTile(x: Int, y: Int, tile: Int, fill: Float) {
+        throw UnsupportedOperationException()
+    }
+
+    override fun unsafeSetTile(x: Int, y: Int, tile: Int, placement: Int) {
+        throw UnsupportedOperationException()
+    }
+
     override fun unsafeSetTile(x: Int, y: Int, bytes: ByteArray) {
-        val tile = (0..3).fold(0) { acc, i -> acc or (bytes[i].toUint()).shl(8*i) }
+        val tile = (0..1).fold(0) { acc, i -> acc or (bytes[i].toUint()).shl(8*i) }
         unsafeSetTile(x, y, tile)
     }
 
@@ -101,8 +115,11 @@ class BlockLayerGenericI16: BlockLayer {
 
     fun isInBound(x: Int, y: Int) = (x >= 0 && y >= 0 && x < width && y < height)
 
+    override var disposed: Boolean = false
+
     override fun dispose() {
         chunkPool.dispose()
+        disposed = true
     }
 
     override fun toString(): String = "BlockLayerI16 (${width}x$height)"

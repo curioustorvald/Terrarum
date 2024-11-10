@@ -28,6 +28,7 @@ import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.*
@@ -46,6 +47,7 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
+import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
@@ -348,7 +350,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     data class Codices(
         val disk: VirtualDisk, // WORLD disk
-        val world: GameWorld,
+        val world: TheGameWorld,
 //        val meta: WriteMeta.WorldMeta,
 //        val block: BlockCodex,
 //        val item: ItemCodex,
@@ -383,7 +385,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
             // feed info to the worldgen
-            Worldgen.attachMap(world, WorldgenParams.getParamsByVersion(codices.worldGenver, world.generatorSeed))
+            if (world is TheGameWorld)
+                Worldgen.attachMap(world as TheGameWorld, WorldgenParams.getParamsByVersion(codices.worldGenver, world.generatorSeed))
         }
 
         loadCallback = codices.callbackAfterLoad
@@ -442,7 +445,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 codices.player.setPosition((world.portalPoint ?: world.spawnPoint).toVector() * TILE_SIZED)
             }
         }
-
 
         // try to unstuck the repositioned player
         codices.player.tryUnstuck()
@@ -520,13 +522,18 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
         else {
             App.getLoadScreen().addMessage("${App.GAME_NAME} ${App.getVERSION_STRING()}")
-
             App.getLoadScreen().addMessage("Creating new world")
 
 
+            val worldFile = getWorldSaveFiledesc(worldSavefileName)
+            VDUtil.dumpToRealMachine(worldDisk, worldFile)
+            val skimmer = DiskSkimmer(worldFile)
+
             // init map as chosen size
             val timeNow = App.getTIME_T()
-            world = GameWorld(worldParams.width, worldParams.height, timeNow, timeNow) // new game, so the creation time is right now
+
+            world = TheGameWorld(worldParams.width, worldParams.height, skimmer, timeNow, timeNow) // new game, so the creation time is right now
+
             world.generatorSeed = worldParams.worldGenSeed
             //gameworldIndices.add(world.worldIndex)
             world.extraFields["basegame.economy"] = GameEconomy()

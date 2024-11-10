@@ -31,6 +31,7 @@ import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent;
 import net.torvald.terrarum.gameitems.GameItem;
 import net.torvald.terrarum.gameworld.GameWorld;
+import net.torvald.terrarum.gameworld.TheGameWorld;
 import net.torvald.terrarum.imagefont.BigAlphNum;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.langpack.Lang;
@@ -1016,7 +1017,7 @@ public class App implements ApplicationListener {
 
         ModMgr.INSTANCE.disposeMods();
 
-        GameWorld.Companion.makeNullWorld().dispose();
+        TheGameWorld.Companion.makeNullWorld().dispose();
 
         Terrarum.INSTANCE.dispose();
 

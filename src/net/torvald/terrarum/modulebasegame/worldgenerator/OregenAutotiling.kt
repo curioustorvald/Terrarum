@@ -15,7 +15,6 @@ import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.utils.OrePlacement
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import kotlin.math.max
 
 /**
  * Created by minjaesong on 2023-10-26.

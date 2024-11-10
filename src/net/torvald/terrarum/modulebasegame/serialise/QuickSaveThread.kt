@@ -4,6 +4,7 @@ import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -118,7 +119,7 @@ class QuickSingleplayerWorldSavingThread(
 
 //                    println("Chunk xy from number $chunkNumber -> (${chunkXY.x}, ${chunkXY.y})")
 
-                        if (chunkFlag and 0x7F == GameWorld.CHUNK_LOADED) {
+                        if (chunkFlag and 0x7F == TheGameWorld.CHUNK_LOADED) {
                             val chunkBytes = WriteWorld.encodeChunk(layer, cx, cy)
                             val entryID = 0x1_0000_0000L or layerNum.toLong().shl(24) or chunkNumber.toLong()
 

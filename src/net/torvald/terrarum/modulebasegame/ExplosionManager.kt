@@ -4,9 +4,8 @@ import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.OreCodex
 import net.torvald.terrarum.ceilToInt
-import net.torvald.terrarum.gameworld.BlockLayerGenericI16
+import net.torvald.terrarum.gameworld.BlockLayerInMemoryI16
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.getOffset
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.unsafe.UnsafeHelper
 import java.util.concurrent.*
@@ -34,7 +33,7 @@ object ExplosionManager {
         val lineMax = world.height - ty + CALC_RADIUS
 
         // create a copy of the tilemap
-        val tilemap = BlockLayerGenericI16(CALC_WIDTH, CALC_WIDTH)
+        val tilemap = BlockLayerInMemoryI16(CALC_WIDTH, CALC_WIDTH)
         val breakmap = UnsafeFloatArray(CALC_WIDTH, CALC_WIDTH)
 
         // fill in the tilemap copy
@@ -69,9 +68,9 @@ object ExplosionManager {
         }.start()
     }
 
-    private fun memcpyFromWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerGenericI16) {
+    private fun memcpyFromWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerInMemoryI16) {
         // if the bounding box must wrap around
-        if (xStart > world.width - CALC_RADIUS) {
+        /*if (xStart > world.width - CALC_RADIUS) {
             val lenLeft = world.width - xStart
             val lenRight = CALC_WIDTH - lenLeft
 
@@ -98,12 +97,18 @@ object ExplosionManager {
                 out.getOffset(0, yOff),
                 world.layerTerrain.bytesPerBlock * CALC_WIDTH
             )
+        }*/
+        // temporary: copy one by one
+        for (ox in xStart until xStart + CALC_WIDTH) {
+            val (x, y) = world.coerceXY(ox, yStart + yOff)
+            val tileInWorld = world.layerTerrain.unsafeGetTile(x, y)
+            out.unsafeSetTile(x, y, tileInWorld)
         }
     }
 
-    private fun memcpyToWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerGenericI16) {
+    private fun memcpyToWorldTiles(CALC_RADIUS: Int, CALC_WIDTH: Int, world: GameWorld, xStart: Int, yStart: Int, yOff: Int, out: BlockLayerInMemoryI16) {
         // if the bounding box must wrap around
-        if (xStart > world.width - CALC_RADIUS) {
+        /*if (xStart > world.width - CALC_RADIUS) {
             val lenLeft = world.width - xStart
             val lenRight = CALC_WIDTH - lenLeft
 
@@ -130,6 +135,12 @@ object ExplosionManager {
                 world.layerTerrain.getOffset(xStart, yStart + yOff),
                 world.layerTerrain.bytesPerBlock * CALC_WIDTH
             )
+        }*/
+        // temporary: copy one by one
+        for (ox in xStart until xStart + CALC_WIDTH) {
+            val (x, y) = world.coerceXY(ox, yStart + yOff)
+            val tileInWorld = out.unsafeGetTile(x, y)
+            world.layerTerrain.unsafeSetTile(x, y, tileInWorld)
         }
     }
 
@@ -155,7 +166,7 @@ object ExplosionManager {
         CALC_RADIUS: Int, CALC_WIDTH: Int,
         world: GameWorld,
         breakmap: UnsafeFloatArray,
-        tilemap: BlockLayerGenericI16,
+        tilemap: BlockLayerInMemoryI16,
         tx: Int, ty: Int,
         power: Float,
         dropProbNonOre: Float,

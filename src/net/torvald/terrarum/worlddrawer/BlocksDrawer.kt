@@ -17,9 +17,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.gameworld.FLUID_MIN_MASS
-import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.gameworld.*
 import net.torvald.terrarum.modulebasegame.worldgenerator.shake
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.toBig64
@@ -43,7 +41,7 @@ import kotlin.math.roundToInt
 internal object BlocksDrawer {
 
     /** World change is managed by IngameRenderer.setWorld() */
-    internal var world: GameWorld = GameWorld.makeNullWorld()
+    internal var world: GameWorld = TheGameWorld.makeNullWorld()
 
 
     /**
@@ -448,6 +446,10 @@ internal object BlocksDrawer {
      */
     private fun fillInTileBuffer(mode: Int) {
 
+        // don't render fluid and ores for TitlescreenGameWorld (for now)
+        if (world.layerFluids !is BlockLayerFluidI16F16) return
+        if (world.layerOres !is BlockLayerOresI16I8) return
+
         // TODO the real fluid rendering must use separate function, but its code should be similar to this.
         //      shader's tileAtlas will be fluid.tga, pixels written to the buffer is in accordance with the new
         //      atlas. IngameRenderer must be modified so that fluid-draw call is separated from drawing tiles.
@@ -467,7 +469,7 @@ internal object BlocksDrawer {
                     WALL -> world.layerWall.unsafeGetTile(wx, wy)
                     TERRAIN -> world.layerTerrain.unsafeGetTile(wx, wy)
                     ORES -> world.layerOres.unsafeGetTile(wx, wy)//.also { println(it) }
-                    FLUID -> world.layerFluids.unsafeGetTile1(wx, wy).let { (number, fill) ->
+                    FLUID -> world.layerFluids.unsafeGetTileI16F16(wx, wy).let { (number, fill) ->
                         if (number == 65535 || fill < 1f/30f) 0
                         else number
                     }
@@ -497,7 +499,7 @@ internal object BlocksDrawer {
                     val nearbyFluidType = fluids.asSequence().filter { it.amount >= 0.5f / 16f }.map { it.type }.filter { it.startsWith("fluid@") }.sorted().firstOrNull()
 
                     val fillThis =
-                        world.layerFluids.unsafeGetTile1(wx, wy).second.let { if (it.isNaN()) 0f else it.coerceAtMost(1f) }
+                        world.layerFluids.unsafeGetTileI16F16(wx, wy).second.let { if (it.isNaN()) 0f else it.coerceAtMost(1f) }
 
                     val tile = world.getTileFromTerrain(wx, wy)
 
@@ -671,7 +673,7 @@ internal object BlocksDrawer {
                         rawTileNum + nearbyTilesInfo
                     // special case: ores
                     else if (mode == ORES)
-                        rawTileNum + world.layerOres.unsafeGetTile1(wx, wy).second
+                        rawTileNum + world.layerOres.unsafeGetTileI16I8(wx, wy).second
                     // rest of the cases: terrain and walls
                     else rawTileNum + when (renderTag.maskType) {
                         CreateTileAtlas.RenderTag.MASK_NA -> 0
@@ -1188,7 +1190,7 @@ internal object BlocksDrawer {
         get() {
             val rate = (((Gdx.graphics.framesPerSecond / 50f) * TILE_SIZEF) / maxOf(WorldCamera.deltaX.abs(), WorldCamera.deltaY.abs()).coerceAtLeast(1)).roundToInt().coerceIn(1, 4)
             App.debugTimers.put("Renderer.tilemapUpdateDivider", rate.toLong())
-            return (!world.layerTerrain.ptrDestroyed && App.GLOBAL_RENDER_TIMER % rate == 0L)
+            return (!world.layerTerrain.disposed && App.GLOBAL_RENDER_TIMER % rate == 0L)
         }
 
     private var camTransX = 0

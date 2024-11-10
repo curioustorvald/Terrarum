@@ -5,6 +5,7 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.NoSerialise
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
@@ -95,12 +96,12 @@ object WriteWorld {
  */
 object ReadWorld {
 
-    operator fun invoke(worldDataStream: Reader, origin: File?): GameWorld =
-        Common.jsoner.fromJson(GameWorld::class.java, worldDataStream).also {
+    operator fun invoke(worldDataStream: Reader, origin: File?): TheGameWorld =
+        Common.jsoner.fromJson(TheGameWorld::class.java, worldDataStream).also {
             fillInDetails(origin, it)
         }
 
-    private fun fillInDetails(origin: File?, world: GameWorld) {
+    private fun fillInDetails(origin: File?, world: TheGameWorld) {
         world.tileNumberToNameMap.forEach { l, s ->
             world.tileNameToNumberMap[s] = l.toInt()
         }

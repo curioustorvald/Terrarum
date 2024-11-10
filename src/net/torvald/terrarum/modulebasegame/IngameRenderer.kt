@@ -17,7 +17,6 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.FluidCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.METER
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.PHYS_EPSILON_DIST
@@ -28,6 +27,7 @@ import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.modulebasegame.gameitems.ItemThrowable
@@ -42,8 +42,6 @@ import net.torvald.util.CircularArray
 import org.dyn4j.geometry.Vector2
 import kotlin.math.min
 import kotlin.system.exitProcess
-
-
 
 
 /**
@@ -131,7 +129,7 @@ object IngameRenderer : Disposable {
     //var renderingParticleCount = 0
     //    private set
 
-    var world: GameWorld = GameWorld.makeNullWorld()
+    var world: GameWorld = TheGameWorld.makeNullWorld()
         private set // the grammar "IngameRenderer.world = gameWorld" seemes mundane and this function needs special care!
 
     private var newWorldLoadedLatch = false
@@ -393,11 +391,16 @@ object IngameRenderer : Disposable {
 
         blendNormalStraightAlpha(batch)
 
-        val (vo, vg) = world.weatherbox.let {
-            if (it.currentWeather.identifier == "titlescreen")
-                1f to 1f
-            else
-                it.currentVibrancy.x to it.currentVibrancy.y
+        val (vo, vg) = if (world is TheGameWorld) {
+            (world as TheGameWorld).weatherbox.let {
+                if (it.currentWeather.identifier == "titlescreen")
+                    1f to 1f
+                else
+                    it.currentVibrancy.x to it.currentVibrancy.y
+            }
+        }
+        else {
+            1f to 1f
         }
 
         mixedOutTex.texture.bind(0)

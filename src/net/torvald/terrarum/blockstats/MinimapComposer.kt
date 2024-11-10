@@ -2,26 +2,17 @@ package net.torvald.terrarum.blockstats
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.GdxRuntimeException
-import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.App
-import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.abs
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryMinimap.Companion.MINIMAP_HEIGHT
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryMinimap.Companion.MINIMAP_WIDTH
-import net.torvald.terrarum.sqr
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
 import java.util.concurrent.Callable
-import java.util.concurrent.atomic.AtomicInteger
-import kotlin.math.absoluteValue
 import kotlin.math.max
-import kotlin.math.roundToInt
 
 object MinimapComposer : Disposable {
 
@@ -32,7 +23,7 @@ object MinimapComposer : Disposable {
     val MINIMAP_TILE_WIDTH = (MINIMAP_WIDTH.toInt() * 3) / SQUARE_SIZE + 4
     val MINIMAP_TILE_HEIGHT = (MINIMAP_HEIGHT.toInt() * 3) / SQUARE_SIZE + 4
 
-    private var world: GameWorld = GameWorld.makeNullWorld()
+    private var world: GameWorld = TheGameWorld.makeNullWorld()
 
     fun setWorld(world: GameWorld) {
         try {

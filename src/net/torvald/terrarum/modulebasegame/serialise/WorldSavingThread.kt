@@ -2,11 +2,11 @@ package net.torvald.terrarum.modulebasegame.serialise
 
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameworld.GameWorld.Companion.CHUNK_LOADED
 import net.torvald.terrarum.gameworld.GameWorld.Companion.FLUID
 import net.torvald.terrarum.gameworld.GameWorld.Companion.ORES
 import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
 import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
+import net.torvald.terrarum.gameworld.TheGameWorld.Companion.CHUNK_LOADED
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase

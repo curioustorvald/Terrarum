@@ -24,18 +24,15 @@ import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameparticles.ParticleBase
-import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.WorldTime
-import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.gameworld.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UILoadGovernor
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.serialise.ReadSimpleWorld
+import net.torvald.terrarum.serialise.ReadTitlescreenGameWorld
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.utils.OpenURL
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -69,7 +66,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     //private var loadDone = false // not required; draw-while-loading is implemented in the AppLoader
 
-    private lateinit var demoWorld: GameWorld
+    private lateinit var demoWorld: TitlescreenGameWorld
     private lateinit var cameraNodes: FloatArray // camera Y-pos
     private val cameraNodeWidth = 15
     private val lookaheadDist = cameraNodeWidth * TILE_SIZED
@@ -165,19 +162,19 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             val file = ModMgr.getFile("basegame", "demoworld")
             val reader = java.io.FileReader(file)
             //ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
-            val world = ReadSimpleWorld(reader, file)
+            val world = ReadTitlescreenGameWorld(reader, file)
             demoWorld = world
             demoWorld.worldTime.timeDelta = 30
             printdbg(this, "Demo world loaded")
         }
         catch (e: IOException) {
-            demoWorld = GameWorld(LandUtil.CHUNK_W, LandUtil.CHUNK_H, 0L, 0L)
+            demoWorld = TitlescreenGameWorld(LandUtil.CHUNK_W, LandUtil.CHUNK_H)
             demoWorld.worldTime.timeDelta = 30
             printdbg(this, "Demo world not found, using empty world")
         }
 
-        demoWorld.renumberTilesAfterLoad()
         this.world = demoWorld
+        demoWorld.renumberTilesAfterLoad()
 
         // set initial time to summer
         demoWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
@@ -365,7 +362,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         gdxClearAndEnableBlend(.64f, .754f, .84f, 1f)
 
 
-        if (!demoWorld.layerTerrain.ptr.destroyed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
+        if (!demoWorld.disposed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
             WorldCamera.update(demoWorld, cameraPlayer)
 
             IngameRenderer.invoke(

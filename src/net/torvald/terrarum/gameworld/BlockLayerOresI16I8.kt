@@ -1,14 +1,8 @@
 package net.torvald.terrarum.gameworld
 
-import net.torvald.terrarum.App
-import net.torvald.terrarum.gameworld.BlockLayerFluidI16F16.Companion
-import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
-import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClusteredFormatDOM
 import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.serialise.toUint
-import net.torvald.unsafe.UnsafeHelper
-import net.torvald.unsafe.UnsafePtr
 
 /**
  * Memory layout:
@@ -16,9 +10,11 @@ import net.torvald.unsafe.UnsafePtr
  *  a7 a6 a5 a4 a3 a2 a1 a0 | aF aE aD aC aB aA a9 a8 | p7 p6 p5 p4 p3 p2 p1 p0 ||
  * ```
  * where a_n is a tile number, p_n is a placement index
- * Created by minjaesong on 2023-10-10.
+ *
+ * Unsafe version Created by minjaesong on 2023-10-10.
+ * Chunkpool version Created by minjaesong on 2024-10-22.
  */
-class BlockLayerOresI16I8 : BlockLayer {
+class BlockLayerOresI16I8 : BlockLayerWithChunkPool {
 
     override val width: Int
     override val height: Int
@@ -29,7 +25,7 @@ class BlockLayerOresI16I8 : BlockLayer {
         height: Int,
         disk: ClusteredFormatDOM,
         layerNum: Int,
-        world: GameWorld
+        world: TheGameWorld
     ) {
         this.width = width
         this.height = height
@@ -42,7 +38,7 @@ class BlockLayerOresI16I8 : BlockLayer {
         height: Int,
         disk: DiskSkimmer,
         layerNum: Int,
-        world: GameWorld
+        world: TheGameWorld
     ) {
         this.width = width
         this.height = height
@@ -54,16 +50,16 @@ class BlockLayerOresI16I8 : BlockLayer {
     override val bytesPerBlock = BYTES_PER_BLOCK
 
     override fun unsafeGetTile(x: Int, y: Int): Int {
-        return unsafeGetTile1(x, y).first
+        return unsafeGetTileI16I8(x, y).first
     }
 
-    internal fun unsafeGetTile1(x: Int, y: Int): Pair<Int, Int> {
+    override fun unsafeGetTileI16I8(x: Int, y: Int): Pair<Int, Int> {
         val (chunk, ox, oy) = chunkPool.worldXYChunkNumAndOffset(x, y)
         return chunkPool.getTileI16I8(chunk, ox, oy)
     }
 
     override fun unsafeToBytes(x: Int, y: Int): ByteArray {
-        val (tile, fill) = unsafeGetTile1(x, y)
+        val (tile, fill) = unsafeGetTileI16I8(x, y)
         return byteArrayOf(
             ((tile ushr 8) and 255).toByte(),
             (tile and 255).toByte(),
@@ -71,7 +67,15 @@ class BlockLayerOresI16I8 : BlockLayer {
         )
     }
 
-    internal fun unsafeSetTile(x: Int, y: Int, tile: Int, placement: Int) {
+    override fun unsafeSetTile(x: Int, y: Int, tile: Int) {
+        throw UnsupportedOperationException()
+    }
+
+    override fun unsafeSetTile(x: Int, y: Int, tile: Int, fill: Float) {
+        throw UnsupportedOperationException()
+    }
+
+    override fun unsafeSetTile(x: Int, y: Int, tile: Int, placement: Int) {
         val (chunk, ox, oy) = chunkPool.worldXYChunkNumAndOffset(x, y)
         chunkPool.setTileRaw(chunk, ox, oy, tile or placement.shl(16))
     }
@@ -82,8 +86,8 @@ class BlockLayerOresI16I8 : BlockLayer {
         unsafeSetTile(x, y, tile, placement)
     }
 
-    internal fun unsafeSetTileKeepPlacement(x: Int, y: Int, tile: Int) {
-        val oldPlacement = unsafeGetTile1(x, y).second
+    override fun unsafeSetTileKeepOrePlacement(x: Int, y: Int, tile: Int) {
+        val oldPlacement = unsafeGetTileI16I8(x, y).second
         unsafeSetTile(x, y, tile, oldPlacement)
     }
 
@@ -102,8 +106,11 @@ class BlockLayerOresI16I8 : BlockLayer {
 
     fun isInBound(x: Int, y: Int) = (x >= 0 && y >= 0 && x < width && y < height)
 
+    override var disposed: Boolean = false
+
     override fun dispose() {
         chunkPool.dispose()
+        disposed = true
     }
 
     override fun toString(): String = "BlockLayerI16I8 (${width}x$height)"

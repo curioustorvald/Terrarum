@@ -1,13 +1,11 @@
 package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.jme3.math.FastMath
 import net.torvald.colourutil.ColourTemp
 import net.torvald.terrarum.*
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
-import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockstats.TileSurvey
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.roundToInt
 
@@ -17,7 +15,7 @@ import kotlin.math.roundToInt
 object FeaturesDrawer {
 
     /** World change is managed by IngameRenderer.setWorld() */
-    internal var world: GameWorld = GameWorld.makeNullWorld()
+    internal var world: GameWorld = TheGameWorld.makeNullWorld()
 
     //const val TILE_SIZE = TILE_SIZE
 

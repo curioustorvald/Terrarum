@@ -19,6 +19,7 @@ import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.isBlock
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.modulebasegame.ui.abs
@@ -43,7 +44,7 @@ import kotlin.math.*
 object LightmapRenderer {
 
     /** World change is managed by IngameRenderer.setWorld() */
-    private var world: GameWorld = GameWorld.makeNullWorld()
+    private var world: GameWorld = TheGameWorld.makeNullWorld()
 
     //private lateinit var lightCalcShader: ShaderProgram
     //private val SHADER_LIGHTING = AppLoader.getConfigBoolean("gpulightcalc")
@@ -141,7 +142,7 @@ object LightmapRenderer {
     }
 
     fun recalculate(actorContainer: List<ActorWithBody>) {
-        if (!world.layerTerrain.ptrDestroyed) _recalculate(actorContainer, lightmap)
+        if (!world.layerTerrain.disposed) _recalculate(actorContainer, lightmap)
     }
 
     private fun _recalculate(actorContainer: List<ActorWithBody>, lightmap: UnsafeCvecArray) {
@@ -153,7 +154,7 @@ object LightmapRenderer {
         }
         catch (e: NullPointerException) {
             System.err.println("[LightmapRendererNew.recalculate] Attempted to refer destroyed unsafe array " +
-                               "(${world.layerTerrain.ptr})")
+                               "(${world.layerTerrain})")
             e.printStackTrace()
             return // something's wrong but we'll ignore it like a trustful AK
         }
@@ -656,7 +657,7 @@ object LightmapRenderer {
 
     internal fun draw(): Texture {
 
-        if (!world.layerTerrain.ptrDestroyed) {
+        if (!world.layerTerrain.disposed) {
             // when shader is not used: 0.5 ms on 6700K
             App.measureDebugTime("Renderer.LightToScreen") {
 

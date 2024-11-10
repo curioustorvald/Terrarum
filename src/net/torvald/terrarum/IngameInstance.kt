@@ -12,6 +12,8 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.TheGameWorld
+import net.torvald.terrarum.gameworld.TitlescreenGameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -105,7 +107,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         printStackTrace(this)
     }
 
-    open var world: GameWorld = GameWorld.makeNullWorld()
+    open var world: GameWorld = TheGameWorld.makeNullWorld()
         set(value) {
             val oldWorld = field
             newWorldLoadedLatch = true
