@@ -1,8 +1,10 @@
 package net.torvald.terrarum.modulebasegame.serialise
 
 import net.torvald.terrarum.*
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameworld.*
+import net.torvald.terrarum.gameworld.ChunkPool.Companion.chunkOffsetsNearPlayer
 import net.torvald.terrarum.gameworld.GameWorld.Companion.FLUID
 import net.torvald.terrarum.gameworld.GameWorld.Companion.ORES
 import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
@@ -14,6 +16,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.*
 import net.torvald.terrarum.serialise.Common
+import org.dyn4j.geometry.Vector2
 import java.io.Reader
 import java.util.logging.Level
 import kotlin.experimental.or
@@ -124,6 +127,18 @@ object LoadSavegame {
                 }
                 loadscreen.progress.getAndAdd(1)
             }
+
+            val playerChunk = player.hitbox.canonVec.let {
+                (it.x / (cw * TILE_SIZED)).toInt() to (it.y / (ch * TILE_SIZED)).toInt()
+            }.let { Point2i(it.first, it.second) }
+
+            val chunksToLoad = chunkOffsetsNearPlayer.map {
+                playerChunk + it
+            } + playerChunk
+
+            /*for (layer in worldLayer) {
+                (layer as? BlockLayerWithChunkPool)?.chunkPool?.
+            }*/
 
             loadscreen.addMessage(Lang["MENU_IO_LOAD_UPDATING_BLOCK_MAPPINGS"])
             world.renumberTilesAfterLoad()

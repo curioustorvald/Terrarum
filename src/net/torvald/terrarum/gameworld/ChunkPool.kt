@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameworld
 
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClusteredFormatDOM
@@ -8,6 +9,7 @@ import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.Clustf
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
+import net.torvald.terrarum.savegame.ByteArray64
 import net.torvald.terrarum.savegame.DiskEntry
 import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.EntryFile
@@ -35,13 +37,20 @@ enum class ChunkAllocClass {
 }
 
 /**
- * FIXME: loading a chunk from disk will attempt to create a chunk because the chunk-to-be-loaded is not on the pointers map, and this operation will want to create a new chunk file but the file already exists
+ * WHAT IF instead of reading chunks directly from the savegame, I treat ChunkPool as a mere disk-cache?
+ *
+ * FIXME: loading a chunk from disk will attempt to create a chunk because the chunk-to-be-loaded
+ * is not on the pointers map, and this operation will want to create a new chunk file but the file already exists
  *
  * Single layer gets single Chunk Pool.
  *
  * Created by minjaesong on 2024-09-07.
  */
 open class ChunkPool {
+
+    private enum class ChunkLoadingStatus {
+        LOADING_REQUESTED, RAW, LOADED_FROM_DISK, NEWLY_GENERATED
+    }
 
     // `DiskSkimmer` or `ClusteredFormatDOM`
     private val disk: Any
@@ -51,6 +60,7 @@ open class ChunkPool {
     private val initialValue: Int // bytes to fill the new chunk
     private val renumberFun: (Int) -> Int
 
+    private val chunkStatus = HashMap<Long, ChunkLoadingStatus>()
     private val pointers = TreeMap<Long, Long>()
     private var allocCap = 32
     private var allocMap = Array<ChunkAllocation?>(allocCap) { null }
@@ -216,10 +226,10 @@ open class ChunkPool {
      * @return `unit` if IO operation was successful, `null` if failed (e.g. file not exists)
      */
     private fun fetchFromDisk(chunkNumber: Long): Unit? {
-        val fileName = chunkNumToFileNum(layerIndex, chunkNumber)
-
         // read data from the disk
         return if (disk is ClusteredFormatDOM) {
+            val fileName = chunkNumToFileNumType17(layerIndex, chunkNumber)
+
             Clustfile(disk, fileName).let {
                 if (!it.exists()) return@let null
 
@@ -230,19 +240,28 @@ open class ChunkPool {
             }
         }
         else if (disk is DiskSkimmer) {
-            val fileID = fileName.toLong()
+            val fileID = chunkNumToFileEntryID(layerIndex, chunkNumber)
+
             disk.getFile(fileID).let {
+                printdbg(this, "Reading chunk data: Layer $layerIndex Chunk $chunkNumber (fileID: $fileID), file: $it")
+
                 if (it == null) return@let null
 
                 val bytes = Common.unzip(it.bytes)
                 val ptr = allocate(chunkNumber)
-                UnsafeHelper.memcpyFromArrToPtr(bytes, 0, ptr.ptr, bytes.size)
+                memcpyFromByteArray64ToPtr(bytes, 0L, ptr, 0L, bytes.size)
                 renumber(ptr)
             }
         }
         else {
             throw IllegalStateException()
         }
+    }
+
+    private fun memcpyFromByteArray64ToPtr(ba: ByteArray64, srcIndex: Long, destPtr: UnsafePtr, destOffset: Long, copyLen: Long) {
+        // TODO temporary
+        val obj = ba.toByteArray()
+        UnsafeHelper.memcpyFromArrToPtr(obj, srcIndex.toInt(), destPtr.ptr + destOffset, copyLen)
     }
 
     /**
@@ -253,10 +272,10 @@ open class ChunkPool {
     }
 
     private fun storeToDisk(chunkNumber: Long) {
-        val fileName = chunkNumToFileNum(layerIndex, chunkNumber)
-
         // write to the disk (the disk must be an autosaving copy of the original)
         if (disk is ClusteredFormatDOM) {
+            val fileName = chunkNumToFileNumType17(layerIndex, chunkNumber)
+
             Clustfile(disk, fileName).let {
                 val bytes = Common.zip(serialise(chunkNumber).iterator())
                 it.overwrite(bytes.toByteArray())
@@ -264,7 +283,7 @@ open class ChunkPool {
         }
         // append the new entry
         else if (disk is DiskSkimmer) {
-            val fileID = fileName.toLong()
+            val fileID = chunkNumToFileEntryID(layerIndex, chunkNumber)
 
             val bytes = Common.zip(serialise(chunkNumber).iterator())
             val oldEntry = disk.getEntry(fileID)
@@ -376,9 +395,12 @@ open class ChunkPool {
     }
 
     companion object {
-        fun chunkNumToFileNum(layerNum: Int, chunkNum: Long): String {
+        fun chunkNumToFileNumType17(layerNum: Int, chunkNum: Long): String {
             val entryID = Common.layerAndChunkNumToEntryID(layerNum, chunkNum)
             return Common.type254EntryIDtoType17Filename(entryID)
+        }
+        fun chunkNumToFileEntryID(layerNum: Int, chunkNum: Long): Long {
+            return Common.layerAndChunkNumToEntryID(layerNum, chunkNum)
         }
         
         private fun Int.get1SS() = this and 65535
@@ -426,7 +448,8 @@ open class ChunkPool {
             }
         }
 
-        private val chunkOffsetsNearPlayer = listOf(
+        // this list does NOT contain `Point2i(0,0)`
+        val chunkOffsetsNearPlayer = listOf(
             Point2i(-1,-2), Point2i(0,-2),Point2i(1,-2),
             Point2i(-2,-1),Point2i(-1,-1),Point2i(0,-1),Point2i(1,-1),Point2i(2,-1),
             Point2i(-2,0),Point2i(-1,0),Point2i(1,0),Point2i(2,0),
