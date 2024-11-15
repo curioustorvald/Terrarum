@@ -1,5 +1,6 @@
 {
   "ITEM_ALLOYING_FURNACE": "Alloying Furnace",
+  "ITEM_AXLE": "Axle",
   "ITEM_BRICK_SINGULAR": "Brick", /* always singular */
   "ITEM_BUCKET_IRON": "Iron Bucket %1$s",
   "ITEM_BUCKET_WOODEN": "Wooden Bucket %1$s",
@@ -17,6 +18,7 @@
   "ITEM_ELECTRIC_WORKBENCH": "Electric Workbench",
   "ITEM_ENGRAVING_WORKBENCH": "Engraving Workbench",
   "ITEM_FURNACE_AND_ANVIL": "Furnace and Anvil",
+  "ITEM_GEARBOX": "Gearbox",
   "ITEM_GEM_RUBY": "Raw Ruby",
   "ITEM_GEM_EMERALD": "Raw Emerald",
   "ITEM_GEM_SAPPHIRE": "Raw Sapphire",
@@ -30,6 +32,7 @@
   "ITEM_HATCHET_STEEL": "Steel Axe",
   "ITEM_HATCHET_STONE": "Stone Axe",
   "ITEM_HATCHET_WOODEN": "Wooden Axe",
+  "ITEM_INDUCTION_MOTOR": "Induction Motor",
   "ITEM_INGOT_BRASS": "Brass Ingot",
   "ITEM_INGOT_BRONZE": "Bronze Ingot",
   "ITEM_INGOT_COPPER": "Copper Ingot",

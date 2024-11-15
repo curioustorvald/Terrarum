@@ -175,7 +175,7 @@ open class Electric : FixtureBase {
                     val wx = x + worldBlockPos!!.x
                     val wy = y + worldBlockPos!!.y
 
-                    println("Wxy($wx,$wy) getWireState($type)=$new, oldState($type)=$old")
+//                    println("Wxy($wx,$wy) getWireState($type)=$new, oldState($type)=$old")
 
                     if (new.x - old.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTRIC_THRESHOLD_HIGH)
                         risingEdgeIndices.add(index)
@@ -188,9 +188,9 @@ open class Electric : FixtureBase {
             }
         }
 
-        if (risingEdgeIndices.isNotEmpty()) {
-            println("risingEdgeIndices=$risingEdgeIndices")
-        }
+//        if (risingEdgeIndices.isNotEmpty()) {
+//            println("risingEdgeIndices=$risingEdgeIndices")
+//        }
 
         risingEdgeIndices.forEach { onRisingEdge(it) }
         fallingEdgeIndices.forEach { onFallingEdge(it) }
