@@ -132,8 +132,8 @@ id;classname;tags
 320;net.torvald.terrarum.modulebasegame.gameitems.ItemWorldPortal;FIXTURE,STATION
 
 # industrial
-2048;net.torvald.terrarum.modulebasegame.gameitems.ItemInductionMotor;FIXTURE,POWER,KINETIC
-2049;net.torvald.terrarum.modulebasegame.gameitems.ItemGearbox;FIXTURE,POWER,KINETIC
+#2048;net.torvald.terrarum.modulebasegame.gameitems.ItemInductionMotor;FIXTURE,POWER,KINETIC
+#2049;net.torvald.terrarum.modulebasegame.gameitems.ItemGearbox;FIXTURE,POWER,KINETIC
 
 # data storage (discs; 256)
 # 32768 is a reserved number for a blank disc
@@ -179,5 +179,5 @@ id;classname;tags
 1048835;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketIron03;FLUIDSTORAGE,OPENSTORAGE
 
 # reserved for debug items
-16777216;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessWaterBucket;DEBUG,TOOL
-16777217;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessLavaBucket;DEBUG,TOOL
+#16777216;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessWaterBucket;DEBUG,TOOL
+#16777217;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessLavaBucket;DEBUG,TOOL
