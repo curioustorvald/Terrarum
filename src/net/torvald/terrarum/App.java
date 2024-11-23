@@ -38,6 +38,7 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
 import net.torvald.terrarum.serialise.WriteConfig;
+import net.torvald.terrarum.ui.BlurMgr;
 import net.torvald.terrarum.ui.Toolkit;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
@@ -52,6 +53,7 @@ import org.apache.commons.csv.CSVParser;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
 
+import javax.tools.Tool;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -1025,6 +1027,9 @@ public class App implements ApplicationListener {
         audioDevice.dispose();
 
         deleteTempfiles();
+
+        Toolkit.INSTANCE.dispose();
+        BlurMgr.INSTANCE.dispose();
 
         disposables.forEach((it) -> {
             try {

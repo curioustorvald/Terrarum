@@ -35,7 +35,7 @@ class UICheatDetected : UICanvas() {
         Terrarum.ingame?.consoleHandler?.setAsClose()
         Terrarum.ingame?.consoleHandler?.isVisible = false
 
-        Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, 2f, 0, 0, width, height)
+        Toolkit.blurEntireScreen(batch, 2f, 0, 0, width, height)
         batch.color = backgroundCol
         Toolkit.fillArea(batch, 0f, 0f, width.toFloat(), height.toFloat())
 
@@ -80,7 +80,7 @@ class UIPauseTheGame : UICanvas() {
         Terrarum.ingame?.consoleHandler?.setAsClose()
         Terrarum.ingame?.consoleHandler?.isVisible = false
 
-        Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, 2f, 0, 0, width, height)
+        Toolkit.blurEntireScreen(batch, 2f, 0, 0, width, height)
         batch.color = backgroundCol
         Toolkit.fillArea(batch, 0f, 0f, width.toFloat(), height.toFloat())
 

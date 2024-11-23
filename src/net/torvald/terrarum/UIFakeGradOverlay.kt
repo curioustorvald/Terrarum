@@ -95,7 +95,7 @@ class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas
         batchDrawCol.a = openness
         batch.color = batchDrawCol
         if (App.getConfigBoolean("fx_backgroundblur")) {
-            Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, blurRadius * openness, 0, 0, width, height)
+            Toolkit.blurEntireScreen(batch, blurRadius * openness, 0, 0, width, height)
         }
 
         if (!nodarken) {
