@@ -67,7 +67,7 @@ class SavegameCracker(
     private val cmds: HashMap<String, KFunction<*>> = HashMap()
     init {
         SavegameCracker::class.declaredFunctions
-            .filter { it.findAnnotation<Command>() != null }
+            .filter { it.findAnnotation<SavegameCrackerCommand>() != null }
 //                .forEach { it.isAccessible = true; cmds[it.name] = it }
             .forEach { cmds[it.name] = it }
     }
@@ -100,7 +100,7 @@ class SavegameCracker(
                     printerrln("${args[0]}: command not found")
                 else {
                     try {
-                        val annot = it.findAnnotation<Command>()!!
+                        val annot = it.findAnnotation<SavegameCrackerCommand>()!!
                         // check arguments
                         val synopsis = annot.synopsis.split(' ').filter { it.isNotBlank() }
                         // print out synopsis
@@ -185,14 +185,14 @@ class SavegameCracker(
         return this + sb.toString()
     }
 
-    @Command("Loads a disk archive", "path-to-file")
+    @SavegameCrackerCommand("Loads a disk archive", "path-to-file")
     fun load(args: List<String>) {
         file = File(args[1])
         disk = VDUtil.readDiskArchive(file!!, Level.INFO) { printerrln("# Warning: $it") }
         file!!.copyTo(File(file!!.absolutePath + ".bak"), true)
     }
 
-    @Command("Lists contents of the disk")
+    @SavegameCrackerCommand("Lists contents of the disk")
     fun ls(args: List<String>) {
         letdisk {
             it.entries.toSortedMap().forEach { (i, entry) ->
@@ -207,19 +207,19 @@ class SavegameCracker(
         }
     }
 
-    @Command("Prints out available commands and their usage")
+    @SavegameCrackerCommand("Prints out available commands and their usage")
     fun help(args: List<String>) {
         cmds.forEach { name, it ->
-            println("$ccNoun${name.padStart(8)}$cc0 - ${it.findAnnotation<Command>()!!.help}")
+            println("$ccNoun${name.padStart(8)}$cc0 - ${it.findAnnotation<SavegameCrackerCommand>()!!.help}")
         }
     }
 
-    @Command("Exits the program")
+    @SavegameCrackerCommand("Exits the program")
     fun exit(args: List<String>) { this.exit = true }
-    @Command("Exits the program")
+    @SavegameCrackerCommand("Exits the program")
     fun quit(args: List<String>) = exit(args)
 
-    @Command("Exports contents of the entry into a real file", "entry-id output-file")
+    @SavegameCrackerCommand("Exports contents of the entry into a real file", "entry-id output-file")
     fun export(args: List<String>) {
         letdisk {
             val entryID = args[1].toLong(10)
@@ -228,7 +228,7 @@ class SavegameCracker(
         }
     }
 
-    @Command("Changes one entry-ID into another", "change-from change-to")
+    @SavegameCrackerCommand("Changes one entry-ID into another", "change-from change-to")
     fun renum(args: List<String>) {
         letdisk {
             val id0 = args[1].toLong(10)
@@ -244,7 +244,7 @@ class SavegameCracker(
         }
     }
 
-    @Command("Imports a real file onto the savefile", "input-file entry-id")
+    @SavegameCrackerCommand("Imports a real file onto the savefile", "input-file entry-id")
     fun import(args: List<String>) {
         letdisk {
             val file = File(args[1])
@@ -257,7 +257,7 @@ class SavegameCracker(
         }
     }
 
-    @Command("Removes a file within the savefile", "entry-id")
+    @SavegameCrackerCommand("Removes a file within the savefile", "entry-id")
     fun rm(args: List<String>) {
         letdisk {
             val id = args[1].toLong(10)
@@ -266,14 +266,14 @@ class SavegameCracker(
         }
     }
 
-    @Command("Saves changes onto the savefile")
+    @SavegameCrackerCommand("Saves changes onto the savefile")
     fun save(args: List<String>) {
         letdisk {
             VDUtil.dumpToRealMachine(it, file!!)
         }
     }
 
-    @Command("Retrieves all UUIDs found (player UUID, current world UUID, etc.")
+    @SavegameCrackerCommand("Retrieves all UUIDs found (player UUID, current world UUID, etc.")
     fun uuid(args: List<String>) {
         letdisk {
             val jsonFile = it.getFile(-1) ?: throw FileNotFoundException("savegameinfo.json (entry ID -1) not found")
@@ -294,7 +294,7 @@ class SavegameCracker(
         }
     }
 
-    @Command("Removes the specified chunk(s) completely", "IDs")
+    @SavegameCrackerCommand("Removes the specified chunk(s) completely", "IDs")
     fun discardchunk(args: List<String>) {
         letdisk { disk ->
             val ids = args[1]
@@ -320,7 +320,7 @@ class SavegameCracker(
     }
 }
 
-internal annotation class Command(val help: String = "", val synopsis: String = "")
+internal annotation class SavegameCrackerCommand(val help: String = "", val synopsis: String = "")
 
 fun main(args: Array<String>) {
     SavegameCracker(args).invoke()

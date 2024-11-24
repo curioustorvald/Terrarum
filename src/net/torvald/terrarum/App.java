@@ -60,6 +60,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Stream;
+import java.util.zip.Deflater;
 
 import static java.lang.Thread.MAX_PRIORITY;
 import static net.torvald.terrarum.TerrarumKt.*;
@@ -766,7 +767,7 @@ public class App implements ApplicationListener {
             FrameBufferManager.begin(fb);
             try {
                 Pixmap p = Pixmap.createFromFrameBuffer(0, 0, fb.getWidth(), fb.getHeight());
-                PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, 9, true);
+                PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, Deflater.DEFAULT_COMPRESSION, true);
                 p.dispose();
             }
             catch (Throwable e) {

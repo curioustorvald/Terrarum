@@ -40,12 +40,12 @@ class ConsoleWindow : UICanvas() {
     private var commandHistory = CircularArray<String>(COMMAND_HISTORY_MAX, true)
 
     private val LINE_HEIGHT = 20
-    private val MESSAGES_DISPLAY_COUNT = 11
+    private val MESSAGES_DISPLAY_COUNT = 12
 
     private val inputToMsgboxGap = 3
 
     override var width: Int = App.scr.width
-    override var height: Int = LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT + 1) + inputToMsgboxGap
+    override var height: Int = LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT + 1) + inputToMsgboxGap + 4
 
     override var openCloseTime = 0f
 

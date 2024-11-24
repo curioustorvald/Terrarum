@@ -75,6 +75,7 @@ object IngameRenderer : Disposable {
     private lateinit var fboA_lightMixed: Float16FrameBuffer
     private lateinit var fboEmissive: Float16FrameBuffer
     private lateinit var fboMixedOut: Float16FrameBuffer
+
     private lateinit var rgbTex: TextureRegion
     private lateinit var aTex: TextureRegion
     private lateinit var mixedOutTex: TextureRegion
