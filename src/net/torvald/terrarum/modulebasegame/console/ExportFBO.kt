@@ -132,6 +132,11 @@ internal object ExportFBO : ConsoleCommand {
     fun fborgbterrainshadow(): FrameBuffer {
         return IngameRenderer.extortField<Float16FrameBuffer>("fboRGBterrainShadow")!!
     }
+
+    @ExportFBOCmd("Framebuffer for wall blocks")
+    fun fborgbwall(): FrameBuffer {
+        return IngameRenderer.extortField<Float16FrameBuffer>("fboRGBwall")!!
+    }
 }
 
 internal annotation class ExportFBOCmd(val description: String)
