@@ -76,6 +76,9 @@ object IngameRenderer : Disposable {
     private lateinit var fboEmissive: Float16FrameBuffer
     private lateinit var fboMixedOut: Float16FrameBuffer
 
+    private lateinit var fboRGBactorsBehind: Float16FrameBuffer // for small shadow eff; A channel is for glow effects so they don't get shadow effects
+    private lateinit var fboRGBactorsMiddle: Float16FrameBuffer // for large shadew eff; A channel is for glow effects so they don't get shadow effects
+
     private lateinit var rgbTex: TextureRegion
     private lateinit var aTex: TextureRegion
     private lateinit var mixedOutTex: TextureRegion
@@ -498,9 +501,35 @@ object IngameRenderer : Disposable {
         fboRGB_lightMixed0.inAction(null, null) { clearBuffer() }
         fboRGB_lightMixed.inAction(null, null) { clearBuffer() }
 
-        fboRGB.inAction(camera, batch) {
 
+        fboRGBactorsBehind.inAction(camera, batch) {
+            clearBuffer()
             setCameraPosition(0f, 0f)
+
+            batch.inUse {
+                batch.shader = shaderForActors
+                batch.color = Color.WHITE
+                moveCameraToWorldCoord()
+                actorsRenderBehind?.forEach { it.drawBody(frameDelta, batch) }
+            }
+        }
+
+        fboRGBactorsMiddle.inAction(camera, batch) {
+            clearBuffer()
+            setCameraPosition(0f, 0f)
+
+            batch.inUse {
+                batch.shader = shaderForActors
+                batch.color = Color.WHITE
+                moveCameraToWorldCoord()
+                actorsRenderMiddle?.forEach { it.drawBody(frameDelta, batch) }
+            }
+        }
+
+
+        fboRGB.inAction(camera, batch) {
+            setCameraPosition(0f, 0f)
+
             BlocksDrawer.drawWall(batch.projectionMatrix, false)
 
             batch.inUse {
@@ -508,7 +537,12 @@ object IngameRenderer : Disposable {
                 batch.color = Color.WHITE
                 moveCameraToWorldCoord()
                 actorsRenderFarBehind?.forEach { it.drawBody(frameDelta, batch) }
-                actorsRenderBehind?.forEach { it.drawBody(frameDelta, batch) }
+
+//                actorsRenderBehind?.forEach { it.drawBody(frameDelta, batch) }
+                setCameraPosition(0f, 0f)
+                batch.drawFlipped(fboRGBactorsBehind.colorBufferTexture, 0f, 0f)
+
+                moveCameraToWorldCoord()
                 particlesContainer?.forEach { it.drawBody(frameDelta, batch) }
             }
 
@@ -522,8 +556,12 @@ object IngameRenderer : Disposable {
                 /////////////////
                 // draw actors //
                 /////////////////
+//                moveCameraToWorldCoord()
+//                actorsRenderMiddle?.forEach { it.drawBody(frameDelta, batch) }
+                setCameraPosition(0f, 0f)
+                batch.drawFlipped(fboRGBactorsMiddle.colorBufferTexture, 0f, 0f)
+
                 moveCameraToWorldCoord()
-                actorsRenderMiddle?.forEach { it.drawBody(frameDelta, batch) }
                 actorsRenderMidTop?.forEach { it.drawBody(frameDelta, batch) }
                 player?.drawBody(frameDelta, batch)
                 actorsRenderFront?.forEach { it.drawBody(frameDelta, batch) }
@@ -1210,6 +1248,8 @@ object IngameRenderer : Disposable {
         fboA_lightMixed = Float16FrameBuffer(width, height, false)
         fboEmissive = Float16FrameBuffer(width, height, false)
         fboMixedOut = Float16FrameBuffer(width, height, false)
+        fboRGBactorsBehind = Float16FrameBuffer(width, height, false)
+        fboRGBactorsMiddle = Float16FrameBuffer(width, height, false)
         lightmapFbo = Float16FrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
@@ -1272,6 +1312,8 @@ object IngameRenderer : Disposable {
         if (::fboEmissive.isInitialized) fboEmissive.tryDispose()
         if (::fboMixedOut.isInitialized) fboMixedOut.tryDispose()
         if (::lightmapFbo.isInitialized) lightmapFbo.tryDispose()
+        if (::fboRGBactorsBehind.isInitialized) fboRGBactorsBehind.tryDispose()
+        if (::fboRGBactorsMiddle.isInitialized) fboRGBactorsMiddle.tryDispose()
 
         blurtex0.tryDispose()
 

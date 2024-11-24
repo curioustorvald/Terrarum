@@ -102,6 +102,16 @@ internal object ExportFBO : ConsoleCommand {
     fun fboemissive(): FrameBuffer {
         return IngameRenderer.extortField<Float16FrameBuffer>("fboEmissive")!!
     }
+
+    @ExportFBOCmd("Framebuffer for render-behind actors used for creating shallow shadow effects")
+    fun fboergbactorsbehind(): FrameBuffer {
+        return IngameRenderer.extortField<Float16FrameBuffer>("fboRGBactorsBehind")!!
+    }
+
+    @ExportFBOCmd("Framebuffer for render-middle actors used for creating large shadow effects")
+    fun fboergbactorsmiddle(): FrameBuffer {
+        return IngameRenderer.extortField<Float16FrameBuffer>("fboRGBactorsMiddle")!!
+    }
 }
 
 internal annotation class ExportFBOCmd(val description: String)
