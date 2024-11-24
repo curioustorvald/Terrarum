@@ -16,11 +16,12 @@ import org.dyn4j.geometry.Vector2
  */
 class FixtureLogicSignalSwitchManual : Electric {
 
-    @Transient override val spawnNeedsFloor = true
+    @Transient override val spawnNeedsFloor = false
     @Transient override val spawnNeedsWall = true
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 1, 1),
+        renderOrder = RenderOrder.BEHIND,
         nameFun = { Lang["ITEM_LOGIC_SIGNAL_SWITCH"] }
     )
 
@@ -74,11 +75,12 @@ class FixtureLogicSignalSwitchManual : Electric {
  */
 class FixtureLogicSignalPushbutton : Electric {
 
-    @Transient override val spawnNeedsFloor = true
+    @Transient override val spawnNeedsFloor = false
     @Transient override val spawnNeedsWall = true
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 1, 1),
+        renderOrder = RenderOrder.BEHIND,
         nameFun = { Lang["ITEM_LOGIC_SIGNAL_PUSHBUTTON"] }
     )
 

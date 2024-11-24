@@ -18,6 +18,7 @@ class FixtureLogicSignalBulb : Electric {
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 1, 1),
+        renderOrder = RenderOrder.BEHIND,
         nameFun = { Lang["ITEM_COPPER_BULB"] }
     )
 
