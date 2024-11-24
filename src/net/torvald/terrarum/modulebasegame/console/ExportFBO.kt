@@ -104,13 +104,18 @@ internal object ExportFBO : ConsoleCommand {
     }
 
     @ExportFBOCmd("Framebuffer for render-behind actors used for creating shallow shadow effects")
-    fun fboergbactorsbehind(): FrameBuffer {
+    fun fborgbactorsbehind(): FrameBuffer {
         return IngameRenderer.extortField<Float16FrameBuffer>("fboRGBactorsBehind")!!
     }
 
     @ExportFBOCmd("Framebuffer for render-middle actors used for creating large shadow effects")
-    fun fboergbactorsmiddle(): FrameBuffer {
+    fun fborgbactorsmiddle(): FrameBuffer {
         return IngameRenderer.extortField<Float16FrameBuffer>("fboRGBactorsMiddle")!!
+    }
+
+    @ExportFBOCmd("Framebuffer for terrain blocks used for creating large shadow effects")
+    fun fborgbterrain(): FrameBuffer {
+        return IngameRenderer.extortField<Float16FrameBuffer>("fboRGBterrain")!!
     }
 }
 

@@ -77,7 +77,8 @@ object IngameRenderer : Disposable {
     private lateinit var fboMixedOut: Float16FrameBuffer
 
     private lateinit var fboRGBactorsBehind: Float16FrameBuffer // for small shadow eff; A channel is for glow effects so they don't get shadow effects
-    private lateinit var fboRGBactorsMiddle: Float16FrameBuffer // for large shadew eff; A channel is for glow effects so they don't get shadow effects
+    private lateinit var fboRGBactorsMiddle: Float16FrameBuffer // for large shadow eff; A channel is for glow effects so they don't get shadow effects
+    private lateinit var fboRGBterrain: Float16FrameBuffer // for large shadow eff; A channel is for glow effects so they don't get shadow effects
 
     private lateinit var rgbTex: TextureRegion
     private lateinit var aTex: TextureRegion
@@ -526,6 +527,12 @@ object IngameRenderer : Disposable {
             }
         }
 
+        fboRGBterrain.inAction(camera, batch) {
+            clearBuffer()
+            setCameraPosition(0f, 0f)
+            BlocksDrawer.drawTerrain(batch.projectionMatrix, false)
+        }
+
 
         fboRGB.inAction(camera, batch) {
             setCameraPosition(0f, 0f)
@@ -546,10 +553,13 @@ object IngameRenderer : Disposable {
                 particlesContainer?.forEach { it.drawBody(frameDelta, batch) }
             }
 
-            setCameraPosition(0f, 0f)
-            BlocksDrawer.drawTerrain(batch.projectionMatrix, false)
+            batch.inUse {
+                batch.shader = null
+                batch.color = Color.WHITE
+                setCameraPosition(0f, 0f)
+                batch.drawFlipped(fboRGBterrain.colorBufferTexture, 0f, 0f)
+            }
 
-            batch.shader = shaderForActors
             batch.inUse {
                 batch.shader = shaderForActors
                 batch.color = Color.WHITE
@@ -1250,6 +1260,7 @@ object IngameRenderer : Disposable {
         fboMixedOut = Float16FrameBuffer(width, height, false)
         fboRGBactorsBehind = Float16FrameBuffer(width, height, false)
         fboRGBactorsMiddle = Float16FrameBuffer(width, height, false)
+        fboRGBterrain = Float16FrameBuffer(width, height, false)
         lightmapFbo = Float16FrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
@@ -1314,6 +1325,7 @@ object IngameRenderer : Disposable {
         if (::lightmapFbo.isInitialized) lightmapFbo.tryDispose()
         if (::fboRGBactorsBehind.isInitialized) fboRGBactorsBehind.tryDispose()
         if (::fboRGBactorsMiddle.isInitialized) fboRGBactorsMiddle.tryDispose()
+        if (::fboRGBterrain.isInitialized) fboRGBterrain.tryDispose()
 
         blurtex0.tryDispose()
 
