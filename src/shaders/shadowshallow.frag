@@ -10,7 +10,7 @@ uniform sampler2D u_texture;
 uniform sampler2D u_wall;
 out vec4 fragColor;
 
-vec4 mult = vec4(0.0, 0.0, 0.0, 1.4142);
+vec4 mult = vec4(0.0, 0.0, 0.0, 1.5);
 
 void main() {
     vec4 backcol = texture(u_wall, v_texCoords);

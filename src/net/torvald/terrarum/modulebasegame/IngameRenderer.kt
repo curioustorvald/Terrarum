@@ -515,6 +515,7 @@ object IngameRenderer : Disposable {
         fboRGBactorsBehind.inAction(camera, batch) {
             clearBuffer()
             setCameraPosition(0f, 0f)
+            BlocksDrawer.drawTerrainWallSticker(batch.projectionMatrix, false)
 
             batch.inUse {
                 batch.shader = shaderForActors
@@ -574,9 +575,6 @@ object IngameRenderer : Disposable {
                 batch.drawFlipped(fboRGBactorsBehindShadow.colorBufferTexture, 0f, 0f)
             }
 
-            fboRGBwall.colorBufferTexture.bind(1)
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
-
             batch.inUse {
                 batch.shader = shaderShadowDeep
                 shaderShadowDeep.setUniformi("u_wall", 1)
@@ -584,8 +582,6 @@ object IngameRenderer : Disposable {
                 batch.drawFlipped(fboRGBterrainShadow.colorBufferTexture, 0f, 0f)
                 batch.drawFlipped(fboRGBactorsMiddleShadow.colorBufferTexture, 0f, 0f)
             }
-
-//            Gdx.gl20.glActiveTexture(0)
 
             // draw behind actors and particles
             batch.inUse {

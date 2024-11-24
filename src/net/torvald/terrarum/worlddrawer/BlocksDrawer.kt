@@ -73,9 +73,10 @@ internal object BlocksDrawer {
 
     val WALL = GameWorld.WALL
     val TERRAIN = GameWorld.TERRAIN
+    val TERRAIN_WALLSTICKER = GameWorld.TERRAIN + 1024
     val ORES = GameWorld.ORES
     val FLUID = -2
-    val OCCLUSION = 31337
+//    val OCCLUSION = 31337
     val BLURMAP_BASE = 31338
     val BLURMAP_TERR = BLURMAP_BASE + TERRAIN
     val BLURMAP_WALL = BLURMAP_BASE + WALL
@@ -88,6 +89,7 @@ internal object BlocksDrawer {
     private const val NEARBY_TILE_KEY_LEFT = 3
 
     private lateinit var terrainTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
+    private lateinit var terrainWallStickerTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var wallTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var oreTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var fluidTilesBuffer: UnsafeLong2D // stores subtiles (dimension is doubled)
@@ -96,9 +98,11 @@ internal object BlocksDrawer {
     private lateinit var blurMapWall: UnsafeLong2D // stores subtiles (dimension is doubled)
     private lateinit var tempRenderTypeBuffer: UnsafeLong2D // this one is NOT dimension doubled; 0x tttt 00 ii where t=rawTileNum, i=nearbyTilesInfo
     private var terrainDrawBuffer1: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
-    private var terrainDrawBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var terrainDrawBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888) // holds breakage and fliprot
+    private var terrainWallStickerDrawBuffer1: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var terrainWallStickerDrawBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888) // holds breakage and fliprot
     private var wallDrawBuffer1: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
-    private var wallDrawBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    private var wallDrawBuffer2: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888) // holds breakage and fliprot
     private var oresDrawBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
     private var fluidDrawBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
     private var occlusionDrawBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
@@ -276,6 +280,7 @@ internal object BlocksDrawer {
             measureDebugTime("Renderer.Tiling*") {
                 fillInTileBuffer(WALL)
                 fillInTileBuffer(TERRAIN) // regular tiles
+                fillInTileBuffer(TERRAIN_WALLSTICKER)
                 fillInTileBuffer(ORES)
                 fillInTileBuffer(FLUID)
 //                fillInTileBuffer(OCCLUSION)
@@ -309,6 +314,10 @@ internal object BlocksDrawer {
         renderUsingBuffer(TERRAIN, projectionMatrix, drawGlow, drawEmissive)
         renderUsingBuffer(ORES, projectionMatrix, drawGlow, drawEmissive)
         renderUsingBuffer(FLUID, projectionMatrix, drawGlow, drawEmissive)
+    }
+
+    internal fun drawTerrainWallSticker(projectionMatrix: Matrix4, drawGlow: Boolean, drawEmissive: Boolean = false) {
+        renderUsingBuffer(TERRAIN_WALLSTICKER, projectionMatrix, drawGlow, drawEmissive)
     }
 
 
@@ -465,27 +474,37 @@ internal object BlocksDrawer {
 
                 var rawTileNum: Int = when (mode) {
                     WALL -> world.layerWall.unsafeGetTile(wx, wy)
-                    TERRAIN -> world.layerTerrain.unsafeGetTile(wx, wy)
+                    TERRAIN, TERRAIN_WALLSTICKER -> world.layerTerrain.unsafeGetTile(wx, wy)
                     ORES -> world.layerOres.unsafeGetTile(wx, wy)//.also { println(it) }
                     FLUID -> world.layerFluids.unsafeGetTile1(wx, wy).let { (number, fill) ->
-                        if (number == 65535 || fill < 1f/30f) 0
+                        if (number == 65535 || fill < 1f / 30f) 0
                         else number
                     }
-                    OCCLUSION -> occlusionRenderTag.tileNumber
+//                    OCCLUSION -> occlusionRenderTag.tileNumber
                     else -> throw IllegalArgumentException()
                 }
 
-                val renderTag = if (mode == OCCLUSION) occlusionRenderTag else App.tileMaker.getRenderTag(rawTileNum)
+                var renderTag = /*if (mode == OCCLUSION) occlusionRenderTag else*/App.tileMaker.getRenderTag(rawTileNum)
 
-                var hash = if ((mode == WALL || mode == TERRAIN) && !BlockCodex[world.tileNumberToNameMap[rawTileNum.toLong()]].hasTag("NORANDTILE"))
-                    getHashCoord(x, y, 8, mode, renderTag.tileNumber)
-                else 0 // this zero is completely ignored if the block uses Subtiling
+                // filter for TERRAIN_WALLSTICKER
+                if (mode == TERRAIN_WALLSTICKER &&
+                    renderTag.connectionType != CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER &&
+                    renderTag.connectionType != CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER_CONNECT_SELF
+                ) {
+                    rawTileNum = 0
+                    renderTag = App.tileMaker.getRenderTag(rawTileNum)
+                }
+
+                var hash =
+                    if ((mode == WALL || mode == TERRAIN || mode == TERRAIN_WALLSTICKER) && !BlockCodex[world.tileNumberToNameMap[rawTileNum.toLong()]].hasTag("NORANDTILE"))
+                        getHashCoord(x, y, 8, if (mode == TERRAIN_WALLSTICKER) TERRAIN else mode, renderTag.tileNumber)
+                    else 0 // this zero is completely ignored if the block uses Subtiling
 
                 // draw a tile
-                val nearbyTilesInfo = if (mode == OCCLUSION) {
+                val nearbyTilesInfo = /*if (mode == OCCLUSION) {
                     getNearbyTilesInfoFakeOcc(x, y)
                 }
-                else if (mode == ORES) {
+                else*/ if (mode == ORES) {
                     0
                 }
                 else if (mode == FLUID) {
@@ -494,7 +513,8 @@ internal object BlocksDrawer {
                     val fluids = getNearbyFluidsInfo(x, y)
                     val fluidU = fluids[3].amount
 
-                    val nearbyFluidType = fluids.asSequence().filter { it.amount >= 0.5f / 16f }.map { it.type }.filter { it.startsWith("fluid@") }.sorted().firstOrNull()
+                    val nearbyFluidType = fluids.asSequence().filter { it.amount >= 0.5f / 16f }.map { it.type }
+                        .filter { it.startsWith("fluid@") }.sorted().firstOrNull()
 
                     val fillThis =
                         world.layerFluids.unsafeGetTile1(wx, wy).second.let { if (it.isNaN()) 0f else it.coerceAtMost(1f) }
@@ -522,7 +542,7 @@ internal object BlocksDrawer {
                         }
                         // check R
                         else if (tileToUse and 0b0010 != 0) {
-                            if (fluidR < 0.5f / 16f )
+                            if (fluidR < 0.5f / 16f)
                                 tileToUse = 0
                         }
                         // check L
@@ -612,32 +632,14 @@ internal object BlocksDrawer {
 
                 val breakingStage =
                     if (mode == TERRAIN || mode == WALL || mode == ORES)
-                            (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt()
+                        (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt()
                     else 0
 
-                /*if (mode == TERRAIN || mode == WALL) {
-                    // translate nearbyTilesInfo into proper subtile number
-                    val nearbyTilesInfo = getNearbyTilesInfoDeblocking(mode, x, y)
-                    val subtiles = if (nearbyTilesInfo == null)
-                        listOf(
-                            Point2i(130, 1), Point2i(130, 1), Point2i(130, 1), Point2i(130, 1)
-                        )
-                    else
-                        (0..3).map {
-                            Point2i(126, 0) + deblockerNearbyTilesToSubtile[it][nearbyTilesInfo]
-                        }
-
-                    /*TL*/writeToBufferSubtile(BLURMAP_BASE + mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 0, subtiles[0].x, subtiles[0].y, 0, 0)
-                    /*TR*/writeToBufferSubtile(BLURMAP_BASE + mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 0, subtiles[1].x, subtiles[1].y, 0, 0)
-                    /*BR*/writeToBufferSubtile(BLURMAP_BASE + mode, bufferBaseX * 2 + 1, bufferBaseY * 2 + 1, subtiles[2].x, subtiles[2].y, 0, 0)
-                    /*BL*/writeToBufferSubtile(BLURMAP_BASE + mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 1, subtiles[3].x, subtiles[3].y, 0, 0)
-                }*/
-
                 if (renderTag.maskType >= CreateTileAtlas.RenderTag.MASK_SUBTILE_GENERIC) {
-                    hash = getHashCoord(x, y, 268435456, mode, renderTag.tileNumber)
+                    hash = getHashCoord(x, y, 268435456, if (mode == TERRAIN_WALLSTICKER) TERRAIN else mode, renderTag.tileNumber)
 
                     val subtileSwizzlers = if (renderTag.tilingMode and 1 == 1)
-                        intArrayOf(0,0,0,0)
+                        intArrayOf(0, 0, 0, 0)
                     else
                         intArrayOf(
                             (hash ushr 16) and 7,
@@ -662,7 +664,7 @@ internal object BlocksDrawer {
                     /*BL*/writeToBufferSubtile(mode, bufferBaseX * 2 + 0, bufferBaseY * 2 + 1, subtiles[3].x, subtiles[3].y, breakingStage, subtileSwizzlers[3])
                 }
                 else {
-                    var tileNumber = if (rawTileNum == 0 && mode != OCCLUSION) 0
+                    var tileNumber = if (rawTileNum == 0 /*&& mode != OCCLUSION*/) 0
                     // special case: actorblocks and F3 key
                     else if (renderOnF3Only.binarySearch(rawTileNum) >= 0 && !KeyToggler.isOn(Keys.F3))
                         0
@@ -683,7 +685,7 @@ internal object BlocksDrawer {
 
                     // hide tiles with super low lights, kinda like Minecraft's Orebfuscator
                     val lightAtXY = LightmapRenderer.getLight(x, y) ?: Cvec(0)
-                    if (mode != FLUID && mode != OCCLUSION && maxOf(lightAtXY.fastLum(), lightAtXY.a) <= 1.5f / 255f) {
+                    if (mode != FLUID && /*mode != OCCLUSION &&*/ maxOf(lightAtXY.fastLum(), lightAtXY.a) <= 1.5f / 255f) {
                         tileNumber = 2 // black solid
                     }
 
@@ -700,7 +702,10 @@ internal object BlocksDrawer {
                     /*BL*/writeToBuffer(mode, bufferBaseX * 2 + offsets[3].x, bufferBaseY * 2 + offsets[3].y, thisTileX + 0, thisTileY + 2, breakingStage, hash)
                 }
 
-                tempRenderTypeBuffer[bufferBaseY, bufferBaseX] = (nearbyTilesInfo or rawTileNum.shl(16)).toLong()
+
+                if (mode != TERRAIN_WALLSTICKER) {
+                    tempRenderTypeBuffer[bufferBaseY, bufferBaseX] = (nearbyTilesInfo or rawTileNum.shl(16)).toLong()
+                }
             }
         }
 //        println("App.tileMaker.TILES_IN_X = ${App.tileMaker.TILES_IN_X}\tApp.tileMaker.atlas.width = ${App.tileMaker.atlas.width}")
@@ -793,7 +798,7 @@ internal object BlocksDrawer {
     private fun getNearbyTilesInfoConSelf(x: Int, y: Int, mode: Int, mark: Int): Int {
         val layer = when (mode) {
             WALL -> world.layerWall
-            TERRAIN -> world.layerTerrain
+            TERRAIN, TERRAIN_WALLSTICKER -> world.layerTerrain
             ORES -> world.layerOres
             FLUID -> world.layerFluids
             else -> throw IllegalArgumentException("Unknown mode $mode")
@@ -874,6 +879,8 @@ internal object BlocksDrawer {
     )
 
     private fun getNearbyTilesInfoConMutual(x: Int, y: Int, mode: Int): Int {
+        val mode = if (mode == TERRAIN_WALLSTICKER) TERRAIN else mode
+
         val nearbyTiles: List<ItemID> = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) }
 
         var ret = 0
@@ -917,6 +924,8 @@ internal object BlocksDrawer {
     }
 
     private fun getNearbyTilesInfoTreeLeaves(x: Int, y: Int, mode: Int): Int {
+        val mode = if (mode == TERRAIN_WALLSTICKER) TERRAIN else mode
+
         val nearbyTiles: List<ItemID> = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) }
 
         var ret = 0
@@ -930,6 +939,8 @@ internal object BlocksDrawer {
     }
 
     private fun getNearbyTilesInfoTreeTrunks(x: Int, y: Int, mode: Int): Int {
+        val mode = if (mode == TERRAIN_WALLSTICKER) TERRAIN else mode
+
         val nearbyTiles: List<ItemID> = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) }
 
         var ret = 0
@@ -1148,10 +1159,11 @@ internal object BlocksDrawer {
     private fun writeToBuffer(mode: Int, bufferPosX: Int, bufferPosY: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int) {
         val sourceBuffer = when(mode) {
             TERRAIN -> terrainTilesBuffer
+            TERRAIN_WALLSTICKER -> terrainWallStickerTilesBuffer
             WALL -> wallTilesBuffer
             ORES -> oreTilesBuffer
             FLUID -> fluidTilesBuffer
-            OCCLUSION -> occlusionBuffer
+//            OCCLUSION -> occlusionBuffer
             else -> throw IllegalArgumentException()
         }
 
@@ -1164,10 +1176,11 @@ internal object BlocksDrawer {
     private fun writeToBufferSubtile(mode: Int, bufferPosX: Int, bufferPosY: Int, sheetX: Int, sheetY: Int, breakage: Int, hash: Int) {
         val sourceBuffer = when(mode) {
             TERRAIN -> terrainTilesBuffer
+            TERRAIN_WALLSTICKER -> terrainWallStickerTilesBuffer
             WALL -> wallTilesBuffer
             ORES -> oreTilesBuffer
             FLUID -> fluidTilesBuffer
-            OCCLUSION -> occlusionBuffer
+//            OCCLUSION -> occlusionBuffer
             BLURMAP_TERR -> blurMapTerr
             BLURMAP_WALL -> blurMapWall
             else -> throw IllegalArgumentException()
@@ -1195,27 +1208,30 @@ internal object BlocksDrawer {
     private var camTransY = 0
 
     private fun prepareDrawBuffers() {
-        listOf(TERRAIN, WALL, ORES, FLUID, OCCLUSION).forEach { mode ->
+        listOf(TERRAIN, TERRAIN_WALLSTICKER, WALL, ORES, FLUID/*, OCCLUSION*/).forEach { mode ->
             val sourceBuffer = when(mode) {
                 TERRAIN -> terrainTilesBuffer
+                TERRAIN_WALLSTICKER -> terrainWallStickerTilesBuffer
                 WALL -> wallTilesBuffer
                 ORES -> oreTilesBuffer
                 FLUID -> fluidTilesBuffer
-                OCCLUSION -> occlusionBuffer
+//                OCCLUSION -> occlusionBuffer
                 else -> throw IllegalArgumentException()
             }
 
             val drawBuffer1 = when(mode) {
                 TERRAIN -> terrainDrawBuffer1
+                TERRAIN_WALLSTICKER -> terrainWallStickerDrawBuffer1
                 WALL -> wallDrawBuffer1
                 ORES -> oresDrawBuffer
                 FLUID -> fluidDrawBuffer
-                OCCLUSION -> occlusionDrawBuffer
+//                OCCLUSION -> occlusionDrawBuffer
                 else -> throw IllegalArgumentException()
             }
 
             val drawBuffer2 = when(mode) {
                 TERRAIN -> terrainDrawBuffer2
+                TERRAIN_WALLSTICKER -> terrainWallStickerDrawBuffer2
                 WALL -> wallDrawBuffer2
                 else -> null
             }
@@ -1255,7 +1271,7 @@ internal object BlocksDrawer {
 
 
         val tileAtlas = when (mode) {
-            TERRAIN, ORES, WALL, OCCLUSION, FLUID, BLURMAP_TERR, BLURMAP_WALL -> tilesTerrain
+            TERRAIN, TERRAIN_WALLSTICKER, ORES, WALL, /*OCCLUSION,*/ FLUID, BLURMAP_TERR, BLURMAP_WALL -> tilesTerrain
             else -> throw IllegalArgumentException()
         }
 
@@ -1266,15 +1282,17 @@ internal object BlocksDrawer {
 
         val drawBuffer1 = when(mode) {
             TERRAIN -> terrainDrawBuffer1
+            TERRAIN_WALLSTICKER -> terrainWallStickerDrawBuffer1
             WALL -> wallDrawBuffer1
             ORES -> oresDrawBuffer
             FLUID -> fluidDrawBuffer
-            OCCLUSION -> occlusionDrawBuffer
+//            OCCLUSION -> occlusionDrawBuffer
             else -> throw IllegalArgumentException()
         }
 
         val drawBuffer2 = when(mode) {
             TERRAIN -> terrainDrawBuffer2
+            TERRAIN_WALLSTICKER -> terrainWallStickerDrawBuffer2
             WALL -> wallDrawBuffer2
             else -> nullBuffer
         }
@@ -1332,7 +1350,7 @@ internal object BlocksDrawer {
         else
             0f
         )
-        shaderTiling.setUniformf("mulBlendIntensity", if (mode == OCCLUSION) occlusionIntensity else 1f)
+        shaderTiling.setUniformf("mulBlendIntensity", /*if (mode == OCCLUSION) occlusionIntensity else*/ 1f)
         tilesQuad.render(shaderTiling, GL20.GL_TRIANGLE_FAN)
 
         //tilesBufferAsTex.dispose()
@@ -1359,6 +1377,7 @@ internal object BlocksDrawer {
         // only update if it's really necessary
         if (oldTH != tilesInHorizontal || oldTV != tilesInVertical) {
             if (::terrainTilesBuffer.isInitialized) terrainTilesBuffer.destroy()
+            if (::terrainWallStickerTilesBuffer.isInitialized) terrainWallStickerTilesBuffer.destroy()
             if (::wallTilesBuffer.isInitialized) wallTilesBuffer.destroy()
             if (::oreTilesBuffer.isInitialized) oreTilesBuffer.destroy()
             if (::fluidTilesBuffer.isInitialized) fluidTilesBuffer.destroy()
@@ -1366,6 +1385,7 @@ internal object BlocksDrawer {
             if (::tempRenderTypeBuffer.isInitialized) tempRenderTypeBuffer.destroy()
 
             terrainTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
+            terrainWallStickerTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             wallTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             oreTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
             fluidTilesBuffer = UnsafeLong2D(tilesInHorizontal, tilesInVertical)
@@ -1378,6 +1398,10 @@ internal object BlocksDrawer {
             terrainDrawBuffer1 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
             terrainDrawBuffer2.dispose()
             terrainDrawBuffer2 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            terrainWallStickerDrawBuffer1.dispose()
+            terrainWallStickerDrawBuffer1 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            terrainWallStickerDrawBuffer2.dispose()
+            terrainWallStickerDrawBuffer2 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
             wallDrawBuffer1.dispose()
             wallDrawBuffer1 = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
             wallDrawBuffer2.dispose()
@@ -1457,6 +1481,8 @@ internal object BlocksDrawer {
         tileItemWallEmissive.dispose()
         terrainDrawBuffer1.dispose()
         terrainDrawBuffer2.dispose()
+        terrainWallStickerDrawBuffer1.dispose()
+        terrainWallStickerDrawBuffer2.dispose()
         wallDrawBuffer1.dispose()
         wallDrawBuffer2.dispose()
         oresDrawBuffer.dispose()
@@ -1473,6 +1499,7 @@ internal object BlocksDrawer {
         nullBuffer.dispose()
 
         if (::terrainTilesBuffer.isInitialized) terrainTilesBuffer.destroy()
+        if (::terrainWallStickerTilesBuffer.isInitialized) terrainWallStickerTilesBuffer.destroy()
         if (::wallTilesBuffer.isInitialized) wallTilesBuffer.destroy()
         if (::oreTilesBuffer.isInitialized) oreTilesBuffer.destroy()
         if (::fluidTilesBuffer.isInitialized) fluidTilesBuffer.destroy()
