@@ -17,7 +17,6 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.FluidCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.METER
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.PHYS_EPSILON_DIST
@@ -32,6 +31,7 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.modulebasegame.gameitems.ItemThrowable
 import net.torvald.terrarum.modulebasegame.gameitems.getThrowPosAndVector
+import net.torvald.terrarum.ui.BlurMgr
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
@@ -80,6 +80,11 @@ object IngameRenderer : Disposable {
     private lateinit var fboRGBactorsMiddle: Float16FrameBuffer // for large shadow eff; A channel is for glow effects so they don't get shadow effects
     private lateinit var fboRGBterrain: Float16FrameBuffer // for large shadow eff; A channel is for glow effects so they don't get shadow effects
 
+    private lateinit var fboRGBactorsBehindShadow: Float16FrameBuffer // for small shadow eff; A channel is for glow effects so they don't get shadow effects
+    private lateinit var fboRGBactorsMiddleShadow: Float16FrameBuffer // for large shadow eff; A channel is for glow effects so they don't get shadow effects
+    private lateinit var fboRGBterrainShadow: Float16FrameBuffer // for large shadow eff; A channel is for glow effects so they don't get shadow effects
+
+
     private lateinit var rgbTex: TextureRegion
     private lateinit var aTex: TextureRegion
     private lateinit var mixedOutTex: TextureRegion
@@ -109,6 +114,8 @@ object IngameRenderer : Disposable {
     val shaderBlendGlow: ShaderProgram
     val shaderBlendGlowTex1Flip: ShaderProgram
     val shaderForActors: ShaderProgram
+    val shaderShadowShallow: ShaderProgram
+    val shaderShadowDeep: ShaderProgram
     val shaderDemultiply: ShaderProgram
 
     val shaderBayerAlpha: ShaderProgram
@@ -151,6 +158,8 @@ object IngameRenderer : Disposable {
 
 
         shaderForActors = App.loadShaderFromClasspath("shaders/default.vert", "shaders/actors.frag")
+        shaderShadowShallow = App.loadShaderFromClasspath("shaders/default.vert", "shaders/shadowshallow.frag")
+        shaderShadowDeep = App.loadShaderFromClasspath("shaders/default.vert", "shaders/shadowdeep.frag")
         shaderBlendGlow = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/blendGlow.frag")
         shaderBlendGlowTex1Flip = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/blendGlowTex1Flip.frag")
         shaderDemultiply = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/demultiply.frag")
@@ -511,9 +520,11 @@ object IngameRenderer : Disposable {
                 batch.shader = shaderForActors
                 batch.color = Color.WHITE
                 moveCameraToWorldCoord()
+                actorsRenderFarBehind?.forEach { it.drawBody(frameDelta, batch) }
                 actorsRenderBehind?.forEach { it.drawBody(frameDelta, batch) }
             }
         }
+        BlurMgr.makeBlur(fboRGBactorsBehind, fboRGBactorsBehindShadow, 0.25f)
 
         fboRGBactorsMiddle.inAction(camera, batch) {
             clearBuffer()
@@ -526,12 +537,14 @@ object IngameRenderer : Disposable {
                 actorsRenderMiddle?.forEach { it.drawBody(frameDelta, batch) }
             }
         }
+        BlurMgr.makeBlur(fboRGBactorsMiddle, fboRGBactorsMiddleShadow, 2.5f)
 
         fboRGBterrain.inAction(camera, batch) {
             clearBuffer()
             setCameraPosition(0f, 0f)
             BlocksDrawer.drawTerrain(batch.projectionMatrix, false)
         }
+        BlurMgr.makeBlur(fboRGBterrain, fboRGBterrainShadow, 2.5f)
 
 
         fboRGB.inAction(camera, batch) {
@@ -539,24 +552,36 @@ object IngameRenderer : Disposable {
 
             BlocksDrawer.drawWall(batch.projectionMatrix, false)
 
+            // draw actor shadow BEFORE the terrain draw
+            batch.inUse {
+                batch.shader = shaderShadowShallow
+                setCameraPosition(0f, 0f)
+                batch.drawFlipped(fboRGBactorsBehindShadow.colorBufferTexture, 0f, 0f)
+
+                batch.shader = shaderShadowDeep
+                setCameraPosition(0f, 0f)
+                batch.drawFlipped(fboRGBterrainShadow.colorBufferTexture, 0f, 0f)
+                batch.drawFlipped(fboRGBactorsMiddleShadow.colorBufferTexture, 0f, 0f)
+            }
+
+            // draw behind actors and particles
             batch.inUse {
                 batch.shader = shaderForActors
                 batch.color = Color.WHITE
-                moveCameraToWorldCoord()
-                actorsRenderFarBehind?.forEach { it.drawBody(frameDelta, batch) }
 
-//                actorsRenderBehind?.forEach { it.drawBody(frameDelta, batch) }
                 setCameraPosition(0f, 0f)
+                batch.color = Color.WHITE
                 batch.drawFlipped(fboRGBactorsBehind.colorBufferTexture, 0f, 0f)
 
                 moveCameraToWorldCoord()
                 particlesContainer?.forEach { it.drawBody(frameDelta, batch) }
             }
 
+            // draw just the terrain
             batch.inUse {
                 batch.shader = null
-                batch.color = Color.WHITE
                 setCameraPosition(0f, 0f)
+                batch.color = Color.WHITE
                 batch.drawFlipped(fboRGBterrain.colorBufferTexture, 0f, 0f)
             }
 
@@ -566,9 +591,8 @@ object IngameRenderer : Disposable {
                 /////////////////
                 // draw actors //
                 /////////////////
-//                moveCameraToWorldCoord()
-//                actorsRenderMiddle?.forEach { it.drawBody(frameDelta, batch) }
                 setCameraPosition(0f, 0f)
+                batch.color = Color.WHITE
                 batch.drawFlipped(fboRGBactorsMiddle.colorBufferTexture, 0f, 0f)
 
                 moveCameraToWorldCoord()
@@ -1261,6 +1285,9 @@ object IngameRenderer : Disposable {
         fboRGBactorsBehind = Float16FrameBuffer(width, height, false)
         fboRGBactorsMiddle = Float16FrameBuffer(width, height, false)
         fboRGBterrain = Float16FrameBuffer(width, height, false)
+        fboRGBactorsBehindShadow = Float16FrameBuffer(width, height, false)
+        fboRGBactorsMiddleShadow = Float16FrameBuffer(width, height, false)
+        fboRGBterrainShadow = Float16FrameBuffer(width, height, false)
         lightmapFbo = Float16FrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
@@ -1326,6 +1353,9 @@ object IngameRenderer : Disposable {
         if (::fboRGBactorsBehind.isInitialized) fboRGBactorsBehind.tryDispose()
         if (::fboRGBactorsMiddle.isInitialized) fboRGBactorsMiddle.tryDispose()
         if (::fboRGBterrain.isInitialized) fboRGBterrain.tryDispose()
+        if (::fboRGBactorsBehindShadow.isInitialized) fboRGBactorsBehindShadow.tryDispose()
+        if (::fboRGBactorsMiddleShadow.isInitialized) fboRGBactorsMiddleShadow.tryDispose()
+        if (::fboRGBterrainShadow.isInitialized) fboRGBterrainShadow.tryDispose()
 
         blurtex0.tryDispose()
 
@@ -1349,6 +1379,8 @@ object IngameRenderer : Disposable {
         shaderBlendGlow.dispose()
         shaderBlendGlowTex1Flip.dispose()
         shaderForActors.dispose()
+        shaderShadowShallow.dispose()
+        shaderShadowDeep.dispose()
         shaderDemultiply.dispose()
 
         shaderBayerAlpha.dispose()

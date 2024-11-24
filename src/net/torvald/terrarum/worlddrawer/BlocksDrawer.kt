@@ -278,7 +278,7 @@ internal object BlocksDrawer {
                 fillInTileBuffer(TERRAIN) // regular tiles
                 fillInTileBuffer(ORES)
                 fillInTileBuffer(FLUID)
-                fillInTileBuffer(OCCLUSION)
+//                fillInTileBuffer(OCCLUSION)
                 prepareDrawBuffers()
             }
         }
@@ -289,7 +289,7 @@ internal object BlocksDrawer {
         renderUsingBuffer(WALL, projectionMatrix, drawGlow, drawEmissive)
 
         gdxBlendMul()
-        renderUsingBuffer(OCCLUSION, projectionMatrix, false, drawEmissive)
+//        renderUsingBuffer(OCCLUSION, projectionMatrix, false, drawEmissive)
     }
 
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App
 import net.torvald.terrarum.ceilToInt
+import net.torvald.terrarum.gdxClearAndEnableBlend
 import net.torvald.terrarum.inAction
 
 /**
@@ -97,6 +98,8 @@ object BlurMgr {
 
         val radius3 = FastMath.pow(strength / 2, 0.5f)//(blurRadius - 3f) / 8f
         fbos.half.inAction(fbos.camera, batch) {
+            gdxClearAndEnableBlend(0f,0f,0f,0f)
+
             blurtex0 = `in`.colorBufferTexture
             blurtex0.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             blurtex0.bind(0)
@@ -108,6 +111,8 @@ object BlurMgr {
         }
 
         fbos.quarter.inAction(fbos.camera, batch) {
+            gdxClearAndEnableBlend(0f,0f,0f,0f)
+
             blurtex1 = fbos.half.colorBufferTexture
             blurtex1.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             blurtex1.bind(0)
@@ -119,6 +124,8 @@ object BlurMgr {
         }
 
         fbos.half.inAction(fbos.camera, batch) {
+            gdxClearAndEnableBlend(0f,0f,0f,0f)
+
             blurtex2 = fbos.quarter.colorBufferTexture
             blurtex2.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             blurtex2.bind(0)
@@ -130,6 +137,8 @@ object BlurMgr {
         }
 
         out.inAction(fbos.camera, batch) {
+            gdxClearAndEnableBlend(0f,0f,0f,0f)
+
             blurtex3 = fbos.half.colorBufferTexture
             blurtex3.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             blurtex3.bind(0)
