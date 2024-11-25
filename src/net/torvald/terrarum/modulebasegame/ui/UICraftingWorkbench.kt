@@ -20,6 +20,7 @@ import net.torvald.terrarum.modulebasegame.ui.UITemplateHalfInventory.Companion.
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemCatBar.Companion.FILTER_CAT_ALL
 import net.torvald.unicode.getKeycapPC
+import kotlin.math.roundToInt
 
 /**
  * This UI has inventory, but it's just there to display all craftable items and should not be serialised.
@@ -122,7 +123,7 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
     private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
     private val cellsWidth = (listGap + UIItemInventoryElemWide.height) * 6 - listGap
 
-    private val LAST_LINE_IN_GRID = ((UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 2)) + 22//359 // TEMPORARY VALUE!
+    internal val LAST_LINE_IN_GRID = ((UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 2)) + 22//359 // TEMPORARY VALUE!
 
     private var recipeClicked: CraftingCodex.CraftingRecipe? = null
 
@@ -321,10 +322,14 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
         handler.allowESCtoClose = true
 
 
+        val navbarHeight = 82 // a magic number
+        val fakeNavbarY = itemListIngredients.posY
+        fun getIconPosY2(index: Int) = (fakeNavbarY + ((index*2+1)/4f) * navbarHeight).roundToInt() - catIcons.tileH/2
+
         val menuButtonTechView = UIItemImageButton(
             this, catIcons.get(20, 1),
             initialX = itemListCraftable.navRemoCon.posX + 12,
-            initialY = itemListCraftable.navRemoCon.getIconPosY(-2) - 8,
+            initialY = getIconPosY2(0),
             highlightable = true
         ).also {
             it.clickOnceListener = { _, _ ->
@@ -336,7 +341,7 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
         val menuButtonCraft = UIItemImageButton(
             this, catIcons.get(19, 1),
             initialX = itemListCraftable.navRemoCon.posX + 12,
-            initialY = itemListCraftable.navRemoCon.getIconPosY(-1) - 8,
+            initialY = getIconPosY2(1),
             activeCol = Toolkit.Theme.COL_SELECTED,
             inactiveCol = Toolkit.Theme.COL_SELECTED,
             highlightable = true

@@ -86,7 +86,7 @@ internal object SavegameMigrator {
         if (worldVersion == playerVersion) {
             this::class.declaredFunctions.filter {
                 annotationMatches(worldVersion, it.findAnnotation())
-            }.forEach { func ->
+            }.sortedBy { it.name }.forEach { func ->
                 printdbg(this, func.toString())
                 actors0.forEach { actor -> func.call(this, actor) }
             }
@@ -122,7 +122,7 @@ internal object SavegameMigrator {
 
 
     @AppliedVersion("all")
-    fun mergeUnlitBlocks(actor: Actor) {
+    fun b_mergeUnlitBlocksAndFillInInventory(actor: Actor) {
         if (ItemCodex.isEmpty()) throw Error("ItemCodex is empty")
 
         if (actor is Pocketed) {
@@ -164,7 +164,7 @@ internal object SavegameMigrator {
 
 
     @AppliedVersion("0.4.0")
-    fun updatePlayerEncumbrance(actor: Actor) {
+    fun a_updatePlayerEncumbrance(actor: Actor) {
         if (actor is IngamePlayer && actor.actorValue.getAsInt("encumbrance") == 1000) {
             actor.actorValue.set("encumbrance", 50000)
         }

@@ -130,6 +130,12 @@ open class FixtureInventory() {
         updateEncumbrance()
     }
 
+    open fun removeEntryForced(itemID: ItemID) {
+        searchByID(itemID)?.let {
+            itemList.remove(it)
+        }
+    }
+
     open fun remove(itemID: ItemID, count: Long) = remove(ItemCodex[itemID]!!, count) {}
     open fun remove(item: GameItem, count: Long = 1L) = remove(item, count) {}
 

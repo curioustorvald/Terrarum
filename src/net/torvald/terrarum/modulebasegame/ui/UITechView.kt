@@ -10,6 +10,7 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIItemInventoryElemSimple
 import net.torvald.unicode.getKeycapPC
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2024-02-18.
@@ -32,24 +33,25 @@ class UITechView(val inventoryUI: UIInventoryFull?, val parentContainer: UICraft
     private val posX1 = posX0 - UIItemListNavBarVertical.LIST_TO_CONTROL_GAP - UIItemListNavBarVertical.WIDTH - 4
     private val posY1 = posY0
 
-//    private val navbarX = posX1 + UIItemListNavBarVertical.LIST_TO_CONTROL_GAP
-//    private val navbarY = posY1
-    private val navbarX = parentContainer.transitionalCraftingUI.itemListCraftable.navRemoCon.posX + 12
-    private val navbarY = parentContainer.transitionalCraftingUI.itemListCraftable.navRemoCon.posY - 8
-    private val navbarWidth = UIItemListNavBarVertical.WIDTH
-    private val navbarHeight = parentContainer.transitionalCraftingUI.itemListCraftable.height
-
-    private val panelX = 32 + navbarX
-    private val panelY = navbarY
+    private val panelX = 32 + parentContainer.transitionalCraftingUI.itemListCraftable.navRemoCon.posX + 12
+    private val panelY = parentContainer.transitionalCraftingUI.itemListCraftable.navRemoCon.posY - 8
     private val panelWidth = 720
-    private val panelHeight = navbarHeight
+    private val panelHeight = parentContainer.transitionalCraftingUI.itemListCraftable.height +
+            parentContainer.transitionalCraftingUI.itemListIngredients.height + 64 // 64 is a magic number
+
+    private val navbarWidth = UIItemListNavBarVertical.WIDTH
+    private val navbarHeight = 82 // a magic number
+    private val navbarX = panelX - 32 // also a magic number
+    private val navbarY = panelY + panelHeight - navbarHeight
+
+    private val fakeNavbarY = parentContainer.transitionalCraftingUI.itemListIngredients.posY
 
     private val catIcons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
     private val menuButtonTechView = UIItemImageButton(
         this, catIcons.get(20, 1),
         initialX = navbarX,
-        initialY = getIconPosY(-2),
+        initialY = getIconPosY(0),
         activeCol = Toolkit.Theme.COL_SELECTED,
         inactiveCol = Toolkit.Theme.COL_SELECTED,
         highlightable = false
@@ -57,7 +59,7 @@ class UITechView(val inventoryUI: UIInventoryFull?, val parentContainer: UICraft
     private val menuButtonCraft = UIItemImageButton(
         this, catIcons.get(19, 1),
         initialX = navbarX,
-        initialY = getIconPosY(-1),
+        initialY = getIconPosY(1),
         highlightable = true
     ).also {
         it.clickOnceListener = { _, _ ->
@@ -66,17 +68,15 @@ class UITechView(val inventoryUI: UIInventoryFull?, val parentContainer: UICraft
         }
     }
 
-    fun getIconPosY(index: Int) =
-        if (index >= 0)
-            posY1 + 26 * index
-        else
-            (posY1 + navbarHeight) + (26 * index)
+    fun getIconPosY(index: Int) = (fakeNavbarY + ((index*2+1)/4f) * navbarHeight).roundToInt() - catIcons.tileH/2
 
     init {
         addUIitem(menuButtonCraft)
         addUIitem(menuButtonTechView)
     }
     private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
+
+    private val cellHighlightNormalCol2 = colourTheme.cellHighlightNormalCol.cpy().also { it.a /= 2f }
 
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         // draw fake navbar //
@@ -86,6 +86,10 @@ class UITechView(val inventoryUI: UIInventoryFull?, val parentContainer: UICraft
         // cell border
         batch.color = colourTheme.cellHighlightNormalCol
         Toolkit.drawBoxBorder(batch, navbarX - 4, navbarY, navbarWidth, navbarHeight)
+        // cell divider
+        batch.color = cellHighlightNormalCol2
+        Toolkit.drawStraightLine(batch, navbarX - 3, navbarY + navbarHeight/2, navbarX-3 + navbarWidth-2, 1, false)
+
 
 
         // draw window //
