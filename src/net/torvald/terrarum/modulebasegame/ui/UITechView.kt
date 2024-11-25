@@ -88,7 +88,7 @@ class UITechView(val inventoryUI: UIInventoryFull?, val parentContainer: UICraft
         Toolkit.drawBoxBorder(batch, navbarX - 4, navbarY, navbarWidth, navbarHeight)
         // cell divider
         batch.color = cellHighlightNormalCol2
-        Toolkit.drawStraightLine(batch, navbarX - 3, navbarY + navbarHeight/2, navbarX-3 + navbarWidth-2, 1, false)
+        Toolkit.drawStraightLine(batch, navbarX - 2, navbarY + navbarHeight/2, navbarX-2 + navbarWidth-4, 1, false)
 
 
 
