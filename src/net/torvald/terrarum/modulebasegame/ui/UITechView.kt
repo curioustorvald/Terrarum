@@ -39,59 +39,13 @@ class UITechView(val inventoryUI: UIInventoryFull?, val parentContainer: UICraft
     private val panelHeight = parentContainer.transitionalCraftingUI.itemListCraftable.height +
             parentContainer.transitionalCraftingUI.itemListIngredients.height + 64 // 64 is a magic number
 
-    private val navbarWidth = UIItemListNavBarVertical.WIDTH
-    private val navbarHeight = 82 // a magic number
-    private val navbarX = panelX - 32 // also a magic number
-    private val navbarY = panelY + panelHeight - navbarHeight
-
-    private val fakeNavbarY = parentContainer.transitionalCraftingUI.itemListIngredients.posY
-
-    private val catIcons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
-
-    private val menuButtonTechView = UIItemImageButton(
-        this, catIcons.get(20, 1),
-        initialX = navbarX,
-        initialY = getIconPosY(0),
-        activeCol = Toolkit.Theme.COL_SELECTED,
-        inactiveCol = Toolkit.Theme.COL_SELECTED,
-        highlightable = false
-    )
-    private val menuButtonCraft = UIItemImageButton(
-        this, catIcons.get(19, 1),
-        initialX = navbarX,
-        initialY = getIconPosY(1),
-        highlightable = true
-    ).also {
-        it.clickOnceListener = { _, _ ->
-            parentContainer.showCraftingUI()
-            it.highlighted = false
-        }
-    }
-
-    fun getIconPosY(index: Int) = (fakeNavbarY + ((index*2+1)/4f) * navbarHeight).roundToInt() - catIcons.tileH/2
-
     init {
-        addUIitem(menuButtonCraft)
-        addUIitem(menuButtonTechView)
+
     }
+
     private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
 
-    private val cellHighlightNormalCol2 = colourTheme.cellHighlightNormalCol.cpy().also { it.a /= 2f }
-
     override fun renderImpl(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
-        // draw fake navbar //
-        // draw the tray
-        batch.color = Toolkit.Theme.COL_CELL_FILL
-        Toolkit.fillArea(batch, navbarX - 4, navbarY, navbarWidth, navbarHeight)
-        // cell border
-        batch.color = colourTheme.cellHighlightNormalCol
-        Toolkit.drawBoxBorder(batch, navbarX - 4, navbarY, navbarWidth, navbarHeight)
-        // cell divider
-        batch.color = cellHighlightNormalCol2
-        Toolkit.drawStraightLine(batch, navbarX - 2, navbarY + navbarHeight/2, navbarX-2 + navbarWidth-4, 1, false)
-
-
-
         // draw window //
         batch.color = Toolkit.Theme.COL_CELL_FILL
         Toolkit.fillArea(batch, panelX, panelY, panelWidth, panelHeight)

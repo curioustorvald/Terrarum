@@ -36,7 +36,7 @@ class UIHandler(//var UI: UICanvas,
     var alwaysUpdate = false
 
     companion object {
-        private val SHADER_PROG_FRAG = """
+        val SHADER_PROG_FRAG = """
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -55,7 +55,7 @@ void main() {
 }
 """.trimIndent()
 
-        private val SHADER_PROG_VERT = """
+        val SHADER_PROG_VERT = """
 in vec4 a_position;
 in vec4 a_color;
 in vec4 a_generic;

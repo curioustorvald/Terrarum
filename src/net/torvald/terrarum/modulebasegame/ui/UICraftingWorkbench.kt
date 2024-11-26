@@ -123,8 +123,6 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
     private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
     private val cellsWidth = (listGap + UIItemInventoryElemWide.height) * 6 - listGap
 
-    internal val LAST_LINE_IN_GRID = ((UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 2)) + 22//359 // TEMPORARY VALUE!
-
     private var recipeClicked: CraftingCodex.CraftingRecipe? = null
 
     private val controlHelp: String
@@ -153,7 +151,7 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
             this,
             { ingredients },
             thisOffsetX,
-            thisOffsetY + LAST_LINE_IN_GRID,
+            UICrafting.panelToggleBarY,
             6, 1,
             drawScrollOnRightside = false,
             drawWallet = false,
@@ -321,43 +319,11 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
 
         handler.allowESCtoClose = true
 
-
-        val navbarHeight = 82 // a magic number
-        val fakeNavbarY = itemListIngredients.posY
-        fun getIconPosY2(index: Int) = (fakeNavbarY + ((index*2+1)/4f) * navbarHeight).roundToInt() - catIcons.tileH/2
-
-        val menuButtonTechView = UIItemImageButton(
-            this, catIcons.get(20, 1),
-            initialX = itemListCraftable.navRemoCon.posX + 12,
-            initialY = getIconPosY2(0),
-            highlightable = true
-        ).also {
-            it.clickOnceListener = { _, _ ->
-                parentContainer.showTechViewUI()
-                it.highlighted = false
-            }
-        }
-
-        val menuButtonCraft = UIItemImageButton(
-            this, catIcons.get(19, 1),
-            initialX = itemListCraftable.navRemoCon.posX + 12,
-            initialY = getIconPosY2(1),
-            activeCol = Toolkit.Theme.COL_SELECTED,
-            inactiveCol = Toolkit.Theme.COL_SELECTED,
-            highlightable = true
-        )
-
-
         addUIitem(itemListCraftable)
         addUIitem(itemListIngredients)
         addUIitem(playerThings)
         addUIitem(spinnerCraftCount)
         addUIitem(buttonCraft)
-        // temporarily disabled for 0.4 release
-        if (TerrarumAppConfiguration.VERSION_RAW >= 0x0000_000005_000000) {
-            addUIitem(menuButtonCraft)
-            addUIitem(menuButtonTechView)
-        }
     }
 
     private fun filterPlayerListUsing(recipe: CraftingCodex.CraftingRecipe?) {
@@ -487,7 +453,7 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
         val ingredientsLabel = Lang["GAME_INVENTORY_INGREDIENTS"]
 
         App.fontGame.draw(batch, craftingLabel, thisOffsetX + (cellsWidth - App.fontGame.getWidth(craftingLabel)) / 2, thisOffsetY - INVENTORY_NAME_TEXT_GAP)
-        App.fontGame.draw(batch, ingredientsLabel, thisOffsetX + (cellsWidth - App.fontGame.getWidth(ingredientsLabel)) / 2, thisOffsetY + LAST_LINE_IN_GRID - INVENTORY_NAME_TEXT_GAP)
+        App.fontGame.draw(batch, ingredientsLabel, thisOffsetX + (cellsWidth - App.fontGame.getWidth(ingredientsLabel)) / 2, thisOffsetY + UICrafting.LAST_LINE_IN_GRID - INVENTORY_NAME_TEXT_GAP)
 
 
         // control hints
@@ -527,6 +493,7 @@ class UICraftingWorkbench(val inventoryUI: UIInventoryFull?, val parentContainer
     }
 
     companion object {
+
         data class RecipeIngredientRecord(
             val selectedItem: ItemID,
             val howManyPlayerHas: Long,
