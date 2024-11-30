@@ -525,7 +525,7 @@ object IngameRenderer : Disposable {
                 actorsRenderBehind?.forEach { it.drawBody(frameDelta, batch) }
             }
         }
-        BlurMgr.makeBlur(fboRGBactorsBehind, fboRGBactorsBehindShadow, 0.25f)
+        BlurMgr.makeBlurSmall(fboRGBactorsBehind, fboRGBactorsBehindShadow, 1f)
 
         fboRGBactorsMiddle.inAction(camera, batch) {
             clearBuffer()

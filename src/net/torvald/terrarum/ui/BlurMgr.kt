@@ -20,6 +20,7 @@ object BlurMgr {
         private val internalHeight = (height.toFloat() / 4f).ceilToInt() * 4
 
         val full = Float16FrameBuffer(width, height, false)
+//        val full2 = Float16FrameBuffer(width, height, false)
         val half = Float16FrameBuffer(internalWidth / 2, internalHeight / 2, false)
         val quarter = Float16FrameBuffer(internalWidth / 4, internalHeight / 4, false)
         val camera = OrthographicCamera(width.toFloat(), height.toFloat())
@@ -70,6 +71,7 @@ object BlurMgr {
         
         fun dispose() {
             full.dispose()
+//            full2.dispose()
             half.dispose()
             quarter.dispose()
         }
@@ -84,11 +86,14 @@ object BlurMgr {
 
     private val shaderKawaseDown = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawasedown.frag")
     private val shaderKawaseUp = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawaseup.frag")
+    private val shaderGauss3 = App.loadShaderFromClasspath("shaders/default.vert", "shaders/gaussian3x3.frag")
 
     fun makeBlur(`in`: FrameBuffer, out: FrameBuffer, strength: Float) {
         assert(`in`.width == out.width && `in`.height == out.height) {
             "Input and Output dimension mismatch: In(${`in`.width}x${`in`.height}), Out(${out.width}x${out.height})"
         }
+
+        if (strength.isNaN() || strength.isInfinite()) throw IllegalArgumentException("Strength not a number ($strength)")
 
         val fbos = fboDict.getOrPut(`in`.width.toLong().shl(32) or `in`.height.toLong()) {
             FrameBufferSet(`in`.width, `in`.height)
@@ -150,10 +155,52 @@ object BlurMgr {
         }
     }
 
+    fun makeBlurSmall(`in`: FrameBuffer, out: FrameBuffer, strength: Float) {
+        assert(`in`.width == out.width && `in`.height == out.height) {
+            "Input and Output dimension mismatch: In(${`in`.width}x${`in`.height}), Out(${out.width}x${out.height})"
+        }
+
+        if (strength.isNaN() || strength.isInfinite()) throw IllegalArgumentException("Strength not a number ($strength)")
+        if (strength > 1f) throw IllegalArgumentException("strength too high ($strength); Use makeBlur() instead")
+
+        val fbos = fboDict.getOrPut(`in`.width.toLong().shl(32) or `in`.height.toLong()) {
+            FrameBufferSet(`in`.width, `in`.height)
+        }
+
+        val batch: SpriteBatch? = null // placeholder
+
+        fbos.full.inAction(fbos.camera, batch) {
+            gdxClearAndEnableBlend(0f,0f,0f,0f)
+
+            blurtex0 = `in`.colorBufferTexture
+            blurtex0.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            blurtex0.bind(0)
+            shaderGauss3.bind()
+            shaderGauss3.setUniformMatrix("u_projTrans", fbos.camera.combined)
+            shaderGauss3.setUniformi("u_texture", 0)
+            shaderGauss3.setUniformf("halfpixel", strength / fbos.full.width, strength / fbos.full.height)
+            fbos.quadFull.render(shaderGauss3, GL20.GL_TRIANGLE_FAN)
+        }
+
+        out.inAction(fbos.camera, batch) {
+            gdxClearAndEnableBlend(0f,0f,0f,0f)
+
+            blurtex3 = fbos.full.colorBufferTexture
+            blurtex3.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            blurtex3.bind(0)
+            shaderGauss3.bind()
+            shaderGauss3.setUniformMatrix("u_projTrans", fbos.camera.combined)
+            shaderGauss3.setUniformi("u_texture", 0)
+            shaderGauss3.setUniformf("halfpixel", strength / fbos.full.width, strength / fbos.full.height)
+            fbos.quadFull.render(shaderGauss3, GL20.GL_TRIANGLE_FAN)
+        }
+    }
+
     fun dispose() {
         fboDict.values.forEach { it.dispose() }
         shaderKawaseUp.dispose()
         shaderKawaseDown.dispose()
+        shaderGauss3.dispose()
     }
 
 }
