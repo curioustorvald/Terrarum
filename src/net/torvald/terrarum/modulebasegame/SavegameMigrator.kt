@@ -138,7 +138,10 @@ internal object SavegameMigrator {
                     }
                 }
                 else {
-                    actor.inventory.add(itm, qty)
+//                    try {
+                        actor.inventory.add(itm, qty)
+//                    }
+//                    catch (e: NullPointerException) {}
                 }
             }
 

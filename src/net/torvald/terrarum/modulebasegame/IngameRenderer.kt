@@ -80,7 +80,8 @@ object IngameRenderer : Disposable {
     private lateinit var fboRGBactorsMiddle: Float16FrameBuffer // for large shadow eff; A channel is for glow effects so they don't get shadow effects
     private lateinit var fboRGBterrain: Float16FrameBuffer // for large shadow eff; A channel is for glow effects so they don't get shadow effects
 
-    private lateinit var fboRGBactorsBehindShadow: Float16FrameBuffer // for small shadow eff; A channel is for glow effects so they don't get shadow effects
+    private lateinit var fboRGBactorsBehindShadow: Float16FrameBuffer // for tiny shadow eff; A channel is for glow effects so they don't get shadow effects
+    private lateinit var fboRGBactorsBehindShadow2: Float16FrameBuffer // for small shadow eff; A channel is for glow effects so they don't get shadow effects
     private lateinit var fboRGBactorsMiddleShadow: Float16FrameBuffer // for large shadow eff; A channel is for glow effects so they don't get shadow effects
     private lateinit var fboRGBterrainShadow: Float16FrameBuffer // for large shadow eff; A channel is for glow effects so they don't get shadow effects
 
@@ -481,6 +482,8 @@ object IngameRenderer : Disposable {
         blendNormalStraightAlpha(batch)
     }
 
+    private val shadowBlack2 = Color(0f, 0f, 0f, 0.55f)
+
     /**
      * This "screencap" will capture the game WITHOUT gui and postprocessors!
      * To capture the entire game, use [App.requestScreenshot]
@@ -526,6 +529,7 @@ object IngameRenderer : Disposable {
             }
         }
         BlurMgr.makeBlurSmall(fboRGBactorsBehind, fboRGBactorsBehindShadow, 1f)
+        BlurMgr.makeBlur(fboRGBactorsBehind, fboRGBactorsBehindShadow2, 0.5f)
 
         fboRGBactorsMiddle.inAction(camera, batch) {
             clearBuffer()
@@ -570,13 +574,22 @@ object IngameRenderer : Disposable {
 
             batch.inUse {
                 batch.shader = shaderShadowShallow
+                batch.color = Color.BLACK
                 shaderShadowShallow.setUniformi("u_wall", 1)
                 setCameraPosition(0f, 0f)
                 batch.drawFlipped(fboRGBactorsBehindShadow.colorBufferTexture, 0f, 0f)
             }
+            batch.inUse {
+                batch.shader = shaderShadowDeep
+                batch.color = shadowBlack2
+                shaderShadowShallow.setUniformi("u_wall", 1)
+                setCameraPosition(0f, 0f)
+                batch.drawFlipped(fboRGBactorsBehindShadow2.colorBufferTexture, 0f, 0f)
+            }
 
             batch.inUse {
                 batch.shader = shaderShadowDeep
+                batch.color = Color.BLACK
                 shaderShadowDeep.setUniformi("u_wall", 1)
                 setCameraPosition(0f, 0f)
                 batch.drawFlipped(fboRGBterrainShadow.colorBufferTexture, 0f, 0f)
@@ -1305,6 +1318,7 @@ object IngameRenderer : Disposable {
         fboRGBactorsMiddle = Float16FrameBuffer(width, height, false)
         fboRGBterrain = Float16FrameBuffer(width, height, false)
         fboRGBactorsBehindShadow = Float16FrameBuffer(width, height, false)
+        fboRGBactorsBehindShadow2 = Float16FrameBuffer(width, height, false)
         fboRGBactorsMiddleShadow = Float16FrameBuffer(width, height, false)
         fboRGBterrainShadow = Float16FrameBuffer(width, height, false)
         fboRGBwall = Float16FrameBuffer(width, height, false)
@@ -1374,6 +1388,7 @@ object IngameRenderer : Disposable {
         if (::fboRGBactorsMiddle.isInitialized) fboRGBactorsMiddle.tryDispose()
         if (::fboRGBterrain.isInitialized) fboRGBterrain.tryDispose()
         if (::fboRGBactorsBehindShadow.isInitialized) fboRGBactorsBehindShadow.tryDispose()
+        if (::fboRGBactorsBehindShadow2.isInitialized) fboRGBactorsBehindShadow2.tryDispose()
         if (::fboRGBactorsMiddleShadow.isInitialized) fboRGBactorsMiddleShadow.tryDispose()
         if (::fboRGBterrainShadow.isInitialized) fboRGBterrainShadow.tryDispose()
         if (::fboRGBwall.isInitialized) fboRGBwall.tryDispose()
