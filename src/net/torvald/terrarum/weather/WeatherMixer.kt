@@ -102,9 +102,8 @@ internal object WeatherMixer : RNGConsumer {
         it.texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
     }
 
-    private val shaderAstrum =
-        App.loadShaderFromClasspath("shaders/blendSkyboxStars.vert", "shaders/blendSkyboxStars.frag")
-    private val shaderClouds = App.loadShaderFromClasspath("shaders/default.vert", "shaders/clouds.frag")
+    private val shaderAstrum = ShaderMgr["astrum"]
+    private val shaderClouds = ShaderMgr["clouds"]
 
     private var astrumOffX = 0f
     private var astrumOffY = 0f
@@ -891,8 +890,6 @@ internal object WeatherMixer : RNGConsumer {
 
     fun dispose() {
         starmapTex.texture.dispose()
-        shaderAstrum.dispose()
-        shaderClouds.dispose()
     }
 
     private fun Cvec.linearise(): Cvec {

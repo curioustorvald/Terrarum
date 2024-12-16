@@ -110,8 +110,8 @@ internal object BlocksDrawer {
     private var nullBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
     private lateinit var tilesQuad: Mesh
-    private val shaderTiling = App.loadShaderFromClasspath("shaders/default.vert", "shaders/tiling.frag")
-    private val shaderDeblock = App.loadShaderFromClasspath("shaders/default.vert", "shaders/deblocking.frag")
+    private val shaderTiling = ShaderMgr["tiling"]
+    private val shaderDeblock = ShaderMgr["deblock"]
 
     private lateinit var deblockingFBO: Float16FrameBuffer
     private lateinit var blurmapFBO: Float16FrameBuffer
@@ -1493,8 +1493,6 @@ internal object BlocksDrawer {
         _tilesBufferAsTex2.dispose()
 //        _blurTilesBuffer.dispose()
         tilesQuad.tryDispose()
-        shaderTiling.dispose()
-        shaderDeblock.dispose()
         nullTex.dispose()
         nullBuffer.dispose()
 

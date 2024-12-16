@@ -590,6 +590,8 @@ public class App implements ApplicationListener {
         gl40capable = (Gdx.graphics.getGLVersion().getMajorVersion() >= 4);
         printdbg(this, "GL40 capable? "+gl40capable);
 
+        ShaderMgr.INSTANCE.compile(Gdx.files.classpath("shaders/shaders.csv"));
+
         CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_take_a_break.tga")));
         CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
         CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bup", () -> new MusicContainer("haptic_bup", Gdx.files.internal("./assets/audio/effects/haptic_bup.ogg").file(), false, true, (AudioBank m) -> { return null; }));
@@ -1002,6 +1004,7 @@ public class App implements ApplicationListener {
         shaderGhastlyWhite.dispose();
         hq2x.dispose();
 
+        ShaderMgr.INSTANCE.dispose();
         CommonResourcePool.INSTANCE.dispose();
         fullscreenQuad.dispose();
         logoBatch.dispose();

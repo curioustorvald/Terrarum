@@ -5,10 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.Float16FrameBuffer
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
-import net.torvald.terrarum.App
-import net.torvald.terrarum.ceilToInt
-import net.torvald.terrarum.gdxClearAndEnableBlend
-import net.torvald.terrarum.inAction
+import net.torvald.terrarum.*
 
 /**
  * Created by minjaesong on 2024-11-23.
@@ -84,9 +81,9 @@ object BlurMgr {
     private lateinit var blurtex2: Texture
     private lateinit var blurtex3: Texture
 
-    private val shaderKawaseDown = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawasedown.frag")
-    private val shaderKawaseUp = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawaseup.frag")
-    private val shaderGauss3 = App.loadShaderFromClasspath("shaders/default.vert", "shaders/gaussian3x3.frag")
+    private val shaderKawaseDown = ShaderMgr["irKawaseDown"]
+    private val shaderKawaseUp = ShaderMgr["irKawaseUp"]
+    private val shaderGauss3 = ShaderMgr["gaus3"]
 
     fun makeBlur(`in`: FrameBuffer, out: FrameBuffer, strength: Float) {
         assert(`in`.width == out.width && `in`.height == out.height) {
@@ -198,9 +195,6 @@ object BlurMgr {
 
     fun dispose() {
         fboDict.values.forEach { it.dispose() }
-        shaderKawaseUp.dispose()
-        shaderKawaseDown.dispose()
-        shaderGauss3.dispose()
     }
 
 }

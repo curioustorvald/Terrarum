@@ -154,24 +154,24 @@ object IngameRenderer : Disposable {
     // these codes will run regardless of the invocation of the "initialise()" function
     // the "initialise()" function will also be called
     init {
-        shaderBlur = App.loadShaderFromClasspath("shaders/blur.vert", "shaders/blur.frag")
-        shaderRGBOnly = App.loadShaderFromClasspath("shaders/default.vert", "shaders/rgbonly.frag")
-        shaderAtoGrey = App.loadShaderFromClasspath("shaders/default.vert", "shaders/aonly.frag")
+        shaderBlur = ShaderMgr["irBlur"]
+        shaderRGBOnly = ShaderMgr["irRGBOnly"]
+        shaderAtoGrey = ShaderMgr["irAtoGrey"]
 
 
-        shaderForActors = App.loadShaderFromClasspath("shaders/default.vert", "shaders/actors.frag")
-        shaderShadowShallow = App.loadShaderFromClasspath("shaders/default.vert", "shaders/shadowshallow.frag")
-        shaderShadowDeep = App.loadShaderFromClasspath("shaders/default.vert", "shaders/shadowdeep.frag")
-        shaderBlendGlow = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/blendGlow.frag")
-        shaderBlendGlowTex1Flip = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/blendGlowTex1Flip.frag")
-        shaderDemultiply = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/demultiply.frag")
+        shaderForActors = ShaderMgr["irForActors"]
+        shaderShadowShallow = ShaderMgr["irShadowShallow"]
+        shaderShadowDeep = ShaderMgr["irShadowDeep"]
+        shaderBlendGlow = ShaderMgr["irBlendGlow"]
+        shaderBlendGlowTex1Flip = ShaderMgr["irBlendGlowTex1Flip"]
+        shaderDemultiply = ShaderMgr["irDemultiply"]
 
-        shaderBayerAlpha = App.loadShaderFromClasspath("shaders/default.vert", "shaders/alphadither.frag")
+        shaderBayerAlpha = ShaderMgr["irBayerAlpha"]
 
-        shaderKawaseDown = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawasedown.frag")
-        shaderKawaseUp = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawaseup.frag")
+        shaderKawaseDown = ShaderMgr["irKawaseDown"]
+        shaderKawaseUp = ShaderMgr["irKawaseUp"]
 
-        shaderVibrancy = App.loadShaderFromClasspath("shaders/default.vert", "shaders/vibrancy.frag")
+        shaderVibrancy = ShaderMgr["irVibrancy"]
 
         if (!shaderBlendGlow.isCompiled) {
             Gdx.app.log("shaderBlendGlow", shaderBlendGlow.log)
@@ -1403,26 +1403,6 @@ object IngameRenderer : Disposable {
         WeatherMixer.dispose()
 
         if (::batch.isInitialized) batch.tryDispose()
-
-
-        shaderBlur.dispose()
-        shaderRGBOnly.dispose()
-        shaderAtoGrey.dispose()
-
-        shaderKawaseDown.dispose()
-        shaderKawaseUp.dispose()
-
-        shaderBlendGlow.dispose()
-        shaderBlendGlowTex1Flip.dispose()
-        shaderForActors.dispose()
-        shaderShadowShallow.dispose()
-        shaderShadowDeep.dispose()
-        shaderDemultiply.dispose()
-
-        shaderBayerAlpha.dispose()
-
-        shaderVibrancy.dispose()
-
         if (::fboRGBexport.isInitialized) fboRGBexport.tryDispose()
     }
 

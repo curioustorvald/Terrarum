@@ -184,8 +184,8 @@ object Toolkit : Disposable {
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
-        batch.begin()
         batch.shader = null
+        batch.begin()
         (batch as FlippingSpriteBatch).drawFlipped(fboBlur.colorBufferTexture, x.toFloat(), y.toFloat())
     }
 

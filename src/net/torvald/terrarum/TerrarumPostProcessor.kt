@@ -52,8 +52,8 @@ object TerrarumPostProcessor : Disposable {
 
     private val batteryTex = TextureRegionPack(Gdx.files.internal("assets/graphics/gui/fullscreen_bat_ind.tga"), 23, 14)
 
-    private val shaderPostDither = App.loadShaderFromClasspath("shaders/default.vert", "shaders/postproc_dither.frag")
-    private val shaderPostNoDither = App.loadShaderFromClasspath("shaders/default.vert", "shaders/postproc_nodither.frag")
+    private val shaderPostDither = ShaderMgr["postDither"]
+    private val shaderPostNoDither = ShaderMgr["postNoDither"]
 
     private val recommendRatio = 1.5f
 
@@ -83,8 +83,6 @@ object TerrarumPostProcessor : Disposable {
         batch.dispose()
         shapeRenderer.dispose()
         functionRowHelper.dispose()
-        shaderPostDither.dispose()
-        shaderPostNoDither.dispose()
         if (::lutTex.isInitialized) lutTex.tryDispose()
         if (::outFBO.isInitialized) outFBO.dispose()
 //        testfill.dispose()
