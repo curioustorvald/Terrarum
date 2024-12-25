@@ -260,6 +260,7 @@ class AudioMixer : Disposable {
 
         masterTrack.filters[0] = SoftClp
         masterTrack.filters[1] = Buffer
+//        masterTrack.filters[1] = Comp(-24f, 5f, 0.5f)
         masterTrack.filters[2] = Vecto(1.4142f)
         masterTrack.filters[3] = Spectro()
 
