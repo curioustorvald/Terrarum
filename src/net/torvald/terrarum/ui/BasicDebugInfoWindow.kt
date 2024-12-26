@@ -789,19 +789,24 @@ class BasicDebugInfoWindow : UICanvas() {
         }
 
         // comp marker
-        track.filters.filterIsInstance<DspCompressor>().firstOrNull()?.let {
+        val compSumDB = mutableListOf(0.0, 0.0)
+        track.filters.filter { !it.bypass }.filterIsInstance<DspCompressor>().forEach {
             for (ch in 0..1) {
                 val downForceNow = it.downForce[ch] * 1.0
-                if (downForceNow != 0.0) {
-                    val down = FastMath.interpolateLinear(PEAK_SMOOTHING_FACTOR, downForceNow, oldComp[index][ch])
-                    val dBfs = fullscaleToDecibels(down)
+                compSumDB[ch] += fullscaleToDecibels(downForceNow)
+            }
+        }
+        for (ch in 0..1) {
+            val downForceNow = compSumDB[ch]
+            if (downForceNow != 0.0) {
+                val down = FastMath.interpolateLinear(PEAK_SMOOTHING_FACTOR, downForceNow, oldComp[index][ch])
+                val dBfs = down//fullscaleToDecibels(down)
 
-                    val h = meterHeight + ((dBfs + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
-                    batch.color = COL_METER_COMP_BAR
-                    Toolkit.fillArea(batch, x + 16f + ch * 17, faderY + 19f, 2f, h)
+                val h = meterHeight + ((dBfs + dbLow) / dbLow * -meterHeight).coerceAtMost(0.0).toFloat()
+                batch.color = COL_METER_COMP_BAR
+                Toolkit.fillArea(batch, x + 16f + ch * 17, faderY + 19f, 2f, h)
 
-                    oldComp[index][ch] = down
-                }
+                oldComp[index][ch] = down
             }
         }
 

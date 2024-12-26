@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack
 import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RATE
+import net.torvald.terrarum.audio.dsp.Comp
 import net.torvald.terrarum.audio.dsp.Lowpass
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.UICanvas
@@ -35,16 +36,32 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 arrayOf("audio_speaker_setup", { Lang["MENU_OPTIONS_SPEAKER_SETUP", true] }, "textsel,headphone=MENU_OPTIONS_SPEAKER_HEADPHONE,stereo=MENU_OPTIONS_SPEAKER_STEREO"),
                 arrayOf("audio_buffer_size", { Lang["MENU_OPTIONS_AUDIO_BUFFER_SIZE", true] }, "spinnersel,128,256,512,1024,2048"),
                 arrayOf("", { "${Lang["MENU_LABEL_AUDIO_BUFFER_INSTRUCTION"]}" }, "p"),
+                //arrayOf("audio_dsp_compressor_ratio", { Lang["MENU_OPTIONS_AUDIO_COMP", true] }, "textsel,none=MENU_OPTIONS_DISABLE,light=MENU_OPTIONS_LIGHT,heavy=MENU_OPTIONS_STRONG")
 
         ))
     }
 
+    private val compDict = mapOf(
+        "none" to 1f,
+        "light" to 2f,
+        "heavy" to 5f
+    )
+
     override var height = ControlPanelCommon.getMenuHeight("basegame.soundcontrolpanel")
 
     private var oldBufferSize = App.getConfigInt("audio_buffer_size")
+    private var oldCompRatio = App.getConfigString("audio_dsp_compressor_ratio")
 
     override fun updateImpl(delta: Float) {
         uiItems.forEach { it.update(delta) }
+
+        App.getConfigString("audio_dsp_compressor_ratio").let {
+            if (it != oldCompRatio) {
+                oldCompRatio = it
+
+                App.audioMixer.masterTrack.getFilter<Comp>().ratio = compDict[it] ?: 1f
+            }
+        }
 
         App.getConfigInt("audio_buffer_size").let {
             if (it != oldBufferSize) {

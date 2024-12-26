@@ -259,8 +259,9 @@ class AudioMixer : Disposable {
         }
 
         masterTrack.filters[0] = SoftClp
-        masterTrack.filters[1] = Buffer
-//        masterTrack.filters[1] = Comp(-24f, 5f, 0.5f)
+        masterTrack.filters[1] =  Comp(-36f, 1f, 12f).also {
+            it.bypass = true
+        }
         masterTrack.filters[2] = Vecto(1.4142f)
         masterTrack.filters[3] = Spectro()
 
@@ -297,6 +298,7 @@ class AudioMixer : Disposable {
         fadeBus.addSidechainInput(convolveBusOpen, 2.0 / 3.0)
         fadeBus.addSidechainInput(convolveBusCave, 2.0 / 3.0)
         fadeBus.filters[0] = Lowpass(SAMPLING_RATE / 2f)
+
 
         masterTrack.addSidechainInput(fadeBus, 1.0)
         masterTrack.addSidechainInput(guiTrack, 1.0)

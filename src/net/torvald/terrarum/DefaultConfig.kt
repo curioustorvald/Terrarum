@@ -26,6 +26,7 @@ object DefaultConfig {
             "audio_buffer_size" to 512,
             "audio_dynamic_source_max" to 128,
             "audio_speaker_setup" to "headphone", // "headphone" or "stereo"
+            "audio_dsp_compressor_ratio" to "none",
 
             "language" to App.getSysLang(),
             "notificationshowuptime" to 4000, // 4s
