@@ -1,6 +1,10 @@
 {
   "MENU_MONITOR_CALI_TITLE": "모니터 확인",
+  "MENU_OPTIONS_AUDIO_COMP": "조용한 소리 증폭",
+  "MENU_OPTIONS_DISABLE": "비활성화",
+  "MENU_OPTIONS_LIGHT": "약하게",
   "MENU_OPTIONS_SHOW_ORES_TOOLTIP_WHEN_MINING": "채굴 시 광석 툴팁 보이기",
+  "MENU_OPTIONS_STRONG": "강하게",
   "MENU_OPTIONS_MAX_CRAFTING": "한번에 제작할 최대 아이템 수",
   "MENU_OPTIONS_UNIT_BLOCKS": "블록",
   "MENU_OPTIONS_UNIT_FEET": "피트",

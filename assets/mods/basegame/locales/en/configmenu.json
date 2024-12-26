@@ -1,6 +1,10 @@
 {
   "MENU_MONITOR_CALI_TITLE": "Check Monitor",
+  "MENU_OPTIONS_AUDIO_COMP": "Enhance Quiet Sounds",
+  "MENU_OPTIONS_DISABLE": "Disable",
+  "MENU_OPTIONS_LIGHT": "Light",
   "MENU_OPTIONS_SHOW_ORES_TOOLTIP_WHEN_MINING": "Show Ore Tooltip When Mining",
+  "MENU_OPTIONS_STRONG": "Strong",
   "MENU_OPTIONS_MAX_CRAFTING": "Max Number of Items for Crafting",
   "MENU_OPTIONS_UNIT_BLOCKS": "Blocks",
   "MENU_OPTIONS_UNIT_FEET": "Imperial",

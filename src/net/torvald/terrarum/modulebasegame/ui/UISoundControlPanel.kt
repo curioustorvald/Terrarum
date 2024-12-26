@@ -43,8 +43,8 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val compDict = mapOf(
         "none" to 1f,
-        "light" to 2f,
-        "heavy" to 5f
+        "light" to 1.8f,
+        "heavy" to 5.4f
     )
 
     override var height = ControlPanelCommon.getMenuHeight("basegame.soundcontrolpanel")
