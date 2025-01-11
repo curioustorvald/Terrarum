@@ -37,6 +37,7 @@ import net.torvald.terrarum.langpack.Lang;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
+import net.torvald.terrarum.modulebasegame.ui.UISoundControlPanel;
 import net.torvald.terrarum.serialise.WriteConfig;
 import net.torvald.terrarum.ui.BlurMgr;
 import net.torvald.terrarum.ui.Toolkit;
@@ -1268,6 +1269,7 @@ public class App implements ApplicationListener {
 
         audioBufferSize = getConfigInt("audio_buffer_size");
         audioMixer = new AudioMixer();
+        UISoundControlPanel.Companion.setupCompRatioByCurrentConfig();
         audioMixerInitialised = true;
         audioManagerThread = new Thread(new AudioManagerRunnable(audioMixer), "TerrarumAudioManager");
         audioManagerThread.setPriority(MAX_PRIORITY); // higher = more predictable; audio delay is very noticeable so it gets high priority

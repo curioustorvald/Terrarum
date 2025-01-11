@@ -56,7 +56,7 @@ data class Post(
     val postContents: PostContents,
     val parcel: FixtureInventory?,
 ) {
-    @Transient val basePostage = GamePostalService.calculateBasePostage(this)
+    @Transient val postage = GamePostalService.calculateBasePostage(this).coerceAtLeast(1)
 }
 
 data class PostContents(

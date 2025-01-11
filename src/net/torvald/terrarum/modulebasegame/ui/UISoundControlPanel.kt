@@ -32,11 +32,11 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 arrayOf("", { "" }, "pp"),
                 arrayOf("guivolume", { Lang["MENU_LABEL_INTERFACE", true] }, "sliderd,0,1"),
                 arrayOf("", { "" }, "pp"),
+                arrayOf("audio_dsp_compressor_ratio", { Lang["MENU_OPTIONS_AUDIO_COMP", true] }, "textsel,none=MENU_OPTIONS_DISABLE,light=MENU_OPTIONS_LIGHT,heavy=MENU_OPTIONS_STRONG"),
             arrayOf("", { Lang["MENU_LABEL_AUDIO_ENGINE", true] }, "h1"),
                 arrayOf("audio_speaker_setup", { Lang["MENU_OPTIONS_SPEAKER_SETUP", true] }, "textsel,headphone=MENU_OPTIONS_SPEAKER_HEADPHONE,stereo=MENU_OPTIONS_SPEAKER_STEREO"),
                 arrayOf("audio_buffer_size", { Lang["MENU_OPTIONS_AUDIO_BUFFER_SIZE", true] }, "spinnersel,128,256,512,1024,2048"),
                 arrayOf("", { "${Lang["MENU_LABEL_AUDIO_BUFFER_INSTRUCTION"]}" }, "p"),
-                //arrayOf("audio_dsp_compressor_ratio", { Lang["MENU_OPTIONS_AUDIO_COMP", true] }, "textsel,none=MENU_OPTIONS_DISABLE,light=MENU_OPTIONS_LIGHT,heavy=MENU_OPTIONS_STRONG")
 
         ))
     }
@@ -44,7 +44,7 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val compDict = mapOf(
         "none" to 1f,
         "light" to 1.8f,
-        "heavy" to 5.4f
+        "heavy" to 5.0f
     )
 
     override var height = ControlPanelCommon.getMenuHeight("basegame.soundcontrolpanel")
@@ -84,6 +84,20 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     }
 
     override fun dispose() {
+    }
+
+    companion object {
+        private val compDict = mapOf(
+            "none" to 1f,
+            "light" to 1.8f,
+            "heavy" to 5.0f
+        )
+
+        fun setupCompRatioByCurrentConfig() {
+            App.getConfigString("audio_dsp_compressor_ratio").let {
+                App.audioMixer.masterTrack.getFilter<Comp>().ratio = compDict[it] ?: 1f
+            }
+        }
     }
 
 }
