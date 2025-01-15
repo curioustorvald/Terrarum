@@ -258,10 +258,10 @@ class AudioMixer : Disposable {
             it.filters[0] = BinoPan(0f)
         }
 
-        masterTrack.filters[0] = SoftClp
-        masterTrack.filters[1] =  Comp(-36f, 1f, 12f).also {
+        masterTrack.filters[0] =  Comp(-36f, 1f, 12f).also {
             it.bypass = true
         }
+        masterTrack.filters[1] = SoftClp
         masterTrack.filters[2] = Vecto(1.4142f)
         masterTrack.filters[3] = Spectro()
 

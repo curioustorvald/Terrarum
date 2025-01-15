@@ -50,7 +50,7 @@ class GamePostalService {
 
 data class Post(
     val sender: String, // an identifier for an actor, an entity, etc.; actor identifier is always "UUID:<actor UUID>"
-    val receiver: String, // an identifier for an actor, an entity, etc.; actor identifier is always "UUID:<actor UUID>"
+    val recipient: String, // an identifier for an actor, an entity, etc.; actor identifier is always "UUID:<actor UUID>"
     val postmarkDate: Long, // world TIME_T
     val postType: Int = 0, // 0: regular post; 128: sent by system/NPCs; may be extended with future additions such as registered post
     val postContents: PostContents,
@@ -62,5 +62,64 @@ data class Post(
 data class PostContents(
     val type: String, // "text", "btex"
     val contentsRaw: String, // plain text for "text"; xml for "btex"
-    val contentsExtra: Any? = null
+    val encryption: String = "none", // "none", "end2end"
+    val contentsExtra: Any? = null,
 )
+
+
+/*
+
+Serialised Post Format
+
+Endianness: little
+
+Chunks:
+- MAGIC
+- HEADER
+- CONTENTSRAW
+- CONTENTSEXTRA
+- PARCEL
+
+When the mail is "sealed" (having encryption="end2end"), each chunk after the HEADER are encrypted.
+Encryption method: AES-128 using ((128 bits Sender UUID) xor (128 bits Recipient UUID)) + ((float64 parcel weight) shake (date in postmark))
+
+MAGIC: 'TeMeSbTR'
+HEADER:
+    - Int8   Protocol version (always 0x01)
+    - Int8   Post type
+    - Int8   Generic flags
+    - Uint24 Offset to CONTENTSRAW
+    - Uint24 Offset to PARCEL (0xFFFFFF to denote null)
+    - Uint24 Offset to CONTENTSEXTRA (0xFFFFFF to denote null)
+    - Int128 The world UUID
+    - Int64  Date in Postmark (ingame world TIME_T)
+    - Uint16 Length of Sender string
+    - Bytes  Sender String
+    - Uint16 Length of Recipient string
+    - Bytes  Recipient String
+
+    Post Type
+    - 0: text, 1: btex
+
+    Flags
+    - 1: not posted (players can edit the contents)
+    - 128: sealed
+
+    Notes: post is either:
+          1. always pre-paid when posted
+          2. not yet encrypted when in not-posted status (can always calculate postage on the fly)
+        so no postage information is needed for the Serialised Format 
+
+CONTENTSRAW
+    - Uint48 unzipped size
+    - Bytes  payload in Zstd compression
+
+CONTENTSEXTRA
+    - Uint48 unzipped size
+    - Bytes  payload in Zstd compression
+
+PARCEL
+    - Uint48 unzipped size
+    - Bytes  FixtureInventory JSON string in Zstd compression
+
+ */

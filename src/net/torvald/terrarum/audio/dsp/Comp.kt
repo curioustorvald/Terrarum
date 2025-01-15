@@ -123,12 +123,11 @@ class Comp(
 //        Toolkit.fillArea(batch, x.toFloat() + STRIP_W, y+14f, -STRIP_W * perc, 2f)
 
         batch.color = FILTER_NAME_ACTIVE
-        App.fontSmallNumbers.draw(batch, "T:${threshold.absoluteValue.times(100).roundToInt().div(100f)}", x+3f, y+1f)
-        App.fontSmallNumbers.draw(batch, "K:${knee.absoluteValue.times(100).roundToInt().div(100f)}", x+3f, y+17f)
-        App.fontSmallNumbers.draw(batch, "R:${ratio.absoluteValue.times(100).roundToInt().div(100f)}:1", x+3f, y+33f)
+        App.fontSmallNumbers.draw(batch, "P:${threshold.absoluteValue.toInt()}/${knee.absoluteValue.toInt()}", x+3f, y+1f)
+        App.fontSmallNumbers.draw(batch, "R:${ratio.absoluteValue.times(100).roundToInt().div(100f)}:1", x+3f, y+17f)
     }
 
-    override val debugViewHeight: Int = 48
+    override val debugViewHeight: Int = 32
 
     override fun copyParamsFrom(other: TerrarumAudioFilter) {
         if (other is Comp) {
