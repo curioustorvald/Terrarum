@@ -22,7 +22,7 @@ class UIItemRedeemCodeArea(
 ) : UIItem(parentUI, initialX, initialY) {
 
     private val CELL_W = 16
-    private val CELL_H = 22
+    private val CELL_H = 24
 
     override val width = textCols * CELL_W
     override val height = textRows * CELL_H
@@ -85,6 +85,7 @@ class UIItemRedeemCodeArea(
         Toolkit.drawBoxBorder(batch, posX, posY, width, height)
 
         // draw cells
+        batch.color = Toolkit.Theme.COL_INACTIVE
         for (y in 0 until textRows) {
             for (x in 0 until textCols) {
                 batch.draw(inputFormTiles.get(if (x == 0) 0 else if (x == textCols - 1) 2 else 1, 0),
@@ -99,9 +100,9 @@ class UIItemRedeemCodeArea(
             for (x in 0 until textCols) {
                 BigAlphNum.draw(
                     batch,
-                    "${inputText[y * textRows + x]}",
+                    "${inputText.getOrElse(y * textRows + x) { 'A' }}",
                     posX + CELL_W * x + 2f,
-                    posY + CELL_H * y + 3f
+                    posY + CELL_H * y + 4f
                 )
             }
         }
