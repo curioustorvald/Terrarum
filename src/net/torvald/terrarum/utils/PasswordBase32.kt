@@ -12,7 +12,7 @@ import kotlin.experimental.xor
 object PasswordBase32 {
 
     private val si = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567="
-    private val so = "YBNDRFG8EJKMCPQXOTLVUIS2A345H769 "
+    private val so = "YBNDRFGWEJKMCPQXOTLVUIS2A345H769 "
 
     private val standardToModified = HashMap<Char, Char>(32)
     private val modifiedToStandard = HashMap<Char, Char>(32)
@@ -26,6 +26,7 @@ object PasswordBase32 {
         modifiedToStandard['0'] = modifiedToStandard['O']!!
         modifiedToStandard['1'] = modifiedToStandard['I']!!
         modifiedToStandard['Z'] = modifiedToStandard['2']!!
+        modifiedToStandard['8'] = modifiedToStandard['B']!!
     }
 
     private val nullPw = byteArrayOf(0.toByte())

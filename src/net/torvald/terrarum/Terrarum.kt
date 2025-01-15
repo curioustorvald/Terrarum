@@ -1044,7 +1044,7 @@ fun distBetween(a: ActorWithBody, bpos: Vector2): Double {
     val dist = min(min(bpos.distanceSquared(apos1), bpos.distanceSquared(apos2)), bpos.distanceSquared(apos3))
     return dist.sqrt()
 }
-const val hashStrMap = "YBNDRFG8EJKMCPQXOTLVWIS2A345H769"
+const val hashStrMap = "YBNDRFGWEJKMCPQXOTLVUIS2A345H769"
 fun getHashStr(length: Int = 5) = (0 until length).map { hashStrMap[Math.random().times(32).toInt()] }.joinToString("")
 
 fun <S, T> List<S>.cartesianProduct(other: List<T>) = this.flatMap { thisIt ->

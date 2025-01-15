@@ -108,7 +108,7 @@ HEADER:
     Notes: post is either:
           1. always pre-paid when posted
           2. not yet encrypted when in not-posted status (can always calculate postage on the fly)
-        so no postage information is needed for the Serialised Format 
+        so no postage information is needed for the Serialised Format
 
 CONTENTSRAW
     - Uint48 unzipped size
