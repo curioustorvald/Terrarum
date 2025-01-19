@@ -21,11 +21,16 @@ class UIItemRedeemCodeArea(
 
 ) : UIItem(parentUI, initialX, initialY) {
 
-    private val CELL_W = 16
-    private val CELL_H = 24
-
     override val width = textCols * CELL_W
     override val height = textRows * CELL_H
+
+    companion object {
+        private val CELL_W = 16
+        private val CELL_H = 24
+
+        fun estimateWidth(cols: Int) = CELL_W * cols
+        fun estimateHeight(rows: Int) = CELL_H * rows
+    }
 
     init {
         CommonResourcePool.addToLoadingList("spritesheet:terrarum_redeem_code_form") {
@@ -75,6 +80,14 @@ class UIItemRedeemCodeArea(
 
     private val caretCol = Toolkit.Theme.COL_SELECTED
 
+    private var cursorBlinkTimer = 0f
+
+    override fun update(delta: Float) {
+        super.update(delta)
+        cursorBlinkTimer += delta
+        if (cursorBlinkTimer >= 1f) cursorBlinkTimer -= 1f
+    }
+
     override fun render(frameDelta: Float, batch: SpriteBatch, camera: OrthographicCamera) {
         super.render(frameDelta, batch, camera)
 
@@ -83,6 +96,10 @@ class UIItemRedeemCodeArea(
         // draw border
         batch.color = lineCol
         Toolkit.drawBoxBorder(batch, posX, posY, width, height)
+
+        // draw cells back
+        batch.color = Toolkit.Theme.COL_CELL_FILL
+        Toolkit.fillArea(batch, posX, posY, CELL_W * textCols, CELL_H * textRows)
 
         // draw cells
         batch.color = Toolkit.Theme.COL_INACTIVE
@@ -100,7 +117,7 @@ class UIItemRedeemCodeArea(
             for (x in 0 until textCols) {
                 BigAlphNum.draw(
                     batch,
-                    "${inputText.getOrElse(y * textRows + x) { 'A' }}",
+                    "${inputText.getOrElse(y * textRows + x) { ' ' }}",
                     posX + CELL_W * x + 2f,
                     posY + CELL_H * y + 4f
                 )
@@ -108,13 +125,20 @@ class UIItemRedeemCodeArea(
         }
 
         // draw caret
-        batch.color = caretCol
-        val cx = textCaret % textCols
-        val cy = textCaret / textCols
-        Toolkit.drawStraightLine(batch,
-            posX + CELL_W * cx - 1,
-            posY + CELL_H * cy + 1,
-            posY + CELL_H * cy + 1 + 20, 2, true)
+        if (cursorBlinkTimer < 0.5f) {
+            batch.color = caretCol
+            val cx = textCaret % textCols
+            val cy = textCaret / textCols
+            Toolkit.drawStraightLine(
+                batch,
+                posX + CELL_W * cx - 1,
+                posY + CELL_H * cy + 1,
+                posY + CELL_H * cy + 1 + 20, 2, true
+            )
+        }
+
+
+        batch.color = Color.WHITE
     }
 
     override fun dispose() {

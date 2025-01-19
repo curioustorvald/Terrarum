@@ -167,6 +167,10 @@ abstract class UICanvas(
 
     /**
      * Do not modify ui.handler.openCloseCounter here.
+     *
+     * When you override this function, you usually append either of following functions:
+     * - `INGAME.pause()` to literally pause the game and disable the player control
+     * - `INGAME.disablePlayerControl()` to not pause the game but still disable the player control
      */
     open fun doOpening(delta: Float) {
         handler.opacity = handler.openCloseCounter / openCloseTime
@@ -175,6 +179,10 @@ abstract class UICanvas(
 
     /**
      * Do not modify ui.handler.openCloseCounter here.
+     *
+     * When you override this function, you usually append either of following functions:
+     * - `INGAME.resume()` if your `doOpening()` paused the game
+     * - `INGAME.resumePlayerControl()` if `doOpening()` disabled the player control
      */
     open fun doClosing(delta: Float) {
         handler.opacity = (openCloseTime - handler.openCloseCounter) / openCloseTime
