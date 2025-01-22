@@ -9,10 +9,7 @@ import net.torvald.terrarum.ControlPresets
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.RunningEnvironment
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItemInventoryElemSimple
-import net.torvald.terrarum.ui.UIItemRedeemCodeArea
+import net.torvald.terrarum.ui.*
 import net.torvald.unicode.getKeycapPC
 
 /**
@@ -26,13 +23,19 @@ class UIRedeemCodeMachine : UICanvas(
     override var width = Toolkit.drawWidth
     override var height = App.scr.height
 
+    val title = UIItemTextLabel(this, { "Enter the Code" },
+        (Toolkit.drawWidth - UIItemRedeemCodeArea.estimateWidth(14)) / 2,
+        App.scr.halfh - UIItemRedeemCodeArea.estimateHeight(4) - 48 - 48,
+        UIItemRedeemCodeArea.estimateWidth(14)
+        )
+
     val inputPanel = UIItemRedeemCodeArea(this,
         (Toolkit.drawWidth - UIItemRedeemCodeArea.estimateWidth(14)) / 2,
         App.scr.halfh - UIItemRedeemCodeArea.estimateHeight(4) - 48,
         14, 4)
 
     init {
-
+        addUIitem(title)
         addUIitem(inputPanel)
     }
 
