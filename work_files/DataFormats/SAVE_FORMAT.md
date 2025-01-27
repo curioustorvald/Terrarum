@@ -15,6 +15,8 @@ The main game directory is composed of following directories:
       [-5] screenshot.tga.gz
       [-1025] !optional! sprite-bodypart-name-to-entry-number-map.properties,
       [-1026] !optional! spriteglow-bodypart-name-to-entry-number-map.properties,
+      /* -2147483648 and onward are for BLOBs */
+      [-2147483648] Redeemed Codes Bloom Filter
       [1+] !optional! bodyparts tga.gz
     }
     *if file -1025 is not there, read bodyparts from assets directory

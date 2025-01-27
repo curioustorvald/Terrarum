@@ -159,9 +159,12 @@ object InputStrober {
 
 data class TerrarumKeyboardEvent(
         val type: Int,
-        val character: String, // representative key symbol
-        val headkey: Int, // representative keycode
+        /** representative key symbol */
+        val character: String,
+        /** representative keycode */
+        val headkey: Int,
         val repeatCount: Int,
+        /** always fixed size of 8 elements */
         val keycodes: IntArray
 )
 

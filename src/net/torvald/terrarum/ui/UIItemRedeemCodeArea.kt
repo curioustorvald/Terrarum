@@ -43,10 +43,15 @@ class UIItemRedeemCodeArea(
 
 
     private val inputText = StringBuilder(textCols * textRows)
+    private fun ensureLength() {
+        inputText.append(" ".repeat((textCols * textRows) - inputText.length + 1))
+        inputText.setLength(textCols * textRows)
+    }
     private var textCaret = 0
     fun clearInput() { inputText.clear(); textCaret = 0 }
     fun acceptChar(char: Char): Boolean {
         if (textCaret in 0 until textCols * textRows) {
+            ensureLength()
             inputText.insert(textCaret, char)
             textCaret++
             return true
@@ -54,25 +59,27 @@ class UIItemRedeemCodeArea(
         else return false
     }
     fun backspace(): Boolean {
-        if (textCaret in 1 until textCols * textRows) {
+        if (textCaret in 1 .. textCols * textRows) {
             inputText.deleteCharAt(textCaret - 1)
+            ensureLength()
             textCaret--
             return true
         }
         else return false
     }
     fun reverseBackspace(): Boolean {
-        if (textCaret in 0 until (textCols * textRows - 1)) {
+        if (textCaret in 0 .. (textCols * textRows - 1)) {
             inputText.deleteCharAt(textCaret)
+            ensureLength()
             return true
         }
         else return false
     }
     fun __moveCursorBackward(delta: Int = 1) {
-        textCaret = (textCaret - 1).coerceIn(0, textCols * textRows)
+        textCaret = (textCaret - 1).coerceIn(0, textCols * textRows - 1)
     }
     fun __moveCursorForward(delta: Int = 1) {
-        textCaret = (textCaret + 1).coerceIn(0, textCols * textRows)
+        textCaret = (textCaret + 1).coerceIn(0, textCols * textRows - 1)
     }
 
     fun getInputAsString() = inputText.toString()
@@ -117,7 +124,7 @@ class UIItemRedeemCodeArea(
             for (x in 0 until textCols) {
                 BigAlphNum.draw(
                     batch,
-                    "${inputText.getOrElse(y * textRows + x) { ' ' }}",
+                    "${inputText.getOrElse(y * textCols + x) { ' ' }}",
                     posX + CELL_W * x + 2f,
                     posY + CELL_H * y + 4f
                 )
@@ -127,8 +134,8 @@ class UIItemRedeemCodeArea(
         // draw caret
         if (cursorBlinkTimer < 0.5f) {
             batch.color = caretCol
-            val cx = textCaret % textCols
-            val cy = textCaret / textCols
+            val cx = if (textCaret >= textCols * textRows) textCols else textCaret % textCols
+            val cy = if (textCaret >= textCols * textRows) textRows - 1 else textCaret / textCols
             Toolkit.drawStraightLine(
                 batch,
                 posX + CELL_W * cx - 1,
