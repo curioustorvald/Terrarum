@@ -42,21 +42,24 @@ open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
      * Application-defined.
      *
      * For Terrarum:
-     * - "music_disc" for music discs used by Jukebox
+     * - "medium/music_disc" for music discs used by Jukebox
+     * - "application/xml-btex" for not compiled BTeX document
+     * - "application/btexbook" for compiled BTeX document
+     * - "text/typewriter" for typewrited texts
      *
      * For dwarventech:
-     * - "floppy_oem" (oem: for "commercial" software)
-     * - "floppy_small"
-     * - "floppy_mid"
-     * - "floppy_large"
-     * - "floppy_debug"
-     * - "floppy_homebrew"
-     * - "harddisk_small"
-     * - "harddisk_mid"
-     * - "harddisk_large"
-     * - "harddisk_debug"
-     * - "eeprom_bios" (bios chips only)
-     * - "eeprom_64k" (extra rom for custom motherboards)
+     * - "medium/floppy-oem" (oem: for "commercial" software)
+     * - "medium/floppy-small"
+     * - "medium/floppy-mid"
+     * - "medium/floppy-large"
+     * - "medium/floppy-debug"
+     * - "medium/floppy-homebrew"
+     * - "medium/harddisk-small"
+     * - "medium/harddisk-mid"
+     * - "medium/harddisk-large"
+     * - "medium/harddisk-debug"
+     * - "medium/eeprom-bios" (bios chips only)
+     * - "medium/eeprom-64k" (extra rom for custom motherboards)
      *
      */
     open var mediumIdentifier = ""
