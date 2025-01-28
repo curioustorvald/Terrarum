@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import com.badlogic.gdx.Gdx
 import net.torvald.terrarum.App
 import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import java.io.File
@@ -60,6 +61,19 @@ open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
      */
     open var mediumIdentifier = ""
 
+    /**
+     * How this item should look like on inventory/in world. Used when creation of subclass is not possible.
+     */
+    open var morphItem = ""
+
+    /**
+     * Fully-qualified classname. Class to be called when this item is used by hitting "interaction" key.
+     * Used when creation of subclass is not possible.
+     *
+     * If specified, the class must implement FileRefItemPrimaryUseHandler
+     */
+    open var useItemHandler = ""
+
 
     override var baseMass = 1.0
     override var baseToolSize: Double? = null
@@ -77,4 +91,31 @@ open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
         File(App.saveSharedDir + "/$refPath")
     else
         ModMgr.getFile(refModuleName, refPath)
+
+    @Transient private var classCache: FileRefItemPrimaryUseHandler? = null
+
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
+        return if (useItemHandler.isNotBlank()) {
+            try {
+                if (classCache == null) {
+                    val newClass = Class.forName(useItemHandler)
+                    val newClassConstructor = newClass.getConstructor(/* no args defined */)
+                    val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
+                    classCache = (newClassInstance as FileRefItemPrimaryUseHandler)
+                }
+                classCache!!.use(this)
+            }
+            catch (e: Throwable) {
+                e.printStackTrace()
+                super.startPrimaryUse(actor, delta)
+            }
+        }
+        else super.startPrimaryUse(actor, delta)
+    }
+}
+
+interface FileRefItemPrimaryUseHandler {
+    /** If this item must be consumed, return 1; if this item must not be consumed, return 0; if this item
+     * was failed to be used (for some reason), return -1. */
+    fun use(item: ItemFileRef): Long
 }

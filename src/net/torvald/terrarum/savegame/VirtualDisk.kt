@@ -317,6 +317,8 @@ object VDFileID {
     const val BODYPART_TO_ENTRY_MAP = -1025L
     const val BODYPARTGLOW_TO_ENTRY_MAP = -1026L
     const val BODYPARTEMISSIVE_TO_ENTRY_MAP = -1027L
+
+    const val BLOB_REDEEMED_CODES = -2147483648L
 }
 
 fun diskIDtoReadableFilename(id: EntryID, saveKind: Int?): String = when (id) {
@@ -354,6 +356,7 @@ fun diskIDtoReadableFilename(id: EntryID, saveKind: Int?): String = when (id) {
     VDFileID.BODYPART_TO_ENTRY_MAP -> "bodypart-to-entry.map"
     VDFileID.BODYPARTGLOW_TO_ENTRY_MAP -> "bodypartglow-to-entry.map"
     VDFileID.BODYPARTEMISSIVE_TO_ENTRY_MAP -> "bodypartemsv-to-entry.map"
+    VDFileID.BLOB_REDEEMED_CODES -> "blob: redeemed codes"
     in 1..65535 ->
         if (saveKind == PLAYER_DATA)
             "bodypart #$id.tga.gz"
