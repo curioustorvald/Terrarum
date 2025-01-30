@@ -16,6 +16,10 @@ import java.util.UUID
  */
 open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
 
+    private constructor() : this("")
+
+    /*var name is defined in GameItem*/
+
     var author = ""
     var collection = ""
 
@@ -98,6 +102,8 @@ open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
     @Transient private var classCache: FileRefItemPrimaryUseHandler? = null
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
+//        println("Use item! handler=${useItemHandler}; cache=${classCache?.javaClass?.canonicalName}")
+
         return if (useItemHandler.isNotBlank()) {
             try {
                 if (classCache == null) {

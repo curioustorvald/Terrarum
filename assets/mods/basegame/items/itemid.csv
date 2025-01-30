@@ -153,6 +153,8 @@ id;classname;tags
 # data storage (text signs; 256)
 33280;net.torvald.terrarum.modulebasegame.gameitems.ItemTextSignCopper;FIXTURE,BASEOBJECT
 
+# data storage (typewritten leaflets; 256)
+33536;net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef;FIXTURE,BASEOBJECT
 
 
 # fluids on storage

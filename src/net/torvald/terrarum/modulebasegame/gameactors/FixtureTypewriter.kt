@@ -1,8 +1,16 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.spriteanimation.SheetSpriteAnimation
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameitems.FileRefItemPrimaryUseHandler
+import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
+import net.torvald.terrarum.serialise.Common
+import java.util.*
 import kotlin.math.roundToInt
 
 /**
@@ -41,7 +49,7 @@ class FixtureTypewriter : FixtureBase {
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
 
-        (sprite as SheetSpriteAnimation).currentRow = 1 + (carriagePosition.toFloat() / TYPEWRITER_COLUMNS * 10).roundToInt()
+        //(sprite as SheetSpriteAnimation).currentRow = 1 + (carriagePosition.toFloat() / TYPEWRITER_COLUMNS * 10).roundToInt()
     }
 
     companion object {
@@ -49,4 +57,42 @@ class FixtureTypewriter : FixtureBase {
         const val TYPEWRITER_ROWS = 30
     }
 
+    override fun onInteract(mx: Double, my: Double) {
+        printdbg(this, "Typewriter onInteract")
+        // test spit out ItemFileRef item
+
+        val textFileContents = """This is a test of creating ItemFileRef item in-game.
+            |Caller: ${this.javaClass.canonicalName}
+        """.trimMargin()
+
+        val newUUID = UUID.randomUUID()
+        Terrarum.getSharedSaveFiledesc(newUUID.toString()).let {
+            printdbg(this, "FilePath: ${it.path}")
+            it.writeText(textFileContents, Common.CHARSET)
+        }
+
+        // DON'T create an anonymous class here: they won't be serialised
+        INGAME.actorNowPlaying?.inventory?.let { inventory ->
+            val newItem = ItemFileRef("item@basegame:33536").makeDynamic(inventory).also { it0 ->
+                val it = it0 as ItemFileRef
+
+                it.refIsShared = true
+                it.uuid = newUUID
+                it.refPath = newUUID.toString()
+                it.mediumIdentifier = "text/typewriter"
+                it.useItemHandler = "net.torvald.terrarum.modulebasegame.gameactors.TestLeafletPrimaryUseHandler"
+                it.name = "Testification"
+                it.author = "Author Name Here"
+            }
+
+            inventory.add(newItem)
+        }
+    }
+}
+
+internal class TestLeafletPrimaryUseHandler : FileRefItemPrimaryUseHandler {
+    override fun use(item: ItemFileRef): Long {
+        println(item.getAsFile().readText(Common.CHARSET))
+        return 0L
+    }
 }
