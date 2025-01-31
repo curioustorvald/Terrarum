@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.Gdx
 import net.torvald.terrarum.App
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
@@ -24,6 +25,7 @@ open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
     var collection = ""
 
     open var uuid: UUID = UUID(0, 0)
+    open var authorUUID: UUID = UUID(0, 0)
 
     /**
      * String of path within the module (if not refIsShared), or path under savedir/Shared/
@@ -127,4 +129,32 @@ interface FileRefItemPrimaryUseHandler {
     /** If this item must be consumed, return 1; if this item must not be consumed, return 0; if this item
      * was failed to be used (for some reason), return -1. */
     fun use(item: ItemFileRef): Long
+}
+
+class ItemPlainDocument(originalID: ItemID) : ItemFileRef(originalID) {
+    private constructor() : this("")
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(2,14)
+    }
+}
+
+class ItemUnsealedLetter(originalID: ItemID) : ItemFileRef(originalID) {
+    private constructor() : this("")
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(3,14)
+    }
+}
+
+class ItemSealedLetter(originalID: ItemID) : ItemFileRef(originalID) {
+    private constructor() : this("")
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(4,14)
+    }
+}
+
+class ItemPostParcel(originalID: ItemID) : ItemFileRef(originalID) {
+    private constructor() : this("")
+    init {
+        itemImage = CommonResourcePool.getAsItemSheet("basegame.items").get(5,14)
+    }
 }

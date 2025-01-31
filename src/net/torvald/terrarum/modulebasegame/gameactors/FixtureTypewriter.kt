@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FileRefItemPrimaryUseHandler
 import net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef
+import net.torvald.terrarum.modulebasegame.gameitems.ItemPlainDocument
 import net.torvald.terrarum.serialise.Common
 import java.util.*
 import kotlin.math.roundToInt
@@ -40,7 +41,7 @@ class FixtureTypewriter : FixtureBase {
         setHitboxDimension(16, 16, 8, 0)
 
         makeNewSprite(FixtureBase.getSpritesheet("basegame", "sprites/fixtures/typewriter.tga", 32, 16)).let {
-            it.setRowsAndFrames(1,1)
+            it.setRowsAndFrames(12,1)
         }
 
         actorValue[AVKey.BASEMASS] = 3.6
@@ -49,7 +50,7 @@ class FixtureTypewriter : FixtureBase {
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
 
-        //(sprite as SheetSpriteAnimation).currentRow = 1 + (carriagePosition.toFloat() / TYPEWRITER_COLUMNS * 10).roundToInt()
+        (sprite as SheetSpriteAnimation).currentRow = 1 + (carriagePosition.toFloat() / TYPEWRITER_COLUMNS * 10).roundToInt()
     }
 
     companion object {
@@ -73,16 +74,18 @@ class FixtureTypewriter : FixtureBase {
 
         // DON'T create an anonymous class here: they won't be serialised
         INGAME.actorNowPlaying?.inventory?.let { inventory ->
-            val newItem = ItemFileRef("item@basegame:33536").makeDynamic(inventory).also { it0 ->
+            val newItem = ItemPlainDocument("item@basegame:33536").makeDynamic(inventory).also { it0 ->
                 val it = it0 as ItemFileRef
 
                 it.refIsShared = true
                 it.uuid = newUUID
+                if (INGAME.actorNowPlaying is IngamePlayer)
+                    it.authorUUID = (INGAME.actorNowPlaying as IngamePlayer).uuid
                 it.refPath = newUUID.toString()
                 it.mediumIdentifier = "text/typewriter"
                 it.useItemHandler = "net.torvald.terrarum.modulebasegame.gameactors.TestLeafletPrimaryUseHandler"
                 it.name = "Testification"
-                it.author = "Author Name Here"
+                it.author = INGAME.actorNowPlaying?.actorValue?.getAsString(AVKey.NAME) ?: ""
             }
 
             inventory.add(newItem)
