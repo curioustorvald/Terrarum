@@ -3,7 +3,9 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.TerrarumScreenSize
@@ -21,6 +23,11 @@ object ControlPanelCommon {
     init {
         CommonResourcePool.addToLoadingList("gui_hrule") {
             TextureRegionPack(Gdx.files.internal("assets/graphics/gui/hrule.tga"), 216, 20)
+        }
+        CommonResourcePool.addToLoadingList("gui_slider_horz_backdrop_contrast") {
+            TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/slider_background_contrast.tga")).also {
+                it.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            })
         }
         CommonResourcePool.loadAll()
     }
@@ -92,7 +99,7 @@ object ControlPanelCommon {
             }
         }
         else if (args.startsWith("sliderd,")) {
-            UIItemHorzSlider(parent, x, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), CONFIG_SLIDER_WIDTH) to { it: UIItem, optionStr: String ->
+            UIItemHorzSlider(parent, x, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), CONFIG_SLIDER_WIDTH, backgroundTexture = CommonResourcePool.getAsTextureRegion("gui_slider_horz_backdrop_contrast")) to { it: UIItem, optionStr: String ->
                 (it as UIItemHorzSlider).selectionChangeListener = {
                     App.setConfig(optionStr, it)
                 }
