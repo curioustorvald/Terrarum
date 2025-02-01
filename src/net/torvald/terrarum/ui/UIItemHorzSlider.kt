@@ -30,17 +30,27 @@ class UIItemHorzSlider(
     val min: Double,
     val max: Double,
     override val width: Int,
-    val handleWidth: Int = 12,
+    initialHandleWidth: Int = 12,
     private val backgroundTexture: TextureRegion? = null,
     private val disposeTexture: Boolean = false
 ) : UIItem(parentUI, initialX, initialY) {
 
     override var suppressHaptic = false
 
+    var handleWidth: Int = initialHandleWidth
+        set(value) {
+            // reset the scroll status
+            handlePos = 0.0
+            this.value = 0.0
+            field = value
+
+            handleTravelDist = width - value
+        }
+
     override val height = 24
     private var mouseOnHandle = false
 
-    private val handleTravelDist = width - handleWidth
+    private var handleTravelDist = width - handleWidth
     private var handlePos = (initialValue / max).times(handleTravelDist).coerceIn(0.0, handleTravelDist.toDouble())
 
     var value: Double = initialValue; private set

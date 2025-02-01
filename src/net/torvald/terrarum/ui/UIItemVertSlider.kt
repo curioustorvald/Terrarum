@@ -23,12 +23,22 @@ class UIItemVertSlider(
     val min: Double,
     val max: Double,
     override val height: Int,
-    val handleHeight: Int = 12,
+    initialHandleHeight: Int = 12,
     private val backgroundTexture: TextureRegion? = null,
     private val disposeTexture: Boolean = false
 ) : UIItem(parentUI, initialX, initialY) {
 
     override var suppressHaptic = false
+
+    var handleHeight: Int = initialHandleHeight
+        set(value) {
+            // reset the scroll status
+            handlePos = 0.0
+            this.value = 0.0
+            field = value
+
+            handleTravelDist = height - value
+        }
 
     companion object {
         const val WIDTH = 16
@@ -37,7 +47,7 @@ class UIItemVertSlider(
     override val width = WIDTH
     private var mouseOnHandle = false
 
-    private val handleTravelDist = height - handleHeight
+    private var handleTravelDist = height - handleHeight
     private var handlePos = if (max == 0.0) 0.0 else (initialValue / max).times(handleTravelDist).coerceIn(0.0, handleTravelDist.toDouble())
 
     var value: Double = initialValue; private set

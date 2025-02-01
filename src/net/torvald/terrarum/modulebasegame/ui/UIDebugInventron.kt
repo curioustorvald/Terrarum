@@ -10,6 +10,7 @@ import net.torvald.terrarum.ui.*
 import net.torvald.unicode.getKeycapPC
 import java.lang.reflect.Field
 import java.util.*
+import kotlin.math.roundToInt
 
 
 /**
@@ -37,6 +38,10 @@ class UIDebugInventron : UICanvas(
     private val analyserPosY = UITemplateHalfInventory.YOFFSET
     private val analyserPosY2 = UITemplateHalfInventory.YOFFSET + UIItemInventoryElemWide.height + UIItemInventoryItemGrid.listGap
 
+    private val analyserWidth: Int
+    private val analyserHeight: Int
+
+    private val analyserScroll: UIItemVertSlider
 
     init {
         catBar = UIItemCatBar(
@@ -96,6 +101,18 @@ class UIDebugInventron : UICanvas(
             keyDownFun = { _, _, _, _, _ -> },
             touchDownFun = { _, _, _, _, _ -> selectedItem = null; refreshAnalysis() },
             wheelFun = { _, _, _, _, _, _ -> }
+        ).also {
+            it.showItemCount = false
+        }
+
+        analyserWidth = itemListPlayer.itemList.width
+        analyserHeight = itemListPlayer.itemList.height - (analyserPosY2 - analyserPosY)
+
+
+        analyserScroll = UIItemVertSlider(this,
+            analyserPosX - 18,
+            analyserPosY2 + 1,
+            0.0, 0.0, 1.0, analyserHeight - 2, analyserHeight - 2
         )
 
         handler.allowESCtoClose = true
@@ -103,13 +120,14 @@ class UIDebugInventron : UICanvas(
         addUIitem(catBar)
         addUIitem(itemListPlayer)
         addUIitem(selectedItemSlot)
+        addUIitem(analyserScroll)
     }
 
     override fun show() {
         super.show()
 
         itemListPlayer.itemList.getInventory = { INGAME.actorNowPlaying!!.inventory }
-        selectedItem = null
+        selectedItem = null; refreshAnalysis()
 
         itemListUpdate()
     }
@@ -147,9 +165,9 @@ class UIDebugInventron : UICanvas(
 
         // analyser view
         batch.color = Color(0x7F)
-        Toolkit.fillArea(batch, analyserPosX, analyserPosY2, itemListPlayer.itemList.width, itemListPlayer.itemList.height - (analyserPosY2 - analyserPosY))
+        Toolkit.fillArea(batch, analyserPosX, analyserPosY2, analyserWidth, analyserHeight)
         batch.color = Toolkit.Theme.COL_INACTIVE
-        Toolkit.drawBoxBorder(batch, analyserPosX, analyserPosY2, itemListPlayer.itemList.width, itemListPlayer.itemList.height - (analyserPosY2 - analyserPosY))
+        Toolkit.drawBoxBorder(batch, analyserPosX, analyserPosY2, analyserWidth, analyserHeight)
 
         batch.color = Color.WHITE
         drawAnalysis(batch)
@@ -193,15 +211,15 @@ class UIDebugInventron : UICanvas(
         return fields
     }
 
-    private fun refreshAnalysis() {
-        selectedItemSlot.item = selectedItem
+    private val TEXT_LINE_HEIGHT = 24
 
+    private fun refreshAnalysis() {
         analysisTextBuffer = ArrayList<String>()
+
+        // update wall of text
         if (selectedItem != null) {
-            /*analysisTextBuffer = selectedItem!!.javaClass.fields.map {
-                it.isAccessible = true
-                "$ccY${it.name}$ccW($ccO${it.type.simpleName}$ccW) = $ccG${it.get(selectedItem!!)}"
-            }*/
+            selectedItemSlot.item = selectedItem
+            selectedItemSlot.itemImage = selectedItem!!.itemImage
 
             val fields: ArrayList<Field> = ArrayList<Field>()
             getAllFields(fields, selectedItem!!.javaClass)
@@ -218,11 +236,22 @@ class UIDebugInventron : UICanvas(
                 catch (e: Throwable) {}
             }
         }
+        else {
+            selectedItemSlot.item = null
+        }
+
+        // update scrollbar
+        analyserScroll.isEnabled = (selectedItem == null)
+        analyserScroll.handleHeight = if (analysisTextBuffer.isEmpty() || selectedItem == null)
+            analyserHeight
+        else
+            (analyserHeight.toFloat() / analysisTextBuffer.size.times(TEXT_LINE_HEIGHT)).times(analyserHeight).roundToInt().coerceIn(12, analyserHeight)
     }
 
     private fun drawAnalysis(batch: SpriteBatch) {
+        val scroll = (analyserScroll.value * analysisTextBuffer.size.times(TEXT_LINE_HEIGHT).minus(analyserHeight - 3)).roundToInt().coerceAtLeast(0)
         analysisTextBuffer.forEachIndexed { index, s ->
-            App.fontGame.draw(batch, s, analyserPosX + 6, analyserPosY2 + 3 + index * 24)
+            App.fontGame.draw(batch, s, analyserPosX + 6, analyserPosY2 + 3 + index * TEXT_LINE_HEIGHT - scroll)
         }
     }
 
