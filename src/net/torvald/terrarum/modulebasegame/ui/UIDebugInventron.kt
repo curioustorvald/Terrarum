@@ -224,8 +224,10 @@ class UIDebugInventron : UICanvas(
             val fields: ArrayList<Field> = ArrayList<Field>()
             getAllFields(fields, selectedItem!!.javaClass)
 
+            println("INSTANCE: ${selectedItem!!.javaClass.canonicalName}")
             println("FIELDS:")
-            println(fields)
+
+            analysisTextBuffer.add("${ccO}INSTANCE$ccW =$ccM ${selectedItem!!.javaClass.canonicalName}")
 
             fields.forEach {
                 try {
