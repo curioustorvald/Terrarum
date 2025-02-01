@@ -23,6 +23,7 @@ import net.torvald.terrarum.FlippingSpriteBatch
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.ifNaN
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.worldgenerator.BiomegenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.TerragenParams
@@ -516,7 +517,7 @@ internal class TerragenTest(val seed: Long, val params: TerragenParams) : NoiseM
     }
 
     private fun Double.toColour(): Int {
-        val d = if (this.isNaN()) 0.0 else this.absoluteValue
+        val d = this.ifNaN(0.0).absoluteValue
         val b = d.toFloat()
 
         val c = if (b >= 2f)

@@ -891,7 +891,7 @@ open class GameWorld(
         if (fluidID == Block.NULL || fluidID == Block.NOT_GENERATED)
             fluidID = Fluid.NULL
 
-        return FluidInfo(fluidID, if (fill.isNaN()) 0f else fill) // hex FFFFFFFF (magic number for ungenerated tiles) is interpreted as Float.NaN
+        return FluidInfo(fluidID, fill.ifNaN(0f)) // hex FFFFFFFF (magic number for ungenerated tiles) is interpreted as Float.NaN
     }
 
     /*private fun fluidTypeToBlock(type: FluidType) = when (type.abs()) {

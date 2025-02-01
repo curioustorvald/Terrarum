@@ -2298,7 +2298,7 @@ open class ActorWithBody : Actor {
         @Transient internal val HITBOX_COLOURS1 = Color(0xFFFF0088.toInt())
 
 
-        fun isCloseEnough(a: Double, b: Double) = ((a / b).let { if (it.isNaN()) 0.0 else it } - 1).absoluteValue < PHYS_EPSILON_DIST
+        fun isCloseEnough(a: Double, b: Double) = ((a / b).ifNaN(0.0) - 1).absoluteValue < PHYS_EPSILON_DIST
     }
 
 

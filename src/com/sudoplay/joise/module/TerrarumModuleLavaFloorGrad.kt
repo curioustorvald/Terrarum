@@ -3,6 +3,7 @@ package com.sudoplay.joise.module
 import com.sudoplay.joise.ModuleInstanceMap
 import com.sudoplay.joise.ModuleMap
 import com.sudoplay.joise.ModulePropertyMap
+import net.torvald.terrarum.ifNaN
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_DIVISOR
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen.YHEIGHT_MAGIC
 
@@ -19,7 +20,7 @@ class TerrarumModuleLavaFloorGrad : Module() {
 
     private fun undoYtransform(yp: Double): Double = yp + (3200 - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR
 
-    private fun Double.op() = Math.sqrt((this - h.value + l.value) / l.value).let { if (it.isNaN()) 0.0 else it }
+    private fun Double.op() = Math.sqrt((this - h.value + l.value) / l.value).ifNaN(0.0)
 
     override fun get(x: Double, y: Double) = undoYtransform(y).op()
     override fun get(x: Double, y: Double, z: Double) = undoYtransform(y).op()/*.also {

@@ -249,7 +249,7 @@ class UIDebugInventron : UICanvas(
     }
 
     private fun drawAnalysis(batch: SpriteBatch) {
-        val scroll = (analyserScroll.value * analysisTextBuffer.size.times(TEXT_LINE_HEIGHT).minus(analyserHeight - 3)).roundToInt().coerceAtLeast(0)
+        val scroll = (analyserScroll.value * analysisTextBuffer.size.times(TEXT_LINE_HEIGHT).minus(analyserHeight - 3)).ifNaN(0.0).roundToInt().coerceAtLeast(0)
         analysisTextBuffer.forEachIndexed { index, s ->
             App.fontGame.draw(batch, s, analyserPosX + 6, analyserPosY2 + 3 + index * TEXT_LINE_HEIGHT - scroll)
         }

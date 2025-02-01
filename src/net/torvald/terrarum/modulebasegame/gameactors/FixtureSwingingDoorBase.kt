@@ -340,11 +340,11 @@ open class FixtureSwingingDoorBase : FixtureBase {
 
     private fun ActorWithBody.movingTowardsRight(): Boolean {
 //        return ((this.controllerV ?: Vector2()) + this.externalV).x >= PHYS_EPSILON_VELO
-        return (((this.controllerV?.x ?: 0.0) / this.externalV.x).let { if (it.isNaN()) 0.0 else it } - 1) >= PHYS_EPSILON_DIST
+        return (((this.controllerV?.x ?: 0.0) / this.externalV.x).ifNaN(0.0) - 1) >= PHYS_EPSILON_DIST
     }
     private fun ActorWithBody.movingTowardsLeft(): Boolean {
 //        return ((this.controllerV ?: Vector2()) + this.externalV).x <= -PHYS_EPSILON_VELO
-        return (((this.controllerV?.x ?: 0.0) / this.externalV.x).let { if (it.isNaN()) 0.0 else it } - 1) <= PHYS_EPSILON_DIST
+        return (((this.controllerV?.x ?: 0.0) / this.externalV.x).ifNaN(0.0) - 1) <= PHYS_EPSILON_DIST
     }
     private fun ActorWithBody.notMoving(): Boolean {
 //        return ((this.controllerV ?: Vector2()) + this.externalV).x.absoluteValue < PHYS_EPSILON_VELO

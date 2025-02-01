@@ -3,6 +3,7 @@ package com.sudoplay.joise.module
 import com.sudoplay.joise.ModuleInstanceMap
 import com.sudoplay.joise.ModuleMap
 import com.sudoplay.joise.ModulePropertyMap
+import net.torvald.terrarum.ifNaN
 
 /**
  * Created by minjaesong on 2024-09-07.
@@ -12,7 +13,7 @@ class TerrarumModuleCaveLayerClosureGrad : Module() {
     protected val l = ScalarParameter(3.0)
 
 
-    private fun Double.op() = Math.sqrt((-this + h.value - l.value) / l.value).let { if (it.isNaN()) 0.0 else it.coerceIn(0.0, 1.0) }
+    private fun Double.op() = Math.sqrt((-this + h.value - l.value) / l.value).ifNaN(0.0).coerceIn(0.0, 1.0)
 
     override fun get(x: Double, y: Double) = y.op()
     override fun get(x: Double, y: Double, z: Double) = y.op()/*.also {

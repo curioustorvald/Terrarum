@@ -517,7 +517,7 @@ internal object BlocksDrawer {
                         .filter { it.startsWith("fluid@") }.sorted().firstOrNull()
 
                     val fillThis =
-                        world.layerFluids.unsafeGetTile1(wx, wy).second.let { if (it.isNaN()) 0f else it.coerceAtMost(1f) }
+                        world.layerFluids.unsafeGetTile1(wx, wy).second.ifNaN(0f).coerceAtMost(1f)
 
                     val tile = world.getTileFromTerrain(wx, wy)
 

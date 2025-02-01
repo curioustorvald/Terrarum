@@ -35,9 +35,9 @@ class UIItemVertSlider(
             // reset the scroll status
             handlePos = 0.0
             this.value = 0.0
-            field = value
+            field = value.coerceIn(12, height)
 
-            handleTravelDist = height - value
+            handleTravelDist = height - field
         }
 
     companion object {

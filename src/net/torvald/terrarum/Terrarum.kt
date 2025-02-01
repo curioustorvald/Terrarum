@@ -648,6 +648,8 @@ inline fun Boolean.toLong(shift: Int = 0) = if (this) 1L.shl(shift) else 0L
 inline fun Int.bitCount() = java.lang.Integer.bitCount(this)
 inline fun Long.bitCount() = java.lang.Long.bitCount(this)
 inline fun Double.signedSqrt() = this.abs().sqrt() * this.sign
+inline fun Float.ifNaN(new: Float) = if (this.isNaN()) new else this
+inline fun Double.ifNaN(new: Double) = if (this.isNaN()) new else this
 
 
 fun absMax(left: Double, right: Double): Double {

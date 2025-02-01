@@ -42,9 +42,9 @@ class UIItemHorzSlider(
             // reset the scroll status
             handlePos = 0.0
             this.value = 0.0
-            field = value
+            field = value.coerceIn(12, width)
 
-            handleTravelDist = width - value
+            handleTravelDist = width - field
         }
 
     override val height = 24

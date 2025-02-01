@@ -88,7 +88,7 @@ internal object ExportMap2 : ConsoleCommand {
     }
 
     private fun Iterable<Float>.normaliseNaN(default: Float = 0f): FloatArray {
-        return this.map { if (it.isNaN()) default else it }.toFloatArray()
+        return this.map { it.ifNaN(default) }.toFloatArray()
     }
 
     override fun execute(args: Array<String>) {

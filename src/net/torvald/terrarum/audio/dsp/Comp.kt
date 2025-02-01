@@ -136,9 +136,5 @@ class Comp(
             this.ratio = other.ratio
         }
     }
-
-    private fun Double.unNaN(d: Double): Double {
-        return if (this.isNaN()) d else this
-    }
 }
 
