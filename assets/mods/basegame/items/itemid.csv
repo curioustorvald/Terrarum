@@ -196,3 +196,4 @@ id;classname;tags
 #16777216;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessWaterBucket;DEBUG,TOOL
 #16777217;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessLavaBucket;DEBUG,TOOL
 16777472;net.torvald.terrarum.modulebasegame.gameitems.ItemMysteriousATM;DEBUG
+16777473;net.torvald.terrarum.modulebasegame.gameitems.ItemDebugInventron;DEBUG

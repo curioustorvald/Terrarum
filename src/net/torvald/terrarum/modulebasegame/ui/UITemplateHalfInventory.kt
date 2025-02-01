@@ -31,14 +31,15 @@ class UITemplateHalfInventory(
 
     companion object {
         const val INVENTORY_NAME_TEXT_GAP = 28
+
+        const val halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) / 2
+
+        val XOFFSET_LEFT = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
+        val XOFFSET_RIGHT = XOFFSET_LEFT + (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 7
+        val YOFFSET = UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
     }
 
     val itemList: UIItemInventoryItemGrid
-
-    private val halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) / 2
-    private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
-    private val thisOffsetX2 = thisOffsetX + (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 7
-    private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
 
     internal var itemListKeyDownFun = { gameItem: GameItem?, amount: Long, keycode: Int, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
         /* crickets */
@@ -54,8 +55,8 @@ class UITemplateHalfInventory(
         itemList = UIItemInventoryItemGrid(
             parent,
             getInventoryFun,
-            if (drawOnLeft) thisOffsetX else thisOffsetX2,
-            thisOffsetY,
+            if (drawOnLeft) XOFFSET_LEFT else XOFFSET_RIGHT,
+            YOFFSET,
             6, UIInventoryFull.CELLS_VRT,
             drawScrollOnRightside = !drawOnLeft,
             drawWallet = false,
@@ -92,7 +93,7 @@ class UITemplateHalfInventory(
         itemList.render(frameDelta, batch, camera)
 
         batch.color = Color.WHITE
-        Toolkit.drawTextCentered(batch, App.fontGame, inventoryNameFun(), width, posX, thisOffsetY - INVENTORY_NAME_TEXT_GAP)
+        Toolkit.drawTextCentered(batch, App.fontGame, inventoryNameFun(), width, posX, YOFFSET - INVENTORY_NAME_TEXT_GAP)
     }
 
     var posX: Int

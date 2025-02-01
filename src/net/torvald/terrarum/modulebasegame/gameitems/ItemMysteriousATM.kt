@@ -19,3 +19,19 @@ class ItemMysteriousATM(originalID: ItemID) : FixtureItemBase(originalID, "net.t
     override var originalName = "ITEM_MYSTERIOUS_ATM"
 
 }
+
+
+/**
+ * Created by minjaesong on 2025-02-01.
+ */
+class ItemDebugInventron(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureDebugInventron") {
+
+    override var baseMass = 2000.0
+    override val canBeDynamic = false
+    override val materialId = ""
+    init {
+        itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/mysterious_atm.tga")
+    }
+    override var originalName = "ITEM_DEBUG_INVENTRON"
+
+}

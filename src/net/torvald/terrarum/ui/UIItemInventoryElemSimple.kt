@@ -44,7 +44,7 @@ class UIItemInventoryElemSimple(
     override var suppressHaptic = false
 
     companion object {
-        val height = UIItemInventoryElemWide.height
+        const val height = UIItemInventoryElemWide.height
     }
 
     override val width = Companion.height

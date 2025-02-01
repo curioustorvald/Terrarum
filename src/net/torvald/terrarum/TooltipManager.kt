@@ -22,7 +22,7 @@ object TooltipManager {
  */
 abstract class TooltipListener {
 
-    open val tooltipHash = System.nanoTime()
+    @Transient open val tooltipHash = System.nanoTime()
 
     /**
      * Acquire a control over the "tooltip bus". If the message is null, `releaseTooltip()` will be invoked instead.

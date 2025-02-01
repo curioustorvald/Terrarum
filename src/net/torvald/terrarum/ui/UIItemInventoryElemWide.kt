@@ -43,10 +43,10 @@ class UIItemInventoryElemWide(
     override var suppressHaptic = false
 
     companion object {
-        val height = 48
-        val UNIQUE_ITEM_HAS_NO_AMOUNT = -1L
+        const val height = 48
+        const val UNIQUE_ITEM_HAS_NO_AMOUNT = -1L
 
-        val durabilityBarThickness = 3
+        const val durabilityBarThickness = 3
     }
 
     override val height = Companion.height

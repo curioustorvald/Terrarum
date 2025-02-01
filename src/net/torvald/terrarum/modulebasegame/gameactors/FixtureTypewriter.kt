@@ -86,6 +86,9 @@ class FixtureTypewriter : FixtureBase {
                 it.useItemHandler = "net.torvald.terrarum.modulebasegame.gameactors.TestLeafletPrimaryUseHandler"
                 it.name = "Testification"
                 it.author = INGAME.actorNowPlaying?.actorValue?.getAsString(AVKey.NAME) ?: ""
+                // documents can be photocopied
+                it.isUnique = false
+                it.stackable = true
             }
 
             inventory.add(newItem)
