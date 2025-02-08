@@ -1,5 +1,9 @@
 package net.torvald.terrarum
 
+import java.io.IOException
+import java.util.*
+import kotlin.collections.HashMap
+
 typealias ItemValue = KVHashMap
 
 /**
@@ -34,6 +38,17 @@ open class KVHashMap {
      */
     open operator fun set(key: String, value: Any) {
         hashMap.put(key.toLowerCase(), value)
+    }
+
+    fun setBlob(key: String, value: ByteArray) {
+        val filename0 = hashMap.getOrPut(key.toLowerCase()) { "blob://${UUID.randomUUID()}" } as String
+        if (filename0.startsWith("blob://")) {
+            Terrarum.getSharedSaveFiledesc(filename0.removePrefix("blob://")).let {
+                if (!it.exists()) it.createNewFile()
+                it.writeBytes(value) // will overwrite whatever's there
+            }
+        }
+        else throw TypeCastException("ActorValue is not blob")
     }
 
     /**
@@ -74,6 +89,19 @@ open class KVHashMap {
         return value as Boolean
     }
 
+    fun getAsBlob(key: String): ByteArray? {
+        val uri = getAsString(key) ?: return null
+        if (uri.startsWith("blob://")) {
+            val filename = uri.removePrefix("blob://")
+            val file = Terrarum.getSharedSaveFiledesc(filename)
+            if (file.exists())
+                return file.readBytes()
+            else
+                throw IOException("Blob not found")
+        }
+        else throw TypeCastException("ActorValue is not blob")
+    }
+
     fun hasKey(key: String) = hashMap.containsKey(key)
 
     val keySet: Set<Any>
@@ -81,7 +109,15 @@ open class KVHashMap {
 
     open fun remove(key: String) {
         if (hashMap[key] != null) {
-            hashMap.remove(key, hashMap[key]!!)
+            val value = hashMap[key]!!
+            hashMap.remove(key, value)
+
+            (value as? String)?.let {
+                if (it.startsWith("blob://")) {
+                    val filename = it.removePrefix("blob://")
+                    Terrarum.getSharedSaveFiledesc(filename).delete()
+                }
+            }
         }
     }
 
