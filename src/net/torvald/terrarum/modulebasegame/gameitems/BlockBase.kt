@@ -118,10 +118,12 @@ object BlockBase {
 
     /**
      * This function assumes xy and oxy are neighboured and tiles are correctly placed
+     *
+     * @param branching 0: no branching, 1: tee-only, 2: cross-only, 3: tee and cross
      */
-    private fun setConnectivity(mode: String, world: GameWorld, vec: Int, item: ItemID, x: Int, y: Int, ox: Int, oy: Int) {
-        when (mode) {
-            "axle" -> {
+    private fun setConnectivity(branching: Int, world: GameWorld, vec: Int, item: ItemID, x: Int, y: Int, ox: Int, oy: Int) {
+        when (branching) {
+            0 -> {
                 // vec is guaranteed to be 5 or 10
                 world.setWireGraphOf(x, y, item, vec)
                 world.setWireGraphOf(ox, oy, item, vec)
@@ -143,11 +145,13 @@ object BlockBase {
           else false
     }
 
-    fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float, wirePlaceMode: String) = mouseInInteractableRange(actor) { mx, my, mtx, mty ->
+    fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float) = mouseInInteractableRange(actor) { mx, my, mtx, mty ->
 
         val itemID = gameItem.originalID
         val ingame = Terrarum.ingame!! as TerrarumIngame
         val ww = ingame.world.width
+
+        val wirePlaceMode = WireCodex[itemID].branching
 
         if (Gdx.input.isButtonJustPressed(App.getConfigInt("config_mouseprimary")) ||
                 !isNeighbouring(ww, mtx, mty, oldTileX, oldTileY)) {
@@ -166,7 +170,7 @@ object BlockBase {
         val oldTileOccupied = oldTileWires.first?.searchFor(itemID) != null
 
         val oldToNewVector = when (wirePlaceMode) {
-            "axle" -> {
+            0 -> {
                 // determine new vector by dividing the block cell in X-shape
                 val mxt = mx - mtx * TILE_SIZE
                 val myt = my - mty * TILE_SIZE
@@ -190,7 +194,7 @@ object BlockBase {
             }
         }
         val connectedEachOther = when (wirePlaceMode) {
-            "axle" -> thisTileOccupied && oldTileOccupied
+            0 -> thisTileOccupied && oldTileOccupied
             else -> wireNodesConnectedEachOther(oldToNewVector, thisTileWireCnx, oldTileWireCnx)
         }
         val thisTileWasDraggedOn = initialMouseDownTileX != mtx || initialMouseDownTileY != mty

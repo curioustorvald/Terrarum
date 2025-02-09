@@ -197,7 +197,7 @@ class WireCodex {
         prop.inputCount = record.intVal("inputcount")
         prop.inputType = record.get("inputtype") ?: prop.accepts
         prop.outputType = record.get("outputtype") ?: prop.accepts
-        prop.canBranch = record.boolVal("branching")
+        prop.branching = record.intVal("branching")
         prop.tags = record.get("tags").split(',').map { it.trim().toUpperCase() }.toHashSet()
 
         wireProps[prop.id] = prop

@@ -90,7 +90,7 @@ class ActorValue : KVHashMap {
         return ActorValue(newActor, hashMap).also {
             val listOfBlobs = it.hashMap.entries.filter { (it.value as? String)?.startsWith(BLOB) ?: false }
             listOfBlobs.forEach {
-                
+
             }
         }
         // TODO clone blobs

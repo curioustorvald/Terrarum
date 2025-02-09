@@ -32,7 +32,7 @@ class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, priva
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
-        return BlockBase.wireStartPrimaryUse(actor,this, delta, "signal_wire")
+        return BlockBase.wireStartPrimaryUse(actor,this, delta)
     }
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
@@ -69,7 +69,7 @@ class WirePieceAxle(originalID: ItemID, private val atlasID: String, private val
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
-        return BlockBase.wireStartPrimaryUse(actor,this, delta, "axle")
+        return BlockBase.wireStartPrimaryUse(actor,this, delta)
     }
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
