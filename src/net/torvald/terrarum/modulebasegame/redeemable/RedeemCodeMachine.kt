@@ -46,7 +46,7 @@ object RedeemCodeMachine {
         "umonataj kunvenauw, sed nature a"
     ).map { MessageDigest.getInstance("SHA-256").digest(it.toByteArray()) }
 
-    fun encode(itemID: ItemID, amountIndex: Int, isUnique: Boolean, receiver: UUID? = null, msgType: Int = 0, arg1: String = "", arg2: String = ""): String {
+    fun encode(itemID: ItemID, amountIndex: Int, isUnique: Boolean, receiver: UUID? = null, msgType: Int = 0, args: String = ""): String {
         // filter item ID
         val itemType = itemID.substringBefore("@")
         val (itemModule, itemNumber0) = itemID.substringAfter("@").split(":")
@@ -72,7 +72,24 @@ object RedeemCodeMachine {
         bytes[3] = itemNumber.toByte() // 0b item number low
         bytes[4] = itemNumber.ushr(8).toByte()// 0b item number high
 
-        // TODO ascii to baudot
+        // convert ascii to baudot
+        val paddedTextBits = (asciiToBaudot(args) + "00000").let { // always end the message with NUL
+            // then fill the remainder with random bits
+            val remaining = (if (isShortCode) 60 else 180) - it.length
+            it + StringBuilder().let { sb ->
+                repeat(remaining) { sb.append((Math.random() < 0.5).toInt()) }
+            }.toString()
+        }
+
+        // fill upper nybble of bytes[5] first
+        // lower nybble will have msgType
+        bytes[5] = ((msgType and 15) or (paddedTextBits.substring(0, 4).toInt(2).shl(4))).toByte()
+
+        var c = 4
+        for (i in 6 until bytes.size - 2) {
+            bytes[i] = paddedTextBits.substring(c, c + 8).toInt(2).toByte()
+            c += 8
+        }
 
         val crc16 = Crc16().let {
             for (i in 0 until bytes.size - 2) {
@@ -138,12 +155,19 @@ object RedeemCodeMachine {
 
         val messageTemplateIndex = decoded[5].toUint() and 15
 
-        // TODO baudot to ascii
+        // baudot to ascii
+        val baudotBits = StringBuilder().let {
+            it.append(decoded[5].toUint().ushr(4).toString(2).padStart(4,'0'))
+            for (i in 6 until decoded.size - 2) {
+                it.append(decoded[i].toUint().toString(2).padStart(8,'0'))
+            }
+        }.toString()
+        val decodedStr = baudotToAscii(baudotBits).substringBefore('\u0000') // remove trailing random bits
 
-        return RedeemVoucher(itemID, itemAmount, reusable, "", listOf())
+        return RedeemVoucher(itemID, itemAmount, reusable, messageTemplateIndex, decodedStr.split('\n'))
     }
 
-    data class RedeemVoucher(val itemID: ItemID, val amount: Int, val reusable: Boolean, val msgTemplate: String, val args: List<String>)
+    data class RedeemVoucher(val itemID: ItemID, val amount: Int, val reusable: Boolean, val msgTemplateIndex: Int, val args: List<String>)
 
 
     val tableLtrs = "\u0000E\nA SIU\rDRJNFCKTZLWHYPQOBG\u000FMXV\u000E"
@@ -156,6 +180,7 @@ object RedeemCodeMachine {
     val codeFigs = tableFigs.mapIndexed { index: Int, c: Char -> c to index.toString(2).padStart(5,'0') }.toMap()
 
     val basket = arrayOf(codeLtrs, codeFigs) // think of it as a "type basket" of a typewriter
+    val basket2 = arrayOf(tableLtrs, tableFigs) // think of it as a "type basket" of a typewriter
 
     private fun isInLtrs(char: Char) = char in setLtrs
     private fun isInFigs(char: Char) = char in setFigs
@@ -192,7 +217,25 @@ object RedeemCodeMachine {
     }
 
     private fun baudotToAscii(binaryStr: String): String {
-        TODO()
+        val sb = StringBuilder()
+
+        var currentShift = 0 // initially ltrs
+        var cursor = 0
+
+        while (cursor < binaryStr.length) {
+            val number = binaryStr.substring(cursor, cursor + 5).toInt(2)
+
+            if (number == 0b11011)
+                currentShift = 1
+            else if (number == 0b11111)
+                currentShift = 0
+            else
+                sb.append(basket2[currentShift][number])
+
+            cursor += 5
+        }
+
+        return sb.toString()
     }
 
 }
