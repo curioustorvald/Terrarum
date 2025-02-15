@@ -106,7 +106,7 @@ object RedeemCodeMachine {
         bytes[bytes.size - 1] = crc16.toByte()
 
 
-        val basePwd = initialPassword.random()
+        val basePwd = initialPassword.random().copyOf()
         val receiverPwd = receiver?.toByteArray() ?: ByteArray(16) // 128 bits of something
 
         // xor basePWD with receiverPwd
@@ -124,11 +124,19 @@ object RedeemCodeMachine {
     fun decode(codeStr: String, decoderUUID: UUID? = null): RedeemVoucher? {
         val receiverPwd = decoderUUID?.toByteArray() ?: ByteArray(16) // 128 bits of something
 
-        val passwords = initialPassword.map { basePwd ->
+        // for decrypting targeted code
+        val passwords1 = initialPassword.map { basePwd ->
             ByteArray(32) { i ->
                 basePwd[i] xor receiverPwd[i % 16]
             }
         }
+        // for decrypting generic code
+        val passwords2 = initialPassword.map { basePwd ->
+            ByteArray(32) { i ->
+                basePwd[i]
+            }
+        }
+        val passwords = passwords1 + passwords2
 
         // try to decode the input string by just trying all 8 possible keys
         val decodeds = passwords.map {
@@ -149,7 +157,7 @@ object RedeemCodeMachine {
         }
 
         // if all CRC fails...
-        if (crcResults.none()) {
+        if (crcResults.indexOf(true) < 0) {
             return null
         }
 

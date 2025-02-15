@@ -33,9 +33,11 @@ class ActorValue : KVHashMap {
         hashMap = newMap
     }
 
+    private fun isString(key: String) = (get(key) is String)
+
     override fun set(key: String, value: Any) {
         // check if the key exists and is a blob
-        if (getAsString(key.toLowerCase())?.startsWith(BLOB) == true) {
+        if (isString(key.toLowerCase()) && getAsString(key.toLowerCase())?.startsWith(BLOB) == true) {
             throw IllegalStateException("Cannot write plain values to the blob object")
         }
         else

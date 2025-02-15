@@ -24,16 +24,18 @@ class UIRedeemCodeMachine : UICanvas(
     override var width = Toolkit.drawWidth
     override var height = App.scr.height
 
+    private val codeCols = 12
+
     val title = UIItemTextLabel(this, { "Enter the Code" },
-        (Toolkit.drawWidth - UIItemRedeemCodeArea.estimateWidth(14)) / 2,
+        (Toolkit.drawWidth - UIItemRedeemCodeArea.estimateWidth(codeCols)) / 2,
         App.scr.halfh - UIItemRedeemCodeArea.estimateHeight(4) - 48 - 48,
-        UIItemRedeemCodeArea.estimateWidth(14)
+        UIItemRedeemCodeArea.estimateWidth(codeCols)
         )
 
     val inputPanel = UIItemRedeemCodeArea(this,
-        (Toolkit.drawWidth - UIItemRedeemCodeArea.estimateWidth(14)) / 2,
+        (Toolkit.drawWidth - UIItemRedeemCodeArea.estimateWidth(codeCols)) / 2,
         App.scr.halfh - UIItemRedeemCodeArea.estimateHeight(4) - 48,
-        14, 4)
+        codeCols, 4)
 
     init {
         addUIitem(title)
