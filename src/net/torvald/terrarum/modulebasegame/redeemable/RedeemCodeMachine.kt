@@ -4,6 +4,7 @@ import javazoom.jl.decoder.Crc16
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.serialise.toUint
+import net.torvald.terrarum.toHex
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.utils.PasswordBase32
 import net.torvald.unicode.CURRENCY
@@ -46,9 +47,9 @@ object RedeemCodeMachine {
         "umonataj kunvenauw, sed nature a"
     ).map { MessageDigest.getInstance("SHA-256").digest(it.toByteArray()) }
 
-    fun encode(itemID: ItemID, amountIndex: Int, isUnique: Boolean, receiver: UUID? = null, msgType: Int = 0, args: String = ""): String {
+    fun encode(itemID: ItemID, amountIndex: Int, isReusable: Boolean, receiver: UUID? = null, msgType: Int = 0, args: String = ""): String {
         // filter item ID
-        val itemType = itemID.substringBefore("@")
+        val itemType = if (itemID.contains('@')) itemID.substringBefore("@") else ""
         val (itemModule, itemNumber0) = itemID.substringAfter("@").split(":")
         val itemNumber = itemNumber0.toInt()
 
@@ -59,12 +60,14 @@ object RedeemCodeMachine {
         if (itemNumber !in 0..65535)
             throw IllegalArgumentException("Unsupported item number for ItemID: $itemID")
 
-        val isShortCode = true
+        val unpaddedStr = asciiToBaudot(args)
 
-        val bytes = ByteArray(isShortCode.toInt().plus(1) * 15)
+        val isShortCode = (unpaddedStr.length <= 60)
+
+        val bytes = ByteArray(if (isShortCode) 15 else 30)
 
         // sync pattern and flags
-        bytes[0] = (isUnique.toInt() or 0xA4).toByte()
+        bytes[0] = (isReusable.toInt() or 0xA4).toByte()
         bytes[1] = 0xA5.toByte()
         // compressed item name
         // 0b nnnn mm cc
@@ -73,11 +76,12 @@ object RedeemCodeMachine {
         bytes[4] = itemNumber.ushr(8).toByte()// 0b item number high
 
         // convert ascii to baudot
-        val paddedTextBits = (asciiToBaudot(args) + "00000").let { // always end the message with NUL
+        val paddedTextBits = (unpaddedStr).let {
             // then fill the remainder with random bits
             val remaining = (if (isShortCode) 60 else 180) - it.length
-            it + StringBuilder().let { sb ->
-                repeat(remaining) { sb.append((Math.random() < 0.5).toInt()) }
+            it + StringBuilder().also { sb ->
+                sb.append("00000") // add null terminator
+                repeat(remaining - 5) { sb.append((Math.random() < 0.5).toInt()) } // add random bits
             }.toString()
         }
 
@@ -102,7 +106,7 @@ object RedeemCodeMachine {
         bytes[bytes.size - 1] = crc16.toByte()
 
 
-        val basePwd = initialPassword[bytes[bytes.size - 1].toUint().shr(2).and(7)]
+        val basePwd = initialPassword.random()
         val receiverPwd = receiver?.toByteArray() ?: ByteArray(16) // 128 bits of something
 
         // xor basePWD with receiverPwd
@@ -120,29 +124,38 @@ object RedeemCodeMachine {
     fun decode(codeStr: String, decoderUUID: UUID? = null): RedeemVoucher? {
         val receiverPwd = decoderUUID?.toByteArray() ?: ByteArray(16) // 128 bits of something
 
-        // 0x [byte 29] [byte 30]
-        val crc = PasswordBase32.decode(codeStr.substring(codeStr.length - 8), 5).let {
-            it[3].toUint().shl(8) or it[4].toUint()
-        }
-
-        val basePwdIndex = crc.shr(2).and(7)
-
-        val password = initialPassword[basePwdIndex].let { basePwd ->
+        val passwords = initialPassword.map { basePwd ->
             ByteArray(32) { i ->
                 basePwd[i] xor receiverPwd[i % 16]
             }
         }
 
-        // try to decode the input string
-        val decoded = PasswordBase32.decode(codeStr, if (codeStr.length > 24) 30 else 15, password)
+        // try to decode the input string by just trying all 8 possible keys
+        val decodeds = passwords.map {
+            PasswordBase32.decode(codeStr, if (codeStr.length > 24) 30 else 15, it)
+        }
 
-        // check CRC
-        val crc2 = decoded[decoded.size - 2].toUint().shl(8) or decoded[decoded.size - 1].toUint()
+        // check which one of the 8 keys passes CRC test
+        val crcResults = decodeds.map { decoded ->
+            val crc = Crc16().let {
+                for (i in 0 until decoded.size - 2) {
+                    it.add_bits(decoded[i].toInt(), 8)
+                }
+                it.checksum().toInt().and(0xFFFF)
+            }
+            val crc2 = decoded[decoded.size - 2].toUint().shl(8) or decoded[decoded.size - 1].toUint()
 
-        // if CRC fails...
-        if (crc != crc2)
+            (crc == crc2)
+        }
+
+        // if all CRC fails...
+        if (crcResults.none()) {
             return null
+        }
 
+
+
+        val decoded = decodeds[crcResults.indexOf(true)]
 
         val reusable = (decoded[0] and 1) != 0.toByte()
 
@@ -156,7 +169,7 @@ object RedeemCodeMachine {
         val messageTemplateIndex = decoded[5].toUint() and 15
 
         // baudot to ascii
-        val baudotBits = StringBuilder().let {
+        val baudotBits = StringBuilder().also {
             it.append(decoded[5].toUint().ushr(4).toString(2).padStart(4,'0'))
             for (i in 6 until decoded.size - 2) {
                 it.append(decoded[i].toUint().toString(2).padStart(8,'0'))
