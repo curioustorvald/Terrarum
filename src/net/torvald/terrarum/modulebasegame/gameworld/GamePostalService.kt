@@ -60,7 +60,7 @@ data class Post(
 }
 
 data class PostContents(
-    val type: String, // "text", "btex"
+    val type: String, // "text"(read from LANG), "textcustom"(custom string), "btex"(always custom)
     val contentsRaw: String, // plain text for "text"; xml for "btex"
     val encryption: String = "none", // "none", "end2end"
     val contentsExtra: Any? = null,

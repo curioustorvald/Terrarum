@@ -57,7 +57,7 @@ class UIRedeemCodeMachine : UICanvas(
     private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap - halfSlotOffset
     private val yEnd = -UIInventoryFull.YPOS_CORRECTION + (App.scr.height + UIInventoryFull.internalHeight).div(2).toFloat()
 
-    private val alphnums = (('0'..'9') + ('a'..'z') + ('A'..'Z')).map { "$it" }.toHashSet()
+    private val alphnums = (('0'..'9') + ('a'..'z') + ('A'..'Z') + '@').map { "$it" }.toHashSet()
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {
         super.inputStrobed(e)
