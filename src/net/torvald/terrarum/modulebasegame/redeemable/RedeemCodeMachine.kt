@@ -37,14 +37,14 @@ object RedeemCodeMachine {
     private val amountIndexToAmount = intArrayOf(1,2,3,4,5,6,10,12,15,20,24,32,50,100,250,500)
 
     val initialPassword = listOf( // will be list of 256 bits of something
-        "N'Gasta! Kvaka! Kvakis! ahkstas ",
-        "so novajxletero (oix jhemile) so",
-        "Ranetauw. Ricevas gxin pagintaj ",
-        "membrauw kaj aliaj individuauw, ",
-        "kiujn iamaniere tusxas so raneta",
-        " aktivado. En gxi aperas informa",
-        "uw unuavice pri so lokauw so cxi",
-        "umonataj kunvenauw, sed nature a"
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "Nam nisl leo, semper a ligula a, sollicitudin congue turpis.",
+        "Aenean id malesuada nibh, vitae accumsan risus.",
+        "Morbi tempus velit et consequat vehicula.",
+        "Integer varius turpis nec euismod mattis.",
+        "Vivamus dictum non ipsum vitae mollis.",
+        "Quisque tincidunt, diam non dictum sodales, nisl neque aliquet risus, pulvinar posuere lacus est a arcu.",
+        "Fusce eu venenatis sapien, non aliquam massa.",
     ).map { MessageDigest.getInstance("SHA-256").digest(it.toByteArray()) }
 
     fun encode(itemID: ItemID, amountIndex: Int, isReusable: Boolean, receiver: UUID? = null, msgType: Int = 0, args: String = ""): String {
