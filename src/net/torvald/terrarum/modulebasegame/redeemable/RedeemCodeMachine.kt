@@ -4,7 +4,6 @@ import javazoom.jl.decoder.Crc16
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.serialise.toUint
-import net.torvald.terrarum.toHex
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.utils.PasswordBase32
 import net.torvald.unicode.CURRENCY
@@ -12,6 +11,15 @@ import java.security.MessageDigest
 import java.util.*
 import kotlin.experimental.and
 import kotlin.experimental.xor
+
+class SimplePRNG(seed: Int) {
+    private var state: Int = seed
+
+    fun nextInt(): Int {
+        state = (state * 1664525 + 1013904223) and 0x7FFFFFFF // LCG Algorithm
+        return state
+    }
+}
 
 /**
  * Created by minjaesong on 2025-02-13.
@@ -38,14 +46,97 @@ object RedeemCodeMachine {
 
     val initialPassword = listOf( // will be list of 256 bits of something
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        "Nam nisl leo, semper a ligula a, sollicitudin congue turpis.",
-        "Aenean id malesuada nibh, vitae accumsan risus.",
-        "Morbi tempus velit et consequat vehicula.",
-        "Integer varius turpis nec euismod mattis.",
-        "Vivamus dictum non ipsum vitae mollis.",
-        "Quisque tincidunt, diam non dictum sodales, nisl neque aliquet risus, pulvinar posuere lacus est a arcu.",
-        "Fusce eu venenatis sapien, non aliquam massa.",
+//        "Nam nisl leo, semper a ligula a, sollicitudin congue turpis.",
+//        "Aenean id malesuada nibh, vitae accumsan risus.",
+//        "Morbi tempus velit et consequat vehicula.",
+//        "Integer varius turpis nec euismod mattis.",
+//        "Vivamus dictum non ipsum vitae mollis.",
+//        "Quisque tincidunt, diam non dictum sodales, nisl neque aliquet risus, pulvinar posuere lacus est a arcu.",
+//        "Fusce eu venenatis sapien, non aliquam massa.",
     ).map { MessageDigest.getInstance("SHA-256").digest(it.toByteArray()) }
+
+    private fun shuffleBits(data: ByteArray, seed: Int): ByteArray {
+        return data
+
+        val rng = SimplePRNG(seed)
+        val bitList = mutableListOf<Int>()
+        val unshuffledBits = mutableListOf<Int>()
+        for (i in data.indices) {
+            for (bit in 0..7) {
+                if (i < data.size - 2) {
+                    bitList.add((data[i].toInt() shr bit) and 1)
+                } else {
+                    unshuffledBits.add((data[i].toInt() shr bit) and 1)
+                }
+            }
+        }
+        val indices = bitList.indices.toMutableList()
+        val shuffledBits = MutableList(bitList.size) { 0 }
+        val shuffleMap = indices.toMutableList()
+        val originalToShuffled = indices.toMutableList()
+
+        for (i in indices.indices.reversed()) {
+            val j = rng.nextInt() % (i + 1)
+            shuffledBits[i] = bitList[shuffleMap[j]]
+            originalToShuffled[shuffleMap[j]] = i
+            shuffleMap.removeAt(j)
+        }
+
+        val shuffledBytes = ByteArray(data.size)
+        for (i in shuffledBits.indices) {
+            shuffledBytes[i / 8] = (shuffledBytes[i / 8].toInt() or (shuffledBits[i] shl (i % 8))).toByte()
+        }
+
+        // Restore the last two bytes without shuffling
+        for (i in 0 until 16) {
+            shuffledBytes[(data.size - 2) + (i / 8)] = (shuffledBytes[(data.size - 2) + (i / 8)].toInt() or (unshuffledBits[i] shl (i % 8))).toByte()
+        }
+
+        return shuffledBytes
+    }
+
+    private fun unshuffleBits(data: ByteArray, seed: Int): ByteArray {
+        return data
+
+        val rng = SimplePRNG(seed)
+        val bitList = mutableListOf<Int>()
+        val unshuffledBits = mutableListOf<Int>()
+        for (i in data.indices) {
+            for (bit in 0..7) {
+                if (i < data.size - 2) {
+                    bitList.add((data[i].toInt() shr bit) and 1)
+                } else {
+                    unshuffledBits.add((data[i].toInt() shr bit) and 1)
+                }
+            }
+        }
+        val indices = bitList.indices.toMutableList()
+        val shuffleMap = indices.toMutableList()
+        val shuffledToOriginal = MutableList(bitList.size) { 0 }
+
+        for (i in indices.indices.reversed()) {
+            val j = rng.nextInt() % (i + 1)
+            shuffledToOriginal[i] = shuffleMap[j]
+            shuffleMap.removeAt(j)
+        }
+
+        val originalBits = MutableList(bitList.size) { 0 }
+        for (i in bitList.indices) {
+            originalBits[shuffledToOriginal[i]] = bitList[i]
+        }
+
+        val originalBytes = ByteArray(data.size)
+        for (i in originalBits.indices) {
+            originalBytes[i / 8] = (originalBytes[i / 8].toInt() or (originalBits[i] shl (i % 8))).toByte()
+        }
+
+        // Restore the last two bytes without unshuffling
+        for (i in 0 until 16) {
+            originalBytes[(data.size - 2) + (i / 8)] = (originalBytes[(data.size - 2) + (i / 8)].toInt() or (unshuffledBits[i] shl (i % 8))).toByte()
+        }
+
+        return originalBytes
+    }
 
     fun encode(itemID: ItemID, amountIndex: Int, isReusable: Boolean, receiver: UUID? = null, msgType: Int = 0, args: String = ""): String {
         // filter item ID
@@ -64,7 +155,7 @@ object RedeemCodeMachine {
 
         val isShortCode = (unpaddedStr.length <= 60)
 
-        val bytes = ByteArray(if (isShortCode) 15 else 30)
+        var bytes = ByteArray(if (isShortCode) 15 else 30)
 
         // sync pattern and flags
         bytes[0] = (isReusable.toInt() or 0xA4).toByte()
@@ -102,6 +193,8 @@ object RedeemCodeMachine {
             it.checksum().toInt()
         }
 
+        println("Encoding CRC: $crc16")
+
         bytes[bytes.size - 2] = crc16.ushr(8).toByte()
         bytes[bytes.size - 1] = crc16.toByte()
 
@@ -114,7 +207,7 @@ object RedeemCodeMachine {
             basePwd[i] = basePwd[i] xor receiverPwd[i % 16]
         }
 
-        return PasswordBase32.encode(bytes, basePwd)
+        return PasswordBase32.encode(shuffleBits(bytes, crc16), basePwd)
     }
 
     private fun UUID.toByteArray(): ByteArray {
@@ -144,26 +237,32 @@ object RedeemCodeMachine {
         }
 
         // check which one of the 8 keys passes CRC test
-        val crcResults = decodeds.map { decoded ->
+        var key: Int? = null
+        val crcResults = decodeds.map { decoded0 ->
+            val crc0 = decoded0[decoded0.size - 2].toInt().shl(8) or decoded0[decoded0.size - 1].toInt()
+            val decoded = unshuffleBits(decoded0, crc0)
             val crc = Crc16().let {
                 for (i in 0 until decoded.size - 2) {
                     it.add_bits(decoded[i].toInt(), 8)
                 }
-                it.checksum().toInt().and(0xFFFF)
+                it.checksum().toInt()
             }
-            val crc2 = decoded[decoded.size - 2].toUint().shl(8) or decoded[decoded.size - 1].toUint()
 
-            (crc == crc2)
+            println("Trying CRC $crc0 to $crc")
+
+            ((crc == crc0) to decoded).also {
+                if (it.first) key = crc0
+            }
         }
 
         // if all CRC fails...
-        if (crcResults.indexOf(true) < 0) {
+        if (key == null) {
             return null
         }
 
+        println("Decoding CRC: $key")
 
-
-        val decoded = decodeds[crcResults.indexOf(true)]
+        val decoded = crcResults.first { it.first }.second
 
         val reusable = (decoded[0] and 1) != 0.toByte()
 

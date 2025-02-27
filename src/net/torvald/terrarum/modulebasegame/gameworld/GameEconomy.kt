@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
 import net.torvald.terrarum.gameactors.ActorID
+import net.torvald.terrarum.gameworld.TerrarumSavegameExtrafieldSerialisable
 
 /**
  * The whole world is economically isolated system. Economy will be important to make player keep playing,
@@ -11,7 +12,7 @@ import net.torvald.terrarum.gameactors.ActorID
  *
  * Created by minjaesong on 2017-04-23.
  */
-class GameEconomy {
+class GameEconomy : TerrarumSavegameExtrafieldSerialisable {
 
     val transactionHistory = TransanctionHistory()
 

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
+import net.torvald.terrarum.gameworld.TerrarumSavegameExtrafieldSerialisable
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import kotlin.math.ceil
 
@@ -9,7 +10,7 @@ import kotlin.math.ceil
  *
  * Created by minjaesong on 2024-12-29.
  */
-class GamePostalService {
+class GamePostalService : TerrarumSavegameExtrafieldSerialisable {
 
 
     companion object {

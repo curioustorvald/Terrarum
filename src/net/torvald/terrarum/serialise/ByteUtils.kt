@@ -115,3 +115,33 @@ fun ByteArray.toBigInt64(offset: Int = 0): Long {
 }
 fun Byte.toUlong() = java.lang.Byte.toUnsignedLong(this)
 fun Byte.toUint() = java.lang.Byte.toUnsignedInt(this)
+
+fun ByteArray.writeBigInt16(value: Int, offset: Int = 0) {
+        for (i in 0..1) {
+                this[i + offset] = value.shr((1 - i) * 8).toByte()
+        }
+}
+
+fun ByteArray.writeBigInt24(value: Int, offset: Int = 0) {
+        for (i in 0..2) {
+                this[i + offset] = value.shr((2 - i) * 8).toByte()
+        }
+}
+
+fun ByteArray.writeBigInt32(value: Int, offset: Int = 0) {
+        for (i in 0..3) {
+                this[i + offset] = value.shr((3 - i) * 8).toByte()
+        }
+}
+
+fun ByteArray.writeBigInt48(value: Long, offset: Int = 0) {
+        for (i in 0..5) {
+                this[i + offset] = value.shr((5 - i) * 8).toByte()
+        }
+}
+
+fun ByteArray.writeBigInt64(value: Long, offset: Int = 0) {
+        for (i in 0..7) {
+                this[i + offset] = value.shr((7 - i) * 8).toByte()
+        }
+}

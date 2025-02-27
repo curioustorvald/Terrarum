@@ -178,7 +178,7 @@ open class GameWorld(
         it[Fluid.NULL] = 0
     }*/
 
-    val extraFields = HashMap<String, Any?>()
+    val extraFields = HashMap<String, TerrarumSavegameExtrafieldSerialisable?>()
 
     // NOTE: genver was here but removed: genver will be written by manually editing the serialising JSON. Reason: the 'genver' string must be found on a fixed offset on the file.
     internal var comp = -1 // only gets used when the game saves and loads
