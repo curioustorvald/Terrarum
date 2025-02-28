@@ -1,8 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
-import net.torvald.terrarum.serialise.toBigInt32
-import net.torvald.terrarum.serialise.toUint
-import net.torvald.terrarum.serialise.writeBigInt32
+import net.torvald.terrarum.serialise.*
 import java.util.zip.CRC32
 
 /**
@@ -42,6 +40,11 @@ import java.util.zip.CRC32
  * - (Bytes) The actual data
  * - (Byte4) CRC-32 of the actual data
  *
+ * ## Acknowledgement
+ *
+ * - (Byte4) Receiver MAC address
+ * - (Byte2) Optional status, should be set to 0 if not used; value of 65535 (all bits set) is reserved for negative acknowledgement
+ *
  * Created by minjaesong on 2025-02-27.
  */
 data class IngameNetPacket(val byteArray: ByteArray) {
@@ -50,6 +53,7 @@ data class IngameNetPacket(val byteArray: ByteArray) {
         return when (byteArray.first().toUint()) {
             0xff -> "token"
             0xaa -> "data"
+            0x55 -> "ack"//nowledgement
             0xee -> "abort"
             0x99 -> "ballot"
             0x00 -> "invalid"
@@ -59,6 +63,8 @@ data class IngameNetPacket(val byteArray: ByteArray) {
 
     private fun checkIsToken() { if (getFrameType() != "token") throw Error() }
     private fun checkIsData() { if (getFrameType() != "data") throw Error() }
+    private fun checkIsAck() { if (getFrameType() != "ack") throw Error() }
+    private fun checkIsDataOrAck() { if (getFrameType() != "data" && getFrameType() != "ack") throw Error() }
     private fun checkIsAbort() { if (getFrameType() != "abort") throw Error() }
     private fun checkIsBallot() { if (getFrameType() != "ballot") throw Error() }
 
@@ -74,7 +80,7 @@ data class IngameNetPacket(val byteArray: ByteArray) {
 
     fun shouldIintercept(mac: Int) = when (getFrameType()) {
         "ballot" -> (getBallot() < mac)
-        "data" -> (getDataRecipient() == mac)
+        "data", "ack" -> (getDataRecipient() == mac)
         else -> false
     }
 
@@ -91,8 +97,13 @@ data class IngameNetPacket(val byteArray: ByteArray) {
         return if (crc != crc0) null else ret
     }
 
+    fun getAckStatus(): Int {
+        checkIsAck()
+        return byteArray.toBigInt16(10)
+    }
+
     fun getDataRecipient(): Int {
-        checkIsData()
+        checkIsDataOrAck()
         return byteArray.toBigInt32(6)
     }
 
@@ -116,6 +127,12 @@ data class IngameNetPacket(val byteArray: ByteArray) {
             System.arraycopy(data, 0, it, 14, data.size)
             val crc = CRC32().also { it.update(data) }.value.toInt()
             it.writeBigInt32(crc, 14 + data.size)
+        }
+
+        fun makeAck(sender: Int, recipient: Int, status: Int = 0) = ByteArray(12).also {
+            it.makeHeader(0x55, sender)
+            it.writeBigInt32(recipient, 6)
+            it.writeBigInt16(status, 10)
         }
     }
 
