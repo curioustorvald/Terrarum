@@ -98,6 +98,7 @@ open class Electric : FixtureBase {
     /** Triggered when 'digital_bit' is held low. This function WILL NOT be triggered simultaneously with the falling edge. Level detection only considers the real component (labeled as 'x') of the vector */
     //open fun onSignalLow(readFrom: BlockBoxIndex) {}
 
+    // called right after `onRisingEdge` and `onFallingEdge` in the `updateImpl`
     open fun updateSignal() {}
 
     fun getWireStateAt(offsetX: Int, offsetY: Int, sinkType: WireEmissionType): Vector2 {

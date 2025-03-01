@@ -11,7 +11,7 @@ import java.util.zip.CRC32
  * ## The Header
  *
  * - (Byte1) Frame Type
- *      - 00 : invalid
+ *      - 00 : invalid (mark the packet as "to be destroyed" by game)
  *      - FF : token (an "empty" packet for a Token Ring)
  *      - AA : data
  *      - EE : abort
@@ -107,6 +107,10 @@ data class IngameNetPacket(val byteArray: ByteArray) {
         return byteArray.toBigInt32(6)
     }
 
+    fun discardPacket() {
+        byteArray[0] = 0
+    }
+
     companion object {
         private fun ByteArray.makeHeader(frameType: Int, mac: Int): ByteArray {
             this[0] = frameType.toByte()
@@ -114,26 +118,26 @@ data class IngameNetPacket(val byteArray: ByteArray) {
             return this
         }
 
-        fun makeToken(mac: Int) = ByteArray(5).makeHeader(0xff, mac)
+        fun makeToken(mac: Int) = IngameNetPacket(ByteArray(5).makeHeader(0xff, mac))
 
-        fun makeAbort(mac: Int) = ByteArray(5).makeHeader(0xee, mac)
+        fun makeAbort(mac: Int) = IngameNetPacket(ByteArray(5).makeHeader(0xee, mac))
 
-        fun makeBallot(mac: Int) = ByteArray(9).makeHeader(0x99, mac)
+        fun makeBallot(mac: Int) = IngameNetPacket(ByteArray(9).makeHeader(0x99, mac))
 
-        fun makeData(sender: Int, recipient: Int, data: ByteArray) = ByteArray(18 + data.size).also {
+        fun makeData(sender: Int, recipient: Int, data: ByteArray) = IngameNetPacket(ByteArray(18 + data.size).also {
             it.makeHeader(0xaa, sender)
             it.writeBigInt32(recipient, 6)
             it.writeBigInt32(data.size, 10)
             System.arraycopy(data, 0, it, 14, data.size)
             val crc = CRC32().also { it.update(data) }.value.toInt()
             it.writeBigInt32(crc, 14 + data.size)
-        }
+        })
 
-        fun makeAck(sender: Int, recipient: Int, status: Int = 0) = ByteArray(12).also {
+        fun makeAck(sender: Int, recipient: Int, status: Int = 0) = IngameNetPacket(ByteArray(12).also {
             it.makeHeader(0x55, sender)
             it.writeBigInt32(recipient, 6)
             it.writeBigInt16(status, 10)
-        }
+        })
     }
 
 }

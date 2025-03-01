@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.gameworld.TerrarumSavegameExtrafieldSerialisable
 import java.util.TreeMap
 
@@ -10,6 +11,8 @@ import java.util.TreeMap
  */
 class PacketRunner : TerrarumSavegameExtrafieldSerialisable {
 
+    @Transient private val rng = HQRNG()
+
     private val ledger = TreeMap<Int, IngameNetPacket>()
 
     operator fun set(id: Int, packet: IngameNetPacket) {
@@ -18,5 +21,15 @@ class PacketRunner : TerrarumSavegameExtrafieldSerialisable {
 
     operator fun get(id: Int) = ledger[id]!!
 
+    fun addPacket(packet: IngameNetPacket): Int {
+        var i = rng.nextInt()
+        while (ledger.containsKey(i)) {
+            i = rng.nextInt()
+        }
+
+        ledger[i] = packet
+
+        return i
+    }
 }
 
