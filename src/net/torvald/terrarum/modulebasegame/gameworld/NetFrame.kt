@@ -130,11 +130,6 @@ data class NetFrame(val byteArray: ByteArray) {
 
         fun makeBallot(mac: Int) = NetFrame(ByteArray(9).makeHeader(0x99, mac))
 
-        fun makeWinnerAnnouncement(mac: Int) = NetFrame(ByteArray(9).makeHeader(0x99, mac).also {
-            it[1] = 1
-            it.writeBigInt32(mac, 6)
-        })
-
         fun makeData(sender: Int, recipient: Int, data: ByteArray) = NetFrame(ByteArray(18 + data.size).also {
             it.makeHeader(0xaa, sender)
             it.writeBigInt32(recipient, 6)

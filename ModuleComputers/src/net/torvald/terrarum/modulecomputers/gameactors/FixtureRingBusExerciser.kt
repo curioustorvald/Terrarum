@@ -22,6 +22,7 @@ class FixtureRingBusExerciser : Electric {
     private val mac = rng.nextInt()
 
     companion object {
+        const val INITIAL_LISTENING_TIMEOUT = 300
         const val SIGNAL_TOO_WEAK_THRESHOLD = 1.0 / 16.0
     }
 
@@ -52,12 +53,20 @@ class FixtureRingBusExerciser : Electric {
     private var statusAbort = false // will "eat away" any receiving frames unless the frame is a ballot frame
     private var activeMonitorStatus = 0 // 0: unknown, 1: known and not me, 2: known and it's me
 
+    private var lastAccessTime = -1L
+
     override fun updateSignal() {
+        val time_t = INGAME.world.worldTime.TIME_T
+        if (lastAccessTime == -1L) lastAccessTime = time_t
+
+
         // monitor the input port
         val inn = getWireStateAt(1, 0, "10base2")
 
         // if a signal is there
         if (inn.x >= SIGNAL_TOO_WEAK_THRESHOLD) {
+            lastAccessTime = time_t
+
             val frameNumber = (inn.y + (0.5 * inn.y.sign)).toInt()
 
             if (frameNumber != 0) { // frame number must be non-zero
@@ -67,6 +76,12 @@ class FixtureRingBusExerciser : Electric {
                     try {
                         val frame = getFrameByNumber(frameNumber)
 
+                        // fast init (voting) cancellation, if applicable
+                        if (activeMonitorStatus == 0 && frame.getFrameType() == "token") {
+                            activeMonitorStatus = 1
+                        }
+
+                        // if I have a message to send or the frame should be captured, do something with it
                         if (msgQueue.notEmpty() || frame.shouldIintercept(mac)) {
                             // do something with the received frame
                             val newFrame = doSomethingWithFrame(frame) ?: frameNumber
@@ -77,14 +92,14 @@ class FixtureRingBusExerciser : Electric {
                                 frame.discardFrame()
                             }
                         }
+                        // else, just pass it along
                         else {
                             setWireEmissionAt(0, 0, Vector2(1.0, frameNumber.toDouble()))
                         }
                     }
                     // frame lost due to poor savegame migration or something: send out ABORT signal
                     catch (e: NullPointerException) {
-                        val abortFrame = NetFrame.makeAbort(mac)
-                        emitNewFrame(abortFrame)
+                        emitNewFrame(NetFrame.makeAbort(mac))
                         statusAbort = true
                     }
                 }
@@ -137,6 +152,14 @@ class FixtureRingBusExerciser : Electric {
         // if a signal is not there
         else {
             setWireEmissionAt(0, 0, Vector2())
+
+            // if no-signal for 5 in-game minutes (around 5 real-life seconds)
+            if (time_t - lastAccessTime > INITIAL_LISTENING_TIMEOUT) {
+                // initialise the voting process
+                activeMonitorStatus = 0
+                emitNewFrame(NetFrame.makeBallot(mac))
+                lastAccessTime = time_t
+            }
         }
     }
 
@@ -165,8 +188,7 @@ class FixtureRingBusExerciser : Electric {
         val (recipient, msgStr) = msgQueue.removeFirst()
         val msgByte = msgStr.toByteArray(Common.CHARSET)
 
-        val newFrame = NetFrame.makeData(mac, recipient, msgByte)
-        return emitNewFrame(newFrame)
+        return emitNewFrame(NetFrame.makeData(mac, recipient, msgByte))
     }
 
     protected fun doSomethingWithData(incomingFrame: NetFrame): Int? {
@@ -177,8 +199,7 @@ class FixtureRingBusExerciser : Electric {
             msgLog.addLast(rec to (str ?: "(null)"))
 
             // make ack
-            val ack = NetFrame.makeAck(mac, incomingFrame.getSender())
-            return emitNewFrame(ack)
+            return emitNewFrame(NetFrame.makeAck(mac, incomingFrame.getSender()))
         }
         else return null
     }
@@ -201,8 +222,7 @@ class FixtureRingBusExerciser : Electric {
             }
 
             // make an empty token
-            val token = NetFrame.makeToken(mac)
-            return emitNewFrame(token)
+            return emitNewFrame(NetFrame.makeToken(mac))
         }
         else return null
     }
@@ -222,9 +242,8 @@ class FixtureRingBusExerciser : Electric {
                 if (incomingFrame.getSender() == mac && incomingFrame.getBallot() == mac) {
                     activeMonitorStatus = 2
 
-                    // send out winner announcement
-                    val win = NetFrame.makeWinnerAnnouncement(mac)
-                    return emitNewFrame(win)
+                    // send out first empty token
+                    return emitNewFrame(NetFrame.makeToken(mac))
                 }
             }
             // if i'm in the winner announcement phase, kill the frame
