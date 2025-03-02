@@ -40,11 +40,18 @@ class FixtureRingBusExerciser : Electric {
 
     init {
         setEmitterAndSink()
+
+        if (!INGAME.world.extraFields.containsKey("tokenring")) {
+            INGAME.world.extraFields["tokenring"] = NetRunner()
+        }
     }
 
     override fun reload() {
         super.reload()
         setEmitterAndSink()
+        if (!INGAME.world.extraFields.containsKey("tokenring")) {
+            INGAME.world.extraFields["tokenring"] = NetRunner()
+        }
     }
 
     private val msgQueue = Queue<Pair<Int, String>>()

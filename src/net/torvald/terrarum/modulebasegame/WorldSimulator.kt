@@ -69,11 +69,6 @@ object WorldSimulator {
     private val world: GameWorld
             get() = ingame.world
 
-
-    fun resetForThisFrame() {
-
-    }
-
     private val rng = HQRNG()
 
     /** Must be called BEFORE the actors update -- actors depend on the R-Tree for various things */

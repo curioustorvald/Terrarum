@@ -19,6 +19,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.TerrarumWorldWatchdog
 import net.torvald.terrarum.modulebasegame.gameitems.BlockBase
 import net.torvald.terrarum.modulebasegame.worldgenerator.OregenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
@@ -890,6 +891,14 @@ object ModMgr {
 
         @JvmStatic fun register(uiCreationFun: (TerrarumIngame) -> UICanvas) {
             guis.add(uiCreationFun)
+        }
+    }
+
+    object GameWatchdogLoader {
+        internal val watchdogs = TreeMap<String, TerrarumWorldWatchdog>()
+
+        @JvmStatic fun register(moduleName: String, watchdog: TerrarumWorldWatchdog) {
+            watchdogs["$moduleName.${watchdog.javaClass.simpleName}"] = watchdog
         }
     }
 }

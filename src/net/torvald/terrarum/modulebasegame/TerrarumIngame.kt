@@ -668,6 +668,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             uiContainer.add(it(this))
         }
 
+        ModMgr.GameWatchdogLoader.watchdogs.forEach {
+            registerWatchdog(it.key, it.value)
+        }
+
         // these need to appear on top of any others
         uiContainer.add(notifier)
 
@@ -878,6 +882,12 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private var deltaTeeCleared = false
 
+    private val terrarumWorldWatchdogs = TreeMap<String, TerrarumWorldWatchdog>()
+
+    fun registerWatchdog(identifier: String, watchdog: TerrarumWorldWatchdog) {
+        terrarumWorldWatchdogs[identifier] = watchdog
+    }
+
     /**
      * Ingame (world) related updates; UI update must go to renderGame()
      */
@@ -895,8 +905,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         if ((!paused && !App.isScreenshotRequested()) || newWorldLoadedLatch) {
 
             //hypothetical_input_capturing_function_if_you_finally_decided_to_forgo_gdx_input_processor_and_implement_your_own_to_synchronise_everything()
-
-            WorldSimulator.resetForThisFrame()
 
 
             ////////////////////////////
@@ -962,6 +970,13 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 if (WORLD_UPDATE_TIMER % 2 == 0L) {
                     val fixtures = INGAME.actorContainerActive.filterIsInstance<Electric>()
                     fillUpWirePortsView(fixtures)
+                }
+            }
+            terrarumWorldWatchdogs.entries.forEach {
+                measureDebugTime("Ingame.Watchdog.${it.key}*") {
+                    if (WORLD_UPDATE_TIMER % it.value.runIntervalByTick.toLong() == 0L) {
+                        it.value(world)
+                    }
                 }
             }
             oldCamX = WorldCamera.x

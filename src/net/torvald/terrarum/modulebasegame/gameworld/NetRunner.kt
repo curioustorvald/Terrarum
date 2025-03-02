@@ -31,5 +31,11 @@ class NetRunner : TerrarumSavegameExtrafieldSerialisable {
 
         return i
     }
+
+    fun purgeDeadFrames() {
+        ledger.filter { it.value.getFrameType() == "invalid" }.map { it.key }.forEach {
+            ledger.remove(it)
+        }
+    }
 }
 
