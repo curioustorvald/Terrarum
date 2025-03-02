@@ -9,25 +9,25 @@ import java.util.TreeMap
  *
  * Created by minjaesong on 2025-02-27.
  */
-class PacketRunner : TerrarumSavegameExtrafieldSerialisable {
+class NetRunner : TerrarumSavegameExtrafieldSerialisable {
 
     @Transient private val rng = HQRNG()
 
-    private val ledger = TreeMap<Int, IngameNetPacket>()
+    private val ledger = TreeMap<Int, NetFrame>()
 
-    operator fun set(id: Int, packet: IngameNetPacket) {
+    operator fun set(id: Int, packet: NetFrame) {
         ledger[id] = packet
     }
 
     operator fun get(id: Int) = ledger[id]!!
 
-    fun addPacket(packet: IngameNetPacket): Int {
+    fun addFrame(frame: NetFrame): Int {
         var i = rng.nextInt()
         while (ledger.containsKey(i)) {
             i = rng.nextInt()
         }
 
-        ledger[i] = packet
+        ledger[i] = frame
 
         return i
     }
