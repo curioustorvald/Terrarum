@@ -4,12 +4,10 @@ import com.badlogic.gdx.utils.Queue
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Point2i
-import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.BlockBox
 import net.torvald.terrarum.modulebasegame.gameactors.Electric
 import net.torvald.terrarum.modulebasegame.gameworld.NetFrame
 import net.torvald.terrarum.modulebasegame.gameworld.NetRunner
-import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
 import org.dyn4j.geometry.Vector2
 import kotlin.math.sign
@@ -72,10 +70,18 @@ open class FixtureRingBusCore : Electric {
 
     private var lastAccessTime = -1L
 
+    private enum class RingBusState {
+        NORMAL,
+        ABORT,
+        ELECTING,
+        ELECTED_MONITOR
+    }
+
+    private var currentState = RingBusState.NORMAL
+
     override fun updateSignal() {
         val time_t = INGAME.world.worldTime.TIME_T
         if (lastAccessTime == -1L) lastAccessTime = time_t
-
 
         // monitor the input port
         val inn = getWireStateAt(1, 0, "10base2")
@@ -83,100 +89,97 @@ open class FixtureRingBusCore : Electric {
         // if a signal is there
         if (inn.x >= SIGNAL_TOO_WEAK_THRESHOLD) {
             lastAccessTime = time_t
-
             val frameNumber = (inn.y + (0.5 * inn.y.sign)).toInt()
 
             if (frameNumber != 0) { // frame number must be non-zero
-                // if not in abort state, process the incoming frames
-                if (!statusAbort) {
-                    // fetch frame from the world
-                    try {
-                        val frame = getFrameByNumber(frameNumber)
-
-                        // fast init (voting) cancellation, if applicable
-                        if (activeMonitorStatus == 0 && frame.getFrameType() == "token") {
-                            activeMonitorStatus = 1
-                        }
-
-                        // if I have a message to send or the frame should be captured, do something with it
-                        if (msgQueue.notEmpty() || frame.shouldIintercept(mac)) {
-                            // do something with the received frame
-                            val newFrame = doSomethingWithFrame(frame) ?: frameNumber
-                            setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, newFrame.toDouble()))
-
-                            // if the "do something" processs returns a new frame, mark the old frame as to be destroyed
-                            if (newFrame != frameNumber) {
-                                frame.discardFrame()
-                            }
-                        }
-                        // else, just pass it along
-                        else {
-                            setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, frameNumber.toDouble()))
-                        }
-                    }
-                    // frame lost due to poor savegame migration or something: send out ABORT signal
-                    catch (e: NullPointerException) {
-                        emitNewFrame(NetFrame.makeAbort(mac))
-                        statusAbort = true
-                    }
-                }
-                // else, still watch for the new valid token
-                else {
-                    // fetch frame from the world
-                    try {
-                        val frame = getFrameByNumber(frameNumber)
-
-                        // not an Active Monitor
-                        if (activeMonitorStatus < 2) {
-                            if (frame.getFrameType() == "token") {
-                                // unlock myself and pass the token
-                                statusAbort = false
-                                setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, frameNumber.toDouble()))
-                            }
-                            else if (frame.getFrameType() == "abort") {
-                                // lock myself (just in case) and pass the token
-                                statusAbort = true
-                                setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, frameNumber.toDouble()))
-                            }
-                            else {
-                                // discard anything that is not a token or yet another abort
-                                setWireEmissionAt(portEmit.x, portEmit.y, Vector2())
-                            }
-                        }
-                        // am Active Monitor
-                        else {
-                            if (frame.getFrameType() == "abort") {
-                                // send out a new token
-                                emitNewFrame(NetFrame.makeToken(mac))
-                                statusAbort = false
-                            }
-                            else {
-                                // discard anything that is not an abort
-                                setWireEmissionAt(portEmit.x, portEmit.y, Vector2())
-                            }
-                        }
-                    }
-                    // frame lost due to poor savegame migration or something: discard token
-                    catch (e: NullPointerException) {
-                        setWireEmissionAt(portEmit.x, portEmit.y, Vector2())
-                    }
-                }
-            }
-            else {
+                processFrameBasedOnState(frameNumber)
+            } else {
                 setWireEmissionAt(portEmit.x, portEmit.y, Vector2())
             }
+        } else {
+            handleNoSignal(time_t)
         }
-        // if a signal is not there
-        else {
-            setWireEmissionAt(portEmit.x, portEmit.y, Vector2())
+    }
 
-            // if no-signal for 5 in-game minutes (around 5 real-life seconds)
-            if (time_t - lastAccessTime > INITIAL_LISTENING_TIMEOUT) {
-                // initialise the voting process
-                activeMonitorStatus = 0
-                emitNewFrame(NetFrame.makeBallot(mac))
-                lastAccessTime = time_t
+    private fun processFrameBasedOnState(frameNumber: Int) {
+        try {
+            val frame = getFrameByNumber(frameNumber)
+
+            when (currentState) {
+                RingBusState.NORMAL -> handleNormalState(frame, frameNumber)
+                RingBusState.ABORT -> handleAbortState(frame, frameNumber)
+                RingBusState.ELECTING -> handleElectingState(frame, frameNumber)
+                RingBusState.ELECTED_MONITOR -> handleElectedMonitorState(frame, frameNumber)
             }
+        } catch (e: NullPointerException) {
+            handleFrameLoss()
+        }
+    }
+
+    private fun handleNormalState(frame: NetFrame, frameNumber: Int) {
+        if (msgQueue.notEmpty() || frame.shouldIintercept(mac)) {
+            val newFrame = doSomethingWithFrame(frame) ?: frameNumber
+            setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, newFrame.toDouble()))
+
+            if (newFrame != frameNumber) {
+                frame.discardFrame()
+            }
+        } else {
+            setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, frameNumber.toDouble()))
+        }
+    }
+
+    private fun handleAbortState(frame: NetFrame, frameNumber: Int) {
+        if (frame.getFrameType() == "token") {
+            currentState = RingBusState.NORMAL
+            setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, frameNumber.toDouble()))
+        } else if (frame.getFrameType() == "abort") {
+            setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, frameNumber.toDouble()))
+        } else {
+            setWireEmissionAt(portEmit.x, portEmit.y, Vector2())
+        }
+    }
+
+    private fun handleElectingState(frame: NetFrame, frameNumber: Int) {
+        if (frame.getFrameType() == "ballot") {
+            if (frame.getBallot() < mac) {
+                frame.setBallot(mac)
+            }
+
+            if (frame.getSender() == mac && frame.getBallot() == mac) {
+                currentState = RingBusState.ELECTED_MONITOR
+                val newFrame = emitNewFrame(NetFrame.makeToken(mac))
+                setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, newFrame.toDouble()))
+            } else {
+                setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, frameNumber.toDouble()))
+            }
+        } else {
+            setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, frameNumber.toDouble()))
+        }
+    }
+
+    private fun handleElectedMonitorState(frame: NetFrame, frameNumber: Int) {
+        if (frame.getFrameType() == "abort") {
+            val newFrame = emitNewFrame(NetFrame.makeToken(mac))
+            currentState = RingBusState.NORMAL
+            setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, newFrame.toDouble()))
+        } else {
+            setWireEmissionAt(portEmit.x, portEmit.y, Vector2())
+        }
+    }
+
+    private fun handleFrameLoss() {
+        emitNewFrame(NetFrame.makeAbort(mac))
+        currentState = RingBusState.ABORT
+    }
+
+    private fun handleNoSignal(time_t: Long) {
+        setWireEmissionAt(portEmit.x, portEmit.y, Vector2())
+
+        if (time_t - lastAccessTime > INITIAL_LISTENING_TIMEOUT) {
+            currentState = RingBusState.ELECTING
+            emitNewFrame(NetFrame.makeBallot(mac))
+            lastAccessTime = time_t
         }
     }
 
