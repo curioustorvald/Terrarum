@@ -144,6 +144,18 @@ data class NetFrame(val byteArray: ByteArray) {
             it.writeBigInt32(recipient, 6)
             it.writeBigInt16(status, 10)
         })
+
+        fun Int.toMAC() = this.ushr(16).toString(16).uppercase().padStart(4,'0') + "." + this.and(65535).toString(16).uppercase().padStart(4,'0')
     }
 
+
+    override fun toString(): String {
+        val frameType = getFrameType()
+        return "Frame($frameType[${getFrameNumber()}] from ${getSender().toMAC()})" + when (frameType) {
+            "data" -> ": to ${getDataRecipient().toMAC()}, datagram size: ${byteArray.size - 18} bytes"
+            "ack" -> ": to ${getDataRecipient().toMAC()}"
+            "ballot" -> ": current candidate: ${getBallot().toMAC()}"
+            else -> ""
+        }
+    }
 }
