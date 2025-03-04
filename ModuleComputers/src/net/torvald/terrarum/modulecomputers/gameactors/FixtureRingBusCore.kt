@@ -31,10 +31,9 @@ open class FixtureRingBusCore : Electric {
     private var portEmit = Point2i(0, 0)
     private var portSink = Point2i(1, 0)
     
-    constructor(portEmit: Point2i, portSink: Point2i, blockBox: BlockBox, nameFun: () -> String, mainUI: UICanvas?) : super(
+    constructor(portEmit: Point2i, portSink: Point2i, blockBox: BlockBox, nameFun: () -> String) : super(
         blockBox0 = blockBox,
         nameFun = nameFun,
-        mainUI = mainUI
     ) {
         this.portEmit = portEmit
         this.portSink = portSink
@@ -74,7 +73,7 @@ open class FixtureRingBusCore : Electric {
         NORMAL,
         ABORT,
         ELECTING,
-        ELECTED_MONITOR
+        IVE_GOT_ELECTED
     }
 
     private var currentState = RingBusState.NORMAL
@@ -109,7 +108,7 @@ open class FixtureRingBusCore : Electric {
                 RingBusState.NORMAL -> handleNormalState(frame, frameNumber)
                 RingBusState.ABORT -> handleAbortState(frame, frameNumber)
                 RingBusState.ELECTING -> handleElectingState(frame, frameNumber)
-                RingBusState.ELECTED_MONITOR -> handleElectedMonitorState(frame, frameNumber)
+                RingBusState.IVE_GOT_ELECTED -> handleIveGotElectedState(frame, frameNumber)
             }
         } catch (e: NullPointerException) {
             handleFrameLoss()
@@ -147,7 +146,8 @@ open class FixtureRingBusCore : Electric {
             }
 
             if (frame.getSender() == mac && frame.getBallot() == mac) {
-                currentState = RingBusState.ELECTED_MONITOR
+                currentState = RingBusState.IVE_GOT_ELECTED
+                // elected Active Monitor sends out the first token
                 val newFrame = emitNewFrame(NetFrame.makeToken(mac))
                 setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, newFrame.toDouble()))
             } else {
@@ -158,12 +158,15 @@ open class FixtureRingBusCore : Electric {
         }
     }
 
-    private fun handleElectedMonitorState(frame: NetFrame, frameNumber: Int) {
+    private fun handleIveGotElectedState(frame: NetFrame, frameNumber: Int) {
         if (frame.getFrameType() == "abort") {
+            // immediately return to normal state
             val newFrame = emitNewFrame(NetFrame.makeToken(mac))
             currentState = RingBusState.NORMAL
             setWireEmissionAt(portEmit.x, portEmit.y, Vector2(1.0, newFrame.toDouble()))
         } else {
+            // make sure to skip a turn after the election, even if the NIC has something to send out
+            currentState = RingBusState.NORMAL
             setWireEmissionAt(portEmit.x, portEmit.y, Vector2())
         }
     }
