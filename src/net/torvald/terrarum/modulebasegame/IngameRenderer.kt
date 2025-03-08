@@ -524,8 +524,8 @@ object IngameRenderer : Disposable {
                 batch.shader = shaderForActors
                 batch.color = Color.WHITE
                 moveCameraToWorldCoord()
-                actorsRenderFarBehind?.forEach { it.drawBody(frameDelta, batch) }
-                actorsRenderBehind?.forEach { it.drawBody(frameDelta, batch) }
+                actorsRenderFarBehind?.forEach { it.drawBody1(frameDelta, batch) }
+                actorsRenderBehind?.forEach { it.drawBody1(frameDelta, batch) }
             }
         }
         BlurMgr.makeBlurSmall(fboRGBactorsBehind, fboRGBactorsBehindShadow, 1f)
@@ -539,7 +539,7 @@ object IngameRenderer : Disposable {
                 batch.shader = shaderForActors
                 batch.color = Color.WHITE
                 moveCameraToWorldCoord()
-                actorsRenderMiddle?.forEach { it.drawBody(frameDelta, batch) }
+                actorsRenderMiddle?.forEach { it.drawBody1(frameDelta, batch) }
             }
         }
         BlurMgr.makeBlur(fboRGBactorsMiddle, fboRGBactorsMiddleShadow, 2.5f)
@@ -628,9 +628,9 @@ object IngameRenderer : Disposable {
                 batch.drawFlipped(fboRGBactorsMiddle.colorBufferTexture, 0f, 0f)
 
                 moveCameraToWorldCoord()
-                actorsRenderMidTop?.forEach { it.drawBody(frameDelta, batch) }
-                player?.drawBody(frameDelta, batch)
-                actorsRenderFront?.forEach { it.drawBody(frameDelta, batch) }
+                actorsRenderMidTop?.forEach { it.drawBody1(frameDelta, batch) }
+                player?.drawBody1(frameDelta, batch)
+                actorsRenderFront?.forEach { it.drawBody1(frameDelta, batch) }
                 // --> Change of blend mode <-- introduced by children of ActorWithBody //
             }
 
@@ -859,7 +859,7 @@ object IngameRenderer : Disposable {
 
                 moveCameraToWorldCoord()
                 actors?.forEach {
-                    it.drawBody(frameDelta, batch)
+                    it.drawBody1(frameDelta, batch)
                 }
             }
 

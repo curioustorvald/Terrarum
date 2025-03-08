@@ -19,7 +19,7 @@ open class FixtureRingBusCore : Electric {
 
     @Transient private val rng = HQRNG()
 
-    private val mac = rng.nextInt()
+    val mac = rng.nextInt()
 
     companion object {
         const val INITIAL_LISTENING_TIMEOUT = 300
@@ -64,14 +64,16 @@ open class FixtureRingBusCore : Electric {
     internal val msgQueue = Queue<Pair<Int, ByteArray>>()
     internal val msgLog = Queue<Pair<Int, NetFrame>>()
 
-    private var statusAbort = false // will "eat away" any receiving frames unless the frame is a ballot frame
+    private var statusAbort = false
     private var activeMonitorStatus = 0 // 0: unknown, 1: known and not me, 2: known and it's me
 
     private var lastAccessTime = -1L
 
+    open protected val ringBusFirmware = RingBusFirmware(0)
+
     private enum class RingBusState {
         NORMAL,
-        ABORT,
+        ABORT, // will "eat away" any receiving frames unless the frame is a ballot frame
         ELECTING,
         IVE_GOT_ELECTED
     }
@@ -219,8 +221,12 @@ open class FixtureRingBusCore : Electric {
         if (rec == mac) {
             msgLog.addLast(rec to incomingFrame)
 
+            val datagramme = incomingFrame.getDataContents()
+
+            val (ret, nextMsg) = if (datagramme == null) (-1 to null) else ringBusFirmware.workWithDataFrame(mac, datagramme)
+
             // make ack
-            return emitNewFrame(NetFrame.makeAck(mac, incomingFrame.getSender()))
+            return emitNewFrame(NetFrame.makeAck(mac, incomingFrame.getSender(), ret))
         }
         else return null
     }

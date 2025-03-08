@@ -13,6 +13,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
+import net.torvald.terrarum.gameactors.ActorWithBody.Companion.PHYS_EPSILON_DIST
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.createRandomBlockParticle
@@ -1860,6 +1861,11 @@ open class ActorWithBody : Actor {
             BlendMode.resolve(drawMode, batch)
             drawSpriteInGoodPosition(frameDelta, sprite!!, batch)
         }
+    }
+
+    
+    internal fun drawBody1(frameDelta: Float, batch: SpriteBatch) {
+        drawBody(frameDelta, batch)
 
         // debug display of hIntTilewiseHitbox
         if (KeyToggler.isOn(Input.Keys.F9)) {
@@ -1869,8 +1875,8 @@ open class ActorWithBody : Actor {
                 batch.color = if (y == intTilewiseHitbox.height.toInt() + 1) HITBOX_COLOURS1 else HITBOX_COLOURS0
                 for (x in 0..intTilewiseHitbox.width.toInt()) {
                     batch.draw(blockMark,
-                            (intTilewiseHitbox.startX.toFloat() + x) * TILE_SIZEF,
-                            (intTilewiseHitbox.startY.toFloat() + y) * TILE_SIZEF
+                        (intTilewiseHitbox.startX.toFloat() + x) * TILE_SIZEF,
+                        (intTilewiseHitbox.startY.toFloat() + y) * TILE_SIZEF
                     )
                 }
             }
@@ -1909,6 +1915,22 @@ open class ActorWithBody : Actor {
             batch.color = oldCol
         }
     }
+
+    fun drawUsingDrawFunInGoodPosition(frameDelta: Float, drawFun: (x: Float, y: Float) -> Unit) {
+        if (world == null) return
+
+        val offsetX = 0f
+        val offsetY = 0f // for some reason this value must be zero to draw the actor planted to the ground
+
+        val posX = hitbox.startX.plus(PHYS_EPSILON_DIST).toFloat()
+        val posY = hitbox.startY.plus(PHYS_EPSILON_DIST).toFloat()
+
+        drawBodyInGoodPosition(posX, posY) { x, y ->
+            drawFun(posX + offsetX + x, posY + offsetY + y)
+        }
+    }
+
+
 
     override fun onActorValueChange(key: String, value: Any?) {
         // do nothing
