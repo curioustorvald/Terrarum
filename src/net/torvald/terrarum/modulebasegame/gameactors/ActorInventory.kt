@@ -96,7 +96,7 @@ class ActorInventory() : FixtureInventory() {
         }
     }
 
-    fun getQuickslotItem(slot: Int): InventoryPair? = searchByID(quickSlot[slot])
+    fun getQuickslotItem(slot: Int?): InventoryPair? = if (slot == null) null else searchByID(quickSlot[slot])
 
     fun consumeItem(item: GameItem, amount: Long = 1L) {
         val actor = this.actor as Actor

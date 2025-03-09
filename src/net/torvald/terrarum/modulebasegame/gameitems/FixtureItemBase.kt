@@ -3,12 +3,10 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
-import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -107,7 +105,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     }
 
     override fun startSecondaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
-        (INGAME as TerrarumIngame).pickupFixture(actor, delta, mwx, mwy, mtx, mty, false)
+        (INGAME as TerrarumIngame).pickupFixtureOrDroppedItem(actor, delta, mwx, mwy, mtx, mty, false)
         -1
     }
 

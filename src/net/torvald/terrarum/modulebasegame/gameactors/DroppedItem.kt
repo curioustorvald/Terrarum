@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.*
@@ -39,7 +38,9 @@ class DroppedItem : ActorWithBody {
 
     private var timeSinceSpawned = 0f
 
-    fun canBePickedUp() = timeSinceSpawned > NO_PICKUP_TIME && !flagDespawn
+    var noAutoPickup = false
+
+    fun canBePickedUpAutomatically() = !noAutoPickup && timeSinceSpawned > NO_PICKUP_TIME && !flagDespawn
 
     private val randKey1 = (Math.random() * 256).toInt()
     private val randKey2 = (Math.random() * 256).toInt()
@@ -53,7 +54,7 @@ class DroppedItem : ActorWithBody {
      * @param topLeftX world-wise coord
      * @param topLeftY world-wise coord
      */
-    constructor(itemID: ItemID, centreX: Double, bottomY: Double, spawnVelo: Vector2? = null) : super(RenderOrder.OVERLAY, PhysProperties.PHYSICS_OBJECT()) {
+    constructor(itemID: ItemID, centreX: Double, bottomY: Double, spawnVelo: Vector2? = null, noAutoPickup: Boolean = false) : super(RenderOrder.OVERLAY, PhysProperties.PHYSICS_OBJECT()) {
         this.itemID = itemID
 
         if (itemID.isActor())
@@ -94,6 +95,8 @@ class DroppedItem : ActorWithBody {
 //        printdbg(this, "DroppedItem with itemID '${itemID}'")
 
         physProp.ignorePlatform = false
+
+        this.noAutoPickup = noAutoPickup
     }
 
 

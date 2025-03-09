@@ -195,7 +195,7 @@ object WorldSimulator {
     fun collideDroppedItems() {
         ingame.actorContainerActive.filter { it is DroppedItem }.forEach { droppedItem0 ->
             val droppedItem = droppedItem0 as DroppedItem
-            if (droppedItem.canBePickedUp()) {
+            if (droppedItem.canBePickedUpAutomatically()) {
                 val actors = ingame.findKNearestActors(droppedItem0 as ActorWithBody, 64) { it is Controllable && it is Pocketed }
                 for (result in actors) {
                     val actor = result.get()

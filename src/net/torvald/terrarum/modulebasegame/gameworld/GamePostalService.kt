@@ -12,6 +12,7 @@ import kotlin.math.ceil
  */
 class GamePostalService : TerrarumSavegameExtrafieldSerialisable {
 
+    internal val centralPostbox = ArrayList<Post>()
 
     companion object {
         private val reXmlTag = Regex("""<[^>]+>""")

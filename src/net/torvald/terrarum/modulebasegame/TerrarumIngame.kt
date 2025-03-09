@@ -793,7 +793,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             // #2. If #1 failed, try to pick up the fixture
             else {
                 mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
-                    pickupFixture(actor, delta, mwx, mwy, mtx, mty)
+                    pickupFixtureOrDroppedItem(actor, delta, mwx, mwy, mtx, mty)
                     0L
                 }
             }
@@ -1702,13 +1702,16 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         return actorsUnderMouse
     }
 
-    fun pickupFixture(actor: ActorWithBody, delta: Float, mwx: Double, mwy: Double, mtx: Int, mty: Int, assignToQuickslot: Boolean = true) {
+    fun pickupFixtureOrDroppedItem(actor: ActorWithBody, delta: Float, mwx: Double, mwy: Double, mtx: Int, mty: Int, assignToQuickslot: Boolean = true) {
         val actorsUnderMouse = getActorsUnderMouse(mwx, mwy)
 
         val fixture = actorsUnderMouse.firstOrNull {
             it is FixtureBase && it.canBeDespawned &&
                     System.nanoTime() - it.spawnRequestedTime > 500000000 // don't pick up the fixture if it was recently placed (0.5 seconds)
         } as? FixtureBase
+        val droppedItemNoAutoPickup = actorsUnderMouse.firstOrNull {
+            it is DroppedItem && it.noAutoPickup
+        } as? DroppedItem
         val mob = actorsUnderMouse.firstOrNull {
             it !is FixtureBase && it.physProp.usePhysics && !it.physProp.immobileBody
         } as? ActorWithBody
@@ -1733,6 +1736,37 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                         // 2-1. unregister if other slot has the same item
                         for (k in 0..9) {
                             if (actor.inventory.getQuickslotItem(k)?.itm == fixtureItem && k != actor.actorValue.getAsInt(
+                                    AVKey.__PLAYER_QUICKSLOTSEL
+                                )
+                            ) {
+                                actor.inventory.setQuickslotItem(k, null)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // pickup a dropped item (no auto-pickup variants only)
+        else if (droppedItemNoAutoPickup != null) {
+            val droppedItemID = droppedItemNoAutoPickup.itemID
+            val droppedItemCount = droppedItemNoAutoPickup.itemCount
+            // 0. hide tooltips
+            TooltipManager.tooltipShowing.clear()
+            setTooltipMessage(null)
+            if (!droppedItemNoAutoPickup.flagDespawn) {
+                // 1. put the fixture to the inventory
+                droppedItemNoAutoPickup.flagDespawn()
+                // 2. register this item(fixture) to the quickslot so that the player sprite would be actually lifting the fixture
+                // BUUUUUUUT, only when the slot is already empty this time
+                if (actor is Pocketed) {
+                    actor.inventory.add(droppedItemID, droppedItemCount)
+
+                    if (assignToQuickslot && actor.inventory.getQuickslotItem(actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)) == null) {
+                        actor.equipItem(droppedItemID)
+                        actor.inventory.setQuickslotItemAtSelected(droppedItemID)
+                        // 2-1. unregister if other slot has the same item
+                        for (k in 0..9) {
+                            if (actor.inventory.getQuickslotItem(k)?.itm == droppedItemID && k != actor.actorValue.getAsInt(
                                     AVKey.__PLAYER_QUICKSLOTSEL
                                 )
                             ) {
