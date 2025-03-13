@@ -1,10 +1,10 @@
 package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.App
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
+import net.torvald.terrarum.worlddrawer.WorldCamera
+import kotlin.math.*
 
 /**
  * Created by minjaesong on 2025-03-10.
@@ -44,7 +44,7 @@ class ActorConveyors : ActorWithBody {
         val wxSpinCntrEnd = (axleX2 + 0.5) * TILE_SIZED
         val wySpinCntrEnd = (axleY2 + 0.5) * TILE_SIZED
 
-        val r = 0.5 * TILE_SIZED
+        val r = 0.5 * TILE_SIZED.minus(2)
 
         val wxBeltTopStart = wxSpinCntrStart + r * sin(inclination)
         val wyBeltTopStart = wySpinCntrStart + r * cos(inclination)
@@ -57,15 +57,33 @@ class ActorConveyors : ActorWithBody {
         val wyBeltBtmEnd = wySpinCntrEnd + r * cos(declination)
 
 
+        val segmentCount = max(1.0, (6 * cbrt(r).toFloat() * (180.0 / 360.0f)).toInt().toDouble())
+
         // belt top
-        drawLineAtWorld(wxBeltTopStart, wyBeltTopStart, wxBeltTopEnd, wyBeltTopEnd)
+        drawLineOnWorld(wxBeltTopStart, wyBeltTopStart, wxBeltTopEnd, wyBeltTopEnd)
         // belt bottom
-        drawLineAtWorld(wxBeltBtmStart, wyBeltBtmStart, wxBeltBtmEnd, wyBeltBtmEnd)
+        drawLineOnWorld(wxBeltBtmStart, wyBeltBtmStart, wxBeltBtmEnd, wyBeltBtmEnd)
         // left arc
-
+        drawArcOnWorld(wxSpinCntrStart, wySpinCntrStart, r, declination, 180.0)
         // right arc
+        drawArcOnWorld(wxSpinCntrEnd, wySpinCntrEnd, r, inclination, 180.0)
+    }
 
+    private fun drawLineOnWorld(x1: Double, y1: Double, x2: Double, y2: Double) {
+        val w = 2.0f
+        App.shapeRender.rectLine(
+            x1.toFloat() - WorldCamera.x, y1.toFloat() - WorldCamera.y,
+            x2.toFloat() - WorldCamera.x, y2.toFloat() - WorldCamera.y,
+            w
+        )
+    }
 
-
+    private fun drawArcOnWorld(xc: Double, yc: Double, r: Double, arcStart: Double, arcDegrees: Double) {
+        val w = 2.0f
+        App.shapeRender.arc(
+            xc.toFloat() - WorldCamera.x,
+            yc.toFloat() - WorldCamera.y,
+            r.toFloat(), arcStart.toFloat(), arcDegrees.toFloat()
+        )
     }
 }
