@@ -13,60 +13,109 @@ class ActorConveyors : ActorWithBody {
 
     // make it savegame-reloadable
     private constructor() {
-        axleX1 = -1
-        axleY1 = -1
-        axleX2 = -1
-        axleY2 = -1
+        x1 = -1
+        y1 = -1
+        x2 = -1
+        y2 = -1
+
+        s = 0.0
+
+        di = 0.0
+        dd = 0.0
+
+        cx1 = 0.0
+        cy1 = 0.0
+        cx2 = 0.0
+        cy2 = 0.0
+
+        r = 0.5 * TILE_SIZED.minus(2)
+
+        btx1 = 0.0
+        bty1 = 0.0
+        btx2 = 0.0
+        bty2 = 0.0
+
+        bbx1 = 0.0
+        bby1 = 0.0
+        bbx2 = 0.0
+        bby2 = 0.0
     }
 
-    val axleX1: Int // can be negative when the conveyor crosses the world border
-    val axleY1: Int
-    val axleX2: Int // always positive
-    val axleY2: Int
+    val x1: Int // can be negative when the conveyor crosses the world border
+    val y1: Int
+    val x2: Int // always positive
+    val y2: Int
+
+    private val s: Double // belt length
+
+    private val di: Double // inclination deg
+    private val dd: Double // declination deg
+
+    private val cx1: Double // centre of the left spindle
+    private val cy1: Double
+    private val cx2: Double // centre of the right spindle
+    private val cy2: Double
+
+    private val r: Double // radius
+
+    private val btx1: Double // line points of the top belt
+    private val bty1: Double
+    private val btx2: Double
+    private val bty2: Double
+
+    private val bbx1: Double // line points of the bottom bolt
+    private val bby1: Double
+    private val bbx2: Double
+    private val bby2: Double
 
     /**
      * xy1 is always the starting point, and the starting point's x-value is always lower than the end points',
      * even when the conveyor crosses the edge of the world border, in which case the x-value is negative.
      */
     constructor(x1: Int, y1: Int, x2: Int, y2: Int) {
-        axleX1 = x1
-        axleY1 = y1
-        axleX2 = x2
-        axleY2 = y2
+        this.x1 = x1
+        this.y1 = y1
+        this.x2 = x2
+        this.y2 = y2
+
+        s = calcBeltLength(x1, y1, x2, y2)
+
+        di = atan2(this.y2.toDouble() - this.y1, this.x2.toDouble() - this.x1)
+        dd = atan2(this.y1.toDouble() - this.y2, this.x1.toDouble() - this.x2)
+
+        cx1 = (this.x1 + 0.5) * TILE_SIZED
+        cy1 = (this.y1 + 0.5) * TILE_SIZED
+        cx2 = (this.x2 + 0.5) * TILE_SIZED
+        cy2 = (this.y2 + 0.5) * TILE_SIZED
+
+        r = 0.5 * TILE_SIZED.minus(2)
+
+        btx1 = cx1 + r * sin(di)
+        bty1 = cy1 + r * cos(di)
+        btx2 = cx2 + r * sin(di)
+        bty2 = cy2 + r * cos(di)
+
+        bbx1 = cx1 + r * sin(dd)
+        bby1 = cy1 + r * cos(dd)
+        bbx2 = cx2 + r * sin(dd)
+        bby2 = cy2 + r * cos(dd)
     }
 
+    private fun calcBeltLength(x1: Int, y1: Int, x2: Int, y2: Int) =
+        2 * (hypot((x2 - x1) * TILE_SIZED, (y2 - y1) * TILE_SIZED) + Math.PI * TILE_SIZED / 2)
+
+
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
-        val inclination = atan2(axleY2.toDouble() - axleY1, axleX2.toDouble() - axleX1)
-        val declination = atan2(axleY1.toDouble() - axleY2, axleX1.toDouble() - axleX2)
 
-        val wxSpinCntrStart = (axleX1 + 0.5) * TILE_SIZED
-        val wySpinCntrStart = (axleY1 + 0.5) * TILE_SIZED
-        val wxSpinCntrEnd = (axleX2 + 0.5) * TILE_SIZED
-        val wySpinCntrEnd = (axleY2 + 0.5) * TILE_SIZED
-
-        val r = 0.5 * TILE_SIZED.minus(2)
-
-        val wxBeltTopStart = wxSpinCntrStart + r * sin(inclination)
-        val wyBeltTopStart = wySpinCntrStart + r * cos(inclination)
-        val wxBeltTopEnd = wxSpinCntrEnd + r * sin(inclination)
-        val wyBeltTopEnd = wySpinCntrEnd + r * cos(inclination)
-
-        val wxBeltBtmStart = wxSpinCntrStart + r * sin(declination)
-        val wyBeltBtmStart = wySpinCntrStart + r * cos(declination)
-        val wxBeltBtmEnd = wxSpinCntrEnd + r * sin(declination)
-        val wyBeltBtmEnd = wySpinCntrEnd + r * cos(declination)
-
-
-        val segmentCount = max(1.0, (6 * cbrt(r).toFloat() * (180.0 / 360.0f)).toInt().toDouble())
 
         // belt top
-        drawLineOnWorld(wxBeltTopStart, wyBeltTopStart, wxBeltTopEnd, wyBeltTopEnd)
+        drawLineOnWorld(btx1, bty1, btx2, bty2)
         // belt bottom
-        drawLineOnWorld(wxBeltBtmStart, wyBeltBtmStart, wxBeltBtmEnd, wyBeltBtmEnd)
+        drawLineOnWorld(bbx1, bby1, bbx2, bby2)
         // left arc
-        drawArcOnWorld(wxSpinCntrStart, wySpinCntrStart, r, declination, 180.0)
+        drawArcOnWorld(cx1, cy1, r, dd, Math.PI)
         // right arc
-        drawArcOnWorld(wxSpinCntrEnd, wySpinCntrEnd, r, inclination, 180.0)
+        drawArcOnWorld(cx2, cy2, r, di, Math.PI)
     }
 
     private fun drawLineOnWorld(x1: Double, y1: Double, x2: Double, y2: Double) {
@@ -78,12 +127,23 @@ class ActorConveyors : ActorWithBody {
         )
     }
 
-    private fun drawArcOnWorld(xc: Double, yc: Double, r: Double, arcStart: Double, arcDegrees: Double) {
+    private fun drawArcOnWorld(xc: Double, yc: Double, r: Double, arcStart: Double, arcDeg: Double) {
         val w = 2.0f
-        App.shapeRender.arc(
-            xc.toFloat() - WorldCamera.x,
-            yc.toFloat() - WorldCamera.y,
-            r.toFloat(), arcStart.toFloat(), arcDegrees.toFloat()
-        )
+        // dissect the circle
+        val pathLen = arcDeg * r
+        //// estimated number of segments. pathLen divided by sqrt(2)
+        val segments = Math.round(pathLen / Double.fromBits(0x3FF6A09E667F3BCDL)).coerceAtLeast(1L).toInt()
+
+        for (i in 0 until segments) {
+            val degStart = (i.toDouble() / segments) * arcDeg + arcStart
+            val degEnd = ((i + 1.0) / segments) * arcDeg + arcStart
+
+            val x1 = r * sin(degStart) + xc
+            val y1 = r * cos(degStart) + yc
+            val x2 = r * sin(degEnd) + xc
+            val y2 = r * cos(degEnd) + yc
+
+            drawLineOnWorld(x1, y1, x2, y2)
+        }
     }
 }
