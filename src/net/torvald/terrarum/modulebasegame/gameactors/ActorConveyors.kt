@@ -1,9 +1,14 @@
-package net.torvald.terrarum.gameactors
+package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.inUse
 import net.torvald.terrarum.worlddrawer.WorldCamera
+import java.util.*
 import kotlin.math.*
 
 /**
@@ -29,6 +34,7 @@ class ActorConveyors : ActorWithBody {
         cy2 = 0.0
 
         r = 0.5 * TILE_SIZED.minus(2)
+        c = 0
 
         btx1 = 0.0
         bty1 = 0.0
@@ -47,6 +53,7 @@ class ActorConveyors : ActorWithBody {
     val y2: Int
 
     private val s: Double // belt length
+    private val c: Int // segment counts
 
     private val di: Double // inclination deg
     private val dd: Double // declination deg
@@ -89,6 +96,7 @@ class ActorConveyors : ActorWithBody {
         cy2 = (this.y2 + 0.5) * TILE_SIZED
 
         r = 0.5 * TILE_SIZED.minus(2)
+        c = (s / 8).roundToInt() * 2 // 4px segments rounded towards nearest even number
 
         btx1 = cx1 + r * sin(di)
         bty1 = cy1 + r * cos(di)
@@ -107,15 +115,18 @@ class ActorConveyors : ActorWithBody {
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
 
+        App.shapeRender.inUse {
+            it.color = Color.RED
 
-        // belt top
-        drawLineOnWorld(btx1, bty1, btx2, bty2)
-        // belt bottom
-        drawLineOnWorld(bbx1, bby1, bbx2, bby2)
-        // left arc
-        drawArcOnWorld(cx1, cy1, r, dd, Math.PI)
-        // right arc
-        drawArcOnWorld(cx2, cy2, r, di, Math.PI)
+            // belt top
+            drawLineOnWorld(btx1, bty1, btx2, bty2)
+            // belt bottom
+            drawLineOnWorld(bbx1, bby1, bbx2, bby2)
+            // left arc
+            drawArcOnWorld(cx1, cy1, r, dd, Math.PI)
+            // right arc
+            drawArcOnWorld(cx2, cy2, r, di, Math.PI)
+        }
     }
 
     private fun drawLineOnWorld(x1: Double, y1: Double, x2: Double, y2: Double) {
@@ -128,11 +139,11 @@ class ActorConveyors : ActorWithBody {
     }
 
     private fun drawArcOnWorld(xc: Double, yc: Double, r: Double, arcStart: Double, arcDeg: Double) {
-        val w = 2.0f
         // dissect the circle
-        val pathLen = arcDeg * r
+//        val pathLen = arcDeg * r
         //// estimated number of segments. pathLen divided by sqrt(2)
-        val segments = Math.round(pathLen / Double.fromBits(0x3FF6A09E667F3BCDL)).coerceAtLeast(1L).toInt()
+//        val segments = Math.round(pathLen / Double.fromBits(0x3FF6A09E667F3BCDL)).coerceAtLeast(1L).toInt()
+        val segments = 12 * 8
 
         for (i in 0 until segments) {
             val degStart = (i.toDouble() / segments) * arcDeg + arcStart
@@ -146,4 +157,40 @@ class ActorConveyors : ActorWithBody {
             drawLineOnWorld(x1, y1, x2, y2)
         }
     }
+
+    /** Real time, in nanoseconds */
+    @Transient var spawnRequestedTime: Long = 0L
+        protected set
+
+    internal var actorThatInstalledThisFixture: UUID? = null
+
+    open fun spawn(installerUUID: UUID?): Boolean {
+        this.isVisible = true
+
+        val posXtl = minOf(x1, x2).toDouble()
+        val posYtl = minOf(y1, y2).toDouble()
+        val posXbr = maxOf(x1, x2).toDouble()
+        val posYbr = maxOf(y1, y2).toDouble()
+
+        this.hitbox.setFromTwoPoints(posXtl * TILE_SIZED, posYtl * TILE_SIZED, (posXbr+1) * TILE_SIZED, (posYbr+1) * TILE_SIZED)
+        this.setHitboxDimension(this.hitbox.width.toInt(), this.hitbox.height.toInt(), 0, 1)
+        this.intTilewiseHitbox.setFromTwoPoints(posXtl, posYtl, posXbr, posYbr)
+
+        // actually add this actor into the world
+        INGAME.queueActorAddition(this)
+        spawnRequestedTime = System.nanoTime()
+
+        actorThatInstalledThisFixture = installerUUID
+
+        //makeNoiseAndDust(posXtl, posYtl)
+
+        onSpawn()
+
+        return true
+    }
+
+    /**
+     * Callend whenever the fixture was spawned successfully.
+     */
+    open fun onSpawn() {}
 }

@@ -104,10 +104,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
         // return true when placed, false when cannot be placed
     }
 
-    override fun startSecondaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
-        (INGAME as TerrarumIngame).pickupFixtureOrDroppedItem(actor, delta, mwx, mwy, mtx, mty, false)
-        -1
-    }
+    override fun startSecondaryUse(actor: ActorWithBody, delta: Float) = fixturePickupFun(actor, delta)
 
     /**
      * Also see: [net.torvald.terrarum.modulebasegame.gameactors.FixtureBase.Companion]
@@ -127,6 +124,11 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
             return CommonResourcePool.getOrPut(id) {
                 TextureRegion(Texture(ModMgr.getGdxFile(module, path)))
             } as TextureRegion
+        }
+
+        fun fixturePickupFun(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
+            (INGAME as TerrarumIngame).pickupFixtureOrDroppedItem(actor, delta, mwx, mwy, mtx, mty, false)
+            -1
         }
     }
 }

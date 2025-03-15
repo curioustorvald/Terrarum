@@ -134,6 +134,7 @@ id;classname;tags
 # industrial
 2048;net.torvald.terrarum.modulebasegame.gameitems.ItemInductionMotor;FIXTURE,POWER,KINETIC
 2049;net.torvald.terrarum.modulebasegame.gameitems.ItemGearbox;FIXTURE,POWER,KINETIC
+2050;net.torvald.terrarum.modulebasegame.gameitems.ItemConveyorBelt;FIXTURE,KINETIC
 
 # data storage (pre-composed discs; 256)
 # 32768 is a reserved number for a BASEOBJECT disc (players can't produce own recordings... yet)
