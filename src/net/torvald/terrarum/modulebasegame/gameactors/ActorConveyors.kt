@@ -87,8 +87,8 @@ class ActorConveyors : ActorWithBody {
 
         s = calcBeltLength(x1, y1, x2, y2)
 
-        di = atan2(this.y2.toDouble() - this.y1, this.x2.toDouble() - this.x1)
-        dd = atan2(this.y1.toDouble() - this.y2, this.x1.toDouble() - this.x2)
+        di = atan2(this.y2.toDouble() - this.y1, this.x1.toDouble() - this.x2)
+        dd = atan2(this.y1.toDouble() - this.y2, this.x2.toDouble() - this.x1)
 
         cx1 = (this.x1 + 0.5) * TILE_SIZED
         cy1 = (this.y1 + 0.5) * TILE_SIZED
@@ -123,9 +123,9 @@ class ActorConveyors : ActorWithBody {
             // belt bottom
             drawLineOnWorld(bbx1, bby1, bbx2, bby2)
             // left arc
-            drawArcOnWorld(cx1, cy1, r, dd, Math.PI)
+            drawArcOnWorld(cx1, cy1, r, dd, -Math.PI)
             // right arc
-            drawArcOnWorld(cx2, cy2, r, di, Math.PI)
+            drawArcOnWorld(cx2, cy2, r, di, -Math.PI)
         }
     }
 
