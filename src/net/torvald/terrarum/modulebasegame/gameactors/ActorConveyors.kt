@@ -75,6 +75,16 @@ class ActorConveyors : ActorWithBody {
     private val bbx2: Double
     private val bby2: Double
 
+    private var turn: Double = 0.0 // TODO decide if the max should be 1.0 or TWO_PI. For a numerical precision, 1.0 is recommended though
+
+    companion object {
+        private val COL_BELT = Color(0x444444ff)
+        private val COL_BELT_ALT = Color(0x666666ff)
+
+        private val COL_BELT_TOP = Color(0x666666ff.toInt())
+        private val COL_BELT_TOP_ALT = Color(0x999999ff.toInt())
+    }
+
     @Transient private var shapeRender = App.makeShapeRenderer()
 
     override fun reload() {
@@ -125,31 +135,36 @@ class ActorConveyors : ActorWithBody {
 
         shapeRender.projectionMatrix = batch.projectionMatrix
         shapeRender.inUse {
-            it.color = Color.RED
+            it.color = COL_BELT
 
             // belt top
-            drawLineOnWorld(btx1, bty1, btx2, bty2)
+            drawLineOnWorld(btx1, bty1, btx2, bty2, 2f)
             // belt bottom
-            drawLineOnWorld(bbx1, bby1, bbx2, bby2)
+            drawLineOnWorld(bbx1, bby1, bbx2, bby2, 2f)
             // left arc
-            drawArcOnWorld(cx1, cy1, r, dd, -Math.PI)
+            drawArcOnWorld(cx1, cy1, r, dd, -Math.PI, 2f)
             // right arc
-            drawArcOnWorld(cx2, cy2, r, di, -Math.PI)
+            drawArcOnWorld(cx2, cy2, r, di, -Math.PI, 2f)
+
+            it.color = COL_BELT_TOP
+            // belt top
+            drawLineOnWorld(btx1, bty1 - 0.5f, btx2, bty2 - 0.5f, 1f)
+            // belt bottom
+            drawLineOnWorld(bbx1, bby1 - 0.5f, bbx2, bby2 - 0.5f, 1f)
         }
 
         batch.begin()
     }
 
-    private fun drawLineOnWorld(x1: Double, y1: Double, x2: Double, y2: Double) {
-        val w = 2.0f
+    private fun drawLineOnWorld(x1: Double, y1: Double, x2: Double, y2: Double, width: Float) {
         shapeRender.rectLine(
             x1.toFloat(), y1.toFloat(),
             x2.toFloat(), y2.toFloat(),
-            w
+            width
         )
     }
 
-    private fun drawArcOnWorld(xc: Double, yc: Double, r: Double, arcStart: Double, arcDeg: Double) {
+    private fun drawArcOnWorld(xc: Double, yc: Double, r: Double, arcStart: Double, arcDeg: Double, width: Float) {
         // dissect the circle
         val pathLen = (arcDeg * r).absoluteValue
         //// estimated number of segments. pathLen divided by sqrt(2)
@@ -165,7 +180,7 @@ class ActorConveyors : ActorWithBody {
             val x2 = r * sin(degEnd) + xc
             val y2 = r * cos(degEnd) + yc
 
-            drawLineOnWorld(x1, y1, x2, y2)
+            drawLineOnWorld(x1, y1, x2, y2, width)
         }
     }
 
