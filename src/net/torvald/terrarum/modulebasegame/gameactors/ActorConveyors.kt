@@ -154,13 +154,18 @@ class ActorConveyors : ActorWithBody {
             it.color = COL_BELT_ALT
             val segmentLen = s / c
             val topSegRemainder = l % segmentLen
-            for (i in 0 until c) {
+            for (i in 0 until c / 2) { // not exact code but whatever
                 val x1 = btx1 + r * sin(di - HALF_PI) * (i - turn + 0.00) * segmentLen
                 val y1 = bty1 + r * cos(di - HALF_PI) * (i - turn + 0.00) * segmentLen
                 val x2 = btx1 + r * sin(di - HALF_PI) * (i - turn + 0.25) * segmentLen
                 val y2 = bty1 + r * cos(di - HALF_PI) * (i - turn + 0.25) * segmentLen
 
-                drawLineOnWorld(x1, y1, x2, y2, 2f)
+                if (x1 < btx2) {
+                    if (y2 > y1)
+                        drawLineOnWorld(x1, y1, minOf(x2, btx2), minOf(y2, bty2), 2f)
+                    else
+                        drawLineOnWorld(x1, y1, minOf(x2, btx2), maxOf(y2, bty2), 2f)
+                }
             }
 
             it.color = COL_BELT_TOP

@@ -254,7 +254,7 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined]
 ],
-"dict":IMEProvider.requestDictionary("cj5-tc.han"),
+"dict":IMEProvider.requestDictionary("cangjie5_dict/cj5-tc.han"),
 "code":0, //0: not composing, 1: composing (has candidates), 2: composing (no candidates)
 "buf":"",
 "candidates":""/*comma-separated values*/}
