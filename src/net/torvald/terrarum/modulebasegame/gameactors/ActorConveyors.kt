@@ -2,12 +2,10 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
-import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.inUse
-import net.torvald.terrarum.tryDispose
+import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
 import java.util.*
 import kotlin.math.*
 
@@ -34,6 +32,7 @@ class ActorConveyors : ActorWithBody {
         cy2 = 0.0
 
         r = 0.5 * TILE_SIZED.minus(2)
+        l = 0.0
         c = 0
 
         btx1 = 0.0
@@ -52,7 +51,8 @@ class ActorConveyors : ActorWithBody {
     val x2: Int // always positive
     val y2: Int
 
-    private val s: Double // belt length
+    private val s: Double // belt length (total)
+    private val l: Double // belt length (single straight part)
     private val c: Int // segment counts
 
     private val di: Double // inclination deg
@@ -79,10 +79,10 @@ class ActorConveyors : ActorWithBody {
 
     companion object {
         private val COL_BELT = Color(0x444444ff)
-        private val COL_BELT_ALT = Color(0x666666ff)
+        private val COL_BELT_TOP = Color(0x666666ff)
 
-        private val COL_BELT_TOP = Color(0x666666ff.toInt())
-        private val COL_BELT_TOP_ALT = Color(0x999999ff.toInt())
+        private val COL_BELT_ALT = Color(0x888888ff.toInt())
+        private val COL_BELT_TOP_ALT = Color(0xccccccff.toInt())
     }
 
     @Transient private var shapeRender = App.makeShapeRenderer()
@@ -103,6 +103,7 @@ class ActorConveyors : ActorWithBody {
         this.y2 = y2
 
         s = calcBeltLength(x1, y1, x2, y2)
+        l = calcBeltLengthStraightPart(x1, y1, x2, y2)
 
         di = atan2(this.y2.toDouble() - this.y1, this.x1.toDouble() - this.x2)
         dd = atan2(this.y1.toDouble() - this.y2, this.x2.toDouble() - this.x1)
@@ -113,7 +114,7 @@ class ActorConveyors : ActorWithBody {
         cy2 = (this.y2 + 0.5) * TILE_SIZED
 
         r = 0.5 * TILE_SIZED.minus(2)
-        c = (s / 8).roundToInt() * 2 // 4px segments rounded towards nearest even number
+        c = (s / 4).roundToInt() * 2 // 4px segments rounded towards nearest even number
 
         btx1 = cx1 + r * sin(di)
         bty1 = cy1 + r * cos(di)
@@ -127,7 +128,10 @@ class ActorConveyors : ActorWithBody {
     }
 
     private fun calcBeltLength(x1: Int, y1: Int, x2: Int, y2: Int) =
-        2 * (hypot((x2 - x1) * TILE_SIZED, (y2 - y1) * TILE_SIZED) + Math.PI * TILE_SIZED / 2)
+        2 * (calcBeltLengthStraightPart(x1, y1, x2, y2) + Math.PI * TILE_SIZED / 2)
+
+    private fun calcBeltLengthStraightPart(x1: Int, y1: Int, x2: Int, y2: Int) =
+        hypot((x2 - x1) * TILE_SIZED, (y2 - y1) * TILE_SIZED)
 
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
@@ -145,6 +149,19 @@ class ActorConveyors : ActorWithBody {
             drawArcOnWorld(cx1, cy1, r, dd, -Math.PI, 2f)
             // right arc
             drawArcOnWorld(cx2, cy2, r, di, -Math.PI, 2f)
+
+            // draw belt stripes under
+            it.color = COL_BELT_ALT
+            val segmentLen = s / c
+            val topSegRemainder = l % segmentLen
+            for (i in 0 until c) {
+                val x1 = btx1 + r * sin(di - HALF_PI) * (i - turn + 0.00) * segmentLen
+                val y1 = bty1 + r * cos(di - HALF_PI) * (i - turn + 0.00) * segmentLen
+                val x2 = btx1 + r * sin(di - HALF_PI) * (i - turn + 0.25) * segmentLen
+                val y2 = bty1 + r * cos(di - HALF_PI) * (i - turn + 0.25) * segmentLen
+
+                drawLineOnWorld(x1, y1, x2, y2, 2f)
+            }
 
             it.color = COL_BELT_TOP
             // belt top
