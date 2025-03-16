@@ -7,7 +7,7 @@ import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.inUse
-import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.terrarum.tryDispose
 import java.util.*
 import kotlin.math.*
 
@@ -75,6 +75,13 @@ class ActorConveyors : ActorWithBody {
     private val bbx2: Double
     private val bby2: Double
 
+    @Transient private var shapeRender = App.makeShapeRenderer()
+
+    override fun reload() {
+        super.reload()
+        shapeRender = App.makeShapeRenderer()
+    }
+
     /**
      * xy1 is always the starting point, and the starting point's x-value is always lower than the end points',
      * even when the conveyor crosses the edge of the world border, in which case the x-value is negative.
@@ -114,8 +121,10 @@ class ActorConveyors : ActorWithBody {
 
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
+        batch.end()
 
-        App.shapeRender.inUse {
+        shapeRender.projectionMatrix = batch.projectionMatrix
+        shapeRender.inUse {
             it.color = Color.RED
 
             // belt top
@@ -127,23 +136,25 @@ class ActorConveyors : ActorWithBody {
             // right arc
             drawArcOnWorld(cx2, cy2, r, di, -Math.PI)
         }
+
+        batch.begin()
     }
 
     private fun drawLineOnWorld(x1: Double, y1: Double, x2: Double, y2: Double) {
         val w = 2.0f
-        App.shapeRender.rectLine(
-            x1.toFloat() - WorldCamera.x, y1.toFloat() - WorldCamera.y,
-            x2.toFloat() - WorldCamera.x, y2.toFloat() - WorldCamera.y,
+        shapeRender.rectLine(
+            x1.toFloat(), y1.toFloat(),
+            x2.toFloat(), y2.toFloat(),
             w
         )
     }
 
     private fun drawArcOnWorld(xc: Double, yc: Double, r: Double, arcStart: Double, arcDeg: Double) {
         // dissect the circle
-//        val pathLen = arcDeg * r
+        val pathLen = (arcDeg * r).absoluteValue
         //// estimated number of segments. pathLen divided by sqrt(2)
-//        val segments = Math.round(pathLen / Double.fromBits(0x3FF6A09E667F3BCDL)).coerceAtLeast(1L).toInt()
-        val segments = 12 * 8
+        val segments = Math.round(pathLen).coerceAtLeast(1L).toInt()
+//        val segments = 12 * 8
 
         for (i in 0 until segments) {
             val degStart = (i.toDouble() / segments) * arcDeg + arcStart
@@ -193,4 +204,8 @@ class ActorConveyors : ActorWithBody {
      * Callend whenever the fixture was spawned successfully.
      */
     open fun onSpawn() {}
+
+    override fun dispose() {
+        shapeRender.tryDispose()
+    }
 }
