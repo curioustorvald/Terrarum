@@ -53,7 +53,7 @@ class ActorConveyors : ActorWithBody {
 
     private val s: Double // belt length (total)
     private val l: Double // belt length (single straight part)
-    private val c: Int // segment counts
+    private val c: Int // total segment counts
 
     private val di: Double // inclination deg
     private val dd: Double // declination deg
@@ -133,6 +133,12 @@ class ActorConveyors : ActorWithBody {
     private fun calcBeltLengthStraightPart(x1: Int, y1: Int, x2: Int, y2: Int) =
         hypot((x2 - x1) * TILE_SIZED, (y2 - y1) * TILE_SIZED)
 
+    override fun updateImpl(delta: Float) {
+        super.updateImpl(delta)
+
+        turn += delta * 2
+        while (turn >= 1f) turn -= 1f
+    }
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         batch.end()
@@ -160,11 +166,23 @@ class ActorConveyors : ActorWithBody {
                 val x2 = btx1 + r * sin(di - HALF_PI) * (i - turn + 0.25) * segmentLen
                 val y2 = bty1 + r * cos(di - HALF_PI) * (i - turn + 0.25) * segmentLen
 
-                if (x1 < btx2) {
-                    if (y2 > y1)
-                        drawLineOnWorld(x1, y1, minOf(x2, btx2), minOf(y2, bty2), 2f)
+                if (x1 in btx1 - 4..btx2 + 4) {
+                    if (bty2 > bty1)
+                        drawLineOnWorld(
+                            x1.coerceIn(btx1..btx2),
+                            y1.coerceIn(bty1..bty2),
+                            x2.coerceIn(btx1..btx2),
+                            y2.coerceIn(bty1..bty2),
+                            2f
+                        )
                     else
-                        drawLineOnWorld(x1, y1, minOf(x2, btx2), maxOf(y2, bty2), 2f)
+                        drawLineOnWorld(
+                            x1.coerceIn(btx1..btx2),
+                            y1.coerceIn(bty2..bty1),
+                            x2.coerceIn(btx1..btx2),
+                            y2.coerceIn(bty2..bty1),
+                            2f
+                        )
                 }
             }
 
