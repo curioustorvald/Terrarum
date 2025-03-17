@@ -52,7 +52,7 @@
         <btex/> abstracts away the meticulous styling and typesetting configurations, so you can focus on
         actually writing your texts than debugging the <latex/> macros. This does come with a downside of
         not being able to change the given style.</p>
-    <p><btex/> document is divided up to five parts: the <a href="btexdoc">Style Declaration</a>, the
+    <p><btex/> document is divided up to the five parts: the <a href="btexdoc">Style Declaration</a>, the
         <a href="cover">Cover</a>, the <a href="table of contents">Table of Contents</a>, the
         <a href="manuscript">Manuscript</a>, and the <a href="index page">Index Page</a>, of which the
         Style Declaration and the Manuscript are the mandatory parts.</p>
@@ -87,7 +87,7 @@
     </callout>
     <p>Only the <code>title</code> tag is mandatory. Cover texts will be printed using a special font that has wider
         gaps between characters. The title text will be printed in a double-size.</p>
-    <p>The cover can have different colour with the <code>hue</code> attribute, which takes a number between 0 and 360.</p>
+    <p>The cover can have a different colour with the <code>hue</code> attribute, which takes a number between 0 and 360.</p>
 
     <chapter>The Table of Contents</chapter>
 
@@ -97,7 +97,7 @@
     <callout align="left" class="code"><index id="tocpage (tag)"/>&lt;tocpage title="Custom page name if necessary"&gt;&zwsp;&lt;tableofcontents/&gt;&zwsp;&lt;/tocpage&gt;
     </callout>
 
-    <p>The optional <code>title</code> attribute allows a custom name can be given to this page.
+    <p>The optional <code>title</code> attribute allows custom names to a page.
         If unspecified, the default name is “Table of Contents”.</p>
     <p>The tag <code>&lt;tableofcontents/&gt;</code> is an internal tag used by the typesetter.</p>
 
@@ -173,8 +173,8 @@
     </callout>
 
     <p>The <code>height</code> attribute specifies the height of the image <emph>in the number of lines</emph>,
-        rather than pixels, the width is calculated automatically; image width wider than the text width
-        will cause an error. The tag optionally takes caption attribute which prints a text below the image.</p>
+        rather than the pixels, the width is calculated automatically; image width wider than the text width
+        will cause an error. The tag optionally takes <code>caption</code> attribute which prints a text below the image.</p>
 
     <p>Supported image formats: JPEG, PNG, BMP or TGA</p>
 
@@ -201,7 +201,7 @@
 
     <chapter>Conclusion</chapter>
 
-    <p>The finished book description using <btex/> can be sent to a publisher, and if there are no errors
+    <p>The finished book description using <btex/> can be sent to the publisher, and if there are no errors
         on your submission, the printed books of specified number of copies will be delivered to your
         location within a reasonable amount of business days. Happy writing!</p>
 
@@ -287,14 +287,14 @@
         In other words, <code>veun</code> and <code>vneun</code> are identical.</p>
     <p>These tags can be used in the following situation: suppose you have a <btex/> document,</p>
 
-    <callout align="left" class="code">[en] Send your &lt;v fromgame="GAME_ITEM_HOLOTAPE"/&gt; that contains the manuscript to the publisher via mail to have your books printed.<br/><!--
+    <callout align="left" class="code">[en] Send your &lt;v fromgame="GAME_ITEM_HOLOTAPE"/&gt; containing the manuscript to the publisher via post to have your books printed.<br/><!--
     -->[koKR] 원고가 담긴 &lt;veul fromgame="GAME_ITEM_HOLOTAPE"/&gt; 출판사로 우편을 통해 보내야 책이 인쇄됩니다.</callout>
 
     <p>The variables will be resolved based on the current ingame language, then the necessary
         linguistic processing is performed, which would result in a following paragraph
         (text in blue denotes the text is inserted using the tags):</p>
 
-    <callout>[en] Send your <itemname>Holotape</itemname> that contains the manuscript to the publisher via mail to have your books printed.<br/><!--
+    <callout>[en] Send your <itemname>Holotape</itemname> that contains the manuscript to the publisher via post to have your books printed.<br/><!--
     -->[koKR] 원고가 담긴 <itemname>홀로테이프를</itemname> 출판사로 우편을 통해 보내야 책이 인쇄됩니다.</callout>
 
 
@@ -309,12 +309,12 @@
         encounter the freezing every time the book is being printed, and this would be a huge minus towards
         the gameplay experience.</p>
 
-    <p>If the process exits without any error, the mailing system will be
-        notified and will send the mail containing finished books to the player; if the process exits
-        with errors, the mail containing details of the errors will be sent instead.</p>
+    <p>If the process exits without any error, the post system will be
+        notified and will send a post containing the finished books to the player; if the process exits
+        with errors, the post containing the details of the errors will be sent instead.</p>
 
     <p>For this reason, the “printing press” is not exposed to the player, they only get to interact with it
-        indirectly through the “publisher” via mail.</p>
+        indirectly through the “publisher” via post.</p>
 
 
 
