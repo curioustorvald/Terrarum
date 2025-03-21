@@ -198,6 +198,36 @@ class ActorConveyors : ActorWithBody {
                 drawArcOnWorld(cx1, cy1, r, a1, segmentLen * 0.25, 2f)
             }
 
+            // bottom straight part
+            val bottomSectionOffset = (l + Math.PI * r) % segmentLen
+            for (i in 0 until c / 2) { // not exact code but whatever
+                val x1 = bbx1 + bottomSectionOffset + r * sin(di - HALF_PI) * (i + turn - 0.00) * segmentLen
+                val y1 = bby1 + bottomSectionOffset + r * cos(di - HALF_PI) * (i + turn - 0.00) * segmentLen
+                val x2 = bbx1 + bottomSectionOffset + r * sin(di - HALF_PI) * (i + turn - 0.25) * segmentLen
+                val y2 = bby1 + bottomSectionOffset + r * cos(di - HALF_PI) * (i + turn - 0.25) * segmentLen
+
+                if (x1 in bbx1 - 4..bbx2 + 4) {
+                    if (bby2 > bby1)
+                        drawLineOnWorld(
+                            x1.coerceIn(bbx1..bbx2),
+                            y1.coerceIn(bby1..bby2),
+                            x2.coerceIn(bbx1..bbx2),
+                            y2.coerceIn(bby1..bby2),
+                            2f
+                        )
+                    else
+                        drawLineOnWorld(
+                            x1.coerceIn(bbx1..bbx2),
+                            y1.coerceIn(bby2..bby1),
+                            x2.coerceIn(bbx1..bbx2),
+                            y2.coerceIn(bby2..bby1),
+                            2f
+                        )
+                }
+            }
+
+
+
             it.color = COL_BELT_TOP
             // belt top
             drawLineOnWorld(btx1, bty1 - 0.5f, btx2, bty2 - 0.5f, 1f)
