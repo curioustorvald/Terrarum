@@ -6,6 +6,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
+import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
 import java.util.*
 import kotlin.math.*
 
@@ -81,7 +82,7 @@ class ActorConveyors : ActorWithBody {
         private val COL_BELT = Color(0x444444ff)
         private val COL_BELT_TOP = Color(0x666666ff)
 
-        private val COL_BELT_ALT = Color(0x888888ff.toInt())
+        private val COL_BELT_ALT = Color.MAGENTA//Color(0x888888ff.toInt())
         private val COL_BELT_TOP_ALT = Color(0xccccccff.toInt())
     }
 
@@ -184,6 +185,17 @@ class ActorConveyors : ActorWithBody {
                             2f
                         )
                 }
+            }
+
+            // stripes at the left spindle
+            // eq: k units/s on straight part == (k / r) rad/s on curve
+            val k = topSegRemainder + turn // TODO calculate starting angle offset
+            val angularOffsetStart = di + k
+            val segmentCount = r / segmentLen
+            for (i in 0 until segmentCount.toInt()) {
+                val a1 = angularOffsetStart + segmentLen * i
+
+                drawArcOnWorld(cx1, cy1, r, a1, segmentLen * 0.25, 2f)
             }
 
             it.color = COL_BELT_TOP
