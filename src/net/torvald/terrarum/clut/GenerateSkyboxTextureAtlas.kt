@@ -8,12 +8,13 @@ import net.torvald.colourutil.toRGB
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.parametricsky.ArHosekSkyModel
 import net.torvald.terrarum.abs
-import net.torvald.terrarum.clut.Skybox.coerceInSmoothly
-import net.torvald.terrarum.clut.Skybox.mapCircle
-import net.torvald.terrarum.clut.Skybox.scaleToFit
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
 import net.torvald.terrarum.serialise.toLittle
 import net.torvald.terrarum.serialise.toUint
+import net.torvald.terrarum.weather.SkyboxModelHosek
+import net.torvald.terrarum.weather.SkyboxModelHosek.coerceInSmoothly
+import net.torvald.terrarum.weather.SkyboxModelHosek.mapCircle
+import net.torvald.terrarum.weather.SkyboxModelHosek.scaleToFit
 import java.io.File
 import kotlin.math.PI
 import kotlin.math.cos
@@ -42,7 +43,7 @@ class GenerateSkyboxTextureAtlas {
         val state =
             ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevationRad.abs())
 
-        for (yp in 0 until Skybox.gradSize) {
+        for (yp in 0 until SkyboxModelHosek.gradSize) {
             val yi = yp - 10
             val xf = -elevationDeg / 90.0
             var yf = (yi / 58.0).coerceIn(0.0, 1.0).mapCircle().coerceInSmoothly(0.0, 0.95)
@@ -81,9 +82,9 @@ class GenerateSkyboxTextureAtlas {
     // y: increasing turbidity (1.0 .. 10.0, in steps of 0.333)
     // x: elevations (-75 .. 75 in steps of 1, then albedo of [0.1, 0.3, 0.5, 0.7, 0.9])
     val TGA_HEADER_SIZE = 18
-    val texh = Skybox.gradSize * Skybox.turbCnt
-    val texh2 = Skybox.turbCnt
-    val texw = Skybox.elevCnt * Skybox.albedoCnt * 2
+    val texh = SkyboxModelHosek.gradSize * SkyboxModelHosek.turbCnt
+    val texh2 = SkyboxModelHosek.turbCnt
+    val texw = SkyboxModelHosek.elevCnt * SkyboxModelHosek.albedoCnt * 2
     val bytesSize = texw * texh
     val bytes2Size = texw * texh2
     val bytes = ByteArray(TGA_HEADER_SIZE + bytesSize * 4 + 26)
@@ -113,18 +114,18 @@ class GenerateSkyboxTextureAtlas {
         // write pixels
         for (gammaPair in 0..1) {
 
-            for (albedo0 in 0 until Skybox.albedoCnt) {
-                val albedo = Skybox.albedos[albedo0]
+            for (albedo0 in 0 until SkyboxModelHosek.albedoCnt) {
+                val albedo = SkyboxModelHosek.albedos[albedo0]
                 println("Albedo=$albedo")
-                for (turb0 in 0 until Skybox.turbCnt) {
-                    val turbidity = Skybox.turbiditiesD[turb0]
+                for (turb0 in 0 until SkyboxModelHosek.turbCnt) {
+                    val turbidity = SkyboxModelHosek.turbiditiesD[turb0]
                     println("....... Turbidity=$turbidity")
-                    for (elev0 in 0 until Skybox.elevCnt) {
-                        var elevationDeg = Skybox.elevationsD[elev0]
+                    for (elev0 in 0 until SkyboxModelHosek.elevCnt) {
+                        var elevationDeg = SkyboxModelHosek.elevationsD[elev0]
                         if (elevationDeg == 0.0) elevationDeg = 0.5 // dealing with the edge case
                         generateStrip(gammaPair, albedo, turbidity, elevationDeg) { yp, i, colour ->
-                            val imgOffX = albedo0 * Skybox.elevCnt + elev0 + Skybox.elevCnt * Skybox.albedoCnt * gammaPair
-                            val imgOffY = texh - 1 - (Skybox.gradSize * turb0 + yp)
+                            val imgOffX = albedo0 * SkyboxModelHosek.elevCnt + elev0 + SkyboxModelHosek.elevCnt * SkyboxModelHosek.albedoCnt * gammaPair
+                            val imgOffY = texh - 1 - (SkyboxModelHosek.gradSize * turb0 + yp)
                             val fileOffset = TGA_HEADER_SIZE + 4 * (imgOffY * texw + imgOffX)
                             bytes[fileOffset + i] = colour
                         }
@@ -140,8 +141,8 @@ class GenerateSkyboxTextureAtlas {
     private val gradSizes = listOf(50)
 
     private fun getByte(gammaPair: Int, albedo0: Int, turb0: Int, elev0: Int, yp: Int, channel: Int): Byte {
-        val imgOffX = albedo0 * Skybox.elevCnt + elev0 + Skybox.elevCnt * Skybox.albedoCnt * gammaPair
-        val imgOffY = texh - 1 - (Skybox.gradSize * turb0 + yp)
+        val imgOffX = albedo0 * SkyboxModelHosek.elevCnt + elev0 + SkyboxModelHosek.elevCnt * SkyboxModelHosek.albedoCnt * gammaPair
+        val imgOffY = texh - 1 - (SkyboxModelHosek.gradSize * turb0 + yp)
         val fileOffset = TGA_HEADER_SIZE + 4 * (imgOffY * texw + imgOffX)
         return bytes[fileOffset + channel]
     }
@@ -171,13 +172,13 @@ class GenerateSkyboxTextureAtlas {
 
         for (gammaPair in 0..1) {
 
-            for (albedo0 in 0 until Skybox.albedoCnt) {
-                val albedo = Skybox.albedos[albedo0]
+            for (albedo0 in 0 until SkyboxModelHosek.albedoCnt) {
+                val albedo = SkyboxModelHosek.albedos[albedo0]
                 println("Albedo=$albedo")
-                for (turb0 in 0 until Skybox.turbCnt) {
-                    val turbidity = Skybox.turbiditiesD[turb0]
+                for (turb0 in 0 until SkyboxModelHosek.turbCnt) {
+                    val turbidity = SkyboxModelHosek.turbiditiesD[turb0]
                     println("....... Turbidity=$turbidity")
-                    for (elev0 in 0 until Skybox.elevCnt) {
+                    for (elev0 in 0 until SkyboxModelHosek.elevCnt) {
 
                         val avrB = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 0).toUint() }.toDouble() / gradSizes.size).div(255.0).toFloat()
                         val avrG = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 1).toUint() }.toDouble() / gradSizes.size).div(255.0).toFloat()
@@ -193,7 +194,7 @@ class GenerateSkyboxTextureAtlas {
                             colour.a.times(255f).roundToInt().coerceIn(0..255).toByte()
                         )
 
-                        val imgOffX = albedo0 * Skybox.elevCnt + elev0 + Skybox.elevCnt * Skybox.albedoCnt * gammaPair
+                        val imgOffX = albedo0 * SkyboxModelHosek.elevCnt + elev0 + SkyboxModelHosek.elevCnt * SkyboxModelHosek.albedoCnt * gammaPair
                         val imgOffY = texh2 - 1 - turb0
                         val fileOffset = TGA_HEADER_SIZE + 4 * (imgOffY * texw + imgOffX)
 

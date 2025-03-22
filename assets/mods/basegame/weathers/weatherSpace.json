@@ -1,0 +1,15 @@
+{
+  "identifier": "space",
+  "skyboxGradColourMap": "static:#020202,#060604",
+  "daylightClut": "static:#FFFFFF",
+  "tags": "space",
+  "cloudChance": 0,
+  "cloudGamma": [1.0, 1.0],
+  "cloudGammaVariance": [0.0, 0.0],
+  "windSpeed": 0.0,
+  "windSpeedVariance": 0.0,
+  "windSpeedDamping": 0.0,
+  "clouds": {},
+  "atmoTurbidity": 1.0,
+  "shaderVibrancy": [1.0, 1.0]
+}

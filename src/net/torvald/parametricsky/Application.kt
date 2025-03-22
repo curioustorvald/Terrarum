@@ -13,14 +13,11 @@ import net.torvald.unicode.EMDASH
 import net.torvald.colourutil.*
 import net.torvald.parametricsky.datasets.DatasetCIEXYZ
 import net.torvald.terrarum.abs
-import net.torvald.terrarum.clut.Skybox
-import net.torvald.terrarum.clut.Skybox.coerceInSmoothly
-import net.torvald.terrarum.clut.Skybox.mapCircle
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
+import net.torvald.terrarum.weather.SkyboxModelHosek.coerceInSmoothly
 import java.awt.BorderLayout
 import java.awt.Dimension
-import java.lang.Math.pow
 import javax.swing.*
 import kotlin.math.*
 

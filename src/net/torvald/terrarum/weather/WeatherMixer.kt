@@ -19,17 +19,11 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import net.torvald.terrarum.RNGConsumer
-import net.torvald.terrarum.clut.Skybox
-import net.torvald.terrarum.clut.Skybox.elevCnt
-import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.terrarum.utils.forEachSiblings
+import net.torvald.terrarum.weather.SkyboxModelHosek.elevCnt
 import net.torvald.terrarum.weather.WeatherObjectCloud.Companion.ALPHA_ROLLOFF_Z
 import net.torvald.terrarum.weather.WeatherObjectCloud.Companion.NEWBORN_GROWTH_TIME
 import net.torvald.terrarum.worlddrawer.WorldCamera
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.util.SortedArrayList
-import java.io.File
-import java.io.FileFilter
 import java.lang.Double.doubleToLongBits
 import java.lang.Math.toDegrees
 import kotlin.collections.ArrayList
@@ -57,7 +51,7 @@ internal object WeatherMixer : RNGConsumer {
     val DEFAULT_WEATHER = BaseModularWeather(
         "default",
         JsonValue(JsonValue.ValueType.`object`),
-        GdxColorMap(1, 3, Color(0x55aaffff), Color(0xaaffffff.toInt()), Color.WHITE),
+        SkyboxGradSimple(GdxColorMap(1, 2, Color(0x55aaffff), Color(0xaaffffff.toInt()))),
         GdxColorMap(2, 2, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE),
         listOf("default"),
         0f,
@@ -556,7 +550,7 @@ internal object WeatherMixer : RNGConsumer {
         fun g(x: Double) = Math.toDegrees(atan(RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_45DEG * x))
         val phi = currentsolarDeg + CLOUD_SOLARDEG_OFFSET
         val x = cloudY
-        return g(x + a(phi)).bipolarClamp(Skybox.elevMax)
+        return g(x + a(phi)).bipolarClamp(SkyboxModelHosek.elevMax)
     }
 
     /**
@@ -661,7 +655,7 @@ internal object WeatherMixer : RNGConsumer {
 
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
 
-        val (tex, uvs, turbTihsBlend, albThisBlend, turbOldBlend, albOldBlend) = Skybox.getUV(
+        val (tex, uvs, turbTihsBlend, albThisBlend, turbOldBlend, albOldBlend) = SkyboxModelHosek.getUV(
             solarElev,
             oldTurbidity,
             oldAlbedo,
@@ -819,14 +813,14 @@ internal object WeatherMixer : RNGConsumer {
         val angleX2 = (angleX1 + 1).coerceAtMost(150)
         val ax = solarAngleInDeg - solarAngleInDegInt
         // fine-grained
-        val turbY = turbidity.coerceIn(Skybox.turbiditiesD.first(), Skybox.turbiditiesD.last()).minus(1.0)
-            .times(Skybox.turbDivisor)
+        val turbY = turbidity.coerceIn(SkyboxModelHosek.turbiditiesD.first(), SkyboxModelHosek.turbiditiesD.last()).minus(1.0)
+            .times(SkyboxModelHosek.turbDivisor)
         val turbY1 = turbY.floorToInt()
-        val turbY2 = (turbY1 + 1).coerceAtMost(Skybox.turbCnt - 1)
+        val turbY2 = (turbY1 + 1).coerceAtMost(SkyboxModelHosek.turbCnt - 1)
         val tx = turbY - turbY1
         // coarse-grained
         val albX =
-            albedo.coerceIn(Skybox.albedos.first(), Skybox.albedos.last()).times(5.0) // 0..5
+            albedo.coerceIn(SkyboxModelHosek.albedos.first(), SkyboxModelHosek.albedos.last()).times(5.0) // 0..5
         val albX1 = albX.floorToInt() * elevCnt
         val albX2 = (albX + 1).floorToInt().coerceAtMost(5) * elevCnt
         val bx = ((albX * elevCnt) - albX1) / elevCnt
@@ -844,14 +838,14 @@ internal object WeatherMixer : RNGConsumer {
         val a2t1b2A = colorMap.getCvec(albX2 + angleX2, turbY1)
         val a1t2b2A = colorMap.getCvec(albX2 + angleX1, turbY2)
         val a2t2b2A = colorMap.getCvec(albX2 + angleX2, turbY2)
-        val a1t1b1B = colorMap.getCvec(albX1 + angleX1 + Skybox.albedoCnt * elevCnt, turbY1)
-        val a2t1b1B = colorMap.getCvec(albX1 + angleX2 + Skybox.albedoCnt * elevCnt, turbY1)
-        val a1t2b1B = colorMap.getCvec(albX1 + angleX1 + Skybox.albedoCnt * elevCnt, turbY2)
-        val a2t2b1B = colorMap.getCvec(albX1 + angleX2 + Skybox.albedoCnt * elevCnt, turbY2)
-        val a1t1b2B = colorMap.getCvec(albX2 + angleX1 + Skybox.albedoCnt * elevCnt, turbY1)
-        val a2t1b2B = colorMap.getCvec(albX2 + angleX2 + Skybox.albedoCnt * elevCnt, turbY1)
-        val a1t2b2B = colorMap.getCvec(albX2 + angleX1 + Skybox.albedoCnt * elevCnt, turbY2)
-        val a2t2b2B = colorMap.getCvec(albX2 + angleX2 + Skybox.albedoCnt * elevCnt, turbY2)
+        val a1t1b1B = colorMap.getCvec(albX1 + angleX1 + SkyboxModelHosek.albedoCnt * elevCnt, turbY1)
+        val a2t1b1B = colorMap.getCvec(albX1 + angleX2 + SkyboxModelHosek.albedoCnt * elevCnt, turbY1)
+        val a1t2b1B = colorMap.getCvec(albX1 + angleX1 + SkyboxModelHosek.albedoCnt * elevCnt, turbY2)
+        val a2t2b1B = colorMap.getCvec(albX1 + angleX2 + SkyboxModelHosek.albedoCnt * elevCnt, turbY2)
+        val a1t1b2B = colorMap.getCvec(albX2 + angleX1 + SkyboxModelHosek.albedoCnt * elevCnt, turbY1)
+        val a2t1b2B = colorMap.getCvec(albX2 + angleX2 + SkyboxModelHosek.albedoCnt * elevCnt, turbY1)
+        val a1t2b2B = colorMap.getCvec(albX2 + angleX1 + SkyboxModelHosek.albedoCnt * elevCnt, turbY2)
+        val a2t2b2B = colorMap.getCvec(albX2 + angleX2 + SkyboxModelHosek.albedoCnt * elevCnt, turbY2)
 
         // no srgblerp here to match the skybox shader's behaviour
 

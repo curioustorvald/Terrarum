@@ -17,7 +17,6 @@ import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
-import net.torvald.terrarum.clut.Skybox
 import net.torvald.terrarum.console.CommandDict
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
@@ -35,8 +34,8 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadSimpleWorld
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.utils.OpenURL
+import net.torvald.terrarum.weather.SkyboxModelHosek
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
@@ -247,7 +246,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiContainer.add(uiRemoCon)
 
         CommandDict // invoke
-        Skybox.loadlut() // invoke
+        SkyboxModelHosek.loadlut() // invoke
 //        Skybox.initiate() // invoke the lengthy calculation
         // TODO add console here
 

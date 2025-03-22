@@ -1,5 +1,6 @@
 package net.torvald.terrarum.weather
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
@@ -39,6 +40,8 @@ class WeatherCodex : Disposable {
 
     fun readFromJson(modname: String, file: File) = readFromJson(modname, file.path)
 
+    private val pathToImage = "weathers"
+
     fun readFromJson(modname: String, path: String) {
         /* JSON structure:
 {
@@ -52,12 +55,11 @@ class WeatherCodex : Disposable {
   ]
 }
          */
-        val pathToImage = "weathers"
 
         val JSON = JsonFetcher(path)
 
-        val skyboxInJson = JSON.getString("skyboxGradColourMap")
-        val lightbox = JSON.getString("daylightClut")
+        val skyboxModel = JSON.getString("skyboxGradColourMap")
+        val lightboxModel = JSON.getString("daylightClut")
 
         val cloudsMap = ArrayList<CloudProps>()
         val clouds = JSON["clouds"]
@@ -81,8 +83,8 @@ class WeatherCodex : Disposable {
         val obj = BaseModularWeather(
             identifier = ident,
             json = JSON,
-            skyboxGradColourMap = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${skyboxInJson}")),
-            daylightClut = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${lightbox}")),
+            skyboxGradColourMap = getSkyboxModelByName(modname, skyboxModel),
+            daylightClut = getLightboxModelByName(modname, lightboxModel),
             tags = tags,
             cloudChance = JSON.getFloat("cloudChance"),
             windSpeed = JSON.getFloat("windSpeed"),
@@ -117,5 +119,72 @@ class WeatherCodex : Disposable {
             k
         }
         else getByTag(tag)!!.random()
+    }
+
+    private fun getSkyboxModelByName(modname: String, name: String): SkyboxModel {
+        return if (name.startsWith("model:")) {
+            when (name.substring(6)) {
+                "hosek" -> SkyboxModelHosek
+                else -> throw UnsupportedOperationException("Unknown skybox model: '$name'")
+            }
+        }
+        else if (name.startsWith("lut:")) {
+            val filename = name.substring(4)
+            val colourMap = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${filename}"))
+            SkyboxGradSimple(colourMap)
+        }
+        else if (name.startsWith("static:")) {
+            val argstr = name.substring(7)
+            val args = argstr.split(',').map {
+                if (it.length == 7) // #RRGGBB
+                    Color(
+                        it.substring(1, 3).toInt(16) / 255.0f,
+                        it.substring(3, 5).toInt(16) / 255.0f,
+                        it.substring(5, 7).toInt(16) / 255.0f,
+                        1f,
+                    )
+                else if (it.length == 9) // #RRGGBBAA
+                    Color(
+                        it.substring(1, 3).toInt(16) / 255.0f,
+                        it.substring(3, 5).toInt(16) / 255.0f,
+                        it.substring(5, 7).toInt(16) / 255.0f,
+                        it.substring(7, 9).toInt(16) / 255.0f,
+                    )
+                else if (it.length == 4) // #RGB
+                    Color(
+                        it.substring(1, 2).toInt(16) / 15.0f,
+                        it.substring(2, 3).toInt(16) / 15.0f,
+                        it.substring(3, 4).toInt(16) / 15.0f,
+                        1f,
+                    )
+                else if (it.length == 5) // #RGBA
+                    Color(
+                        it.substring(1, 2).toInt(16) / 15.0f,
+                        it.substring(2, 3).toInt(16) / 15.0f,
+                        it.substring(3, 4).toInt(16) / 15.0f,
+                        it.substring(4, 5).toInt(16) / 15.0f,
+                    )
+                else throw IllegalArgumentException("Unknown colour code: $it")
+            }
+            SkyboxGradSimple(GdxColorMap(args.size, 1, args))
+        }
+        else {
+            throw UnsupportedOperationException("Unknown skybox: '$name'")
+        }
+    }
+
+    private fun getLightboxModelByName(modname: String, name: String): GdxColorMap {
+        return if (name.startsWith("lut:")) {
+            val filename = name.substring(4)
+            GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${filename}"))
+        }
+        else if (name.startsWith("static:")) {
+            val argstr = name.substring(7)
+            val args = argstr.split(',').map { Color.WHITE }
+            GdxColorMap(args.size, 1, args)
+        }
+        else {
+            throw UnsupportedOperationException("Unknown skybox: '$name'")
+        }
     }
 }

@@ -19,7 +19,7 @@ import kotlin.math.absoluteValue
 data class BaseModularWeather(
     val identifier: String,
     val json: JsonValue,
-    var skyboxGradColourMap: GdxColorMap, // row 0: skybox grad top, row 1: skybox grad bottom, row 2: sunlight (RGBA)
+    var skyboxGradColourMap: SkyboxModel, // row 0: skybox grad top, row 1: skybox grad bottom, row 2: sunlight (RGBA)
     val daylightClut: GdxColorMap,
     val tags: List<String>,
     val cloudChance: Float,

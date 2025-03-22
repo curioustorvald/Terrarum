@@ -1,4 +1,4 @@
-package net.torvald.terrarum.clut
+package net.torvald.terrarum.weather
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
@@ -14,14 +14,13 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.abs
 import net.torvald.terrarum.floorToInt
-import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.*
 
 /**
  * Created by minjaesong on 2023-07-09.
  */
-object Skybox : Disposable {
+object SkyboxModelHosek : SkyboxModel {
 
     private const val HALF_PI = 1.5707963267948966
     private const val PI = 3.141592653589793
@@ -294,8 +293,8 @@ object Skybox : Disposable {
     }
 
     override fun dispose() {
-        if (Skybox::gradTexBinLowAlbedo.isInitialized) gradTexBinLowAlbedo.forEach { it.texture.dispose() }
-        if (Skybox::gradTexBinHighAlbedo.isInitialized) gradTexBinHighAlbedo.forEach { it.texture.dispose() }
-        if (Skybox::tex.isInitialized) tex.dispose()
+        if (SkyboxModelHosek::gradTexBinLowAlbedo.isInitialized) gradTexBinLowAlbedo.forEach { it.texture.dispose() }
+        if (SkyboxModelHosek::gradTexBinHighAlbedo.isInitialized) gradTexBinHighAlbedo.forEach { it.texture.dispose() }
+        if (SkyboxModelHosek::tex.isInitialized) tex.dispose()
     }
 }

@@ -61,6 +61,15 @@ class GdxColorMap {
         is2D = (height > 1)
     }
 
+    constructor(width: Int, height: Int, colours: List<Color>) {
+        dataRaw = colours.map { it.toIntBits() }.toIntArray()
+        dataGdxColor = dataRaw.map { Color(it) }.toTypedArray()
+        dataCvec = dataRaw.map { Cvec(it) }.toTypedArray()
+        this.width = width
+        this.height = height
+        is2D = (height > 1)
+    }
+
     private val dataRaw: IntArray
     private val dataGdxColor: Array<Color>
     private val dataCvec: Array<Cvec>
