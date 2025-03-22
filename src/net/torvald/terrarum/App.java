@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.github.strikerx3.jxinput.XInputDevice;
 import kotlin.jvm.functions.Function0;
 import kotlin.text.Charsets;
@@ -351,7 +352,8 @@ public class App implements ApplicationListener {
     }
 
     public static ShapeRenderer makeShapeRenderer() {
-        return new ShapeRenderer(5000, DefaultGL32Shaders.INSTANCE.createShapeRendererShader());
+        ShapeRenderer s = new ShapeRenderer(5000, DefaultGL32Shaders.INSTANCE.createShapeRendererShader());
+        return s;
     }
 
     public static boolean gl40capable = false;
@@ -468,7 +470,11 @@ public class App implements ApplicationListener {
             appConfig.setTitle(GAME_NAME);
             //appConfig.forceExit = true; // it seems KDE 5 likes this one better...
             // (Plasma freezes upon app exit. with forceExit = true, it's only frozen for a minute; with forceExit = false, it's indefinite)
-            //appConfig.samples = 4; // force the AA on, if the graphics driver didn't do already
+
+            if (SharedLibraryLoader.isMac)
+                appConfig.setBackBufferConfig(8, 8, 8, 8, 16, 0, 4);
+            else
+                appConfig.setBackBufferConfig(16, 16, 16, 16, 16, 0, 4);
 
             // load app icon
             appConfig.setWindowIcon(Files.FileType.Classpath,

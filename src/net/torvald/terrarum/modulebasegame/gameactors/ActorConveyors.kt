@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
@@ -7,6 +8,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
 import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
+import org.lwjgl.opengl.GL11
 import java.util.*
 import kotlin.math.*
 
@@ -153,7 +155,9 @@ class ActorConveyors : ActorWithBody {
         batch.end()
 
         shapeRender.projectionMatrix = batch.projectionMatrix
+            Gdx.gl.glEnable(GL11.GL_LINE_SMOOTH)
         shapeRender.inUse {
+
             it.color = COL_BELT
 
             // belt top

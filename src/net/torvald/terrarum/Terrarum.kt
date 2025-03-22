@@ -41,6 +41,7 @@ import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.util.CircularArray
 import org.dyn4j.geometry.Vector2
+import org.lwjgl.opengl.GL11
 import java.io.File
 import java.io.PrintStream
 import kotlin.math.*
