@@ -2,7 +2,7 @@
   "identifier": "overcast01",
   "skyboxGradColourMap": "model:hosek",
   "daylightClut": "lut:clut_daylight.tga",
-  "tags": "overcast",
+  "tags": "terrestrial,overcast",
   "cloudChance": 200,
   "cloudGamma": [1.45, 1.0],
   "cloudGammaVariance": [0.0, 0.0],

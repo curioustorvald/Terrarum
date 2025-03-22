@@ -2,7 +2,7 @@
   "identifier": "generic02",
   "skyboxGradColourMap": "model:hosek",
   "daylightClut": "lut:clut_daylight.tga",
-  "tags": "generic2",
+  "tags": "terrestrial,generic",
   "cloudChance": 150,
   "cloudGamma": [0.9, 2.4],
   "cloudGammaVariance": [0.111, 0.0],

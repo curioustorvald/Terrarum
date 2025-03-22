@@ -65,7 +65,10 @@ class Weatherbox {
 
     private fun pickNextWeather(): WeatherSchedule {
         // temporary setup for the release
-        val newWeather = WeatherCodex.getRandom()
+        var newWeather = WeatherCodex.getRandom()
+        while (!newWeather.tags.contains("terrestrial")) {
+            newWeather = WeatherCodex.getRandom()
+        }
         val newDuration = takeTriangularRand(3600f..10800f).roundToLong()
         return WeatherSchedule(newWeather, newDuration)
     }

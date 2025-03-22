@@ -1,7 +1,7 @@
 {
   "identifier": "space",
   "skyboxGradColourMap": "static:#020202,#060604",
-  "daylightClut": "static:#FFFFFF",
+  "daylightClut": "static:#FFF7",
   "tags": "space",
   "cloudChance": 0,
   "cloudGamma": [1.0, 1.0],

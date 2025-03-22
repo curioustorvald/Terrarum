@@ -137,9 +137,17 @@ class ActorConveyors : ActorWithBody {
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
 
-        turn += delta * 2
-        while (turn >= 1f) turn -= 1f
+//        turn += delta * 2
+//        while (turn >= 1.0) turn -= 1.0
+
+        turn = 0.0
     }
+
+    @Transient var smu = 0
+
+    override var tooltipText: String?
+        get() = "segmentsUsed=$smu"
+        set(value) {}
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         batch.end()
@@ -160,14 +168,14 @@ class ActorConveyors : ActorWithBody {
             // draw belt stripes under
             it.color = COL_BELT_ALT
             val segmentLen = s / c
-            val topSegRemainder = l % segmentLen
+            var segmentsUsed = 0
             for (i in 0 until c / 2) { // not exact code but whatever
                 val x1 = btx1 + r * sin(di - HALF_PI) * (i - turn + 0.00) * segmentLen
                 val y1 = bty1 + r * cos(di - HALF_PI) * (i - turn + 0.00) * segmentLen
                 val x2 = btx1 + r * sin(di - HALF_PI) * (i - turn + 0.25) * segmentLen
                 val y2 = bty1 + r * cos(di - HALF_PI) * (i - turn + 0.25) * segmentLen
 
-                if (x1 in btx1 - 4..btx2 + 4) {
+                if (x1 in btx1..btx2) {
                     if (bty2 > bty1)
                         drawLineOnWorld(
                             x1.coerceIn(btx1..btx2),
@@ -184,27 +192,29 @@ class ActorConveyors : ActorWithBody {
                             y2.coerceIn(bty2..bty1),
                             2f
                         )
+                    segmentsUsed++
                 }
             }
-
-            // stripes at the left spindle
+            smu = segmentsUsed
+            // stripes at the right spindle
             // eq: k units/s on straight part == (k / r) rad/s on curve
-            val k = topSegRemainder + turn // TODO calculate starting angle offset
-            val angularOffsetStart = di + k
-            val segmentCount = r / segmentLen
+            val k = segmentsUsed * segmentLen - l - turn * segmentLen
+            val angularOffsetStart = di + k / r // use di as a starting point, then add some value to offset it cw
+            val segmentCount = 2//r / segmentLen
             for (i in 0 until segmentCount.toInt()) {
                 val a1 = angularOffsetStart + segmentLen * i
-
-                drawArcOnWorld(cx1, cy1, r, a1, segmentLen * 0.25, 2f)
+                it.color = listOf(Color.LIME, Color.CORAL, Color.CYAN)[i]
+                drawArcOnWorld(cx2, cy2, r, -a1, -segmentLen * 0.25, 2f)
             }
 
             // bottom straight part
-            val bottomSectionOffset = (l + Math.PI * r) % segmentLen
+            it.color = COL_BELT_ALT
+            /*val bottomSectionOffset = (l + Math.PI * r) % segmentLen
             for (i in 0 until c / 2) { // not exact code but whatever
                 val x1 = bbx1 + bottomSectionOffset + r * sin(di - HALF_PI) * (i + turn - 0.00) * segmentLen
-                val y1 = bby1 + bottomSectionOffset + r * cos(di - HALF_PI) * (i + turn - 0.00) * segmentLen
+                val y1 = bby1 + bottomSectionOffset + r * cos(di - HALF_PI) * (i + turn - 0.00) * segmentLen - 1
                 val x2 = bbx1 + bottomSectionOffset + r * sin(di - HALF_PI) * (i + turn - 0.25) * segmentLen
-                val y2 = bby1 + bottomSectionOffset + r * cos(di - HALF_PI) * (i + turn - 0.25) * segmentLen
+                val y2 = bby1 + bottomSectionOffset + r * cos(di - HALF_PI) * (i + turn - 0.25) * segmentLen - 1
 
                 if (x1 in bbx1 - 4..bbx2 + 4) {
                     if (bby2 > bby1)
@@ -224,15 +234,15 @@ class ActorConveyors : ActorWithBody {
                             2f
                         )
                 }
-            }
+            }*/
 
 
 
             it.color = COL_BELT_TOP
             // belt top
-            drawLineOnWorld(btx1, bty1 - 0.5f, btx2, bty2 - 0.5f, 1f)
+//            drawLineOnWorld(btx1, bty1 - 0.5f, btx2, bty2 - 0.5f, 1f)
             // belt bottom
-            drawLineOnWorld(bbx1, bby1 - 0.5f, bbx2, bby2 - 0.5f, 1f)
+//            drawLineOnWorld(bbx1, bby1 - 0.5f, bbx2, bby2 - 0.5f, 1f)
         }
 
         batch.begin()
@@ -248,10 +258,9 @@ class ActorConveyors : ActorWithBody {
 
     private fun drawArcOnWorld(xc: Double, yc: Double, r: Double, arcStart: Double, arcDeg: Double, width: Float) {
         // dissect the circle
-        val pathLen = (arcDeg * r).absoluteValue
+        val pathLen = (arcDeg * r).absoluteValue * 2
         //// estimated number of segments. pathLen divided by sqrt(2)
-        val segments = Math.round(pathLen).coerceAtLeast(1L).toInt()
-//        val segments = 12 * 8
+        val segments = (4 * Math.cbrt(r) * arcDeg.absoluteValue).toInt().coerceAtLeast(1)
 
         for (i in 0 until segments) {
             val degStart = (i.toDouble() / segments) * arcDeg + arcStart
