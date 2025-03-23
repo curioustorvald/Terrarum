@@ -212,14 +212,14 @@ class ActorConveyors : ActorWithBody {
 
             val lSegCnt = l / segmentLen
             val cSegCnt = (c / 2.0) - lSegCnt
-            val cSegOffset = cSegCnt fmod 1.0 // [turn]
-            val turnOffset = -cSegOffset / r
-            tooltipText = "di=$di, dd=$dd\nsegLen=$segmentLen\ntotalSegCnt=$c\nlSegCnt=$lSegCnt\ncSegCnt=$cSegCnt\ncSegOffset=$cSegOffset\nr=$r"
+            val cSegOffset = (cSegCnt fmod 1.0) * segmentLen // [pixels]
+            val turnOffset = cSegOffset / r
+            tooltipText = "di=$di, dd=$dd\nsegLen=$segmentLen\ntotalSegCnt=$c\nlSegCnt=$lSegCnt\ncSegCnt=$cSegCnt\ncSegOffset=$cSegOffset\nturnOffset=$turnOffset\nr=$r"
             for (i in 0 until 2) {
                 it.color = listOf(Color.LIME, Color.CORAL, Color.CYAN)[i]
                 drawArcOnWorld(cx2, cy2, r,
-                    turnOffset + di,
-                    -segmentLen * 0.25, 2f)
+                    di - turnOffset, // use `di` as the baseline
+                    -(segmentLen * 0.25) / r, 2f)
             }
 
             // bottom straight part
