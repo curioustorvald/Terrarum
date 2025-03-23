@@ -143,10 +143,10 @@ class ActorConveyors : ActorWithBody {
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
 
-//        turn += delta * 2
-//        while (turn >= 1.0) turn -= 1.0
+        turn += delta / 1
+        while (turn >= 1.0) turn -= 1.0
 
-        turn = 0.0
+//        turn = 0.0
     }
 
     @Transient var smu = 0
@@ -177,8 +177,8 @@ class ActorConveyors : ActorWithBody {
             var segmentsUsed = 0
             for (i in 0 until c / 2) { // not exact code but whatever
                 //= originPoint + segmentLen * (translation terms) * (movement on the belt terms)
-                val m = segmentLen * (i + 0.00)
-                val n = segmentLen * (i + 0.25 - turn)
+                val m = segmentLen * (i + 0.00 + turn)
+                val n = segmentLen * (i + 0.25 + turn)
                 val x1 = btx1 + m * cos(dd)
                 val y1 = bty1 - m * sin(dd)
                 val x2 = btx1 + n * cos(dd)
@@ -215,10 +215,10 @@ class ActorConveyors : ActorWithBody {
             val cSegOffset = (cSegCnt fmod 1.0) * segmentLen // [pixels]
             val turnOffset = cSegOffset / r
             tooltipText = "di=$di, dd=$dd\nsegLen=$segmentLen\ntotalSegCnt=$c\nlSegCnt=$lSegCnt\ncSegCnt=$cSegCnt\ncSegOffset=$cSegOffset\nturnOffset=$turnOffset\nr=$r"
-            for (i in 0 until 2) {
-                it.color = listOf(Color.LIME, Color.CORAL, Color.CYAN)[i]
+            for (i in 0 until 3) {
+//                it.color = listOf(Color.LIME, Color.CORAL, Color.CYAN)[i]
                 drawArcOnWorld(cx2, cy2, r,
-                    di - turnOffset, // use `di` as the baseline
+                    di - turnOffset - segmentLen * (-i + turn) / r, // use `di` as the baseline
                     -(segmentLen * 0.25) / r, 2f)
             }
 
