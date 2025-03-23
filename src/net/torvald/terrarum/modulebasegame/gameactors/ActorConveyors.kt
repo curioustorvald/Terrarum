@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
 import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
 import org.lwjgl.opengl.GL11
@@ -54,9 +55,9 @@ class ActorConveyors : ActorWithBody {
     val x2: Int // always positive
     val y2: Int
 
-    private val s: Double // belt length (total)
-    private val l: Double // belt length (single straight part)
-    private val c: Int // total segment counts
+    private var s: Double // belt length (total)
+    private var l: Double // belt length (single straight part)
+    private var c: Int // total segment counts
 
     private val di: Double // inclination deg
     private val dd: Double // declination deg
@@ -93,6 +94,9 @@ class ActorConveyors : ActorWithBody {
     override fun reload() {
         super.reload()
         shapeRender = App.makeShapeRenderer()
+        s = calcBeltLength(x1, y1, x2, y2)
+        l = calcBeltLengthStraightPart(x1, y1, x2, y2)
+        c = (s / 32).roundToInt() * 2 // 16px segments rounded towards nearest even number
     }
 
     /**
@@ -147,9 +151,7 @@ class ActorConveyors : ActorWithBody {
 
     @Transient var smu = 0
 
-    override var tooltipText: String?
-        get() = "segmentsUsed=$smu"
-        set(value) {}
+    override var tooltipText: String? = ""
 
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         batch.end()
@@ -174,13 +176,16 @@ class ActorConveyors : ActorWithBody {
             val segmentLen = s / c
             var segmentsUsed = 0
             for (i in 0 until c / 2) { // not exact code but whatever
-                val x1 = btx1 + r * sin(di - HALF_PI) * (i - turn + 0.00) * segmentLen
-                val y1 = bty1 + r * cos(di - HALF_PI) * (i - turn + 0.00) * segmentLen
-                val x2 = btx1 + r * sin(di - HALF_PI) * (i - turn + 0.25) * segmentLen
-                val y2 = bty1 + r * cos(di - HALF_PI) * (i - turn + 0.25) * segmentLen
+                //= originPoint + segmentLen * (translation terms) * (movement on the belt terms)
+                val m = segmentLen * (i + 0.00)
+                val n = segmentLen * (i + 0.25 - turn)
+                val x1 = btx1 + m * cos(dd)
+                val y1 = bty1 - m * sin(dd)
+                val x2 = btx1 + n * cos(dd)
+                val y2 = bty1 - n * sin(dd)
 
                 if (x1 in btx1..btx2) {
-                    if (bty2 > bty1)
+                    if (bty2 > bty1) {
                         drawLineOnWorld(
                             x1.coerceIn(btx1..btx2),
                             y1.coerceIn(bty1..bty2),
@@ -188,7 +193,8 @@ class ActorConveyors : ActorWithBody {
                             y2.coerceIn(bty1..bty2),
                             2f
                         )
-                    else
+                    }
+                    else {
                         drawLineOnWorld(
                             x1.coerceIn(btx1..btx2),
                             y1.coerceIn(bty2..bty1),
@@ -196,19 +202,24 @@ class ActorConveyors : ActorWithBody {
                             y2.coerceIn(bty2..bty1),
                             2f
                         )
+                    }
                     segmentsUsed++
                 }
             }
             smu = segmentsUsed
             // stripes at the right spindle
             // eq: k units/s on straight part == (k / r) rad/s on curve
-            val k = segmentsUsed * segmentLen - l - turn * segmentLen
-            val angularOffsetStart = di + k / r // use di as a starting point, then add some value to offset it cw
-            val segmentCount = 2//r / segmentLen
-            for (i in 0 until segmentCount.toInt()) {
-                val a1 = angularOffsetStart + segmentLen * i
+
+            val lSegCnt = l / segmentLen
+            val cSegCnt = (c / 2.0) - lSegCnt
+            val cSegOffset = cSegCnt fmod 1.0 // [turn]
+            val turnOffset = -cSegOffset / r
+            tooltipText = "di=$di, dd=$dd\nsegLen=$segmentLen\ntotalSegCnt=$c\nlSegCnt=$lSegCnt\ncSegCnt=$cSegCnt\ncSegOffset=$cSegOffset\nr=$r"
+            for (i in 0 until 2) {
                 it.color = listOf(Color.LIME, Color.CORAL, Color.CYAN)[i]
-                drawArcOnWorld(cx2, cy2, r, -a1, -segmentLen * 0.25, 2f)
+                drawArcOnWorld(cx2, cy2, r,
+                    turnOffset + di,
+                    -segmentLen * 0.25, 2f)
             }
 
             // bottom straight part
