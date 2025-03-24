@@ -217,9 +217,19 @@ class ActorConveyors : ActorWithBody {
             tooltipText = "di=$di, dd=$dd\nsegLen=$segmentLen\ntotalSegCnt=$c\nlSegCnt=$lSegCnt\ncSegCnt=$cSegCnt\ncSegOffset=$cSegOffset\nturnOffset=$turnOffset\nr=$r"
             for (i in 0 until 3) {
 //                it.color = listOf(Color.LIME, Color.CORAL, Color.CYAN)[i]
-                drawArcOnWorld(cx2, cy2, r,
-                    di - turnOffset - segmentLen * (-i + turn) / r, // use `di` as the baseline
-                    -(segmentLen * 0.25) / r, 2f)
+
+                val arcStart = di - turnOffset - segmentLen * (-i + turn) / r // use `di` as the baseline
+                val arcSize = -(segmentLen * 0.25) / r
+                val arcEnd = arcStart + arcSize
+                val arcRange = di-Math.PI..di
+
+                // if the arc overlaps the larger arc...
+                if (arcStart in arcRange || arcEnd in arcRange)
+                    drawArcOnWorld(cx2, cy2, r,
+                        arcStart.coerceIn(arcRange), // this doesn't work due to sign flipping
+                        arcSize.coerceIn(arcRange),
+                        2f
+                    )
             }
 
             // bottom straight part
@@ -273,7 +283,6 @@ class ActorConveyors : ActorWithBody {
 
     private fun drawArcOnWorld(xc: Double, yc: Double, r: Double, arcStart: Double, arcDeg: Double, width: Float) {
         // dissect the circle
-        val pathLen = (arcDeg * r).absoluteValue * 2
         //// estimated number of segments. pathLen divided by sqrt(2)
         val segments = (4 * Math.cbrt(r) * arcDeg.absoluteValue).toInt().coerceAtLeast(1)
 
