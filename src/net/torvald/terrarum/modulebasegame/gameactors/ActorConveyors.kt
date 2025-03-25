@@ -83,11 +83,11 @@ class ActorConveyors : ActorWithBody {
     private var turn: Double = 0.0 // TODO decide if the max should be 1.0 or TWO_PI. For a numerical precision, 1.0 is recommended though
 
     companion object {
-        private val COL_BELT = Color(0x444444ff)
-        private val COL_BELT_TOP = Color(0x666666ff)
+        private val COL_BELT = Color(0x41434eff)
+        private val COL_BELT_TOP = Color(0x636678ff)
 
-        private val COL_BELT_ALT = Color.MAGENTA//Color(0x888888ff.toInt())
-        private val COL_BELT_TOP_ALT = Color(0xccccccff.toInt())
+        private val COL_BELT_ALT = Color(0x858795ff.toInt())
+        private val COL_BELT_TOP_ALT = Color(0xc9caceff.toInt())
     }
 
     @Transient private var shapeRender = App.makeShapeRenderer()
@@ -110,6 +110,7 @@ class ActorConveyors : ActorWithBody {
         this.x2 = x2
         this.y2 = y2
 
+        r = 0.5 * TILE_SIZED.minus(2)
         s = calcBeltLength(x1, y1, x2, y2)
         l = calcBeltLengthStraightPart(x1, y1, x2, y2)
 
@@ -121,7 +122,6 @@ class ActorConveyors : ActorWithBody {
         cx2 = (this.x2 + 0.5) * TILE_SIZED
         cy2 = (this.y2 + 0.5) * TILE_SIZED
 
-        r = 0.5 * TILE_SIZED.minus(2)
         c = (s / 32).roundToInt() * 2 // 16px segments rounded towards nearest even number
 
         btx1 = cx1 + r * sin(di)
@@ -136,7 +136,7 @@ class ActorConveyors : ActorWithBody {
     }
 
     private fun calcBeltLength(x1: Int, y1: Int, x2: Int, y2: Int) =
-        2 * (calcBeltLengthStraightPart(x1, y1, x2, y2) + Math.PI * TILE_SIZED / 2)
+        2 * (calcBeltLengthStraightPart(x1, y1, x2, y2) + Math.PI * r)
 
     private fun calcBeltLengthStraightPart(x1: Int, y1: Int, x2: Int, y2: Int) =
         hypot((x2 - x1) * TILE_SIZED, (y2 - y1) * TILE_SIZED)
@@ -149,8 +149,6 @@ class ActorConveyors : ActorWithBody {
 
 //        turn = 0.0
     }
-
-    override var tooltipText: String? = ""
 
     private fun drawBeltMvmtTop(segmentLen: Double) {
         // Pre-compute ranges once outside the loop
@@ -184,14 +182,15 @@ class ActorConveyors : ActorWithBody {
         val isVert = (dd.absoluteValue in HALF_PI - eps..HALF_PI + eps)
         val isHorz = (dd.absoluteValue in -eps..eps)
 
-        for (i in -1 until c / 2) {
+        for (i in 0 until c / 2 + 1) {
             //= originPoint + segmentLen * (translation terms) * (movement on the belt terms)
-            val (m, n) = if (isVert || isHorz) // a "hack" to fix the GL's pixel rounding error?
-                segmentLen * (-i + 0.125 + turn) to
-                segmentLen * (-i - 0.125 + turn)
+
+            val (m, n) = if (isVert)
+                segmentLen * (-i + 0.25 + turn) to
+                segmentLen * (-i + 0.50 + turn)
             else
-                segmentLen * (-i - 0.00 + turn) to
-                segmentLen * (-i - 0.25 + turn)
+                segmentLen * (-i + 0.375 + turn) to
+                segmentLen * (-i + 0.625 + turn)
 
             val x1 = bbx1 + m * cos(di)
             val y1 = bby1 - m * sin(di)
@@ -232,6 +231,30 @@ class ActorConveyors : ActorWithBody {
         }
     }
 
+    private fun drawBeltMvmtLeftSpindle(segmentLen: Double) {
+        // stripes at the right spindle
+        // eq: k units/s on straight part == (k / r) rad/s on curve
+        val lSegCnt = l / segmentLen
+        val cSegCnt = (c / 2.0) - lSegCnt
+        val cSegOffset = (cSegCnt fmod 1.0) * segmentLen // [pixels]
+        val turnOffset = cSegOffset / r
+        for (i in 0 until 3) {
+
+            val arcStart = dd - turnOffset - segmentLen * (-i + 0.25 + turn) / r // use `di` as the baseline
+            val arcSize = (segmentLen * 0.25) / r
+            val arcEnd = arcStart + arcSize
+            val arcRange = dd-Math.PI..dd
+
+            // if the arc overlaps the larger arc...
+            if (arcStart in arcRange || arcEnd in arcRange)
+                drawArcOnWorld2(cx1, cy1, r,
+                    arcStart.coerceIn(arcRange),
+                    arcEnd.coerceIn(arcRange),
+                    2f
+                )
+        }
+    }
+
     override fun drawBody(frameDelta: Float, batch: SpriteBatch) {
         batch.end()
 
@@ -256,7 +279,7 @@ class ActorConveyors : ActorWithBody {
             drawBeltMvmtTop(segmentLen)
             drawBeltMvmtRightSpindle(segmentLen)
             drawBeltMvmtBottom(segmentLen)
-//            drawBeltMvmtLeftSpindle(segmentLen)
+            drawBeltMvmtLeftSpindle(segmentLen)
 
 
 
