@@ -618,5 +618,8 @@ infix fun Long.shake(other: String): Long {
     return this shake XXHash64.hash(other.toByteArray(), this + 31)
 }
 
-val TWO_PI = Math.PI * 2.0
-val HALF_PI = Math.PI / 2.0
+val ONE_HALF_PI = 4.71238898038469
+val TWO_PI = 6.283185307179586
+val HALF_PI = 1.5707963267948966
+val QUARTER_PI = 0.7853981633974483
+val FOUR_PI = 12.566370614359172

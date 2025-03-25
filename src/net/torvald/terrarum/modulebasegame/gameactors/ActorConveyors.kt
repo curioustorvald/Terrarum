@@ -7,6 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.modulebasegame.worldgenerator.FOUR_PI
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
 import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
 import org.lwjgl.opengl.GL11
@@ -225,9 +226,9 @@ class ActorConveyors : ActorWithBody {
 
                 // if the arc overlaps the larger arc...
                 if (arcStart in arcRange || arcEnd in arcRange)
-                    drawArcOnWorld(cx2, cy2, r,
+                    drawArcOnWorld2(cx2, cy2, r,
                         arcStart.coerceIn(arcRange), // this doesn't work due to sign flipping
-                        arcSize.coerceIn(arcRange),
+                        arcEnd.coerceIn(arcRange),
                         2f
                     )
             }
@@ -298,6 +299,25 @@ class ActorConveyors : ActorWithBody {
             drawLineOnWorld(x1, y1, x2, y2, width)
         }
     }
+
+    private fun drawArcOnWorld2(xc: Double, yc: Double, r: Double, arcStart: Double, arcEnd: Double, width: Float, useLongArc: Boolean = false) {
+        // Calculate the arc angle (arcDeg) from arcStart and arcEnd
+        var arcDeg = arcEnd - arcStart
+
+        // Normalize arcDeg to be within [-2π, 2π]
+        arcDeg = ((arcDeg % TWO_PI) + TWO_PI) % TWO_PI
+
+        // Determine whether to use the long arc or short arc based on useLongArc
+        if (useLongArc && arcDeg < Math.PI) {
+            arcDeg -= TWO_PI // Convert to negative to get the long arc
+        } else if (!useLongArc && arcDeg > Math.PI) {
+            arcDeg -= TWO_PI // Use the shorter arc
+        }
+
+        // Call the original drawArcOnWorld function with the calculated arcDeg
+        drawArcOnWorld(xc, yc, r, arcStart, arcDeg, width)
+    }
+
 
     /** Real time, in nanoseconds */
     @Transient var spawnRequestedTime: Long = 0L
