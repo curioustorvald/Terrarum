@@ -37,6 +37,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.lang.reflect.InvocationTargetException
 import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLClassLoader
@@ -525,12 +526,22 @@ object ModMgr {
             if (it == null) {
                 val loadedClass = Class.forName(className)
                 val loadedClassConstructor = loadedClass.getConstructor(*constructorTypes)
-                return loadedClassConstructor.newInstance(*initArgs) as T
+                try {
+                    return loadedClassConstructor.newInstance(*initArgs) as T
+                }
+                catch (e: InvocationTargetException) {
+                    throw InvocationTargetException(e, "Failed to load class '$className' with given constructor arguments")
+                }
             }
             else {
                 val loadedClass = it.loadClass(className)
                 val loadedClassConstructor = loadedClass.getConstructor(*constructorTypes)
-                return loadedClassConstructor.newInstance(*initArgs) as T
+                try {
+                    return loadedClassConstructor.newInstance(*initArgs) as T
+                }
+                catch (e: InvocationTargetException) {
+                    throw InvocationTargetException(e, "Failed to load class '$className' with given constructor arguments")
+                }
             }
         }
     }
@@ -541,12 +552,22 @@ object ModMgr {
             if (it == null) {
                 val loadedClass = Class.forName(className)
                 val loadedClassConstructor = loadedClass.getConstructor()
-                return loadedClassConstructor.newInstance() as T
+                try {
+                    return loadedClassConstructor.newInstance() as T
+                }
+                catch (e: InvocationTargetException) {
+                    throw InvocationTargetException(e, "Failed to load class '$className' with zero constructor arguments")
+                }
             }
             else {
                 val loadedClass = it.loadClass(className)
                 val loadedClassConstructor = loadedClass.getConstructor()
-                return loadedClassConstructor.newInstance() as T
+                try {
+                    return loadedClassConstructor.newInstance() as T
+                }
+                catch (e: InvocationTargetException) {
+                    throw InvocationTargetException(e, "Failed to load class '$className' with zero constructor arguments")
+                }
             }
         }
     }

@@ -83,6 +83,11 @@ open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
      */
     open var useItemHandler = ""
 
+    /**
+     * In which module the "useItemHandler" is located
+     */
+    open var useItemHandlerModule = "basegame"
+
 
     override var baseMass = 1.0
     override var baseToolSize: Double? = null
@@ -109,10 +114,7 @@ open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
         return if (useItemHandler.isNotBlank()) {
             try {
                 if (classCache == null) {
-                    val newClass = Class.forName(useItemHandler)
-                    val newClassConstructor = newClass.getConstructor(/* no args defined */)
-                    val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
-                    classCache = (newClassInstance as FileRefItemPrimaryUseHandler)
+                    classCache = ModMgr.getJavaClass(useItemHandlerModule, useItemHandler)
                 }
                 classCache!!.use(this)
             }

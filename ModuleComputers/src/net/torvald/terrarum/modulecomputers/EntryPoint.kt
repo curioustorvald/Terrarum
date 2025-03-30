@@ -1,5 +1,7 @@
 package net.torvald.terrarum.modulecomputers
 
+import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.ItemSheet
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.ModuleEntryPoint
 
@@ -11,6 +13,14 @@ class EntryPoint : ModuleEntryPoint() {
     private val moduleName = "dwarventech"
 
     override fun invoke() {
+
+        // load common resources to the AssetsManager
+        CommonResourcePool.addToLoadingList("$moduleName.items") {
+            ItemSheet(ModMgr.getGdxFile(moduleName, "items/items.tga"))
+        }
+        CommonResourcePool.loadAll()
+
+
         ModMgr.GameItemLoader.invoke(moduleName)
         ModMgr.GameBlockLoader.invoke(moduleName)
         ModMgr.GameWatchdogLoader.register(moduleName, NetFrameWatchdog())

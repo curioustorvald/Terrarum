@@ -119,7 +119,7 @@ object BlockBase {
     /**
      * This function assumes xy and oxy are neighboured and tiles are correctly placed
      *
-     * @param branching 0: no branching, 1: tee-only, 2: cross-only, 3: tee and cross
+     * @param branching 0: no branching, no bend, 1: no branching, yes bend, 2: tee-only, 3: cross-only, 4: tee and cross
      */
     private fun setConnectivity(branching: Int, world: GameWorld, vec: Int, item: ItemID, x: Int, y: Int, ox: Int, oy: Int) {
         when (branching) {

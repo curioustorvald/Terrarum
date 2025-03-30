@@ -4,11 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
-import net.torvald.terrarum.QNDTreeNode
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TitleScreen
@@ -60,7 +57,7 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
             if (splittedNodeName?.size == 2 && node.data != null) {
                 try {
                     val tag = splittedNodeName[0].split(tagSep).getOrNull(1)
-                    val attachedClass = loadClass(splittedNodeName[1]) // check existence
+                    val attachedClass = loadClass("basegame", splittedNodeName[1]) // check existence
                     screenNames[node.data!!] = splittedNodeName[1] // actual loading will by dynamic as some UIs need to be re-initialised as they're called
                 }
                 catch (e: java.lang.ClassNotFoundException) {
@@ -70,11 +67,8 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
         }
     }
 
-    private fun loadClass(name: String): UICanvas {
-        val newClass = Class.forName(name)
-        val newClassConstructor = newClass.getConstructor(this.javaClass)
-        val newClassInstance = newClassConstructor.newInstance(this)
-        return newClassInstance as UICanvas
+    private fun loadClass(module: String, name: String): UICanvas {
+        return ModMgr.getJavaClass<UICanvas>(module, name, arrayOf(this.javaClass), arrayOf(this))
     }
 
     private var mouseActionAvailable = true
@@ -202,7 +196,7 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
 
         printdbg(this, "$menuString has screen: ${screenNames.containsKey(menuString)}")
         screenNames[menuString]?.let {
-            val ui = loadClass(it)
+            val ui = loadClass("basegame", it)
             ui.setPosition(0,0)
             parent.uiFakeBlurOverlay.setAsOpen()
             ui.setAsOpen()

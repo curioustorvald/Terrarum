@@ -19,7 +19,7 @@ class WireProp : TaggedProp {
     var inputType: String = ""
     var outputType: String = ""
 
-    var branching: Int = 0 // 0: can't; 1: tee-only, 2: cross-only, 3: tee and cross
+    var branching: Int = 0 // 0: can't; 1: can't but can be bent, 2: tee-only, 3: cross-only, 4: tee and cross
 
     /**
      * Mainly intended to be used by third-party modules

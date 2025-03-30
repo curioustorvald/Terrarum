@@ -207,12 +207,14 @@ class WireCodex {
         val invImgSheet = invImgRef[0]
         val invImgX = invImgRef[1].toInt()
         val invImgY = invImgRef[2].toInt()
-
         val className = record.get("javaclass")
-        val loadedClass = Class.forName(className)
-        val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java, String::class.java, Int::class.java, Int::class.java)
-        val loadedClassInstance = loadedClassConstructor.newInstance(prop.id, invImgSheet, invImgX, invImgY)
-        ItemCodex[prop.id] = loadedClassInstance as GameItem
+
+        ModMgr.getJavaClass<GameItem>(modname, className,
+            arrayOf(ItemID::class.java, String::class.java, Int::class.java, Int::class.java),
+            arrayOf(prop.id, invImgSheet, invImgX, invImgY)
+        ).let {
+            ItemCodex[prop.id] = it
+        }
 
         printdbg(this, "Setting prop ${prop.id} ->>\t${prop.nameKey}")
     }
