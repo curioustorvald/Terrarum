@@ -12,6 +12,7 @@ class EntryPoint : ModuleEntryPoint() {
 
     override fun invoke() {
         ModMgr.GameItemLoader.invoke(moduleName)
+        ModMgr.GameBlockLoader.invoke(moduleName)
         ModMgr.GameWatchdogLoader.register(moduleName, NetFrameWatchdog())
         println("[${moduleName[0].toUpperCase()}${moduleName.substring(1)}] Dirtboard(tm) go drrrrr")
     }

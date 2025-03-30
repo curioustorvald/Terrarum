@@ -27,7 +27,8 @@ typealias BlockBoxIndex = Int
 open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
     @Transient open val spawnNeedsWall: Boolean = false
-    @Transient open val spawnNeedsFloor: Boolean = true
+    @Transient open val spawnNeedsFloor: Boolean = true // any floor, including platforms
+    @Transient open val spawnNeedsStableFloor: Boolean = false // solid tiles only (no platforms)
     @Transient open val spawnNeedsCeiling: Boolean = false
 
     // if both spawnNeedsWall and spawnNeedsFloor are true, the condition will be interpreted as OR-condition
@@ -166,6 +167,14 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         return blockprop.isSolid || blockprop.isPlatform
     }
 
+    /**
+     * Condition for (if the tile is solid) is always implied regardless of this function. See [canSpawnHere0]
+     */
+    open fun canSpawnOnThisFloorStable(itemID: ItemID): Boolean {
+        val blockprop = BlockCodex[itemID]
+        return blockprop.isSolid
+    }
+
     fun canSpawnHere(posX0: Int, posY0: Int): Boolean {
         val posX = (posX0 - blockBox.width.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
         val posY = posY0 - blockBox.height + 1
@@ -215,21 +224,24 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         }
 
         // check for floors, if spawnNeedsFloor == true
-        if (spawnNeedsFloor || spawnNeedsCeiling) {
-            val yOff = if (spawnNeedsFloor) 1 else -1
+        if (spawnNeedsStableFloor || spawnNeedsFloor || spawnNeedsCeiling) {
+            val yOff = if (spawnNeedsStableFloor || spawnNeedsFloor) 1 else -1
             cannotSpawnNoFloor = everyBlockboxPos.filter {
-                if (spawnNeedsFloor)
+                if (spawnNeedsStableFloor || spawnNeedsFloor)
                     it.second == posY - oy + blockBox.height - 1
                 else
                     it.second == posY - oy
             }.any { (x, y) ->
                 world!!.getTileFromTerrain(x, y + yOff).let {
-                    !canSpawnOnThisFloor(it)
+                    if (spawnNeedsStableFloor || spawnNeedsCeiling)
+                        !canSpawnOnThisFloorStable(it)
+                    else
+                        !canSpawnOnThisFloor(it)
                 }
             }
         }
 
-        if (spawnNeedsWall && (spawnNeedsFloor || spawnNeedsCeiling))
+        if (spawnNeedsWall && (spawnNeedsStableFloor || spawnNeedsFloor || spawnNeedsCeiling))
             cannotSpawn = cannotSpawn or (cannotSpawnNoWall && cannotSpawnNoFloor)
         else if (spawnNeedsFloor || spawnNeedsCeiling)
             cannotSpawn = cannotSpawn or cannotSpawnNoFloor
