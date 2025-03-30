@@ -53,7 +53,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
     private val normalTex = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/normal.png")))
     private val smallTex = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/small.png")))
 
-    private val tex = arrayOf(smallTex, normalTex, largeTex, hugeTex)
+    private val tex = arrayOf(smallTex, normalTex, largeTex, hugeTex, smallTex)
 
     override var width = 480
     override var height = 480
@@ -72,12 +72,23 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     private val sizeSelector = UIItemInlineRadioButtons(this,
             drawX + radioX, drawY + sizeSelY, radioCellWidth,
-                listOf(
-                        { Lang["CONTEXT_DESCRIPTION_TINY"] },
-                        { Lang["CONTEXT_DESCRIPTION_SMALL"] },
-                        { Lang["CONTEXT_DESCRIPTION_BIG"] },
-                        { Lang["CONTEXT_DESCRIPTION_HUGE"] }
-                )
+        if (App.IS_DEVELOPMENT_BUILD) {
+            listOf(
+                { Lang["CONTEXT_DESCRIPTION_TINY"] },
+                { Lang["CONTEXT_DESCRIPTION_SMALL"] },
+                { Lang["CONTEXT_DESCRIPTION_BIG"] },
+                { Lang["CONTEXT_DESCRIPTION_HUGE"] },
+                { "Testification" }
+            )
+        }
+        else {
+            listOf(
+                { Lang["CONTEXT_DESCRIPTION_TINY"] },
+                { Lang["CONTEXT_DESCRIPTION_SMALL"] },
+                { Lang["CONTEXT_DESCRIPTION_BIG"] },
+                { Lang["CONTEXT_DESCRIPTION_HUGE"] }
+            )
+        }
     )
 
     private val rng = HQRNG()
@@ -290,8 +301,12 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             )
 
             // name/seed input labels
-            App.fontGame.draw(batch, Lang["MENU_NAME"], drawX - 4, drawY + sizeSelY + inputLineY1)
-            App.fontGame.draw(batch, Lang["CONTEXT_GENERATOR_SEED"], drawX - 4, drawY + sizeSelY + inputLineY2)
+            App.fontGame.draw(batch,
+                if (sizeSelector.selection == 4) "Test Program" else Lang["MENU_NAME"],
+                drawX - 4, drawY + sizeSelY + inputLineY1)
+            App.fontGame.draw(batch,
+                if (sizeSelector.selection == 4) "Parameters" else Lang["CONTEXT_GENERATOR_SEED"],
+                drawX - 4, drawY + sizeSelY + inputLineY2)
 
             val (wx, wy) = TerrarumIngame.NEW_WORLD_SIZE[sizeSelector.selection]
             val etaSec = Worldgen.getEstimationSec(wx, wy)

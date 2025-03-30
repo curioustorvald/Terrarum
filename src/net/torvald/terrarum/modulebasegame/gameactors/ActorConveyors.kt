@@ -144,7 +144,7 @@ class ActorConveyors : ActorWithBody {
     override fun updateImpl(delta: Float) {
         super.updateImpl(delta)
 
-        turn += delta / 1
+        turn += delta * 8
         while (turn >= 1.0) turn -= 1.0
 
 //        turn = 0.0

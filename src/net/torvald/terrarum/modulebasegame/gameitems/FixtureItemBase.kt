@@ -6,6 +6,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.getModuleName
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
@@ -22,8 +23,8 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 //    @Transient private val hash = RandomWordsName(4)
 
 
-    @Transient protected open val makeFixture: () -> FixtureBase = {
-        Class.forName(fixtureClassName).getDeclaredConstructor().newInstance() as FixtureBase
+    @Transient protected open val makeFixture: (String) -> FixtureBase = { moduleName: String ->
+        ModMgr.getJavaClass<FixtureBase>(moduleName, fixtureClassName)
     }
 
     init {
@@ -62,7 +63,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
 //        println("ghost: ${ghostItem}; ghostInit = $ghostInit; instance: $hash")
         if (!ghostInit.compareAndExchangeAcquire(false, true)) {
-            ghostItem.set(makeFixture())
+            ghostItem.set(makeFixture(originalID.getModuleName()))
 //            printdbg(this, "ghost item initialised: $ghostItem")
 
         }
@@ -98,7 +99,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) { _, _, mx, my ->
-        val item = ghostItem.getAndSet(makeFixture()) // renew the "ghost" otherwise you'll be spawning exactly the same fixture again; old ghost will be returned
+        val item = ghostItem.getAndSet(makeFixture(originalID.getModuleName())) // renew the "ghost" otherwise you'll be spawning exactly the same fixture again; old ghost will be returned
 
         if (item.spawn(mx, my, if (actor is IngamePlayer) actor.uuid else null)) 1 else -1
         // return true when placed, false when cannot be placed

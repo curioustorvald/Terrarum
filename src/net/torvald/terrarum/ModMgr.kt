@@ -519,6 +519,38 @@ object ModMgr {
         return filesList.toList()
     }
 
+    fun <T> getJavaClass(module: String, className: String, constructorTypes: Array<Class<*>>, initArgs: Array<Any>): T {
+        checkExistence(module)
+        moduleClassloader[module].let {
+            if (it == null) {
+                val loadedClass = Class.forName(className)
+                val loadedClassConstructor = loadedClass.getConstructor(*constructorTypes)
+                return loadedClassConstructor.newInstance(*initArgs) as T
+            }
+            else {
+                val loadedClass = it.loadClass(className)
+                val loadedClassConstructor = loadedClass.getConstructor(*constructorTypes)
+                return loadedClassConstructor.newInstance(*initArgs) as T
+            }
+        }
+    }
+
+    fun <T> getJavaClass(module: String, className: String): T {
+        checkExistence(module)
+        moduleClassloader[module].let {
+            if (it == null) {
+                val loadedClass = Class.forName(className)
+                val loadedClassConstructor = loadedClass.getConstructor()
+                return loadedClassConstructor.newInstance() as T
+            }
+            else {
+                val loadedClass = it.loadClass(className)
+                val loadedClassConstructor = loadedClass.getConstructor()
+                return loadedClassConstructor.newInstance() as T
+            }
+        }
+    }
+
     fun disposeMods() {
         entryPointClasses.forEach { it.dispose() }
     }
@@ -668,26 +700,14 @@ object ModMgr {
             csv.forEach {
                 val className: String = it["classname"].toString()
                 val internalID: Int = it["id"].toInt()
-                val itemName: String = "item@$module:$internalID"
+                val itemName: ItemID = "item@$module:$internalID"
                 val tags = it["tags"].split(',').map { it.trim().toUpperCase() }.toHashSet()
 
                 printdbg(this, "Reading item  ${itemName} <<- internal #$internalID with className $className")
 
-                moduleClassloader[module].let {
-                    if (it == null) {
-                        val loadedClass = Class.forName(className)
-                        val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
-                        val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
-                        ItemCodex[itemName] = loadedClassInstance as GameItem
-                        ItemCodex[itemName]!!.tags.addAll(tags)
-                    }
-                    else {
-                        val loadedClass = it.loadClass(className)
-                        val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
-                        val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
-                        ItemCodex[itemName] = loadedClassInstance as GameItem
-                        ItemCodex[itemName]!!.tags.addAll(tags)
-                    }
+                ModMgr.getJavaClass<GameItem>(module, className, arrayOf(ItemID::class.java), arrayOf(itemName)).let {
+                    ItemCodex[itemName] = it
+                    ItemCodex[itemName]!!.tags.addAll(tags)
                 }
             }
         }

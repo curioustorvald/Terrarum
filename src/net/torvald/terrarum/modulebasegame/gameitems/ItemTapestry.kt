@@ -26,7 +26,7 @@ class ItemTapestry(originalID: ItemID) : FixtureItemBase(originalID, "net.torval
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_TAPESTRY"
 
-    @Transient override val makeFixture: () -> FixtureBase = {
+    @Transient override val makeFixture: (String) -> FixtureBase = { moduleName: String ->
         FixtureTapestry(
             // TODO use extra["fileRef"] (string) and extra["framingMaterial"] (string)
             Gdx.files.internal("assets/monkey_island").readBytes(),

@@ -35,7 +35,7 @@ class ItemTextSignCopper(originalID: ItemID) : FixtureItemBase(originalID, "net.
         stackable = false
     }
 
-    @Transient override val makeFixture: () -> FixtureBase = {
+    @Transient override val makeFixture: (String) -> FixtureBase = { moduleName: String ->
         FixtureTextSignCopper(
             extra.getAsString("signContent") ?: "",
             extra.getAsInt("signPanelCount") ?: 2

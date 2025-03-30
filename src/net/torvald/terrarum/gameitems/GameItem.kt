@@ -21,6 +21,9 @@ import kotlin.math.min
 
 typealias ItemID = String
 
+fun ItemID.getModuleName(): String = this.substringBefore(':').substringAfter('@')
+
+
 /**
  * Instances of the GameItem (e.g. net.torvald.terrarum.modulebasegame.gameitems.PickaxeCopper) are preferably referenced
  * from the ```<module>/items/itemid.csv``` file only, and not from the actual game code.

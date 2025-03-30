@@ -1,3 +1,4 @@
-id;classname
-1;net.torvald.terrarum.modulecomputers.gameitems.ItemWearableWorldRadar
-2;net.torvald.terrarum.modulecomputers.gameitems.ItemHomeComputer
+id;classname;tags
+#1;net.torvald.terrarum.modulecomputers.gameitems.ItemWearableWorldRadar;
+#2;net.torvald.terrarum.modulecomputers.gameitems.ItemHomeComputer;
+16;net.torvald.terrarum.modulecomputers.gameitems.ItemComputerConsole;TAGS
