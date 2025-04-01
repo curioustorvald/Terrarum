@@ -50,6 +50,7 @@ class FixtureComputerProcessor : Electric {
             it.setRowsAndFrames(1,1)
         }
 
+        setWireSinkAt(0, 0, "memory_bus")
         setWireSinkAt(0, 1, "serial")
         setWireSinkAt(1, 1, "serial")
         setWireSinkAt(0, 2, "io_bus")
@@ -83,7 +84,6 @@ class FixtureNetworkInterface : Electric {
     }
 }
 
-
 /**
  * Created by minjaesong on 2025-04-01.
  */
@@ -108,5 +108,28 @@ class FixtureNetworkBridge : Electric {
         setWireSinkAt(0, 1, "token_ring")
         setWireSinkAt(1, 1, "token_ring")
         setWireSinkAt(1, 2, "power_low")
+    }
+}
+
+/**
+ * Created by minjaesong on 2025-04-01.
+ */
+class FixtureMemoryCabinet : Electric {
+
+    @Transient override val spawnNeedsStableFloor = true
+    @Transient override val spawnNeedsWall = false
+
+    constructor() : super(
+        BlockBox(BlockBox.ALLOW_MOVE_DOWN, 2, 3),
+        nameFun = { Lang["ITEM_MEMORY_CABINET"] }
+    )
+
+    init {
+        val itemImage = FixtureItemBase.getItemImageFromSingleImage("dwarventech", "sprites/fixtures/computer_memory_stack_1.tga")
+        makeNewSprite(TextureRegionPack(itemImage.texture, 1*TILE_SIZE, 3*TILE_SIZE)).let {
+            it.setRowsAndFrames(1,1)
+        }
+
+        setWireSinkAt(0, 0, "memory_bus")
     }
 }

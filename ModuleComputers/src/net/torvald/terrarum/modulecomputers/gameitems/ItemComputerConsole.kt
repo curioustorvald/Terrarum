@@ -70,3 +70,20 @@ class ItemNetworkBridge(originalID: ItemID) : FixtureItemBase(originalID, "net.t
     override var originalName = "ITEM_NETWORK_BRIDGE"
 
 }
+
+/**
+ * Created by minjaesong on 2025-04-01.
+ */
+class ItemMemoryCabinet(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulecomputers.gameactors.FixtureMemoryCabinet") {
+
+    override var dynamicID: ItemID = originalID
+    override var baseMass = 80.0
+    override val canBeDynamic = false
+    override val materialId = "STAL"
+    init {
+        itemImage = FixtureItemBase.getItemImageFromSingleImage("dwarventech", "sprites/fixtures/computer_memory_stack_1.tga")
+    }
+    override var baseToolSize: Double? = baseMass
+    override var originalName = "ITEM_MEMORY_CABINET"
+
+}

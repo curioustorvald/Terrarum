@@ -2,3 +2,4 @@
 "serial";"dwarventech";"wires/ports.tga";0;0
 "io_bus";"dwarventech";"wires/ports.tga";1;0
 "token_ring";"dwarventech";"wires/ports.tga";2;0
+"memory_bus";"memory_bus";"wires/ports.tga";2;0
