@@ -20,7 +20,6 @@ class ItemComputerConsole(originalID: ItemID) : FixtureItemBase(originalID, "net
 
 }
 
-
 /**
  * Created by minjaesong on 2025-03-30.
  */
@@ -35,5 +34,39 @@ class ItemComputerProcessor(originalID: ItemID) : FixtureItemBase(originalID, "n
     }
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_COMPUTER_PROCESSOR"
+
+}
+
+/**
+ * Created by minjaesong on 2025-04-01.
+ */
+class ItemNetworkInterface(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulecomputers.gameactors.FixtureNetworkInterface") {
+
+    override var dynamicID: ItemID = originalID
+    override var baseMass = 200.0
+    override val canBeDynamic = false
+    override val materialId = "STAL"
+    init {
+        itemImage = FixtureItemBase.getItemImageFromSingleImage("dwarventech", "sprites/fixtures/computer_network_interface.tga")
+    }
+    override var baseToolSize: Double? = baseMass
+    override var originalName = "ITEM_NETWORK_INTERFACE"
+
+}
+
+/**
+ * Created by minjaesong on 2025-04-01.
+ */
+class ItemNetworkBridge(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulecomputers.gameactors.FixtureNetworkBridge") {
+
+    override var dynamicID: ItemID = originalID
+    override var baseMass = 200.0
+    override val canBeDynamic = false
+    override val materialId = "STAL"
+    init {
+        itemImage = FixtureItemBase.getItemImageFromSingleImage("dwarventech", "sprites/fixtures/computer_network_bridge.tga")
+    }
+    override var baseToolSize: Double? = baseMass
+    override var originalName = "ITEM_NETWORK_BRIDGE"
 
 }
