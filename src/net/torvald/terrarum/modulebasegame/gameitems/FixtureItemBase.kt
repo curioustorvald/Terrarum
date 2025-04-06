@@ -34,7 +34,8 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 //        println("FixtureItemBase init: $hash")
     }
 
-    @Transient private var ghostItem = AtomicReference<FixtureBase>()
+    @Transient
+    protected var ghostItem = AtomicReference<FixtureBase>()
     @Transient private var ghostInit = AtomicBoolean(false)
 
     override var dynamicID: ItemID = originalID
