@@ -173,10 +173,10 @@ id;classname;tags
 65536;net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef;BASEOBJECT
 
 # fluids on storage
-# FUTURE QUEST: autogenerate them using CONTAINERS CODEX
+# FUTURE QUEST: autogenerate them using CANISTERS CODEX
 #   with new ItemID scheme:
 #       basegame_2<fluid@basegame:1
-#       stands for a wooden bucket (CONTAINERS basegame_2) holding a block of water (fluid@basegame:1)
+#       stands for a wooden bucket (CANISTERS basegame_2) holding a block of water (fluid@basegame:1)
 #
 # FLUIDSTORAGE: required tag for buckets/canisters
 # OPENSTORAGE: cannot hold gas. Canisters need LIDDEDSTORAGE/SEALEDSTORAGE

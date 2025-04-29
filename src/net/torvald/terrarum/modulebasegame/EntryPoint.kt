@@ -50,6 +50,7 @@ class EntryPoint : ModuleEntryPoint() {
         ModMgr.GameLanguageLoader.invoke(moduleName)
         ModMgr.GameAudioLoader.invoke(moduleName)
         ModMgr.GameWeatherLoader.invoke(moduleName)
+        ModMgr.GameCanistersLoader.invoke(moduleName)
 
         WeatherCodex.weatherById["titlescreen"] =
             WeatherCodex.getById("generic01")?.copy(identifier = "titlescreen", windSpeed = 1f) ?: WeatherMixer.DEFAULT_WEATHER

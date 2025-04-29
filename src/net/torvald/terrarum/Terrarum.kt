@@ -28,6 +28,7 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.METER
 import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.itemproperties.CanistersCodex
 import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
@@ -86,6 +87,7 @@ object Terrarum : Disposable {
     var oreCodex = OreCodex(); internal set
     var audioCodex = AudioCodex(); internal set
     var weatherCodex = WeatherCodex(); internal set
+    var canistersCodex = CanistersCodex(); internal set
 
 
     //////////////////////////////

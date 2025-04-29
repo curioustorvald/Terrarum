@@ -14,6 +14,7 @@ import net.torvald.terrarum.gamecontroller.IME
 import net.torvald.terrarum.gameitems.FixtureInteractionBlocked
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.itemproperties.CanistersCodex
 import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
@@ -940,6 +941,18 @@ object ModMgr {
 
         @JvmStatic fun register(moduleName: String, watchdog: TerrarumWorldWatchdog) {
             watchdogs["$moduleName.${watchdog.javaClass.simpleName}"] = watchdog
+        }
+    }
+
+    object GameCanistersLoader {
+        const val canisterPath = "canisters/"
+
+        init {
+            Terrarum.canistersCodex = CanistersCodex()
+        }
+
+        @JvmStatic operator fun invoke(module: String) {
+            Terrarum.canistersCodex.fromModule(module, canisterPath + "canisters.csv")
         }
     }
 }
