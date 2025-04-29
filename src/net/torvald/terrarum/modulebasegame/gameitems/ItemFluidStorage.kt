@@ -82,12 +82,14 @@ open class ItemFluidStoragePrototype(originalID: ItemID, sheetX: Int, sheetY: In
 }
 
 
+class ItemBucketWooden(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 0, 0, "basegame.buckets", "ITEM_BUCKET_WOODEN")
 class ItemBucketWooden00(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 0, 0, "basegame.buckets", "ITEM_BUCKET_WOODEN")
 class ItemBucketWooden01(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 1, 0, "basegame.buckets", "ITEM_BUCKET_WOODEN")
 class ItemBucketWooden02(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 2, 0, "basegame.buckets", "ITEM_BUCKET_WOODEN")
 class ItemBucketWooden03(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 3, 0, "basegame.buckets", "ITEM_BUCKET_WOODEN")
 
 
+class ItemBucketIron(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 0, 1, "basegame.buckets", "ITEM_BUCKET_IRON")
 class ItemBucketIron00(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 0, 1, "basegame.buckets", "ITEM_BUCKET_IRON")
 class ItemBucketIron01(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 1, 1, "basegame.buckets", "ITEM_BUCKET_IRON")
 class ItemBucketIron02(originalID: ItemID) : ItemFluidStoragePrototype(originalID, 2, 1, "basegame.buckets", "ITEM_BUCKET_IRON")

@@ -58,6 +58,8 @@ id;classname;tags
 57;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalPushbutton;FIXTURE,SIGNAL
 58;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalPressurePlate;FIXTURE,SIGNAL
 
+59;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketWooden;CONTAINER
+60;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketIron;CONTAINER
 
 # ingots
 112;net.torvald.terrarum.modulebasegame.gameitems.IngotCopper;INGOT
@@ -171,10 +173,16 @@ id;classname;tags
 65536;net.torvald.terrarum.modulebasegame.gameitems.ItemFileRef;BASEOBJECT
 
 # fluids on storage
-# FUTURE QUEST: autogenerate them using FLUID CODEX
+# FUTURE QUEST: autogenerate them using CONTAINERS CODEX
+#   with new ItemID scheme:
+#       basegame_2<fluid@basegame:1
+#       stands for a wooden bucket (CONTAINERS basegame_2) holding a block of water (fluid@basegame:1)
+#
 # FLUIDSTORAGE: required tag for buckets/canisters
 # OPENSTORAGE: cannot hold gas. Canisters need LIDDEDSTORAGE/SEALEDSTORAGE
 # NOEXTREMETHERM: cannot hold cryogenic/molten fluids (can only hold fluid with therm 0 or 1)
+#
+# BELOW ARE COMPELETY IRRELEVANT AND PENDING FOR REMOVAL
 # 100000h..1000FFh : container type 0 x Fluid type 0..255
 # 100100h..1001FFh : container type 1 x Fluid type 0..255
 # 100200h..1002FFh : container type 2 x Fluid type 0..255
@@ -183,18 +191,18 @@ id;classname;tags
 # 100500h..1005FFh : container type 5 x Fluid type 0..255
 # ...
 # 10FF00h..10FFFFh : container type 255 x Fluid type 0..255
-1048576;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketWooden00;FLUIDSTORAGE,OPENSTORAGE,NOEXTREMETHERM,FLUIDSTORAGEEMPTY
-1048577;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketWooden01;FLUIDSTORAGE,OPENSTORAGE,NOEXTREMETHERM
-#1048578;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketWooden02;FLUIDSTORAGE,OPENSTORAGE,NOEXTREMETHERM
-1048579;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketWooden03;FLUIDSTORAGE,OPENSTORAGE,NOEXTREMETHERM
-
-1048832;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketIron00;FLUIDSTORAGE,OPENSTORAGE,FLUIDSTORAGEEMPTY
-1048833;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketIron01;FLUIDSTORAGE,OPENSTORAGE
-1048834;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketIron02;FLUIDSTORAGE,OPENSTORAGE
-1048835;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketIron03;FLUIDSTORAGE,OPENSTORAGE
-
-# reserved for debug items
-#16777216;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessWaterBucket;DEBUG,TOOL
-#16777217;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessLavaBucket;DEBUG,TOOL
-16777472;net.torvald.terrarum.modulebasegame.gameitems.ItemMysteriousATM;DEBUG
-16777473;net.torvald.terrarum.modulebasegame.gameitems.ItemDebugInventron;DEBUG
+#1048576;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketWooden00;FLUIDSTORAGE,OPENSTORAGE,NOEXTREMETHERM,FLUIDSTORAGEEMPTY
+#1048577;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketWooden01;FLUIDSTORAGE,OPENSTORAGE,NOEXTREMETHERM
+##1048578;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketWooden02;FLUIDSTORAGE,OPENSTORAGE,NOEXTREMETHERM
+#1048579;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketWooden03;FLUIDSTORAGE,OPENSTORAGE,NOEXTREMETHERM
+#
+#1048832;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketIron00;FLUIDSTORAGE,OPENSTORAGE,FLUIDSTORAGEEMPTY
+#1048833;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketIron01;FLUIDSTORAGE,OPENSTORAGE
+#1048834;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketIron02;FLUIDSTORAGE,OPENSTORAGE
+#1048835;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketIron03;FLUIDSTORAGE,OPENSTORAGE
+#
+## reserved for debug items
+##16777216;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessWaterBucket;DEBUG,TOOL
+##16777217;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessLavaBucket;DEBUG,TOOL
+#16777472;net.torvald.terrarum.modulebasegame.gameitems.ItemMysteriousATM;DEBUG
+#16777473;net.torvald.terrarum.modulebasegame.gameitems.ItemDebugInventron;DEBUG
