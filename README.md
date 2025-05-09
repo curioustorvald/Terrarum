@@ -1,6 +1,6 @@
 ## Aperçu ##
 
-This project is to create a modular game engine that accommodates a 2D side-scrolling tilemap platformer, and a game that runs on top of it.
+The goal of this project is to create a modular game engine that accommodates a 2D side-scrolling tilemap platformer, and a game that runs on top of it.
 
 The project is divided into two parts: **Terrarum the Game Engine** and **Terrarum the actual game**.
 
