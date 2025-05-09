@@ -10,7 +10,7 @@ import net.torvald.terrarum.modulebasegame.gameworld.NetRunner
  */
 class NetFrameWatchdog : TerrarumWorldWatchdog(App.TICK_SPEED * 60) {
     override fun invoke(world: GameWorld) {
-        (world.extraFields["tokenring"] as NetRunner).let {
+        (world.extraFields["tokenring"] as? NetRunner)?.let {
             it.purgeDeadFrames()
         }
     }

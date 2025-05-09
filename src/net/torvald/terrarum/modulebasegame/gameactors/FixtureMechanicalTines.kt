@@ -62,20 +62,41 @@ class FixtureMechanicalTines : Electric {
         }
     }
 
-    @Transient private var testRollCursor = 0
+    @Transient private var pianoRollCursor = 0
+
+    @Transient private val pianoRoll = ArrayList<Long>()
 
     override fun updateSignal() {
         // TODO update using network port
 
 
         if (isSignalHigh(0, 1)) {
+            if (pianoRoll.isEmpty())
+                fillUsingDicePlay()
+
             // advance every tick
-            testNotes[testRollCursor].let {
-                audioBank.sendMessage(it)
-                spewParticles(it)
+            if (pianoRollCursor in pianoRoll.indices) {
+                pianoRoll[pianoRollCursor].let {
+                    audioBank.sendMessage(it)
+                    spewParticles(it)
+                }
+                pianoRollCursor++
             }
-            testRollCursor = (testRollCursor + 1) % testNotes.size
+            else {
+                // start infinite loop
+                pianoRoll.clear()
+                fillUsingDicePlay()
+            }
         }
+        else {
+            pianoRoll.clear()
+            pianoRollCursor = 0
+        }
+    }
+
+    private fun fillUsingDicePlay() {
+        pianoRoll.addAll(MusikalischesWuerfelspiel.generateRoll())
+        pianoRollCursor = 0
     }
 
     private fun spewParticles(noteBits: Long) {
