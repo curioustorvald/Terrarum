@@ -92,26 +92,26 @@ object FFT: Disposable {
 
     fun fft(signal0: FloatArray): ComplexArray {
         val signal = FloatArray(signal0.size * 2) { if (it % 2 == 0) signal0[it / 2] else 0f }
-        ffts[signal0.size]!!.complexForward(signal)
+        ffts[signal0.size]!!.realForward(signal)
         return ComplexArray(signal)
     }
 
     fun fft(signal0: ComplexArray) {
-        ffts[signal0.size]!!.complexForward(signal0.reim)
+        ffts[signal0.size]!!.realForward(signal0.reim)
     }
 
     fun fftInto(signal0: ComplexArray, out: ComplexArray) {
         System.arraycopy(signal0.reim, 0, out.reim, 0, signal0.reim.size)
-        ffts[signal0.size]!!.complexForward(out.reim)
+        ffts[signal0.size]!!.realForward(out.reim)
     }
 
     fun ifftAndGetReal(signal0: ComplexArray): FloatArray {
-        ffts[signal0.size]!!.complexInverse(signal0.reim, true)
+        ffts[signal0.size]!!.realInverse(signal0.reim, true)
         return signal0.getReal()
     }
 
     fun ifftAndGetReal(signal0: ComplexArray, output: FloatArray) {
-        ffts[signal0.size]!!.complexInverse(signal0.reim, true)
+        ffts[signal0.size]!!.realInverse(signal0.reim, true)
         for (i in 0 until signal0.size) {
             output[i] = signal0.reim[i * 2]
         }
