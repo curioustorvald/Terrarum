@@ -62,7 +62,7 @@ class Convolv(irModule: String, irPath: String, val crossfeed: Float, gain: Floa
 
 
 
-        pushSumCircular(gain, inbuf[0], inbuf[1], sumbuf)
+        pushSum(gain, inbuf[0], inbuf[1], sumbuf)
 
         convolve(sumbuf[0], convFFT[0], fftOutL)
         convolve(sumbuf[1], convFFT[1], fftOutR)
@@ -77,6 +77,20 @@ class Convolv(irModule: String, irPath: String, val crossfeed: Float, gain: Floa
         val ptime = System.nanoTime() - t1
         setDebugTime("audio.convolve", ptime)
         processingSpeed = realtime / ptime
+    }
+
+    private fun pushSum(gain: Float, sampleL: FloatArray, sampleR: FloatArray, sumbuf: Array<ComplexArray>) {
+        // shift numbers
+        System.arraycopy(sumbuf[0].reim, sampleL.size * 2, sumbuf[0].reim, 0, sumbuf[0].reim.size - sampleL.size * 2)
+        System.arraycopy(sumbuf[1].reim, sampleL.size * 2, sumbuf[1].reim, 0, sumbuf[1].reim.size - sampleL.size * 2)
+        // fill in the shifted area
+        val baseI = sumbuf[0].reim.size - sampleL.size * 2
+        for (index in sampleL.indices) {
+            sumbuf[0].reim[baseI + index * 2 + 0] = (sampleL[index] * 1.000000f + sampleR[index] * crossfeed) * gain
+            sumbuf[0].reim[baseI + index * 2 + 1] = 0f
+            sumbuf[1].reim[baseI + index * 2 + 0] = (sampleL[index] * crossfeed + sampleR[index] * 1.000000f) * gain
+            sumbuf[1].reim[baseI + index * 2 + 1] = 0f
+        }
     }
 
     private var bufferIndex = 0
