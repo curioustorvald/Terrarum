@@ -93,18 +93,6 @@ class Convolv(irModule: String, irPath: String, val crossfeed: Float, gain: Floa
         }
     }
 
-    private var bufferIndex = 0
-    private fun pushSumCircular(gain: Float, sampleL: FloatArray, sampleR: FloatArray, sumbuf: Array<ComplexArray>) {
-        val baseIdx = bufferIndex * 2
-        for (i in sampleL.indices) {
-            sumbuf[0].reim[baseIdx + i * 2] = (sampleL[i] + sampleR[i] * crossfeed) * gain
-            sumbuf[0].reim[baseIdx + i * 2 + 1] = 0f
-            sumbuf[1].reim[baseIdx + i * 2] = (sampleL[i] * crossfeed + sampleR[i]) * gain
-            sumbuf[1].reim[baseIdx + i * 2 + 1] = 0f
-        }
-        bufferIndex = (bufferIndex + sampleL.size) % (fftLen - sampleL.size)
-    }
-
     override fun drawDebugView(batch: SpriteBatch, x: Int, y: Int) {
     // processing speed bar
         val w = processingSpeed

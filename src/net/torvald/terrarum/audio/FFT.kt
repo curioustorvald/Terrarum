@@ -96,18 +96,9 @@ object FFT: Disposable {
         return ComplexArray(signal)
     }
 
-    fun fft(signal0: ComplexArray) {
-        ffts[signal0.size]!!.complexForward(signal0.reim)
-    }
-
     fun fftInto(signal0: ComplexArray, out: ComplexArray) {
         System.arraycopy(signal0.reim, 0, out.reim, 0, signal0.reim.size)
         ffts[signal0.size]!!.complexForward(out.reim)
-    }
-
-    fun ifftAndGetReal(signal0: ComplexArray): FloatArray {
-        ffts[signal0.size]!!.complexInverse(signal0.reim, true)
-        return signal0.getReal()
     }
 
     fun ifftAndGetReal(signal0: ComplexArray, output: FloatArray) {
