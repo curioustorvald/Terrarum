@@ -2256,7 +2256,7 @@ open class ActorWithBody : Actor {
          * Constants
          */
 
-        @Transient const val METER = 24.0
+        @Transient const val METER = 25.0
         /**
          * [m / s^2] * SI_TO_GAME_ACC -> [px / InternalFrame^2]
          */

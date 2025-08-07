@@ -32,37 +32,37 @@
   "wire@basegame:8192": { /* signal wire red */
     "workbench": "wirerollingmill",
     "ingredients": [
-      [10, 1, "item@basegame:112"] /* 1 copper */
+      [25, 1, "item@basegame:112"] /* 1 copper */
     ]
   },
   "wire@basegame:8193": { /* signal wire green */
     "workbench": "wirerollingmill",
     "ingredients": [
-      [10, 1, "item@basegame:112"] /* 1 copper */
+      [25, 1, "item@basegame:112"] /* 1 copper */
     ]  },
   "wire@basegame:8194": { /* signal wire blue */
     "workbench": "wirerollingmill",
     "ingredients": [
-      [10, 1, "item@basegame:112"] /* 1 copper */
+      [25, 1, "item@basegame:112"] /* 1 copper */
     ]
   },
   "wire@basegame:8195": { /* signal wire yellow */
     "workbench": "wirerollingmill",
     "ingredients": [
-      [10, 1, "item@basegame:112"] /* 1 copper */
+      [25, 1, "item@basegame:112"] /* 1 copper */
     ]
   },
   "wire@basegame:8196": { /* signal wire purple */
     "workbench": "wirerollingmill",
     "ingredients": [
-      [10, 1, "item@basegame:112"] /* 1 copper */
+      [25, 1, "item@basegame:112"] /* 1 copper */
     ]
   },
 
   "item@basegame:50": { /* soldering wire */
     "workbench": "wirerollingmill",
     "ingredients": [
-      [10, 1, "item@basegame:181"] /* 1 solder bar */
+      [25, 1, "item@basegame:181"] /* 1 solder bar */
     ]
   },
 
