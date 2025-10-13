@@ -59,14 +59,14 @@ class BlockProp : TaggedProp {
     fun getLumCol(x: Int, y: Int) = if (dynamicLuminosityFunction == 0) {
         baseLumCol
     } else {
-        val offset = XXHash32.hashGeoCoord(x, y).fmod(BlockCodex.DYNAMIC_RANDOM_CASES)
+        val offset = getHashCoord(x, y, BlockCodex.DYNAMIC_RANDOM_CASES)
         BlockCodex[BlockCodex.tileToVirtual[id]!![offset]]._lumCol
     }
 
     fun getLumCol(x: Int, y: Int, channel: Int): Float = if (dynamicLuminosityFunction == 0) {
         baseLumCol.lane(channel)
     } else {
-        val offset = XXHash32.hashGeoCoord(x, y).fmod(BlockCodex.DYNAMIC_RANDOM_CASES)
+        val offset = getHashCoord(x, y, BlockCodex.DYNAMIC_RANDOM_CASES)
         BlockCodex[BlockCodex.tileToVirtual[id]!![offset]]._lumCol.lane(channel)
     }
 
@@ -112,4 +112,20 @@ class BlockProp : TaggedProp {
     val isSolidForTileCnx: Boolean
         get() = if (tags.contains("DORENDER") || !isActorBlock) isSolid else false
 
+
+    companion object {
+        private fun tavGrainSynthesisRNG(frame: Int, band: Int, x: Int, y: Int): Int {
+            var hash = frame * 0x9e3779b9.toInt() xor band * 0x7f4a7c15 xor (y shl 16) xor x
+            hash = hash xor (hash shr 16)
+            hash = hash * 0x7feb352d
+            hash = hash xor (hash shr 15)
+            hash = hash * 0x846ca68b.toInt()
+            hash = hash xor (hash shr 16)
+            return hash
+        }
+
+        private fun getHashCoord(x: Int, y: Int, mod: Int): Int {
+            return tavGrainSynthesisRNG(31, 65003, x, y) fmod mod
+        }
+    }
 }

@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Matrix4
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.random.XXHash64
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.App.printdbg
@@ -21,8 +20,6 @@ import net.torvald.terrarum.gameworld.FLUID_MIN_MASS
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.worldgenerator.shake
-import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unsafe.UnsafeLong2D
@@ -410,13 +407,28 @@ internal object BlocksDrawer {
 
     }
 
+    private fun tavGrainSynthesisRNG(frame: Int, band: Int, x: Int, y: Int): Int {
+        var hash = frame * 0x9e3779b9.toInt() xor band * 0x7f4a7c15 xor (y shl 16) xor x
+        hash = hash xor (hash shr 16)
+        hash = hash * 0x7feb352d
+        hash = hash xor (hash shr 15)
+        hash = hash * 0x846ca68b.toInt()
+        hash = hash xor (hash shr 16)
+        return hash
+    }
 
-    private fun getHashCoord(x: Int, y: Int, mod: Long, layer: Int, tileNumber: Int): Int {
+
+    private fun getHashCoord(x: Int, y: Int, mod: Int, layer: Int, tileNumber: Int): Int {
         val (x, y) = world.coerceXY(x, y)
-        return (XXHash64.hash(
+        /*return (XXHash64.hash(
             LandUtil.getBlockAddr(world, x, y).toBig64(),
             world.generatorSeed shake tileNumber.toLong() shake layer.toLong()
-        ) fmod mod).toInt()
+        ) fmod mod).toInt()*/
+        return tavGrainSynthesisRNG(
+            world.worldIndex.leastSignificantBits.toInt(),
+            (world.generatorSeed shake tileNumber.toLong() shake layer.toLong()).toInt(),
+            x, y
+        ) fmod mod
     }
 
     private var for_y_start = 0

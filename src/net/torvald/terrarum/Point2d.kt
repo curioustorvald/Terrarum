@@ -1,6 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.random.XXHash32
+import net.torvald.terrarum.gameworld.fmod
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -118,7 +119,7 @@ class Point2i() {
         return this
     }
 
-    override fun hashCode(): Int = XXHash32.hashGeoCoord(x, y)
+    override fun hashCode(): Int = getHashCoord(x, y)
     override fun equals(other: Any?) = if (other is Point2i)
         this.x == other.x && this.y == other.y
     else
@@ -130,4 +131,20 @@ class Point2i() {
     operator fun component2() = y
 
     fun toVector() = Vector2(this.x.toDouble(), this.y.toDouble())
+
+    companion object {
+        private fun tavGrainSynthesisRNG(frame: Int, band: Int, x: Int, y: Int): Int {
+            var hash = frame * 0x9e3779b9.toInt() xor band * 0x7f4a7c15 xor (y shl 16) xor x
+            hash = hash xor (hash shr 16)
+            hash = hash * 0x7feb352d
+            hash = hash xor (hash shr 15)
+            hash = hash * 0x846ca68b.toInt()
+            hash = hash xor (hash shr 16)
+            return hash
+        }
+
+        private fun getHashCoord(x: Int, y: Int): Int {
+            return tavGrainSynthesisRNG(31, 65003, x, y)
+        }
+    }
 }
