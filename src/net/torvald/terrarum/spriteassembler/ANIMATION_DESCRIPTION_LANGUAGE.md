@@ -96,7 +96,7 @@ Remember that 'variables' are contained within 'properties'
 |---|---|---|
 |DELAY|variable: float|Delay between frames, in seconds|
 |ROW|variable: float|which row the animation goes in the spritesheet|
-|SKELETON|variable: string_pair|Which skeleton this animation uses
+|SKELETON|variable: string_pair|Which skeleton this animation uses|
 
 #### Transforms
 

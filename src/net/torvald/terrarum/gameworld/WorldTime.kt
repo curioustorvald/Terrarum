@@ -256,6 +256,42 @@ class WorldTime(initTime: Long = 0L) {
         TIME_T += t
     }
 
+    /**
+     * Sets the world time to a specific date and time.
+     *
+     * @param year The year (starting from EPOCH_YEAR = 1)
+     * @param month The month (1-4: Spring=1, Summer=2, Autumn=3, Winter=4)
+     * @param day The day of the month (1-30)
+     * @param hour The hour (0-23)
+     * @param minute The minute (0-59)
+     * @param second The second (0-59), defaults to 0
+     */
+    fun setTime(
+        year: Int,
+        month: Int,
+        day: Int,
+        hour: Int = 0,
+        minute: Int = 0,
+        second: Int = 0
+    ) {
+        require(year >= EPOCH_YEAR) { "Year must be >= $EPOCH_YEAR" }
+        require(month in 1..4) { "Month must be 1-4 (Spring=1, Summer=2, Autumn=3, Winter=4)" }
+        require(day in 1..MONTH_LENGTH) { "Day must be 1-$MONTH_LENGTH" }
+        require(hour in 0 until HOURS_PER_DAY) { "Hour must be 0-${HOURS_PER_DAY - 1}" }
+        require(minute in 0 until HOUR_MIN) { "Minute must be 0-${HOUR_MIN - 1}" }
+        require(second in 0 until MINUTE_SEC) { "Second must be 0-${MINUTE_SEC - 1}" }
+
+        val yearDays = (year - EPOCH_YEAR) * YEAR_DAYS
+        val monthDays = (month - 1) * MONTH_LENGTH
+        val dayOffset = day - 1
+        val totalDays = yearDays + monthDays + dayOffset
+
+        TIME_T = (totalDays.toLong() * DAY_LENGTH) +
+                 (hour.toLong() * HOUR_SEC) +
+                 (minute.toLong() * MINUTE_SEC) +
+                 second.toLong()
+    }
+
     fun Long.toPositiveInt() = this.and(0x7FFFFFFF).toInt()
     fun Long.abs() = Math.abs(this)
 

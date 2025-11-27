@@ -343,7 +343,6 @@ public class App implements ApplicationListener {
     public static InputStrober inputStrober;
 
     public static long bogoflops = 0L;
-    private static double bogoflopf = Math.random();
 
     public static boolean hasUpdate = true;
 
@@ -362,20 +361,33 @@ public class App implements ApplicationListener {
 
     public static long loadedTime_t;
 
-    public static void main(String[] args) {
-        loadedTime_t = getTIME_T();
-
+    public static void updateBogoflops(long iteration) {
+        long iters = 0;
+        double a = 1.000001;
+        double b = 1.000002;
+        double c = 1.000003;
 
         long st = System.nanoTime();
         long sc = st;
-        while (sc - st < 100000000L) {
-            bogoflopf = Math.random() * bogoflopf;
-            bogoflops++;
+
+        while (sc - st < iteration) {
+            // burn ALU cycles
+            a = a * b + c;
+            b = b * c + a;
+            c = c * a + b;
+
+            iters += 3; // roughly count flops
             sc = System.nanoTime();
         }
-        bogoflops = Math.round((double)(bogoflops) * (1000000000.0 / (sc - st)));
-//        System.out.println(sc - st);
-//        System.out.println(bogoflops);
+
+        // divide by 4 to make it roughly match up with the old calibrated worldgen estimator
+        bogoflops = Math.round((iters * (1e9 / (sc - st))) / 4);
+    }
+
+    public static void main(String[] args) {
+        loadedTime_t = getTIME_T();
+
+        updateBogoflops(100_000_000L);
 
         // if -ea flag is set, turn on all the debug prints
         try {

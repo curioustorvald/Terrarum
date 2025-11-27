@@ -254,18 +254,10 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         //loadDone = true
 
         // measure bogoflops here
-        val st = System.nanoTime()
-        var sc = st
-        var bogoflopf = Math.random()
-        var bogoflops = 0L
-        while (sc - st < 100000000L) {
-            bogoflopf *= Math.random()
-            bogoflops++
-            sc = System.nanoTime()
-        }
-        bogoflops = Math.round(bogoflops.toDouble() * (1000000000.0 / (sc - st)))
-        printdbg(this, "Bogoflops old: ${App.bogoflops} new: $bogoflops")
-        App.bogoflops = maxOf(App.bogoflops, bogoflops)
+        val bogoflopsOld = App.bogoflops
+        App.updateBogoflops(100_000_000L)
+        printdbg(this, "Bogoflops old: $bogoflopsOld new: ${App.bogoflops}")
+        App.bogoflops = maxOf(App.bogoflops, bogoflopsOld)
 
 
         App.audioMixer.ambientTracks.forEach {
