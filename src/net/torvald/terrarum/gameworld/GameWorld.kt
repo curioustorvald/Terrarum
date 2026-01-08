@@ -581,8 +581,8 @@ open class GameWorld(
             wiringGraph[blockAddr]!!.remove(tile)
             wirings[blockAddr]!!.ws.remove(tile)
 
-            // Rebuild logical wire graph for this wire type
-            logicalWireGraph.rebuild(tile)
+            // Incrementally update logical wire graph for this wire type
+            logicalWireGraph.updateAtPosition(tile, x, y)
         }
     }
 
@@ -601,8 +601,8 @@ open class GameWorld(
             wiringGraph[blockAddr]!!.remove(tile)
             wirings[blockAddr]!!.ws.remove(tile)
 
-            // Rebuild logical wire graph for this wire type
-            logicalWireGraph.rebuild(tile)
+            // Incrementally update logical wire graph for this wire type
+            logicalWireGraph.updateAtPosition(tile, x, y)
         }
     }
 

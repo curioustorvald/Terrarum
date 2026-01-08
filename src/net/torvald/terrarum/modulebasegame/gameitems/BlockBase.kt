@@ -236,9 +236,9 @@ object BlockBase {
         oldTileX = mtx
         oldTileY = mty
 
-        // Rebuild logical wire graph after connectivity is fully established
+        // Incrementally update logical wire graph after connectivity is fully established
         if (ret >= 0) {
-            ingame.world.logicalWireGraph.rebuild(itemID)
+            ingame.world.logicalWireGraph.updateAtPosition(itemID, mtx, mty)
         }
 
         ret

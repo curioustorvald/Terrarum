@@ -87,6 +87,8 @@ class ItemWrench(originalID: ItemID) : GameItem(originalID), FixtureInteractionB
                 else -> old
             }
             (INGAME as TerrarumIngame).world.setWireGraphOf(mtx, mty, "wire@basegame:256", new)
+            // Update logical wire graph after connectivity change
+            (INGAME as TerrarumIngame).world.logicalWireGraph.updateAtPosition("wire@basegame:256", mtx, mty)
             0L
         } ?: -1L
     }

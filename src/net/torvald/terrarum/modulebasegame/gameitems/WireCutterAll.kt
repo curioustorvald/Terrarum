@@ -67,6 +67,9 @@ object WireCutterBase {
 
                 wireItems.filter(wireFilter).notEmptyOrNull()?.forEach {
                     disconnect(it, wireNetP.second!!, wireNetN.second!!, mouseTile.vector)
+                    // Update logical wire graph after connectivity change
+                    ingame.world.logicalWireGraph.updateAtPosition(it, mtx, mty)
+                    ingame.world.logicalWireGraph.updateAtPosition(it, ntx, nty)
                 } ?: return@mouseInInteractableRangeTools false
 
                 true

@@ -474,6 +474,420 @@ class LogicalWireGraph(private val world: GameWorld) {
         return world.wirings[blockAddr]?.ws?.contains(wireType) == true
     }
 
+    // ========================================================================
+    // INCREMENTAL UPDATE METHODS
+    // ========================================================================
+
+    /**
+     * Incrementally update the graph when a wire tile is placed or removed.
+     * Only rebuilds the local area around the changed position.
+     *
+     * @param wireType The wire type being modified
+     * @param x Tile X coordinate
+     * @param y Tile Y coordinate
+     */
+    fun updateAtPosition(wireType: ItemID, x: Int, y: Int) {
+        val graph = graphs[wireType]
+        if (graph == null) {
+            // No graph exists yet, do a full rebuild
+            rebuild(wireType)
+            return
+        }
+
+        val centerAddr = LandUtil.getBlockAddr(world, x, y)
+        val decayConstant = WireCodex.wireDecays[wireType] ?: 1.0
+        val emissionType = WireCodex[wireType].accepts
+
+        // Step 1: Collect affected positions (center + 4 neighbors)
+        val affectedAddrs = mutableSetOf(centerAddr)
+        for (dir in DIRECTIONS) {
+            val offset = DIRECTION_OFFSETS[dir]!!
+            val nx = x + offset.x
+            val ny = y + offset.y
+            if (ny >= 0 && ny < world.height) {
+                affectedAddrs.add(LandUtil.getBlockAddr(world, nx, ny))
+            }
+        }
+
+        // Step 2: Find all segments that touch the affected area
+        val affectedSegments = mutableSetOf<WireSegment>()
+        val boundaryNodes = mutableSetOf<LogicalWireNode>()
+
+        affectedAddrs.forEach { addr ->
+            graph.positionToSegment[addr]?.let { segment ->
+                affectedSegments.add(segment)
+                // The start and end nodes are our boundary nodes (if they're outside affected area)
+                if (!affectedAddrs.contains(LandUtil.getBlockAddr(world, segment.startNode.position.x, segment.startNode.position.y))) {
+                    boundaryNodes.add(segment.startNode)
+                }
+                if (!affectedAddrs.contains(LandUtil.getBlockAddr(world, segment.endNode.position.x, segment.endNode.position.y))) {
+                    boundaryNodes.add(segment.endNode)
+                }
+            }
+            graph.positionToNode[addr]?.let { node ->
+                // Node in the affected area - collect its connected segments
+                node.connectedSegments.forEach { affectedSegments.add(it) }
+            }
+        }
+
+        // Step 3: Remove affected segments from the graph
+        affectedSegments.forEach { segment ->
+            removeSegmentFromGraph(graph, segment)
+        }
+
+        // Step 4: Remove nodes in the affected area (they'll be re-detected)
+        affectedAddrs.forEach { addr ->
+            graph.positionToNode[addr]?.let { node ->
+                graph.nodes.remove(node)
+                graph.positionToNode.remove(addr)
+            }
+        }
+
+        // Step 5: Re-detect nodes in the affected area
+        // 5a: Check for fixture nodes
+        INGAME.actorContainerActive.filterIsInstance<Electric>().forEach { fixture ->
+            if (!fixture.inUpdateRange(world)) return@forEach
+
+            fixture.wireEmitterTypes.forEach { (bbi, wireEmissionType) ->
+                if (wireEmissionType == emissionType) {
+                    val pos = fixture.worldBlockPos!! + fixture.blockBoxIndexToPoint2i(bbi)
+                    val addr = LandUtil.getBlockAddr(world, pos.x, pos.y)
+                    if (affectedAddrs.contains(addr) && hasWireAt(pos.x, pos.y, wireType)) {
+                        if (!graph.positionToNode.containsKey(addr)) {
+                            val node = LogicalWireNode.FixtureNode(pos, wireType, fixture, bbi, true, wireEmissionType)
+                            graph.nodes.add(node)
+                            graph.positionToNode[addr] = node
+                            boundaryNodes.add(node)
+                        }
+                    }
+                }
+            }
+
+            fixture.wireSinkTypes.forEach { (bbi, wireSinkType) ->
+                if (wireSinkType == emissionType) {
+                    val pos = fixture.worldBlockPos!! + fixture.blockBoxIndexToPoint2i(bbi)
+                    val addr = LandUtil.getBlockAddr(world, pos.x, pos.y)
+                    if (affectedAddrs.contains(addr) && hasWireAt(pos.x, pos.y, wireType)) {
+                        if (!graph.positionToNode.containsKey(addr)) {
+                            val node = LogicalWireNode.FixtureNode(pos, wireType, fixture, bbi, false, wireSinkType)
+                            graph.nodes.add(node)
+                            graph.positionToNode[addr] = node
+                            boundaryNodes.add(node)
+                        }
+                    }
+                }
+            }
+        }
+
+        // 5b: Check for junction nodes (3+ connections) in affected area
+        affectedAddrs.forEach { addr ->
+            val wiringNode = world.wirings[addr]
+            if (wiringNode?.ws?.contains(wireType) == true) {
+                val cnx = world.getWireGraphUnsafe(addr, wireType) ?: 0
+                val connectionCount = Integer.bitCount(cnx)
+
+                if (connectionCount >= 3 && !graph.positionToNode.containsKey(addr)) {
+                    val px = (addr % world.width).toInt()
+                    val py = (addr / world.width).toInt()
+                    val node = LogicalWireNode.JunctionNode(Point2i(px, py), wireType, connectionCount)
+                    graph.nodes.add(node)
+                    graph.positionToNode[addr] = node
+                    boundaryNodes.add(node)
+                }
+            }
+        }
+
+        // Step 6: Re-trace segments from all boundary nodes
+        val visitedEdges = HashSet<Pair<BlockAddress, Int>>()
+
+        boundaryNodes.forEach { startNode ->
+            val startAddr = LandUtil.getBlockAddr(world, startNode.position.x, startNode.position.y)
+            val cnx = world.getWireGraphUnsafe(startAddr, wireType) ?: 0
+
+            for (dir in DIRECTIONS) {
+                if (cnx and dir != 0) {
+                    val edgeKey = startAddr to dir
+                    if (visitedEdges.contains(edgeKey)) continue
+
+                    // Check if there's already a segment in this direction (outside affected area)
+                    val offset = DIRECTION_OFFSETS[dir]!!
+                    val nextAddr = LandUtil.getBlockAddr(world, startNode.position.x + offset.x, startNode.position.y + offset.y)
+                    if (graph.positionToSegment.containsKey(nextAddr) && !affectedAddrs.contains(nextAddr)) {
+                        continue  // Already have a valid segment here
+                    }
+
+                    val segment = tracePath(startNode, dir, wireType, decayConstant, graph.positionToNode)
+
+                    if (segment != null) {
+                        graph.segments.add(segment)
+                        startNode.connectedSegments.add(segment)
+                        segment.endNode.connectedSegments.add(segment)
+
+                        segment.tilePositions.forEach { pos ->
+                            val addr = LandUtil.getBlockAddr(world, pos.x, pos.y)
+                            graph.positionToSegment[addr] = segment
+                        }
+
+                        val endAddr = LandUtil.getBlockAddr(world, segment.endNode.position.x, segment.endNode.position.y)
+                        visitedEdges.add(startAddr to dir)
+                        visitedEdges.add(endAddr to dir.wireNodeMirror())
+                    }
+                }
+            }
+        }
+
+        // Step 7: Handle any orphan tiles in the affected area
+        affectedAddrs.forEach { addr ->
+            val wiringNode = world.wirings[addr]
+            if (wiringNode?.ws?.contains(wireType) == true && !graph.positionToSegment.containsKey(addr)) {
+                val px = (addr % world.width).toInt()
+                val py = (addr / world.width).toInt()
+                val pos = Point2i(px, py)
+                val orphanNode = LogicalWireNode.JunctionNode(pos, wireType, 0)
+                val segment = WireSegment(wireType, orphanNode, orphanNode, 0, listOf(pos), decayConstant = decayConstant)
+                graph.segments.add(segment)
+                graph.positionToSegment[addr] = segment
+            }
+        }
+
+        graph.dirty = true
+        graph.structureDirty = false
+    }
+
+    /**
+     * Remove a segment from the graph and clean up references.
+     */
+    private fun removeSegmentFromGraph(graph: WireTypeGraph, segment: WireSegment) {
+        // Remove from segments list
+        graph.segments.remove(segment)
+
+        // Remove from position lookup
+        segment.tilePositions.forEach { pos ->
+            val addr = LandUtil.getBlockAddr(world, pos.x, pos.y)
+            if (graph.positionToSegment[addr] === segment) {
+                graph.positionToSegment.remove(addr)
+            }
+        }
+
+        // Remove from connected nodes
+        segment.startNode.connectedSegments.remove(segment)
+        segment.endNode.connectedSegments.remove(segment)
+    }
+
+    /**
+     * Add a fixture node when an Electric fixture is spawned.
+     * Splits any existing segment at the fixture's position.
+     *
+     * @param wireType The wire type
+     * @param fixture The Electric fixture being added
+     * @param bbi The block box index of the emitter/sink port
+     * @param isEmitter True if this is an emitter, false if sink
+     * @param emissionType The wire emission type (e.g., "digital_bit")
+     */
+    fun addFixtureNode(wireType: ItemID, fixture: Electric, bbi: Int, isEmitter: Boolean, emissionType: WireEmissionType) {
+        val graph = graphs[wireType] ?: run {
+            rebuild(wireType)
+            return
+        }
+
+        val pos = fixture.worldBlockPos!! + fixture.blockBoxIndexToPoint2i(bbi)
+        val blockAddr = LandUtil.getBlockAddr(world, pos.x, pos.y)
+
+        // Check if there's a wire at this position
+        if (!hasWireAt(pos.x, pos.y, wireType)) return
+
+        // Check if there's already a node here
+        if (graph.positionToNode.containsKey(blockAddr)) return
+
+        // Create the new fixture node
+        val newNode = LogicalWireNode.FixtureNode(pos, wireType, fixture, bbi, isEmitter, emissionType)
+        graph.nodes.add(newNode)
+        graph.positionToNode[blockAddr] = newNode
+
+        // Check if this position is in an existing segment
+        val existingSegment = graph.positionToSegment[blockAddr]
+        if (existingSegment != null) {
+            // Need to split the segment at this position
+            splitSegmentAtNode(graph, existingSegment, newNode, wireType)
+        } else {
+            // No segment here, trace new segments from this node
+            traceSegmentsFromNode(graph, newNode, wireType)
+        }
+
+        graph.dirty = true
+        graph.structureDirty = false
+    }
+
+    /**
+     * Remove a fixture node when an Electric fixture is despawned.
+     * Merges adjacent segments if possible.
+     */
+    fun removeFixtureNode(wireType: ItemID, fixture: Electric, bbi: Int) {
+        val graph = graphs[wireType] ?: return
+
+        val pos = fixture.worldBlockPos ?: return
+        val nodePos = pos + fixture.blockBoxIndexToPoint2i(bbi)
+        val blockAddr = LandUtil.getBlockAddr(world, nodePos.x, nodePos.y)
+
+        val node = graph.positionToNode[blockAddr] ?: return
+        if (node !is LogicalWireNode.FixtureNode) return
+        if (node.fixtureRef !== fixture || node.blockBoxIndex != bbi) return
+
+        // Collect connected segments before removing
+        val connectedSegments = node.connectedSegments.toList()
+
+        // Remove the node
+        graph.nodes.remove(node)
+        graph.positionToNode.remove(blockAddr)
+
+        // Remove connected segments
+        connectedSegments.forEach { segment ->
+            removeSegmentFromGraph(graph, segment)
+        }
+
+        // Check if this position should become a junction or just part of a segment
+        val cnx = world.getWireGraphUnsafe(blockAddr, wireType) ?: 0
+        val connectionCount = Integer.bitCount(cnx)
+
+        if (connectionCount >= 3) {
+            // Create a junction node here
+            val junctionNode = LogicalWireNode.JunctionNode(nodePos, wireType, connectionCount)
+            graph.nodes.add(junctionNode)
+            graph.positionToNode[blockAddr] = junctionNode
+            traceSegmentsFromNode(graph, junctionNode, wireType)
+        } else if (connectionCount >= 1) {
+            // This is now part of a segment, re-trace from neighbors
+            retraceFromNeighbors(graph, nodePos.x, nodePos.y, wireType)
+        }
+
+        graph.dirty = true
+        graph.structureDirty = false
+    }
+
+    /**
+     * Split a segment at the given node position.
+     */
+    private fun splitSegmentAtNode(graph: WireTypeGraph, segment: WireSegment, newNode: LogicalWireNode, wireType: ItemID) {
+        val decayConstant = segment.decayConstant
+
+        // Find the index of the new node in the segment's tile positions
+        val splitIndex = segment.tilePositions.indexOfFirst {
+            it.x == newNode.position.x && it.y == newNode.position.y
+        }
+
+        if (splitIndex < 0) return  // Node not in this segment
+
+        // Remove the old segment
+        removeSegmentFromGraph(graph, segment)
+
+        // Create two new segments (if the node isn't at an endpoint)
+        if (splitIndex > 0) {
+            // Segment from original start to new node
+            val path1 = segment.tilePositions.subList(0, splitIndex + 1)
+            val segment1 = WireSegment(
+                wireType = wireType,
+                startNode = segment.startNode,
+                endNode = newNode,
+                length = path1.size - 1,
+                tilePositions = path1.toList(),
+                decayConstant = decayConstant
+            )
+            graph.segments.add(segment1)
+            segment.startNode.connectedSegments.add(segment1)
+            newNode.connectedSegments.add(segment1)
+            path1.forEach { pos ->
+                graph.positionToSegment[LandUtil.getBlockAddr(world, pos.x, pos.y)] = segment1
+            }
+        }
+
+        if (splitIndex < segment.tilePositions.size - 1) {
+            // Segment from new node to original end
+            val path2 = segment.tilePositions.subList(splitIndex, segment.tilePositions.size)
+            val segment2 = WireSegment(
+                wireType = wireType,
+                startNode = newNode,
+                endNode = segment.endNode,
+                length = path2.size - 1,
+                tilePositions = path2.toList(),
+                decayConstant = decayConstant
+            )
+            graph.segments.add(segment2)
+            newNode.connectedSegments.add(segment2)
+            segment.endNode.connectedSegments.add(segment2)
+            path2.forEach { pos ->
+                graph.positionToSegment[LandUtil.getBlockAddr(world, pos.x, pos.y)] = segment2
+            }
+        }
+    }
+
+    /**
+     * Trace new segments from a node in all connected directions.
+     */
+    private fun traceSegmentsFromNode(graph: WireTypeGraph, node: LogicalWireNode, wireType: ItemID) {
+        val decayConstant = WireCodex.wireDecays[wireType] ?: 1.0
+        val startAddr = LandUtil.getBlockAddr(world, node.position.x, node.position.y)
+        val cnx = world.getWireGraphUnsafe(startAddr, wireType) ?: 0
+
+        for (dir in DIRECTIONS) {
+            if (cnx and dir != 0) {
+                // Check if there's already a segment in this direction
+                val alreadyConnected = node.connectedSegments.any { segment ->
+                    val other = segment.getOtherEnd(node)
+                    val offset = DIRECTION_OFFSETS[dir]!!
+                    val expectedPos = Point2i(node.position.x + offset.x, node.position.y + offset.y)
+                    segment.tilePositions.any { it.x == expectedPos.x && it.y == expectedPos.y }
+                }
+                if (alreadyConnected) continue
+
+                val segment = tracePath(node, dir, wireType, decayConstant, graph.positionToNode)
+
+                if (segment != null) {
+                    graph.segments.add(segment)
+                    node.connectedSegments.add(segment)
+                    segment.endNode.connectedSegments.add(segment)
+
+                    segment.tilePositions.forEach { pos ->
+                        graph.positionToSegment[LandUtil.getBlockAddr(world, pos.x, pos.y)] = segment
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Re-trace segments from the neighbors of a removed node.
+     */
+    private fun retraceFromNeighbors(graph: WireTypeGraph, x: Int, y: Int, wireType: ItemID) {
+        val decayConstant = WireCodex.wireDecays[wireType] ?: 1.0
+
+        for (dir in DIRECTIONS) {
+            val offset = DIRECTION_OFFSETS[dir]!!
+            val nx = x + offset.x
+            val ny = y + offset.y
+            val neighborAddr = LandUtil.getBlockAddr(world, nx, ny)
+
+            val neighborNode = graph.positionToNode[neighborAddr]
+            if (neighborNode != null) {
+                // Trace from this neighbor node back through the removed position
+                val cnx = world.getWireGraphUnsafe(neighborAddr, wireType) ?: 0
+                val backDir = dir.wireNodeMirror()
+
+                if (cnx and backDir != 0) {
+                    val segment = tracePath(neighborNode, backDir, wireType, decayConstant, graph.positionToNode)
+                    if (segment != null) {
+                        graph.segments.add(segment)
+                        neighborNode.connectedSegments.add(segment)
+                        segment.endNode.connectedSegments.add(segment)
+
+                        segment.tilePositions.forEach { pos ->
+                            graph.positionToSegment[LandUtil.getBlockAddr(world, pos.x, pos.y)] = segment
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Rebuild graphs for all wire types present in the world.
      */

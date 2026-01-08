@@ -58,23 +58,24 @@ open class Electric : FixtureBase {
     }
 
     /**
-     * When an Electric fixture is spawned, mark all wire graphs as structurally dirty
-     * so they rebuild to include this fixture's emitter/sink nodes.
+     * When an Electric fixture is spawned, mark wire graphs as needing structural rebuild.
+     * This ensures the graphs will be rebuilt to include this fixture's emitter/sink nodes.
      */
     override fun onSpawn(tx: Int, ty: Int) {
         super.onSpawn(tx, ty)
-        // Mark wire graphs as needing structural rebuild to include this fixture
+        // Mark wire graphs for rebuild - incremental fixture updates have timing issues
+        // because the fixture may not be fully initialised in actorContainerActive yet
         if (wireEmitterTypes.isNotEmpty() || wireSinkTypes.isNotEmpty()) {
             INGAME.world.logicalWireGraph.markAllStructureDirty()
         }
     }
 
     /**
-     * When an Electric fixture is despawned, mark all wire graphs as structurally dirty
-     * so they rebuild without this fixture's nodes.
+     * When an Electric fixture is despawned, mark wire graphs as needing structural rebuild.
+     * This ensures the graphs will be rebuilt without this fixture's nodes.
      */
     override fun despawn() {
-        // Mark wire graphs as needing structural rebuild before this fixture is removed
+        // Mark wire graphs for rebuild before this fixture is removed
         if (wireEmitterTypes.isNotEmpty() || wireSinkTypes.isNotEmpty()) {
             INGAME.world.logicalWireGraph.markAllStructureDirty()
         }
