@@ -97,7 +97,8 @@ class WireActor : ActorWithBody, NoSerialise, InternalActor {
 
             // signal wires?
             if (WireCodex.wireProps[wireID]?.accepts == "digital_bit") {
-                val strength = world?.getWireEmitStateOf(worldX, worldY, wireID)?.x ?: 0.0
+                // Use parametric brightness from logical wire graph for efficiency
+                val strength = world?.getWireBrightness(worldX, worldY, wireID) ?: 0.0
 
                 // draw base (unlit) sprite
                 batch.color = Color.WHITE

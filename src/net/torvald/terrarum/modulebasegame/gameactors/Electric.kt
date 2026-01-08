@@ -57,6 +57,30 @@ open class Electric : FixtureBase {
         const val ELECTRIC_EPSILON_GENERIC = 1.0 / 1024.0
     }
 
+    /**
+     * When an Electric fixture is spawned, mark all wire graphs as structurally dirty
+     * so they rebuild to include this fixture's emitter/sink nodes.
+     */
+    override fun onSpawn(tx: Int, ty: Int) {
+        super.onSpawn(tx, ty)
+        // Mark wire graphs as needing structural rebuild to include this fixture
+        if (wireEmitterTypes.isNotEmpty() || wireSinkTypes.isNotEmpty()) {
+            INGAME.world.logicalWireGraph.markAllStructureDirty()
+        }
+    }
+
+    /**
+     * When an Electric fixture is despawned, mark all wire graphs as structurally dirty
+     * so they rebuild without this fixture's nodes.
+     */
+    override fun despawn() {
+        // Mark wire graphs as needing structural rebuild before this fixture is removed
+        if (wireEmitterTypes.isNotEmpty() || wireSinkTypes.isNotEmpty()) {
+            INGAME.world.logicalWireGraph.markAllStructureDirty()
+        }
+        super.despawn()
+    }
+
     fun getWireEmitterAt(blockBoxIndex: BlockBoxIndex) = this.wireEmitterTypes[blockBoxIndex]
     fun getWireEmitterAt(point: Point2i) = this.wireEmitterTypes[pointToBlockBoxIndex(point)]
     fun getWireEmitterAt(x: Int, y: Int) = this.wireEmitterTypes[pointToBlockBoxIndex(x, y)]

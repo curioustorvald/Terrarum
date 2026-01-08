@@ -122,6 +122,13 @@ open class GameWorld(
     public val wirings = HashedWirings()
     private val wiringGraph = HashedWiringGraph()
 
+    /**
+     * Logical wire graph for efficient signal propagation.
+     * Contains coarse graph with logical nodes (fixtures, junctions) and segments.
+     * Rebuilt when wires are placed/removed; used for signal simulation and brightness lookup.
+     */
+    val logicalWireGraph: LogicalWireGraph by lazy { LogicalWireGraph(this) }
+
     @Transient private val WIRE_POS_MAP = intArrayOf(1,2,4,8)
     @Transient private val WIRE_ANTIPOS_MAP = intArrayOf(4,8,1,2)
 
@@ -540,6 +547,10 @@ open class GameWorld(
 
         // scratch-that-i'll-figure-it-out wire placement
         setWireGraphOfUnsafe(blockAddr, tile, connection)
+
+        // Note: Do NOT rebuild logical wire graph here - connectivity is set up
+        // separately by BlockBase.setConnectivity() AFTER this call.
+        // The graph is rebuilt at the end of wire placement in BlockBase.kt
     }
 
     fun setTileOnLayerUnsafe(layer: Int, x: Int, y: Int, tile: Int) {
@@ -569,6 +580,9 @@ open class GameWorld(
             // remove wire from this tile
             wiringGraph[blockAddr]!!.remove(tile)
             wirings[blockAddr]!!.ws.remove(tile)
+
+            // Rebuild logical wire graph for this wire type
+            logicalWireGraph.rebuild(tile)
         }
     }
 
@@ -586,6 +600,9 @@ open class GameWorld(
             // remove wire from this tile
             wiringGraph[blockAddr]!!.remove(tile)
             wirings[blockAddr]!!.ws.remove(tile)
+
+            // Rebuild logical wire graph for this wire type
+            logicalWireGraph.rebuild(tile)
         }
     }
 
@@ -607,6 +624,27 @@ open class GameWorld(
 
     fun getWireEmitStateUnsafe(blockAddr: BlockAddress, itemID: ItemID): Vector2? {
         return wiringGraph[blockAddr]?.get(itemID)?.emt
+    }
+
+    /**
+     * Get wire brightness using parametric evaluation from the logical wire graph.
+     * This is more efficient than per-tile signal storage as it derives brightness
+     * from segment properties rather than storing it per-tile.
+     *
+     * @param x World tile X coordinate
+     * @param y World tile Y coordinate
+     * @param wireType The wire item ID
+     * @return Signal strength at this position (0.0 to 1.0+), or 0.0 if no wire/signal
+     */
+    fun getWireBrightness(x: Int, y: Int, wireType: ItemID): Double {
+        val (cx, cy) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, cx, cy)
+
+        val segment = logicalWireGraph.getGraph(wireType)
+            ?.positionToSegment?.get(blockAddr) ?: return 0.0
+
+        val offset = segment.getOffsetForPosition(Point2i(cx, cy)) ?: return 0.0
+        return segment.getBrightnessAtOffset(offset)
     }
 
     fun getWireReceptionStateOf(x: Int, y: Int, itemID: ItemID): ArrayList<WireReceptionState>? {

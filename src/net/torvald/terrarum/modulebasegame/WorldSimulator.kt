@@ -12,6 +12,8 @@ import net.torvald.terrarum.gameactors.Controllable
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.GameWorld.Companion.FLUID
+import net.torvald.terrarum.gameworld.LogicalWireNode
+import net.torvald.terrarum.gameworld.WireSegment
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameitems.AxeCore
@@ -525,37 +527,155 @@ object WorldSimulator {
                 it.inUpdateRange(world) && it.wireEmitterTypes.isNotEmpty()
             }
 
+    // Keep for backwards compatibility - used by oldTraversedNodes cleanup
     private val wireSimMarked = HashSet<Long>()
     private val wireSimPoints = Queue<WireGraphCursor>()
     private val oldTraversedNodes = ArrayList<WireGraphCursor>()
     private val fixtureCache = HashMap<Point2i, Pair<Electric, WireEmissionType>>() // also instance of Electric
 
+    /**
+     * Simulates wire signal propagation using the two-layer logical wire graph.
+     *
+     * This implementation operates on logical nodes (fixtures, junctions) and segments
+     * rather than individual tiles, reducing complexity from O(wire_tiles) to O(logical_nodes).
+     *
+     * Signal strength is calculated per-segment and stored for parametric brightness evaluation.
+     * Per-tile emission states are also updated for backwards compatibility with existing code.
+     */
     private fun simulateWires(delta: Float) {
-        // unset old wires before we begin
+        // Clear old per-tile emission states for backwards compatibility
         oldTraversedNodes.forEach { (x, y, _, _, wire) ->
             world.getAllWiringGraph(x, y)?.get(wire)?.emt?.set(0.0, 0.0)
         }
-
         oldTraversedNodes.clear()
         fixtureCache.clear()
 
-        wiresimGetSourceBlocks().let { sources ->
-            // signal-emitting fixtures must set emitState of its own tiles via update()
-            sources.forEach {
-                it.wireEmitterTypes.forEach { (bbi, wireType) ->
-
-                    val startingPoint = it.worldBlockPos!! + it.blockBoxIndexToPoint2i(bbi)
-                    val signal = it.wireEmission[bbi] ?: Vector2(0.0, 0.0)
-
-                    world.getAllWiringGraph(startingPoint.x, startingPoint.y)?.keys?.filter { WireCodex[it].accepts == wireType }?.forEach { wire ->
-                        val simStartingPoint = WireGraphCursor(startingPoint, wire)
-                        wireSimMarked.clear()
-                        wireSimPoints.clear()
-                        traverseWireGraph(world, wire, simStartingPoint, signal, wireType)
+        // Collect all wire types that have active emitters
+        val activeWireTypes = HashSet<ItemID>()
+        wiresimGetSourceBlocks().forEach { fixture ->
+            fixture.wireEmitterTypes.forEach { (bbi, wireEmissionType) ->
+                val pos = fixture.worldBlockPos!! + fixture.blockBoxIndexToPoint2i(bbi)
+                world.getAllWiringGraph(pos.x, pos.y)?.keys?.forEach { wireType ->
+                    if (WireCodex[wireType].accepts == wireEmissionType) {
+                        activeWireTypes.add(wireType)
                     }
                 }
             }
         }
+
+        // Process each wire type
+        activeWireTypes.forEach { wireType ->
+            simulateWireType(wireType)
+        }
+    }
+
+    /**
+     * Simulate signal propagation for a specific wire type using the logical graph.
+     */
+    private fun simulateWireType(wireType: ItemID) {
+        val graph = world.logicalWireGraph.getGraph(wireType)
+
+        // Rebuild graph if it doesn't exist, is empty, or structure is dirty (fixtures added/removed)
+        if (graph == null || graph.nodes.isEmpty() || graph.structureDirty) {
+            world.logicalWireGraph.rebuild(wireType)
+        }
+
+        val currentGraph = world.logicalWireGraph.getGraph(wireType) ?: return
+        if (currentGraph.nodes.isEmpty()) return
+
+        val decayConstant = WireCodex.wireDecays[wireType] ?: 1.0
+        val emissionType = WireCodex[wireType].accepts
+
+        // Step 1: Reset all node signal strengths and segment strengths
+        currentGraph.nodes.forEach { node ->
+            node.signalStrength = Vector2(0.0, 0.0)
+        }
+        currentGraph.segments.forEach { segment ->
+            segment.startStrength = 0.0
+            segment.endStrength = 0.0
+        }
+
+        // Step 2: Get signals from emitter fixture nodes
+        val emitterNodes = currentGraph.nodes.filterIsInstance<LogicalWireNode.FixtureNode>()
+            .filter { it.isEmitter && it.fixtureRef.inUpdateRange(world) }
+
+        emitterNodes.forEach { emitterNode ->
+            val signal = emitterNode.fixtureRef.wireEmission[emitterNode.blockBoxIndex] ?: Vector2(0.0, 0.0)
+            emitterNode.signalStrength = signal.copy()
+        }
+
+        // Step 3: BFS propagation on logical graph
+        val visited = HashSet<LogicalWireNode>()
+        val queue = ArrayDeque<LogicalWireNode>()
+
+        // Start from all emitter nodes
+        emitterNodes.forEach { node ->
+            if (node.signalStrength.x > 0.0 || node.signalStrength.y > 0.0) {
+                queue.add(node)
+            }
+        }
+
+        while (queue.isNotEmpty()) {
+            val node = queue.removeFirst()
+            if (visited.contains(node)) continue
+            visited.add(node)
+
+            // Propagate through connected segments
+            node.connectedSegments.forEach { segment ->
+                val otherNode = segment.getOtherEnd(node)
+
+                // Calculate decayed signal at the other end
+                val decayedSignal = node.signalStrength.copy()
+                decayedSignal.x *= decayConstant.pow(segment.length.toDouble())
+                decayedSignal.y *= decayConstant.pow(segment.length.toDouble())
+
+                // Update segment strengths for brightness calculation
+                if (node === segment.startNode || node == segment.startNode) {
+                    segment.startStrength = maxOf(segment.startStrength, node.signalStrength.x)
+                } else {
+                    segment.endStrength = maxOf(segment.endStrength, node.signalStrength.x)
+                }
+
+                // Update other node with max signal (handles multiple paths)
+                if (decayedSignal.x > otherNode.signalStrength.x) {
+                    otherNode.signalStrength.x = decayedSignal.x
+                }
+                if (decayedSignal.y > otherNode.signalStrength.y) {
+                    otherNode.signalStrength.y = decayedSignal.y
+                }
+
+                // Add to queue for further propagation
+                if (!visited.contains(otherNode)) {
+                    queue.add(otherNode)
+                }
+            }
+        }
+
+        // Step 4: Update per-tile emission states for backwards compatibility
+        // This allows getWireEmitStateOf() to work alongside the new getWireBrightness()
+        currentGraph.segments.forEach { segment ->
+            segment.tilePositions.forEachIndexed { index, pos ->
+                val brightness = segment.getBrightnessAtOffset(index)
+                val emitState = Vector2(brightness, 0.0)
+                world.setWireEmitStateOf(pos.x, pos.y, wireType, emitState)
+
+                // Track for cleanup on next tick
+                oldTraversedNodes.add(WireGraphCursor(pos, wireType))
+            }
+        }
+
+        // Step 5: Notify sink fixtures
+        currentGraph.nodes.filterIsInstance<LogicalWireNode.FixtureNode>()
+            .filter { !it.isEmitter && it.fixtureRef.inUpdateRange(world) }
+            .forEach { sinkNode ->
+                if (sinkNode.signalStrength.x > 0.0 || sinkNode.signalStrength.y > 0.0) {
+                    val offsetX = sinkNode.blockBoxIndex % sinkNode.fixtureRef.blockBox.width
+                    val offsetY = sinkNode.blockBoxIndex / sinkNode.fixtureRef.blockBox.width
+                    sinkNode.fixtureRef.updateOnWireGraphTraversal(offsetX, offsetY, sinkNode.emissionType)
+                }
+            }
+
+        currentGraph.dirty = false
     }
 
     private fun calculateDecay(signal: Vector2, dist: Int, wire: ItemID, signalType: WireEmissionType): Vector2 {
@@ -563,7 +683,9 @@ object WorldSimulator {
         return signal * d.pow(dist.toDouble())
     }
 
-    private fun traverseWireGraph(world: GameWorld, wire: ItemID, startingPoint: WireGraphCursor, signal: Vector2, signalType: WireEmissionType) {
+    // Keep old traversal method for reference/fallback (can be removed later)
+    @Deprecated("Use simulateWireType() with logical graph instead")
+    private fun traverseWireGraphLegacy(world: GameWorld, wire: ItemID, startingPoint: WireGraphCursor, signal: Vector2, signalType: WireEmissionType) {
 
         val emissionType = WireCodex[wire].accepts
 
