@@ -795,16 +795,27 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val itemOnGrip = ItemCodex[(actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)]
 
         if (!worldSecondaryClickLatch) {
-            // #1. Perform item's secondaryUse
-            val consumptionSuccessful = itemOnGrip?.startSecondaryUse(actor, delta) ?: -1
-            if (consumptionSuccessful > -1)
-                (actor as Pocketed).inventory.consumeItem(itemOnGrip!!, consumptionSuccessful)
-            // #2. If #1 failed, try to pick up the fixture
-            else {
-                mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
-                    pickupFixtureOrDroppedItem(actor, delta, mwx, mwy, mtx, mty)
+            // #1. Try to pick up the fixture or dropped item first (if in range and there's something to pick up)
+            val pickupSuccessful = mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
+                val actorsUnderMouse = getActorsUnderMouse(mwx, mwy)
+                val hasPickupableActor = actorsUnderMouse.any {
+                    (it is FixtureBase && it.canBeDespawned && System.nanoTime() - it.spawnRequestedTime > 50000000) || // give freshly spawned fixtures 0.05 seconds of immunity
+                    (it is DroppedItem && it.noAutoPickup)
+                }
+                if (hasPickupableActor) {
+                    pickupFixtureOrDroppedItem(actor, delta, mwx, mwy, mtx, mty, assignToQuickslot = (itemOnGrip == null))
                     0L
                 }
+                else {
+                    -1L
+                }
+            }
+
+            // #2. If pickup didn't happen, try to perform item's secondaryUse
+            if (pickupSuccessful < 0) {
+                val consumptionSuccessful = itemOnGrip?.startSecondaryUse(actor, delta) ?: -1
+                if (consumptionSuccessful > -1)
+                    (actor as Pocketed).inventory.consumeItem(itemOnGrip!!, consumptionSuccessful)
             }
 
             worldSecondaryClickLatch = true
