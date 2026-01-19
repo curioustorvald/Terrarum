@@ -121,6 +121,46 @@ emph {
 
         val uptime = App.getTIME_T() - App.startupTime
 
+
+
+        // print out the error
+        printStream.println("<h3>The Error Info</h3>")
+        System.err.println("== The Error Info ==")
+
+        printStream.println("<pre>")
+        e.printStackTrace(printStream)
+        printStream.println("</pre>")
+        e.printStackTrace(System.err)
+
+
+
+        printStream.println("<h3>Module Info</h3>")
+        printStream.println("<h4>Load Order</h4>")
+        printStream.println("<ol>${ModMgr.loadOrder.joinToString(separator = "") { "<li>" +
+                "$it&ensp;<small>(" +
+                "${moduleMetaToText(ModMgr.moduleInfo[it] ?: ModMgr.moduleInfoErrored[it])}" +
+                ")</small></li>" }
+        }</ol>")
+
+
+
+        // print out loaded modules
+        ModMgr.errorLogs.let {
+            if (it.size > 0) {
+                printStream.println("<h4>Module Errors</h4>")
+                System.err.println("== Module Errors ==")
+                it.forEach {
+                    printStream.println("<p>From Module <strong>${it.moduleName}</strong> (${it.type.toHTML()}):</p>")
+                    printStream.println("<pre>")
+                    it.cause?.printStackTrace(printStream)
+                    printStream.println("</pre>")
+                    it.cause?.printStackTrace(System.err)
+                }
+            }
+        }
+
+
+
         // print out device info
         printStream.println("<h3>System Info</h3>")
         printStream.println("<ul>")
@@ -145,39 +185,6 @@ emph {
         catch (e: NullPointerException) {
             printStream.println("<p><emph>GL not initialised</emph></p>")
         }
-
-        printStream.println("<h3>Module Info</h3>")
-        printStream.println("<h4>Load Order</h4>")
-        printStream.println("<ol>${ModMgr.loadOrder.joinToString(separator = "") { "<li>" +
-                   "$it&ensp;<small>(" +
-                   "${moduleMetaToText(ModMgr.moduleInfo[it] ?: ModMgr.moduleInfoErrored[it])}" +
-                   ")</small></li>" }
-                }</ol>")
-
-
-        ModMgr.errorLogs.let {
-            if (it.size > 0) {
-                printStream.println("<h4>Module Errors</h4>")
-                System.err.println("== Module Errors ==")
-                it.forEach {
-                    printStream.println("<p>From Module <strong>${it.moduleName}</strong> (${it.type.toHTML()}):</p>")
-                    printStream.println("<pre>")
-                    it.cause?.printStackTrace(printStream)
-                    printStream.println("</pre>")
-                    it.cause?.printStackTrace(System.err)
-                }
-            }
-        }
-
-        printStream.println("<h3>The Error Info</h3>")
-        System.err.println("== The Error Info ==")
-
-        printStream.println("<pre>")
-        e.printStackTrace(printStream)
-        printStream.println("</pre>")
-        e.printStackTrace(System.err)
-
-
 
         textArea.text = "<html><style type=\"text/css\">$css</style><body>$htmlSB</body></html>"
     }

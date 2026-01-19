@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.PHYS_EPSILON_DIST
 import net.torvald.terrarum.gameactors.BlockMarkerActor
+import net.torvald.terrarum.gameactors.WorldUpdater
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitems.ItemID
@@ -146,6 +147,13 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
 
     val actorAdditionQueue = ArrayList<Triple<Actor, Throwable, (Actor) -> Unit>>() // actor, stacktrace object, onSpawn
     val actorRemovalQueue = ArrayList<Triple<Actor, Throwable, (Actor) -> Unit>>() // actor, stacktrace object, onDespawn
+
+    /**
+     * Registry of actors that implement [WorldUpdater].
+     * World simulation (fluids, wires, tile updates) is active around these actors.
+     * Automatically maintained when actors are added/removed.
+     */
+    val worldUpdaters: MutableSet<ActorWithBody> = HashSet()
 
     /**
      * ## BIG NOTE: Calculated actor distance is the **Euclidean distance SQUARED**
@@ -378,6 +386,10 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
                 actorContainer.removeAt(indexToDelete)
             }
         }
+        // Unregister from worldUpdaters if applicable
+        if (actor is WorldUpdater && actor is ActorWithBody) {
+            worldUpdaters.remove(actor)
+        }
     }
 
     protected open fun forceAddActor(actor: Actor?, caller: Throwable = StackTraceRecorder()) {
@@ -388,6 +400,10 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         }
         else {
             actorContainerActive.add(actor)
+            // Register to worldUpdaters if applicable
+            if (actor is WorldUpdater && actor is ActorWithBody) {
+                worldUpdaters.add(actor)
+            }
         }
     }
 

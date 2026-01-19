@@ -150,8 +150,23 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                         (a.hitbox.centeredY - WorldCamera.yCentre).sqr()
                 )
 
-        /** whether the actor is within update range */
-        fun ActorWithBody.inUpdateRange(world: GameWorld) = distToCameraSqr(world, this) <= ACTOR_UPDATE_RANGE.sqr()
+        /**
+         * Returns the minimum squared distance from the actor to any living WorldUpdater.
+         * Falls back to camera distance if no WorldUpdaters exist.
+         */
+        fun distToNearestUpdaterSqr(world: GameWorld, actor: ActorWithBody): Double {
+            val worldUpdaters = Terrarum.ingame?.worldUpdaters
+            if (worldUpdaters.isNullOrEmpty()) {
+                return distToCameraSqr(world, actor)
+            }
+            return worldUpdaters.minOf { updater ->
+                if (updater.flagDespawn || updater.despawned) Double.MAX_VALUE
+                else distToActorSqr(world, actor, updater)
+            }
+        }
+
+        /** whether the actor is within update range of any WorldUpdater */
+        fun ActorWithBody.inUpdateRange(world: GameWorld) = distToNearestUpdaterSqr(world, this) <= ACTOR_UPDATE_RANGE.sqr()
 
         /** whether the actor is within screen */
         fun ActorWithBody.inScreen(world: GameWorld) =

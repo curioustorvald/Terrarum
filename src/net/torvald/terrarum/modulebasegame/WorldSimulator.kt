@@ -23,6 +23,7 @@ import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_W
 import org.dyn4j.geometry.Vector2
 import kotlin.math.cosh
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -50,6 +51,9 @@ object WorldSimulator {
     private val fluidNewMap = Array(DOUBLE_RADIUS) { FloatArray(DOUBLE_RADIUS) }
     private val fluidNewTypeMap = Array(DOUBLE_RADIUS) { Array(DOUBLE_RADIUS) { Fluid.NULL } }
 
+    // Mask to track tiles that have already been fluid-simulated this frame (for overlap deduplication)
+    private val processedFluidTiles = HashSet<Long>()
+
     const val FLUID_MAX_MASS = 1f // The normal, un-pressurized mass of a full water cell
     const val FLUID_MAX_COMP = 0.01f // How much excess water a cell can store, compared to the cell above it. A tile of fluid can contain more than MaxMass water.
 //    const val FLUID_MIN_MASS = net.torvald.terrarum.gameworld.FLUID_MIN_MASS //Ignore cells that are almost dry (smaller than epsilon of float16)
@@ -65,6 +69,97 @@ object WorldSimulator {
     var updateYFrom = 0
     /** Bottom-right point */
     var updateYTo = 0
+
+    /**
+     * Represents a rectangular region for world updates.
+     */
+    data class UpdateRegion(val xFrom: Int, val yFrom: Int, val xTo: Int, val yTo: Int) {
+        fun overlaps(other: UpdateRegion): Boolean {
+            return xFrom <= other.xTo && xTo >= other.xFrom &&
+                   yFrom <= other.yTo && yTo >= other.yFrom
+        }
+
+        fun merge(other: UpdateRegion): UpdateRegion {
+            return UpdateRegion(
+                min(xFrom, other.xFrom),
+                min(yFrom, other.yFrom),
+                max(xTo, other.xTo),
+                max(yTo, other.yTo)
+            )
+        }
+
+        val width get() = xTo - xFrom
+        val height get() = yTo - yFrom
+    }
+
+    /**
+     * Merges overlapping regions into non-overlapping ones.
+     * Uses iterative merging until no more merges are possible.
+     */
+    private fun mergeOverlappingRegions(regions: List<UpdateRegion>): List<UpdateRegion> {
+        if (regions.size <= 1) return regions
+
+        val result = regions.toMutableList()
+        var merged = true
+        while (merged) {
+            merged = false
+            outer@ for (i in result.indices) {
+                for (j in i + 1 until result.size) {
+                    if (result[i].overlaps(result[j])) {
+                        val mergedRegion = result[i].merge(result[j])
+                        result.removeAt(j)
+                        result[i] = mergedRegion
+                        merged = true
+                        break@outer
+                    }
+                }
+            }
+        }
+        return result
+    }
+
+    /**
+     * Computes update regions from all living WorldUpdaters.
+     * Returns a list of non-overlapping merged regions.
+     */
+    private fun computeUpdateRegions(): List<UpdateRegion> {
+        val worldUpdaters = ingame.worldUpdaters.filter { !it.flagDespawn && !it.despawned }
+        if (worldUpdaters.isEmpty()) return emptyList()
+
+        val regions = worldUpdaters.map { updater ->
+            val cx = updater.hitbox.centeredX.div(TILE_SIZE).roundToInt()
+            val cy = updater.hitbox.centeredY.div(TILE_SIZE).roundToInt()
+            UpdateRegion(
+                cx - FLUID_UPDATING_SQUARE_RADIUS,
+                cy - FLUID_UPDATING_SQUARE_RADIUS,
+                cx + FLUID_UPDATING_SQUARE_RADIUS,
+                cy + FLUID_UPDATING_SQUARE_RADIUS
+            )
+        }
+
+        return mergeOverlappingRegions(regions)
+    }
+
+    /**
+     * Computes individual (unmerged) fluid regions for each WorldUpdater.
+     * Each region is exactly DOUBLE_RADIUS × DOUBLE_RADIUS to fit the fixed fluid arrays.
+     * Overlap deduplication is handled by processedFluidTiles mask during fluidmapToWorld().
+     */
+    private fun computeIndividualFluidRegions(): List<UpdateRegion> {
+        val worldUpdaters = ingame.worldUpdaters.filter { !it.flagDespawn && !it.despawned }
+        if (worldUpdaters.isEmpty()) return emptyList()
+
+        return worldUpdaters.map { updater ->
+            val cx = updater.hitbox.centeredX.div(TILE_SIZE).roundToInt()
+            val cy = updater.hitbox.centeredY.div(TILE_SIZE).roundToInt()
+            UpdateRegion(
+                cx - FLUID_UPDATING_SQUARE_RADIUS,
+                cy - FLUID_UPDATING_SQUARE_RADIUS,
+                cx + FLUID_UPDATING_SQUARE_RADIUS,
+                cy + FLUID_UPDATING_SQUARE_RADIUS
+            )
+        }
+    }
 
     private val ingame: TerrarumIngame
             get() = Terrarum.ingame!! as TerrarumIngame
@@ -82,21 +177,66 @@ object WorldSimulator {
 
         //printdbg(this, "============================")
 
-        if (player != null) {
-            updateXFrom = player.hitbox.centeredX.div(TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
-            updateYFrom = player.hitbox.centeredY.div(TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
-            updateXTo = updateXFrom + DOUBLE_RADIUS
-            updateYTo = updateYFrom + DOUBLE_RADIUS
+        // Compute non-overlapping merged regions for general simulations
+        val mergedRegions = computeUpdateRegions()
+
+        // Compute individual (unmerged) regions for fluid simulation
+        // Each WorldUpdater gets its own fluid region; overlap is handled by processedFluidTiles mask
+        val fluidRegions = computeIndividualFluidRegions()
+
+        // Fallback to player-based region if no WorldUpdaters exist
+        val regionsToProcess = if (mergedRegions.isNotEmpty()) {
+            mergedRegions
+        } else if (player != null) {
+            val px = player.hitbox.centeredX.div(TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
+            val py = player.hitbox.centeredY.div(TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
+            listOf(UpdateRegion(px, py, px + DOUBLE_RADIUS, py + DOUBLE_RADIUS))
+        } else {
+            emptyList()
         }
 
-        if (ingame.terrainChangeQueue.isNotEmpty()) { App.measureDebugTime("WorldSimulator.degrass") { buryGrassImmediately() } }
-        App.measureDebugTime("WorldSimulator.growGrass") { growOrKillGrass() }
-        App.measureDebugTime("WorldSimulator.fluids") { moveFluids(delta) }
-        App.measureDebugTime("WorldSimulator.fallables") { displaceFallables(delta) }
-        App.measureDebugTime("WorldSimulator.wires") { simulateWires(delta) }
-        App.measureDebugTime("WorldSimulator.collisionDroppedItem") { collideDroppedItems() }
-        App.measureDebugTime("WorldSimulator.dropTreeLeaves") { dropTreeLeaves() }
+        val fluidRegionsToProcess = if (fluidRegions.isNotEmpty()) {
+            fluidRegions
+        } else if (player != null) {
+            val px = player.hitbox.centeredX.div(TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
+            val py = player.hitbox.centeredY.div(TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
+            listOf(UpdateRegion(px, py, px + DOUBLE_RADIUS, py + DOUBLE_RADIUS))
+        } else {
+            emptyList()
+        }
 
+        // buryGrassImmediately doesn't depend on update region
+        if (ingame.terrainChangeQueue.isNotEmpty()) {
+            App.measureDebugTime("WorldSimulator.degrass") { buryGrassImmediately() }
+        }
+
+        // Process fluids for each WorldUpdater individually, using mask for overlap deduplication
+        processedFluidTiles.clear()
+        App.measureDebugTime("WorldSimulator.fluids") {
+            for (region in fluidRegionsToProcess) {
+                updateXFrom = region.xFrom
+                updateYFrom = region.yFrom
+                updateXTo = region.xTo
+                updateYTo = region.yTo
+                moveFluids(delta)
+            }
+        }
+
+        // Process other simulations using merged non-overlapping regions
+        for (region in regionsToProcess) {
+            updateXFrom = region.xFrom
+            updateYFrom = region.yFrom
+            updateXTo = region.xTo
+            updateYTo = region.yTo
+
+            App.measureDebugTime("WorldSimulator.growGrass") { growOrKillGrass() }
+            App.measureDebugTime("WorldSimulator.fallables") { displaceFallables(delta) }
+            App.measureDebugTime("WorldSimulator.wires") { simulateWires(delta) }
+            App.measureDebugTime("WorldSimulator.dropTreeLeaves") { dropTreeLeaves() }
+        }
+
+        // collideDroppedItems doesn't depend on update region (uses actor list)
+        App.measureDebugTime("WorldSimulator.collisionDroppedItem") { collideDroppedItems() }
 
         //printdbg(this, "============================")
     }
@@ -502,10 +642,21 @@ object WorldSimulator {
         }
     }
 
+    /** Packs world coordinates into a single Long for use as a HashSet key */
+    private fun packFluidCoords(worldX: Int, worldY: Int): Long =
+        (worldX.toLong() shl 32) or (worldY.toLong() and 0xFFFFFFFFL)
+
     private fun fluidmapToWorld() {
         for (y in fluidMap.indices) {
             for (x in fluidMap[0].indices) {
-                world.setFluid(x + updateXFrom, y + updateYFrom, fluidNewTypeMap[y][x], fluidNewMap[y][x])
+                val worldX = x + updateXFrom
+                val worldY = y + updateYFrom
+                val key = packFluidCoords(worldX, worldY)
+                // Only write if this tile hasn't been processed yet (deduplication for overlapping regions)
+                if (key !in processedFluidTiles) {
+                    world.setFluid(worldX, worldY, fluidNewTypeMap[y][x], fluidNewMap[y][x])
+                    processedFluidTiles.add(key)
+                }
             }
         }
     }

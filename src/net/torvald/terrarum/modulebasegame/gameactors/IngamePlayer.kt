@@ -7,6 +7,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.NoSerialise
+import net.torvald.terrarum.gameactors.WorldUpdater
 import net.torvald.terrarum.itemproperties.ItemRemapTable
 import net.torvald.terrarum.itemproperties.ItemTable
 import net.torvald.terrarum.spriteassembler.ADProperties
@@ -20,7 +21,7 @@ import java.util.*
  * Created by minjaesong on 2015-12-31.
  */
 
-class IngamePlayer : ActorHumanoid, HasAssembledSprite, NoSerialise {
+class IngamePlayer : ActorHumanoid, HasAssembledSprite, NoSerialise, WorldUpdater {
 
     val creationTime = App.getTIME_T()
     var lastPlayTime = App.getTIME_T() // cumulative value for the savegame
