@@ -202,7 +202,9 @@ id;classname;tags
 #1048835;net.torvald.terrarum.modulebasegame.gameitems.ItemBucketIron03;FLUIDSTORAGE,OPENSTORAGE
 #
 ## reserved for debug items
-##16777216;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessWaterBucket;DEBUG,TOOL
-##16777217;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessLavaBucket;DEBUG,TOOL
-#16777472;net.torvald.terrarum.modulebasegame.gameitems.ItemMysteriousATM;DEBUG
-#16777473;net.torvald.terrarum.modulebasegame.gameitems.ItemDebugInventron;DEBUG
+#ifdef App.IS_DEVELOPMENT_BUILD
+16777216;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessWaterBucket;DEBUG,TOOL
+16777217;net.torvald.terrarum.modulebasegame.gameitems.ItemBottomlessLavaBucket;DEBUG,TOOL
+16777472;net.torvald.terrarum.modulebasegame.gameitems.ItemMysteriousATM;DEBUG
+16777473;net.torvald.terrarum.modulebasegame.gameitems.ItemDebugInventron;DEBUG
+#endif
