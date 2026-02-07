@@ -249,7 +249,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                 actionDone = true
             }
 
-            if (!clickOnceListenerFired && mouseUp && button == App.getConfigInt("config_mouseprimary")) {
+            if (!clickOnceListenerFired && mouseUp && button == App.getConfigInt("control_mouse_primary")) {
                 clickOnceListener.invoke(itemRelativeMouseX, itemRelativeMouseY)
                 if (!suppressHaptic)
                     playHapticPushedDown()

@@ -447,6 +447,15 @@ public class App implements ApplicationListener {
             createDirs();
             initialiseConfig();
             readConfigJson();
+
+            // Initialise control preset config (separate from main config)
+            ControlPresetConfig.initialise();
+            // Migrate control settings on first run with new system
+            File controlsFile = new File(controlPresetDir);
+            if (!controlsFile.exists()) {
+                ControlPresetConfig.migrateFromGenericConfig();
+            }
+
             setGamepadButtonLabels();
             rectifyConfigs();
 
@@ -1487,6 +1496,8 @@ public class App implements ApplicationListener {
     public static String worldsDir;
     /** defaultDir + "/config.json" */
     public static String configDir;
+    /** defaultDir + "/controls.json" */
+    public static String controlPresetDir;
     /** defaultDir + "/LoadOrder.txt" */
     public static String loadOrderDir;
     /** defaultDir + "/Imported" */
@@ -1532,6 +1543,7 @@ public class App implements ApplicationListener {
         playersDir = defaultDir + "/Players";
         worldsDir = defaultDir + "/Worlds";
         configDir = defaultDir + "/config.json";
+        controlPresetDir = defaultDir + "/controls.json";
         loadOrderDir = defaultDir + "/LoadOrder.txt";
         recycledPlayersDir = defaultDir + "/Recycled/Players";
         recycledWorldsDir = defaultDir + "/Recycled/Worlds";
@@ -1805,6 +1817,15 @@ public class App implements ApplicationListener {
 
     public static Object getConfigMaster(String key1) {
         String key = key1.toLowerCase();
+
+        // Delegate control_key_*, control_mouse_*, control_preset_keyboard to ControlPresetConfig
+        if (ControlPresetConfig.isControlKey(key)) {
+            Object result = ControlPresetConfig.get(key);
+            if (result != null) {
+                return result;
+            }
+            // Fall through to check defaults if ControlPresetConfig doesn't have it
+        }
 
         Object config;
         try {

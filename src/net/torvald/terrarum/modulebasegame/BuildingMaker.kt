@@ -332,7 +332,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
 
-        if (!Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
+        if (!Gdx.input.isButtonPressed(App.getConfigInt("control_mouse_primary"))) {
             disableMouseClick = false
         }
     }
@@ -368,7 +368,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             // TODO drag support using bresenham's algo
             //      for some reason it just doesn't work...
         }
-        else if (!uiPenMenu.isVisible && Gdx.input.isButtonPressed(App.getConfigInt("config_mousesecondary"))) {
+        else if (!uiPenMenu.isVisible && Gdx.input.isButtonPressed(App.getConfigInt("control_mouse_secondary"))) {
             // open pen menu
             // position the menu to where the cursor is
             uiPenMenu.posX = Terrarum.mouseScreenX - uiPenMenu.width / 2

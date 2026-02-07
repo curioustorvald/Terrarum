@@ -96,7 +96,7 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
             keyDownFun = { _, _, _, _, _ -> Unit },
             wheelFun = { _, _, _, _, _, _ -> },
             touchDownFun = { gameItem, amount, button, _, _ ->
-                if (button == App.getConfigInt("config_mouseprimary")) {
+                if (button == App.getConfigInt("control_mouse_primary")) {
                     if (gameItem != null) {
                         negotiator.refund(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
                     }
@@ -119,7 +119,7 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
             keyDownFun = { _, _, _, _, _ -> Unit },
             wheelFun = { _, _, _, _, _, _ -> },
             touchDownFun = { gameItem, amount, button, _, _ ->
-                if (button == App.getConfigInt("config_mouseprimary")) {
+                if (button == App.getConfigInt("control_mouse_primary")) {
                     if (gameItem != null) {
                         negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
                     }

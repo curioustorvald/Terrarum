@@ -150,7 +150,7 @@ open class UIItemInventoryItemGrid(
 
         fun createInvCellGenericTouchDownFun(listRebuildFun: () -> Unit): (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit {
             return { item: GameItem?, amount: Long, button: Int, _, _ ->
-                if (button == App.getConfigInt("config_mouseprimary")) {
+                if (button == App.getConfigInt("control_mouse_primary")) {
                     if (item != null && Terrarum.ingame != null) {
                         // equip da shit
                         val itemEquipSlot = item.equipPosition

@@ -260,8 +260,8 @@ class UIAlloyingFurnace(val smelter: FixtureAlloyingFurnace) : UICanvas(
     }
 
     private val SP = "\u3000"
-    private val ML = getMouseButton(App.getConfigInt("config_mouseprimary"))
-    private val MR = getMouseButton(App.getConfigInt("config_mousesecondary"))
+    private val ML = getMouseButton(App.getConfigInt("control_mouse_primary"))
+    private val MR = getMouseButton(App.getConfigInt("control_mouse_secondary"))
     private val MW = getMouseButton(2)
     private val controlHelpForSmelter = listOf(
         // no slot selected

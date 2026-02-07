@@ -139,7 +139,8 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         }*/
 
         presetSelector.selectionChangeListener = { index ->
-            App.setConfig("control_preset_keyboard", ControlPresets.presetLabels[index])
+            ControlPresetConfig.set("control_preset_keyboard", ControlPresets.presetLabels[index])
+            ControlPresetConfig.save()
             updateKeycaps()
         }
 
@@ -163,8 +164,11 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 "control_key_crafting",
                 "control_key_discard",
         ).forEach {
-                    App.setConfig(it, DefaultConfig.hashMap[it]!! as Int)
+            // Reset to ESDF defaults (matches ControlPresetConfig defaults)
+            val defaultKey = ControlPresets.esdf[it] ?: return@forEach
+            ControlPresetConfig.set(it, defaultKey)
         }
+        ControlPresetConfig.save()
     }
 
     private fun updateKeycaps() {
@@ -243,18 +247,19 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     }
 
     fun setControlOf(key: Int, control: Int) {
-        if (App.getConfigString("control_preset_keyboard") != "Custom") {
-            System.err.println("[UIKeyboardControlPanel] cannot set a control if the preset is not 'Custom' (current preset: ${App.getConfigString("control_preset_keyboard")})")
+        if (ControlPresetConfig.getString("control_preset_keyboard") != "Custom") {
+            System.err.println("[UIKeyboardControlPanel] cannot set a control if the preset is not 'Custom' (current preset: ${ControlPresetConfig.getString("control_preset_keyboard")})")
             return
         }
         if (control >= 0) {
             val controlName = UIItemControlPaletteBaloon.indexToConfigKey[control]!!
 
-            val conflicts = App.gameConfig.keySet.filter {
+            // Check for conflicts in ControlPresetConfig
+            val conflicts = ControlPresetConfig.keySet.filter {
                     (it as String).startsWith("control_key_")
             }.map {
                 (it as String).let { it to
-                        try { (App.getConfigInt(it) == key) }
+                        try { (ControlPresetConfig.getInt(it) == key) }
                         catch (_: ClassCastException) { false }
                 }
             }.filter { it.second }.map { it.first }.firstOrNull()
@@ -262,13 +267,14 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             println("[UIKeyboardControlPanel] key=$key, control=$controlName")
 
             if (conflicts != null) {
-                val oldValue = App.getConfigInt(controlName)
-                App.setConfig(conflicts, oldValue)
+                val oldValue = ControlPresetConfig.getInt(controlName)
+                ControlPresetConfig.set(conflicts, oldValue)
 
                 println("[UIKeyboardControlPanel] set config $conflicts=$oldValue")
             }
 
-            App.setConfig(controlName, key)
+            ControlPresetConfig.set(controlName, key)
+            ControlPresetConfig.save()
             println("[UIKeyboardControlPanel] set config $controlName=$key")
         }
         updateKeycaps()

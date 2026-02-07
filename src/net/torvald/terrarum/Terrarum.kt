@@ -269,9 +269,9 @@ object Terrarum : Disposable {
     inline val updateRate: Double
         get() = 1.0 / Gdx.graphics.deltaTime
     val mouseDown: Boolean
-        get() = Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))
+        get() = Gdx.input.isButtonPressed(App.getConfigInt("control_mouse_primary"))
     val mouseJustDown: Boolean
-        get() = Gdx.input.isButtonJustPressed(App.getConfigInt("config_mouseprimary"))
+        get() = Gdx.input.isButtonJustPressed(App.getConfigInt("control_mouse_primary"))
     val mouseOnPlayer: Boolean
         get() = ingame?.actorNowPlaying?.mouseUp ?: false
 

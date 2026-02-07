@@ -37,7 +37,7 @@ object DefaultConfig {
 
             "usexinput" to true, // when FALSE, LT+RT input on xbox controller is impossible
 
-            "control_preset_keyboard" to "WASD",
+            // control_preset_keyboard now lives in ControlPresetConfig (controls.json)
 
             "control_gamepad_keyn" to 3,
             "control_gamepad_keyw" to 2,
@@ -65,38 +65,9 @@ object DefaultConfig {
             // to accomodate shifted zero point of analog stick
             "control_gamepad_axiszeropoints" to doubleArrayOf(0.0,0.0,0.0,0.0),
 
-            "control_gamepad_labelstyle" to "msxbone", // "nwii", "logitech", "sonyps", "msxb360", "msxbone"
+            "control_gamepad_labelstyle" to "msxbone", // "nintendo", "logitech", "sony", "msxb360", "msxbone"
 
-            // control-keyboard (GDX key codes,
-            "control_key_up" to Input.Keys.E,
-            "control_key_left" to Input.Keys.S,
-            "control_key_down" to Input.Keys.D,
-            "control_key_right" to Input.Keys.F, // ESDF Masterrace
-
-            "control_key_jump" to Input.Keys.SPACE,
-            "control_key_movementaux" to Input.Keys.A, // movement-auxiliary, or hookshot
-            "control_key_inventory" to Input.Keys.Q,
-            "control_key_interact" to Input.Keys.R,
-            "control_key_discard" to Input.Keys.T,
-            "control_key_close" to Input.Keys.C, // this or hard-coded ESC
-            "control_key_zoom" to Input.Keys.Z,
-
-            "control_key_gamemenu" to Input.Keys.TAB,
-            "control_key_crafting" to Input.Keys.W,
-            "control_key_quicksel" to Input.Keys.SHIFT_LEFT, // pie menu is now LShift because CapsLock is actually used by the my bespoke keyboard input
-            "control_mouse_quicksel" to Input.Buttons.MIDDLE, // middle click to open pie menu
-
-            // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command
-            // so these keys are treated as the same.
-            // FOR ~~FUCKS~~ERGONOMICS' SAKE DON'T USE CTRL AND ALT AS A KEY!
-            "control_key_quickslots" to ((Input.Keys.NUM_1..Input.Keys.NUM_9) + arrayOf(Input.Keys.NUM_0)).map { 1.0*it }.toDoubleArray(),
-            "control_key_quickselalt" to intArrayOf(Input.Keys.BACKSPACE, Input.Keys.CONTROL_LEFT, Input.Keys.BACKSLASH).map { 1.0*it }.toDoubleArray(),
-
-            "control_key_toggleime" to Input.Keys.ALT_RIGHT,
-
-            "config_mouseprimary" to Input.Buttons.LEFT, // left mouse
-            "config_mousesecondary" to Input.Buttons.RIGHT, // right mouse
-
+            // control_key_*, control_mouse_* entries now live in ControlPresetConfig (controls.json)
 
             "pcgamepadenv" to "console",
 

@@ -97,9 +97,9 @@ internal class UIStorageChest : UICanvas(
         itemListChest = UITemplateHalfInventory(this, true, { getFixtureInventory() }, { chestNameFun() }).also {
             it.itemListKeyDownFun = { _, _, _, _, _ -> Unit }
             it.itemListTouchDownFun = { gameItem, amount, button, _, _ ->
-                val amount = if (button == App.getConfigInt("config_mouseprimary"))
+                val amount = if (button == App.getConfigInt("control_mouse_primary"))
                     amount
-                else if (button == App.getConfigInt("config_mousesecondary"))
+                else if (button == App.getConfigInt("control_mouse_secondary"))
                     1
                 else
                     null
@@ -137,9 +137,9 @@ internal class UIStorageChest : UICanvas(
         itemListPlayer = UITemplateHalfInventory(this, false).also {
             it.itemListKeyDownFun = { _, _, _, _, _ -> Unit }
             it.itemListTouchDownFun = { gameItem, amount, button, _, _ ->
-                val amount = if (button == App.getConfigInt("config_mouseprimary"))
+                val amount = if (button == App.getConfigInt("control_mouse_primary"))
                     amount
-                else if (button == App.getConfigInt("config_mousesecondary"))
+                else if (button == App.getConfigInt("control_mouse_secondary"))
                     1
                 else
                     null
@@ -227,8 +227,8 @@ internal class UIStorageChest : UICanvas(
     private val cellsWidth = (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 6 - UIItemInventoryItemGrid.listGap
 
     private val SP = "\u3000"
-    private val ML = getMouseButton(App.getConfigInt("config_mouseprimary"))
-    private val MR = getMouseButton(App.getConfigInt("config_mousesecondary"))
+    private val ML = getMouseButton(App.getConfigInt("control_mouse_primary"))
+    private val MR = getMouseButton(App.getConfigInt("control_mouse_secondary"))
     private val MW = getMouseButton(2)
     private val controlHelpLeft: String
         get() = if (App.environment == RunningEnvironment.PC)

@@ -87,7 +87,7 @@ class ConsoleWindow : UICanvas() {
                     releaseTooltip()
 
                 // click to enter the actor's reference ID
-                if (lb.size > 0 && !clickLatched && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
+                if (lb.size > 0 && !clickLatched && Gdx.input.isButtonPressed(App.getConfigInt("control_mouse_primary"))) {
                     clickLatched = true
                     textinput.appendText(lb.first().substringBefore(' '))
                 }
@@ -100,7 +100,7 @@ class ConsoleWindow : UICanvas() {
         uiItems.forEach { it.update(delta) }
 
 
-        if (!Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
+        if (!Gdx.input.isButtonPressed(App.getConfigInt("control_mouse_primary"))) {
             clickLatched = false
         }
 

@@ -3,6 +3,8 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Input
 
 /**
+ * For mod authors: use `registerPreset()` to register new preset. This must be done on your [ModuleEntryPoint]
+ *
  * Created by minjaesong on 2023-08-24.
  */
 object ControlPresets {
@@ -23,7 +25,7 @@ object ControlPresets {
 
         "control_key_gamemenu" to Input.Keys.TAB,
         "control_key_crafting" to Input.Keys.F,
-        "control_key_quicksel" to Input.Keys.CONTROL_LEFT, // pie menu is now LShift because CapsLock is actually used by the my bespoke keyboard input
+        "control_key_quicksel" to Input.Keys.CONTROL_LEFT, // pie menu is now LShift because CapsLock is actually used by my bespoke keyboard input
     )
 
     val esdf = hashMapOf<String, Int>(
@@ -42,7 +44,7 @@ object ControlPresets {
 
         "control_key_gamemenu" to Input.Keys.TAB,
         "control_key_crafting" to Input.Keys.W,
-        "control_key_quicksel" to Input.Keys.SHIFT_LEFT, // pie menu is now LShift because CapsLock is actually used by the my bespoke keyboard input
+        "control_key_quicksel" to Input.Keys.SHIFT_LEFT, // pie menu is now LShift because CapsLock is actually used by my bespoke keyboard input
     )
 
     val ijkl = hashMapOf<String, Int>(
@@ -61,7 +63,7 @@ object ControlPresets {
 
         "control_key_gamemenu" to Input.Keys.LEFT_BRACKET,
         "control_key_crafting" to Input.Keys.O,
-        "control_key_quicksel" to Input.Keys.APOSTROPHE, // pie menu is now LShift because CapsLock is actually used by the my bespoke keyboard input
+        "control_key_quicksel" to Input.Keys.APOSTROPHE, // pie menu is now LShift because CapsLock is actually used by my bespoke keyboard input
     )
 
     val empty = hashMapOf<String, Int>()
@@ -73,19 +75,31 @@ object ControlPresets {
         "Custom" to empty,
     )
 
-    val presetLabels = listOf( // ordered
+    val presetLabels = mutableListOf<String>( // ordered
         "WASD",
         "ESDF",
         "IJKL",
         "Custom",
     )
 
+    /**
+     * Retrieves a keycode assigned to the action given as `label`, using currently active preset (`ControlPresetConfig.getString("control_preset_keyboard")`) as a reference.
+     *
+     * If `ControlPresetConfig.getString("control_preset_keyboard")` evaluates to `null`, preset "Custom" will be referenced instead.
+     *
+     * @throws IllegalStateException if for some reason the currently active preset is not a known one
+     */
     fun getKey(label: String?): Int {
         if (label == null) return -1
 
-        val presetName = App.getConfigString("control_preset_keyboard") ?: "Custom"
+        val presetName = ControlPresetConfig.getString("control_preset_keyboard") ?: "Custom"
 
-        return (presets[presetName] ?: throw IllegalStateException("No such keyboard preset: $presetName")).getOrDefault(label, App.getConfigInt(label))
+        return (presets[presetName] ?: throw IllegalStateException("No such keyboard preset: $presetName")).getOrDefault(label, ControlPresetConfig.getInt(label))
+    }
+
+    fun registerPreset(label: String, keymap: HashMap<String, Int>) {
+        presets[label] = keymap
+        presetLabels.addLast(label)
     }
 
 }

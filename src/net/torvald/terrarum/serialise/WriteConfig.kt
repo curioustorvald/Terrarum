@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
 import net.torvald.terrarum.App
+import net.torvald.terrarum.ControlPresetConfig
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.Principii
 import net.torvald.terrarum.utils.JsonFetcher
@@ -61,9 +62,16 @@ object WriteConfig {
     }*/
 
     operator fun invoke() {
+        // Filter out control entries that now live in controls.json
+        val filteredConfig = KVHashMap()
+        App.gameConfig.hashMap.forEach { (k, v) ->
+            if (!ControlPresetConfig.isControlKey(k)) {
+                filteredConfig[k] = v
+            }
+        }
+
         val writer = java.io.FileWriter(App.configDir, false)
-        //writer.write(getJson())
-        writer.write(jsoner.prettyPrint(App.gameConfig))
+        writer.write(jsoner.prettyPrint(filteredConfig))
         writer.close()
     }
 

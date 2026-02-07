@@ -35,9 +35,9 @@ object SmelterGuiEventBuilder {
 
     ): (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit { return { gameItem: GameItem?, amount: Long, mouseButton: Int, itemExtraInfo: Any?, theButton: UIItemInventoryCellBase ->
         val playerInventory = getPlayerInventory()
-        val amount = if (mouseButton == App.getConfigInt("config_mouseprimary"))
+        val amount = if (mouseButton == App.getConfigInt("control_mouse_primary"))
             amount
-        else if (mouseButton == App.getConfigInt("config_mousesecondary"))
+        else if (mouseButton == App.getConfigInt("control_mouse_secondary"))
             1
         else
             null
@@ -175,9 +175,9 @@ object SmelterGuiEventBuilder {
             itemListUpdate { oreItemFilter(it.itm) }
         }
         else if (oreItemStatus.isNotNull()) {
-            val removeCount = if (mouseButton == App.getConfigInt("config_mouseprimary"))
+            val removeCount = if (mouseButton == App.getConfigInt("control_mouse_primary"))
                 oreItemStatus.qty
-            else if (mouseButton == App.getConfigInt("config_mousesecondary"))
+            else if (mouseButton == App.getConfigInt("control_mouse_secondary"))
                 1L
             else
                 null
@@ -254,9 +254,9 @@ object SmelterGuiEventBuilder {
             itemListUpdate { ItemCodex.hasTag(it.itm, "COMBUSTIBLE") }
         }
         else if (fireboxItemStatus.isNotNull()) {
-            val removeCount = if (mouseButton == App.getConfigInt("config_mouseprimary"))
+            val removeCount = if (mouseButton == App.getConfigInt("control_mouse_primary"))
                 fireboxItemStatus.qty
-            else if (mouseButton == App.getConfigInt("config_mousesecondary"))
+            else if (mouseButton == App.getConfigInt("control_mouse_secondary"))
                 1L
             else
                 null
@@ -333,9 +333,9 @@ object SmelterGuiEventBuilder {
         }
 
         if (productItemStatus.isNotNull()) {
-            val removeCount = if (mouseButton == App.getConfigInt("config_mouseprimary"))
+            val removeCount = if (mouseButton == App.getConfigInt("control_mouse_primary"))
                 productItemStatus.qty
-            else if (mouseButton == App.getConfigInt("config_mousesecondary"))
+            else if (mouseButton == App.getConfigInt("control_mouse_secondary"))
                 1L
             else
                 null

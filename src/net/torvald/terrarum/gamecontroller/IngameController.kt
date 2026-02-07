@@ -145,7 +145,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 terrarumIngame.worldPrimaryClickStart(actor, App.UPDATE_RATE)
                 worldPrimaryClickLatched = true
             }
-            if (actor != null && Gdx.input.isButtonPressed(App.getConfigInt("config_mousesecondary"))) {
+            if (actor != null && Gdx.input.isButtonPressed(App.getConfigInt("control_mouse_secondary"))) {
                 terrarumIngame.worldSecondaryClickStart(actor, App.UPDATE_RATE)
             }
 
@@ -258,10 +258,10 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
 //            if (terrarumIngame.uiContainer.map { if ((it?.isOpening == true || it?.isOpened == true) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
-                if (button == App.getConfigInt("config_mouseprimary")) {
+                if (button == App.getConfigInt("control_mouse_primary")) {
                     terrarumIngame.worldPrimaryClickEnd(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
                 }
-                if (button == App.getConfigInt("config_mousesecondary")) {
+                if (button == App.getConfigInt("control_mouse_secondary")) {
                     terrarumIngame.worldSecondaryClickEnd(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
                 }
 //            }

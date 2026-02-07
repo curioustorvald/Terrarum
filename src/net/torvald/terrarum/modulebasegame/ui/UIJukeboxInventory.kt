@@ -61,7 +61,7 @@ class UIJukeboxInventory(val parent: UIJukebox) : UICanvas() {
     init {
         fixtureDiscCell.forEachIndexed { index, thisButton ->
             thisButton.touchDownFun = { gameItem, amount, mouseButton, _, _ ->
-                if (operatedByTheInstaller && mouseButton == App.getConfigInt("config_mouseprimary")) {
+                if (operatedByTheInstaller && mouseButton == App.getConfigInt("control_mouse_primary")) {
                     if (gameItem != null) {
                         // if the disc being removed is the same disc being played, stop the playback
                         if (index == parent.parent.discCurrentlyPlaying) {
@@ -175,7 +175,7 @@ class UIJukeboxSonglistPanel(val parent: UIJukebox) : UICanvas() {
             colourTheme = songButtonColourTheme,
             keyDownFun = { _, _, _ -> Unit },
             touchDownFun = { index, button, _ ->
-                if (button == App.getConfigInt("config_mouseprimary") && !parent.parent.musicIsPlaying) {
+                if (button == App.getConfigInt("control_mouse_primary") && !parent.parent.musicIsPlaying) {
                     parent.parent.playDisc(index)
                 }
             }

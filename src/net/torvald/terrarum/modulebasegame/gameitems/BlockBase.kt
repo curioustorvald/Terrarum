@@ -153,7 +153,7 @@ object BlockBase {
 
         val wirePlaceMode = WireCodex[itemID].branching
 
-        if (Gdx.input.isButtonJustPressed(App.getConfigInt("config_mouseprimary")) ||
+        if (Gdx.input.isButtonJustPressed(App.getConfigInt("control_mouse_primary")) ||
                 !isNeighbouring(ww, mtx, mty, oldTileX, oldTileY)) {
             initialMouseDownTileX = mtx
             initialMouseDownTileY = mty

@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Created by minjaesong on 2024-01-10.
  */
-class MouseLatch(val button: List<Int> = listOf(App.getConfigInt("config_mouseprimary"))) {
+class MouseLatch(val button: List<Int> = listOf(App.getConfigInt("control_mouse_primary"))) {
 
     private val status = AtomicBoolean()
 

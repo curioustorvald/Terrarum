@@ -513,7 +513,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 if (Terrarum.mouseScreenX in tx - 32 until tx + tw + 32 &&
                     Terrarum.mouseScreenY in ty2 - 16 until ty2 + App.fontGame.lineHeight.toInt() + 16) {
 
-                    if (Gdx.input.isButtonJustPressed(App.getConfigInt("config_mouseprimary"))) {
+                    if (Gdx.input.isButtonJustPressed(App.getConfigInt("control_mouse_primary"))) {
                         OpenURL(TerrarumAppConfiguration.FIXED_LATEST_DOWNLOAD_LINK)
                     }
                     batch.color = Toolkit.Theme.COL_SELECTED
