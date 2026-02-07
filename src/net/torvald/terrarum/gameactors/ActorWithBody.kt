@@ -582,7 +582,7 @@ open class ActorWithBody : Actor {
 
             // --> Apply more forces <-- //
             // Actors are subject to the gravity and the buoyancy if they are not levitating
-            if (!isNoSubjectToGrav) {
+            if (!isNoSubjectToGrav && platformsRiding.isEmpty()) {
                 applyGravitation()
                 applyBuoyancy()
             }
@@ -603,7 +603,14 @@ open class ActorWithBody : Actor {
                  * If and only if:
                  *     This body is NON-STATIC and the other body is STATIC
                  */
-                if (!isNoCollideWorld) {
+                if (platformsRiding.isNotEmpty()) {
+                    // Riding a platform: skip displaceHitbox entirely.
+                    // The CCD/collision solver doesn't know about platforms and
+                    // will corrupt the rider's position (bounce, stair-step, etc.).
+                    // Only apply horizontal movement; the platform owns Y.
+                    hitbox.translate(vecSum.x, 0.0)
+                }
+                else if (!isNoCollideWorld) {
                     val (collisionStatus, collisionDamage) = displaceHitbox(true)
 
 
@@ -665,7 +672,7 @@ open class ActorWithBody : Actor {
             walledLeft = isWalled(hitbox, COLLIDING_LEFT)
             walledRight = isWalled(hitbox, COLLIDING_RIGHT)
             walledTop = isWalled(hitbox, COLLIDING_TOP)
-            walledBottom = isWalled(hitbox, COLLIDING_BOTTOM)
+            walledBottom = isWalled(hitbox, COLLIDING_BOTTOM) || platformsRiding.isNotEmpty()
             colliding = isColliding(hitbox)
 
             if (isNoCollideWorld) {

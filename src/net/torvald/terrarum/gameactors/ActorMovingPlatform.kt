@@ -15,6 +15,8 @@ import org.dyn4j.geometry.Vector2
  *
  * Subclasses must set [platformVelocity] before calling `super.updateImpl(delta)`.
  *
+ * TODO: in the future this must be generalised as a PhysContraption
+ *
  * Created by minjaesong on 2022-02-28.
  */
 open class ActorMovingPlatform() : ActorWithBody() {
@@ -23,6 +25,11 @@ open class ActorMovingPlatform() : ActorWithBody() {
 
     constructor(newTilewiseWidth: Int) : this() {
         this.tilewiseWidth = newTilewiseWidth
+
+        physProp = PhysProperties.MOBILE_OBJECT()
+        collisionType = COLLISION_KINEMATIC
+
+        setHitboxDimension(TILE_SIZE * newTilewiseWidth, TILE_SIZE, 0, 0)
     }
 
     /** Actors currently riding this platform, stored by ActorID for serialisation. */
@@ -34,8 +41,11 @@ open class ActorMovingPlatform() : ActorWithBody() {
     /** Actual displacement applied this tick (after clampHitbox). */
     @Transient private val appliedVelocity = Vector2(0.0, 0.0)
 
-    /** Tolerance in pixels for "feet on top of platform" detection. */
-    @Transient private val MOUNT_TOLERANCE_Y = 2.0
+    /** Tolerance above platform top for "feet on top" detection (pixels). */
+    @Transient private val MOUNT_TOLERANCE_ABOVE = (TILE_SIZE / 2).toDouble()//2.0
+
+    /** Tolerance below platform top — how far feet can sink before dismount (pixels). */
+    @Transient private val MOUNT_TOLERANCE_BELOW = (TILE_SIZE / 2).toDouble()
 
     /** Minimum combined Y velocity to count as "jumping up" (prevents mount while jumping). */
     @Transient private val JUMP_THRESHOLD_Y = -0.5
@@ -86,12 +96,25 @@ open class ActorMovingPlatform() : ActorWithBody() {
         // Compute actual displacement (clampHitbox may have wrapped coordinates)
         appliedVelocity.set(hitbox.startX - oldX, hitbox.startY - oldY)
 
-        // --- Mount detection and rider management ---
+        // --- Step 1: Move existing riders BEFORE mount detection ---
+        // This keeps riders aligned with the platform's new position so the
+        // mount check doesn't fail when the platform is moving fast.
+        for (riderId in actorsRiding.toList()) {
+            val rider = INGAME.getActorByID(riderId) as? ActorWithBody
+            if (rider != null) {
+                rider.hitbox.translate(appliedVelocity)
+                rider.hitbox.setPositionY(hitbox.startY - rider.hitbox.height)
+                if (rider.externalV.y > 0.0) {
+                    rider.externalV.y = 0.0
+                }
+                rider.walledBottom = true
+            }
+        }
+
+        // --- Step 2: Mount detection (riders are now at correct positions) ---
 
         val ridersToRemove = ArrayList<ActorID>()
-
-        // Build set of actors currently on top of this platform
-        val newRiders = ArrayList<ActorWithBody>()
+        val currentRiders = ArrayList<ActorWithBody>()
 
         // Check all active actors + actorNowPlaying
         val candidates = ArrayList<ActorWithBody>()
@@ -104,10 +127,15 @@ open class ActorMovingPlatform() : ActorWithBody() {
 
         for (actor in candidates) {
             val feetY = actor.hitbox.endY
+            val headY = actor.hitbox.startY
             val platTop = hitbox.startY
 
-            // Check vertical proximity: feet within tolerance of platform top
-            val verticallyAligned = Math.abs(feetY - platTop) <= MOUNT_TOLERANCE_Y
+            // Feet are near platform top: slightly above or sunk partway in
+            val feetNearPlatTop = feetY >= platTop - MOUNT_TOLERANCE_ABOVE &&
+                                  feetY <= platTop + MOUNT_TOLERANCE_BELOW
+
+            // Actor's head must be above platform top (prevents mounting from below)
+            val comingFromAbove = headY < platTop
 
             // Check horizontal overlap
             val horizontalOverlap = actor.hitbox.endX > hitbox.startX && actor.hitbox.startX < hitbox.endX
@@ -116,18 +144,24 @@ open class ActorMovingPlatform() : ActorWithBody() {
             val combinedVelY = actor.externalV.y + (actor.controllerV?.y ?: 0.0)
             val notJumping = combinedVelY >= JUMP_THRESHOLD_Y
 
-            if (verticallyAligned && horizontalOverlap && notJumping) {
+            if (feetNearPlatTop && comingFromAbove && horizontalOverlap && notJumping) {
                 if (!actorsRiding.contains(actor.referenceID)) {
+                    // New rider — mount and snap
                     mount(actor)
+                    actor.hitbox.setPositionY(hitbox.startY - actor.hitbox.height)
+                    if (actor.externalV.y > 0.0) {
+                        actor.externalV.y = 0.0
+                    }
+                    actor.walledBottom = true
                 }
-                newRiders.add(actor)
+                currentRiders.add(actor)
             }
         }
 
-        // Dismount actors that are no longer on top
-        val newRiderIds = newRiders.map { it.referenceID }.toSet()
+        // --- Step 3: Dismount actors no longer on top ---
+        val currentRiderIds = currentRiders.map { it.referenceID }.toSet()
         for (riderId in actorsRiding.toList()) {
-            if (riderId !in newRiderIds) {
+            if (riderId !in currentRiderIds) {
                 val rider = INGAME.getActorByID(riderId)
                 if (rider is ActorWithBody) {
                     dismount(rider)
@@ -138,18 +172,6 @@ open class ActorMovingPlatform() : ActorWithBody() {
             }
         }
         ridersToRemove.forEach { actorsRiding.remove(it) }
-
-        // Move riders and suppress their gravity
-        for (rider in newRiders) {
-            // Translate rider by platform's actual displacement
-            rider.hitbox.translate(appliedVelocity)
-
-            // Snap rider's feet to platform top
-            rider.hitbox.setPositionY(hitbox.startY - rider.hitbox.height)
-
-            // Suppress gravity for this tick
-            rider.walledBottom = true
-        }
     }
 
     /**

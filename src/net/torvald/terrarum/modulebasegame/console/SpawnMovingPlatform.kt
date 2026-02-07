@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.console
 
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.console.ConsoleAlias
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
@@ -13,12 +14,12 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorTestPlatform
 @ConsoleAlias("spawnplatform")
 internal object SpawnMovingPlatform : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        val mouseX = Terrarum.mouseX
-        val mouseY = Terrarum.mouseY
+        val mouseX = Terrarum.mouseTileX * TILE_SIZED
+        val mouseY = Terrarum.mouseTileY * TILE_SIZED
 
         val platform = ActorTestPlatform()
         // setPosition places bottom-centre at the given point; offset Y so the platform is centred at cursor
-        platform.setPosition(mouseX, mouseY + platform.hitbox.height / 2.0)
+        platform.setPosition(mouseX, mouseY)
 
         INGAME.queueActorAddition(platform)
 
