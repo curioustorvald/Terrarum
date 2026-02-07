@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import org.dyn4j.geometry.Vector2
 
@@ -21,7 +23,7 @@ import org.dyn4j.geometry.Vector2
  */
 open class ActorMovingPlatform() : ActorWithBody() {
 
-    protected var tilewiseWidth = 3
+    protected var tilewiseWidth = 3 // default fallback value when no args were given
 
     constructor(newTilewiseWidth: Int) : this() {
         this.tilewiseWidth = newTilewiseWidth
@@ -49,6 +51,9 @@ open class ActorMovingPlatform() : ActorWithBody() {
 
     /** Minimum combined Y velocity to count as "jumping up" (prevents mount while jumping). */
     @Transient private val JUMP_THRESHOLD_Y = -0.5
+
+    /** Block whose friction this platform impersonates. Riders use this for feet friction. */
+    var surfaceBlock: ItemID = Block.STONE
 
     @Transient private var platformTexture: Texture? = null
     @Transient private var platformTextureRegion: TextureRegion? = null

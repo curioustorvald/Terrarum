@@ -294,6 +294,7 @@ open class ActorWithBody : Actor {
     private inline val grounded: Boolean
         get() = if (world == null) true else {
             isNoClip ||
+            platformsRiding.isNotEmpty() ||
             (world!!.gravitation.y > 0 && isWalled(hitbox, COLLIDING_BOTTOM) ||
              world!!.gravitation.y < 0 && isWalled(hitbox, COLLIDING_TOP))
         }
@@ -1692,6 +1693,14 @@ open class ActorWithBody : Actor {
     // after all, feet friction is what it matters
     internal inline val feetFriction: Double
         get() {
+            // When riding a platform, use the platform's surface block friction
+            if (platformsRiding.isNotEmpty()) {
+                val platform = INGAME.getActorByID(platformsRiding[0])
+                if (platform is ActorMovingPlatform) {
+                    return getTileFriction(platform.surfaceBlock)
+                }
+            }
+
             var friction = 0.0
             forEachFeetTileNum {
                 // get max friction
