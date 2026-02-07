@@ -331,7 +331,7 @@ open class ActorWithBody : Actor {
      *
      * Also see [net.torvald.terrarum.modulebasegame.gameactors.ActorMovingPlatform.actorsRiding]
      */
-    @Transient protected val platformsRiding = ArrayList<ActorID>()
+    @Transient internal val platformsRiding = ArrayList<ActorID>()
 
     /**
      * Gravitational Constant G. Load from gameworld.

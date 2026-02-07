@@ -1480,8 +1480,16 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             actorNowPlaying?.update(delta)*/
         }
         else {
+            // Pass 1: update moving platforms first so riders get displaced before their own update
             actorContainerActive.forEach {
-                if (it != actorNowPlaying) {
+                if (it is ActorMovingPlatform && it != actorNowPlaying) {
+                    it.update(delta)
+                }
+            }
+
+            // Pass 2: update all non-platform actors with existing callbacks
+            actorContainerActive.forEach {
+                if (it !is ActorMovingPlatform && it != actorNowPlaying) {
                     it.update(delta)
 
                     if (it is Pocketed) {
@@ -1515,6 +1523,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                     }
                 }
             }
+
+            // Pass 3: update player
             actorNowPlaying?.update(delta)
             //AmmoMeterProxy(player, uiVitalItem.UI as UIVitalMetre)
         }
