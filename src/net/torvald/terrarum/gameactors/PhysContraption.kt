@@ -133,7 +133,7 @@ abstract class PhysContraption() : ActorWithBody() {
         INGAME.actorNowPlaying?.let { candidates.add(it) }
 
         for (actor in candidates) {
-            if (!actorsRiding.contains(actor.referenceID) && isActorOnTop(actor)) {
+            if (!actorsRiding.contains(actor.referenceID) && actor.platformsRiding.isEmpty() && isActorOnTop(actor)) {
                 mount(actor)
                 snapRiderToSurface(actor)
                 // Landing on the contraption kills all vertical velocity.
