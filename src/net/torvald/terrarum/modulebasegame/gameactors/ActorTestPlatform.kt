@@ -51,24 +51,24 @@ class ActorTestPlatform : ActorMovingPlatform(8) {
                 // Horizontal pingpong: position = A * sin(phase)
                 // Velocity = finite difference to prevent float drift
                 val dx = amplitude * (sin(phase) - sin(oldPhase))
-                platformVelocity.set(dx, 0.0)
+                contraptionVelocity.set(dx, 0.0)
             }
             1 -> {
                 // Vertical pingpong: position = A * sin(phase)
                 val dy = amplitude * (sin(phase) - sin(oldPhase))
-                platformVelocity.set(0.0, dy)
+                contraptionVelocity.set(0.0, dy)
             }
             2 -> {
                 // Clockwise circular: position on circle (cos, sin)
                 val dx = amplitude * (cos(phase) - cos(oldPhase))
                 val dy = amplitude * (sin(phase) - sin(oldPhase))
-                platformVelocity.set(dx, dy)
+                contraptionVelocity.set(dx, dy)
             }
             3 -> {
                 // Counter-clockwise circular: negate Y component
                 val dx = amplitude * (cos(phase) - cos(oldPhase))
                 val dy = -(amplitude * (sin(phase) - sin(oldPhase)))
-                platformVelocity.set(dx, dy)
+                contraptionVelocity.set(dx, dy)
             }
         }
 

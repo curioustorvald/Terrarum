@@ -328,9 +328,9 @@ open class ActorWithBody : Actor {
     var isPickedUp = false
 
     /**
-     * Redundant entry for ActorMovingPlatform.actorsRiding. This field must be modified by the platforms!
+     * Redundant entry for PhysContraption.actorsRiding. This field must be modified by the contraptions!
      *
-     * Also see [net.torvald.terrarum.modulebasegame.gameactors.ActorMovingPlatform.actorsRiding]
+     * Also see [PhysContraption.actorsRiding]
      */
     @Transient internal val platformsRiding = ArrayList<ActorID>()
 
@@ -604,14 +604,7 @@ open class ActorWithBody : Actor {
                  * If and only if:
                  *     This body is NON-STATIC and the other body is STATIC
                  */
-                if (platformsRiding.isNotEmpty()) {
-                    // Riding a platform: skip displaceHitbox entirely.
-                    // The CCD/collision solver doesn't know about platforms and
-                    // will corrupt the rider's position (bounce, stair-step, etc.).
-                    // Only apply horizontal movement; the platform owns Y.
-                    hitbox.translate(vecSum.x, 0.0)
-                }
-                else if (!isNoCollideWorld) {
+                if (!isNoCollideWorld) {
                     val (collisionStatus, collisionDamage) = displaceHitbox(true)
 
 
@@ -638,6 +631,21 @@ open class ActorWithBody : Actor {
                 else {
                     stairPenaltyCounter = 999
                     hitbox.translate(vecSum)
+                }
+
+                // Re-snap to platform after displaceHitbox: terrain collision may
+                // have shifted Y (stair-stepping, two-side resolution, etc.) but the
+                // platform, not terrain, owns the rider's vertical position.
+                // Only snap if it wouldn't push the rider into a ceiling.
+                if (platformsRiding.isNotEmpty()) {
+                    val platform = INGAME.getActorByID(platformsRiding[0])
+                    if (platform is ActorWithBody) {
+                        val preSnapY = hitbox.startY
+                        hitbox.setPositionY(platform.hitbox.startY - hitbox.height)
+                        if (isWalled(hitbox, COLLIDING_TOP)) {
+                            hitbox.setPositionY(preSnapY)
+                        }
+                    }
                 }
 
                 //////////////////////////////////////////////////////////////
@@ -1696,7 +1704,7 @@ open class ActorWithBody : Actor {
             // When riding a platform, use the platform's surface block friction
             if (platformsRiding.isNotEmpty()) {
                 val platform = INGAME.getActorByID(platformsRiding[0])
-                if (platform is ActorMovingPlatform) {
+                if (platform is PhysContraption) {
                     return getTileFriction(platform.surfaceBlock)
                 }
             }

@@ -1480,16 +1480,16 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             actorNowPlaying?.update(delta)*/
         }
         else {
-            // Pass 1: update moving platforms first so riders get displaced before their own update
+            // Pass 1: update contraptions first so riders get displaced before their own update
             actorContainerActive.forEach {
-                if (it is ActorMovingPlatform && it != actorNowPlaying) {
+                if (it is PhysContraption && it != actorNowPlaying) {
                     it.update(delta)
                 }
             }
 
-            // Pass 2: update all non-platform actors with existing callbacks
+            // Pass 2: update all non-contraption actors with existing callbacks
             actorContainerActive.forEach {
-                if (it !is ActorMovingPlatform && it != actorNowPlaying) {
+                if (it !is PhysContraption && it != actorNowPlaying) {
                     it.update(delta)
 
                     if (it is Pocketed) {
