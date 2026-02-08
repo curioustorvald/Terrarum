@@ -18,7 +18,7 @@ import kotlin.math.sin
 class ActorTestPlatform : ActorMovingPlatform(8) {
 
     /** Movement pattern index (0-3). */
-    private val pattern: Int = 1//(0..3).random()
+    private val pattern: Int = (0..3).random()
 
     /** Speed in pixels per tick (2.0 to 4.0). */
     private val speed: Double = 2.0 + Math.random() * 2.0

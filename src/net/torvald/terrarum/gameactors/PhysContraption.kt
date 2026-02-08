@@ -93,12 +93,37 @@ abstract class PhysContraption() : ActorWithBody() {
             rider.walledBottom = true
         }
 
-        // --- Step 2: Mount detection (riders are now at correct positions) ---
+        // --- Step 2a: Check existing riders for dismount ---
+        // Uses a stricter (more negative) velocity threshold than mounting
+        // to create hysteresis and prevent oscillation from small controllerV.y
+        // residuals near the mount threshold boundary.
 
         val ridersToRemove = ArrayList<ActorID>()
-        val currentRiders = ArrayList<ActorWithBody>()
+        for (riderId in actorsRiding.toList()) {
+            val rider = INGAME.getActorByID(riderId) as? ActorWithBody
+            if (rider == null) {
+                ridersToRemove.add(riderId)
+                continue
+            }
 
-        // Check all active actors + actorNowPlaying
+            val feetY = rider.hitbox.endY
+            val platTop = hitbox.startY
+            val feetNear = feetY >= platTop - MOUNT_TOLERANCE_ABOVE &&
+                           feetY <= platTop + MOUNT_TOLERANCE_BELOW
+            val horizontalOverlap = rider.hitbox.endX > hitbox.startX &&
+                                    rider.hitbox.startX < hitbox.endX
+            // Detect real jumps (not small residuals) — threshold is 4x the mount threshold
+            val combinedVelY = rider.externalV.y + (rider.controllerV?.y ?: 0.0)
+            val isJumping = combinedVelY < JUMP_THRESHOLD_Y * 4.0
+
+            if (!feetNear || !horizontalOverlap || isJumping) {
+                dismount(rider)
+            }
+        }
+        ridersToRemove.forEach { actorsRiding.remove(it) }
+
+        // --- Step 2b: Mount detection for new candidates ---
+
         val candidates = ArrayList<ActorWithBody>()
         INGAME.actorContainerActive.forEach {
             if (it is ActorWithBody && it !== this && it !is PhysContraption) {
@@ -108,34 +133,19 @@ abstract class PhysContraption() : ActorWithBody() {
         INGAME.actorNowPlaying?.let { candidates.add(it) }
 
         for (actor in candidates) {
-            if (isActorOnTop(actor)) {
-                if (!actorsRiding.contains(actor.referenceID)) {
-                    // New rider — mount and snap
-                    mount(actor)
-                    snapRiderToSurface(actor)
-                    if (actor.externalV.y > 0.0) {
-                        actor.externalV.y = 0.0
-                    }
-                    actor.walledBottom = true
-                }
-                currentRiders.add(actor)
+            if (!actorsRiding.contains(actor.referenceID) && isActorOnTop(actor)) {
+                mount(actor)
+                snapRiderToSurface(actor)
+                // Landing on the contraption kills all vertical velocity.
+                // controllerV.y must also be zeroed: during a jump-then-fall,
+                // controllerV.y stays negative (jump impulse) while externalV.y
+                // goes positive (gravity). Zeroing only externalV.y would leave
+                // a net upward velocity that immediately triggers dismount.
+                actor.externalV.y = 0.0
+                actor.controllerV?.let { it.y = 0.0 }
+                actor.walledBottom = true
             }
         }
-
-        // --- Step 3: Dismount actors no longer on top ---
-        val currentRiderIds = currentRiders.map { it.referenceID }.toSet()
-        for (riderId in actorsRiding.toList()) {
-            if (riderId !in currentRiderIds) {
-                val rider = INGAME.getActorByID(riderId)
-                if (rider is ActorWithBody) {
-                    dismount(rider)
-                }
-                else {
-                    ridersToRemove.add(riderId)
-                }
-            }
-        }
-        ridersToRemove.forEach { actorsRiding.remove(it) }
     }
 
     /**
