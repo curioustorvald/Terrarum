@@ -83,10 +83,21 @@ abstract class PhysContraption() : ActorWithBody() {
                 rider.hitbox.setPositionX(oldRiderX)
             }
 
-            // Snap to contraption surface (sets Y), then check for ceiling collision
+            // Snap to contraption surface (sets Y), then check for terrain collision
             snapRiderToSurface(rider)
-            if (!rider.isNoCollideWorld && rider.isWalled(rider.hitbox, COLLIDING_TOP)) {
-                rider.hitbox.setPositionY(oldRiderY)
+            if (!rider.isNoCollideWorld) {
+                if (rider.isWalled(rider.hitbox, COLLIDING_TOP)) {
+                    // Ceiling: revert Y
+                    rider.hitbox.setPositionY(oldRiderY)
+                }
+                if (rider.isWalled(rider.hitbox, COLLIDING_BOTTOM)) {
+                    // Terrain beneath rider — platform sank into ground.
+                    // Revert Y so rider stands on terrain, then dismount.
+                    rider.hitbox.setPositionY(oldRiderY)
+                    actorsRiding.remove(rider.referenceID)
+                    rider.platformsRiding.remove(this.referenceID)
+                    continue
+                }
             }
 
             if (rider.externalV.y > 0.0) {
@@ -140,7 +151,7 @@ abstract class PhysContraption() : ActorWithBody() {
 
         // --- Step 2b: Mount detection for new candidates ---
 
-        val candidates: List<ActorWithBody> = (INGAME.actorContainerActive.filterIsInstance<ActorWithBody>().filter { it !== this && it !is PhysContraption } + INGAME.actorNowPlaying).filterNotNull()
+        val candidates: List<ActorWithBody> = (INGAME.actorContainerActive.filterIsInstance<ActorWithBody>().filter { it !== this && it !is PhysContraption && it.physProp.usePhysics } + INGAME.actorNowPlaying).filterNotNull()
 
         for (actor in candidates) {
             if (actorsRiding.contains(actor.referenceID)) continue
