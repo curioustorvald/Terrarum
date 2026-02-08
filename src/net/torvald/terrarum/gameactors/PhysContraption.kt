@@ -21,6 +21,8 @@ import org.dyn4j.geometry.Vector2
  */
 abstract class PhysContraption() : ActorWithBody() {
 
+    // NOTE: the entire code assumes downward gravity, meaning this code breaks if gravity is reversed //
+
     /** Actors currently riding this contraption, stored by ActorID for serialisation. */
     protected val actorsRiding = ArrayList<ActorID>()
 
@@ -114,23 +116,31 @@ abstract class PhysContraption() : ActorWithBody() {
                                     rider.hitbox.startX < hitbox.endX
             // Detect real jumps (not small residuals) — threshold is 4x the mount threshold
             val combinedVelY = rider.externalV.y + (rider.controllerV?.y ?: 0.0)
-            val isJumping = combinedVelY < JUMP_THRESHOLD_Y * 4.0
+            val isJumping = combinedVelY < JUMP_THRESHOLD_Y// * 4.0
 
             if (!feetNear || !horizontalOverlap || isJumping) {
-                dismount(rider)
+                if (isJumping) {
+                    // Jump-initiated dismount: always conserve horizontal momentum.
+                    // For vertical: rising platforms (negative Y vel) give a jump
+                    // boost; sinking platforms (positive Y vel) are ignored to avoid
+                    // counteracting the jump impulse.
+                    actorsRiding.remove(rider.referenceID)
+                    rider.platformsRiding.remove(this.referenceID)
+                    rider.externalV.x += contraptionVelocity.x
+                    if (contraptionVelocity.y < 0.0) {
+                        rider.externalV.y += contraptionVelocity.y
+                    }
+                }
+                else {
+                    dismount(rider)
+                }
             }
         }
         ridersToRemove.forEach { actorsRiding.remove(it) }
 
         // --- Step 2b: Mount detection for new candidates ---
 
-        val candidates = ArrayList<ActorWithBody>()
-        INGAME.actorContainerActive.forEach {
-            if (it is ActorWithBody && it !== this && it !is PhysContraption) {
-                candidates.add(it)
-            }
-        }
-        INGAME.actorNowPlaying?.let { candidates.add(it) }
+        val candidates: List<ActorWithBody> = (INGAME.actorContainerActive.filterIsInstance<ActorWithBody>().filter { it !== this && it !is PhysContraption } + INGAME.actorNowPlaying).filterNotNull()
 
         for (actor in candidates) {
             if (actorsRiding.contains(actor.referenceID)) continue
