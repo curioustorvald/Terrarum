@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.abs
@@ -125,11 +126,11 @@ abstract class PhysContraption() : ActorWithBody() {
                            feetY <= platTop + MOUNT_TOLERANCE_BELOW
             val horizontalOverlap = rider.hitbox.endX > hitbox.startX &&
                                     rider.hitbox.startX < hitbox.endX
-            // Detect real jumps (not small residuals) — threshold is 4x the mount threshold
             val combinedVelY = rider.externalV.y + (rider.controllerV?.y ?: 0.0)
             val isJumping = combinedVelY < JUMP_THRESHOLD_Y// * 4.0
+            val isDroppingDown = rider is ActorHumanoid && rider.downButtonHeld > 0
 
-            if (!feetNear || !horizontalOverlap || isJumping) {
+            if (!feetNear || !horizontalOverlap || isJumping || isDroppingDown) {
                 if (isJumping) {
                     // Jump-initiated dismount: always conserve horizontal momentum.
                     // For vertical: rising platforms (negative Y vel) give a jump
@@ -155,6 +156,7 @@ abstract class PhysContraption() : ActorWithBody() {
 
         for (actor in candidates) {
             if (actorsRiding.contains(actor.referenceID)) continue
+            if (actor is ActorHumanoid && actor.downButtonHeld > 0) continue
             if (!isActorOnTop(actor)) continue
 
             // If already riding another contraption, only steal if this
