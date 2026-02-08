@@ -133,18 +133,29 @@ abstract class PhysContraption() : ActorWithBody() {
         INGAME.actorNowPlaying?.let { candidates.add(it) }
 
         for (actor in candidates) {
-            if (!actorsRiding.contains(actor.referenceID) && actor.platformsRiding.isEmpty() && isActorOnTop(actor)) {
-                mount(actor)
-                snapRiderToSurface(actor)
-                // Landing on the contraption kills all vertical velocity.
-                // controllerV.y must also be zeroed: during a jump-then-fall,
-                // controllerV.y stays negative (jump impulse) while externalV.y
-                // goes positive (gravity). Zeroing only externalV.y would leave
-                // a net upward velocity that immediately triggers dismount.
-                actor.externalV.y = 0.0
-                actor.controllerV?.let { it.y = 0.0 }
-                actor.walledBottom = true
+            if (actorsRiding.contains(actor.referenceID)) continue
+            if (!isActorOnTop(actor)) continue
+
+            // If already riding another contraption, only steal if this
+            // surface is strictly above (smaller Y) to prevent oscillation.
+            if (actor.platformsRiding.isNotEmpty()) {
+                val currentPlatform = INGAME.getActorByID(actor.platformsRiding[0]) as? PhysContraption
+                if (currentPlatform != null && hitbox.startY >= currentPlatform.hitbox.startY) continue
+                // Transfer: remove from old contraption without velocity impulse
+                currentPlatform?.actorsRiding?.remove(actor.referenceID)
+                actor.platformsRiding.clear()
             }
+
+            mount(actor)
+            snapRiderToSurface(actor)
+            // Landing on the contraption kills all vertical velocity.
+            // controllerV.y must also be zeroed: during a jump-then-fall,
+            // controllerV.y stays negative (jump impulse) while externalV.y
+            // goes positive (gravity). Zeroing only externalV.y would leave
+            // a net upward velocity that immediately triggers dismount.
+            actor.externalV.y = 0.0
+            actor.controllerV?.let { it.y = 0.0 }
+            actor.walledBottom = true
         }
     }
 
