@@ -56,7 +56,7 @@ abstract class PhysContraption() : ActorWithBody() {
         val oldY = hitbox.startY
 
         // Set externalV to our contraption velocity so super translates the hitbox
-        externalV.set(contraptionVelocity.x, contraptionVelocity.y)
+        externalV.set(contraptionVelocity)
 
         // super.updateImpl handles:
         //   - sprite updates
@@ -72,6 +72,7 @@ abstract class PhysContraption() : ActorWithBody() {
         // --- Step 1: Move existing riders BEFORE mount detection ---
         // This keeps riders aligned with the contraption's new position so the
         // mount check doesn't fail when the contraption is moving fast.
+        val terrainDismounted = HashSet<ActorID>()
         for (riderId in actorsRiding.toList()) {
             val rider = INGAME.getActorByID(riderId) as? ActorWithBody ?: continue
 
@@ -97,6 +98,7 @@ abstract class PhysContraption() : ActorWithBody() {
                     rider.hitbox.setPositionY(oldRiderY)
                     actorsRiding.remove(rider.referenceID)
                     rider.platformsRiding.remove(this.referenceID)
+                    terrainDismounted.add(rider.referenceID)
                     continue
                 }
             }
@@ -156,6 +158,7 @@ abstract class PhysContraption() : ActorWithBody() {
 
         for (actor in candidates) {
             if (actorsRiding.contains(actor.referenceID)) continue
+            if (terrainDismounted.contains(actor.referenceID)) continue
             if (actor is ActorHumanoid && actor.downButtonHeld > 0) continue
             if (!isActorOnTop(actor)) continue
 
@@ -215,7 +218,6 @@ abstract class PhysContraption() : ActorWithBody() {
         actor.platformsRiding.remove(this.referenceID)
 
         // Conservation of momentum: add contraption velocity as impulse
-        actor.externalV.x += contraptionVelocity.x
-        actor.externalV.y += contraptionVelocity.y
+        actor.externalV += contraptionVelocity
     }
 }
