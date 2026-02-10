@@ -13,13 +13,12 @@ object CreditSingleton {
              "Music by Orstphone\n" +
              "Translation Databases:\n" +
              "$ENDASH © 2018 The Polyglot Project. Distributed under CC0.\n" +
-             "$ENDASH Entry from the Microsoft Language Portal. © 2018 Microsoft Corporation. All rights reserved.\n" +
              """
 
 
 $BULLET Terrarum
 
-© 2013-2024 CuriousTorvald (minjaesong)
+${TerrarumAppConfiguration.COPYRIGHT_DATE_NAME}
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 $BULLET Terrarum Sans Bitmap
 
-© 2017-2024 CuriousTorvald (minjaesong)
+© 2017-2025 CuriousTorvald (minjaesong)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
