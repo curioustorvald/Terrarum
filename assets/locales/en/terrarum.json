@@ -7,7 +7,9 @@
   "CONTEXT_TIME_SECOND_PLURAL": "Seconds",
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "All rights reserved",
   "COPYRIGHT_GNU_GPL_3": "Distributed under GNU GPL 3",
+  "GAME_ACTION_CHANGE_COLOR" : "Change color",
   "GAME_ACTION_MOVE_VERB" : "Move",
+  "GAME_ACTION_PUT_DOWN" : "Put down",
   "GAME_ACTION_ZOOM" : "Zoom",
   "GAME_ACTION_ZOOM_OUT" : "Zoom out",
   "MENU_IO_AUTOSAVE": "Autosave",
@@ -54,7 +56,7 @@
   "MENU_OPTIONS_SPEAKER_HEADPHONE": "Headphone",
   "MENU_OPTIONS_SPEAKER_SETUP": "Speaker Setup",
   "MENU_OPTIONS_SPEAKER_STEREO": "Stereo",
-  "MENU_OPTIONS_STREAMERS_LAYOUT": "Chat Overlay",
+  "MENU_OPTIONS_STREAMERS_LAYOUT": "Space for Chat Overlay",
 
   "MENU_CREDIT_GPL_DNT" : "GPL",
   "MENU_LABEL_JVM_DNT" : "JVM",

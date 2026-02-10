@@ -311,12 +311,16 @@ abstract class GameItem(val originalID: ItemID) : TooltipListener(), Comparable<
     /**
      * Effects applied (continuously or not) while being equipped (drawn/pulled out)
      */
-    open fun effectWhileEquipped(actor: ActorWithBody, delta: Float) { }
+    open fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
+        INGAME.setControlHint("GAME_INVENTORY_USE", null) // the most generic control hints
+    }
 
     /**
      * Effects applied only once when unequipped
      */
-    open fun effectOnUnequip(actor: ActorWithBody) { }
+    open fun effectOnUnequip(actor: ActorWithBody) {
+        INGAME.setControlHint(null, null) // hide the control hints
+    }
 
     
     override fun toString(): String {

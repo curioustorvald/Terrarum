@@ -62,6 +62,9 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
+        INGAME.setControlHint("GAME_ACTION_PUT_DOWN", "GAME_ACTION_PICK_UP") // the most generic control hints
+
+
 //        println("ghost: ${ghostItem}; ghostInit = $ghostInit; instance: $hash")
         if (!ghostInit.compareAndExchangeAcquire(false, true)) {
             ghostItem.set(makeFixture(originalID.getModuleName()))
@@ -92,6 +95,8 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     }
 
     override fun effectOnUnequip(actor: ActorWithBody) {
+        super.effectOnUnequip(actor)
+
 //        ghostInit = false
 
         (INGAME as TerrarumIngame).blockMarkingActor.let {

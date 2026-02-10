@@ -672,6 +672,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             uiWatchTierOne,
             getWearableDeviceUI,
             UIScreenZoom(),
+            UIWorldControlHint(),
             uiAutosaveNotifier,
 
             uiInventoryPlayer,

@@ -135,10 +135,12 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID), FixtureInteracti
     }
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
+        INGAME.setControlHint("GAME_INVENTORY_USE", "GAME_ACTION_CHANGE_COLOR") // the most generic control hints
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "wire_render_all"
     }
 
     override fun effectOnUnequip(actor: ActorWithBody) {
+        super.effectOnUnequip(actor)
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
         selectorUI.setAsClose()
     }

@@ -128,6 +128,16 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
      *  Nullability of this property is believed to be unavoidable (trust me!). I'm sorry for the inconvenience.
      */
     open var actorNowPlaying: ActorHumanoid? = null
+
+    protected open val currentlyDisplayingControlHints = ControlHint(null, null)
+
+    fun setControlHint(primary: String?, secondary: String?) {
+        currentlyDisplayingControlHints.primary = primary
+        currentlyDisplayingControlHints.secondary = secondary
+    }
+
+    fun getCurrentControlHint() = currentlyDisplayingControlHints.copy()
+
     /**
      * The actual gamer
      */
@@ -635,3 +645,7 @@ class ProtectedActorRemovalException(whatisit: String, caller: Throwable) : Exce
 val INGAME: IngameInstance
     get() = Terrarum.ingame!!
 
+/**
+ * Control Hints are always referred against Lang for display. To not display a hint for a specific hand, use `null`
+ */
+data class ControlHint(var primary: String?, var secondary: String?)
