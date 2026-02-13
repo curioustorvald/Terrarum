@@ -175,6 +175,10 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
     @Transient private var prevHMoveKey = KEY_NULL
     @Transient private var prevVMoveKey = KEY_NULL
+    @Transient private var wasLeftDown = false
+    @Transient private var wasRightDown = false
+    @Transient private var wasUpDown = false
+    @Transient private var wasDownDown = false
 
     @Transient private val AXIS_KEYBOARD = -13372f // leetz
 
@@ -271,6 +275,15 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             isRightDown = Gdx.input.isKeyPressed(ControlPresets.getKey("control_key_right"))
             isJumpDown = Gdx.input.isKeyPressed(ControlPresets.getKey("control_key_jump"))
 
+            if (isLeftDown && !wasLeftDown)
+                prevHMoveKey = ControlPresets.getKey("control_key_left")
+            if (isRightDown && !wasRightDown)
+                prevHMoveKey = ControlPresets.getKey("control_key_right")
+            if (isUpDown && !wasUpDown)
+                prevVMoveKey = ControlPresets.getKey("control_key_up")
+            if (isDownDown && !wasDownDown)
+                prevVMoveKey = ControlPresets.getKey("control_key_down")
+
             val gamepad = App.gamepad
 
             if (gamepad != null) {
@@ -311,6 +324,11 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         }
         // TODO just disable "snap to ground" on collision solver if {player's body overlaps with the platform/downDownVirtually}?
         // the point is: disable snap (or don't consider offending tiles as solid) for certain Y-pos only, tiles on Y+1 are still solid
+
+        wasLeftDown = isLeftDown
+        wasRightDown = isRightDown
+        wasUpDown = isUpDown
+        wasDownDown = isDownDown
     }
 
     private inline val hasController: Boolean
@@ -359,21 +377,17 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         // ↑F, ↓S
         if (isRightDown && !isLeftDown) {
             walkHorizontal(false, AXIS_KEYBOARD)
-            prevHMoveKey = ControlPresets.getKey("control_key_right")
         } // ↓F, ↑S
         else if (isLeftDown && !isRightDown) {
             walkHorizontal(true, AXIS_KEYBOARD)
-            prevHMoveKey = ControlPresets.getKey("control_key_left")
-        } // ↓F, ↓S
-        /*else if (isLeftDown && isRightDown) {
-               if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
-                   walkHorizontal(false, AXIS_KEYBOARD)
-                   prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
-               } else if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)) {
-                   walkHorizontal(true, AXIS_KEYBOARD)
-                   prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
-               }
-           }*/
+        } // ↓F, ↓S (last key pressed wins)
+        else if (isLeftDown && isRightDown) {
+            if (prevHMoveKey == ControlPresets.getKey("control_key_right")) {
+                walkHorizontal(false, AXIS_KEYBOARD)
+            } else if (prevHMoveKey == ControlPresets.getKey("control_key_left")) {
+                walkHorizontal(true, AXIS_KEYBOARD)
+            }
+        }
 
         /**
          * Up/Down movement
@@ -387,21 +401,17 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             // ↑E, ↓D
             if (isDownDown && !isUpDown) {
                 walkVertical(false, AXIS_KEYBOARD)
-                prevVMoveKey = ControlPresets.getKey("control_key_down")
             } // ↓E, ↑D
             else if (isUpDown && !isDownDown) {
                 walkVertical(true, AXIS_KEYBOARD)
-                prevVMoveKey = ControlPresets.getKey("control_key_up")
-            } // ↓E, ↓D
-            /*else if (isUpDown && isDownDown) {
-                if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
+            } // ↓E, ↓D (last key pressed wins)
+            else if (isUpDown && isDownDown) {
+                if (prevVMoveKey == ControlPresets.getKey("control_key_down")) {
                     walkVertical(false, AXIS_KEYBOARD)
-                    prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
-                } else if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)) {
+                } else if (prevVMoveKey == ControlPresets.getKey("control_key_up")) {
                     walkVertical(true, AXIS_KEYBOARD)
-                    prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
                 }
-            }*/
+            }
         }
         else {
             if (hasController) {
@@ -412,11 +422,16 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             // ↑E, ↓D
             if (isDownDown && !isUpDown) {
                 swimDown()
-                prevVMoveKey = ControlPresets.getKey("control_key_down")
             } // ↓E, ↑D
             else if (isUpDown && !isDownDown) {
                 swimUp()
-                prevVMoveKey = ControlPresets.getKey("control_key_up")
+            } // ↓E, ↓D (last key pressed wins)
+            else if (isUpDown && isDownDown) {
+                if (prevVMoveKey == ControlPresets.getKey("control_key_down")) {
+                    swimDown()
+                } else if (prevVMoveKey == ControlPresets.getKey("control_key_up")) {
+                    swimUp()
+                }
             }
         }
 
