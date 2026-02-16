@@ -9,8 +9,8 @@ RUNTIME="runtime-linux-x86"
 DESKTOPFILE="../out/build_autogen_linux.desktop"
 JARNAME="TerrarumBuild.jar"
 
-if [ ! -d "../assets_release" ]; then
-    echo "'assets_release' does not exist; prepare the assets for the release and put them into the assets_release directory, exiting now." >&2
+if [ ! -f "out/assets.tar.zst" ] || [ ! -f "out/assets.manifest" ]; then
+    echo "'assets.tar.zst' or 'assets.manifest' not found in out/; run 'make assets' first." >&2
     exit 1
 fi
 
@@ -27,11 +27,11 @@ chmod +x $DESTDIR/AppRun
 # Copy over a Java runtime
 mkdir $DESTDIR/out
 cp -r "../out/$RUNTIME" $DESTDIR/out/
-mv $DESTDIR/out/$RUNTIME/bin/java $DESTDIR/out/$RUNTIME/bin/Terrarum
+mv $DESTDIR/out/$RUNTIME/bin/java $DESTDIR/out/$RUNTIME/bin/java
 
-# Copy over all the assets and a jarfile
-cp -r "../assets_release" $DESTDIR/
-mv $DESTDIR/assets_release $DESTDIR/assets
+# Copy over the asset archive, manifest, and jarfile
+cp "out/assets.tar.zst" $DESTDIR/
+cp "out/assets.manifest" $DESTDIR/
 cp "../out/$JARNAME" $DESTDIR/out/
 
 # Pack everything to AppImage

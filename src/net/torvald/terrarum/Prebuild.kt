@@ -10,6 +10,7 @@ import java.time.ZonedDateTime
 
 private fun writeWindowsRC(major: Int, minor: Int, patch: Int) {
     val s = """1 ICON "icns.ico"
+1 RT_MANITEST "terrarum.manifest"
 VS_VERSION_INFO VERSIONINFO
     FILEVERSION    $major,$minor,$patch,0
     PRODUCTVERSION $major,$minor,$patch,0

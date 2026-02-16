@@ -96,7 +96,7 @@ public class Principii {
             extracmd0 += " -Dswing.aatext=true -Dawt.useSystemAAFontSettings=lcd";
         }
 
-        String runtime = new File("out/"+runtimeRoot+"/bin/Terrarum").getAbsolutePath(); // /bin/Terrarum is just a renamed version of /bin/java
+        String runtime = new File("out/"+runtimeRoot+"/bin/java").getAbsolutePath();
         System.out.println("Runtime path: "+runtime);
 
 

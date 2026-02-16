@@ -8,8 +8,8 @@ RUNTIME="runtime-windows-x86"
 RCFILE="../out/build_autogen_windows.rc"
 JARNAME="TerrarumBuild.jar"
 
-if [ ! -d "../assets_release" ]; then
-    echo "'assets_release' does not exist; prepare the assets for the release and put them into the assets_release directory, exiting now." >&2
+if [ ! -f "out/assets.tar.zst" ] || [ ! -f "out/assets.manifest" ]; then
+    echo "'assets.tar.zst' or 'assets.manifest' not found in out/; run 'make assets' first." >&2
     exit 1
 fi
 
@@ -32,12 +32,12 @@ x86_64-w64-mingw32-gcc -Os -s -o $DESTDIR/Terrarum.exe $SRCFILES/Terrarum.c $RCF
 # Copy over a Java runtime
 mkdir $DESTDIR/out
 cp -r "../out/$RUNTIME" $DESTDIR/out/
-mv $DESTDIR/out/$RUNTIME/bin/java.exe $DESTDIR/out/$RUNTIME/bin/Terrarum.exe
+mv $DESTDIR/out/$RUNTIME/bin/java.exe $DESTDIR/out/$RUNTIME/bin/java.exe
 
-# Copy over all the assets and a jarfile
-cp -r "../assets_release" $DESTDIR/
-mv $DESTDIR/assets_release $DESTDIR/assets
-cp  "../out/$JARNAME" $DESTDIR/out/
+# Copy over the asset archive, manifest, and jarfile
+cp "out/assets.tar.zst" $DESTDIR/
+cp "out/assets.manifest" $DESTDIR/
+cp "../out/$JARNAME" $DESTDIR/out/
 
 # zip everything
 rm "out/$DESTDIR.zip"
