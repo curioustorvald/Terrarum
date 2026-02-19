@@ -273,7 +273,7 @@ object PickaxeCore : TooltipListener() {
 
     private val soundCue = MusicContainer(
         "pickaxe_sound_cue",
-        ModMgr.getFile("basegame", "audio/effects/accessibility/pickaxe_valuable.ogg"),
+        ModMgr.getGdxFile("basegame", "audio/effects/accessibility/pickaxe_valuable.ogg"),
         toRAM = false
     ).also {
         App.disposables.add(it)

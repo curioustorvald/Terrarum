@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gamecontroller
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
@@ -173,8 +174,13 @@ object IME {
         else -> throw IllegalArgumentException("Unknown candidates mode: $this")
     }
 
-    fun parseKeylayoutFile(file: File): TerrarumKeyLayout {
-        val src = file.readText(Charsets.UTF_8)
+    fun parseKeylayoutFile(fileHandle: FileHandle): TerrarumKeyLayout =
+        parseKeylayoutFromString(fileHandle.readString("UTF-8"))
+
+    fun parseKeylayoutFile(file: File): TerrarumKeyLayout =
+        parseKeylayoutFromString(file.readText(Charsets.UTF_8))
+
+    private fun parseKeylayoutFromString(src: String): TerrarumKeyLayout {
         val jsval = context.eval("js", "'use strict';Object.freeze($src)")
         val name = jsval.getMember("n").asString()
         val capsmode = jsval.getMember("capslock").asString().toCapsMode()
@@ -201,8 +207,6 @@ object IME {
             }
         }
 
-//        println("[IME] Test Keymap print for $name:"); for (keycode in 0 until 256) { print("$keycode:\t"); println(out[keycode].joinToString("\t")) }
-
         return TerrarumKeyLayout(name, capsmode, out, physicalLayout)
     }
 
@@ -215,8 +219,13 @@ object IME {
                 else -> throw IllegalArgumentException("Unknown operation mode: $this")
             }
 
-    fun parseImeFile(file: File): TerrarumIME {
-        val code = file.readText(Charsets.UTF_8)
+    fun parseImeFile(fileHandle: FileHandle): TerrarumIME =
+        parseImeFromString(fileHandle.readString("UTF-8"))
+
+    fun parseImeFile(file: File): TerrarumIME =
+        parseImeFromString(file.readText(Charsets.UTF_8))
+
+    private fun parseImeFromString(code: String): TerrarumIME {
         val jsval = context.eval("js", "\"use strict\";(function(){$code})()")
         val name = jsval.getMember("n").asString()
         val candidatesCount = jsval.getMember("v").asString().toViewCount()

@@ -156,7 +156,7 @@ class FixtureSmelterBasic : FixtureBase {
         this.mainUI = UISmelterBasic(this)
     }
 
-    @Transient val static = MusicContainer("bonfire", ModMgr.getFile("basegame", "audio/effects/static/bonfire.ogg"), true)
+    @Transient val static = MusicContainer("bonfire", ModMgr.getGdxFile("basegame", "audio/effects/static/bonfire.ogg"), true)
     @Transient val light = Cvec(0.5f, 0.18f, 0f, 0f)
 
     @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(0.0, 2*TILE_SIZED, TILE_SIZED * 2, TILE_SIZED * 2), light))

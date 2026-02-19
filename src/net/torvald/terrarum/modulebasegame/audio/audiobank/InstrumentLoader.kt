@@ -46,7 +46,7 @@ object InstrumentLoader {
             CommonResourcePool.getAs<Pair<FloatArray, FloatArray>>("${baseResourceName}_$it")
         }
 
-        val masterFile = MusicContainer("${idBase}_${initialNote}", ModMgr.getFile(module, path))
+        val masterFile = MusicContainer("${idBase}_${initialNote}", ModMgr.getGdxFile(module, path))
         val masterSamplesL = FloatArray(masterFile.totalSizeInSamples.toInt())
         val masterSamplesR = FloatArray(masterFile.totalSizeInSamples.toInt())
         masterFile.readSamples(masterSamplesL, masterSamplesR)

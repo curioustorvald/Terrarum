@@ -30,7 +30,7 @@ class UIElemTest : ApplicationAdapter() {
     private lateinit var ui: UICanvas
 
     override fun create() {
-        App.fontGame = TerrarumSansBitmap(App.FONT_DIR, false, true, false,
+        App.fontGame = TerrarumSansBitmap(false, true, false,
                  false,
                 256, false, 0.5f, false
         )

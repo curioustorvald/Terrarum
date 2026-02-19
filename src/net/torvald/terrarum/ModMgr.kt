@@ -103,7 +103,7 @@ object ModMgr {
         NOT_EVEN_THERE
     }
 
-    const val modDirInternal = "./assets/mods"
+    val modDirInternal: String get() = "./assets/mods"
     val modDirExternal = "${App.defaultDir}/Modules"
 
     /** Module name (directory name), ModuleMetadata */
@@ -161,21 +161,46 @@ object ModMgr {
                 try {
                     val modMetadata = Properties()
 
-                    val _internalFile = File("$modDirInternal/$moduleName/$metaFilename")
                     val _externalFile = File("$modDirExternal/$moduleName/$metaFilename")
 
                     // external mod has precedence over the internal
-                    val isInternal = if (_externalFile.exists()) false else if (_internalFile.exists()) true else throw FileNotFoundException()
-                    val file = if (isInternal) _internalFile else _externalFile
+                    val internalExists = if (AssetCache.isDistribution)
+                        AssetCache.getFileHandle("mods/$moduleName/$metaFilename").exists()
+                    else
+                        File("$modDirInternal/$moduleName/$metaFilename").exists()
+                    val isInternal = if (_externalFile.exists()) false else if (internalExists) true else throw FileNotFoundException()
                     val modDir = if (isInternal) modDirInternal else modDirExternal
 
-                    fun getGdxFile(path: String) = if (isInternal) Gdx.files.internal(path) else Gdx.files.absolute(path)
+                    fun getGdxFileLocal(path: String) = if (isInternal) {
+                        if (AssetCache.isDistribution) AssetCache.getFileHandle(path.removePrefix("./assets/"))
+                        else Gdx.files.internal(path)
+                    } else Gdx.files.absolute(path)
 
-                    modMetadata.load(FileInputStream(file))
+                    // Load metadata
+                    if (isInternal && AssetCache.isDistribution) {
+                        val metaHandle = AssetCache.getFileHandle("mods/$moduleName/$metaFilename")
+                        modMetadata.load(metaHandle.read())
+                    } else {
+                        val file = if (isInternal) File("$modDirInternal/$moduleName/$metaFilename") else _externalFile
+                        modMetadata.load(FileInputStream(file))
+                    }
 
-                    if (File("$modDir/$moduleName/$defaultConfigFilename").exists()) {
+                    // Load default config
+                    val defaultConfigHandle = if (isInternal && AssetCache.isDistribution)
+                        AssetCache.getFileHandle("mods/$moduleName/$defaultConfigFilename")
+                    else
+                        null
+                    val defaultConfigExists = if (defaultConfigHandle != null)
+                        defaultConfigHandle.exists()
+                    else
+                        File("$modDir/$moduleName/$defaultConfigFilename").exists()
+
+                    if (defaultConfigExists) {
                         try {
-                            val defaultConfig = JsonFetcher("$modDir/$moduleName/$defaultConfigFilename")
+                            val defaultConfig = if (defaultConfigHandle != null)
+                                JsonFetcher.invoke(defaultConfigHandle)
+                            else
+                                JsonFetcher("$modDir/$moduleName/$defaultConfigFilename")
 
                             // read config and store it to the game
                             var entry: JsonValue? = defaultConfig.child
@@ -208,16 +233,29 @@ object ModMgr {
                     val jar = modMetadata.getProperty("jar")
                     val jarHash = modMetadata.getProperty("jarhash").uppercase()
                     val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).filter { it.isNotEmpty() }.toTypedArray()
-                    val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
+                    val isDir = if (isInternal && AssetCache.isDistribution)
+                        true // internal mods in archive are always "directories"
+                    else
+                        FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
 
                     val configPlan = ArrayList<String>()
-                    File("$modDir/$moduleName/configplan.csv").let {
-                        if (it.exists() && it.isFile) {
-                            configPlan.addAll(it.readLines(Common.CHARSET).filter { it.isNotBlank() })
+                    val configPlanHandle = if (isInternal && AssetCache.isDistribution)
+                        AssetCache.getFileHandle("mods/$moduleName/configplan.csv")
+                    else
+                        null
+                    if (configPlanHandle != null) {
+                        if (configPlanHandle.exists()) {
+                            configPlan.addAll(configPlanHandle.readString("UTF-8").lines().filter { it.isNotBlank() })
+                        }
+                    } else {
+                        File("$modDir/$moduleName/configplan.csv").let {
+                            if (it.exists() && it.isFile) {
+                                configPlan.addAll(it.readLines(Common.CHARSET).filter { it.isNotBlank() })
+                            }
                         }
                     }
 
-                    module = ModuleMetadata(index, isDir, getGdxFile("$modDir/$moduleName/icon.png"), properName, description, descTranslations, author, packageName, entryPoint, releaseDate, version, jar, dependency, isInternal, configPlan)
+                    module = ModuleMetadata(index, isDir, getGdxFileLocal("$modDir/$moduleName/icon.png"), properName, description, descTranslations, author, packageName, entryPoint, releaseDate, version, jar, dependency, isInternal, configPlan)
 
                     val versionNumeral = version.split('.')
                     val versionNumber = versionNumeral.toVersionNumber()
@@ -447,24 +485,36 @@ object ModMgr {
     /** Returning files are read-only */
     fun getGdxFile(module: String, path: String): FileHandle {
         checkExistence(module)
-        return if (moduleInfo[module]!!.isInternal)
-            Gdx.files.internal("$modDirInternal/$module/$path")
+        return if (moduleInfo[module]!!.isInternal) {
+            if (AssetCache.isDistribution)
+                ClustfileHandle(AssetCache.getClustfile("mods/$module/$path"))
+            else
+                Gdx.files.internal("$modDirInternal/$module/$path")
+        }
         else
             Gdx.files.absolute("$modDirExternal/$module/$path")
     }
-    fun getFile(module: String, path: String): File {
+    // getGdxFile is preferred due to asset archiving
+    /*fun getFile(module: String, path: String): File {
         checkExistence(module)
-        return if (moduleInfo[module]!!.isInternal)
-            FileSystems.getDefault().getPath("$modDirInternal/$module/$path").toFile()
+        return if (moduleInfo[module]!!.isInternal) {
+            if (AssetCache.isDistribution)
+                throw UnsupportedOperationException("Use getGdxFile() for internal mod files in distribution mode (module=$module, path=$path)")
+            else
+                FileSystems.getDefault().getPath("$modDirInternal/$module/$path").toFile()
+        }
         else
             FileSystems.getDefault().getPath("$modDirExternal/$module/$path").toFile()
-    }
+    }*/
     fun hasFile(module: String, path: String): Boolean {
         if (!moduleInfo.containsKey(module)) return false
-        return getFile(module, path).exists()
+        return getGdxFile(module, path).exists()
     }
-    fun getFiles(module: String, path: String): Array<File> {
+    // getGdxFile is preferred due to asset archiving
+    /*fun getFiles(module: String, path: String): Array<File> {
         checkExistence(module)
+        if (moduleInfo[module]!!.isInternal && AssetCache.isDistribution)
+            throw UnsupportedOperationException("Use getGdxFiles() for internal mod files in distribution mode (module=$module, path=$path)")
         val dir = getFile(module, path)
         if (!dir.isDirectory) {
             throw FileNotFoundException("The path is not a directory")
@@ -472,7 +522,7 @@ object ModMgr {
         else {
             return dir.listFiles()
         }
-    }
+    }*/
     fun getGdxFiles(module: String, path: String): Array<FileHandle> {
         checkExistence(module)
         val dir = getGdxFile(module, path)
@@ -487,20 +537,21 @@ object ModMgr {
     /** Get a common file (literal file or directory) from all the installed mods. Files are guaranteed to exist. If a mod does not
      * contain the file, the mod will be skipped.
      *
-     * @return List of pairs<modname, file>
+     * @return List of pairs<modname, filehandle>
      */
-    fun getFilesFromEveryMod(path: String): List<Pair<String, File>> {
+    // getGdxFile is preferred due to asset archiving
+    /*fun getFilesFromEveryMod(path: String): List<Pair<String, FileHandle>> {
         val path = path.sanitisePath()
         val moduleNames = moduleInfo.keys.toList()
 
-        val filesList = ArrayList<Pair<String, File>>()
+        val filesList = ArrayList<Pair<String, FileHandle>>()
         moduleNames.forEach {
-            val file = getFile(it, path)
+            val file = getGdxFile(it, path)
             if (file.exists()) filesList.add(it to file)
         }
 
         return filesList.toList()
-    }
+    }*/
 
     /** Get a common file (literal file or directory) from all the installed mods. Files are guaranteed to exist. If a mod does not
      * contain the file, the mod will be skipped.
@@ -739,7 +790,7 @@ object ModMgr {
         const val langPath = "locales/"
 
         @JvmStatic operator fun invoke(module: String) {
-            Lang.load(getFile(module, langPath))
+            Lang.load(getGdxFile(module, langPath))
         }
     }
 
@@ -747,25 +798,25 @@ object ModMgr {
         const val keebPath = "keylayout/"
 
         @JvmStatic operator fun invoke(module: String) {
-            val FILE = getFile(module, keebPath)
+            val DIR = getGdxFile(module, keebPath)
 
-            FILE.listFiles { file, s -> s.endsWith(".${IME.KEYLAYOUT_EXTENSION}") }.sortedBy { it.name }.forEach {
-                printdbg(this, "Registering Low layer ${it.nameWithoutExtension.lowercase()}")
-                IME.registerLowLayer(it.nameWithoutExtension.lowercase(), IME.parseKeylayoutFile(it))
+            DIR.list().filter { it.extension().equals(IME.KEYLAYOUT_EXTENSION, ignoreCase = true) }.sortedBy { it.name() }.forEach {
+                printdbg(this, "Registering Low layer ${it.nameWithoutExtension().lowercase()}")
+                IME.registerLowLayer(it.nameWithoutExtension().lowercase(), IME.parseKeylayoutFile(it))
             }
 
-            FILE.listFiles { file, s -> s.endsWith(".${IME.IME_EXTENSION}") }.sortedBy { it.name }.forEach {
-                printdbg(this, "Registering High layer ${it.nameWithoutExtension.lowercase()}")
-                IME.registerHighLayer(it.nameWithoutExtension.lowercase(), IME.parseImeFile(it))
+            DIR.list().filter { it.extension().equals(IME.IME_EXTENSION, ignoreCase = true) }.sortedBy { it.name() }.forEach {
+                printdbg(this, "Registering High layer ${it.nameWithoutExtension().lowercase()}")
+                IME.registerHighLayer(it.nameWithoutExtension().lowercase(), IME.parseImeFile(it))
             }
 
-            val iconFile = getFile(module, keebPath + "icons.tga").let {
-                if (it.exists()) it else getFile(module, keebPath + "icons.png")
+            val iconFile = getGdxFile(module, keebPath + "icons.tga").let {
+                if (it.exists()) it else getGdxFile(module, keebPath + "icons.png")
             }
 
             if (iconFile.exists()) {
-                val iconSheet = TextureRegionPack(iconFile.path, 20, 20)
-                val iconPixmap = Pixmap(Gdx.files.absolute(iconFile.path))
+                val iconSheet = TextureRegionPack(iconFile, 20, 20)
+                val iconPixmap = Pixmap(iconFile)
                 for (k in 0 until iconPixmap.height step 20) {
                     val langCode = StringBuilder()
                     for (c in 0 until 20) {
@@ -855,7 +906,7 @@ object ModMgr {
         }
 
         @JvmStatic operator fun invoke(module: String) {
-            getFiles(module, weatherPath).filter { it.isFile && it.name.lowercase().endsWith(".json") }.forEach {
+            getGdxFile(module, weatherPath).list().filter { !it.isDirectory && it.name().lowercase().endsWith(".json") }.forEach {
                 Terrarum.weatherCodex.readFromJson(module, it)
             }
         }
@@ -878,32 +929,21 @@ object ModMgr {
         }
 
         @JvmStatic operator fun invoke(module: String) {
-            val targetModNames = getFiles(module, retexturesPath).filter { it.isDirectory }
+            val targetModNames = getGdxFile(module, retexturesPath).list().filter { it.isDirectory }
             targetModNames.forEach { baseTargetModDir ->
-                // modules/<module>/retextures/basegame
-//                printdbg(this, "baseTargetModDir = $baseTargetModDir")
-
                 retexables.forEach { category ->
-                    val dir = File(baseTargetModDir, category)
-                    // modules/<module>/retextures/basegame/blocks
-
-//                    printdbg(this, "cats: ${dir.path}")
+                    val dir = baseTargetModDir.child(category)
 
                     if (dir.isDirectory && dir.exists()) {
-                        dir.listFiles { it: File ->
-                            it.name.contains('-')
-                        }?.forEach {
-                            // <other modname>-<hopefully a number>.tga or .png
-                            val tokens = it.name.split('-')
+                        dir.list().filter { it.name().contains('-') }.forEach {
+                            val tokens = it.name().split('-')
                             if (tokens.size > 1) {
                                 val modname = tokens[0]
                                 val filename = tokens.tail().joinToString("-")
-                                altFilePaths["$modDirInternal/$modname/$category/$filename"] = getGdxFile(module, "$retexturesPath${baseTargetModDir.name}/$category/${it.name}")
+                                altFilePaths["$modDirInternal/$modname/$category/$filename"] = getGdxFile(module, "$retexturesPath${baseTargetModDir.name()}/$category/${it.name()}")
                             }
                         }
                     }
-
-//                    retexableCallbacks[category]?.invoke()
                 }
             }
 
@@ -917,12 +957,12 @@ object ModMgr {
         const val smeltingPath = "smelting/"
 
         @JvmStatic operator fun invoke(module: String) {
-            getFile(module, recipePath).listFiles { it: File -> it.name.lowercase().endsWith(".json") }?.forEach { jsonFile ->
-                Terrarum.craftingCodex.addFromJson(JsonFetcher(jsonFile), module, jsonFile.name)
+            getGdxFile(module, recipePath).list().filter { !it.isDirectory && it.name().lowercase().endsWith(".json") }.forEach { jsonHandle ->
+                Terrarum.craftingCodex.addFromJson(JsonFetcher.invoke(jsonHandle), module, jsonHandle.name())
             }
 
-            getFile(module, smeltingPath).listFiles { it: File -> it.name.lowercase().endsWith(".json") }?.forEach { jsonFile ->
-                Terrarum.craftingCodex.addSmeltingFromJson(JsonFetcher(jsonFile), module, jsonFile.name)
+            getGdxFile(module, smeltingPath).list().filter { !it.isDirectory && it.name().lowercase().endsWith(".json") }.forEach { jsonHandle ->
+                Terrarum.craftingCodex.addSmeltingFromJson(JsonFetcher.invoke(jsonHandle), module, jsonHandle.name())
             }
         }
     }

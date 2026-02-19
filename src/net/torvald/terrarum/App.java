@@ -255,10 +255,6 @@ public class App implements ApplicationListener {
     public static DebugTimers debugTimers = new DebugTimers();
 
 
-    public static final String FONT_DIR = "assets/graphics/fonts/terrarum-sans-bitmap";
-
-
-
     public static Texture[] ditherPatterns = new Texture[4];
 //    public static ShaderProgram shaderHicolour;
     public static ShaderProgram shaderDebugDiff;
@@ -445,6 +441,7 @@ public class App implements ApplicationListener {
             // load configs
             getDefaultDirectory();
             createDirs();
+            AssetCache.INSTANCE.init();
             initialiseConfig();
             readConfigJson();
 
@@ -582,13 +579,13 @@ public class App implements ApplicationListener {
                 if (!loadOrder.isEmpty()) {
                     var modname = loadOrder.get(0).get(0);
 
-                    var textureFile = Gdx.files.internal("assets/mods/"+modname+"/splashback.png");
+                    var textureFile = AssetCache.INSTANCE.getFileHandle("mods/"+modname+"/splashback.png");
                     if (textureFile.exists()) {
                         splashBackdrop = new TextureRegion(new Texture(textureFile));
                         splashTextCol = new Color(0xeeeeeeff);
                     }
 
-                    var logoFile = Gdx.files.internal("assets/mods/"+modname+"/splashlogo.png");
+                    var logoFile = AssetCache.INSTANCE.getFileHandle("mods/"+modname+"/splashlogo.png");
                     if (logoFile.exists()) {
                         splashScreenLogo = new TextureRegion(new Texture(logoFile));
                     }
@@ -604,10 +601,10 @@ public class App implements ApplicationListener {
         }
 
         if (splashBackdrop == null) {
-            splashBackdrop = new TextureRegion(new Texture("assets/graphics/background_white.png"));
+            splashBackdrop = new TextureRegion(new Texture(AssetCache.INSTANCE.getFileHandle("graphics/background_white.png")));
         }
         if (splashScreenLogo == null) {
-            splashScreenLogo = new TextureRegion(new Texture("assets/graphics/logo.png"));
+            splashScreenLogo = new TextureRegion(new Texture(AssetCache.INSTANCE.getFileHandle("graphics/logo.png")));
         }
 
         Gdx.graphics.setContinuousRendering(true);
@@ -622,13 +619,13 @@ public class App implements ApplicationListener {
 
         ShaderMgr.INSTANCE.compile(Gdx.files.classpath("shaders/shaders.csv"));
 
-        CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_take_a_break.tga")));
-        CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bup", () -> new MusicContainer("haptic_bup", Gdx.files.internal("./assets/audio/effects/haptic_bup.ogg").file(), false, true, (AudioBank m) -> { return null; }));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bap", () -> new MusicContainer("haptic_bap", Gdx.files.internal("./assets/audio/effects/haptic_bap.ogg").file(), false, true, (AudioBank m) -> { return null; }));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bop", () -> new MusicContainer("haptic_bop", Gdx.files.internal("./assets/audio/effects/haptic_bop.ogg").file(), false, true, (AudioBank m) -> { return null; }));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bep", () -> new MusicContainer("haptic_bep", Gdx.files.internal("./assets/audio/effects/haptic_bep.ogg").file(), false, true, (AudioBank m) -> { return null; }));
-        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bip", () -> new MusicContainer("haptic_bip", Gdx.files.internal("./assets/audio/effects/haptic_bip.ogg").file(), false, true, (AudioBank m) -> { highPrioritySoundPlaying = false; return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(AssetCache.INSTANCE.getFileHandle("graphics/gui/health_take_a_break.tga")));
+        CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(AssetCache.INSTANCE.getFileHandle("graphics/gui/health_distance.tga")));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bup", () -> new MusicContainer("haptic_bup", AssetCache.INSTANCE.getFileHandle("audio/effects/haptic_bup.ogg"), false, true, null, (AudioBank m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bap", () -> new MusicContainer("haptic_bap", AssetCache.INSTANCE.getFileHandle("audio/effects/haptic_bap.ogg"), false, true, null, (AudioBank m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bop", () -> new MusicContainer("haptic_bop", AssetCache.INSTANCE.getFileHandle("audio/effects/haptic_bop.ogg"), false, true, null, (AudioBank m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bep", () -> new MusicContainer("haptic_bep", AssetCache.INSTANCE.getFileHandle("audio/effects/haptic_bep.ogg"), false, true, null, (AudioBank m) -> { return null; }));
+        CommonResourcePool.INSTANCE.addToLoadingList("sound:haptic_bip", () -> new MusicContainer("haptic_bip", AssetCache.INSTANCE.getFileHandle("audio/effects/haptic_bip.ogg"), false, true, null, (AudioBank m) -> { highPrioritySoundPlaying = false; return null; }));
         // make loading list
         CommonResourcePool.INSTANCE.loadAll();
 
@@ -669,7 +666,7 @@ public class App implements ApplicationListener {
         rendererVendor = Gdx.graphics.getGLVersion().getVendorString();
 
 
-        fontGame = new TerrarumSansBitmap(FONT_DIR, false, false, false,
+        fontGame = new TerrarumSansBitmap(false, false, false,
                 false,
                 256, false, 0.5f, false
         );
@@ -1062,6 +1059,8 @@ public class App implements ApplicationListener {
 
         deleteTempfiles();
 
+        AssetCache.INSTANCE.dispose();
+
         Toolkit.INSTANCE.dispose();
         BlurMgr.INSTANCE.dispose();
 
@@ -1157,11 +1156,11 @@ public class App implements ApplicationListener {
         long t1 = System.nanoTime();
 
 
-        CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(AssetCache.INSTANCE.getFileHandle("graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false, false, false));
         CommonResourcePool.INSTANCE.addToLoadingList("blockmarking_actor", () -> new BlockMarkerActor());
-        CommonResourcePool.INSTANCE.addToLoadingList("loading_circle_64", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/loading_circle_64.tga"), 64, 64, 0, 0, 0, 0, false, false, false));
-        CommonResourcePool.INSTANCE.addToLoadingList("inline_loading_spinner", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/inline_loading_spinner.tga"), 20, 20, 0, 0, 0, 0, false, false, false));
-        CommonResourcePool.INSTANCE.addToLoadingList("inventory_category", () -> new TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("loading_circle_64", () -> new TextureRegionPack(AssetCache.INSTANCE.getFileHandle("graphics/gui/loading_circle_64.tga"), 64, 64, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("inline_loading_spinner", () -> new TextureRegionPack(AssetCache.INSTANCE.getFileHandle("graphics/gui/inline_loading_spinner.tga"), 20, 20, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("inventory_category", () -> new TextureRegionPack(AssetCache.INSTANCE.getFileHandle("graphics/gui/inventory/category.tga"), 20, 20, 0, 0, 0, 0, false, false, false));
         CommonResourcePool.INSTANCE.loadAll();
 
 //        shaderHicolour = loadShaderFromClasspath("shaders/default.vert", "shaders/hicolour.frag");
@@ -1226,12 +1225,12 @@ public class App implements ApplicationListener {
         else {
             environment = RunningEnvironment.PC;
         }*/
-        fontUITitle = new TerrarumSansBitmap(FONT_DIR, false, false, false,
+        fontUITitle = new TerrarumSansBitmap(false, false, false,
                 false,
                 64, false, 0.5f, false
         );
         fontUITitle.setInterchar(1);
-        fontGameFBO = new TerrarumSansBitmap(FONT_DIR, false, true, false,
+        fontGameFBO = new TerrarumSansBitmap(false, true, false,
                 false,
                 64, false, 203f/255f, false
         );
@@ -1514,6 +1513,8 @@ public class App implements ApplicationListener {
     /** defaultDir + "/Custom/Music" */
     public static String customMusicDir;
     public static String customAmbientDir;
+    /** defaultDir + "/Caches" */
+    public static String cachesDir;
 
     private static void getDefaultDirectory() {
         String OS = OSName.toUpperCase();
@@ -1551,6 +1552,7 @@ public class App implements ApplicationListener {
         customDir = defaultDir + "/Custom";
         customMusicDir = customDir + "/Music";
         customAmbientDir = customDir + "/Ambient";
+        cachesDir = defaultDir + "/Caches";
 
         System.out.println(String.format("os.name = %s (with identifier %s)", OSName, operationSystem));
         System.out.println(String.format("os.version = %s", OSVersion));

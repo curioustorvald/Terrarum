@@ -98,7 +98,7 @@ class FixtureTypewriter : FixtureBase {
 
 internal class TestLeafletPrimaryUseHandler : FileRefItemPrimaryUseHandler {
     override fun use(item: ItemFileRef): Long {
-        println(item.getAsFile().readText(Common.CHARSET))
+        println(item.getAsGdxFile().readString(Common.CHARSET.displayName()))
         return 0L
     }
 }

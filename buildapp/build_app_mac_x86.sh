@@ -9,8 +9,8 @@ RUNTIME="runtime-osx-x86"
 PLISTFILE="../out/build_autogen_macos_Info.plist"
 JARNAME="TerrarumBuild.jar"
 
-if [ ! -f "out/assets.tar.zst" ] || [ ! -f "out/assets.manifest" ]; then
-    echo "'assets.tar.zst' or 'assets.manifest' not found in out/; run 'make assets' first." >&2
+if [ ! -f "out/assets.tevd" ]; then
+    echo "'assets.tevd' not found in out/; run 'make assets' first." >&2
     exit 1
 fi
 
@@ -32,9 +32,8 @@ mkdir $DESTDIR/Contents/MacOS/out
 cp -r "../out/$RUNTIME" $DESTDIR/Contents/MacOS/out/
 mv $DESTDIR/Contents/MacOS/out/$RUNTIME/bin/java $DESTDIR/Contents/MacOS/out/$RUNTIME/bin/java
 
-# Copy over the asset archive, manifest, and jarfile
-cp "out/assets.tar.zst" $DESTDIR/Contents/MacOS/
-cp "out/assets.manifest" $DESTDIR/Contents/MacOS/
+# Copy over the asset archive and jarfile
+cp "out/assets.tevd" $DESTDIR/Contents/MacOS/
 cp "../out/$JARNAME" $DESTDIR/Contents/MacOS/out/
 
 # zip everything

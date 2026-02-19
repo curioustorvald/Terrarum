@@ -1,5 +1,6 @@
 package net.torvald.terrarum.langpack
 
+import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.tail
@@ -82,47 +83,62 @@ object Lang {
         }
     }
 
+    fun load(localesHandle: FileHandle) {
+        printdbg(this, "Loading languages from ${localesHandle.path()}")
+
+        localesHandle.list().filter { it.isDirectory }.forEach { languageList.add(it.name()) }
+
+        // temporary filter
+        languageList.remove("jaJPysi")
+
+        for (lang in languageList) {
+            printdbg(this, "Loading langpack from ${localesHandle.path()}/$lang/")
+
+            val langFiles = localesHandle.child(lang).list()
+
+            langFiles.forEach {
+                if (!it.name().startsWith("Polyglot") && it.name().endsWith(".json")) {
+                    processRegularLangfile(it, lang)
+                }
+                else if (it.name().startsWith("Polyglot") && it.name().endsWith(".json")) {
+                    processPolyglotLangFile(it, lang)
+                }
+            }
+        }
+    }
+
     private fun processRegularLangfile(file: File, lang: String) {
         val json = JsonFetcher(file)
-        /*
-         * Terrarum langpack JSON structure is:
-         *
-         * (root object)
-         *      "<<STRING ID>>" = "<<LOCALISED TEXT>>"
-         */
-        //println(json.entrySet())
         JsonFetcher.forEachSiblings(json) { key, value ->
             langpack.put("${key}_$lang", value.asString().trim())
         }
+    }
 
+    private fun processRegularLangfile(fileHandle: FileHandle, lang: String) {
+        val json = JsonFetcher(fileHandle)
+        JsonFetcher.forEachSiblings(json) { key, value ->
+            langpack.put("${key}_$lang", value.asString().trim())
+        }
     }
 
     private fun processPolyglotLangFile(file: File, lang: String) {
         val json = JsonFetcher(file)
-        /*
-         * Polyglot JSON structure is:
-         *
-         * (root object)
-         *      "resources": object
-         *          "polyglot": object
-         *              (polyglot meta)
-         *          "data": array
-         *             [0]: object
-         *                  n = "CONTEXT_CHARACTER_CLASS"
-         *                  s = "Class"
-         *             [1]: object
-         *                  n = "CONTEXT_CHARACTER_DELETE"
-         *                  s = "Delecte Character"
-         *             (the array continues)
-         *
-         */
         JsonFetcher.forEachSiblings(json.get("resources").get("data")) { _, entry ->
             langpack.put(
                     "${entry.getString("n")}_$lang",
                     entry.getString("s").trim()
             )
         }
+    }
 
+    private fun processPolyglotLangFile(fileHandle: FileHandle, lang: String) {
+        val json = JsonFetcher(fileHandle)
+        JsonFetcher.forEachSiblings(json.get("resources").get("data")) { _, entry ->
+            langpack.put(
+                    "${entry.getString("n")}_$lang",
+                    entry.getString("s").trim()
+            )
+        }
     }
 
     private val bindOp = ">>="

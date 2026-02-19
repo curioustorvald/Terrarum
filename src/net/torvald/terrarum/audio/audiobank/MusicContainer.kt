@@ -18,13 +18,15 @@ import net.torvald.terrarum.audio.TerrarumAudioMixerTrack.Companion.SAMPLING_RAT
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.unsafe.UnsafePtr
+import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
 import javax.sound.sampled.AudioSystem
 
 class MusicContainer(
     override val name: String,
-    val file: File,
+    val file: File?,
+    val fileHandle: FileHandle?,
     val looping: Boolean = false,
     val toRAM: Boolean = false,
     val samplingRateOverride: Float?, // this is FIXED sampling rate
@@ -34,6 +36,15 @@ class MusicContainer(
     override var channels: Int
     val codec: String
 
+    // File-based constructors (existing API)
+    constructor(
+        name: String,
+        file: File,
+        looping: Boolean = false,
+        toRAM: Boolean = false,
+        samplingRateOverride: Float?,
+        songFinishedHook: (AudioBank) -> Unit = {}
+    ) : this(name, file, null, looping, toRAM, samplingRateOverride, songFinishedHook)
     // make Java code shorter
     constructor(
         name: String,
@@ -41,27 +52,37 @@ class MusicContainer(
         looping: Boolean = false,
         toRAM: Boolean = false,
         songFinishedHook: (AudioBank) -> Unit = {}
-    ) : this(name, file, looping, toRAM, null, songFinishedHook)
+    ) : this(name, file, null, looping, toRAM, null, songFinishedHook)
     // make Java code shorter
     constructor(
         name: String,
         file: File,
         looping: Boolean = false,
         songFinishedHook: (AudioBank) -> Unit = {}
-    ) : this(name, file, looping, false, null, songFinishedHook)
+    ) : this(name, file, null, looping, false, null, songFinishedHook)
     // make Java code shorter
     constructor(
         name: String,
         file: File,
         songFinishedHook: (AudioBank) -> Unit = {}
-    ) : this(name, file, false, false, null, songFinishedHook)
+    ) : this(name, file, null, false, false, null, songFinishedHook)
+
+    // FileHandle-based constructor (for TEVD archive support)
+    constructor(
+        name: String,
+        fileHandle: FileHandle,
+        looping: Boolean = false,
+        toRAM: Boolean = false,
+        samplingRateOverride: Float? = null,
+        songFinishedHook: (AudioBank) -> Unit = {}
+    ) : this(name, null, fileHandle, looping, toRAM, samplingRateOverride, songFinishedHook)
 
 
     var samplesReadCount = 0L; internal set
     override var totalSizeInSamples: Long
     private val totalSizeInBytes: Long
 
-    private val gdxMusic: Music = Gdx.audio.newMusic(FileHandle(file))
+    private val gdxMusic: Music = if (file != null) Gdx.audio.newMusic(FileHandle(file)) else Gdx.audio.newMusic(fileHandle!!)
 
     private var soundBuf: UnsafePtr? = null; private set
 
@@ -94,7 +115,10 @@ class MusicContainer(
                 rate.toFloat()
             }
             is Mp3.Music -> {
-                val tempMusic = Gdx.audio.newMusic(Gdx.files.absolute(file.absolutePath))
+                val tempMusic = if (file == null)
+                    Gdx.audio.newMusic(fileHandle)
+                else
+                    Gdx.audio.newMusic(Gdx.files.absolute(file.absolutePath))
                 val bitstream = tempMusic.extortField<Bitstream>("bitstream")!!
                 val header = bitstream.readFrame()
                 val rate = header.sampleRate
@@ -118,11 +142,22 @@ class MusicContainer(
             if (it.last() == "Music") it.dropLast(1).last() else it.last()
         }
 
-        totalSizeInSamples = when (gdxMusic) {
-            is Wav.Music -> getWavFileSampleCount(file)
-            is Ogg.Music -> getOggFileSampleCount(file)
-            is Mp3.Music -> getMp3FileSampleCount(file)
-            else -> Long.MAX_VALUE
+        totalSizeInSamples = if (file != null) {
+            when (gdxMusic) {
+                is Wav.Music -> getWavFileSampleCount(file)
+                is Ogg.Music -> getOggFileSampleCount(file)
+                is Mp3.Music -> getMp3FileSampleCount(file)
+                else -> Long.MAX_VALUE
+            }
+        } else if (fileHandle != null) {
+            when (gdxMusic) {
+                is Wav.Music -> getWavFileSampleCountFromHandle(fileHandle)
+                is Ogg.Music -> getOggFileSampleCountFromHandle(fileHandle)
+                is Mp3.Music -> getMp3FileSampleCountFromHandle(fileHandle)
+                else -> Long.MAX_VALUE
+            }
+        } else {
+            Long.MAX_VALUE
         }
         totalSizeInBytes = totalSizeInSamples * 2 * channels
 
@@ -329,10 +364,65 @@ class MusicContainer(
         }
     }
 
-    override fun toString() = if (name.isEmpty()) file.nameWithoutExtension else name
+    private fun getWavFileSampleCountFromHandle(fh: FileHandle): Long {
+        return try {
+            val ais = AudioSystem.getAudioInputStream(BufferedInputStream(fh.read()))
+            val r = ais.frameLength
+            ais.close()
+            r
+        }
+        catch (_: Throwable) {
+            Long.MAX_VALUE
+        }
+    }
 
-    override fun equals(other: Any?) = this.file.path == (other as MusicContainer).file.path
-    fun equalInstance(other: Any?) = this.file.path == (other as MusicContainer).file.path && this.hash == (other as MusicContainer).hash
+    private fun getOggFileSampleCountFromHandle(fh: FileHandle): Long {
+        return try {
+            // VorbisFile requires a file path; use a temp file
+            val tempFile = java.io.File.createTempFile("terrarum_ogg_", ".ogg")
+            tempFile.deleteOnExit()
+            tempFile.writeBytes(fh.readBytes())
+            val vorbisFile = VorbisFile(tempFile.absolutePath)
+            val r = vorbisFile.pcm_total(0)
+            tempFile.delete()
+            r
+        }
+        catch (_: Throwable) {
+            Long.MAX_VALUE
+        }
+    }
+
+    private fun getMp3FileSampleCountFromHandle(fh: FileHandle): Long {
+        return try {
+            val input = BufferedInputStream(fh.read())
+            val bs = Bitstream(input)
+
+            var header = bs.readFrame()
+            val rate = header.frequency()
+            var totalSamples = 0L
+
+            while (header != null) {
+                totalSamples += (header.ms_per_frame() * rate / 1000).toLong()
+                bs.closeFrame()
+                header = bs.readFrame()
+            }
+
+            bs.close()
+            input.close()
+
+            totalSamples
+        }
+        catch (_: Throwable) {
+            Long.MAX_VALUE
+        }
+    }
+
+    private val identPath: String get() = file?.path ?: fileHandle?.path() ?: name
+
+    override fun toString() = if (name.isEmpty()) (file?.nameWithoutExtension ?: fileHandle?.nameWithoutExtension() ?: "") else name
+
+    override fun equals(other: Any?) = this.identPath == (other as MusicContainer).identPath
+    fun equalInstance(other: Any?) = this.identPath == (other as MusicContainer).identPath && this.hash == (other as MusicContainer).hash
 
     override fun dispose() {
         gdxMusic.dispose()
@@ -340,7 +430,10 @@ class MusicContainer(
     }
 
     override fun makeCopy(): AudioBank {
-        val new = MusicContainer(name, file, looping, false, samplingRateOverride, songFinishedHook)
+        val new = if (file != null)
+            MusicContainer(name, file, looping, false, samplingRateOverride, songFinishedHook)
+        else
+            MusicContainer(name, fileHandle!!, looping, false, samplingRateOverride, songFinishedHook)
 
         synchronized(this) {
             if (this.toRAM) {

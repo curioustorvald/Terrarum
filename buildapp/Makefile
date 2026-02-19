@@ -5,6 +5,7 @@ what:
 
 assets:
 	./make_assets_release.sh || true
+	./make_assets_archive.sh
 
 linux_x86:
 	./build_app_linux_x86.sh

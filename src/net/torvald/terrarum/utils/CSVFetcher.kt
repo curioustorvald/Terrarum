@@ -40,7 +40,10 @@ object CSVFetcher {
         return csvRecordList
     }
 
-    fun readFromModule(module: String, path: String) = net.torvald.terrarum.utils.CSVFetcher.readFromFile(ModMgr.getGdxFile(module, path).path())
+    fun readFromModule(module: String, path: String): List<org.apache.commons.csv.CSVRecord> {
+        val content = ModMgr.getGdxFile(module, path).readString("UTF-8")
+        return readFromString(content)
+    }
 
     fun readFromString(csv: String): List<org.apache.commons.csv.CSVRecord> {
         val preprocessed = preprocessCSV(csv)

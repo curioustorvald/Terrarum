@@ -2017,15 +2017,15 @@ object BTeXParser {
             private lateinit var subtitleFont: TerrarumSansBitmap
 
             fun preloadFonts() {
-                testFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha, textCacheSize = 4096)
-                partTitleFont = TerrarumSansBitmap(App.FONT_DIR, shadowAlpha = bodyTextShadowAlpha).also {
+                testFont = TerrarumSansBitmap(shadowAlpha = bodyTextShadowAlpha, textCacheSize = 4096)
+                partTitleFont = TerrarumSansBitmap(shadowAlpha = bodyTextShadowAlpha).also {
                     it.interchar = 1
                 }
-                titleFont = TerrarumSansBitmap(App.FONT_DIR).also {
+                titleFont = TerrarumSansBitmap().also {
                     it.interchar = 1
                     it.scale = 2
                 }
-                subtitleFont = TerrarumSansBitmap(App.FONT_DIR).also {
+                subtitleFont = TerrarumSansBitmap().also {
                     it.interchar = 1
                 }
                 fontInit = true

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.weather
 
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
@@ -40,24 +41,17 @@ class WeatherCodex : Disposable {
 
     fun readFromJson(modname: String, file: File) = readFromJson(modname, file.path)
 
+    fun readFromJson(modname: String, fileHandle: FileHandle) {
+        readFromJsonValue(modname, JsonFetcher.invoke(fileHandle))
+    }
+
     private val pathToImage = "weathers"
 
     fun readFromJson(modname: String, path: String) {
-        /* JSON structure:
-{
-  "skyboxGradColourMap": "colourmap/sky_colour.tga", // string (path to image) for dynamic. Image must be RGBA8888 or RGB888
-  "extraImages": [
-      // if any, it will be like:
-      sun01.tga,
-      clouds01.tga,
-      clouds02.tga,
-      auroraBlueViolet.tga
-  ]
-}
-         */
+        readFromJsonValue(modname, JsonFetcher(path))
+    }
 
-        val JSON = JsonFetcher(path)
-
+    private fun readFromJsonValue(modname: String, JSON: com.badlogic.gdx.utils.JsonValue) {
         val skyboxModel = JSON.getString("skyboxGradColourMap")
         val lightboxModel = JSON.getString("daylightClut")
 

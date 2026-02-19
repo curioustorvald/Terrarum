@@ -161,10 +161,10 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         try {
-            val file = ModMgr.getFile("basegame", "demoworld")
-            val reader = java.io.FileReader(file)
+            val fileHandle = ModMgr.getGdxFile("basegame", "demoworld")
+            val reader = fileHandle.reader("UTF-8")
             //ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
-            val world = ReadSimpleWorld(reader, file)
+            val world = ReadSimpleWorld(reader, fileHandle.file())
             demoWorld = world
             demoWorld.worldTime.timeDelta = 30
             printdbg(this, "Demo world loaded")

@@ -7,6 +7,7 @@ import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import com.badlogic.gdx.files.FileHandle
 import java.io.File
 import java.util.UUID
 
@@ -42,7 +43,7 @@ open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
      */
     open var refIsShared: Boolean = false
 
-    @Transient open lateinit var ref: File
+    @Transient open lateinit var ref: FileHandle
 
     /**
      * Application-defined.
@@ -101,10 +102,10 @@ open class ItemFileRef(originalID: ItemID) : GameItem(originalID) {
     else
         ModMgr.getGdxFile(refModuleName, refPath)
 
-    fun getAsFile() = if (refIsShared)
+    /*fun getAsFile() = if (refIsShared)
         File(App.saveSharedDir + "/$refPath")
     else
-        ModMgr.getFile(refModuleName, refPath)
+        ModMgr.getFile(refModuleName, refPath)*/
 
     @Transient private var classCache: FileRefItemPrimaryUseHandler? = null
 

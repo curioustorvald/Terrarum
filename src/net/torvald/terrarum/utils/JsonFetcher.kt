@@ -1,5 +1,6 @@
 package net.torvald.terrarum.utils
 
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.JsonReader
 import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.App.printdbg
@@ -34,6 +35,13 @@ object JsonFetcher {
         if (jsonString == null) throw Error("[JsonFetcher] jsonString is null!")
 
         return JsonReader().parse(jsonString.toString())
+    }
+
+    @Throws(java.io.IOException::class)
+    operator fun invoke(fileHandle: FileHandle): JsonValue {
+        val content = fileHandle.readString("UTF-8")
+        printdbg(this, "Reading JSON ${fileHandle.path()}")
+        return JsonReader().parse(content)
     }
 
     fun readFromJsonString(stringReader: Reader): JsonValue {

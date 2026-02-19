@@ -1,13 +1,13 @@
 package net.torvald.terrarum.audio
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import com.jme3.math.FastMath
 import net.torvald.reflection.forceInvoke
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.serialise.toUint
-import java.io.File
 
 /**
  * Created by minjaesong on 2024-01-24.
@@ -26,7 +26,7 @@ object AudioHelper {
             return fft
         }
         else {
-            val ir = ModMgr.getFile(module, path)
+            val ir = ModMgr.getGdxFile(module, path)
             val fft = createIR(ir)
 
             CommonResourcePool.addToLoadingList(id) { fft }
@@ -36,19 +36,20 @@ object AudioHelper {
         }
     }
 
-    private fun createIR(ir: File): Array<ComplexArray> {
+    private fun createIR(ir: FileHandle): Array<ComplexArray> {
         if (!ir.exists()) {
-            throw IllegalArgumentException("Impulse Response file '${ir.path}' does not exist.")
+            throw IllegalArgumentException("Impulse Response file '${ir.path()}' does not exist.")
         }
 
-        val sampleCount = (ir.length().toInt() / 8)//.coerceAtMost(65536)
+        val irBytes = ir.readBytes()
+        val sampleCount = (irBytes.size / 8)//.coerceAtMost(65536)
         val fftLen = FastMath.nextPowerOfTwo(sampleCount)
 
-        printdbg(this, "IR '${ir.path}' Sample Count = $sampleCount; FFT Length = $fftLen")
+        printdbg(this, "IR '${ir.path()}' Sample Count = $sampleCount; FFT Length = $fftLen")
 
         val conv = Array(2) { FloatArray(fftLen) }
 
-        ir.inputStream().let {
+        java.io.ByteArrayInputStream(irBytes).let {
             for (i in 0 until sampleCount) {
                 val f1 = Float.fromBits(it.read().and(255) or
                         it.read().and(255).shl(8) or
@@ -79,7 +80,7 @@ object AudioHelper {
             return CommonResourcePool.getAs<Array<FloatArray>>(id)
         }
         else {
-            val file = ModMgr.getFile(module, path)
+            val file = ModMgr.getGdxFile(module, path)
             val samples = createAudioInSamples(file)
 
             CommonResourcePool.addToLoadingList(id) { samples }
@@ -89,8 +90,8 @@ object AudioHelper {
         }
     }
 
-    private fun createAudioInSamples(static: File): Array<FloatArray> {
-        val music = Gdx.audio.newMusic(Gdx.files.absolute(static.absolutePath))
+    private fun createAudioInSamples(static: FileHandle): Array<FloatArray> {
+        val music = Gdx.audio.newMusic(static)
         val readbuf = ByteArray(AudioProcessBuf.MP3_CHUNK_SIZE * 4)
         val OUTBUF_BLOCK_SIZE_IN_BYTES = (48000 * 60) * 2 * 2
         var outbuf = ByteArray(OUTBUF_BLOCK_SIZE_IN_BYTES)

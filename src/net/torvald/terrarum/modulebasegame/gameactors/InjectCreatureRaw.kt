@@ -24,7 +24,7 @@ object InjectCreatureRaw {
      * @param jsonFileName with extension
      */
     operator fun invoke(actorValueRef: ActorValue, module: String, jsonFileName: String) {
-        val jsonObj = JsonFetcher(ModMgr.getFile(module, "creatures/$jsonFileName"))
+        val jsonObj = JsonFetcher(ModMgr.getGdxFile(module, "creatures/$jsonFileName"))
 
 
         JsonFetcher.forEachSiblings(jsonObj) { key, value -> if (!key.startsWith("_")) {

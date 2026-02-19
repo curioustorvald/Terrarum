@@ -22,7 +22,7 @@ data class MusicDiscMetadata(val title: String, val author: String, val album: S
 object MusicDiscHelper {
     fun getMetadata(musicFile: FileHandle): MusicDiscMetadata {
         val musicdbFile = musicFile.sibling("_musicdb.json")
-        val musicdb = JsonFetcher.invoke(musicdbFile.file())
+        val musicdb = JsonFetcher.invoke(musicdbFile)
         val propForThisFile = musicdb.get(musicFile.name())
 
         val artist = propForThisFile.get("artist").asString()
@@ -37,7 +37,7 @@ open class MusicDiscPrototype(originalID: ItemID, module: String, path: String) 
     override var refPath = path
     override var refModuleName = module
     override val canBeDynamic = false
-    @Transient override var ref = ModMgr.getFile(refModuleName, refPath)
+    @Transient override var ref = ModMgr.getGdxFile(refModuleName, refPath)
     override var mediumIdentifier = "music_disc"
 
     init {

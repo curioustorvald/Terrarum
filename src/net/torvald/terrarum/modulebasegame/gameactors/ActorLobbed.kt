@@ -23,7 +23,7 @@ open class ActorLobbed(throwPitch: Float) : ActorWithBody() {
 
     @Transient private val pitch = throwPitch.coerceIn(0.5f, 2f)
     @Transient private val whooshSound = MusicContainer(
-        "throw_low_short", ModMgr.getFile("basegame", "audio/effects/throwing/throw_low_short.wav"),
+        "throw_low_short", ModMgr.getGdxFile("basegame", "audio/effects/throwing/throw_low_short.wav"),
         toRAM = true,
         samplingRateOverride = 48000f * pitch
     )
@@ -63,17 +63,17 @@ open class ActorPrimedBomb(
     private var explosionCalled = false
 
     @Transient private val boomSound = MusicContainer(
-        "boom", ModMgr.getFile("basegame", "audio/effects/explosion/bang_bomb.wav"), toRAM = true
+        "boom", ModMgr.getGdxFile("basegame", "audio/effects/explosion/bang_bomb.wav"), toRAM = true
     ) {
         this.flagDespawn()
     }
     @Transient private val fuseSound = MusicContainer(
-        "fuse", ModMgr.getFile("basegame", "audio/effects/explosion/fuse.wav"), toRAM = true
+        "fuse", ModMgr.getGdxFile("basegame", "audio/effects/explosion/fuse.wav"), toRAM = true
     ) {
         this.flagDespawn()
     }
     @Transient private val fuseSoundCont = MusicContainer(
-        "fuse_continue", ModMgr.getFile("basegame", "audio/effects/explosion/fuse_continue.wav"), toRAM = true
+        "fuse_continue", ModMgr.getGdxFile("basegame", "audio/effects/explosion/fuse_continue.wav"), toRAM = true
     ) {
         this.flagDespawn()
     }

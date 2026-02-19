@@ -8,8 +8,8 @@ RUNTIME="runtime-windows-x86"
 RCFILE="../out/build_autogen_windows.rc"
 JARNAME="TerrarumBuild.jar"
 
-if [ ! -f "out/assets.tar.zst" ] || [ ! -f "out/assets.manifest" ]; then
-    echo "'assets.tar.zst' or 'assets.manifest' not found in out/; run 'make assets' first." >&2
+if [ ! -f "out/assets.tevd" ]; then
+    echo "'assets.tevd' not found in out/; run 'make assets' first." >&2
     exit 1
 fi
 
@@ -34,9 +34,8 @@ mkdir $DESTDIR/out
 cp -r "../out/$RUNTIME" $DESTDIR/out/
 mv $DESTDIR/out/$RUNTIME/bin/java.exe $DESTDIR/out/$RUNTIME/bin/java.exe
 
-# Copy over the asset archive, manifest, and jarfile
-cp "out/assets.tar.zst" $DESTDIR/
-cp "out/assets.manifest" $DESTDIR/
+# Copy over the asset archive and jarfile
+cp "out/assets.tevd" $DESTDIR/
 cp "../out/$JARNAME" $DESTDIR/out/
 
 # zip everything
