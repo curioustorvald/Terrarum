@@ -17,9 +17,9 @@ import java.util.*;
  */
 public class Principii {
 
-    private static KVHashMap gameConfig = new KVHashMap();
+    private static final KVHashMap gameConfig = new KVHashMap();
 
-    private static String OSName = System.getProperty("os.name");
+    private static final String OSName = System.getProperty("os.name");
 
     private static String operationSystem;
     /** %appdata%/Terrarum, without trailing slash */
@@ -27,27 +27,29 @@ public class Principii {
     /** defaultDir + "/config.json" */
     private static String configDir;
 
+    private static final String GAME_NAME = TerrarumAppConfiguration.INSTANCE.getGAME_NAME_FOR_FILESYSTEM();
+
     public static void getDefaultDirRoot() {
         String OS = OSName.toUpperCase();
         if (OS.contains("WIN")) {
             operationSystem = "WINDOWS";
-            defaultDir = System.getenv("APPDATA") + "/Terrarum";
+            defaultDir = System.getenv("APPDATA") + "/" + GAME_NAME;
         }
         else if (OS.contains("OS X") || OS.contains("MACOS")) { // OpenJDK for mac will still report "Mac OS X" with version number "10.16", even on Big Sur and beyond
             operationSystem = "OSX";
-            defaultDir = System.getProperty("user.home") + "/Library/Application Support/Terrarum";
+            defaultDir = System.getProperty("user.home") + "/Library/Application Support/" + GAME_NAME;
         }
         else if (OS.contains("NUX") || OS.contains("NIX") || OS.contains("BSD")) {
             operationSystem = "LINUX";
-            defaultDir = System.getProperty("user.home") + "/.Terrarum";
+            defaultDir = System.getProperty("user.home") + "/." + GAME_NAME;
         }
         else if (OS.contains("SUNOS")) {
             operationSystem = "SOLARIS";
-            defaultDir = System.getProperty("user.home") + "/.Terrarum";
+            defaultDir = System.getProperty("user.home") + "/." + GAME_NAME;
         }
         else {
             operationSystem = "UNKNOWN";
-            defaultDir = System.getProperty("user.home") + "/.Terrarum";
+            defaultDir = System.getProperty("user.home") + "/." + GAME_NAME;
         }
     }
 
@@ -135,8 +137,9 @@ public class Principii {
         cmd0.add("-Xms1G");
         cmd0.add("-Xmx"+xmx+"G");
         cmd0.add("-cp");
-        cmd0.add("./out/TerrarumBuild.jar");
+        cmd0.add("./out/" + TerrarumAppConfiguration.JAR_NAME);
         cmd0.add(cp);
+        cmd0.addAll(List.of(args));
         var cmd = cmd0.stream().filter((it) -> !it.isBlank()).toList();
 
         System.out.println(cmd);

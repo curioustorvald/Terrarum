@@ -342,6 +342,14 @@ public class App implements ApplicationListener {
 
     public static boolean hasUpdate = true;
 
+    /**
+     * Path to a specific .tevd assets archive supplied via the --assets command-line argument.
+     * When non-null, this archive is used exclusively; the default ./assets.tevd and the
+     * local ./assets/ directory are both ignored.
+     */
+    @Nullable
+    public static String overrideAssetArchive = null;
+
     public static Screen getCurrentScreen() {
         return currentScreen;
     }
@@ -381,6 +389,17 @@ public class App implements ApplicationListener {
     }
 
     public static void main(String[] args) {
+//        System.out.println("Arguments: "+String.join(",", args));
+
+        // Parse command-line arguments before anything else
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--assets") && i + 1 < args.length) {
+                overrideAssetArchive = args[i + 1];
+                System.out.println("Using custom assets: "+overrideAssetArchive);
+                i++;
+            }
+        }
+
         loadedTime_t = getTIME_T();
 
         updateBogoflops(100_000_000L);
@@ -441,7 +460,7 @@ public class App implements ApplicationListener {
             // load configs
             getDefaultDirectory();
             createDirs();
-            AssetCache.INSTANCE.init();
+            AssetCache.INSTANCE.init(overrideAssetArchive);
             initialiseConfig();
             readConfigJson();
 

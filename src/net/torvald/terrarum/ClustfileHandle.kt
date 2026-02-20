@@ -1,10 +1,13 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.Files
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.Clustfile
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClustfileInputStream
 import java.io.File
 import java.io.InputStream
+
 
 /**
  * A GDX FileHandle backed by a Clustfile from TerranVirtualDisk.
@@ -29,6 +32,10 @@ class ClustfileHandle(private val clustfile: Clustfile) : FileHandle() {
     override fun name(): String = clustfile.name
 
     override fun path(): String = clustfile.path
+
+    init {
+        type = Files.FileType.Internal // just a dummy value
+    }
 
     override fun extension(): String {
         val n = name()
@@ -60,6 +67,13 @@ class ClustfileHandle(private val clustfile: Clustfile) : FileHandle() {
     override fun file(): File {
         // Return a dummy File for logging/toString purposes only
         return File(clustfile.path)
+    }
+
+    override fun sibling(name: String?): FileHandle {
+        if (name == null) throw GdxRuntimeException("Sibling name must not be null.")
+        val parentPath = clustfile.parent ?: throw GdxRuntimeException("Cannot get the sibling of the root.")
+        val siblingPath = if (parentPath.endsWith("/")) "$parentPath$name" else "$parentPath/$name"
+        return ClustfileHandle(Clustfile(clustfile.DOM, siblingPath))
     }
 
     override fun toString(): String = clustfile.path

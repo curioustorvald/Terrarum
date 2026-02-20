@@ -19,20 +19,30 @@ import java.io.RandomAccessFile
  */
 object AssetCache {
 
-    private val archivePath = File("./assets.tevd")
+    private val defaultArchivePath = File("./assets.tevd")
 
     /** Whether we're running from a distribution archive */
-    val isDistribution: Boolean get() = archivePath.exists()
+    val isDistribution: Boolean get() = dom != null
 
     private var dom: ClusteredFormatDOM? = null
 
     /**
      * Open the archive on startup. Call early, after defaultDir is set.
+     *
+     * @param overridePath When non-null, load this specific .tevd archive exclusively,
+     *                     ignoring both the default ./assets.tevd and the ./assets/ directory.
      */
-    fun init() {
-        if (isDistribution) {
-            println("[AssetCache] Distribution mode: opening ${archivePath.path}")
-            dom = ClusteredFormatDOM(RandomAccessFile(archivePath, "r"))
+    @JvmOverloads
+    fun init(overridePath: String? = null) {
+        if (overridePath != null) {
+            val f = File(overridePath)
+            if (!f.exists()) throw FileNotFoundException("Specified assets archive not found: $overridePath")
+            println("[AssetCache] Override archive: opening ${f.path}")
+            dom = ClusteredFormatDOM(RandomAccessFile(f, "r"))
+            println("[AssetCache] Override archive opened successfully")
+        } else if (defaultArchivePath.exists()) {
+            println("[AssetCache] Distribution mode: opening ${defaultArchivePath.path}")
+            dom = ClusteredFormatDOM(RandomAccessFile(defaultArchivePath, "r"))
             println("[AssetCache] Archive opened successfully")
         } else {
             println("[AssetCache] No archive found, using loose assets (development mode)")
@@ -41,13 +51,12 @@ object AssetCache {
 
     /**
      * Get a Clustfile for a path relative to the assets root.
+     *
+     * Note: nothing guarantees the file's actual existence!
      */
     fun getClustfile(relativePath: String): Clustfile {
         val path = if (relativePath.startsWith("/")) relativePath else "/$relativePath"
-        return Clustfile(dom!!, path).let {
-            if (!it.exists()) throw FileNotFoundException("Clustfile not exists: /$relativePath")
-            else it
-        }
+        return Clustfile(dom!!, path)
     }
 
     /**

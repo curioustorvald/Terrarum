@@ -17,6 +17,8 @@ object TerrarumAppConfiguration {
     // CONFIGURATION FOR THE APP ITSELF //
     //////////////////////////////////////
     const val GAME_NAME = "Terrarum"
+    const val JAR_NAME = "TerrarumBuild.jar" // must match what's on the buildapp scripts
+    val GAME_NAME_FOR_FILESYSTEM = GAME_NAME.replace(' ', '_')
     const val COPYRIGHT_DATE_NAME = "© 2013-2026 CuriousToꝛvald (minjaesong)"
     val COPYRIGHT_LICENSE: String; get() = Lang["COPYRIGHT_GNU_GPL_3"]
     const val COPYRIGHT_LICENSE_ENGLISH = "Distributed under GNU GPL 3"
@@ -38,7 +40,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # Modules are loaded from top to bottom.
 # Name of the module corresponds with the name of the directory the module is stored in,
 # typically under:
-#    1. assets/mods of the installation path (the modules comes with the release of the game)
+#    1. assets.tevd/mods of the installation path (the modules comes with the release of the game)
 #    2. %APPDATA%/Modules (the modules installed by the user)
 #    where %APPDATA% is:
 #        Windows -- C:\Users\<username>\AppData\Roaming\Terrarum
