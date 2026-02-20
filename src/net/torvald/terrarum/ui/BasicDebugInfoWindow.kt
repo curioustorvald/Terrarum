@@ -53,9 +53,9 @@ class BasicDebugInfoWindow : UICanvas() {
     private var ingame: IngameInstance? = null
     internal var world: GameWorld? = null // is set by IngameRenderer.setRenderedWorld(GameWorld)
 
-    private val icons = TextureRegionPack(Gdx.files.internal("assets/graphics/gui/debug_window_symbols.tga"), 21, 26)
-    private val back = Texture(Gdx.files.internal("assets/graphics/gui/debug_window_background.tga"))
-    private val back2 = Texture(Gdx.files.internal("assets/graphics/gui/debug_window_background2.tga"))
+    private val icons = TextureRegionPack(AssetCache.getFileHandle("graphics/gui/debug_window_symbols.tga"), 21, 26)
+    private val back = Texture(AssetCache.getFileHandle("graphics/gui/debug_window_background.tga"))
+    private val back2 = Texture(AssetCache.getFileHandle("graphics/gui/debug_window_background2.tga"))
 
     private val ARROW_RIGHT = 0xC0.toChar()
     private val ARROW_LEFT = 0xC1.toChar()

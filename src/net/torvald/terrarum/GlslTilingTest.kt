@@ -47,10 +47,10 @@ object GlslTilingTest : ApplicationAdapter() {
     override fun create() {
         ShaderProgram.pedantic = false
 
-        shader = ShaderProgram(Gdx.files.internal("assets/shaders/default.vert"), Gdx.files.internal("assets/shaders/tiling.frag"))
+        shader = ShaderProgram(AssetCache.getFileHandle("shaders/default.vert"), AssetCache.getFileHandle("shaders/tiling.frag"))
 
 
-        font = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap")
+        font = TerrarumSansBitmap()
 
 
         if (!shader.isCompiled) {
@@ -93,9 +93,9 @@ object GlslTilingTest : ApplicationAdapter() {
 
         batch = SpriteBatch()
 
-        fucktex = Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"))
+        fucktex = Texture(AssetCache.getFileHandle("graphics/ortho_line_tex_2px.tga"))
 
-        tileAtlas = Texture(Gdx.files.internal("assets/terrain.tga"))//BlocksDrawer.tilesTerrain.texture
+        tileAtlas = Texture(AssetCache.getFileHandle("terrain.tga"))//BlocksDrawer.tilesTerrain.texture
 
 
         println(tilesBuffer.format)

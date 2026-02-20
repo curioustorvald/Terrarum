@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gamecontroller
 
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.AssetCache
 import net.torvald.util.SortedArrayList
 import org.graalvm.polyglot.HostAccess
 import java.io.File
@@ -29,7 +30,7 @@ class IMEDictionary(private val filename: String) {
     private var dictLoaded = false
 
     private fun loadDict() {
-        val reader = FileReader(File("assets/keylayout/", filename), Charsets.UTF_8)
+        val reader = AssetCache.getFileHandle("keylayout/$filename").reader(Charsets.UTF_8.displayName())
         reader.forEachLine {
             if (it.contains(',')) {
                 val (key, value) = it.split(',')

@@ -73,7 +73,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private var genFutures: Array<Future<*>?> = arrayOfNulls(genSlices)
 
     override fun create() {
-        font = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap")
+        font = TerrarumSansBitmap()
 
         batch = FlippingSpriteBatch(1000)
         camera = OrthographicCamera(NOISEBOX_WIDTH.toFloat(), NOISEBOX_HEIGHT.toFloat())

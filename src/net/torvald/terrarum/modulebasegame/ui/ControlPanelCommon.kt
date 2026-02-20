@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.TerrarumScreenSize
 import net.torvald.terrarum.langpack.Lang
@@ -22,10 +23,10 @@ object ControlPanelCommon {
 
     init {
         CommonResourcePool.addToLoadingList("gui_hrule") {
-            TextureRegionPack(Gdx.files.internal("assets/graphics/gui/hrule.tga"), 216, 20)
+            TextureRegionPack(AssetCache.getFileHandle("graphics/gui/hrule.tga"), 216, 20)
         }
         CommonResourcePool.addToLoadingList("gui_slider_horz_backdrop_contrast") {
-            TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/slider_background_contrast.tga")).also {
+            TextureRegion(Texture(AssetCache.getFileHandle("graphics/gui/slider_background_contrast.tga")).also {
                 it.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             })
         }

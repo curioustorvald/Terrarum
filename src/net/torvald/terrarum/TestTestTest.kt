@@ -50,7 +50,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
 
         img = Texture("assets/test_texture.tga")
 
-        gameFont = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap")
+        gameFont = TerrarumSansBitmap()
         //gameFont = BitmapFont()
 
 
@@ -196,7 +196,7 @@ object TestTestMain : ApplicationAdapter() {
 
     override fun create() {
         ShaderProgram.pedantic = false
-        blurShader = ShaderProgram(Gdx.files.internal("assets/shaders/blur.vert"), Gdx.files.internal("assets/shaders/blur.frag"))
+        blurShader = ShaderProgram(AssetCache.getFileHandle("shaders/blur.vert"), AssetCache.getFileHandle("shaders/blur.frag"))
 
 
         batch = SpriteBatch()

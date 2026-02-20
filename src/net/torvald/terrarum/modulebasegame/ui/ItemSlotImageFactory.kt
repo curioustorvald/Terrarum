@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -28,7 +29,7 @@ object ItemSlotImageFactory {
     /** Blend mode: screen */
     val CELLCOLOUR_BLACK_ACTIVE = Color(0x282828ff)
 
-    val slotImage = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slots_atlas2.tga"), TILE_WIDTH, TILE_HEIGHT) // must have same w/h as slotLarge
+    val slotImage = TextureRegionPack(AssetCache.getFileHandle("graphics/gui/quickbar/item_slots_atlas2.tga"), TILE_WIDTH, TILE_HEIGHT) // must have same w/h as slotLarge
 
     fun produce(isBlack: Boolean, number: Int?, sprite: TextureRegion?): ItemSlotImage {
         return ItemSlotImage(slotImage.get(number ?: 10, 0 or isBlack.toInt().shl(1)), sprite)

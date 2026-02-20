@@ -37,7 +37,7 @@ object TerrarumPostProcessor : Disposable {
     private lateinit var outFBO: FrameBuffer
 
     fun reloadLUT(filename: String) {
-        lutTex = Texture(Gdx.files.internal("assets/clut/$filename"))
+        lutTex = Texture(AssetCache.getFileHandle("clut/$filename"))
     }
 
     private val defaultResCol = Color(0x66ffff66)
@@ -48,9 +48,9 @@ object TerrarumPostProcessor : Disposable {
 
     internal val debugUI = BasicDebugInfoWindow()
 
-    private val functionRowHelper = Texture(Gdx.files.internal("assets/graphics/function_row_help.png"))
+    private val functionRowHelper = Texture(AssetCache.getFileHandle("graphics/function_row_help.png"))
 
-    private val batteryTex = TextureRegionPack(Gdx.files.internal("assets/graphics/gui/fullscreen_bat_ind.tga"), 23, 14)
+    private val batteryTex = TextureRegionPack(AssetCache.getFileHandle("graphics/gui/fullscreen_bat_ind.tga"), 23, 14)
 
     private val shaderPostDither = ShaderMgr["postDither"]
     private val shaderPostNoDither = ShaderMgr["postNoDither"]

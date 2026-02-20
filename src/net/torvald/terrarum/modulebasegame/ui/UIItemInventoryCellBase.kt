@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.GdxColorMap
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.ui.Toolkit
@@ -86,7 +87,7 @@ abstract class UIItemInventoryCellBase(
 }
 
 object UIItemInventoryCellCommonRes {
-    val meterColourMap = GdxColorMap(Gdx.files.internal("./assets/clut/health_bar_colouring_4096.tga"))
+    val meterColourMap = GdxColorMap(AssetCache.getFileHandle("clut/health_bar_colouring_4096.tga"))
     val meterBackDarkening = Color(0x666666ff.toInt())
 
     fun getHealthMeterColour(value: Float, start: Float, end: Float): Color {

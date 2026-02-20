@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.roundToFloat
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -15,7 +16,7 @@ object BigAlphNum : BitmapFont() {
     internal const val W = 12
     internal const val H = 16
 
-    internal val fontSheet = TextureRegionPack("./assets/graphics/fonts/code.tga", W, H)
+    internal val fontSheet = TextureRegionPack(AssetCache.getFileHandle("graphics/fonts/code.tga"), W, H)
 
 
     private const val interchar = 1

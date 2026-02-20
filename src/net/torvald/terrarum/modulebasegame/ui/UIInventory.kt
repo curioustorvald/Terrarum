@@ -76,7 +76,7 @@ package net.torvald.terrarum.modulebasegame.ui
             readFromLang = true,
             textAreaWidth = 100,
             defaultSelection = 0,
-            iconSpriteSheet = TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20),
+            iconSpriteSheet = TextureRegionPack(AssetCache.getFileHandle("graphics/gui/inventory/category.tga"), 20, 20),
             iconSpriteSheetIndices = intArrayOf(9,6,7,1,0,2,3,4,5,8),
             iconCol = defaultTextColour,
             highlightBackCol = Color(0xb8b8b8_ff.toInt()),
@@ -108,7 +108,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 
     private val scrollImageButtonAtlas = TextureRegionPack(
-            Gdx.files.internal("assets/graphics/gui/inventory/page_arrow_button.tga"),
+            AssetCache.getFileHandle("graphics/gui/inventory/page_arrow_button.tga"),
             40, 54
     )
     private val scrollLeftButton = UIItemImageButton(this,

@@ -9,6 +9,8 @@ import java.io.InputStream
 /**
  * A GDX FileHandle backed by a Clustfile from TerranVirtualDisk.
  * Allows transparent asset loading from .tevd archives using all standard GDX APIs.
+ *
+ * Created by minjaesong on 2026-02-19.
  */
 class ClustfileHandle(private val clustfile: Clustfile) : FileHandle() {
 

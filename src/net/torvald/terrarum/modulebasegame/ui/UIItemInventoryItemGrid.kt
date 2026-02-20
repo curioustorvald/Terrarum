@@ -66,7 +66,7 @@ open class UIItemInventoryItemGrid(
 
     init {
         CommonResourcePool.addToLoadingList("inventory_walletnumberfont") {
-            TextureRegionPack("./assets/graphics/fonts/inventory_wallet_numbers.tga", 20, 9)
+            TextureRegionPack(AssetCache.getFileHandle("graphics/fonts/inventory_wallet_numbers.tga"), 20, 9)
         }
         CommonResourcePool.loadAll()
     }
@@ -105,7 +105,7 @@ open class UIItemInventoryItemGrid(
     var inventorySortList = ArrayList<InventoryPair>()
     protected var rebuildList = true
 
-    protected val walletFont = TextureRegionPack("./assets/graphics/fonts/inventory_wallet_numbers.tga", 20, 9)
+    protected val walletFont = TextureRegionPack(AssetCache.getFileHandle("graphics/fonts/inventory_wallet_numbers.tga"), 20, 9)
     protected var walletText = ""
 
 

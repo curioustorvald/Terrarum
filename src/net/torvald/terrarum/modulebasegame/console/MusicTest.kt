@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.console
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 
@@ -35,7 +36,7 @@ internal object MusicTest : ConsoleCommand {
                 File("./assets/sounds/test/${args[1]}").absoluteFile.toURI().toURL()
         ).playAsMusic(1f, 1f, false)*/
 
-        music = Gdx.audio.newMusic(Gdx.files.internal("./assets/sounds/test/${args[1]}"))
+        music = Gdx.audio.newMusic(AssetCache.getFileHandle("sounds/test/${args[1]}"))
         music!!.play()
     }
 

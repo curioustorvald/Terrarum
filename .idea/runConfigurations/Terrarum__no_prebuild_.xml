@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Terrarum (no prebuild)" type="JarApplication">
+    <option name="JAR_PATH" value="$PROJECT_DIR$/out/TerrarumBuild.jar" />
+    <option name="VM_PARAMETERS" value="-ea -Dswing.aatext=true -Dawt.useSystemAAFontSettings=lcd" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="ALTERNATIVE_JRE_PATH" value="17" />
+    <module name="TerrarumBuild" />
+    <method v="2">
+      <option name="BuildArtifacts" enabled="true">
+        <artifact name="TerrarumBuild" />
+      </option>
+      <option name="RunConfigurationTask" enabled="false" run_configuration_name="QuickDirtyLint" run_configuration_type="Application" />
+    </method>
+  </configuration>
+</component>

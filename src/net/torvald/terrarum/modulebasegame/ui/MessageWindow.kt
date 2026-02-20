@@ -67,7 +67,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 
         // will be disposed by Terrarum (application main instance)
-        val SEGMENT_BLACK = TextureRegionPack("assets/graphics/gui/message_black.tga", 8, 56)
-        val SEGMENT_WHITE = TextureRegionPack("assets/graphics/gui/message_white.tga", 8, 56)
+        val SEGMENT_BLACK = TextureRegionPack(AssetCache.getFileHandle("graphics/gui/message_black.tga"), 8, 56)
+        val SEGMENT_WHITE = TextureRegionPack(AssetCache.getFileHandle("graphics/gui/message_white.tga"), 8, 56)
     }
 }*/

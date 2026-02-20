@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.App
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.gameitems.GameItem
@@ -34,7 +35,7 @@ object AssembleSheetPixmap {
      * The name of the Bodypart here may or may not be case-sensitive (depends on your actual filesystem -- NTFS, APFS, Ext4, ...)
      */
     fun getAssetsDirFileGetter(properties: ADProperties): (String) -> InputStream? = { partName: String ->
-        val file = Gdx.files.internal("assets/${properties.toFilename(partName)}")
+        val file = AssetCache.getFileHandle("${properties.toFilename(partName)}")
         if (file.exists()) file.read() else null
     }
 

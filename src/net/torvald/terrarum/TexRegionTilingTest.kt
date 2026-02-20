@@ -60,7 +60,7 @@ object TexRegionTilingTest : ApplicationAdapter() {
         val gzTmpFName = listOf("tmp_terrain.tga", "tmp_wire.tga")
         // unzip GZIP temporarily
         gzFileList.forEachIndexed { index, filename ->
-            val terrainTexFile = Gdx.files.internal("assets/modules/basegame/" + filename)
+            val terrainTexFile = AssetCache.getFileHandle("modules/basegame/" + filename)
             val gzi = GZIPInputStream(terrainTexFile.read(8192))
             val wholeFile = gzi.readBytes()
             gzi.close()

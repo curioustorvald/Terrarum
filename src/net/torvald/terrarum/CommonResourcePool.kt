@@ -22,16 +22,16 @@ object CommonResourcePool {
 
     init {
         addToLoadingList("itemplaceholder_16") {
-            TextureRegion(Texture("assets/item_kari_16.tga")).also { it.flip(false, false) }
+            TextureRegion(Texture(AssetCache.getFileHandle("item_kari_16.tga"))).also { it.flip(false, false) }
         }
         addToLoadingList("itemplaceholder_24") {
-            TextureRegion(Texture("assets/item_kari_24.tga")).also { it.flip(false, false) }
+            TextureRegion(Texture(AssetCache.getFileHandle("item_kari_24.tga"))).also { it.flip(false, false) }
         }
         addToLoadingList("itemplaceholder_32") {
-            TextureRegion(Texture("assets/item_kari_32.tga")).also { it.flip(false, false) }
+            TextureRegion(Texture(AssetCache.getFileHandle("item_kari_32.tga"))).also { it.flip(false, false) }
         }
         addToLoadingList("itemplaceholder_48") {
-            TextureRegion(Texture("assets/item_kari_48.tga")).also { it.flip(false, false) }
+            TextureRegion(Texture(AssetCache.getFileHandle("item_kari_48.tga"))).also { it.flip(false, false) }
         }
         /*addToLoadingList("test_texture") {
             TextureRegion(Texture("assets/test_texture.tga")).also { it.flip(false, false) }

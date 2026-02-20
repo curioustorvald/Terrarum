@@ -12,6 +12,7 @@ import net.torvald.colourutil.toRGB
 import net.torvald.parametricsky.ArHosekSkyModel
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.abs
 import net.torvald.terrarum.floorToInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -36,7 +37,7 @@ object SkyboxModelHosek : SkyboxModel {
     private lateinit var texStripRegions: TextureRegionPack
 
     fun loadlut() {
-        tex = Texture(Gdx.files.internal("assets/clut/skybox.png"))
+        tex = Texture(AssetCache.getFileHandle("clut/skybox.png"))
         tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         tex.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
         texRegions = TextureRegionPack(tex, 2, gradSize - 2, 0, 2, 0, 1)

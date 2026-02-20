@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.toInt
@@ -28,7 +29,7 @@ class UIItemToggleButton(
 
     init {
         CommonResourcePool.addToLoadingList("gui_toggler_icons") {
-            TextureRegionPack(Texture(Gdx.files.internal("assets/graphics/gui/toggler_icons.tga")), 14, 14)
+            TextureRegionPack(Texture(AssetCache.getFileHandle("graphics/gui/toggler_icons.tga")), 14, 14)
         }
         CommonResourcePool.loadAll()
     }

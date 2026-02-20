@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.imagefont
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -22,7 +23,7 @@ class NewRunes : BitmapFont() {
             null
 
 
-    private val runes = TextureRegionPack("./assets/graphics/fonts/newrunes.tga", runeSize, runeSize)
+    private val runes = TextureRegionPack(AssetCache.getFileHandle("graphics/fonts/newrunes.tga"), runeSize, runeSize)
 
     var scale = 1
     var linegap = 8

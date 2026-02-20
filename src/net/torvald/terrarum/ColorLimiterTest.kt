@@ -38,7 +38,7 @@ object ColorLimiterTest : ApplicationAdapter() {
     override fun create() {
         ShaderProgram.pedantic = false
 
-        shader4096 = ShaderProgram(Gdx.files.internal("assets/shaders/default.vert"), Gdx.files.internal("assets/shaders/postproc_dither.frag"))
+        shader4096 = ShaderProgram(AssetCache.getFileHandle("shaders/default.vert"), AssetCache.getFileHandle("shaders/postproc_dither.frag"))
         shader4096.bind()
         shader4096.setUniformf("rcount", 4f)
         shader4096.setUniformf("gcount", 4f)
@@ -50,7 +50,7 @@ object ColorLimiterTest : ApplicationAdapter() {
         batch = SpriteBatch()
         shapeRenderer = App.makeShapeRenderer()
 
-        font = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap")
+        font = TerrarumSansBitmap()
 
 
         if (!shader4096.isCompiled) {

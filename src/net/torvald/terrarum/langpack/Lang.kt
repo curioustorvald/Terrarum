@@ -3,6 +3,7 @@ package net.torvald.terrarum.langpack
 import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.tail
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.unicode.getKeycapPC
@@ -49,13 +50,13 @@ object Lang {
 
     init {
         // load base langs
-        load(File("./assets/locales/"))
+        load(AssetCache.getFileHandle("locales/"))
     }
 
 
     @JvmStatic operator fun invoke() { /* dummy method for manual initialisation */ }
 
-    fun load(localesDir: File) {
+    /*fun load(localesDir: File) {
         printdbg(this, "Loading languages from $localesDir")
 
         // get all of the languages installed
@@ -81,7 +82,7 @@ object Lang {
             }
 
         }
-    }
+    }*/
 
     fun load(localesHandle: FileHandle) {
         printdbg(this, "Loading languages from ${localesHandle.path()}")

@@ -39,10 +39,10 @@ object ShitOnGlsl : ApplicationAdapter() {
     override fun create() {
         ShaderProgram.pedantic = false
 
-        shader = ShaderProgram(Gdx.files.internal("assets/shaders/default.vert"), Gdx.files.internal("assets/shaders/crt.frag"))
+        shader = ShaderProgram(AssetCache.getFileHandle("shaders/default.vert"), AssetCache.getFileHandle("shaders/crt.frag"))
 
 
-        font = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap")
+        font = TerrarumSansBitmap()
 
 
         if (!shader.isCompiled) {
@@ -75,8 +75,8 @@ object ShitOnGlsl : ApplicationAdapter() {
 
         batch = SpriteBatch()
 
-        fucktex = Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"))
-        testTex = Texture(Gdx.files.internal("assets/test_texture.tga"))
+        fucktex = Texture(AssetCache.getFileHandle("graphics/ortho_line_tex_2px.tga"))
+        testTex = Texture(AssetCache.getFileHandle("test_texture.tga"))
     }
 
 

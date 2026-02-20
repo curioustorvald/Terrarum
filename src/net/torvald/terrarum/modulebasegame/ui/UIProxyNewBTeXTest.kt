@@ -103,7 +103,7 @@ class BTeXTest(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             Thread {
                 try {
                     measureTimeMillis {
-                        val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"), varMap, typesetProgress)
+                        val f = BTeXParser.invoke(AssetCache.getFileHandle("mods/basegame/books/$filePath"), varMap, typesetProgress)
                         document = f.first
                         documentHandler = f.second
                     }.also {
@@ -130,7 +130,7 @@ class BTeXTest(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
         else {
             measureTimeMillis {
-                document = BTeXDocument.fromFile(Gdx.files.internal("./assets/mods/basegame/books/$filePath"))
+                document = BTeXDocument.fromFile(AssetCache.getFileHandle("mods/basegame/books/$filePath"))
             }.also {
                 println("Time spent on loading [ms]: $it")
             }

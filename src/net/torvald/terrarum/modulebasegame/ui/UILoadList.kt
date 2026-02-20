@@ -73,7 +73,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
 
     init {
         CommonResourcePool.addToLoadingList("gradtile32") {
-            TextureRegionPack("assets/graphics/gui/gradtile32.tga", 1, 32)
+            TextureRegionPack(AssetCache.getFileHandle("graphics/gui/gradtile32.tga"), 1, 32)
         }
         CommonResourcePool.loadAll()
     }

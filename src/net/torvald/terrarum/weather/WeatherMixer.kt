@@ -91,7 +91,7 @@ internal object WeatherMixer : RNGConsumer {
     var forceTurbidity: Double? = null
 
     // doesn't work if the png is in greyscale/indexed mode
-    val starmapTex: TextureRegion = TextureRegion(Texture(Gdx.files.internal("assets/graphics/astrum.png"))).also {
+    val starmapTex: TextureRegion = TextureRegion(Texture(AssetCache.getFileHandle("graphics/astrum.png"))).also {
         it.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         it.texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
     }
@@ -112,7 +112,7 @@ internal object WeatherMixer : RNGConsumer {
         get() = 256 shl (App.getConfigInt("maxparticles") / 256)
 
 
-    private val skyboxavr = GdxColorMap(Gdx.files.internal("assets/clut/skyboxavr.png"))
+    private val skyboxavr = GdxColorMap(AssetCache.getFileHandle("clut/skyboxavr.png"))
 
 
     override fun loadFromSave(ingame: IngameInstance, s0: Long, s1: Long) {

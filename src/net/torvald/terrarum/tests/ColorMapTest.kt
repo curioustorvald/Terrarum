@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.GdxColorMap
 
 /**
@@ -26,7 +27,7 @@ class ColorMapTest : Game() {
     }
 
     override fun render() {
-        val colormap = GdxColorMap(Gdx.files.internal("assets/testimage_resized.png"))
+        val colormap = GdxColorMap(AssetCache.getFileHandle("testimage_resized.png"))
         println(colormap)
 
         System.exit(0)

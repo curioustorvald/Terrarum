@@ -629,7 +629,7 @@ public class App implements ApplicationListener {
         // make loading list
         CommonResourcePool.INSTANCE.loadAll();
 
-        newTempFile("wenquanyi.tga"); // temp file required by the font
+//        newTempFile("wenquanyi.tga"); // temp file required by the font
 
 
         // set basis of draw
@@ -1992,8 +1992,8 @@ public class App implements ApplicationListener {
     }
 
     public static ShaderProgram loadShaderFromFile(String vert, String frag) {
-        String v = Gdx.files.internal(vert).readString("utf-8");
-        String f = Gdx.files.internal(frag).readString("utf-8");
+        String v = AssetCache.INSTANCE.getFileHandle(vert).readString("utf-8");
+        String f = AssetCache.INSTANCE.getFileHandle(frag).readString("utf-8");
         return loadShaderInline(v, f);
     }
 

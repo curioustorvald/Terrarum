@@ -97,7 +97,7 @@ class CreateTileAtlas {
     // 16 tiles are reserved for internal use: solid black, solid white, breakage stages.
     // 0th tile is complete transparent tile and is also a BlockID of zero: air.
     private var atlasCursor = 66 // 66 predefined tiles. The normal blocks (e.g. Air) should start from this number
-    private val atlasInit = "./assets/graphics/blocks/init.tga"
+    private val atlasInit = "graphics/blocks/init.tga"
     private var itemSheetCursor = 16
 
     internal lateinit var itemTerrainPixmap: Pixmap
@@ -111,7 +111,7 @@ class CreateTileAtlas {
         get() = atlasVernal
 
     private fun drawInitPixmap() {
-        val initPixmap = Pixmap(Gdx.files.internal(atlasInit))
+        val initPixmap = Pixmap(AssetCache.getFileHandle(atlasInit))
 
         val tilesInInitPixmap = (initPixmap.width * initPixmap.height) / (TILE_SIZE * TILE_SIZE)
         val tilesPossibleInCurrentPixmap = (atlas.width * atlas.height) / (TILE_SIZE * TILE_SIZE)
@@ -240,10 +240,10 @@ class CreateTileAtlas {
                 printdbg(this, "processing $prefix $modname:${filehandle.name()}")
 
                 try {
-                    val glowFile = Gdx.files.internal(
+                    val glowFile = AssetCache.getFileHandle(
                         filehandle.path().dropLast(4) + "_glow.tga"
                     ) // assuming strict ".tga" file for now...
-                    val emissiveFile = Gdx.files.internal(
+                    val emissiveFile = AssetCache.getFileHandle(
                         filehandle.path().dropLast(4) + "_emsv.tga"
                     ) // assuming strict ".tga" file for now...
                     fileToAtlantes(

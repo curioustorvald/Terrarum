@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.File
 
@@ -108,8 +109,8 @@ object IME {
         }
 
 
-        val iconSheet = TextureRegionPack("assets/graphics/gui/ime_icons_by_language.tga", 20, 20)
-        val iconPixmap = Pixmap(Gdx.files.internal("assets/graphics/gui/ime_icons_by_language.tga"))
+        val iconSheet = TextureRegionPack(AssetCache.getFileHandle("graphics/gui/ime_icons_by_language.tga"), 20, 20)
+        val iconPixmap = Pixmap(AssetCache.getFileHandle("graphics/gui/ime_icons_by_language.tga"))
         for (k in 0 until iconPixmap.height step 20) {
             val langCode = StringBuilder()
             for (c in 0 until 20) {

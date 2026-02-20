@@ -28,10 +28,10 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         handler.allowESCtoClose = false
 
         CommonResourcePool.addToLoadingList("terrarum-defaultsavegamethumb") {
-            TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/savegame_thumb_placeholder.png")))
+            TextureRegion(Texture(AssetCache.getFileHandle("graphics/gui/savegame_thumb_placeholder.png")))
         }
         CommonResourcePool.addToLoadingList("savegame_status_icon") {
-            TextureRegionPack("assets/graphics/gui/savegame_status_icon.tga", 24, 24)
+            TextureRegionPack(AssetCache.getFileHandle("graphics/gui/savegame_status_icon.tga"), 24, 24)
         }
         CommonResourcePool.loadAll()
     }

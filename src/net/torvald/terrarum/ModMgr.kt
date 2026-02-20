@@ -168,7 +168,7 @@ object ModMgr {
                         AssetCache.getFileHandle("mods/$moduleName/$metaFilename").exists()
                     else
                         File("$modDirInternal/$moduleName/$metaFilename").exists()
-                    val isInternal = if (_externalFile.exists()) false else if (internalExists) true else throw FileNotFoundException()
+                    val isInternal = if (_externalFile.exists()) false else if (internalExists) true else throw FileNotFoundException("mods/$moduleName/$metaFilename")
                     val modDir = if (isInternal) modDirInternal else modDirExternal
 
                     fun getGdxFileLocal(path: String) = if (isInternal) {

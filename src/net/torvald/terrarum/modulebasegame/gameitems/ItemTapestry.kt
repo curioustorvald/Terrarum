@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
@@ -29,7 +30,7 @@ class ItemTapestry(originalID: ItemID) : FixtureItemBase(originalID, "net.torval
     @Transient override val makeFixture: (String) -> FixtureBase = { moduleName: String ->
         FixtureTapestry(
             // TODO use extra["fileRef"] (string) and extra["framingMaterial"] (string)
-            Gdx.files.internal("assets/monkey_island").readBytes(),
+            AssetCache.getFileHandle("monkey_island").readBytes(),
             Block.PLANK_NORMAL
         )
     }

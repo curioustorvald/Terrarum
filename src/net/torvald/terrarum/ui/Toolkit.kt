@@ -46,11 +46,11 @@ object Toolkit : Disposable {
     }
     private lateinit var fboBlur: Float16FrameBuffer
 
-//    val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36)
-    val shadowTile = TextureRegionPack("assets/graphics/gui/blur_shadow.tga", 32, 32)
+//    val baloonTile = TextureRegionPack(AssetCache.getFileHandle("graphics/gui/message_black_tileable.tga"), 36, 36)
+    val shadowTile = TextureRegionPack(AssetCache.getFileHandle("graphics/gui/blur_shadow.tga"), 32, 32)
 
-    val textureWhiteSquare = Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"))
-    val textureWhiteCircle = Texture(Gdx.files.internal("assets/graphics/circle_512.tga"))
+    val textureWhiteSquare = Texture(AssetCache.getFileHandle("graphics/ortho_line_tex_2px.tga"))
+    val textureWhiteCircle = Texture(AssetCache.getFileHandle("graphics/circle_512.tga"))
 
     init {
         App.disposables.add(this)
@@ -59,7 +59,7 @@ object Toolkit : Disposable {
         textureWhiteCircle.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
         CommonResourcePool.addToLoadingList("toolkit_box_border") {
-            TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/box_border_flat_tileable.tga"), 1, 1)
+            TextureRegionPack(AssetCache.getFileHandle("graphics/gui/box_border_flat_tileable.tga"), 1, 1)
         }
         CommonResourcePool.loadAll()
     }

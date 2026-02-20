@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import net.torvald.btex.BTeXDocViewer
 import net.torvald.btex.BTeXParser
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.FlippingSpriteBatch
 import net.torvald.terrarum.btex.BTeXDocument
 import net.torvald.terrarum.gdxClearAndEnableBlend
@@ -82,7 +83,7 @@ class BTeXTest : ApplicationAdapter() {
             Thread {
                 try {
                     measureTimeMillis {
-                        val f = BTeXParser.invoke(Gdx.files.internal("./assets/mods/basegame/books/$filePath"), varMap, typesetProgress)
+                        val f = BTeXParser.invoke(AssetCache.getFileHandle("mods/basegame/books/$filePath"), varMap, typesetProgress)
                         document = f.first
                         documentHandler = f.second
                     }.also {
@@ -103,7 +104,7 @@ class BTeXTest : ApplicationAdapter() {
         }
         else {
             measureTimeMillis {
-                document = BTeXDocument.fromFile(Gdx.files.internal("./assets/mods/basegame/books/$filePath"))
+                document = BTeXDocument.fromFile(AssetCache.getFileHandle("mods/basegame/books/$filePath"))
             }.also {
                 println("Time spent on loading [ms]: $it")
             }

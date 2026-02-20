@@ -6,6 +6,7 @@ import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.files.FileHandle
+import net.torvald.terrarum.AssetCache
 import java.awt.BorderLayout
 import javax.swing.JFrame
 import javax.swing.JPanel
@@ -41,7 +42,7 @@ class AudioPlayerSlave : Game() {
 
 
     override fun create() {
-        audioSample = Gdx.files.internal("assets/loopey.wav")
+        audioSample = AssetCache.getFileHandle("loopey.wav")
         gdxSound = Gdx.audio.newSound(audioSample)
         surroundPanner = SurroundPannerTest()
         soundID = gdxSound.loop()
@@ -137,7 +138,7 @@ class AudioPlayerSlave : Game() {
 
 
     override fun create() {
-        audioSample = Gdx.files.internal("assets/loopey.wav")
+        audioSample = AssetCache.getFileHandle("loopey.wav")
         gdxSound = Gdx.audio.newSound(audioSample)
 
 

@@ -5,12 +5,17 @@ import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.ClusteredFormatDOM
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.archivers.Clustfile
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.RandomAccessFile
 
 /**
- * Central accessor for the TerranVirtualDisk asset archive.
+ * Central accessor for the game assets.
  * In distribution mode, assets are read directly from assets.tevd.
  * In development mode, assets are read from the local ./assets/ directory.
+ *
+ * Never call `gdx.files.internal` directly!
+ *
+ * Created by minjaesong on 2026-02-19.
  */
 object AssetCache {
 
@@ -39,7 +44,10 @@ object AssetCache {
      */
     fun getClustfile(relativePath: String): Clustfile {
         val path = if (relativePath.startsWith("/")) relativePath else "/$relativePath"
-        return Clustfile(dom!!, path)
+        return Clustfile(dom!!, path).let {
+            if (!it.exists()) throw FileNotFoundException("Clustfile not exists: /$relativePath")
+            else it
+        }
     }
 
     /**

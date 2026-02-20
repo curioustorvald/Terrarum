@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.roundToFloat
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
@@ -18,8 +19,8 @@ object TinyAlphNum : BitmapFont() {
     internal const val W = 7
     internal const val H = 13
 
-    internal val fontSheet = TextureRegionPack("./assets/graphics/fonts/7x13_Tamzen7x14b.tga", W+1, H+1)
-    internal val fontPixmap = Pixmap(Gdx.files.internal("./assets/graphics/fonts/7x13_Tamzen7x14b.tga"))
+    internal val fontSheet = TextureRegionPack(AssetCache.getFileHandle("graphics/fonts/7x13_Tamzen7x14b.tga"), W+1, H+1)
+    internal val fontPixmap = Pixmap(AssetCache.getFileHandle("graphics/fonts/7x13_Tamzen7x14b.tga"))
 
     init {
         setOwnsTexture(true)

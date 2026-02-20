@@ -149,8 +149,8 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private lateinit var worldFBO: Float16FrameBuffer
 
-    private val warning32bitJavaIcon = TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/32_bit_warning.tga")))
-    private val warningAppleRosettaIcon = TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/apple_rosetta_warning.tga")))
+    private val warning32bitJavaIcon = TextureRegion(Texture(AssetCache.getFileHandle("graphics/gui/32_bit_warning.tga")))
+    private val warningAppleRosettaIcon = TextureRegion(Texture(AssetCache.getFileHandle("graphics/gui/apple_rosetta_warning.tga")))
 
     init {
         gameUpdateGovernor = ConsistentUpdateRate.also { it.reset() }
@@ -219,7 +219,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         // load a half-gradient texture that would be used throughout the titlescreen and its sub UIs
         CommonResourcePool.addToLoadingList("title_halfgrad") {
-            Texture(Gdx.files.internal("./assets/graphics/halfgrad.tga")).also {
+            Texture(AssetCache.getFileHandle("graphics/halfgrad.tga")).also {
                 it.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             }
         }

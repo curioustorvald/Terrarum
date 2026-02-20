@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.AssetCache
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.imagefont.BigAlphNum
 import net.torvald.terrarum.utils.PasswordBase32
@@ -34,7 +35,7 @@ class UIItemRedeemCodeArea(
 
     init {
         CommonResourcePool.addToLoadingList("spritesheet:terrarum_redeem_code_form") {
-            TextureRegionPack(Gdx.files.internal("assets/graphics/code_input_cells.tga"), CELL_W, CELL_H)
+            TextureRegionPack(AssetCache.getFileHandle("graphics/code_input_cells.tga"), CELL_W, CELL_H)
         }
         CommonResourcePool.loadAll()
     }

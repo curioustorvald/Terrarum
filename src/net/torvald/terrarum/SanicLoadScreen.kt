@@ -55,10 +55,10 @@ object SanicLoadScreen : LoadScreenBase() {
                 false
         )
 
-        arrowObjTex = Texture(Gdx.files.internal("assets/graphics/test_loading_arrow_atlas.tga"))
+        arrowObjTex = Texture(AssetCache.getFileHandle("graphics/test_loading_arrow_atlas.tga"))
         arrowObjGlideOffsetX = -arrowObjTex.width.toFloat()
 
-        textOverlayTex = Texture(Gdx.files.internal("assets/graphics/test_loading_text_tint.tga"))
+        textOverlayTex = Texture(AssetCache.getFileHandle("graphics/test_loading_text_tint.tga"))
     }
 
 

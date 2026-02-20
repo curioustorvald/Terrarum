@@ -34,7 +34,7 @@ public class MusicComposerApp extends ApplicationAdapter {
 
     @Override
     public void create() {
-        fontGame = new TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap", false, true, false);
+        fontGame = new TerrarumSansBitmap(false, true, false);
     }
 
     @Override
