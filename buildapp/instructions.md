@@ -28,6 +28,8 @@ jlink --module-path ~/Documents/openjdk/jdk-21.0.2.jdk-x86/Contents/Home/jmods:m
 
 This process assumes that the game does NOT use the Java 9+ modules and every single required libraries are fat-jar'd (their contents extracted right into the Jar)
 
+The Linux Aarch64 runtime must be prepared on the actual ARM Linux session.
+
 Copy the runtimes to your workstation, rename the `bin/java` into `bin/Terrarum`, then `chmod -R +x` all of them.
 
 ### Packaging
@@ -39,7 +41,7 @@ Before running the packaging script make sure:
 1. The required runtime must exist on `(project root)/out/runtime-<linux|osx|windows>-<arm|x86>` directory
 2. The build scripts are on a subdirectory of the project directory
 
-To build, **cd into the "(project root)/buildapp/", then execute the appropriate script**.
+To build, **cd into the "(project root)/buildapp/", then execute the appropriate Make job**.
 
 The packaged application can be found on `(project root)/buildapp/out/`
 
@@ -61,3 +63,4 @@ It might be possible to create .icns on Linux, haven't tried though. https://den
 ### Notes to Terrarum Programmers
 
 By self-containing everything in one file, it is not possible to modify the base game easily. Modloading scheme must be extended to load from mutable directory such as `%APPDATA%/Terrarum/mods`.
+[Building-the-App.md](../Terrarum.wiki/Building-the-App.md)
