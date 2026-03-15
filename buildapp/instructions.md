@@ -30,8 +30,6 @@ This process assumes that the game does NOT use the Java 9+ modules and every si
 
 The Linux Aarch64 runtime must be prepared on the actual ARM Linux session.
 
-Copy the runtimes to your workstation, rename the `bin/java` into `bin/Terrarum`, then `chmod -R +x` all of them.
-
 ### Packaging
 
 Create an output directory if there is none (project root/buildapp/out)
