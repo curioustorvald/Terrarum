@@ -4,8 +4,13 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Queue
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unsafe.UnsafePtr
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by minjaesong on 2019-03-10.
@@ -13,12 +18,41 @@ import net.torvald.unsafe.UnsafePtr
 object CommonResourcePool {
 
     private val loadingList = Queue<ResourceLoadingDescriptor>()
-    private val pool = HashMap<String, Any>()
+    private val pool = ConcurrentHashMap<String, Any>()
     private val poolKillFun = HashMap<String, ((Any) -> Unit)?>()
-    //private val typesMap = HashMap<String, Class<*>>()
     private var loadCounter = -1 // using counters so that the loading can be done on separate thread (gg if the asset requires GL context to be loaded)
-    val loaded: Boolean // see if there's a thing to load
-        get() = loadCounter == 0
+    val loaded: Boolean
+        get() = loadCounter <= 0 && slowLoadingRemaining.get() == 0
+
+    @Volatile private var glThread: Thread? = null
+
+    private val glDispatchQueue = ConcurrentLinkedQueue<Pair<List<ResourceLoadingDescriptor>, CountDownLatch>>()
+    private val glRunnableQueue = ConcurrentLinkedQueue<Pair<() -> Unit, CountDownLatch>>()
+
+    private val slowLoadingQueue = ConcurrentLinkedQueue<ResourceLoadingDescriptor>()
+    private val slowLoadingRemaining = AtomicInteger(0)
+
+    fun setGLThread(thread: Thread) {
+        glThread = thread
+    }
+
+    fun isOnGLThread(): Boolean {
+        return glThread == null || Thread.currentThread() == glThread
+    }
+
+    /**
+     * Runs [block] on the GL thread, blocking the calling thread until it completes.
+     * If already on the GL thread, runs [block] directly.
+     */
+    fun <T> runOnGLThread(block: () -> T): T {
+        if (isOnGLThread()) return block()
+        var result: Any? = null
+        val latch = CountDownLatch(1)
+        glRunnableQueue.add(Pair({ result = block() }, latch))
+        latch.await()
+        @Suppress("UNCHECKED_CAST")
+        return result as T
+    }
 
     init {
         addToLoadingList("itemplaceholder_16") {
@@ -80,24 +114,84 @@ object CommonResourcePool {
     }
 
     /**
-     * Consumes the loading list. After the load, the list will be empty
+     * Consumes the loading list. After the load, the list will be empty.
+     * When called from a non-GL thread, dispatches the actual loading to the GL thread and blocks until complete.
      */
     fun loadAll() {
         if (loaded) return
+        if (loadingList.isEmpty) return
 
+        // Drain the loadingList into a local list
+        val batch = mutableListOf<ResourceLoadingDescriptor>()
         while (!loadingList.isEmpty) {
-            val (name, loadfun, killfun) = loadingList.removeFirst()
+            batch.add(loadingList.removeFirst())
+        }
 
-            // no need for the collision checking; quarantine is done when the loading list is being appended
-            /*if (pool.containsKey(name)) {
-                throw IllegalArgumentException("Assets with identifier '$name' already exists.")
-            }*/
+        if (isOnGLThread()) {
+            // Load directly on GL thread
+            for ((name, loadfun, killfun) in batch) {
+                pool[name] = loadfun.invoke()
+                poolKillFun[name] = killfun
+                loadCounter -= 1
+            }
+        }
+        else {
+            // Dispatch to GL thread and block until done
+            val latch = CountDownLatch(1)
+            glDispatchQueue.add(batch to latch)
+            latch.await()
+        }
+    }
 
-            //typesMap[name] = type
+    /**
+     * Moves all pending items in the loading list to the slow loading queue,
+     * then blocks until the GL thread has processed all of them (one per frame via [update]).
+     */
+    fun loadAllSlowly() {
+        while (!loadingList.isEmpty) {
+            val desc = loadingList.removeFirst()
+            slowLoadingQueue.add(desc)
+            slowLoadingRemaining.incrementAndGet()
+        }
+        // Block until the GL thread has processed all slow items
+        while (slowLoadingRemaining.get() > 0) {
+            Thread.sleep(16)
+        }
+    }
+
+    /**
+     * Called every frame from App.render() on the GL thread.
+     * Processes dispatched loadAll() requests and one slow-loading item per frame.
+     */
+    fun update() {
+//        printdbg(this, "CommonResPool update!")
+        // 1. Process all immediate dispatch requests (from loadAll() on background thread)
+        while (true) {
+            val request = glDispatchQueue.poll() ?: break
+            val (batch, latch) = request
+            for ((name, loadfun, killfun) in batch) {
+                pool[name] = loadfun.invoke()
+                poolKillFun[name] = killfun
+                loadCounter -= 1
+            }
+            latch.countDown()
+        }
+
+        // 2. Process all generic GL runnables (from runOnGLThread() on background thread)
+        while (true) {
+            val (runnable, latch) = glRunnableQueue.poll() ?: break
+            runnable()
+            latch.countDown()
+        }
+
+        // 3. Process one item from the slow loading queue (timesliced)
+        val desc = slowLoadingQueue.poll()
+        if (desc != null) {
+            val (name, loadfun, killfun) = desc
             pool[name] = loadfun.invoke()
             poolKillFun[name] = killfun
-
             loadCounter -= 1
+            slowLoadingRemaining.decrementAndGet()
         }
     }
 
@@ -109,8 +203,15 @@ object CommonResourcePool {
     fun getOrPut(name: String, loadfun: () -> Any) = CommonResourcePool.getOrPut(name, loadfun, null)
         fun getOrPut(name: String, loadfun: () -> Any, killfun: ((Any) -> Unit)?): Any {
         if (pool.containsKey(name)) return pool[name]!!
-        pool[name] = loadfun.invoke()
-        poolKillFun[name] = killfun
+        if (isOnGLThread()) {
+            pool[name] = loadfun.invoke()
+            poolKillFun[name] = killfun
+        }
+        else {
+            val latch = CountDownLatch(1)
+            glDispatchQueue.add(listOf(ResourceLoadingDescriptor(name, loadfun, killfun)) to latch)
+            latch.await()
+        }
         return pool[name]!!
     }
 

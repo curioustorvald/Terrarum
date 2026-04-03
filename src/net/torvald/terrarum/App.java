@@ -363,6 +363,11 @@ public class App implements ApplicationListener {
 
     public static Thread audioManagerThread;
 
+    private volatile Thread postInitLoadingThread;
+    private volatile boolean loadingThreadDone = false;
+    private volatile boolean loadingThreadNoModules = false;
+    private volatile boolean postLoadInitDone = false;
+
     public static long loadedTime_t;
 
     public static void updateBogoflops(long iteration) {
@@ -723,6 +728,21 @@ public class App implements ApplicationListener {
 
             if (loadTimer >= showupTime) {
                 firePostInit();
+            }
+
+            // Process resource loading requests from the loading thread
+            CommonResourcePool.INSTANCE.update();
+
+            // When loading thread is done and all resources are loaded, finish init + show title
+            if (loadingThreadDone && CommonResourcePool.INSTANCE.getLoaded()) {
+                if (!postLoadInitDone) {
+                    if (loadingThreadNoModules) {
+                        postLoadInitDone = true;
+                    }
+                    else {
+                        postLoadInit();
+                    }
+                }
 
                 // hand over the scene control to this single class; Terrarum must call
                 // 'AppLoader.getINSTANCE().screen.render(delta)', this is not redundant at all!
@@ -1187,6 +1207,8 @@ public class App implements ApplicationListener {
         shaderColLUT = loadShaderFromClasspath("shaders/default.vert", "shaders/rgbonly.frag");
         shaderGhastlyWhite = loadShaderFromClasspath("shaders/default.vert", "shaders/ghastlywhite.frag");
 
+        printdbg(this, "CommTex+Shader done at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
+
         // make gamepad(s)
         if (App.getConfigBoolean("usexinput")) {
             try {
@@ -1255,16 +1277,10 @@ public class App implements ApplicationListener {
         );
         Lang.invoke();
 
-
-
-        ModMgr.INSTANCE.invoke(); // invoke Module Manager
-
+        printdbg(this, "Font done at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
 
         fontSmallNumbers = TinyAlphNum.INSTANCE;
         fontBigNumbers = BigAlphNum.INSTANCE;
-
-        IME.invoke();
-        inputStrober = InputStrober.INSTANCE;
 
         try {
             audioDevice = Gdx.audio.newAudioDevice(48000, false);
@@ -1274,7 +1290,43 @@ public class App implements ApplicationListener {
             System.err.println("[AppLoader] failed to create audio device: Audio device occupied by Exclusive Mode Device? (e.g. ASIO4all)");
         }
 
-        CommonResourcePool.INSTANCE.loadAll();
+        IME.invoke();
+        inputStrober = InputStrober.INSTANCE;
+        printdbg(this, "IME done (loading thread) at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
+
+        // Set GL thread reference for CommonResourcePool dispatch
+        CommonResourcePool.INSTANCE.setGLThread(Thread.currentThread());
+        // Launch loading thread for ModMgr + slow resource loading
+        postInitLoadingThread = new Thread(() -> {
+            ModMgr.INSTANCE.invoke(); // triggers module init block + EntryPoint.invoke() calls
+
+            printdbg(this, "ModMgr done (loading thread) at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
+
+
+            if (ModMgr.INSTANCE.getModuleInfo().isEmpty()) {
+                loadingThreadNoModules = true;
+                loadingThreadDone = true;
+                return;
+            }
+
+            CommonResourcePool.INSTANCE.loadAllSlowly();
+
+            printdbg(this, "loadAllSlowly done (loading thread) at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
+
+            loadingThreadDone = true;
+        }, "Terrarum-PostInitLoader");
+        postInitLoadingThread.start();
+
+        long t2 = System.nanoTime();
+        double tms = (t2 - t1) / 1000000000.0;
+        printdbg(this, "PostInit done; took "+tms+" seconds");
+    }
+
+    /**
+     * Called on the GL thread after the loading thread finishes and all resources are loaded.
+     */
+    private void postLoadInit() {
+        long t1 = System.nanoTime();
 
         // check if selected IME is accessible; if not, set selected IME to none
         String selectedIME = getConfigString("inputmethod");
@@ -1282,17 +1334,7 @@ public class App implements ApplicationListener {
             setConfig("inputmethod", "none");
         }
 
-        if (ModMgr.INSTANCE.getModuleInfo().isEmpty()) {
-
-
-
-            return;
-        }
-
-
-
         printdbg(this, "all modules loaded successfully");
-
 
         // test print
         if (IS_DEVELOPMENT_BUILD) {
@@ -1301,7 +1343,6 @@ public class App implements ApplicationListener {
                     (String s) -> System.out.print(s + " "));
             System.out.println();
         }
-
 
         try {
             // create tile atlas
@@ -1313,6 +1354,7 @@ public class App implements ApplicationListener {
             throw new Error("TileMaker failed to load", e);
         }
 
+        printdbg(this, "TileMaker done at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
 
         audioBufferSize = getConfigInt("audio_buffer_size");
         audioMixer = new AudioMixer();
@@ -1322,8 +1364,11 @@ public class App implements ApplicationListener {
         audioManagerThread.setPriority(MAX_PRIORITY); // higher = more predictable; audio delay is very noticeable so it gets high priority
         audioManagerThread.start();
 
+        printdbg(this, "AudioEngine done at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
+
         Terrarum.initialise();
 
+        printdbg(this, "TerrarumInit done at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
 
         // if there is a predefined screen, open that screen after my init process
         if (injectScreen != null) {
@@ -1333,14 +1378,11 @@ public class App implements ApplicationListener {
             IngameRenderer.initialise();
         }
 
-
         hasUpdate = CheckUpdate.INSTANCE.hasUpdate();
         printdbg(this, "Has update: " + hasUpdate);
 
-
-        long t2 = System.nanoTime();
-        double tms = (t2 - t1) / 1000000000.0;
-        printdbg(this, "PostInit done; took "+tms+" seconds");
+        postLoadInitDone = true;
+        printdbg(this, "PostLoadInit done; took "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
     }
 
     public static void reloadAudioProcessor(int bufferSize) {

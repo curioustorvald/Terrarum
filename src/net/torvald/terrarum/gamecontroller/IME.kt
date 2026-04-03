@@ -95,18 +95,25 @@ object IME {
 
     val icons = HashMap<String, TextureRegion>()
 
+    lateinit var layoutLoadingThread: Thread
+        private set
+
     init {
-        context.getBindings("js").putMember("IMEProvider", IMEProviderDelegate(this))
+        layoutLoadingThread = Thread({
+            context.getBindings("js").putMember("IMEProvider", IMEProviderDelegate(this))
 
-        File(KEYLAYOUT_DIR).listFiles { file, s -> s.endsWith(".$KEYLAYOUT_EXTENSION") }.sortedBy { it.name }.forEach {
-            printdbg(this, "Registering Low layer ${it.nameWithoutExtension.lowercase()}")
-            registerLowLayer(it.nameWithoutExtension.lowercase(), parseKeylayoutFile(it))
-        }
+            File(KEYLAYOUT_DIR).listFiles { _, s -> s.endsWith(".$KEYLAYOUT_EXTENSION") }.sortedBy { it.name }.forEach {
+                printdbg(this, "Registering Low layer ${it.nameWithoutExtension.lowercase()}")
+                registerLowLayer(it.nameWithoutExtension.lowercase(), parseKeylayoutFile(it))
+            }
 
-        File(KEYLAYOUT_DIR).listFiles { file, s -> s.endsWith(".$IME_EXTENSION") }.sortedBy { it.name }.forEach {
-            printdbg(this, "Registering High layer ${it.nameWithoutExtension.lowercase()}")
-            registerHighLayer(it.nameWithoutExtension.lowercase(), parseImeFile(it))
-        }
+            File(KEYLAYOUT_DIR).listFiles { _, s -> s.endsWith(".$IME_EXTENSION") }.sortedBy { it.name }.forEach {
+                printdbg(this, "Registering High layer ${it.nameWithoutExtension.lowercase()}")
+                registerHighLayer(it.nameWithoutExtension.lowercase(), parseImeFile(it))
+            }
+        }, "Terrarum-IMELoader")
+        layoutLoadingThread.isDaemon = true
+        layoutLoadingThread.start()
 
 
         val iconSheet = TextureRegionPack(AssetCache.getFileHandle("graphics/gui/ime_icons_by_language.tga"), 20, 20)

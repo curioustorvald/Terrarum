@@ -353,7 +353,6 @@ object ModMgr {
                             val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
 
                             entryPointClasses.add(newClassInstance as ModuleEntryPoint)
-                            (newClassInstance as ModuleEntryPoint).invoke()
 
                             printdbg(this, "Module loaded successfully: $moduleName")
                         }
@@ -414,7 +413,11 @@ object ModMgr {
 
     private class ScriptModDisallowedException : RuntimeException("Script Mods disabled")
 
-    operator fun invoke() { }
+    operator fun invoke() {
+        entryPointClasses.forEach { ep ->
+            CommonResourcePool.runOnGLThread { ep.invoke() }
+        }
+    }
 
     /*fun reloadModules() {
         loadOrder.forEach {
@@ -575,7 +578,7 @@ object ModMgr {
                 val loadedClass = Class.forName(className)
                 val loadedClassConstructor = loadedClass.getConstructor(*constructorTypes)
                 try {
-                    return loadedClassConstructor.newInstance(*initArgs) as T
+                    return CommonResourcePool.runOnGLThread { loadedClassConstructor.newInstance(*initArgs) as T }
                 }
                 catch (e: InvocationTargetException) {
                     throw InvocationTargetException(e, "Failed to load class '$className' with given constructor arguments")
@@ -585,7 +588,7 @@ object ModMgr {
                 val loadedClass = it.loadClass(className)
                 val loadedClassConstructor = loadedClass.getConstructor(*constructorTypes)
                 try {
-                    return loadedClassConstructor.newInstance(*initArgs) as T
+                    return CommonResourcePool.runOnGLThread { loadedClassConstructor.newInstance(*initArgs) as T }
                 }
                 catch (e: InvocationTargetException) {
                     throw InvocationTargetException(e, "Failed to load class '$className' with given constructor arguments")
@@ -601,7 +604,7 @@ object ModMgr {
                 val loadedClass = Class.forName(className)
                 val loadedClassConstructor = loadedClass.getConstructor()
                 try {
-                    return loadedClassConstructor.newInstance() as T
+                    return CommonResourcePool.runOnGLThread { loadedClassConstructor.newInstance() as T }
                 }
                 catch (e: InvocationTargetException) {
                     throw InvocationTargetException(e, "Failed to load class '$className' with zero constructor arguments")
@@ -611,7 +614,7 @@ object ModMgr {
                 val loadedClass = it.loadClass(className)
                 val loadedClassConstructor = loadedClass.getConstructor()
                 try {
-                    return loadedClassConstructor.newInstance() as T
+                    return CommonResourcePool.runOnGLThread { loadedClassConstructor.newInstance() as T }
                 }
                 catch (e: InvocationTargetException) {
                     throw InvocationTargetException(e, "Failed to load class '$className' with zero constructor arguments")
