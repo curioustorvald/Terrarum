@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -70,6 +71,10 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     @Volatile private var backgroundLoadDone = false
     private var glLoadStep = 0
     private lateinit var titleLoadingThread: Thread
+
+    private var splashCapture: Texture? = null
+    private var settleFrames = 0
+    private var transitionState = 0 // 0=loading, 1=settling, 2=fading, 3=done
 
     private lateinit var demoWorld: GameWorld
     private lateinit var cameraNodes: FloatArray // camera Y-pos
@@ -314,21 +319,71 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
 
-    private val introUncoverTime: Second = 0.3f
-    private var introUncoverDeltaCounter = 0f
+    private val introFadeTime: Second = 0.5f
+    private var introFadeDeltaCounter = 0f
+    private val settleFrameCount = 12
 
     override fun renderImpl(updateRate: Float) {
-        if (!loadDone) {
-            App.drawSplash()
-            processGLLoadStep()
-            return
+        when (transitionState) {
+            // Loading phase: show splash, advance GL load steps
+            0 -> {
+                App.drawSplash()
+                processGLLoadStep()
+                if (loadDone) {
+                    // capture the current framebuffer (splash) as a texture
+                    val pixmap = Pixmap.createFromFrameBuffer(0, 0, App.scr.width, App.scr.height)
+                    splashCapture = Texture(pixmap)
+                    pixmap.dispose()
+                    transitionState = 1
+                    settleFrames = 0
+                }
+            }
+            // Settle phase: render title screen normally but paint captured splash on top
+            1 -> {
+                renderTitleScreen()
+                drawSplashCapture(1f)
+                settleFrames++
+                if (settleFrames >= settleFrameCount) {
+                    transitionState = 2
+                    introFadeDeltaCounter = 0f
+                }
+            }
+            // Fade phase: crossfade from captured splash to title screen
+            2 -> {
+                renderTitleScreen()
+                introFadeDeltaCounter += Gdx.graphics.deltaTime
+                val opacity = 1f - (introFadeDeltaCounter / introFadeTime).coerceIn(0f, 1f)
+                drawSplashCapture(opacity)
+                if (introFadeDeltaCounter >= introFadeTime) {
+                    splashCapture?.dispose()
+                    splashCapture = null
+                    transitionState = 3
+                }
+            }
+            // Normal rendering
+            3 -> {
+                renderTitleScreen()
+            }
         }
+    }
 
+    private fun renderTitleScreen() {
         IngameRenderer.setRenderedWorld(demoWorld)
-
-        super.renderImpl(updateRate)
-        // async update and render
+        super.renderImpl(0f)
         gameUpdateGovernor.update(Gdx.graphics.deltaTime, App.UPDATE_RATE, updateScreen, renderScreen)
+    }
+
+    private fun drawSplashCapture(opacity: Float) {
+        val tex = splashCapture ?: return
+        setCameraPosition(0f, 0f)
+        blendNormalStraightAlpha(batch)
+        batch.inUse {
+            batch.shader = null
+            batch.color = Color(1f, 1f, 1f, opacity)
+            // framebuffer capture is Y-flipped; draw flipped
+            batch.drawFlipped(tex, 0f, 0f)
+            batch.color = Color.WHITE
+        }
     }
 
     private val updateScreen = { delta: Float ->
@@ -586,6 +641,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     override fun dispose() {
         if (::uiRemoCon.isInitialized) uiRemoCon.dispose()
         if (::demoWorld.isInitialized) demoWorld.dispose()
+        splashCapture?.dispose()
         warning32bitJavaIcon.texture.dispose()
         warningAppleRosettaIcon.texture.dispose()
     }

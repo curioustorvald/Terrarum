@@ -172,5 +172,5 @@ Both save/restore `camera.position` and call `setToOrtho` with `App.scr.wf/hf` o
 - **`lateinit var` guards**: Use `::prop.isInitialized` checks in `resize()` and `dispose()` for properties set during async loading steps.
 - **`ConsistentUpdateRate`**: Accumulates delta time; may call `updateFunction` multiple times before `renderFunction`. Call `.reset()` before transitioning to active rendering to avoid catch-up storms.
 - **Textures**: Use TGA format. Images with semitransparency must be TGA; opaque images may be PNG.
-- **Coordinate system**: Y-down (camera `setToOrtho(true, ...)`). `setCameraPosition(0, 0)` places origin at screen top-left.
+- **Coordinate system**: Y-down (camera `setToOrtho(true, ...)`). `setCameraPosition(0, 0)` places origin at screen top-left, which is not LibGDX nor OpenGL works natively, hence the existence of `FlippingSpriteBatch`. If the user reports renders are flipped vertically, try draw()/drawFlipped() accordingly.
 - **ROUNDWORLD**: World wraps horizontally. `WorldCamera.x` uses `fmod worldWidth`. Lightmap and tile drawing account for wrapping.

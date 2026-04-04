@@ -900,7 +900,7 @@ public class App implements ApplicationListener {
             logoBatch.end();
         }
 
-        int logoPosX = (int)(logoPosX0 + Math.round(100 * Math.sin(GLOBAL_RENDER_TIMER / 50.0)));
+        int logoPosX = logoPosX0;//(int)(logoPosX0 + Math.round(100 * Math.sin(GLOBAL_RENDER_TIMER / 50.0)));
 
         // draw logo reflection
         logoBatch.setShader(shaderReflect);
