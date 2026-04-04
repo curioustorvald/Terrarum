@@ -336,7 +336,7 @@ public class App implements ApplicationListener {
             "xinput", "xbox", "game", "joy", "pad"
     };
 
-    public static InputStrober inputStrober;
+    public static InputStrober inputStrober; // set by IME.kt loading thread
 
     public static long bogoflops = 0L;
 
@@ -1275,12 +1275,11 @@ public class App implements ApplicationListener {
                 false,
                 64, false, 203f/255f, false
         );
-        Lang.invoke();
-
-        printdbg(this, "Font done at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
 
         fontSmallNumbers = TinyAlphNum.INSTANCE;
         fontBigNumbers = BigAlphNum.INSTANCE;
+
+        printdbg(this, "Font done at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
 
         try {
             audioDevice = Gdx.audio.newAudioDevice(48000, false);
@@ -1290,14 +1289,19 @@ public class App implements ApplicationListener {
             System.err.println("[AppLoader] failed to create audio device: Audio device occupied by Exclusive Mode Device? (e.g. ASIO4all)");
         }
 
-        IME.invoke();
-        inputStrober = InputStrober.INSTANCE;
-        printdbg(this, "IME done (loading thread) at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
+        printdbg(this, "AudioDevice done at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
+
+        IME.invoke(); // calls `App.inputStrober = InputStrober` on our behalf
+        printdbg(this, "IME done at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
 
         // Set GL thread reference for CommonResourcePool dispatch
         CommonResourcePool.INSTANCE.setGLThread(Thread.currentThread());
         // Launch loading thread for ModMgr + slow resource loading
         postInitLoadingThread = new Thread(() -> {
+            Lang.invoke();
+
+            printdbg(this, "Lang done (loading thread) at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");
+
             ModMgr.INSTANCE.invoke(); // triggers module init block + EntryPoint.invoke() calls
 
             printdbg(this, "ModMgr done (loading thread) at "+((System.nanoTime() - t1) / 1000000000.0)+" seconds");

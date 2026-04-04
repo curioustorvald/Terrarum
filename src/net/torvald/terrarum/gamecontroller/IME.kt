@@ -1,6 +1,5 @@
 package net.torvald.terrarum.gamecontroller
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -111,6 +110,8 @@ object IME {
                 printdbg(this, "Registering High layer ${it.nameWithoutExtension.lowercase()}")
                 registerHighLayer(it.nameWithoutExtension.lowercase(), parseImeFile(it))
             }
+
+            App.inputStrober = InputStrober
         }, "Terrarum-IMELoader")
         layoutLoadingThread.isDaemon = true
         layoutLoadingThread.start()
