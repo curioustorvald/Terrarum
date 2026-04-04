@@ -865,7 +865,7 @@ public class App implements ApplicationListener {
         return ditherPatterns[hash % ditherPatterns.length];
     }
 
-    private void drawSplash() {
+    public static void drawSplash() {
         setCameraPosition(0f, 0f);
 
         logoBatch.setColor(Color.WHITE);
@@ -874,7 +874,7 @@ public class App implements ApplicationListener {
 
         int drawWidth = Toolkit.INSTANCE.getDrawWidth();
         int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY", true));
-        int logoPosX = (drawWidth - splashScreenLogo.getRegionWidth() - safetyTextLen) >>> 1;
+        int logoPosX0 = (drawWidth - splashScreenLogo.getRegionWidth() - safetyTextLen) >>> 1;
         int logoPosY = Math.round(scr.getHeight() / 15f);
         int textY = logoPosY + splashScreenLogo.getRegionHeight() - 16;
 
@@ -900,7 +900,7 @@ public class App implements ApplicationListener {
             logoBatch.end();
         }
 
-
+        int logoPosX = (int)(logoPosX0 + Math.round(100 * Math.sin(GLOBAL_RENDER_TIMER / 50.0)));
 
         // draw logo reflection
         logoBatch.setShader(shaderReflect);
@@ -1448,7 +1448,7 @@ public class App implements ApplicationListener {
     }
 
 
-    private void setCameraPosition(float newX, float newY) {
+    private static void setCameraPosition(float newX, float newY) {
         camera.position.set((-newX + scr.getWidth() / 2), (-newY + scr.getHeight() / 2), 0f); // deliberate integer division
         camera.update();
         logoBatch.setProjectionMatrix(camera.combined);

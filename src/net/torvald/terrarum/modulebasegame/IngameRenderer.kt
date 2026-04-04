@@ -1307,6 +1307,11 @@ object IngameRenderer : Disposable {
             //fboBlurQuarter.dispose()
         }
 
+        // BlocksDrawer and LightmapRenderer must be resized before lightmapFbo is created,
+        // because lightmapFbo dimensions are derived from LightmapRenderer.lightBuffer.
+        BlocksDrawer.resize(width, height)
+        LightmapRenderer.resize(width, height)
+
         fboRGB = Float16FrameBuffer(width, height, false)
         fboRGB_lightMixed0 = Float16FrameBuffer(width, height, false)
         fboRGB_lightMixed = Float16FrameBuffer(width, height, false)
@@ -1344,9 +1349,6 @@ object IngameRenderer : Disposable {
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 4,
                 false
         )*/
-
-        BlocksDrawer.resize(width, height)
-        LightmapRenderer.resize(width, height)
 
 
         blurWriteQuad.setVertices(floatArrayOf(

@@ -66,7 +66,10 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
 
-    //private var loadDone = false // not required; draw-while-loading is implemented in the AppLoader
+    private var loadDone = false
+    @Volatile private var backgroundLoadDone = false
+    private var glLoadStep = 0
+    private lateinit var titleLoadingThread: Thread
 
     private lateinit var demoWorld: GameWorld
     private lateinit var cameraNodes: FloatArray // camera Y-pos
@@ -156,117 +159,129 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         gameUpdateGovernor = ConsistentUpdateRate.also { it.reset() }
     }
 
-    private fun loadThingsWhileIntroIsVisible() {
-        printdbg(this, "Intro pre-load")
+    private fun startBackgroundLoading() {
+        titleLoadingThread = Thread({
+            printdbg(this, "Background loading started")
 
-
-        try {
-            val fileHandle = ModMgr.getGdxFile("basegame", "demoworld")
-            val reader = fileHandle.reader("UTF-8")
-            //ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
-            val world = ReadSimpleWorld(reader, fileHandle.file())
-            demoWorld = world
-            demoWorld.worldTime.timeDelta = 30
-            printdbg(this, "Demo world loaded")
-        }
-        catch (e: IOException) {
-            demoWorld = GameWorld(LandUtil.CHUNK_W, LandUtil.CHUNK_H, 0L, 0L)
-            demoWorld.worldTime.timeDelta = 30
-            printdbg(this, "Demo world not found, using empty world")
-        }
-
-        demoWorld.renumberTilesAfterLoad()
-        this.world = demoWorld
-
-        // set initial time to summer
-        demoWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
-
-        // construct camera nodes
-        val nodeCount = demoWorld.width / cameraNodeWidth
-        cameraNodes = kotlin.FloatArray(nodeCount) {
-            val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorToInt()
-            var travelDownCounter = 0
-            while (travelDownCounter < demoWorld.height &&
-                   !BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid
-//                   !BlockCodex[demoWorld.getTileFromWall(tileXPos, travelDownCounter)].isSolid
-            ) {
-                travelDownCounter += 2
+            try {
+                val fileHandle = ModMgr.getGdxFile("basegame", "demoworld")
+                val reader = fileHandle.reader("UTF-8")
+                val world = ReadSimpleWorld(reader, fileHandle.file())
+                demoWorld = world
+                demoWorld.worldTime.timeDelta = 30
+                printdbg(this, "Demo world loaded")
             }
-            travelDownCounter * TILE_SIZEF
-        }
-        // apply gaussian blur to the camera nodes
-        for (i in cameraNodes.indices) {
-//            val offM2 = cameraNodes[(i-2) fmod cameraNodes.size] * 1f
-            val offM1 = cameraNodes[(i-1) fmod cameraNodes.size] * 1f
-            val off0 = cameraNodes[i] * 2f
-            val off1 = cameraNodes[(i+1) fmod cameraNodes.size] * 1f
-//            val off2 = cameraNodes[(i+2) fmod cameraNodes.size] * 1f
+            catch (e: IOException) {
+                demoWorld = GameWorld(LandUtil.CHUNK_W, LandUtil.CHUNK_H, 0L, 0L)
+                demoWorld.worldTime.timeDelta = 30
+                printdbg(this, "Demo world not found, using empty world")
+            }
 
-//            cameraNodes[i] = (offM2 + offM1 + off0 + off1 + off2) / 16f
-            cameraNodes[i] = (offM1 + off0 + off1) / 4f
-        }
+            demoWorld.renumberTilesAfterLoad()
+            this.world = demoWorld
 
+            // set initial time to summer
+            demoWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
 
+            // construct camera nodes
+            val nodeCount = demoWorld.width / cameraNodeWidth
+            cameraNodes = kotlin.FloatArray(nodeCount) {
+                val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorToInt()
+                var travelDownCounter = 0
+                while (travelDownCounter < demoWorld.height &&
+                       !BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid
+                ) {
+                    travelDownCounter += 2
+                }
+                travelDownCounter * TILE_SIZEF
+            }
+            // apply gaussian blur to the camera nodes
+            for (i in cameraNodes.indices) {
+                val offM1 = cameraNodes[(i-1) fmod cameraNodes.size] * 1f
+                val off0 = cameraNodes[i] * 2f
+                val off1 = cameraNodes[(i+1) fmod cameraNodes.size] * 1f
+                cameraNodes[i] = (offM1 + off0 + off1) / 4f
+            }
 
-        cameraPlayer = CameraPlayer(demoWorld, cameraAI)
+            cameraPlayer = CameraPlayer(demoWorld, cameraAI)
 
+            CommandDict // invoke
 
-        IngameRenderer.setRenderedWorld(demoWorld)
-        WeatherMixer.internalReset(this)
-        WeatherMixer.titleScreenInitWeather(demoWorld.weatherbox)
-        WeatherMixer.forceTimeAt = 23456
+            // measure bogoflops here
+            val bogoflopsOld = App.bogoflops
+            App.updateBogoflops(100_000_000L)
+            printdbg(this, "Bogoflops old: $bogoflopsOld new: ${App.bogoflops}")
+            App.bogoflops = maxOf(App.bogoflops, bogoflopsOld)
 
+            App.audioMixer.ambientTracks.forEach {
+                it.stop()
+                it.currentTrack = null
+                it.nextTrack = null
+            }
+            App.audioMixer.reset()
 
-        // load a half-gradient texture that would be used throughout the titlescreen and its sub UIs
-        CommonResourcePool.addToLoadingList("title_halfgrad") {
-            Texture(AssetCache.getFileHandle("graphics/halfgrad.tga")).also {
-                it.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            printdbg(this, "Background loading done")
+            backgroundLoadDone = true
+        }, "Terrarum-TitleScreenLoader")
+        titleLoadingThread.isDaemon = true
+        titleLoadingThread.start()
+    }
+
+    private fun processGLLoadStep() {
+        when (glLoadStep) {
+            0 -> {
+                // Wait for background thread to finish world loading + CPU work
+                if (backgroundLoadDone) glLoadStep++
+            }
+            1 -> {
+                SkyboxModelHosek.loadlut()
+                glLoadStep++
+            }
+            2 -> {
+                IngameRenderer.setRenderedWorld(demoWorld)
+                WeatherMixer.internalReset(this)
+                WeatherMixer.titleScreenInitWeather(demoWorld.weatherbox)
+                WeatherMixer.forceTimeAt = 23456
+                glLoadStep++
+            }
+            3 -> {
+                // Load half-gradient texture
+                CommonResourcePool.addToLoadingList("title_halfgrad") {
+                    Texture(AssetCache.getFileHandle("graphics/halfgrad.tga")).also {
+                        it.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                    }
+                }
+                CommonResourcePool.loadAll()
+                glLoadStep++
+            }
+            4 -> {
+                // Gradient overlay UI
+                val uiFakeGradOverlay = UIFakeGradOverlay()
+                uiFakeGradOverlay.setPosition(0, 0)
+                uiContainer.add(uiFakeGradOverlay)
+                glLoadStep++
+            }
+            5 -> {
+                // Blur overlay UI
+                uiFakeBlurOverlay = UIFakeBlurOverlay(1f, false)
+                uiFakeBlurOverlay.setPosition(0, 0)
+                uiContainer.add(uiFakeBlurOverlay)
+                glLoadStep++
+            }
+            6 -> {
+                // Remote control UI
+                uiRemoCon = UIRemoCon(this, UITitleRemoConYaml(App.savegamePlayers.isNotEmpty()))
+                uiRemoCon.setPosition(0, 0)
+                uiRemoCon.setAsOpen()
+                uiContainer.add(uiRemoCon)
+                glLoadStep++
+            }
+            7 -> {
+                MusicService.enterScene("title")
+                gameUpdateGovernor.reset()
+                loadDone = true
             }
         }
-        CommonResourcePool.loadAll()
-
-
-        // fake UI for gradient overlay
-        val uiFakeGradOverlay = UIFakeGradOverlay()
-        uiFakeGradOverlay.setPosition(0, 0)
-        uiContainer.add(uiFakeGradOverlay)
-
-
-        // fake UI for blur
-        uiFakeBlurOverlay = UIFakeBlurOverlay(1f, false)
-        uiFakeBlurOverlay.setPosition(0,0)
-        uiContainer.add(uiFakeBlurOverlay)
-
-
-        uiRemoCon = UIRemoCon(this, UITitleRemoConYaml(App.savegamePlayers.isNotEmpty()))
-        uiRemoCon.setPosition(0, 0)
-        uiRemoCon.setAsOpen()
-
-
-        uiContainer.add(uiRemoCon)
-
-        CommandDict // invoke
-        SkyboxModelHosek.loadlut() // invoke
-//        Skybox.initiate() // invoke the lengthy calculation
-        // TODO add console here
-
-
-        //loadDone = true
-
-        // measure bogoflops here
-        val bogoflopsOld = App.bogoflops
-        App.updateBogoflops(100_000_000L)
-        printdbg(this, "Bogoflops old: $bogoflopsOld new: ${App.bogoflops}")
-        App.bogoflops = maxOf(App.bogoflops, bogoflopsOld)
-
-
-        App.audioMixer.ambientTracks.forEach {
-            it.stop()
-            it.currentTrack = null
-            it.nextTrack = null
-        }
-        App.audioMixer.reset()
-
     }
 
 
@@ -294,10 +309,8 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         App.updateListOfSavegames()
         UILoadGovernor.reset()
 
-        loadThingsWhileIntroIsVisible()
+        startBackgroundLoading()
         printdbg(this, "show() exit")
-
-        MusicService.enterScene("title")
     }
 
 
@@ -305,6 +318,12 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private var introUncoverDeltaCounter = 0f
 
     override fun renderImpl(updateRate: Float) {
+        if (!loadDone) {
+            App.drawSplash()
+            processGLLoadStep()
+            return
+        }
+
         IngameRenderer.setRenderedWorld(demoWorld)
 
         super.renderImpl(updateRate)
@@ -549,23 +568,24 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         initViewPort(App.scr.width, App.scr.height)
 
 
-        // resize UI by re-creating it (!!)
-        uiRemoCon.resize(App.scr.width, App.scr.height)
-        // TODO I forgot what the fuck kind of hack I was talking about
-        //uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
-        uiRemoCon.setPosition(0, 0) // shitty hack. Could be:
-        // 1: Init code and resize code are different
-        // 2: The UI is coded shit
+        if (::uiRemoCon.isInitialized) {
+            // resize UI by re-creating it (!!)
+            uiRemoCon.resize(App.scr.width, App.scr.height)
+            // TODO I forgot what the fuck kind of hack I was talking about
+            //uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
+            uiRemoCon.setPosition(0, 0) // shitty hack. Could be:
+            // 1: Init code and resize code are different
+            // 2: The UI is coded shit
 
-
-        IngameRenderer.resize(App.scr.width, App.scr.height)
+            IngameRenderer.resize(App.scr.width, App.scr.height)
+        }
 
         printdbg(this, "resize() exit")
     }
 
     override fun dispose() {
-        uiRemoCon.dispose()
-        demoWorld.dispose()
+        if (::uiRemoCon.isInitialized) uiRemoCon.dispose()
+        if (::demoWorld.isInitialized) demoWorld.dispose()
         warning32bitJavaIcon.texture.dispose()
         warningAppleRosettaIcon.texture.dispose()
     }
