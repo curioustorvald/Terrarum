@@ -60,7 +60,7 @@ class UIItemVertSlider(
     override fun update(delta: Float) {
         super.update(delta)
 
-        mouseOnHandle = itemRelativeMouseY in handlePos.roundToInt() until handlePos.roundToInt() + handleHeight && itemRelativeMouseX in 0 until width
+        mouseOnHandle = if (!isEnabled) false else itemRelativeMouseY in handlePos.roundToInt() until handlePos.roundToInt() + handleHeight && itemRelativeMouseX in 0 until width
 
         // update handle position and value
         if (mouseUp && Terrarum.mouseDown || mouseLatched) {

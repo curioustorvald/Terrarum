@@ -63,7 +63,7 @@ class UIItemHorzSlider(
     override fun update(delta: Float) {
         super.update(delta)
 
-        mouseOnHandle = itemRelativeMouseX in handlePos.roundToInt() until handlePos.roundToInt() + handleWidth && itemRelativeMouseY in 0 until height
+        mouseOnHandle = if (!isEnabled) false else itemRelativeMouseX in handlePos.roundToInt() until handlePos.roundToInt() + handleWidth && itemRelativeMouseY in 0 until height
 
         // update handle position and value
         if (mouseUp && Terrarum.mouseDown || mouseLatched) {

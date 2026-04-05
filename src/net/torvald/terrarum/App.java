@@ -946,6 +946,9 @@ public class App implements ApplicationListener {
 
         logoBatch.end();
 
+        // draw loading bar and subtitle
+        SplashScreen.render(logoBatch, camera);
+
         // draw health messages
         if (getConfigBoolean("showhealthmessageonstartup")) {
             logoBatch.setShader(null);

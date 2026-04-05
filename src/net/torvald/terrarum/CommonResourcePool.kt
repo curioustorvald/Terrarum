@@ -31,6 +31,16 @@ object CommonResourcePool {
 
     private val slowLoadingQueue = ConcurrentLinkedQueue<ResourceLoadingDescriptor>()
     private val slowLoadingRemaining = AtomicInteger(0)
+    private val slowLoadingTotal = AtomicInteger(0)
+
+    /** 0.0 = not started yet, 1.0 = all done. Only meaningful during / after [loadAllSlowly]. */
+    val loadingProgress: Float
+        get() {
+            val total = slowLoadingTotal.get()
+            if (total == 0) return 0f
+            val remaining = slowLoadingRemaining.get()
+            return (total - remaining).toFloat() / total.toFloat()
+        }
 
     fun setGLThread(thread: Thread) {
         glThread = thread
@@ -152,6 +162,7 @@ object CommonResourcePool {
             val desc = loadingList.removeFirst()
             slowLoadingQueue.add(desc)
             slowLoadingRemaining.incrementAndGet()
+            slowLoadingTotal.incrementAndGet()
         }
         // Block until the GL thread has processed all slow items
         while (slowLoadingRemaining.get() > 0) {
