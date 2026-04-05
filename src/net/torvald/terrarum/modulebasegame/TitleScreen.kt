@@ -75,6 +75,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private var splashCapture: Texture? = null
     private var settleFrames = 0
     private var transitionState = 0 // 0=loading, 1=settling, 2=fading, 3=done
+    private var enteringFromIngame = false
 
     private lateinit var demoWorld: GameWorld
     private lateinit var cameraNodes: FloatArray // camera Y-pos
@@ -296,6 +297,15 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     override fun show() {
         printdbg(this, "show() called")
 
+        // consume the pre-captured frame provided by App.render()'s deferred-capture path
+        val pixmap = App.captureLastFrame
+        App.captureLastFrame = null
+        if (pixmap != null) {
+            splashCapture = Texture(pixmap)
+            pixmap.dispose()
+            enteringFromIngame = true
+        }
+
         for (k in Input.Keys.F1..Input.Keys.F12) {
             KeyToggler.forceSet(k, false)
         }
@@ -325,15 +335,22 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     override fun renderImpl(updateRate: Float) {
         when (transitionState) {
-            // Loading phase: show splash, advance GL load steps
+            // Loading phase: show splash or last ingame frame, advance GL load steps
             0 -> {
-                App.drawSplash()
+                if (enteringFromIngame) {
+                    // hold the last ingame frame while the title screen loads in the background
+                    drawSplashCapture(1f)
+                } else {
+                    App.drawSplash()
+                }
                 processGLLoadStep()
                 if (loadDone) {
-                    // capture the current framebuffer (splash) as a texture
-                    val pixmap = Pixmap.createFromFrameBuffer(0, 0, App.scr.width, App.scr.height)
-                    splashCapture = Texture(pixmap)
-                    pixmap.dispose()
+                    if (!enteringFromIngame) {
+                        // capture the current splash screen frame for the crossfade
+                        val pixmap = Pixmap.createFromFrameBuffer(0, 0, App.scr.width, App.scr.height)
+                        splashCapture = Texture(pixmap)
+                        pixmap.dispose()
+                    }
                     transitionState = 1
                     settleFrames = 0
                 }

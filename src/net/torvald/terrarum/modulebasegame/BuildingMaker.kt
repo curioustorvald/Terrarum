@@ -727,7 +727,7 @@ class MovableWorldCamera(val parent: BuildingMaker) : ActorHumanoid(0, physProp 
 
 class YamlCommandExit : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        App.setScreen(TitleScreen(App.batch))
+        App.pendingScreenWithCapture = TitleScreen(App.batch)
     }
 }
 

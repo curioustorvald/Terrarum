@@ -176,7 +176,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             when (new) {
                 2 -> {
                     areYouSureMainMenuButtons.deselect()
-                    App.setScreen(TitleScreen(App.batch))
+                    App.pendingScreenWithCapture = TitleScreen(App.batch)
                 }
                 3 -> {
                     screen = 0; areYouSureMainMenuButtons.deselect()

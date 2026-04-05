@@ -280,6 +280,11 @@ public class App implements ApplicationListener {
     private static TerrarumGamescreen currentScreen;
     private static LoadScreenBase currentSetLoadScreen;
 
+    /** When set, App.render() will capture postProcessorOutFBO and then transition to this screen after the current frame finishes. */
+    public static TerrarumGamescreen pendingScreenWithCapture = null;
+    /** Populated by the deferred-capture path; consumed by TitleScreen.show(). */
+    public static Pixmap captureLastFrame = null;
+
     private void initViewPort(int width, int height) {
         // Set Y to point downwards
         camera.setToOrtho(true, width, height); // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin
@@ -767,6 +772,17 @@ public class App implements ApplicationListener {
 
             currentScreen.render(UPDATE_RATE);
             postProcessorOutFBO = TerrarumPostProcessor.INSTANCE.draw(Gdx.graphics.getDeltaTime(), camera.combined, renderFBO);
+
+            // Deferred transition: capture the just-rendered frame then switch screens.
+            // This fires AFTER the current screen has fully rendered so the capture is of the real last ingame frame.
+            if (pendingScreenWithCapture != null) {
+                TerrarumGamescreen next = pendingScreenWithCapture;
+                pendingScreenWithCapture = null;
+                FrameBufferManager.begin(postProcessorOutFBO);
+                captureLastFrame = Pixmap.createFromFrameBuffer(0, 0, postProcessorOutFBO.getWidth(), postProcessorOutFBO.getHeight());
+                FrameBufferManager.end();
+                setScreen(next);
+            }
         }
 
 
