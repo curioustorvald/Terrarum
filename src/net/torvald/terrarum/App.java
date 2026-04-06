@@ -265,10 +265,10 @@ public class App implements ApplicationListener {
     public static Hq2x hq2x;
 
     public static Mesh fullscreenQuad;
-    private static OrthographicCamera camera;
-    private static FlippingSpriteBatch logoBatch;
+    public static OrthographicCamera camera;
+    public static FlippingSpriteBatch logoBatch;
     public static TextureRegion splashScreenLogo;
-    private static TextureRegion splashBackdrop;
+    public static TextureRegion splashBackdrop;
     public static AudioDevice audioDevice;
 
     public static FlippingSpriteBatch batch;
@@ -550,7 +550,7 @@ public class App implements ApplicationListener {
         }
     }
 
-    private static Color splashTextCol = new Color(0x282828FF);
+    public static Color splashTextCol = new Color(0x282828FF);
 
     @Override
     public void create() {
@@ -752,6 +752,7 @@ public class App implements ApplicationListener {
                 // hand over the scene control to this single class; Terrarum must call
                 // 'AppLoader.getINSTANCE().screen.render(delta)', this is not redundant at all!
 
+                SplashScreen.loadingComplete = true;
                 IngameInstance title = ModMgr.INSTANCE.getTitleScreen(batch);
 
                 if (title != null) {
@@ -882,107 +883,7 @@ public class App implements ApplicationListener {
     }
 
     public static void drawSplash() {
-        setCameraPosition(0f, 0f);
-
-        logoBatch.setColor(Color.WHITE);
-        logoBatch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
-
-        int drawWidth = Toolkit.INSTANCE.getDrawWidth();
-        int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY", true));
-        int logoPosX0 = (drawWidth - splashScreenLogo.getRegionWidth() - safetyTextLen) >>> 1;
-        int logoPosY = Math.round(scr.getHeight() / 15f);
-        int textY = logoPosY + splashScreenLogo.getRegionHeight() - 16;
-
-        // draw custom backdrop (if exists)
-        if (splashBackdrop != null) {
-            logoBatch.setShader(null);
-            logoBatch.begin();
-
-
-            var size = ((float) Math.max(scr.getWidth(), scr.getHeight()));
-            var x = 0f;
-            var y = 0f;
-            if (scr.getWidth() > scr.getHeight()) {
-                y = (scr.getHeight() - size) / 2f;
-            }
-            else {
-                x = (scr.getWidth() - size) / 2f;
-            }
-
-            logoBatch.draw(splashBackdrop, x, y, size, size);
-
-
-            logoBatch.end();
-        }
-
-        int logoPosX = logoPosX0;//(int)(logoPosX0 + Math.round(100 * Math.sin(GLOBAL_RENDER_TIMER / 50.0)));
-
-        // draw logo reflection
-        logoBatch.setShader(shaderReflect);
-        logoBatch.setColor(Color.WHITE);
-        logoBatch.begin();
-        if (getConfigBoolean("showhealthmessageonstartup")) {
-            logoBatch.draw(splashScreenLogo, logoPosX, logoPosY + splashScreenLogo.getRegionHeight());
-        }
-        else {
-            logoBatch.draw(splashScreenLogo, (drawWidth - splashScreenLogo.getRegionWidth()) / 2f,
-                    (scr.getHeight() - splashScreenLogo.getRegionHeight() * 2) / 2f + splashScreenLogo.getRegionHeight()
-            );
-        }
-        logoBatch.end();
-        logoBatch.setShader(null);
-        logoBatch.begin();
-        if (getConfigBoolean("showhealthmessageonstartup")) {
-            logoBatch.draw(splashScreenLogo, logoPosX, logoPosY);
-        }
-        else {
-            logoBatch.draw(splashScreenLogo, (drawWidth - splashScreenLogo.getRegionWidth()) / 2f,
-                    (scr.getHeight() - splashScreenLogo.getRegionHeight() * 2) / 2f
-            );
-        }
-
-
-
-        logoBatch.end();
-
-        // draw loading bar and subtitle
         SplashScreen.render(logoBatch, camera);
-
-        // draw health messages
-        if (getConfigBoolean("showhealthmessageonstartup")) {
-            logoBatch.setShader(null);
-            logoBatch.begin();
-
-            logoBatch.setColor(splashTextCol);
-            fontGame.draw(logoBatch, Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY", true),
-                    logoPosX + splashScreenLogo.getRegionWidth(),
-                    textY
-            );
-
-            // some chinese stuff
-            if (GAME_LOCALE.contentEquals("zhCN")) {
-                for (int i = 1; i <= 4; i++) {
-                    String s = Lang.INSTANCE.get("APP_CHINESE_HEALTHY_GAME_MSG_" + i, true);
-
-                    fontGame.draw(logoBatch, s,
-                            (drawWidth - fontGame.getWidth(s)) >>> 1,
-                            Math.round(scr.getHeight() * 12f / 15f + fontGame.getLineHeight() * (i - 1))
-                    );
-                }
-            }
-
-            Texture tex1 = CommonResourcePool.INSTANCE.getAsTexture("title_health1");
-            Texture tex2 = CommonResourcePool.INSTANCE.getAsTexture("title_health2");
-            int virtualHeight = scr.getHeight() - logoPosY - splashScreenLogo.getRegionHeight() / 4;
-            int virtualHeightOffset = scr.getHeight() - virtualHeight;
-            logoBatch.drawFlipped(tex1, (drawWidth - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
-            logoBatch.drawFlipped(tex2, (drawWidth - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
-
-        }
-
-        logoBatch.end();
-        batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     /**
@@ -1471,7 +1372,7 @@ public class App implements ApplicationListener {
     }
 
 
-    private static void setCameraPosition(float newX, float newY) {
+    public static void setCameraPosition(float newX, float newY) {
         camera.position.set((-newX + scr.getWidth() / 2), (-newY + scr.getHeight() / 2), 0f); // deliberate integer division
         camera.update();
         logoBatch.setProjectionMatrix(camera.combined);
