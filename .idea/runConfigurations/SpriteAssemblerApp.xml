@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="SpriteAssemblerApp" type="JarApplication">
     <option name="JAR_PATH" value="$PROJECT_DIR$/out/SpriteAssemblerApp.jar" />
-    <option name="VM_PARAMETERS" value="-ea" />
+    <option name="VM_PARAMETERS" value="-ea --upgrade-module-path=lib/compiler-23.1.10.jar:lib/compiler-management-23.1.10.jar:lib/truffle-compiler-23.1.10.jar:lib/truffle-api-23.1.10.jar:lib/truffle-runtime-23.1.10.jar:lib/polyglot-23.1.10.jar:lib/collections-23.1.10.jar:lib/word-23.1.10.jar:lib/nativeimage-23.1.10.jar:lib/jniutils-23.1.10.jar -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI --add-exports=java.base/jdk.internal.misc=jdk.internal.vm.compiler" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="ALTERNATIVE_JRE_PATH" value="17" />
     <module name="TerrarumBuild" />

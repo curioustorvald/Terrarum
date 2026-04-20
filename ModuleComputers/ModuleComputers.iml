@@ -9,7 +9,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="ModuleComputersLib" level="project" />
     <orderEntry type="module" module-name="TerrarumBuild" scope="PROVIDED" />
-    <orderEntry type="library" scope="PROVIDED" name="graalvm-js 22.3.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="graalvm-js 23.1.10" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="TerrarumSansBitmap" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="badlogicgames.gdx" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="badlogicgames.gdx.backend.lwjgl3" level="project" />

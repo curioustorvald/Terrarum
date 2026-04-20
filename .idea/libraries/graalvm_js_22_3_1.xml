@@ -1,28 +1,52 @@
 <component name="libraryTable">
-  <library name="graalvm-js 22.3.1">
+  <library name="graalvm-js 23.1.10">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/graal-sdk-22.3.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/icu4j-71.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/js-22.3.1-edit.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/js-scriptengine-22.3.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/regex-22.3.1-edit.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/truffle-api-22.3.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/polyglot-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/icu4j-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-language-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-scriptengine-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/regex-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-api-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-runtime-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-compiler-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/compiler-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/compiler-management-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/collections-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/word-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/nativeimage-23.1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jniutils-23.1.10.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$PROJECT_DIR$/lib/graal-sdk-22.3.1-javadoc.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/icu4j-71.1-javadoc.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/js-22.3.1-javadoc.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/js-scriptengine-22.3.1-javadoc.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/regex-22.3.1-javadoc.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/truffle-api-22.3.1-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/polyglot-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/icu4j-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-language-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-scriptengine-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/regex-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-api-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-runtime-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-compiler-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/compiler-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/compiler-management-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/collections-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/word-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/nativeimage-23.1.10-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jniutils-23.1.10-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar://$PROJECT_DIR$/lib/graal-sdk-22.3.1-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/icu4j-71.1-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/js-22.3.1-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/js-scriptengine-22.3.1-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/regex-22.3.1-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/truffle-api-22.3.1-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/polyglot-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/icu4j-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-language-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-scriptengine-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/regex-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-api-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-runtime-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-compiler-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/compiler-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/compiler-management-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/collections-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/word-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/nativeimage-23.1.10-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jniutils-23.1.10-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

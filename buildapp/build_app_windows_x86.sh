@@ -38,6 +38,9 @@ mv $DESTDIR/out/$RUNTIME/bin/java.exe $DESTDIR/out/$RUNTIME/bin/java.exe
 cp "out/assets.tevd" $DESTDIR/
 cp "../out/$JARNAME" $DESTDIR/out/
 
+# Copy over Graal module-path JARs for JIT compiler
+cp "../lib/compiler-23.1.10.jar" "../lib/compiler-management-23.1.10.jar" "../lib/truffle-compiler-23.1.10.jar" "../lib/truffle-api-23.1.10.jar" "../lib/truffle-runtime-23.1.10.jar" "../lib/polyglot-23.1.10.jar" "../lib/collections-23.1.10.jar" "../lib/word-23.1.10.jar" "../lib/nativeimage-23.1.10.jar" "../lib/jniutils-23.1.10.jar" $DESTDIR/
+
 # zip everything
 rm "out/$DESTDIR.zip"
 zip -r -9 -l "out/$DESTDIR.zip" $DESTDIR

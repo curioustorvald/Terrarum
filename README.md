@@ -43,7 +43,7 @@ Requires 64 bit processor and operation system.
 
 Kotlin runtimes must be downloaded using the IntelliJ IDEA. All other libraries are included in the repository.
 
-The project includes modified version of the GraalVM-JS, in which the only difference is the `regex-22.3.1-edit.jar` is a modification of `regex-22.3.1.jar` where the only difference is its `MANIFEST.MD`
+The project uses GraalVM 23.1.10 for JavaScript execution (with the Graal JIT compiler enabled via `--upgrade-module-path`).
 
 ## Copyright ##
 

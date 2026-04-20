@@ -17,7 +17,7 @@
     <orderEntry type="library" name="gdx-controllers-core-2.2.1" level="project" />
     <orderEntry type="library" name="gdx-controllers-desktop-2.2.1" level="project" />
     <orderEntry type="library" name="jxinput-1.0.0" level="project" />
-    <orderEntry type="library" name="graalvm-js 22.3.1" level="project" />
+    <orderEntry type="library" name="graalvm-js 23.1.10" level="project" />
     <orderEntry type="library" name="badlogicgames.gdx" level="project" />
     <orderEntry type="library" name="badlogicgames.gdx.backend.lwjgl3" level="project" />
     <orderEntry type="library" name="io.github.classgraph" level="project" />
