@@ -53,6 +53,7 @@ public class Principii {
         }
     }
 
+    private static final String GRAAL_MODULE_PATH = "compiler-23.1.10.jar:compiler-management-23.1.10.jar:truffle-compiler-23.1.10.jar:truffle-api-23.1.10.jar:truffle-runtime-23.1.10.jar:polyglot-23.1.10.jar:collections-23.1.10.jar:word-23.1.10.jar:nativeimage-23.1.10.jar:jniutils-23.1.10.jar";
 
     public static void main(String[] args) {
 
@@ -130,6 +131,13 @@ public class Principii {
         List<String> userDefinedExtraCmds = Arrays.stream(userDefinedExtraCmd0.split(" +")).filter((it) -> !it.isBlank()).toList();
         ArrayList<String> cmd0 = new ArrayList<>();
         cmd0.add(runtime);
+        cmd0.add("--upgrade-module-path="+GRAAL_MODULE_PATH);
+        cmd0.add("-XX:+UnlockExperimentalVMOptions");
+        cmd0.add("-XX:+EnableJVMCI");
+        cmd0.add("-XX:+UseZGC");
+        cmd0.add("-XX:+ZGenerational");
+        cmd0.add("-XX:+UseDynamicNumberOfGCThreads");
+        cmd0.add("--add-exports=java.base/jdk.internal.misc=jdk.internal.vm.compiler");
         cmd0.addAll(extracmds);
         cmd0.addAll(userDefinedExtraCmds);
 //        cmd0.add("-Dhttps.protocols=SSLv3,TLSv1.2,TLSv1.1,TLSv1");
