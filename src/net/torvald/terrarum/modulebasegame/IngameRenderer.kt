@@ -8,8 +8,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.Float16FrameBuffer
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.utils.BufferUtils
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
+import java.nio.ByteBuffer
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
@@ -87,11 +89,20 @@ object IngameRenderer : Disposable {
 
     private lateinit var fboRGBwall: Float16FrameBuffer // for masking away the shadows
 
+    private lateinit var fboUI: Float16FrameBuffer // UI composite target for scene-aware dimming
+    private lateinit var fboSceneAvg: Float16FrameBuffer // tiny target for brightness readback
+
     private lateinit var rgbTex: TextureRegion
     private lateinit var aTex: TextureRegion
     private lateinit var mixedOutTex: TextureRegion
+    private lateinit var uiTex: TextureRegion
     private lateinit var lightTex: TextureRegion
     private lateinit var blurTex: TextureRegion
+
+    // Contextual UI dimming: dim slightly when the world scene is dark.
+    private val sceneAvgBuf: ByteBuffer = BufferUtils.newByteBuffer(SCENE_AVG_SIZE * SCENE_AVG_SIZE * 4)
+    @Volatile private var smoothedSceneLuma = 1f
+    private var uiDimFactor = 1f
 
     private lateinit var fboBlurHalf: Float16FrameBuffer
 //    private lateinit var fboBlurQuarter: Float16FrameBuffer
@@ -135,6 +146,14 @@ object IngameRenderer : Disposable {
 
     /** lower value = greater lozenge artefact from linear intp */
     const val lightmapDownsample = 2f // still has choppy look when the camera moves but unnoticeable when blurred
+
+    // Contextual UI dimming parameters.
+    private const val SCENE_AVG_SIZE = 16          // side of the small RGBA8 FBO used for brightness readback
+    private const val SCENE_AVG_INTERVAL = 6L      // sample every N frames; smoothing fills the gaps
+    private const val UI_DIM_DARK_FACTOR = 0.8f  // 80% brightness when the scene is dark
+    private const val UI_DIM_DARK_LUMA = 0.08f     // luma at/below this -> fully dimmed
+    private const val UI_DIM_BRIGHT_LUMA = 0.22f   // luma at/above this -> no dimming
+    private const val UI_DIM_SMOOTHING = 0.12f     // per-sample EMA factor for luma
 
     private var debugMode = 0
 
@@ -444,18 +463,36 @@ object IngameRenderer : Disposable {
 
         ///////////////////////////////////////////////////////////////////////
 
-        // draw UI
-        setCameraPosition(0f, 0f)
+        // contextual UI dimming: keep uiDimFactor in sync with the rendered scene's brightness
+        sampleSceneBrightness()
 
-        batch.inUse {
-            batch.shader = null
-            batch.color = Color.WHITE
+        // draw UI into its own FBO so individual UIs can keep using batch.color freely
+        fboUI.inAction(camera, batch) {
+            gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
+            blendNormalStraightAlpha(batch)
 
-            if (!KeyToggler.isOn(Input.Keys.F4)) {
-                uiContainer?.forEach {
-                    it?.render(frameDelta, batch, camera)
+            batch.inUse {
+                batch.shader = null
+                batch.color = Color.WHITE
+
+                if (!KeyToggler.isOn(Input.Keys.F4)) {
+                    uiContainer?.forEach {
+                        it?.render(frameDelta, batch, camera)
+                    }
                 }
             }
+        }
+
+        // composite UI on top of the world with the contextual dim tint
+        setCameraPosition(0f, 0f)
+        blendNormalStraightAlpha(batch)
+
+        uiTex.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        batch.inUse {
+            batch.shader = null
+            batch.color = Color(uiDimFactor, uiDimFactor, uiDimFactor, 1f)
+            batch.drawFlipped(uiTex, 0f, 0f, fboUI.width.toFloat(), fboUI.height.toFloat())
+            batch.color = Color.WHITE
         }
 
         // works but some UI elements have wrong transparency -> should be fixed with Terrarum.gdxCleanAndSetBlend -- Torvald 2019-01-12
@@ -464,6 +501,48 @@ object IngameRenderer : Disposable {
 
 
         if (newWorldLoadedLatch) newWorldLoadedLatch = false
+    }
+
+    /**
+     * Downsamples [fboMixedOut] into [fboSceneAvg], reads it back, and updates [smoothedSceneLuma]
+     * and [uiDimFactor]. Sampling is throttled to every [SCENE_AVG_INTERVAL] frames; the EMA fills gaps.
+     */
+    private fun sampleSceneBrightness() {
+        if (App.GLOBAL_RENDER_TIMER % SCENE_AVG_INTERVAL == 0L) {
+            mixedOutTex.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+
+            fboSceneAvg.inAction(camera, batch) {
+                gdxClearAndEnableBlend(0f, 0f, 0f, 1f)
+                batch.inUse {
+                    batch.shader = null
+                    batch.color = Color.WHITE
+                    batch.draw(mixedOutTex, 0f, 0f, fboSceneAvg.width.toFloat(), fboSceneAvg.height.toFloat())
+                }
+
+                sceneAvgBuf.rewind()
+                Gdx.gl.glReadPixels(0, 0, fboSceneAvg.width, fboSceneAvg.height,
+                    GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, sceneAvgBuf)
+            }
+
+            sceneAvgBuf.rewind()
+            var sumR = 0L
+            var sumG = 0L
+            var sumB = 0L
+            val count = fboSceneAvg.width * fboSceneAvg.height
+            for (i in 0 until count) {
+                sumR += (sceneAvgBuf.get().toInt() and 0xFF)
+                sumG += (sceneAvgBuf.get().toInt() and 0xFF)
+                sumB += (sceneAvgBuf.get().toInt() and 0xFF)
+                sceneAvgBuf.get() // alpha discarded
+            }
+            val inv = 1f / (count * 255f)
+            val luma = 0.2126f * (sumR * inv) + 0.7152f * (sumG * inv) + 0.0722f * (sumB * inv)
+            smoothedSceneLuma += (luma - smoothedSceneLuma) * UI_DIM_SMOOTHING
+        }
+
+        val t = ((smoothedSceneLuma - UI_DIM_DARK_LUMA) / (UI_DIM_BRIGHT_LUMA - UI_DIM_DARK_LUMA))
+            .coerceIn(0f, 1f)
+        uiDimFactor = UI_DIM_DARK_FACTOR + (1f - UI_DIM_DARK_FACTOR) * t
     }
 
 
@@ -1305,6 +1384,9 @@ object IngameRenderer : Disposable {
 
             fboBlurHalf.dispose()
             //fboBlurQuarter.dispose()
+
+            if (::fboUI.isInitialized) fboUI.dispose()
+            if (::fboSceneAvg.isInitialized) fboSceneAvg.dispose()
         }
 
         // BlocksDrawer and LightmapRenderer must be resized before lightmapFbo is created,
@@ -1332,11 +1414,15 @@ object IngameRenderer : Disposable {
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 false
         )
+        fboUI = Float16FrameBuffer(width, height, false)
+        fboSceneAvg = Float16FrameBuffer(SCENE_AVG_SIZE, SCENE_AVG_SIZE, false)
+
         rgbTex = TextureRegion(fboRGB_lightMixed.colorBufferTexture)
         aTex = TextureRegion(fboA_lightMixed.colorBufferTexture)
         lightTex = TextureRegion(lightmapFbo.colorBufferTexture)
         blurTex = TextureRegion()
         mixedOutTex = TextureRegion(fboMixedOut.colorBufferTexture)
+        uiTex = TextureRegion(fboUI.colorBufferTexture)
 
         fboBlurHalf = Float16FrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 2,
@@ -1394,6 +1480,8 @@ object IngameRenderer : Disposable {
         if (::fboRGBactorsMiddleShadow.isInitialized) fboRGBactorsMiddleShadow.tryDispose()
         if (::fboRGBterrainShadow.isInitialized) fboRGBterrainShadow.tryDispose()
         if (::fboRGBwall.isInitialized) fboRGBwall.tryDispose()
+        if (::fboUI.isInitialized) fboUI.tryDispose()
+        if (::fboSceneAvg.isInitialized) fboSceneAvg.tryDispose()
 
         blurtex0.tryDispose()
 
