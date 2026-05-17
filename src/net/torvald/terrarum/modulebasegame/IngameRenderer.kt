@@ -485,7 +485,7 @@ object IngameRenderer : Disposable {
 
         // composite UI on top of the world with the contextual dim tint
         setCameraPosition(0f, 0f)
-        blendNormalStraightAlpha(batch)
+        blendNormalPremultAlpha(batch)
 
         uiTex.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         batch.inUse {
