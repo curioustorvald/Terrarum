@@ -23,7 +23,7 @@ class WorldRadar : BlockTransferInterface(false, true) {
     private val STONE_OUT = 7.toByte()
 
     init {
-        statusCode = TestDiskDrive.STATE_CODE_STANDBY
+        statusCode.set(TestDiskDrive.STATE_CODE_STANDBY)
     }
 
     private val messageComposeBuffer = ByteArrayOutputStream(BLOCK_SIZE) // always use this and don't alter blockSendBuffer please

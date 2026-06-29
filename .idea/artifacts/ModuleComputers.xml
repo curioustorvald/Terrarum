@@ -3,7 +3,9 @@
     <output-path>$PROJECT_DIR$/assets/mods/dwarventech</output-path>
     <root id="archive" name="ModuleComputers.jar">
       <element id="module-output" name="ModuleComputers" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/ModuleComputers/lib/TerrarumTSVM.jar" path-in-jar="/" />
+      <!-- TSVM is intentionally NOT bundled here: it ships as a separate, swappable TerranTSVM.jar
+           (see metadata.properties `extrajars`). TerranVirtualDisk stays bundled as it is a stable
+           dependency of the module itself. -->
       <element id="extracted-dir" path="$PROJECT_DIR$/ModuleComputers/lib/TerranVirtualDisk.jar" path-in-jar="/" />
     </root>
   </artifact>

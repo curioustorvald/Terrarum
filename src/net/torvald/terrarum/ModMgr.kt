@@ -232,6 +232,12 @@ object ModMgr {
                     val version = modMetadata.getProperty("version")
                     val jar = modMetadata.getProperty("jar")
                     val jarHash = modMetadata.getProperty("jarhash").uppercase()
+                    // additional, NON hash-locked jars added to the very same module classloader.
+                    // Use this for swappable runtime libraries (e.g. a virtual-machine jar that the
+                    // module references directly but which should be upgradable by just replacing the
+                    // file). Comma or semicolon separated.
+                    val extraJars = (modMetadata.getProperty("extrajars") ?: "")
+                        .split(Regex("""[,;][ ]*""")).map { it.trim() }.filter { it.isNotEmpty() }
                     val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).filter { it.isNotEmpty() }.toTypedArray()
                     val isDir = if (isInternal && AssetCache.isDistribution)
                         true // internal mods in archive are always "directories"
@@ -316,6 +322,19 @@ object ModMgr {
                                 val cl = JarFileLoader(urls)
                                 cl.addFile(jarFilePath)
                                 moduleClassloader[moduleName] = cl
+
+                                // attach the extra (swappable, non hash-checked) jars to the same
+                                // classloader so the module can reference their classes directly.
+                                extraJars.forEach { extraJar ->
+                                    val extraPath = "${File(modDir).absolutePath}/$moduleName/$extraJar"
+                                    if (File(extraPath).exists()) {
+                                        cl.addFile(extraPath)
+                                        printdbg(this, "Module $moduleName: attached extra classpath jar '$extraJar'")
+                                    }
+                                    else {
+                                        printdbgerr(this, "Module $moduleName: extra jar not found, skipping: '$extraJar' (expected at $extraPath)")
+                                    }
+                                }
 
                                 // check for hash
                                 digester.reset()

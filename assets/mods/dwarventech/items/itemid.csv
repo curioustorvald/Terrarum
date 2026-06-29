@@ -1,5 +1,5 @@
 id;classname;tags
 #1;net.torvald.terrarum.modulecomputers.gameitems.ItemWearableWorldRadar;
-#2;net.torvald.terrarum.modulecomputers.gameitems.ItemHomeComputer;
+2;net.torvald.terrarum.modulecomputers.gameitems.ItemHomeComputer;
 256;net.torvald.terrarum.modulecomputers.gameitems.ItemComputerConsole;
 257;net.torvald.terrarum.modulecomputers.gameitems.ItemComputerProcessor;
