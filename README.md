@@ -1,10 +1,10 @@
-## Aperçu ##
+## Aperçu
 
 The goal of this project is to create a modular game engine that accommodates a 2D side-scrolling tilemap platformer, and a game that runs on top of it.
 
 The project is divided into two parts: **Terrarum the Game Engine** and **Terrarum the actual game**.
 
-## Terrarum the Game Engine ##
+## Terrarum the Game Engine
 
 This game engine aims to provide following features:
 
@@ -16,13 +16,13 @@ This game engine aims to provide following features:
 - Fluid simulation based on Cellular Automata
 - Built-in multilingual font — please refer to [its own Repository](https://github.com/curioustorvald/Terrarum-sans-bitmap)
 
-## Terrarum the Actual Game ##
+## Terrarum the Actual Game
 
 *Terrarum* is a side-view tilemap platformer-adventure-sandbox game.
 
-## Player Setup ##
+## Player Setup
 
-### System Requirements ###
+### System Requirements
 Requires 64 bit processor and operation system.
 | | Minimum | Recommended |
 |---|---|---|
@@ -35,7 +35,7 @@ Requires 64 bit processor and operation system.
 
 - Playing the game on the Minimum Requirement is ill advised: framerate will be sub-20 and the world generation will take more than 10 minutes
 
-## Development Environment ##
+## Development Environment
 
 - Requirements:
     - JDK 17 or higher
@@ -45,6 +45,19 @@ Kotlin runtimes must be downloaded using the IntelliJ IDEA. All other libraries 
 
 The project uses GraalVM 23.1.10 for JavaScript execution (with the Graal JIT compiler enabled via `--upgrade-module-path`).
 
-## Copyright ##
+## Copyright
 
-Please refer to [```COPYING.md```](COPYING.md) but it's mostly GPL 3.
+Copyright (C) 2013-2026 Minjae Song ("CuriousTorvald")
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

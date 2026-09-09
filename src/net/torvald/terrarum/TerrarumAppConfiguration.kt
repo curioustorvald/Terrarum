@@ -51,7 +51,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 basegame
 """
 
-    val FIXED_LATEST_DOWNLOAD_LINK = URL("https://github.com/curioustorvald/Terrarum/releases/latest")
+    val STATIC_LATEST_DOWNLOAD_LINK = URL("https://github.com/curioustorvald/Terrarum/releases/latest")
 
     /**
      *
@@ -76,11 +76,11 @@ basegame
     // Commit counts up to the Release 0.3.1: 2278
     // Commit counts up to the Release 0.3.2: 2732
     // Commit counts up to the Release 0.3.3: 3020
-    // Commit counts up to the Release 0.4.0: 3631
-    // Commit counts up to the Release 0.4.1: 3678
-    // Commit counts up to the Release 0.4.2: 3762
-    // Commit counts up to the Release 0.5.0: 4090
-    // Commit counts up to the Release 0.5.1: 4097
+    // Commit counts up to the Release 0.4.0: 3631 (Alpha 1.0)
+    // Commit counts up to the Release 0.4.1: 3678 (Alpha 1.1)
+    // Commit counts up to the Release 0.4.2: 3762 (Alpha 1.2)
+    // Commit counts up to the Release 0.5.0: 4090 (Alpha 2.0)
+    // Commit counts up to the Release 0.5.1: 4097 (Alpha 2.1)
 
     val DEV_CYCLE: Map<String, Long> = mapOf(
         "Alpha" to 0x0000_000004_000000,

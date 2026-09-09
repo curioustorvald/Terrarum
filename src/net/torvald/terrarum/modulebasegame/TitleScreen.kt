@@ -600,12 +600,12 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 )
 
 
-                val tw = App.fontGame.getWidth("<${TerrarumAppConfiguration.FIXED_LATEST_DOWNLOAD_LINK}>")
+                val tw = App.fontGame.getWidth("<${TerrarumAppConfiguration.STATIC_LATEST_DOWNLOAD_LINK}>")
                 if (Terrarum.mouseScreenX in tx - 32 until tx + tw + 32 &&
                     Terrarum.mouseScreenY in ty2 - 16 until ty2 + App.fontGame.lineHeight.toInt() + 16) {
 
                     if (Gdx.input.isButtonJustPressed(App.getConfigInt("control_mouse_primary"))) {
-                        OpenURL(TerrarumAppConfiguration.FIXED_LATEST_DOWNLOAD_LINK)
+                        OpenURL(TerrarumAppConfiguration.STATIC_LATEST_DOWNLOAD_LINK)
                     }
                     batch.color = Toolkit.Theme.COL_SELECTED
                 }
@@ -614,7 +614,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
                 App.fontGame.draw(
                     batch,
-                    "<${TerrarumAppConfiguration.FIXED_LATEST_DOWNLOAD_LINK}>",
+                    "<${TerrarumAppConfiguration.STATIC_LATEST_DOWNLOAD_LINK}>",
                     tx, ty2
                 )
 
