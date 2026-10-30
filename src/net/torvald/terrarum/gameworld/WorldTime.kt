@@ -208,17 +208,11 @@ class WorldTime(initTime: Long = 0L) {
         const val DIURNAL_MOTION_LENGTH = 86636f
 
         val DAY_NAMES = arrayOf(//daynames are taken from Nynorsk (å -> o)
-                "MONDAG", "TYSDAG", "MIDTVEKE" //middle-week
+                "MONDAG", "TYSDAG", "MIDDAG"
                 , "TORSDAG", "FREDAG", "LAURDAG", "SUNDAG", "VERDDAG" //From Norsk word 'verd'
         )
         val DAY_NAMES_SHORT = arrayOf("MON", "TYS", "MID", "TOR", "FRE", "LAU", "SUN", "VER")
-        // dwarven calendar of 12 monthes
-        /*val MONTH_NAMES = arrayOf(
-                "Opal", "Obsidian", "Granite", "Slate", "Felsite", "Hematite",
-                "Malachite", "Galena", "Limestone", "Sandstone", "Timber", "Moonstone"
-        )
-        val MONTH_NAMES_SHORT = arrayOf("Opal", "Obsi", "Gran", "Slat", "Fels", "Hema",
-                "Mala", "Gale", "Lime", "Sand", "Timb", "Moon")*/
+
         val MONTH_NAMES = arrayOf("SPRING", "SUMMER", "AUTUMN", "WINTER")
         val MONTH_NAMES_SHORT = arrayOf("SPRI", "SUMM", "AUTM", "WINT")
 
