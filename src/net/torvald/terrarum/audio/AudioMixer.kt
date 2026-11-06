@@ -395,7 +395,8 @@ class AudioMixer : Disposable {
         // the real updates
         (Gdx.audio as? Lwjgl3Audio)?.update()
         masterTrack.volume = masterVolume
-        musicTrack.getFilter<PreGain>().gain = musicVolume.toFloat() * 0.5f
+        // the song's own extra gain (a music pack's global_dsp_request) rides on the volume setting
+        musicTrack.getFilter<PreGain>().gain = musicVolume.toFloat() * 0.5f * (musicTrack.currentTrack?.preGain ?: 1f)
         ambientTracks.forEach {
             it.getFilter<PreGain>().gain = ambientVolume.toFloat()
         }
@@ -551,6 +552,12 @@ class AudioMixer : Disposable {
             req.fadeTarget = target * track.maxVolume
             req.fadeStart = source ?: fadeBus.volume
             req.callback = jobAfterFadeout
+        }
+        else {
+            // a fade-out is already under way: ride it, and tell this caller too when it is done. Dropping the
+            // job would leave a MusicService transaction waiting for it forever, holding the lock.
+            val earlier = req.callback
+            req.callback = { earlier(); jobAfterFadeout() }
         }
     }
 

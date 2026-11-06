@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.audio.AudioBank
 import net.torvald.terrarum.audio.audiobank.MusicContainer
 import java.io.File
 
@@ -13,8 +14,8 @@ import java.io.File
  * Created by minjaesong on 2024-06-29.
  */
 class TerrarumMusicPlaylist(
-    /** list of files */
-    val musicList: List<MusicContainer>,
+    /** list of songs: files ([MusicContainer]) or anything else that plays ([net.torvald.terrarum.audio.taudplay.TaudAudioBank]) */
+    val musicList: List<AudioBank>,
     /** name of the album/playlist shown in the [net.torvald.terrarum.musicplayer.gui.MusicPlayer] */
     val name: String,
     /** canonicalPath with path separators converted to forward slash */
@@ -22,7 +23,12 @@ class TerrarumMusicPlaylist(
     /** "continuous", "intermittent"; not used by the Playlist itself but by the BackgroundMusicPlayer (aka you are the one who make it actually work) */
     val diskJockeyingMode: String,
     /** if set, the `internalIndices` will be shuffled accordingly, and this happens automatically. (aka you don't need to worry about) */
-    val shuffled: Boolean
+    val shuffled: Boolean,
+    /** if set, [queueNext] asks it for the index of the song to play next, given the index of the current one (-1
+     * if none), in place of the shuffled order: a pick by the situation at that moment (see
+     * [net.torvald.terrarum.audio.taudplay.MusicPack.playlist]). The songs it picks are kept in the history, so
+     * [queuePrev] still goes back through what has played. */
+    val nextPicker: ((Int) -> Int)? = null,
 ): Disposable {
 
     private val internalIndices = ArrayList<Int>()
@@ -44,7 +50,7 @@ class TerrarumMusicPlaylist(
             refillInternalIndices()
     }
 
-    fun getCurrent(): MusicContainer {
+    fun getCurrent(): AudioBank {
         checkRefill()
 
         return musicList[internalIndices[currentIndexCursor]]
@@ -55,14 +61,18 @@ class TerrarumMusicPlaylist(
      *
      * For intermittent playback, this function is called by the transaction defined in [MusicService.update]
      */
-    fun queueNext(): MusicContainer {
+    fun queueNext(): AudioBank {
         checkRefill()
+        nextPicker?.takeIf { musicList.isNotEmpty() }?.let { picker ->
+            internalIndices[currentIndexCursor + 1] = picker(internalIndices.getOrElse(currentIndexCursor) { -1 })
+                .coerceIn(0, musicList.size - 1)
+        }
         currentIndexCursor += 1
 
         return musicList[internalIndices[currentIndexCursor]]
     }
 
-    fun queuePrev(): MusicContainer {
+    fun queuePrev(): AudioBank {
         if (currentIndexCursor == 0) {
             if (shuffled) {
                 musicList.indices.toMutableList().also { if (shuffled) it.shuffle() }.reversed().forEach {
@@ -83,7 +93,7 @@ class TerrarumMusicPlaylist(
         return musicList[internalIndices[currentIndexCursor]]
     }
 
-    fun queueNthSong(n: Int): MusicContainer {
+    fun queueNthSong(n: Int): AudioBank {
         if (shuffled) {
             internalIndices.clear()
             refillInternalIndices()

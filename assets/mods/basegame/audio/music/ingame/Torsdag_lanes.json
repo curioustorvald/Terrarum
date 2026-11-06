@@ -1,0 +1,31 @@
+{
+  "format": "terrarum-bgm-lanes 1",
+  "title": "Torsdag",
+  "file": "Torsdag.taud",
+  "kind": "biome",
+  "biome": "cave",
+  "about": "A piece for the deep caves. The game does not choose music by depth, so it is written to stand in the shallow caves too, and it is played as written everywhere underground: every fader is 0 dB there. The game keeps playing it when the player comes up into the open air, and it is meant to stand that; the 'open' hint only takes the bells out of the birdsong's way. The roles say what each lane does.",
+  "roles": {
+    "lead":       "the tune: the electric piano: keep it",
+    "foundation": "the lithophone's figure (one stroke on each group's head) and the bowed bass, the pulse and the floor: keep it",
+    "bed":        "the cello and the pad, sustained: the first to smear under the cave reverb (the cello has nothing under 90 Hz, the pad nothing under 220 Hz)",
+    "sparkle":    "the bells, silver and gold: high, struck, in quick runs; they share the top with the birdsong outdoors"
+  },
+  "lanes": [
+    { "index": 0,  "id": "tune",  "label": "Tune",     "role": "lead" },
+    { "index": 1,  "id": "st1",   "label": "Stone 1",  "role": "foundation" },
+    { "index": 2,  "id": "st2",   "label": "Stone 2",  "role": "foundation" },
+    { "index": 3,  "id": "st3",   "label": "Stone 3",  "role": "foundation" },
+    { "index": 4,  "id": "bass",  "label": "Bass",     "role": "foundation" },
+    { "index": 5,  "id": "cello", "label": "Cello",    "role": "bed", "note": "the second voice of the closing (bars 13–20) and the tune of the pocket (bars 21–24): lead there" },
+    { "index": 6,  "id": "pad1",  "label": "Pad 1",    "role": "bed", "note": "only in the pocket (bars 21–24)" },
+    { "index": 7,  "id": "pad2",  "label": "Pad 2",    "role": "bed", "note": "only in the pocket (bars 21–24)" },
+    { "index": 8,  "id": "pad3",  "label": "Pad 3",    "role": "bed", "note": "only in the pocket (bars 21–24)" },
+    { "index": 9,  "id": "ore1",  "label": "Silver 1", "role": "sparkle" },
+    { "index": 10, "id": "ore2",  "label": "Silver 2", "role": "sparkle" },
+    { "index": 11, "id": "gold",  "label": "Gold",     "role": "sparkle", "note": "from the pocket on (bar 22)" }
+  ],
+  "hints_db": {
+    "open": { "sparkle": -3 }
+  }
+}

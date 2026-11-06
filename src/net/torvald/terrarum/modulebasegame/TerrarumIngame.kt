@@ -12,6 +12,7 @@ import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
 import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.audio.taudplay.MusicEnvironment
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.blockstats.TileSurvey
@@ -1024,11 +1025,13 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 val ratio1 = ratio.coerceIn(0.0, 1.0)
                 App.audioMixer.convolveBusCave.volume = ratio1
                 App.audioMixer.convolveBusOpen.volume = 1.0 - ratio1
+                MusicEnvironment.enclosure = ratio1 // the music's crossfades follow the same balance
             }
             else {
                 val ratio1 = (ratio / MaterialCodex["AIIR"].sondrefl).absoluteValue.coerceIn(0.0, 1.0)
                 App.audioMixer.convolveBusOpen.volume = (1.0 - ratio1).pow(0.75)
                 App.audioMixer.convolveBusCave.volume = 0.0
+                MusicEnvironment.enclosure = 0.0
             }
             val openness = (TileSurvey.getRatio("basegame.Ingame.openness") ?: 0.0).times(1.74).coerceIn(0.0, 1.0)
             App.audioMixer.amb1plus2.volume = openness.pow(2.0 / 3.0)

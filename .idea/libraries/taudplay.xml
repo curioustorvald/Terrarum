@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="taudplay">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/taudplay-4.7.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/taudplay-4.7.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

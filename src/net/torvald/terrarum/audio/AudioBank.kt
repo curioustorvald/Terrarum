@@ -19,6 +19,12 @@ abstract class AudioBank : Disposable {
 
     abstract val name: String
 
+    /**
+     * Extra gain the mixer puts on the music track's [net.torvald.terrarum.audio.dsp.PreGain] while this audio is
+     * its current track, on top of the music volume setting: e.g. a music pack's `global_dsp_request`. 1 = as is.
+     */
+    open val preGain: Float = 1f
+
     abstract var samplingRate: Float
     abstract var channels: Int
     abstract var totalSizeInSamples: Long

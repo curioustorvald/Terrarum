@@ -9,8 +9,8 @@ import net.torvald.unicode.MIDDOT
 object CreditSingleton {
 
     val credit: List<String>; get() =
-            ("Programming, Arts, Directed by CuriousTorvald\n" +
-             "Music by Orstphone\n" +
+            ("Codes, Aseets, Directed by CuriousTorvald\n" +
+             "Record Music by Orstphone\n" +
              "Translation Databases:\n" +
              "$ENDASH © 2018 The Polyglot Project. Distributed under CC0.\n" +
              """
@@ -316,7 +316,13 @@ limitations under the License.
 
 
 
-$BULLET Music:
+$BULLET Ingame Music:
+℗ 2026 CuriousTorvald
+Created using Microtone, a music tracker I made <https://microtone.cc>
+
+
+
+$BULLET Record Music:
 
 ℗ 2021, 2022, 2023, 2024 Orstphone
 Check out the original tracks on:

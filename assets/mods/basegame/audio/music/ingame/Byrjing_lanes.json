@@ -1,0 +1,139 @@
+{
+  "format": "terrarum-bgm-lanes 1",
+  "title": "Byrjing",
+  "file": "Byrjing.taud",
+  "kind": "combinatorial",
+  "about": "The title-screen music. A 64-lane project of 40 lanes, of which only a DRAW plays: at every playback start the player draws options from the slots below and sets every lane's fader (taudplay setVoiceGain) to 1 if its option was drawn and to 0 if not, before play(), and leaves them there until the song ends. Every lane is written against one chord chart and plays only that bar's five pentatonic notes, so any draw is consonant: no draw is better than another. The written levels put a FULL draw (one of everything, one sparkle) at about −32 LUFS, unmastered, and every option of a slot at about the level of the others, so any draw is balanced: random draws measure −33.1 to −31.6 LUFS, and the sparsest (tune, pulse, bass) −33.3. A player that sets no faders plays all 40 lanes at once, which is not the piece.",
+  "roles": {
+    "lead":       "the tune (slot 'tune'), and the replies in its gaps (slot 'answer')",
+    "foundation": "the 11/8 figure (slot 'pulse') and the bass on each downbeat (slot 'bass'): the pulse, never a drum",
+    "bed":        "the held chord (slot 'bed'): the first to smear under a cave reverb, though the title screen is out in the open",
+    "sparkle":    "high struck colour (slot 'sparkle'): shares the top with the birdsong of the title screen's morning"
+  },
+  "selection": {
+    "when": "once, at every playback start, before play(); nothing changes while the song plays",
+    "rule": "For each slot, in the order listed: draw how many options it plays (k) from 'count', a table of k → weight; then draw k different options from 'options' by their weights, without replacement. Set every lane of a drawn option to gain 'gain'[k] (1 when the slot has no 'gain'), and every lane of the song that no drawn option names to 0.",
+    "weights": "an item's chance is its weight divided by the sum of the weights still in the draw",
+    "fade_ms": 0,
+    "random": "any source; pick.mjs is the reference implementation (a seedable mulberry32), and render.mjs renders a draw by seed or by name",
+    "draws": 52800,
+    "draws_note": "8 tunes × 5 answers (none, or one of four) × 5 pulses × 4 basses × 6 beds (none, or one of five) × 11 sparkle sets (none, one of four, or two of four), every one of them a complete piece"
+  },
+  "slots": [
+    {
+      "id": "tune", "label": "Tune", "role": "lead",
+      "about": "The theme, sung by the lead voice of one of the eight day pieces.",
+      "count": { "1": 1 },
+      "options": [
+        { "id": "vibraphone", "label": "Vibraphone", "day": "Mondag",  "lanes": [0], "weight": 1 },
+        { "id": "ocarina",    "label": "Ocarina",    "day": "Tysdag",  "lanes": [1], "weight": 1 },
+        { "id": "flute",      "label": "Flute",      "day": "Middag",  "lanes": [2], "weight": 1 },
+        { "id": "tine-piano", "label": "Tine piano", "day": "Torsdag", "lanes": [3], "weight": 1 },
+        { "id": "soft-lead",  "label": "Soft lead",  "day": "Fredag",  "lanes": [4], "weight": 1 },
+        { "id": "piano",      "label": "Piano",      "day": "Laurdag", "lanes": [5], "weight": 1 },
+        { "id": "clarinet",   "label": "Clarinet",   "day": "Sundag",  "lanes": [6], "weight": 1 },
+        { "id": "pan-flute",  "label": "Pan flute",  "day": "Verddag", "lanes": [7], "weight": 1 }
+      ]
+    },
+    {
+      "id": "answer", "label": "Answer", "role": "lead",
+      "about": "Short replies in the gaps the theme leaves, an octave below it. Never sound with the tune's notes, only with its silences.",
+      "count": { "0": 1, "1": 3 },
+      "options": [
+        { "id": "cello",       "label": "Cello",       "day": "Tysdag",  "lanes": [8],  "weight": 1 },
+        { "id": "horn",        "label": "Horn",        "day": "Sundag",  "lanes": [9],  "weight": 1 },
+        { "id": "viola",       "label": "Viola",       "day": "Verddag", "lanes": [10], "weight": 1 },
+        { "id": "cor-anglais", "label": "Cor anglais", "day": "Fredag",  "lanes": [11], "weight": 1 }
+      ]
+    },
+    {
+      "id": "pulse", "label": "Pulse", "role": "foundation",
+      "about": "The 11/8 figure, a low lane and a high lane. The four 3+3+3+2 players each play a different rotation of the bar and move one place on at every section (the 'grouping' is the first section's); the steel guitar does the same with 2+2+3+2+2.",
+      "count": { "1": 1 },
+      "options": [
+        { "id": "harp",    "label": "Harp",          "day": "Mondag",  "lanes": [12, 13], "grouping": "3+3+3+2",   "weight": 1 },
+        { "id": "nylon",   "label": "Nylon guitar",  "day": "Middag",  "lanes": [14, 15], "grouping": "3+3+2+3",   "weight": 1 },
+        { "id": "marimba", "label": "Marimba",       "day": "Tysdag",  "lanes": [16, 17], "grouping": "3+2+3+3",   "weight": 1 },
+        { "id": "kalimba", "label": "Kalimba",       "day": "Verddag", "lanes": [18, 19], "grouping": "2+3+3+3",   "weight": 1 },
+        { "id": "steel",   "label": "Steel guitar",  "day": "Sundag",  "lanes": [20, 21], "grouping": "2+2+3+2+2", "weight": 1 }
+      ]
+    },
+    {
+      "id": "bass", "label": "Bass", "role": "foundation",
+      "about": "On every downbeat, the one place all the groupings share.",
+      "count": { "1": 1 },
+      "options": [
+        { "id": "upright",   "label": "Upright bass", "day": "Sundag",  "lanes": [22], "weight": 1 },
+        { "id": "bowed",     "label": "Bowed bass",   "day": "Mondag",  "lanes": [23], "weight": 1 },
+        { "id": "fretless",  "label": "Fretless",     "day": "Middag",  "lanes": [24], "weight": 1 },
+        { "id": "piano-low", "label": "Piano low",    "day": "Fredag",  "lanes": [25], "weight": 1 }
+      ]
+    },
+    {
+      "id": "bed", "label": "Bed", "role": "bed",
+      "about": "Two held notes of each chord, between the pulse and the tune.",
+      "count": { "0": 1, "1": 4 },
+      "options": [
+        { "id": "warm-pad",  "label": "Warm pad",     "day": "Laurdag", "lanes": [26, 27], "weight": 1 },
+        { "id": "strings",   "label": "Slow strings", "day": "Middag",  "lanes": [28, 29], "weight": 1 },
+        { "id": "oohs",      "label": "Voice oohs",   "day": "Mondag",  "lanes": [30, 31], "weight": 1 },
+        { "id": "organ",     "label": "Reed organ",   "day": "Sundag",  "lanes": [32, 33], "weight": 1 },
+        { "id": "bandoneon", "label": "Bandoneon",    "day": "Tysdag",  "lanes": [34, 35], "weight": 1 }
+      ]
+    },
+    {
+      "id": "sparkle", "label": "Sparkle", "role": "sparkle",
+      "about": "High struck colour placed by keyed chance (the same notes every playback; only which lanes are heard changes). The bell marks each new key.",
+      "count": { "0": 1, "1": 2, "2": 2 },
+      "gain": { "1": 1, "2": 0.84 },
+      "options": [
+        { "id": "celesta",   "label": "Celesta",   "day": "Mondag",  "lanes": [36], "weight": 1 },
+        { "id": "music-box", "label": "Music box", "day": "Laurdag", "lanes": [37], "weight": 1 },
+        { "id": "bell",      "label": "Bell",      "day": "Sundag",  "lanes": [38], "weight": 1 },
+        { "id": "silver",    "label": "Silver",    "day": "Torsdag", "lanes": [39], "weight": 1 }
+      ]
+    }
+  ],
+  "lanes": [
+    { "index": 0,  "id": "vib",  "slot": "tune",    "option": "vibraphone",  "label": "Vibraphone",   "role": "lead" },
+    { "index": 1,  "id": "oca",  "slot": "tune",    "option": "ocarina",     "label": "Ocarina",      "role": "lead" },
+    { "index": 2,  "id": "fl",   "slot": "tune",    "option": "flute",       "label": "Flute",        "role": "lead" },
+    { "index": 3,  "id": "ep",   "slot": "tune",    "option": "tine-piano",  "label": "Tine piano",   "role": "lead" },
+    { "index": 4,  "id": "lead", "slot": "tune",    "option": "soft-lead",   "label": "Soft lead",    "role": "lead" },
+    { "index": 5,  "id": "pno",  "slot": "tune",    "option": "piano",       "label": "Piano",        "role": "lead" },
+    { "index": 6,  "id": "cl",   "slot": "tune",    "option": "clarinet",    "label": "Clarinet",     "role": "lead" },
+    { "index": 7,  "id": "pf",   "slot": "tune",    "option": "pan-flute",   "label": "Pan flute",    "role": "lead" },
+    { "index": 8,  "id": "vc",   "slot": "answer",  "option": "cello",       "label": "Cello",        "role": "lead" },
+    { "index": 9,  "id": "hn",   "slot": "answer",  "option": "horn",        "label": "Horn",         "role": "lead" },
+    { "index": 10, "id": "vla",  "slot": "answer",  "option": "viola",       "label": "Viola",        "role": "lead" },
+    { "index": 11, "id": "cor",  "slot": "answer",  "option": "cor-anglais", "label": "Cor anglais",  "role": "lead" },
+    { "index": 12, "id": "hp1",  "slot": "pulse",   "option": "harp",        "label": "Harp low",     "role": "foundation" },
+    { "index": 13, "id": "hp2",  "slot": "pulse",   "option": "harp",        "label": "Harp high",    "role": "foundation" },
+    { "index": 14, "id": "ny1",  "slot": "pulse",   "option": "nylon",       "label": "Guitar thumb", "role": "foundation" },
+    { "index": 15, "id": "ny2",  "slot": "pulse",   "option": "nylon",       "label": "Guitar high",  "role": "foundation" },
+    { "index": 16, "id": "mb1",  "slot": "pulse",   "option": "marimba",     "label": "Marimba low",  "role": "foundation" },
+    { "index": 17, "id": "mb2",  "slot": "pulse",   "option": "marimba",     "label": "Marimba high", "role": "foundation" },
+    { "index": 18, "id": "ka1",  "slot": "pulse",   "option": "kalimba",     "label": "Kalimba low",  "role": "foundation" },
+    { "index": 19, "id": "ka2",  "slot": "pulse",   "option": "kalimba",     "label": "Kalimba high", "role": "foundation" },
+    { "index": 20, "id": "st1",  "slot": "pulse",   "option": "steel",       "label": "Steel thumb",  "role": "foundation" },
+    { "index": 21, "id": "st2",  "slot": "pulse",   "option": "steel",       "label": "Steel high",   "role": "foundation" },
+    { "index": 22, "id": "ub",   "slot": "bass",    "option": "upright",     "label": "Upright bass", "role": "foundation" },
+    { "index": 23, "id": "cb",   "slot": "bass",    "option": "bowed",       "label": "Bowed bass",   "role": "foundation" },
+    { "index": 24, "id": "fb",   "slot": "bass",    "option": "fretless",    "label": "Fretless",     "role": "foundation" },
+    { "index": 25, "id": "pb",   "slot": "bass",    "option": "piano-low",   "label": "Piano low",    "role": "foundation" },
+    { "index": 26, "id": "wp1",  "slot": "bed",     "option": "warm-pad",    "label": "Warm pad 1",   "role": "bed" },
+    { "index": 27, "id": "wp2",  "slot": "bed",     "option": "warm-pad",    "label": "Warm pad 2",   "role": "bed" },
+    { "index": 28, "id": "sn1",  "slot": "bed",     "option": "strings",     "label": "Strings 1",    "role": "bed" },
+    { "index": 29, "id": "sn2",  "slot": "bed",     "option": "strings",     "label": "Strings 2",    "role": "bed" },
+    { "index": 30, "id": "oo1",  "slot": "bed",     "option": "oohs",        "label": "Oohs 1",       "role": "bed" },
+    { "index": 31, "id": "oo2",  "slot": "bed",     "option": "oohs",        "label": "Oohs 2",       "role": "bed" },
+    { "index": 32, "id": "og1",  "slot": "bed",     "option": "organ",       "label": "Organ 1",      "role": "bed" },
+    { "index": 33, "id": "og2",  "slot": "bed",     "option": "organ",       "label": "Organ 2",      "role": "bed" },
+    { "index": 34, "id": "bd1",  "slot": "bed",     "option": "bandoneon",   "label": "Bandoneon 1",  "role": "bed" },
+    { "index": 35, "id": "bd2",  "slot": "bed",     "option": "bandoneon",   "label": "Bandoneon 2",  "role": "bed" },
+    { "index": 36, "id": "cel",  "slot": "sparkle", "option": "celesta",     "label": "Celesta",      "role": "sparkle" },
+    { "index": 37, "id": "box",  "slot": "sparkle", "option": "music-box",   "label": "Music box",    "role": "sparkle" },
+    { "index": 38, "id": "tub",  "slot": "sparkle", "option": "bell",        "label": "Bell",         "role": "sparkle" },
+    { "index": 39, "id": "sil",  "slot": "sparkle", "option": "silver",      "label": "Silver",       "role": "sparkle" }
+  ]
+}

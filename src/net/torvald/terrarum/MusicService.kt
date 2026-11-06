@@ -3,7 +3,9 @@ package net.torvald.terrarum
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.audio.AudioBank
 import net.torvald.terrarum.audio.AudioMixer.Companion.DEFAULT_FADEOUT_LEN
-import net.torvald.terrarum.audio.audiobank.MusicContainer
+import net.torvald.terrarum.audio.taudplay.MusicEnvironment
+import net.torvald.terrarum.audio.taudplay.MusicPack
+import net.torvald.terrarum.transaction.LockedException
 import net.torvald.terrarum.transaction.Transaction
 import net.torvald.terrarum.transaction.TransactionListener
 import net.torvald.terrarum.transaction.TransactionState
@@ -67,7 +69,7 @@ object MusicService : TransactionListener() {
         currentPlaybackState.set(STATE_PLAYING)
     }
 
-    fun getRandomMusicInterval() = 16f + Math.random().toFloat() * 4f // longer gap (16s to 20s)
+    fun getRandomMusicInterval() = 30f + Math.random().toFloat() * 30f // longer gap (30s to 60s)
 
     private fun enterIntermissionAndWaitForPlaylist() {
         val djmode = currentPlaylist?.diskJockeyingMode ?: "intermittent"
@@ -89,48 +91,62 @@ object MusicService : TransactionListener() {
         enterIntermissionAndWaitForPlaylist()
     }
 
-    private var playTransactionOngoing = false
+    @Volatile private var playTransactionOngoing = false
+
+    /** A scene's playlist ([enterScene]) waiting for the lock: leaving the last scene is still fading its music out.
+     * @param waitFirst start the playlist after an intermission ([getRandomMusicInterval]) instead of at once */
+    private class PendingScene(val playlist: TerrarumMusicPlaylist, val waitFirst: Boolean)
+    private val pendingScenePlaylist = AtomicReference<PendingScene?>(null)
 
     fun update(delta: Float) {
+        // put the scene's playlist once no transaction holds the lock; one that loses a race for it waits again
+        if (!transactionLocked) pendingScenePlaylist.getAndSet(null)?.let { pending ->
+            val base = if (pending.waitFirst)
+                createTransactionPlaylistChange(pending.playlist) { enterIntermission() }
+            else
+                createTransactionPlaylistChangeAndPlayImmediately(pending.playlist, DEFAULT_FADEOUT_LEN) {}
+            runTransaction(object : Transaction by base {
+                override fun onFailure(e: Throwable, state: TransactionState) {
+                    base.onFailure(e, state)
+                    if (e is LockedException) pendingScenePlaylist.compareAndSet(null, pending)
+                }
+            })
+        }
+
         when (currentPlaybackState.get()) {
             STATE_FIREPLAY -> {
-                if (!playTransactionOngoing) {
+                // ONE transaction takes FIREPLAY to PLAYING, and no other starts until it is done. Two would start
+                // two songs: the second fades the first out, and in continuous mode the faded song's finishing
+                // hook calls FIREPLAY again, for ever.
+                if (!playTransactionOngoing && !transactionLocked) {
                     playTransactionOngoing = true
-                    MusicService.resumePlaylistPlayback(
-                        /* onSuccess: () -> Unit */
-                        {
-                            runTransaction(object : Transaction {
-                                private lateinit var nextMusic: MusicContainer
+                    runTransaction(object : Transaction {
+                        private var started = false
 
-                                override fun start(state: TransactionState) {
-                                    nextMusic = (state["currentPlaylist"] as TerrarumMusicPlaylist).queueNext()
-                                    App.audioMixer.startMusic(nextMusic)
-                                }
-
-                                override fun onSuccess(state: TransactionState) {
-//                                    printdbg(this, "FIREPLAY started music (${nextMusic.name})")
-                                    currentPlaybackState.set(STATE_PLAYING) // force PLAYING
-                                }
-
-                                override fun onFailure(e: Throwable, state: TransactionState) {
-//                                    printdbg(this, "FIREPLAY resume OK but startMusic failed, entering intermission")
-                                    enterIntermissionAndWaitForPlaylist() // will try again
-                                }
-                            })
-                        },
-                        /* onFailure: (Throwable) -> Unit */
-                        {
-//                            printdbg(this, "FIREPLAY resume failed, entering intermission")
-                            enterIntermissionAndWaitForPlaylist() // will try again
-                        },
-                        // onFinally: () -> Unit
-                        {
-                            playTransactionOngoing = false
+                        override fun start(state: TransactionState) {
+                            if (currentPlaybackState.get() != STATE_FIREPLAY) return // moved on meanwhile
+                            // a song already playing (one the mixer started from its queue) is the song: starting
+                            // another would fade it out
+                            if (!App.audioMixer.musicTrack.isPlaying) {
+                                val nextMusic = (state["currentPlaylist"] as TerrarumMusicPlaylist).queueNext()
+                                App.audioMixer.startMusic(nextMusic)
+                            }
+                            started = true
                         }
-                    )
-                }
-                else {
-//                    printdbg(this, "FIREPLAY no-op: playTransaction is ongoing")
+
+                        override fun onSuccess(state: TransactionState) {
+                            if (started) currentPlaybackState.set(STATE_PLAYING)
+                        }
+
+                        override fun onFailure(e: Throwable, state: TransactionState) {
+                            if (e is LockedException)
+                                playTransactionOngoing = false // another transaction got there first: try again
+                            else
+                                enterIntermissionAndWaitForPlaylist() // will try again
+                        }
+                    }) {
+                        playTransactionOngoing = false
+                    }
                 }
             }
             STATE_PLAYING -> {
@@ -149,22 +165,34 @@ object MusicService : TransactionListener() {
     }
 
 
+    /**
+     * Puts the scene's playlist from the default music pack ([MusicPack.default], basegame's `audio/music/ingame`)
+     * and starts it: "title" plays the pack's title-screen theme at once and back to back; "ingame" every other theme
+     * with the usual intermissions, the first song after one too ([getRandomMusicInterval]). A scene the pack has
+     * nothing for (or no pack) stops the music.
+     */
     fun enterScene(id: String) {
-        /*val playlist = when (id) {
-            "title" -> getTitlePlaylist()
-            "ingame" -> getIngameDefaultPlaylist()
-            else -> getIngameDefaultPlaylist()
+        if (id == "title") MusicEnvironment.enclosure = 0.0 // the title screen is out in the open
+
+        val pack = MusicPack.default
+        val playlist = when (id) {
+            "title" -> pack?.titlePlaylist()
+            "ingame" -> pack?.ingamePlaylist()
+            else -> null
         }
 
-        putNewPlaylist(playlist) {
-            // after the fadeout, we'll...
-            enterSTATE_FIREPLAY()
-        }*/
-
-        stopPlaylistPlayback { }
+        if (playlist == null || playlist.musicList.isEmpty()) {
+            pendingScenePlaylist.getAndSet(null)?.playlist?.dispose()
+            stopPlaylistPlayback { }
+        }
+        else {
+            // put by update() once no transaction holds the lock: leaveScene() is usually still fading out
+            pendingScenePlaylist.getAndSet(PendingScene(playlist, waitFirst = id == "ingame"))?.playlist?.dispose()
+        }
     }
 
     fun leaveScene() {
+        pendingScenePlaylist.getAndSet(null)?.playlist?.dispose()
         stopPlaylistPlayback {}
     }
 

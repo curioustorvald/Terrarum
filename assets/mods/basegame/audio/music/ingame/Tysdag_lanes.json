@@ -1,0 +1,45 @@
+{
+  "format": "terrarum-bgm-lanes 1",
+  "title": "Tysdag",
+  "file": "Tysdag.taud",
+  "kind": "dual",
+  "about": "One song with a core that always plays (group 'core': the tune and the bass) and two arrangements around it, above ground (group 'open') and underground (group 'cave'). The game crossfades the open and cave groups by the player's surroundings and never touches the core. The faders are the mix, not a suggestion. Written levels are the core plus ONE arrangement at full fader (about −32 LUFS, unmastered); a player that sets no faders plays everything at full, about 1 LU louder (the core is not doubled).",
+  "roles": {
+    "lead":       "a tune: the ocarina (core), the recorder's and the cello's answers",
+    "foundation": "the bass on the shared downbeat (core); the dulcimer (open) and the marimba frame (cave), each striking the 7/8 bar in its own grouping",
+    "bed":        "the bandoneon (open) and the halo pad (cave): the first to smear under a cave reverb",
+    "sparkle":    "the marimba's high ninth (cave, octave 6): shares the top with the birdsong outdoors, but the cave group is silent outdoors"
+  },
+  "groups": {
+    "core": { "label": "Everywhere",   "lanes": [0, 1] },
+    "open": { "label": "Above ground", "lanes": [2, 3, 4, 5, 6, 7] },
+    "cave": { "label": "Underground",  "lanes": [8, 9, 10, 11, 12] }
+  },
+  "crossfade": {
+    "control": "x, 0 = in the open … 1 = enclosed in rock: the same balance the game's 73×73 survey sets between the open and cave convolvers, smoothed (a time constant of about 3 s) so that a tunnel mouth does not flutter",
+    "law": "equal-power",
+    "gain": { "core": "1", "open": "cos(x·π/2)", "cave": "sin(x·π/2)" },
+    "points": [
+      { "x": 0,   "core": 1, "open": 1,     "cave": 0 },
+      { "x": 0.5, "core": 1, "open": 0.707, "cave": 0.707 },
+      { "x": 1,   "core": 1, "open": 0,     "cave": 1 }
+    ],
+    "fade_ms": 1500,
+    "note": "taudplay: setVoiceGain(lane, gain, fade_ms) on every lane of the open and cave groups whenever the smoothed x has moved by more than about 0.02. The core lanes stay at 1. The two arrangements never clash, so any x is a valid mix, and x = 0.5 is the fullest form of the piece."
+  },
+  "lanes": [
+    { "index": 0,  "id": "tune", "group": "core", "label": "Tune",        "role": "lead" },
+    { "index": 1,  "id": "bass", "group": "core", "label": "Bass",        "role": "foundation" },
+    { "index": 2,  "id": "d1",   "group": "open", "label": "Dulcimer 1",  "role": "foundation" },
+    { "index": 3,  "id": "d2",   "group": "open", "label": "Dulcimer 2",  "role": "foundation" },
+    { "index": 4,  "id": "d3",   "group": "open", "label": "Dulcimer 3",  "role": "foundation" },
+    { "index": 5,  "id": "rec",  "group": "open", "label": "Recorder",    "role": "lead" },
+    { "index": 6,  "id": "acc1", "group": "open", "label": "Bandoneon 1", "role": "bed" },
+    { "index": 7,  "id": "acc2", "group": "open", "label": "Bandoneon 2", "role": "bed" },
+    { "index": 8,  "id": "m1",   "group": "cave", "label": "Marimba 1",   "role": "foundation" },
+    { "index": 9,  "id": "m2",   "group": "cave", "label": "Marimba 2",   "role": "foundation" },
+    { "index": 10, "id": "m3",   "group": "cave", "label": "Marimba 3",   "role": "sparkle" },
+    { "index": 11, "id": "vc",   "group": "cave", "label": "Cello",       "role": "lead" },
+    { "index": 12, "id": "pad",  "group": "cave", "label": "Halo",        "role": "bed" }
+  ]
+}

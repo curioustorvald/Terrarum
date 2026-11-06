@@ -22,7 +22,13 @@ src/net/torvald/terrarum/
   IngameInstance.kt          -- Base class for game screens (show/hide/render/resize lifecycle)
   Terrarum.kt               -- Game-level singleton (ingame instance management, extension functions)
   GameUpdateGovernor.kt      -- Update/render tick governors (ConsistentUpdateRate, Anarchy)
-  MusicService.kt            -- Music playback management
+  MusicService.kt            -- Music playback management (enterScene puts the default music pack's playlist)
+
+  audio/taudplay/            -- Taud songs (.taud) via lib/taudplay + lib/taudplay-libgdx:
+                                TaudAudioBank (an AudioBank, loads on first pull, drops the song on reset),
+                                BgmLanes (*_lanes.json), LaneDirector (faders), MusicPack (_muspackmanifest.json),
+                                MusicEnvironment (enclosure x, set by TerrarumIngame from the convolver balance).
+                                Test: tests/TaudMusicPackTest.kt (run from the project root)
 
   modulebasegame/
     EntryPoint.kt            -- Basegame module entry point (registers items, fixtures, blocks, weather)

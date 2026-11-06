@@ -1,0 +1,48 @@
+{
+  "format": "terrarum-bgm-lanes 1",
+  "title": "Verddag",
+  "file": "Verddag.taud",
+  "kind": "dual",
+  "about": "One song with a core that always plays (group 'core': the tune, the bass, the season bell) and two arrangements around it, above ground (group 'open') and underground (group 'cave'). The game crossfades the open and cave groups by the player's surroundings and never touches the core. Above ground every bar is struck in its own day's meter; underground the kalimba runs 3+3+2 through every bar line. The faders are the mix, not a suggestion. Written levels are the core plus ONE arrangement at full fader (about −32 LUFS, unmastered); a player that sets no faders plays everything at full, about 1.4 LU louder (−30.6 LUFS).",
+  "roles": {
+    "lead":       "a tune: the pan flute (core), the viola's answers (open) and the blown bottle's (cave)",
+    "foundation": "the bass on each day's first beat (core); the piano striking each day's groups (open); the kalimba's 3+3+2 cycle (cave)",
+    "bed":        "the choir (open) and the voice pad (cave): the first to smear under a cave reverb",
+    "sparkle":    "the kalimba's high ninth (cave, octave 5–6) and the small bells (open: triangle, sleigh bells, bell tree), which share the top with the birdsong outdoors",
+    "percussion": "colour, never a beat: the season bell (core), the timpani rolls into each season (cave), the small bells (open)"
+  },
+  "groups": {
+    "core": { "label": "Everywhere",   "lanes": [0, 1, 2] },
+    "open": { "label": "Above ground", "lanes": [3, 4, 5, 6, 7, 8] },
+    "cave": { "label": "Underground",  "lanes": [9, 10, 11, 12, 13, 14] }
+  },
+  "crossfade": {
+    "control": "x, 0 = in the open … 1 = enclosed in rock: the same balance the game's 73×73 survey sets between the open and cave convolvers, smoothed (a time constant of about 3 s) so that a tunnel mouth does not flutter",
+    "law": "equal-power",
+    "gain": { "core": "1", "open": "cos(x·π/2)", "cave": "sin(x·π/2)" },
+    "points": [
+      { "x": 0,   "core": 1, "open": 1,     "cave": 0 },
+      { "x": 0.5, "core": 1, "open": 0.707, "cave": 0.707 },
+      { "x": 1,   "core": 1, "open": 0,     "cave": 1 }
+    ],
+    "fade_ms": 1500,
+    "note": "taudplay: setVoiceGain(lane, gain, fade_ms) on every lane of the open and cave groups whenever the smoothed x has moved by more than about 0.02. The core lanes stay at 1. The two arrangements divide every chord between them (the open air its colour: the third with the ninth, sixth or seventh; the cave its frame: the root, the fifth and the ninth above), so any x is a valid mix, and x = 0.5 is the fullest form of the piece."
+  },
+  "lanes": [
+    { "index": 0,  "id": "tune", "group": "core", "label": "Tune",      "role": "lead" },
+    { "index": 1,  "id": "bass", "group": "core", "label": "Bass",      "role": "foundation" },
+    { "index": 2,  "id": "bell", "group": "core", "label": "Bell",      "role": "percussion" },
+    { "index": 3,  "id": "p1",   "group": "open", "label": "Piano 1",   "role": "foundation" },
+    { "index": 4,  "id": "p2",   "group": "open", "label": "Piano 2",   "role": "foundation" },
+    { "index": 5,  "id": "vla",  "group": "open", "label": "Viola",     "role": "lead" },
+    { "index": 6,  "id": "ch1",  "group": "open", "label": "Choir 1",   "role": "bed" },
+    { "index": 7,  "id": "ch2",  "group": "open", "label": "Choir 2",   "role": "bed" },
+    { "index": 8,  "id": "kit",  "group": "open", "label": "Bells",     "role": "sparkle" },
+    { "index": 9,  "id": "k1",   "group": "cave", "label": "Kalimba 1", "role": "foundation" },
+    { "index": 10, "id": "k2",   "group": "cave", "label": "Kalimba 2", "role": "foundation" },
+    { "index": 11, "id": "k3",   "group": "cave", "label": "Kalimba 3", "role": "sparkle" },
+    { "index": 12, "id": "bot",  "group": "cave", "label": "Bottle",    "role": "lead" },
+    { "index": 13, "id": "pad",  "group": "cave", "label": "Voice",     "role": "bed" },
+    { "index": 14, "id": "timp", "group": "cave", "label": "Timpani",   "role": "percussion" }
+  ]
+}

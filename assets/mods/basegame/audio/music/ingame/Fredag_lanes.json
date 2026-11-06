@@ -1,0 +1,32 @@
+{
+  "format": "terrarum-bgm-lanes 1",
+  "title": "Fredag",
+  "file": "Fredag.taud",
+  "kind": "biome",
+  "biome": "open",
+  "about": "A piece for the mountains, above ground. It is written for its biome as it stands, so every fader is 0 dB in the open air. The game keeps playing it when the player goes underground, and it is meant to stand that; the 'cave' hint only thins the sustained strings and glass, the lanes the cave reverb smears first. The roles say what each lane does.",
+  "roles": {
+    "lead":       "the tune: the soft synth, the cor anglais when it sings the tune again (bars 26–29), and the floating island's tune on glass (bars 24–25): keep it",
+    "foundation": "the piano: the tables' five strokes a bar, the climbs and slips on the cliffs, the sinking bass under the overhang, the valley's low A: the pulse and the floor: keep it",
+    "bed":        "the strings (a soft bed on the tables, the heavy held chord of the overhang) and the island's glass chord: sustained, the first to smear under the cave reverb (the strings have nothing under 200 Hz)"
+  },
+  "lanes": [
+    { "index": 0,  "id": "tune", "label": "Tune",        "role": "lead" },
+    { "index": 1,  "id": "p1",   "label": "Piano 1",     "role": "foundation" },
+    { "index": 2,  "id": "p2",   "label": "Piano 2",     "role": "foundation" },
+    { "index": 3,  "id": "p3",   "label": "Piano 3",     "role": "foundation" },
+    { "index": 4,  "id": "p4",   "label": "Piano 4",     "role": "foundation" },
+    { "index": 5,  "id": "bass", "label": "Piano low",   "role": "foundation" },
+    { "index": 6,  "id": "str1", "label": "Strings 1",   "role": "bed" },
+    { "index": 7,  "id": "str2", "label": "Strings 2",   "role": "bed" },
+    { "index": 8,  "id": "str3", "label": "Strings 3",   "role": "bed", "note": "only under the overhang (bars 18–21)" },
+    { "index": 9,  "id": "cor",  "label": "Cor anglais", "role": "lead", "note": "only in bars 26–29" },
+    { "index": 10, "id": "isle", "label": "Island",      "role": "lead", "note": "only in bars 24–25: the tune a comma (23 cents) above the ground; nothing else plays under it" },
+    { "index": 11, "id": "gl1",  "label": "Glass 1",     "role": "bed", "note": "the island (bars 24–25) and the far island (bars 32–34)" },
+    { "index": 12, "id": "gl2",  "label": "Glass 2",     "role": "bed", "note": "the island (bars 24–25)" },
+    { "index": 13, "id": "gl3",  "label": "Glass 3",     "role": "bed", "note": "the island (bars 24–25) and the far island (bars 32–34)" }
+  ],
+  "hints_db": {
+    "cave": { "bed": -3 }
+  }
+}

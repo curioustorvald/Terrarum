@@ -1,0 +1,44 @@
+{
+  "format": "terrarum-bgm-lanes 1",
+  "title": "Middag",
+  "file": "Middag.taud",
+  "kind": "dual",
+  "about": "One song in two arrangements, above ground (group 'open') and underground (group 'cave'). The game crossfades the two groups by the player's surroundings; the faders are the mix, not a suggestion. Every lane of a group takes that group's gain. Written levels are each arrangement ALONE at full fader; both at full (a plain player) is about 3 dB louder than intended.",
+  "roles": {
+    "lead":       "a tune: the flute's calls, the tines' B tune and answers",
+    "foundation": "bass and the guitar's picking, the pulse",
+    "bed":        "sustained strings or glass: the first to smear under a cave reverb",
+    "sparkle":    "high, struck colour (kalimba): shares the top with the birdsong outdoors"
+  },
+  "groups": {
+    "open": { "label": "Above ground", "lanes": [0, 1, 2, 3, 4, 5, 6] },
+    "cave": { "label": "Underground",  "lanes": [7, 8, 9, 10, 11, 12] }
+  },
+  "crossfade": {
+    "control": "x, 0 = in the open … 1 = enclosed in rock: the same balance the game's 73×73 survey sets between the open and cave convolvers, smoothed (a time constant of about 3 s) so that a tunnel mouth does not flutter",
+    "law": "equal-power",
+    "gain": { "open": "cos(x·π/2)", "cave": "sin(x·π/2)" },
+    "points": [
+      { "x": 0,   "open": 1,     "cave": 0 },
+      { "x": 0.5, "open": 0.707, "cave": 0.707 },
+      { "x": 1,   "open": 0,     "cave": 1 }
+    ],
+    "fade_ms": 1500,
+    "note": "taudplay: setVoiceGain(lane, gain, fade_ms) on every lane of both groups whenever the smoothed x has moved by more than about 0.02. The two arrangements never clash, so any x is a valid mix, and x = 0.5 is the fullest form of the piece."
+  },
+  "lanes": [
+    { "index": 0,  "id": "gt",  "group": "open", "label": "Guitar thumb", "role": "foundation" },
+    { "index": 1,  "id": "g1",  "group": "open", "label": "Guitar 1",     "role": "foundation" },
+    { "index": 2,  "id": "g2",  "group": "open", "label": "Guitar 2",     "role": "foundation" },
+    { "index": 3,  "id": "g3",  "group": "open", "label": "Guitar 3",     "role": "foundation" },
+    { "index": 4,  "id": "fl",  "group": "open", "label": "Flute",        "role": "lead" },
+    { "index": 5,  "id": "st1", "group": "open", "label": "Strings 1",    "role": "bed" },
+    { "index": 6,  "id": "st2", "group": "open", "label": "Strings 2",    "role": "bed" },
+    { "index": 7,  "id": "bs",  "group": "cave", "label": "Fretless",     "role": "foundation" },
+    { "index": 8,  "id": "rh1", "group": "cave", "label": "Tines 1",      "role": "bed" },
+    { "index": 9,  "id": "rh2", "group": "cave", "label": "Tines 2",      "role": "bed" },
+    { "index": 10, "id": "rhm", "group": "cave", "label": "Tine tune",    "role": "lead" },
+    { "index": 11, "id": "kal", "group": "cave", "label": "Kalimba",      "role": "sparkle" },
+    { "index": 12, "id": "air", "group": "cave", "label": "Glass",        "role": "bed" }
+  ]
+}

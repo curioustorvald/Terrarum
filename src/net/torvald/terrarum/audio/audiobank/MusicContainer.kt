@@ -421,8 +421,9 @@ class MusicContainer(
 
     override fun toString() = if (name.isEmpty()) (file?.nameWithoutExtension ?: fileHandle?.nameWithoutExtension() ?: "") else name
 
-    override fun equals(other: Any?) = this.identPath == (other as MusicContainer).identPath
-    fun equalInstance(other: Any?) = this.identPath == (other as MusicContainer).identPath && this.hash == (other as MusicContainer).hash
+    // a playlist may hold other AudioBanks (e.g. Taud songs), and the music player compares them with this
+    override fun equals(other: Any?) = other is MusicContainer && this.identPath == other.identPath
+    fun equalInstance(other: Any?) = other is MusicContainer && this.identPath == other.identPath && this.hash == other.hash
 
     override fun dispose() {
         gdxMusic.dispose()

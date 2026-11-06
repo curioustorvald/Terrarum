@@ -1,0 +1,27 @@
+{
+  "format": "terrarum-bgm-lanes 1",
+  "title": "Mondag",
+  "file": "Mondag.taud",
+  "kind": "biome",
+  "biome": "cave",
+  "about": "A piece for the caves. It is written for its biome as it stands, so every fader is 0 dB underground. The game keeps playing it when the player comes up into the open air, and it is meant to stand that; the 'open' hint only takes the celesta's drips out of the birdsong's way. The roles say what each lane does.",
+  "roles": {
+    "lead":       "the tune: the vibraphone, and the voice when it sings the tune (bars 25–28): keep it",
+    "foundation": "the harp's seven-quaver figure and the bowed bass, the pulse and the floor: keep it",
+    "bed":        "the voice holding the chords: already thin (nothing under 250 Hz)",
+    "sparkle":    "the celesta's drips: high, struck, sparse; they share the top with the birdsong outdoors"
+  },
+  "lanes": [
+    { "index": 0, "id": "tune", "label": "Tune",    "role": "lead" },
+    { "index": 1, "id": "h1",   "label": "Harp 1",  "role": "foundation" },
+    { "index": 2, "id": "h2",   "label": "Harp 2",  "role": "foundation" },
+    { "index": 3, "id": "h3",   "label": "Harp 3",  "role": "foundation" },
+    { "index": 4, "id": "bass", "label": "Bass",    "role": "foundation" },
+    { "index": 5, "id": "vo1",  "label": "Voice 1", "role": "bed", "note": "sings the tune in bars 25–28 (lead there)" },
+    { "index": 6, "id": "vo2",  "label": "Voice 2", "role": "bed" },
+    { "index": 7, "id": "drip", "label": "Drips",   "role": "sparkle" }
+  ],
+  "hints_db": {
+    "open": { "sparkle": -3 }
+  }
+}

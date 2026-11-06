@@ -1,0 +1,28 @@
+{
+  "format": "terrarum-bgm-lanes 1",
+  "title": "Laurdag",
+  "file": "Laurdag.taud",
+  "kind": "generic",
+  "about": "One piece for every biome, open or underground: it plays as written everywhere, so every fader is 0 dB by default. The roles say what each lane does, so a player that wants to may lean a piece towards its surroundings; the hints are suggestions, not part of the mix.",
+  "roles": {
+    "lead":       "the tune: keep it",
+    "foundation": "bass and the left-hand figure, the pulse: keep it",
+    "bed":        "sustained pad: the first to smear under a cave reverb",
+    "sparkle":    "high, struck colour (music box): shares the top with the birdsong outdoors"
+  },
+  "lanes": [
+    { "index": 0, "id": "mel",  "label": "Tune",      "role": "lead" },
+    { "index": 1, "id": "bass", "label": "Bass",      "role": "foundation" },
+    { "index": 2, "id": "f1",   "label": "Figure 1",  "role": "foundation" },
+    { "index": 3, "id": "f2",   "label": "Figure 2",  "role": "foundation" },
+    { "index": 4, "id": "f3",   "label": "Figure 3",  "role": "foundation" },
+    { "index": 5, "id": "f4",   "label": "Figure 4",  "role": "foundation" },
+    { "index": 6, "id": "pad1", "label": "Pad 1",     "role": "bed" },
+    { "index": 7, "id": "pad2", "label": "Pad 2",     "role": "bed" },
+    { "index": 8, "id": "box",  "label": "Music box", "role": "sparkle" }
+  ],
+  "hints_db": {
+    "cave": { "bed": -4 },
+    "open": { "sparkle": -2 }
+  }
+}

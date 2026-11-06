@@ -28,5 +28,7 @@
     <orderEntry type="library" name="TerranVirtualDisk" level="project" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" name="GetBatteryStatus" level="project" />
+    <orderEntry type="library" name="taudplay" level="project" />
+    <orderEntry type="library" name="taudplay-libgdx" level="project" />
   </component>
 </module>

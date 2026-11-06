@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(./gradlew compileKotlin 2>&1 | tail -60)",
+      "Bash(find out:*)"
+    ]
+  }
+}

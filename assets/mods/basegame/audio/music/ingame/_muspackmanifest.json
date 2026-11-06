@@ -1,0 +1,25 @@
+{
+  "manifest":{
+    "format_version":1,
+    "name":"Terrarum Ingame Music Pack",
+    "pack_version":"1.0.0",
+    "author":"CuriousTorvald",
+    "Copyright":"(c) 2026 CuriousTorvald.",
+    "licence":"GPL-3-or-later"
+  },
+  "global_dsp_request":{/*Applies to all songs in this muspack. volume_db: extra volume in decibels. volume_amp: extra volume in multiplier*/
+    "volume_amp":2.0
+  },
+  "themes":{/*list of files/file-meta-pairs*/
+    "generic":[["Laurdag_master.taud","Laurdag_lanes.json"]],
+    "dual":[["Middag_master.taud","Middag_lanes.json"],["Tysdag_master.taud","Tysdag_lanes.json"],["Verddag_master.taud","Verddag_lanes.json"]],
+    "cave":[["Mondag_master.taud","Mondag_lanes.json"],["Torsdag_master.taud","Torsdag_lanes.json"]],
+    "above":[["Sundag_master.taud","Sundag_lanes.json"],["Fredag_master.taud","Fredag_lanes.json"]],
+    "titlescreen":[["Byrjing_master.taud","Byrjing_lanes.json"]]
+  },
+  "probabilities":[/*biome: OR conditions. prefer: list of files/file-meta-pairs. power: boosted likelihood of each files in `prefer`, where 2.0 = 2x more likely. Size of `prefer` must be identical to size of `power`*/
+    {"biome":["deep_underground"], "prefer":[["Torsdag_master.taud","Torsdag_lanes.json"]], "power":[2.0]},
+    {"biome":["mountains"], "prefer":[["Fredag_master.taud","Fredag_lanes.json"]], "power":[2.0]},
+    {"biome":["lowlands"], "prefer":[["Sundag_master.taud","Sundag_lanes.json"]], "power":[2.0]}
+  ]
+}
