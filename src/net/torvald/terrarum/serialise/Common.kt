@@ -46,8 +46,30 @@ object Common {
     private fun Byte.tostr() = this.toInt().and(255).toString(16).padStart(2,'0')
     private val digester = DigestUtils.getSha256Digest()
 
+    /**
+     * Runs `block` with a fresh [jsoner]. If libGDX Json overflows the stack (it has no cycle detection and gives
+     * no field trace for Errors), the object graph of `root` is walked to locate the offending reference cycle,
+     * and the error is rethrown with the field path in its message.
+     */
+    fun <T> toJsonGuarded(root: Any, block: (Json) -> T): T {
+        val json = jsoner
+        try {
+            return block(json)
+        }
+        catch (e: StackOverflowError) {
+            val report = try {
+                SerialisationCycleFinder.find(root, json) ?: "No reference cycle found from ${root.javaClass.name}."
+            }
+            catch (e2: Throwable) {
+                "Cycle finder failed: $e2"
+            }
+            System.err.println("[Common.toJsonGuarded] Serialising ${root.javaClass.name} overflowed the stack.\n$report")
+            throw StackOverflowError("Serialising ${root.javaClass.name} overflowed the stack.\n$report").also { it.initCause(e) }
+        }
+    }
+
     val jsoner: Json
-        get() = Json(JsonWriter.OutputType.json).also {
+        get() =Json(JsonWriter.OutputType.json).also {
             // install custom (de)serialiser
             it.ignoreUnknownFields = true
             it.setUsePrototypes(false)

@@ -95,8 +95,8 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib-jdk7/2.0.0/kotlin-stdlib-jdk7-2.0.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/GetBatteryStatus.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/aircompressor-2.0.2.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/taudplay-4.7.4.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/taudplay-libgdx-1.0.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/taudplay-4.8.3.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

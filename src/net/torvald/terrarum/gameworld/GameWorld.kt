@@ -127,7 +127,7 @@ open class GameWorld(
      * Contains coarse graph with logical nodes (fixtures, junctions) and segments.
      * Rebuilt when wires are placed/removed; used for signal simulation and brightness lookup.
      */
-    val logicalWireGraph: LogicalWireGraph by lazy { LogicalWireGraph(this) }
+    @delegate:Transient val logicalWireGraph: LogicalWireGraph by lazy { LogicalWireGraph(this) }
 
     @Transient private val WIRE_POS_MAP = intArrayOf(1,2,4,8)
     @Transient private val WIRE_ANTIPOS_MAP = intArrayOf(4,8,1,2)

@@ -52,7 +52,8 @@ object WriteWorld {
 
     // genver must be found on fixed location of the JSON string
     operator fun invoke(oldGenVer: Long?, ingame: TerrarumIngame, time_t: Long, actorsList: List<Actor>, playersList: List<IngamePlayer>): String {
-        val s = Common.jsoner.toJson(preWrite(ingame, time_t, actorsList, playersList))
+        val world = preWrite(ingame, time_t, actorsList, playersList)
+        val s = Common.toJsonGuarded(world) { it.toJson(world) }
         return """{"genver":${oldGenVer ?: Common.GENVER},${s.substring(1)}"""
     }
 
@@ -61,7 +62,8 @@ object WriteWorld {
 
         val header = """{"genver":${oldGenVer ?: Common.GENVER}"""
         baw.write(header)
-        Common.jsoner.toJson(preWrite(ingame, time_t, actorsList, playersList), baw)
+        val world = preWrite(ingame, time_t, actorsList, playersList)
+        Common.toJsonGuarded(world) { it.toJson(world, baw) }
         baw.flush(); baw.close()
         // by this moment, contents of the baw will be:
         //  {"genver":123456{"actorValue":{},......}

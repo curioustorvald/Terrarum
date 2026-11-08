@@ -152,7 +152,7 @@ data class WireSegment(
  * Complete logical wire graph for a world.
  * Stored per wire-type for efficiency.
  */
-class LogicalWireGraph(private val world: GameWorld) {
+class LogicalWireGraph(@Transient private val world: GameWorld) {
 
     companion object {
         private const val RIGHT = 1

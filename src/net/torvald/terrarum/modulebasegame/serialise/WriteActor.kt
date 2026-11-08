@@ -31,7 +31,7 @@ object WriteActor {
 
     // genver must be found on fixed location of the JSON string
     operator fun invoke(actor: Actor): String {
-        val s = Common.jsoner.toJson(actor, actor.javaClass)
+        val s = Common.toJsonGuarded(actor) { it.toJson(actor, actor.javaClass) }
         return """{"genver":${Common.GENVER},"class":"${actor.javaClass.canonicalName}",${s.substring(1)}"""
     }
 
@@ -40,7 +40,7 @@ object WriteActor {
 
         val header = """{"genver":${Common.GENVER},"class":"${actor.javaClass.canonicalName}""""
         baw.write(header)
-        Common.jsoner.toJson(actor, actor.javaClass, baw)
+        Common.toJsonGuarded(actor) { it.toJson(actor, actor.javaClass, baw) }
         baw.flush(); baw.close()
         // by this moment, contents of the baw will be:
         //  {"class":"some.class.Name"{"actorValue":{},......}
