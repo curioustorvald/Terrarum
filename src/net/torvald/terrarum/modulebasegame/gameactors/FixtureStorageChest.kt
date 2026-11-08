@@ -8,6 +8,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureStorageChest.Companion.MASS
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureStorageChest.Companion.MAXCAP_MODE
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureStorageChest.Companion.MAXCAP_NUM
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureStorageChest.Companion.storageChestControlHint
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -49,10 +50,16 @@ class FixtureStorageChest : FixtureBase {
         (mainUI as UIStorageChest).chestNameFun = this.nameFun
     }
 
+    override fun getControlHint() = storageChestControlHint(this)
+
     companion object {
         const val MASS = 2.0
         const val MAXCAP_NUM = 40L
         val MAXCAP_MODE = CAPACITY_MODE_COUNT
+
+        /** Open the chest; offer picking it up only when it is empty (non-empty chests cannot be despawned) */
+        fun storageChestControlHint(chest: FixtureBase) =
+            ControlHint("GAME_ACTION_OPEN", if (chest.canBeDespawned) "GAME_ACTION_PICK_UP" else null)
     }
 }
 
@@ -92,6 +99,8 @@ class FixtureStorageChestEbony : FixtureBase {
         (mainUI as UIStorageChest).chestInventory = this.inventory!!
         (mainUI as UIStorageChest).chestNameFun = this.nameFun
     }
+
+    override fun getControlHint() = storageChestControlHint(this)
 }
 
 /**
@@ -130,6 +139,8 @@ class FixtureStorageChestBirch : FixtureBase {
         (mainUI as UIStorageChest).chestInventory = this.inventory!!
         (mainUI as UIStorageChest).chestNameFun = this.nameFun
     }
+
+    override fun getControlHint() = storageChestControlHint(this)
 }
 
 /**
@@ -168,4 +179,6 @@ class FixtureStorageChestRosewood : FixtureBase {
         (mainUI as UIStorageChest).chestInventory = this.inventory!!
         (mainUI as UIStorageChest).chestNameFun = this.nameFun
     }
+
+    override fun getControlHint() = storageChestControlHint(this)
 }

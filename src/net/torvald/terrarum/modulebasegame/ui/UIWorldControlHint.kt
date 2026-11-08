@@ -4,8 +4,12 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.ControlHint
 import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameitems.FixtureInteractionBlocked
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -15,6 +19,7 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINotControllable
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
+import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.unicode.getKeycapPC
 import net.torvald.unicode.getMouseButton
 import kotlin.math.roundToInt
@@ -30,8 +35,7 @@ class UIWorldControlHint : UICanvas() {
         handler.setAsAlwaysVisible()
     }
 
-    private fun getHintText(): String {
-        val control = INGAME.getCurrentControlHint()
+    private fun getHintText(control: ControlHint): String {
         return if (control.primary != null && control.secondary != null)
             "${getMouseButton(App.getConfigInt("control_mouse_primary"))} ${Lang[control.primary!!]}\u3000" +
                     "${getMouseButton(App.getConfigInt("control_mouse_secondary"))} ${Lang[control.secondary!!]}"
@@ -43,10 +47,8 @@ class UIWorldControlHint : UICanvas() {
             ""
     }
 
-    // always use getter to accomodate a language change
-    private fun getFixtureHintText(): String =
-        "${getMouseButton(App.getConfigInt("control_mouse_primary"))} ${Lang["GAME_INVENTORY_USE"]}\u3000" +
-                "${getMouseButton(App.getConfigInt("control_mouse_secondary"))} ${Lang["GAME_ACTION_PICK_UP"]}"
+    // the most generic control hints for the fixtures
+    private val genericFixtureHint = ControlHint("GAME_INVENTORY_USE", "GAME_ACTION_PICK_UP")
 
 
     private var cachedText = ""
@@ -60,19 +62,33 @@ class UIWorldControlHint : UICanvas() {
 
     private var opacityCounter = 0f
 
-    private fun hasFixtureUnderMouse(): Boolean {
-        return mouseInInteractableRange(INGAME.actorNowPlaying ?: INGAME.actorGamer) { mwx, mwy, mtx, mty ->
-            val actorsUnderMouse = (INGAME as TerrarumIngame).getActorsUnderMouse(mwx, mwy)
-            val hasPickupableActor = actorsUnderMouse.any {
-                (it is FixtureBase && it.canBeDespawned && System.nanoTime() - it.spawnRequestedTime > 50000000) // give freshly spawned fixtures 0.05 seconds of immunity
-            }
-            if (hasPickupableActor) 0L else -1L
-        } > -1L
+    /**
+     * @return the control hint of the fixture under the mouse, or null if there is none (or the mouse is out of reach)
+     */
+    private fun getFixtureControlHint(): ControlHint? {
+        val actor = INGAME.actorNowPlaying ?: INGAME.actorGamer
+        var hint: ControlHint? = null
+        mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
+            val fixturesUnderMouse = (INGAME as TerrarumIngame).getActorsUnderMouse(mwx, mwy).filterIsInstance<FixtureBase>()
+            val itemOnGrip = ItemCodex[(actor as? Pocketed)?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)]
+
+            // fixture-specific hint; follows TerrarumIngame.worldPrimaryClickStart in that the item is used instead when it's FixtureInteractionBlocked
+            if (itemOnGrip !is FixtureInteractionBlocked)
+                hint = fixturesUnderMouse.firstOrNull()?.getControlHint()
+
+            if (hint == null && fixturesUnderMouse.any {
+                it.canBeDespawned && System.nanoTime() - it.spawnRequestedTime > 50000000 // give freshly spawned fixtures 0.05 seconds of immunity
+            })
+                hint = genericFixtureHint
+
+            0L
+        }
+        return hint
     }
 
     override fun updateImpl(delta: Float) {
-        val fixtureUnderMouse = hasFixtureUnderMouse()
-        val newText = if (fixtureUnderMouse) getFixtureHintText() else getHintText()
+        // always build the text from the hint to accomodate a language change
+        val newText = getHintText(getFixtureControlHint() ?: INGAME.getCurrentControlHint())
 
         if (newText.isNotEmpty()) {
             cachedText = newText

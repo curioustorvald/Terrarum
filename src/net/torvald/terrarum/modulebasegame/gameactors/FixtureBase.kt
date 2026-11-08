@@ -90,6 +90,13 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     /**
+     * Control hint shown by the UIWorldControlHint while the mouse is hovering over this fixture within the reach.
+     *
+     * Return null to fall back to the generic hint (Use/Pick up), which is shown only if the fixture can be picked up.
+     */
+    open fun getControlHint(): ControlHint? = null
+
+    /**
      * Making the sprite: do not address the CommonResourcePool directly; just do it like this snippet:
      *
      * ```makeNewSprite(FixtureBase.getSpritesheet("basegame", "sprites/fixtures/tiki_torch.tga", 16, 32))```
